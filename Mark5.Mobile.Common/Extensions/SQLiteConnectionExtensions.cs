@@ -1,7 +1,13 @@
+﻿//
+// File: SQLiteConnectionExtensions.cs
+// Author: Bartosz Cichecki <bgc@nordic-it.com>
+//
+// Copyright (c) 2016 Nordic IT
+//
+
 using System.Collections.Generic;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
     public static class SQLiteConnectionExtensions
@@ -9,10 +15,7 @@ namespace Mark5.Mobile.Common
         public static void InsertOrReplaceAll<T>(this SQLiteConnection c, IEnumerable<T> list)
         {
             foreach (var item in list)
-            {
                 c.InsertOrReplace(item);
-            }
         }
     }
 }
-

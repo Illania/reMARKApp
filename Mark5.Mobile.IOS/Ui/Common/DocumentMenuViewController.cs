@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Foundation;
 using UIKit;
 
@@ -12,7 +13,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class DocumentMenuViewController : UIDocumentMenuViewController
     {
-
         public DocumentMenuViewController(string[] allowedUTIs, UIDocumentPickerMode mode)
             : base(allowedUTIs, mode)
         {

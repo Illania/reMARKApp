@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class SwitchDocumentActivity : BaseAppCompatActivity
     {
-
         public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
         public const string DocumentIdIntentKey = "DocumentId_690fc3d6-ae73-4f5e-844a-06bdc44b6747";

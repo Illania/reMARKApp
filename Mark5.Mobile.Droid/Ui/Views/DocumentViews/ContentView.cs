@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Support.V4.View;
@@ -14,10 +15,8 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
-
     public class ContentView : DocumentView
     {
-
         CustomWebView webView;
 
         public ContentView(Context context)
@@ -70,7 +69,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         class CustomWebView : WebView
         {
-
             public CustomWebView(Context context)
                 : base(context)
             {
@@ -95,7 +93,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         class CustomWebViewClient : WebViewClient
         {
-
             [Obsolete]
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {

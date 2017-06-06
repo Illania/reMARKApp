@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -17,10 +18,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
-    
     public class DocumentDateRangeSearchView : AbstractSearchView<SearchDocumentsCriteria>
     {
-        
         long fromTimestamp = -1;
         long toTimestamp = -1;
 
@@ -29,7 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         readonly DocumentSearchCriteriaFragment parentFragment;
 
-        public DocumentDateRangeSearchView(Context context, DocumentSearchCriteriaFragment f) : base(context)
+        public DocumentDateRangeSearchView(Context context, DocumentSearchCriteriaFragment f)
+            : base(context)
         {
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);
@@ -133,14 +133,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void UpdateText()
         {
-            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                    .ConvertUtcToUserTime()
-                                                                                    .ConvertDateTimeToTimestampMilliseconds()
-                                                                                    .FormatUserTimestampAsDateString(Context);
-            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                                                .ConvertUtcToUserTime()
-                                                                                .ConvertDateTimeToTimestampMilliseconds()
-                                                                                .FormatUserTimestampAsDateString(Context);
+            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
+            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
         }
 
         public override void Refresh()

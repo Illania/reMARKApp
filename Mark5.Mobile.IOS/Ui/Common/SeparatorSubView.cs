@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common

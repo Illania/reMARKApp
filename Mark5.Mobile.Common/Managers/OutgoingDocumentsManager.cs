@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: OutgoingDocumentsManager.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -14,13 +14,10 @@ using Mark5.Mobile.Common.PortableCollections;
 using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Storage;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     class OutgoingDocumentsManager : IOutgoingDocumentsManager
     {
-
         CancellationTokenSource cts;
         Task sendTask;
 
@@ -38,7 +35,10 @@ namespace Mark5.Mobile.Common.Managers
 
         public OutgoingDocumentsManager()
         {
-            queue = (IPortableConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(Guid) }));
+            queue = (IPortableConcurrentQueue<Guid>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[]
+            {
+                typeof(Guid)
+            }));
             semaphore = new SemaphoreSlim(1);
             UnlockAllDocuments(); //Used to unlock all the documents that were not unlocked because the app closed/crashed on compose view
         }
@@ -77,7 +77,6 @@ namespace Mark5.Mobile.Common.Managers
                     CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
                     subscribed = true;
                 }
-
                 StartSendTask();
             }
             finally
@@ -98,7 +97,6 @@ namespace Mark5.Mobile.Common.Managers
                     CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityRefreshed;
                     subscribed = false;
                 }
-
                 active = false;
             }
             finally
@@ -117,24 +115,22 @@ namespace Mark5.Mobile.Common.Managers
             {
                 return;
             }
-
             if (!CommonConfig.ReachabilityService.IsReachable)
             {
                 return;
             }
-
             cts = new CancellationTokenSource();
 
-            sendTask = Task.Run(async () => await SendAction()).ContinueWith(async (t) =>
-            {
-                sendTask = null;
-
-                if (t.IsFaulted)
+            sendTask = Task.Run(async () => await SendAction())
+                .ContinueWith(async (t) =>
                 {
-                    await Start();
-                }
+                    sendTask = null;
 
-            });
+                    if (t.IsFaulted)
+                    {
+                        await Start();
+                    }
+                });
         }
 
         async Task StopSendTask()
@@ -148,13 +144,11 @@ namespace Mark5.Mobile.Common.Managers
                     cts.Cancel();
                     cts = null;
                 }
-
                 if (sendTask != null)
                 {
                     await sendTask;
                     sendTask = null;
                 }
-
             }
             finally
             {
@@ -179,12 +173,10 @@ namespace Mark5.Mobile.Common.Managers
 
                     var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier, false, LoadMode.Complete);
 
-                    if (container == null || container.Info.State == OutgoingDocumentState.Failed
-                        || container.Info.State == OutgoingDocumentState.AutoSaved || container.Info.Locked)
+                    if (container == null || container.Info.State == OutgoingDocumentState.Failed || container.Info.State == OutgoingDocumentState.AutoSaved || container.Info.Locked)
                     {
                         continue;
                     }
-
                     var document = container.Document;
                     var documentPreview = container.DocumentPreview;
                     var info = container.Info;
@@ -201,21 +193,17 @@ namespace Mark5.Mobile.Common.Managers
                             var attachmentGuid = await Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
                             attachmentGuids.Add(attachmentGuid);
                         }
-
-                        await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PreviousDocumentId,
-                                                                                   info.PreviousDocumentdFolderId, info.SendOnTimestamp,
-                                                                                   info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
+                        await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PreviousDocumentId, info.PreviousDocumentdFolderId, info.SendOnTimestamp, info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
                         sendSuccessful = true;
                     }
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error("Could not send document", ex);
 
-                        await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier, ex);
+                        await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier);
 
                         DocumentSendingFailed(this, container);
                     }
-
                     if (sendSuccessful)
                     {
                         await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
@@ -241,7 +229,6 @@ namespace Mark5.Mobile.Common.Managers
             {
                 return;
             }
-
             if (e.IsReachable)
             {
                 StartSendTask();
@@ -265,19 +252,20 @@ namespace Mark5.Mobile.Common.Managers
         void UnlockAllDocuments()
         {
             Task.Run(async () =>
-            {
-                var ids = await FileSystemStorage.GetOutgoingDocumentIdentifiersAsync();
-                foreach (var id in ids)
                 {
-                    await FileSystemStorage.UnlockOutgoingDocumentAsync(id);
-                }
-            }).ContinueWith(t =>
-            {
-                if (t.IsFaulted)
+                    var ids = await FileSystemStorage.GetOutgoingDocumentIdentifiersAsync();
+                    foreach (var id in ids)
+                    {
+                        await FileSystemStorage.UnlockOutgoingDocumentAsync(id);
+                    }
+                })
+                .ContinueWith(t =>
                 {
-                    CommonConfig.Logger.Error("Error while unlocking documents at startup", t.Exception.InnerException);
-                }
-            });
+                    if (t.IsFaulted)
+                    {
+                        CommonConfig.Logger.Error("Error while unlocking documents at startup", t.Exception.InnerException);
+                    }
+                });
         }
 
         void AddToQueue(IEnumerable<Guid> identifiers)
@@ -294,8 +282,5 @@ namespace Mark5.Mobile.Common.Managers
         }
 
         #endregion
-
     }
-
 }
-

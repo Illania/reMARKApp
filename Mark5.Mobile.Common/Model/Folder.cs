@@ -1,24 +1,21 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: Folder.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     [Table("Folder")]
     public class Folder : ICopiable<Folder>
     {
-
         [Column("Id"), PrimaryKey]
         public int Id { get; set; } = -1;
 
@@ -49,10 +46,7 @@ namespace Mark5.Mobile.Common.Model
         [Ignore]
         public bool Local
         {
-            get
-            {
-                return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id);
-            }
+            get { return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id); }
         }
 
         List<Folder> subFolders;
@@ -66,13 +60,9 @@ namespace Mark5.Mobile.Common.Model
                 {
                     subFolders = new List<Folder>();
                 }
-
                 return subFolders;
             }
-            set
-            {
-                subFolders = value;
-            }
+            set { subFolders = value; }
         }
 
         [Column("Subscribed")]
@@ -89,14 +79,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("OptionalParametersString")]
         public string OptionalParametersString
         {
-            get
-            {
-                return SerializationUtils.Serialize(OptionalParameters);
-            }
-            set
-            {
-                OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value);
-            }
+            get { return SerializationUtils.Serialize(OptionalParameters); }
+            set { OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value); }
         }
 
         #endregion
@@ -186,7 +170,10 @@ namespace Mark5.Mobile.Common.Model
             Module = ModuleType.Documents,
             Type = FolderType.None,
             HasSubFolders = true,
-            SubFolders = { DocumentsOutgoingFolder }
+            SubFolders =
+            {
+                DocumentsOutgoingFolder
+            }
         };
 
         readonly static Folder contactsRootFolder = new Folder
@@ -302,4 +289,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

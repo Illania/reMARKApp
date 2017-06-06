@@ -1,109 +1,37 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: Managers.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     public static class Managers
     {
-
-        public static IFoldersManager FoldersManager
-        {
-            get;
-            private set;
-        }
-
-        public static IDocumentsManager DocumentsManager
-        {
-            get;
-            private set;
-        }
-
-        public static IContactsManager ContactsManager
-        {
-            get;
-            private set;
-        }
-
-        public static IShortcodesManager ShortcodesManager
-        {
-            get;
-            private set;
-        }
-
-        public static ICalendarManager CalendarManager
-        {
-            get;
-            private set;
-        }
-
-        public static ISearchManager SearchManager
-        {
-            get;
-            private set;
-        }
-
-        public static INotificationsManager NotificationsManager
-        {
-            get;
-            private set;
-        }
-
-        public static ISystemManager SystemManager
-        {
-            get;
-            private set;
-        }
-
-        public static ICommonActionsManager CommonActionsManager
-        {
-            get;
-            private set;
-        }
-
-        public static IOutgoingDocumentsManager OutgoingDocumentsManager
-        {
-            get;
-            private set;
-        }
-
-        public static IDownloadManager DownloadManager
-        {
-            get;
-            private set;
-        }
-
-        public static ICleanUpManager CleanUpManager
-        {
-            get;
-            private set;
-        }
-
-        public static ConnectionInfo ActiveConnectionInfo
-        {
-            get;
-            private set;
-        }
+        public static IFoldersManager FoldersManager { get; private set; }
+        public static IDocumentsManager DocumentsManager { get; private set; }
+        public static IContactsManager ContactsManager { get; private set; }
+        public static IShortcodesManager ShortcodesManager { get; private set; }
+        public static ICalendarManager CalendarManager { get; private set; }
+        public static ISearchManager SearchManager { get; private set; }
+        public static INotificationsManager NotificationsManager { get; private set; }
+        public static ISystemManager SystemManager { get; private set; }
+        public static ICommonActionsManager CommonActionsManager { get; private set; }
+        public static IOutgoingDocumentsManager OutgoingDocumentsManager { get; private set; }
+        public static IDownloadManager DownloadManager { get; private set; }
+        public static ICleanUpManager CleanUpManager { get; private set; }
+        public static ConnectionInfo ActiveConnectionInfo { get; private set; }
 
         public static void Initialize(ConnectionInfo connectionInfo)
         {
-            if (connectionInfo == null)
-            {
-                throw new ArgumentNullException(nameof(connectionInfo));
-            }
-
-            ActiveConnectionInfo = connectionInfo;
+            ActiveConnectionInfo = connectionInfo ?? throw new ArgumentNullException(nameof(connectionInfo));
 
             var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port, CommonConfig.HttpClientHandler);
             var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port, CommonConfig.HttpClientHandler);
@@ -130,4 +58,3 @@ namespace Mark5.Mobile.Common.Managers
         }
     }
 }
-

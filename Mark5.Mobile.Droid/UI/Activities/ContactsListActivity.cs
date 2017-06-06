@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -19,11 +20,9 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ContactsListActivity : BaseAppCompatActivity
     {
-
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
         Toolbar toolbar;
@@ -65,7 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                clf = (ContactsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                clf = (ContactsListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ContactsListActivity)}");
             }
 
@@ -93,4 +92,3 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
     }
 }
-

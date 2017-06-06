@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -18,10 +19,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views
 {
-
     public class ObjectLinksView : CardView
     {
-
         int distanceVeryLarge;
         int distanceLarge;
         int distanceNormal;
@@ -80,7 +79,6 @@ namespace Mark5.Mobile.Droid.Ui.Views
 
         class ObjectLinkView : LinearLayoutCompat
         {
-
             public ObjectLinkView(Context context, ObjectLink ol, int distanceVeryLarge, int distanceNormal)
                 : base(context)
             {
@@ -105,11 +103,14 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 AddView(subtitleView);
 
                 if (ol.IsReverse)
-                {   
+                {
                     Clickable = (ol.FromObjectType == ObjectType.Document || ol.FromObjectType == ObjectType.Contact || ol.FromObjectType == ObjectType.Shortcode);
                     if (Clickable)
                     {
-                        var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                        var typedArray = Context.ObtainStyledAttributes(new int[]
+                        {
+                            Resource.Attribute.selectableItemBackground
+                        });
                         SetBackgroundResource(typedArray.GetResourceId(0, 0));
                         typedArray.Recycle();
                     }
@@ -119,13 +120,15 @@ namespace Mark5.Mobile.Droid.Ui.Views
                     Clickable = (ol.ToObjectType == ObjectType.Document || ol.ToObjectType == ObjectType.Contact || ol.ToObjectType == ObjectType.Shortcode);
                     if (Clickable)
                     {
-                        var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                        var typedArray = Context.ObtainStyledAttributes(new int[]
+                        {
+                            Resource.Attribute.selectableItemBackground
+                        });
                         SetBackgroundResource(typedArray.GetResourceId(0, 0));
                         typedArray.Recycle();
                     }
                 }
             }
         }
-
     }
 }

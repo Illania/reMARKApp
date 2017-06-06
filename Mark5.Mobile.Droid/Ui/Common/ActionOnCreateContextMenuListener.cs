@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Views;
 

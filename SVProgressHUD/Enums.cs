@@ -1,5 +1,4 @@
 ﻿//
-// Project: SVProgressHUD
 // File: Enums.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -8,7 +7,6 @@
 
 namespace SVProgressHUD
 {
-    
     public enum Style
     {
         Light,

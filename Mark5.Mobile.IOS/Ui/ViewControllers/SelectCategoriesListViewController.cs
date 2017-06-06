@@ -5,11 +5,13 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -19,10 +21,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class SelectCategoriesListViewController : UITableViewController
     {
-
         readonly ModuleType module;
         readonly List<int> preselectedItems;
 
@@ -35,7 +35,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         TaskCompletionSource<List<Category>> tcs = new TaskCompletionSource<List<Category>>();
 
-        public Task<List<Category>> Task { get { return tcs.Task; } }
+        public Task<List<Category>> Task
+        {
+            get { return tcs.Task; }
+        }
 
 
         public SelectCategoriesListViewController(ModuleType module, List<int> preselectedItems)

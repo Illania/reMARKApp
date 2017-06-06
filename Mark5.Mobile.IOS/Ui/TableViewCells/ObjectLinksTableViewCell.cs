@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -13,10 +14,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class ObjectLinksTableViewCell : UITableViewCell
     {
-
         public static readonly UINib Nib = UINib.FromName("ObjectLinksTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ObjectLinksTableViewCell");
 
@@ -27,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static ObjectLinksTableViewCell Create()
         {
-            var cell = (ObjectLinksTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (ObjectLinksTableViewCell) Nib.Instantiate(null, null)[0];
 
             cell.TitleLabel.Font = Theme.DefaultBoldFont;
 

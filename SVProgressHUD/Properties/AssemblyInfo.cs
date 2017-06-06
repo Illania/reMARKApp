@@ -1,10 +1,9 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: AssemblyInfo.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
+﻿// //
+// // File: AssemblyInfo.cs
+// // Author: Bartosz Cichecki <bgc@nordic-it.com>
+// // Copyright (c) 2017 Nordic IT
+// //
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -16,7 +15,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nordic IT")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Nordic IT")]
+[assembly: AssemblyCopyright("2017 Nordic IT")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

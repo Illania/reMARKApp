@@ -1,24 +1,20 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: DatabaseConnectionProvider.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
-using PCLStorage;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Database
 {
-
     class DatabaseConnectionProvider
     {
-
         public static DatabaseConnectionProvider DocumentsDatabase
         {
             get
@@ -27,7 +23,6 @@ namespace Mark5.Mobile.Common.Database
                 {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
                 }
-
                 return documentsDatabase.Value;
             }
         }
@@ -40,7 +35,6 @@ namespace Mark5.Mobile.Common.Database
                 {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
                 }
-
                 return contactsDatabase.Value;
             }
         }
@@ -53,7 +47,6 @@ namespace Mark5.Mobile.Common.Database
                 {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
                 }
-
                 return shortcodesDatabase.Value;
             }
         }
@@ -66,7 +59,6 @@ namespace Mark5.Mobile.Common.Database
                 {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
                 }
-
                 return calendarDatabase.Value;
             }
         }
@@ -79,15 +71,18 @@ namespace Mark5.Mobile.Common.Database
                 {
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
                 }
-
                 return systemDatabase.Value;
             }
         }
 
         static readonly Lazy<DatabaseConnectionProvider> documentsDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("documents.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
+
         static readonly Lazy<DatabaseConnectionProvider> contactsDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("contacts.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
+
         static readonly Lazy<DatabaseConnectionProvider> shortcodesDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("shortcodes.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
+
         static readonly Lazy<DatabaseConnectionProvider> calendarDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("calendar.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
+
         static readonly Lazy<DatabaseConnectionProvider> systemDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("system.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
 
         public static DatabaseConnectionProvider DatabaseForModuleType(ModuleType moduleType)
@@ -138,10 +133,7 @@ namespace Mark5.Mobile.Common.Database
                 {
                     connectionSemaphore.Wait();
 
-                    connection.RunInTransaction(() =>
-                    {
-                        action(connection);
-                    });
+                    connection.RunInTransaction(() => { action(connection); });
                 }
                 finally
                 {
@@ -168,4 +160,3 @@ namespace Mark5.Mobile.Common.Database
         }
     }
 }
-

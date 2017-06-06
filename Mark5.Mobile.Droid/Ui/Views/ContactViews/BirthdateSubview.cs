@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Views;
@@ -13,10 +14,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-
     public class BirthdateSubview : DescriptionCardSubview
     {
-
         public BirthdateSubview(Context context)
             : base(context)
         {
@@ -32,10 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             else
             {
                 Visibility = ViewStates.Visible;
-                Content = Contact?.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToUserTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatUserTimestampAsLongDateString(Context);
+                Content = Contact?.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsLongDateString(Context);
             }
         }
     }

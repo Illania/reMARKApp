@@ -1,15 +1,12 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: Enums.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     #region Managers
 
     public enum SourceType
@@ -25,7 +22,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum ModuleType
     {
-
         None = 0,
         Documents = 1,
         Contacts = 2,
@@ -35,7 +31,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum FolderType
     {
-
         None = 0,
         Inbox = 1,
         Outbox = 2,
@@ -51,7 +46,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum FolderInternalType
     {
-
         None = 0,
         Static = 1,
         Dynamic = 2,
@@ -66,7 +60,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum DocumentCreationModeFlag
     {
-
         None = 0,
         New = 1,
         Reply = 2,
@@ -79,7 +72,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum Priority
     {
-
         None = 0,
         Ignore = 1,
         Low = 2,
@@ -90,7 +82,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum DocumentDirection
     {
-
         None = 0,
         Outgoing = 1,
         Incoming = 2,
@@ -100,7 +91,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum DocumentAddressType
     {
-
         None = 0,
         To = 1,
         From = 2,
@@ -111,7 +101,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum ContentType
     {
-
         None = 0,
         PlainText = 1,
         Html = 2,
@@ -119,7 +108,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum DocumentBodyTypeRequest
     {
-
         None = 0,
         HtmlOnly = 1,
         PlainTextOnly = 2,
@@ -132,7 +120,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum CommunicationAddressType
     {
-
         None = 0,
         Email = 1,
         Fax = 2,
@@ -147,7 +134,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum ContactType
     {
-
         None = 0,
         Person = 1,
         Department = 2,
@@ -160,7 +146,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum CalendarCategoryType
     {
-
         None = 0,
         Appointment = 1,
         Task = 2,
@@ -170,7 +155,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum CalendarCategorySubType
     {
-
         None = 0,
         Event = 1,
         Custom = 2,
@@ -193,7 +177,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum AppointmentStatus
     {
-
         None = 0,
         Free = 1,
         Tentative = 2,
@@ -205,7 +188,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum CalendarOccurenceType
     {
-
         None = 0,
         Normal = 1,
         Pattern = 2,
@@ -216,7 +198,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum ParticipantPresenence
     {
-
         None = 0,
         Mandatory = 1,
         Optional = 2,
@@ -224,7 +205,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum ParticipantType
     {
-
         None = 0,
         User = 1,
         Client = 2,
@@ -234,7 +214,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum ParticipantStatus
     {
-
         None = 0,
         NeedAction = 1,
         Accepted = 2,
@@ -244,7 +223,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum TaskStatus
     {
-
         None = 0,
         NotStarted = 1,
         Active = 2,
@@ -255,7 +233,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum DelegationStatus
     {
-
         None = 0,
         NoDelegation = 1,
         Unknown = 2,
@@ -269,7 +246,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum SearchCalendarEventsType
     {
-
         None = 0,
         Appointments = 1,
         Tasks = 2,
@@ -277,7 +253,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum FiledInFolderType
     {
-
         None = 0,
         Filed = 1,
         Unfiled = 2,
@@ -285,7 +260,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum FiledInFolderFolderType
     {
-
         None = 0,
         Any = 1,
         Cabinet = 2,
@@ -325,7 +299,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum EventType
     {
-
         None = 0,
         NewObjectCreated = 1,
         NewObjectInFolder = 2,
@@ -337,7 +310,6 @@ namespace Mark5.Mobile.Common.Model
 
     public enum DeviceType
     {
-
         Unknown = 0,
         IOS = 1,
         Android = 2,
@@ -377,6 +349,4 @@ namespace Mark5.Mobile.Common.Model
     }
 
     #endregion
-
 }
-

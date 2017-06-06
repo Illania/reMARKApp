@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -12,43 +13,41 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
 {
-
     public class SubjectView : MailViewerView
-	{
+    {
+        AppCompatTextView subjectTextView;
 
-		AppCompatTextView subjectTextView;
+        public SubjectView(Context context)
+            : base(context)
+        {
+            InitializeView();
+        }
 
-		public SubjectView(Context context)
-			: base(context)
-		{
-			InitializeView();
-		}
-
-		void InitializeView()
-		{
-			SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
+        void InitializeView()
+        {
+            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
 
             subjectTextView = new AppCompatTextView(Context)
-			{
-				LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-			};
-			subjectTextView.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            subjectTextView.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
 
-			AddView(subjectTextView);
-		}
+            AddView(subjectTextView);
+        }
 
-		public override void RefreshView()
-		{
+        public override void RefreshView()
+        {
             if (MailMessage != null)
-			{
-				Visibility = ViewStates.Visible;
+            {
+                Visibility = ViewStates.Visible;
                 subjectTextView.Text = string.IsNullOrWhiteSpace(MailMessage.Subject) ? Context.GetString(Resource.String.no_subject) : MailMessage.Subject;
-			}
-			else
-			{
-				Visibility = ViewStates.Gone;
-				subjectTextView.Text = string.Empty;
-			}
-		}
-	}
+            }
+            else
+            {
+                Visibility = ViewStates.Gone;
+                subjectTextView.Text = string.Empty;
+            }
+        }
+    }
 }

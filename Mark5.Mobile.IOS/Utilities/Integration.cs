@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Linq;
 using System.Text;
@@ -20,10 +21,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public static class Integration
     {
-
         #region iPhone/iPad recognition
 
         const float IPhonePlusMaxBounds = 736f;
@@ -73,14 +72,14 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber)dict.FreeSize).LongValue;
+            return ((NSNumber) dict.FreeSize).LongValue;
         }
 
         public static long GetTotalDiskSpace()
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber)dict.Size).LongValue;
+            return ((NSNumber) dict.Size).LongValue;
         }
 
         public static void ClearData()
@@ -447,6 +446,5 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         #endregion
-
     }
 }

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Mark5.Mobile.Common.Model;
 
@@ -15,7 +16,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly CustomButton withAttachmentsButton;
         readonly CustomButton unreadEmailsButton;
 
-        public DocumentAttachmentUnreadSearchView(Android.Content.Context context) : base(context)
+        public DocumentAttachmentUnreadSearchView(Android.Content.Context context)
+            : base(context)
         {
             withAttachmentsButton = new CustomButton(context, Resource.String.search_document_with_attachments);
             unreadEmailsButton = new CustomButton(context, Resource.String.search_document_unread);

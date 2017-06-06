@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -14,10 +15,8 @@ using UserNotifications;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public static class NotificationsUtilities
     {
-
         public static Notification Convert(UNNotification notification)
         {
             try
@@ -46,10 +45,10 @@ namespace Mark5.Mobile.IOS.Utilities
                 n.Title = title;
                 n.Message = body;
                 n.Guid = new Guid(guid);
-                n.Type = (EventType)Enum.Parse(typeof(EventType), type);
+                n.Type = (EventType) Enum.Parse(typeof(EventType), type);
                 n.FolderId = folderId.Int32Value;
                 n.ObjectId = objectId.Int32Value;
-                n.ObjectType = (ObjectType)Enum.Parse(typeof(ObjectType), objectType);
+                n.ObjectType = (ObjectType) Enum.Parse(typeof(ObjectType), objectType);
 
                 n.IsRead = false;
                 n.IsSilent = false;

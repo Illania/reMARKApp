@@ -1,38 +1,25 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: AbstractLogger.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2014 Nordic IT
 //
+
 using System;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
-
     public abstract class AbstractLogger : ILogger
     {
-
         bool enabled = true;
 
         public bool Enabled
         {
-            get
-            {
-                return enabled;
-            }
-            set
-            {
-                enabled = value;
-            }
+            get { return enabled; }
+            set { enabled = value; }
         }
 
-        public LogLevel Level
-        {
-            get;
-            set;
-        }
+        public LogLevel Level { get; set; }
 
         #region Trace
 

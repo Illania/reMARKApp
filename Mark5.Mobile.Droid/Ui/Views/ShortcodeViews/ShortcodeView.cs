@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Util;
@@ -14,10 +15,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {
-
     public abstract class ShortcodeView : CardView
     {
-
         public ShortcodePreview ShortcodePreview { get; set; }
 
         public Shortcode Shortcode { get; set; }
@@ -57,4 +56,3 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
         public abstract void RefreshView();
     }
 }
-

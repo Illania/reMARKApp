@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -13,27 +14,19 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-
     public abstract class DescriptionCardSubview : ContactView
     {
-
         readonly AppCompatTextView titleTextView;
         protected readonly AppCompatTextView ContentTextView;
 
         public string Title
         {
-            set
-            {
-                titleTextView.Text = value;
-            }
+            set { titleTextView.Text = value; }
         }
 
         public string Content
         {
-            set
-            {
-                ContentTextView.Text = value;
-            }
+            set { ContentTextView.Text = value; }
         }
 
         protected DescriptionCardSubview(Context context)
@@ -62,5 +55,4 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             AddView(ContentTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
     }
-
 }

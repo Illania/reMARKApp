@@ -1,38 +1,29 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: ContactPreview.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     [Table("ContactPreview")]
     public class ContactPreview : BusinessEntityPreview
     {
-
         [Ignore]
         public override ObjectType ObjectType
         {
-            get
-            {
-                return ObjectType.Contact;
-            }
+            get { return ObjectType.Contact; }
         }
 
         [Ignore]
         public override ModuleType ModuleType
         {
-            get
-            {
-                return ModuleType.Contacts;
-            }
+            get { return ModuleType.Contacts; }
         }
 
         [Ignore]
@@ -67,13 +58,9 @@ namespace Mark5.Mobile.Common.Model
                 {
                     categories = new List<Category>();
                 }
-
                 return categories;
             }
-            set
-            {
-                categories = value;
-            }
+            set { categories = value; }
         }
 
         [Ignore]
@@ -84,27 +71,15 @@ namespace Mark5.Mobile.Common.Model
         [Column("CategoriesString")]
         public string CategoriesString
         {
-            get
-            {
-                return SerializationUtils.Serialize(Categories);
-            }
-            set
-            {
-                Categories = SerializationUtils.Deserialize<List<Category>>(value);
-            }
+            get { return SerializationUtils.Serialize(Categories); }
+            set { Categories = SerializationUtils.Deserialize<List<Category>>(value); }
         }
 
         [Column("PrimaryAddressString")]
         public string PrimaryAddressString
         {
-            get
-            {
-                return SerializationUtils.Serialize(PrimaryAddress);
-            }
-            set
-            {
-                PrimaryAddress = SerializationUtils.Deserialize<CommunicationAddress>(value);
-            }
+            get { return SerializationUtils.Serialize(PrimaryAddress); }
+            set { PrimaryAddress = SerializationUtils.Deserialize<CommunicationAddress>(value); }
         }
 
         #endregion
@@ -115,4 +90,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

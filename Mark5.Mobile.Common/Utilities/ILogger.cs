@@ -1,16 +1,14 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: ILogger.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2014 Nordic IT
 //
+
 using System;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
-
     public enum LogLevel
     {
         TRACE = 5,
@@ -23,7 +21,6 @@ namespace Mark5.Mobile.Common.Utilities
 
     public interface ILogger
     {
-
         LogLevel Level { get; set; }
 
         #region Trace
@@ -77,6 +74,5 @@ namespace Mark5.Mobile.Common.Utilities
         void Error(string message, Exception exception);
 
         #endregion
-
     }
 }

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -38,9 +39,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 var lp = fab.LayoutParameters as CoordinatorLayout.LayoutParams;
                 if (lp != null)
                 {
-                    lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
+                    lp.BottomMargin = (int) Resources.GetDimension(Resource.Dimension.fab_margin);
                     if (!CommonConfig.ReachabilityService.IsReachable)
-                        lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                        lp.BottomMargin += (int) Resources.GetDimension(Resource.Dimension.connection_bar_height);
                     fab.RequestLayout();
                 }
             }
@@ -79,9 +80,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var lp = fab?.LayoutParameters as CoordinatorLayout.LayoutParams;
             if (lp != null)
             {
-                lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
+                lp.BottomMargin = (int) Resources.GetDimension(Resource.Dimension.fab_margin);
                 if (!e.IsReachable)
-                    lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                    lp.BottomMargin += (int) Resources.GetDimension(Resource.Dimension.connection_bar_height);
                 fab.RequestLayout();
             }
         }

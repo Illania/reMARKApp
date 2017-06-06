@@ -32,7 +32,6 @@ namespace TinyMessenger
         public void Handle(ITinyMessage message, Exception exception)
         {
             //default behaviour is to do nothing
-
         }
     }
 
@@ -57,12 +56,10 @@ namespace TinyMessenger
         /// keep the message around and prevent the sender from being collected.
         /// </summary>
         readonly WeakReference _Sender;
+
         public object Sender
         {
-            get
-            {
-                return (_Sender == null) ? null : _Sender.Target;
-            }
+            get { return _Sender?.Target; }
         }
 
         /// <summary>
@@ -126,11 +123,8 @@ namespace TinyMessenger
         public CancellableGenericTinyMessage(object sender, TContent content, Action cancelAction)
             : base(sender)
         {
-            if (cancelAction == null)
-                throw new ArgumentNullException(nameof(cancelAction));
-
             Content = content;
-            Cancel = cancelAction;
+            Cancel = cancelAction ?? throw new ArgumentNullException(nameof(cancelAction));
         }
     }
 
@@ -158,13 +152,14 @@ namespace TinyMessenger
         {
             if (_Hub.IsAlive)
             {
-                var hubTarget = _Hub.Target as ITinyMessengerHub;
-
-                if (hubTarget != null)
+                if (_Hub.Target is ITinyMessengerHub hubTarget)
                 {
                     var unsubscribeMethod = typeof(ITinyMessengerHub).GetTypeInfo().GetDeclaredMethods("Unsubscribe").First(mi => mi.GetParameters().Length == 1);
                     unsubscribeMethod = unsubscribeMethod.MakeGenericMethod(_MessageType);
-                    unsubscribeMethod.Invoke(hubTarget, new object[] { this });
+                    unsubscribeMethod.Invoke(hubTarget, new object[]
+                    {
+                        this
+                    });
                 }
             }
 
@@ -225,10 +220,7 @@ namespace TinyMessenger
         /// </summary>
         public static DefaultTinyMessageProxy Instance
         {
-            get
-            {
-                return _Instance;
-            }
+            get { return _Instance; }
         }
 
         DefaultTinyMessageProxy()
@@ -240,9 +232,11 @@ namespace TinyMessenger
             subscription.Deliver(message);
         }
     }
+
     #endregion
 
     #region Exceptions
+
     /// <summary>
     /// Thrown when an exceptions occurs while subscribing to a message type
     /// </summary>
@@ -253,18 +247,18 @@ namespace TinyMessenger
         public TinyMessengerSubscriptionException(Type messageType, string reason)
             : base(string.Format(ERROR_TEXT, messageType, reason))
         {
-
         }
 
         public TinyMessengerSubscriptionException(Type messageType, string reason, Exception innerException)
             : base(string.Format(ERROR_TEXT, messageType, reason), innerException)
         {
-
         }
     }
+
     #endregion
 
     #region Hub Interface
+
     /// <summary>
     /// Messenger hub responsible for taking subscriptions/publications and delivering of messages.
     /// </summary>
@@ -399,9 +393,11 @@ namespace TinyMessenger
         /// <param name="callback">AsyncCallback called on completion</param>
         void PublishAsync<TMessage>(TMessage message, AsyncCallback callback) where TMessage : class, ITinyMessage;
     }
+
     #endregion
 
     #region Hub Implementation
+
     /// <summary>
     /// Messenger hub responsible for taking subscriptions/publications and delivering of messages.
     /// </summary>
@@ -420,11 +416,12 @@ namespace TinyMessenger
         {
             _SubscriberErrorHandler = subscriberErrorHandler;
         }
+
         #endregion
 
         #region  Types and Interfaces
-        class WeakTinyMessageSubscription<TMessage> : ITinyMessageSubscription
-           where TMessage : class, ITinyMessage
+
+        class WeakTinyMessageSubscription<TMessage> : ITinyMessageSubscription where TMessage : class, ITinyMessage
         {
             protected TinyMessageSubscriptionToken _SubscriptionToken;
             protected WeakReference _DeliveryAction;
@@ -449,7 +446,7 @@ namespace TinyMessenger
                 if (!_MessageFilter.IsAlive)
                     return false;
 
-                return ((Func<TMessage, bool>)_MessageFilter.Target).Invoke(message as TMessage);
+                return ((Func<TMessage, bool>) _MessageFilter.Target).Invoke(message as TMessage);
             }
 
             public void Deliver(ITinyMessage message)
@@ -460,7 +457,7 @@ namespace TinyMessenger
                 if (!_DeliveryAction.IsAlive)
                     return;
 
-                ((Action<TMessage>)_DeliveryAction.Target).Invoke(message as TMessage);
+                ((Action<TMessage>) _DeliveryAction.Target).Invoke(message as TMessage);
             }
 
             /// <summary>
@@ -486,8 +483,7 @@ namespace TinyMessenger
             }
         }
 
-        class StrongTinyMessageSubscription<TMessage> : ITinyMessageSubscription
-           where TMessage : class, ITinyMessage
+        class StrongTinyMessageSubscription<TMessage> : ITinyMessageSubscription where TMessage : class, ITinyMessage
         {
             protected TinyMessageSubscriptionToken _SubscriptionToken;
             protected Action<TMessage> _DeliveryAction;
@@ -525,23 +521,16 @@ namespace TinyMessenger
             /// <param name="messageFilter">Filter function</param>
             public StrongTinyMessageSubscription(TinyMessageSubscriptionToken subscriptionToken, Action<TMessage> deliveryAction, Func<TMessage, bool> messageFilter)
             {
-                if (subscriptionToken == null)
-                    throw new ArgumentNullException(nameof(subscriptionToken));
-
-                if (deliveryAction == null)
-                    throw new ArgumentNullException(nameof(deliveryAction));
-
-                if (messageFilter == null)
-                    throw new ArgumentNullException(nameof(messageFilter));
-
-                _SubscriptionToken = subscriptionToken;
-                _DeliveryAction = deliveryAction;
-                _MessageFilter = messageFilter;
+                _SubscriptionToken = subscriptionToken ?? throw new ArgumentNullException(nameof(subscriptionToken));
+                _DeliveryAction = deliveryAction ?? throw new ArgumentNullException(nameof(deliveryAction));
+                _MessageFilter = messageFilter ?? throw new ArgumentNullException(nameof(messageFilter));
             }
         }
+
         #endregion
 
         #region Subscription dictionary
+
         class SubscriptionItem
         {
             public ITinyMessageProxy Proxy { get; set; }
@@ -556,9 +545,11 @@ namespace TinyMessenger
 
         readonly object _SubscriptionsPadlock = new object();
         readonly List<SubscriptionItem> _Subscriptions = new List<SubscriptionItem>();
+
         #endregion
 
         #region Public API
+
         /// <summary>
         /// Subscribe to a message type with the given destination and delivery action.
         /// All references are held with strong references
@@ -723,11 +714,12 @@ namespace TinyMessenger
         {
             PublishAsyncInternal(message, callback);
         }
+
         #endregion
 
         #region Internal Methods
-        TinyMessageSubscriptionToken AddSubscriptionInternal<TMessage>(Action<TMessage> deliveryAction, Func<TMessage, bool> messageFilter, bool strongReference, ITinyMessageProxy proxy)
-               where TMessage : class, ITinyMessage
+
+        TinyMessageSubscriptionToken AddSubscriptionInternal<TMessage>(Action<TMessage> deliveryAction, Func<TMessage, bool> messageFilter, bool strongReference, ITinyMessageProxy proxy) where TMessage : class, ITinyMessage
         {
             if (deliveryAction == null)
                 throw new ArgumentNullException(nameof(deliveryAction));
@@ -754,25 +746,21 @@ namespace TinyMessenger
             }
         }
 
-        void RemoveSubscriptionInternal<TMessage>(TinyMessageSubscriptionToken subscriptionToken)
-               where TMessage : class, ITinyMessage
+        void RemoveSubscriptionInternal<TMessage>(TinyMessageSubscriptionToken subscriptionToken) where TMessage : class, ITinyMessage
         {
             if (subscriptionToken == null)
                 throw new ArgumentNullException(nameof(subscriptionToken));
 
             lock (_SubscriptionsPadlock)
             {
-                var currentlySubscribed = (from sub in _Subscriptions
-                                           where ReferenceEquals(sub.Subscription.SubscriptionToken, subscriptionToken)
-                                           select sub).ToList();
+                var currentlySubscribed = (from sub in _Subscriptions where ReferenceEquals(sub.Subscription.SubscriptionToken, subscriptionToken) select sub).ToList();
 
                 foreach (var sub in currentlySubscribed)
                     _Subscriptions.Remove(sub);
             }
         }
 
-        void PublishInternal<TMessage>(TMessage message)
-               where TMessage : class, ITinyMessage
+        void PublishInternal<TMessage>(TMessage message) where TMessage : class, ITinyMessage
         {
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
@@ -780,9 +768,7 @@ namespace TinyMessenger
             List<SubscriptionItem> currentlySubscribed;
             lock (_SubscriptionsPadlock)
             {
-                currentlySubscribed = (from sub in _Subscriptions
-                                       where sub.Subscription.ShouldAttemptDelivery(message)
-                                       select sub).ToList();
+                currentlySubscribed = (from sub in _Subscriptions where sub.Subscription.ShouldAttemptDelivery(message) select sub).ToList();
             }
 
             foreach (var sub in currentlySubscribed)
@@ -805,7 +791,9 @@ namespace TinyMessenger
 
             publishAction.BeginInvoke(callback, null);
         }
+
         #endregion
     }
+
     #endregion
 }

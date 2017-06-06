@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Views;
@@ -12,10 +13,8 @@ using Android.Webkit;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
-    
     class CustomWebView : WebView
     {
-        
         public CustomWebView(Context context)
             : base(context)
         {

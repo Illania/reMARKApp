@@ -18,13 +18,13 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class PickCategoriesListActivity : BaseAppCompatActivity
     {
-
         public const string ObjectTypeIntentKey = "ObjectType_eede2fd6-3ad7-4503-adec-fdeb5ac44584";
+
         public const string PreselectedCategoryIdsIntentKey = "PreselectedCategoryIdsIntentKey_41340fa3-c8e3-4090-80ee-49ba5b062d67";
+
         public const string CategoriesResultKey = "CategoriesResult_36d29e7f-7336-42d6-9162-95178f8fec87";
 
         Toolbar toolbar;
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.Droid
 
             if (savedInstanceState == null)
             {
-                var ot = (ObjectType)Intent.Extras.GetInt(ObjectTypeIntentKey);
+                var ot = (ObjectType) Intent.Extras.GetInt(ObjectTypeIntentKey);
                 var pci = Intent.Extras.GetIntArray(PreselectedCategoryIdsIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
                 var pclf = new PickCategoriesListFragment

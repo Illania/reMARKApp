@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         }
 
         public SubjectView(Context context)
-                : base(context)
+            : base(context)
         {
             SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
 

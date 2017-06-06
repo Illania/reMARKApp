@@ -5,13 +5,13 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class PopoverPresentationControllerDelegate : UIPopoverPresentationControllerDelegate
     {
-
         readonly UIBarButtonItem barButtonItem;
         readonly UIView sourceView;
         readonly UITableView tableView;

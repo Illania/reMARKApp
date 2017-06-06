@@ -5,16 +5,18 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System.IO;
 using System.Text;
 
 namespace Mark5.ServiceReference.Utilities
 {
-
     public class StringWriterWithEncoding : StringWriter
     {
-
-        public override Encoding Encoding { get { return encoding; } }
+        public override Encoding Encoding
+        {
+            get { return encoding; }
+        }
 
         readonly Encoding encoding;
 

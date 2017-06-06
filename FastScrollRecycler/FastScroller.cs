@@ -1,10 +1,10 @@
 ﻿//
-// Project: Mark5.Mobile.Droid
 // File: FastScroller.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Android.Animation;
 using Android.Content;
@@ -16,14 +16,12 @@ using Java.Interop;
 
 namespace FastScrollRecycler
 {
-
     class FastScroller : Java.Lang.Object
     {
-
         const int DefaultAutoHideDelay = 1500;
 
-        FastScrollRecyclerView recyclerView;
-        FastScrollPopup popup;
+        readonly FastScrollRecyclerView recyclerView;
+        readonly FastScrollPopup popup;
 
         int thumbHeight;
         int width;
@@ -81,7 +79,7 @@ namespace FastScrollRecycler
                 var popupTextColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextColor, colorffffffff);
                 var popupTextSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextSize, Utils.ToPixels(resources, 56f));
                 var popupBackgroundSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundSize, Utils.ToPixels(resources, 88f));
-                var popupPosition = (FastScrollerPosition)typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupPosition, (int)FastScrollerPosition.Adjacent);
+                var popupPosition = (FastScrollerPosition) typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupPosition, (int) FastScrollerPosition.Adjacent);
 
                 track.Color = trackColor;
                 thumb.Color = thumbColor;
@@ -110,10 +108,7 @@ namespace FastScrollRecycler
                 autoHideAnimator.Start();
             };
 
-            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy, objects) =>
-            {
-                Show();
-            }));
+            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy, objects) => { Show(); }));
         }
 
         public int GetThumbHeight()
@@ -133,11 +128,10 @@ namespace FastScrollRecycler
 
         public void HandleTouchEvent(MotionEvent ev, int downX, int downY, int lastY, IOnFastScrollStateChangeListener stateChangedListener)
         {
-
             var config = ViewConfiguration.Get(recyclerView.Context);
 
             var action = ev.Action;
-            var y = (int)ev.GetY();
+            var y = (int) ev.GetY();
 
             switch (action)
             {
@@ -158,7 +152,7 @@ namespace FastScrollRecycler
                     {
                         var top = 0;
                         var bottom = recyclerView.Height - thumbHeight;
-                        var boundedY = (float)Math.Max(top, Math.Min(bottom, y - touchOffset));
+                        var boundedY = (float) Math.Max(top, Math.Min(bottom, y - touchOffset));
                         var sectionName = recyclerView.ScrollToPositionAtProgress((boundedY - top) / (bottom - top));
                         popup.SetSectionName(sectionName);
                         popup.AnimateVisibility(!string.IsNullOrEmpty(sectionName));
@@ -176,7 +170,6 @@ namespace FastScrollRecycler
                     }
                     break;
             }
-
         }
 
         public void Draw(Canvas canvas)
@@ -191,8 +184,7 @@ namespace FastScrollRecycler
 
         bool IsNearPoint(int x, int y)
         {
-            tmpRect.Set(thumbPosition.X, thumbPosition.Y, thumbPosition.X + width,
-                        thumbPosition.Y + thumbHeight);
+            tmpRect.Set(thumbPosition.X, thumbPosition.Y, thumbPosition.X + width, thumbPosition.Y + thumbHeight);
             tmpRect.Inset(touchInset, touchInset);
             return tmpRect.Contains(x, y);
         }

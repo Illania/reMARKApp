@@ -1,10 +1,10 @@
 //
-// Project: Mark5.Mobile.ServiceReference
 // File: WcfAppServiceProxy.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.IO;
 using System.Net;
@@ -19,14 +19,14 @@ using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.ServiceReference.Utilities;
 
-#pragma warning disable CS1701
 namespace Mark5.ServiceReference.AppService
 {
-
     class HttpAppServiceProxy : IAppServiceProxy
     {
-
-        public Version Version { get { return new Version(3, 0, 0); } }
+        public Version Version
+        {
+            get { return new Version(3, 0, 0); }
+        }
 
         readonly Func<HttpMessageHandler> httpClientHandler;
         readonly string requestUri;
@@ -56,8 +56,7 @@ namespace Mark5.ServiceReference.AppService
             }
             catch (Exception ex) when (!(ex is HttpAppServiceException))
             {
-                var tce = ex as TaskCanceledException;
-                if (tce != null && !tce.CancellationToken.IsCancellationRequested)
+                if (ex is TaskCanceledException tce && !tce.CancellationToken.IsCancellationRequested)
                 {
                     var te = new TimeoutException("Request timed out.");
                     throw new HttpAppServiceException(statusCode, te.Message, te);
@@ -99,7 +98,10 @@ namespace Mark5.ServiceReference.AppService
 
             var content = new StringContent(sw.ToString());
             content.Headers.Add("SOAPAction", soapAction);
-            content.Headers.ContentType = new MediaTypeHeaderValue("text/xml") { CharSet = "utf-8" };
+            content.Headers.ContentType = new MediaTypeHeaderValue("text/xml")
+            {
+                CharSet = "utf-8"
+            };
             req.Content = content;
 
             return req;
@@ -137,7 +139,7 @@ namespace Mark5.ServiceReference.AppService
                 }))
                 {
                     var result = dcs.ReadObject(r);
-                    return (R)result;
+                    return (R) result;
                 }
             }
 
@@ -171,7 +173,7 @@ namespace Mark5.ServiceReference.AppService
                 }))
                 {
                     var result = dcs.ReadObject(r);
-                    faultDetail = (AppServiceFaultDetail)result;
+                    faultDetail = (AppServiceFaultDetail) result;
                 }
 
                 throw new HttpAppServiceException(res.StatusCode, faultString, faultDetail);
@@ -180,23 +182,15 @@ namespace Mark5.ServiceReference.AppService
             throw new HttpAppServiceException(res.StatusCode, "Invalid status code received.");
         }
 
-        #region Authentication
-
         public async Task<AuthenticateResult> AuthenticateAsync(AuthenticateParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<AuthenticateResult, AuthenticateParameters>("Authenticate", parameters, ct);
         }
 
-        #endregion
-
-        #region Folders
-
         public async Task<GetFoldersResult> GetFoldersAsync(GetFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<GetFoldersResult, GetFoldersParameters>("GetFolders", parameters, ct);
         }
-
-        #endregion
 
         public async Task<GetDocumentPreviewsResult> GetDocumentPreviewsAsync(GetDocumentPreviewsParameters parameters, CancellationToken ct = default(CancellationToken))
         {

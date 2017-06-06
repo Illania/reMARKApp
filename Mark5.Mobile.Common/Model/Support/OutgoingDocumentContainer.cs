@@ -1,11 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: OutgoingDocumentContainer.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
-#pragma warning disable CS1701
+
 using System;
 using System.Collections.Generic;
 
@@ -14,6 +13,7 @@ namespace Mark5.Mobile.Common.Model
     public class OutgoingDocumentContainer
     {
         Document document;
+
         public Document Document
         {
             get
@@ -24,13 +24,11 @@ namespace Mark5.Mobile.Common.Model
                 }
                 return document;
             }
-            set
-            {
-                document = value;
-            }
+            set { document = value; }
         }
 
         List<OutgoingDocumentAttachmentDescription> localAttachments = new List<OutgoingDocumentAttachmentDescription>();
+
         public List<OutgoingDocumentAttachmentDescription> LocalAttachments
         {
             get
@@ -41,10 +39,7 @@ namespace Mark5.Mobile.Common.Model
                 }
                 return localAttachments;
             }
-            set
-            {
-                localAttachments = value;
-            }
+            set { localAttachments = value; }
         }
 
         public DocumentPreview DocumentPreview { get; set; }
@@ -58,4 +53,3 @@ namespace Mark5.Mobile.Common.Model
         Complete,
     }
 }
-

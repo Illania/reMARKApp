@@ -1,5 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: IShortcodesManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -13,13 +12,10 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     public interface IShortcodesManager
     {
-
         int MaxToFetch { get; set; }
 
         Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto);
@@ -35,4 +31,3 @@ namespace Mark5.Mobile.Common.Managers
         Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto);
     }
 }
-

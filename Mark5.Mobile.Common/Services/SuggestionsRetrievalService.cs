@@ -1,19 +1,19 @@
 ﻿//
-// Project: Mark5.Mobile.Common
 // File: SuggestionService.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 
-#pragma warning disable CS1701
-namespace Mark5.Mobile.Common.Utilities
+namespace Mark5.Mobile.Common.Services
 {
     public class SuggestionsRetrievalService
     {
@@ -23,7 +23,6 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return;
             }
-
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
@@ -35,15 +34,13 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return;
             }
-
             Task.Run(async () =>
             {
                 var filtered = new List<PrintableSuggestion>();
                 try
                 {
                     var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync();
-                    filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase))
-                                                 .Select(ra => new PrintableSuggestion(ra)).ToList();
+                    filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase)).Select(ra => new PrintableSuggestion(ra)).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -51,7 +48,6 @@ namespace Mark5.Mobile.Common.Utilities
                 }
                 handler(filtered, token);
             });
-
         }
 
         public void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
@@ -60,13 +56,12 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return;
             }
-
             Task.Run(() =>
-           {
-               var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Contact>();
-               var filtered = PrintableSuggestion.GetPrintableSuggestionsFromContacts(phonebookContacts, SuggestionType.Phonebook);
-               handler(filtered, token);
-           });
+            {
+                var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Contact>();
+                var filtered = PrintableSuggestion.GetPrintableSuggestionsFromContacts(phonebookContacts, SuggestionType.Phonebook);
+                handler(filtered, token);
+            });
         }
 
         public void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
@@ -75,20 +70,19 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return;
             }
-
             Task.Run(async () =>
-           {
-               var filtered = new List<PrintableSuggestion>();
-               try
-               {
-                   filtered = await Managers.Managers.ContactsManager.GetSuggestions(phrase);
-               }
-               catch (Exception ex)
-               {
-                   CommonConfig.Logger.Error("Error while retrieving suggestions from database", ex);
-               }
-               handler(filtered, token);
-           });
+            {
+                var filtered = new List<PrintableSuggestion>();
+                try
+                {
+                    filtered = await Managers.Managers.ContactsManager.GetSuggestions(phrase);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while retrieving suggestions from database", ex);
+                }
+                handler(filtered, token);
+            });
         }
     }
 }

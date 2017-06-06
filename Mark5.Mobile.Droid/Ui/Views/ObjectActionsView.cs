@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -17,10 +18,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views
 {
-
     public class ObjectActionsView : CardView
     {
-
         int distanceVeryLarge;
         int distanceLarge;
         int distanceNormal;
@@ -74,7 +73,6 @@ namespace Mark5.Mobile.Droid.Ui.Views
 
         class ObjectActionView : LinearLayoutCompat
         {
-
             public ObjectActionView(Context context, ObjectAction objectAction, int distanceVeryLarge, int distanceNormal)
                 : base(context)
             {
@@ -103,6 +101,5 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 AddView(subtitleView);
             }
         }
-
     }
 }

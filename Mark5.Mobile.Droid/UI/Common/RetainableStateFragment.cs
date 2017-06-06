@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.OS;
 using Android.Support.V4.App;
@@ -13,10 +14,8 @@ using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public abstract class RetainableStateFragment : BaseFragment
     {
-
         const string TagKey = "tag_b474fec8";
 
         bool destroyedBySystem;
@@ -131,4 +130,3 @@ namespace Mark5.Mobile.Droid.Ui.Common
         }
     }
 }
-

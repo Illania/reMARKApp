@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.IO;
 using Foundation;
@@ -15,10 +16,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class FoldersTableViewCell : UITableViewCell
     {
-
         public const float Height = 48f;
 
         public static readonly UINib Nib = UINib.FromName("FoldersTableViewCell", NSBundle.MainBundle);
@@ -30,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static FoldersTableViewCell Create()
         {
-            var cell = (FoldersTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (FoldersTableViewCell) Nib.Instantiate(null, null)[0];
             cell.FolderCheckedIndicatorImage.Image = UIImage.FromBundle(Path.Combine("icons", "checkmark.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             cell.FolderCheckedIndicatorImage.TintColor = Theme.Brown;
             cell.OfflineIndicatorImage.Image = UIImage.FromBundle(Path.Combine("icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);

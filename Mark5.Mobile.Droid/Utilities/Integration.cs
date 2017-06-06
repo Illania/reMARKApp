@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.App;
 using Android.Content;
@@ -15,10 +16,8 @@ using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public static class Integration
     {
-        
         public static void DialNumber(Context context, string formattedNumber)
         {
             var intent = new Intent(Intent.ActionDial);
@@ -45,15 +44,16 @@ namespace Mark5.Mobile.Droid.Utilities
         public static bool IsConnectedToMeteredConnection()
         {
             var ctx = Application.Context;
-            var cm = (ConnectivityManager)ctx.GetSystemService(Context.ConnectivityService);
+            var cm = (ConnectivityManager) ctx.GetSystemService(Context.ConnectivityService);
             return ConnectivityManagerCompat.IsActiveNetworkMetered(cm);
         }
 
         public static void CopyToClipboard(Context context, string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) return;
-                
-            var cm = (ClipboardManager)context.GetSystemService(Context.ClipboardService);
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            var cm = (ClipboardManager) context.GetSystemService(Context.ClipboardService);
             cm.PrimaryClip = ClipData.NewPlainText(text, text);
 
             Toast.MakeText(context, Resource.String.copied_to_clipboard, ToastLength.Short).Show();
@@ -67,10 +67,23 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static bool IsRootedMethod2()
         {
-            var paths = new[] { "/system/app/Superuser.apk", "/sbin/su", "/system/bin/su", "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su", "/data/local/su", "/su/bin/su" };
+            var paths = new[]
+            {
+                "/system/app/Superuser.apk",
+                "/sbin/su",
+                "/system/bin/su",
+                "/system/xbin/su",
+                "/data/local/xbin/su",
+                "/data/local/bin/su",
+                "/system/sd/xbin/su",
+                "/system/bin/failsafe/su",
+                "/data/local/su",
+                "/su/bin/su"
+            };
             foreach (var path in paths)
             {
-                if (new Java.IO.File(path).Exists()) return true;
+                if (new Java.IO.File(path).Exists())
+                    return true;
             }
             return false;
         }
@@ -80,9 +93,15 @@ namespace Mark5.Mobile.Droid.Utilities
             Java.Lang.Process process = null;
             try
             {
-                process = Java.Lang.Runtime.GetRuntime().Exec(new[] { "/system/xbin/which", "su" });
+                process = Java.Lang.Runtime.GetRuntime()
+                    .Exec(new[]
+                    {
+                        "/system/xbin/which",
+                        "su"
+                    });
                 var br = new Java.IO.BufferedReader(new Java.IO.InputStreamReader(process.InputStream));
-                if (br.ReadLine() != null) return true;
+                if (br.ReadLine() != null)
+                    return true;
                 return false;
             }
             catch (Exception)
@@ -102,4 +121,3 @@ namespace Mark5.Mobile.Droid.Utilities
         }
     }
 }
-

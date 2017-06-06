@@ -5,14 +5,13 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-    
     public class SubjectView : LargeTextSubView
     {
-        
         public SubjectView()
         {
         }

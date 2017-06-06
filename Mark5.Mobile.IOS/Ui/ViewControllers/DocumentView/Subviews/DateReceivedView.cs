@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -22,19 +23,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         {
             if (Container != null)
             {
-                TextView.Text = Container.Info.DateLastSavedTimestamp
-                        .ConvertTimestampMillisecondsToDateTime()
-                        .ConvertUtcToUserTime()
-                        .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatUserTimestampAsCompactLongDateTimeString();
+                TextView.Text = Container.Info.DateLastSavedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
             }
             else if (DocumentPreview != null)
             {
-                TextView.Text = DocumentPreview.DateReceivedTimestamp
-                         .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToUserTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                        .FormatUserTimestampAsCompactLongDateTimeString();
+                TextView.Text = DocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
             }
         }
 

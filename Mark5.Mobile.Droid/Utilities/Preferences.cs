@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
@@ -13,10 +14,8 @@ using System.Collections.Generic;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public class Preferences
     {
-
         readonly ISharedPreferences sp;
 
         public Preferences()
@@ -26,76 +25,49 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public IDictionary<string, object> All
         {
-            get
-            {
-                return sp.All;
-            }
+            get { return sp.All; }
         }
 
         #region Documents
 
         public bool ShowCreatorOutgoing
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_show_creator_outgoing), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_show_creator_outgoing_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_show_creator_outgoing), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_show_creator_outgoing_default)); }
         }
 
         public bool UseServerTimeZone
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_use_server_timezone), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_use_server_timezone_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_use_server_timezone), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_use_server_timezone_default)); }
         }
 
         public int DocumentsToDownload
         {
-            get
-            {
-                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_documents_to_load), Application.Context.Resources.GetString(Resource.String.pref_documents_to_load_default)));
-            }
+            get { return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_documents_to_load), Application.Context.Resources.GetString(Resource.String.pref_documents_to_load_default))); }
         }
 
         public int MarkAsReadDelaySeconds
         {
-            get
-            {
-                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_documents_mark_as_read), Application.Context.Resources.GetString(Resource.String.pref_documents_mark_as_read_default)));
-            }
+            get { return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_documents_mark_as_read), Application.Context.Resources.GetString(Resource.String.pref_documents_mark_as_read_default))); }
         }
 
         public bool UnreadIndicatorMe
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_read_indicator_me), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_read_indicator_me_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_read_indicator_me), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_read_indicator_me_default)); }
         }
 
         public bool CompactDocumentsList
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_compact_list), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_compact_list_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_compact_list), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_compact_list_default)); }
         }
 
         public bool LargeAttachmentWarning
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_large_attachment_warn), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_large_attachment_warn_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_large_attachment_warn), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_large_attachment_warn_default)); }
         }
 
         public DocumentBodyTypeRequest DocumentBodyRequestType
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_download_as_plaintext), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_download_as_plaintext_default)) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_download_as_plaintext), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_download_as_plaintext_default)) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly; }
         }
 
         #endregion
@@ -104,83 +76,53 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool ContactCommunicationFaxNumbersEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_fax), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_fax_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_fax), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_fax_default)); }
         }
 
         public bool ContactCommunicationTelexNumbersEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_telex), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_telex_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_telex), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_telex_default)); }
         }
 
         public bool ContactCommunicationImEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_im), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_im_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_im), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_im_default)); }
         }
 
         public bool ContactCommunicationInternalEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_internal), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_internal_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_internal), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_internal_default)); }
         }
 
         public bool ContactCommunicationOtherEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_other), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_other_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_other), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_other_default)); }
         }
 
         public bool ContactAddressesEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_address), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_address_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_address), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_address_default)); }
         }
 
         public bool ContactBirthdateEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_birthdate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_birthdate_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_birthdate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_birthdate_default)); }
         }
 
         public bool ContactAccountEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_account), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_account_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_account), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_account_default)); }
         }
 
         public bool ContactVatEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_vat), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_vat_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_vat), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_vat_default)); }
         }
 
 
         public bool SynchroniseContacts
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_synchronised_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_synchronised_default)); }
         }
 
         #endregion
@@ -189,10 +131,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool SynchroniseShortcodes
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_shortcodes_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_shortcodes_synchronised_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_shortcodes_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_shortcodes_synchronised_default)); }
         }
 
         #endregion
@@ -201,98 +140,64 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool ComposePriorityEnabled
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_priority_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_priority_enabled_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_priority_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_priority_enabled_default)); }
         }
 
         public bool RemoveLine
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_default)); }
         }
 
         public TemplateUsageMode UseTemplate
         {
-            get
-            {
-                return (TemplateUsageMode)int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_mode), Application.Context.GetString(Resource.String.pref_compose_template_mode_default)));
-            }
+            get { return (TemplateUsageMode) int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_mode), Application.Context.GetString(Resource.String.pref_compose_template_mode_default))); }
         }
 
         public string LocalTemplate
         {
-            get
-            {
-                return sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_local), Application.Context.GetString(Resource.String.pref_compose_template_local_default));
-            }
+            get { return sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_local), Application.Context.GetString(Resource.String.pref_compose_template_local_default)); }
         }
 
         #endregion
 
         #region Search
 
-
         public int MaxDocumentsToSearch
         {
-            get
-            {
-                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_documents_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_documents_to_get_default)));
-            }
+            get { return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_documents_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_documents_to_get_default))); }
         }
 
         public int MaxContactsToSearch
         {
-            get
-            {
-                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_contacts_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_contacts_to_get_default)));
-            }
+            get { return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_contacts_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_contacts_to_get_default))); }
         }
 
 
         public int MaxShortcodesToSearch
         {
-            get
-            {
-                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_shortcodes_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_shortcodes_to_get_default)));
-            }
+            get { return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_shortcodes_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_shortcodes_to_get_default))); }
         }
 
         public bool PartialWordSearch
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_search_partial_word), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_search_partial_word_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_search_partial_word), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_search_partial_word_default)); }
         }
 
         #endregion
 
         public bool HideReadNotifications
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_hide_read), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_hide_read_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_hide_read), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_hide_read_default)); }
         }
 
         public bool SilenceNotifications
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_silence), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_silence_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_silence), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_silence_default)); }
         }
 
         public string NotificationsRingtone
         {
-            get
-            {
-                return sp.GetString(Application.Context.GetString(Resource.String.pref_key_notification_ringtone), Application.Context.Resources.GetString(Resource.String.pref_notification_ringtone_default));
-            }
+            get { return sp.GetString(Application.Context.GetString(Resource.String.pref_key_notification_ringtone), Application.Context.Resources.GetString(Resource.String.pref_notification_ringtone_default)); }
             set
             {
                 var e = sp.Edit();
@@ -303,26 +208,17 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool NotificationsVibrate
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_vibrate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_vibrate_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_notification_vibrate), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_notification_vibrate_default)); }
         }
 
         public int CleanCacheIntervalDays
         {
-            get
-            {
-                return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_cache_auto_clean), Application.Context.Resources.GetString(Resource.String.pref_cache_auto_clean_default)));
-            }
+            get { return int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_cache_auto_clean), Application.Context.Resources.GetString(Resource.String.pref_cache_auto_clean_default))); }
         }
 
         public bool ClearCache
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_cache_clear_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_cache_clear), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_cache_clear_default)); }
             set
             {
                 var e = sp.Edit();
@@ -333,18 +229,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool EnableReporting
         {
-            get
-            {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default));
-            }
+            get { return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_advanced_enable_reporting), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_advanced_enable_reporting_default)); }
         }
 
         public string PushNotificationToken
         {
-            get
-            {
-                return sp.GetString(Application.Context.GetString(Resource.String.push_notification_token), string.Empty);
-            }
+            get { return sp.GetString(Application.Context.GetString(Resource.String.push_notification_token), string.Empty); }
             set
             {
                 var e = sp.Edit();
@@ -362,4 +252,3 @@ namespace Mark5.Mobile.Droid.Utilities
         }
     }
 }
-

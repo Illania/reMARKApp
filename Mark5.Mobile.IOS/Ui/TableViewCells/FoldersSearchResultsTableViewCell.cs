@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.IO;
 using Foundation;
@@ -14,10 +15,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
     public partial class FoldersSearchResultsTableViewCell : UITableViewCell
     {
-
         public const float Height = 65f;
 
         public static readonly NSString Key = new NSString("FoldersSearchResultsTableViewCell");
@@ -25,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static FoldersSearchResultsTableViewCell Create()
         {
-            return (FoldersSearchResultsTableViewCell)Nib.Instantiate(null, null)[0];
+            return (FoldersSearchResultsTableViewCell) Nib.Instantiate(null, null)[0];
         }
 
         protected FoldersSearchResultsTableViewCell(IntPtr handle)

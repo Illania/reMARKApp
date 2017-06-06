@@ -1,23 +1,20 @@
 //
-// Project: Mark5.Mobile.ServiceReference
 // File: IAppServiceClient.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.ServiceModel;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 
-#pragma warning disable CS1701
 namespace Mark5.ServiceReference.AppService
 {
-
     [ServiceContract(Name = "AppService.v3", Namespace = "com.nordic-it.appservice.v3", ConfigurationName = "Mark5.Mobile.Common.ServiceContract.IAppServicev3")]
     interface IAppServiceClient
     {
-
         #region Authentication
 
         [OperationContract(Action = "Authenticate", AsyncPattern = true)]
@@ -355,7 +352,5 @@ namespace Mark5.ServiceReference.AppService
         TestResult EndTest(IAsyncResult asyncResult);
 
         #endregion
-
     }
 }
-

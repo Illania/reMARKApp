@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -14,10 +15,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
-
     public class Divider : LinearLayoutCompat
     {
-
         public Divider(Context context)
             : base(context)
         {
@@ -43,6 +42,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
             inner.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
             AddView(inner);
         }
-
     }
 }

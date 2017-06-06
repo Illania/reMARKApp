@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -15,10 +16,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    
     public class DeviceInfoProvider : IDeviceInfoProvider
     {
-        
         public DeviceType GetDeviceType()
         {
             return DeviceType.IOS;

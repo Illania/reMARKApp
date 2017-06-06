@@ -1,5 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: StringExtensions.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -8,13 +7,10 @@
 
 using System;
 
-#pragma warning disable CS1701
-namespace Mark5.Mobile.Common.Utilities
+namespace Mark5.Mobile.Common.Extensions
 {
-
     public static class StringExtensions
     {
-
         public static string SafeSubstring(this string str, int startIndex)
         {
             if (str.Length <= startIndex)
@@ -49,12 +45,6 @@ namespace Mark5.Mobile.Common.Utilities
             return index >= 0 ? str.SafeSubstring(index + v.Length) : str;
         }
 
-        public static string SafeSubstringAfterLast(this string str, char v, StringComparison comparisonType = StringComparison.CurrentCulture)
-        {
-            var index = str.LastIndexOf(v);
-            return index >= 0 ? str.SafeSubstring(index + 1) : str;
-        }
-
         public static string SafeSubstringAfterLast(this string str, string v, StringComparison comparisonType = StringComparison.CurrentCulture)
         {
             var index = str.LastIndexOf(v, comparisonType);
@@ -64,6 +54,12 @@ namespace Mark5.Mobile.Common.Utilities
         public static bool ContainsCaseInsensitive(this string str, string v)
         {
             return str.IndexOf(v, StringComparison.CurrentCultureIgnoreCase) >= 0;
+        }
+
+        public static string SafeSubstringAfterLast(this string str, char v)
+        {
+            var index = str.LastIndexOf(v);
+            return index >= 0 ? str.SafeSubstring(index + 1) : str;
         }
     }
 }

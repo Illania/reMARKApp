@@ -1,20 +1,17 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: TaskExtensions.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Threading.Tasks;
 
-#pragma warning disable CS1701
-namespace Mark5.Mobile.Common.Utilities
+namespace Mark5.Mobile.Common.Extensions
 {
-
     public static class TaskExtensions
     {
-
         public static async void FireAndForget(this Task task)
         {
             try
@@ -36,4 +33,3 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 }
-

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,23 +18,21 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Action CloseRequest { get; set; }
 
         CopyToUserWorktrayAdapter CurrentAdapter
         {
-            get { return (CopyToUserWorktrayAdapter)recyclerView.GetAdapter(); }
+            get { return (CopyToUserWorktrayAdapter) recyclerView.GetAdapter(); }
         }
 
         SwipeRefreshLayout refreshLayout;
@@ -83,7 +82,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, selectedSystemUsers.Values.ToList());
 
-                    if (CloseRequest != null) CloseRequest();
+                    if (CloseRequest != null)
+                        CloseRequest();
                 }
                 catch (Exception ex)
                 {
@@ -104,8 +104,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={BusinessEntities?.Count}]");
         }
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var searchItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            searchView = (SearchView) MenuItemCompat.GetActionView(searchItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -232,19 +232,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateControls()
         {
-            if (!IsAdded || IsDetached || IsRemoving) return;
+            if (!IsAdded || IsDetached || IsRemoving)
+                return;
 
             if (selectedSystemUsers.Count < 1)
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = false;
             }
             else
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = true;
             }
@@ -325,7 +326,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CopyToUserWorktrayFragmentState : IRetainableState
         {
-
             public List<IBusinessEntity> BusinessEntities { get; set; }
 
             public List<SystemUser> SystemUsers { get; set; }
@@ -339,12 +339,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CopyToUserWorktrayAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-
             readonly List<SystemUser> systemUsersInView = new List<SystemUser>(100);
             readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
 
-            public override int ItemCount { get { return systemUsersInView.Count; } }
-            public List<SystemUser> Items { get { return systemUsersInView; } }
+            public override int ItemCount
+            {
+                get { return systemUsersInView.Count; }
+            }
+
+            public List<SystemUser> Items
+            {
+                get { return systemUsersInView; }
+            }
 
             public CopyToUserWorktrayAdapter(Dictionary<int, SystemUser> selectedSystemUsersInView)
             {
@@ -356,7 +362,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var suvh = holder as UserViewHolder;
-                if (suvh == null) return;
+                if (suvh == null)
+                    return;
 
                 var su = systemUsersInView[position];
 
@@ -416,29 +423,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class UserViewHolder : RecyclerView.ViewHolder
         {
-
             public string FullName
             {
-                set
-                {
-                    fullnameTextView.Text = value;
-                }
+                set { fullnameTextView.Text = value; }
             }
 
             public string Username
             {
-                set
-                {
-                    username.Text = value;
-                }
+                set { username.Text = value; }
             }
 
             public bool Selected
             {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
+                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
             }
 
             readonly AppCompatTextView fullnameTextView;
@@ -446,7 +443,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly View selectedOverlay;
 
             public UserViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 fullnameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_full_name);
                 username = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_system_user_name);
@@ -457,4 +454,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

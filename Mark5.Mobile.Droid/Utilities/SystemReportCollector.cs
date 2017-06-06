@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Linq;
 using System.Text;
@@ -19,15 +20,16 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    
     public static class SystemReportCollector
     {
-
         public static Intent CreateShareReportIntent(Context context, string report)
         {
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
-            sendIntent.PutExtra(Intent.ExtraEmail, new[] { "support@nordic-it.com" });
+            sendIntent.PutExtra(Intent.ExtraEmail, new[]
+            {
+                "support@nordic-it.com"
+            });
             sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android System report");
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
@@ -160,7 +162,15 @@ namespace Mark5.Mobile.Droid.Utilities
 
             try
             {
-                var r = Java.Lang.Runtime.GetRuntime().Exec(new[] { "logcat", "-d", "Mono:I", "MARK5:V", "*:S" });
+                var r = Java.Lang.Runtime.GetRuntime()
+                    .Exec(new[]
+                    {
+                        "logcat",
+                        "-d",
+                        "Mono:I",
+                        "MARK5:V",
+                        "*:S"
+                    });
                 string line = null;
                 using (var isr = new Java.IO.InputStreamReader(r.InputStream))
                 using (var br = new Java.IO.BufferedReader(isr))

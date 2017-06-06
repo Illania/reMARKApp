@@ -1,21 +1,18 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: IAuthenticationManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Authenticator
 {
-
     public interface IAuthenticator
     {
-
         Task<bool> IsAuthenticatedAsync(CancellationToken ct = default(CancellationToken));
 
         Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
@@ -25,4 +22,3 @@ namespace Mark5.Mobile.Common.Authenticator
         Task SaveConnectionInfoAsync(ConnectionInfo connectionInfo, CancellationToken ct = default(CancellationToken));
     }
 }
-

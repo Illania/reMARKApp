@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using Android.Graphics;
@@ -50,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_priorities);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_priorities);
 
             CommonConfig.Logger.Info($"Created {nameof(PickPrioritiesListFragment)}");
         }
@@ -68,7 +69,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void RefreshData()
         {
-            var priorities = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
+            var priorities = new List<Priority>
+            {
+                Priority.Urgent,
+                Priority.Normal,
+                Priority.Low
+            };
             adapter.SetSelectedPriorities(SelectedPriorities);
             adapter.SetItems(priorities);
         }
@@ -93,8 +99,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (CloseRequest != null) CloseRequest(adapter.SelectedPriorities);
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(adapter.SelectedPriorities);
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Retained State
@@ -133,10 +140,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly List<Priority> prioritiesInView = new List<Priority>(3);
             readonly List<Priority> selectedPriorities = new List<Priority>(3);
 
-            public List<Priority> SelectedPriorities { get { return selectedPriorities; } }
+            public List<Priority> SelectedPriorities
+            {
+                get { return selectedPriorities; }
+            }
 
-            public override int ItemCount { get { return prioritiesInView.Count; } }
-            public List<Priority> Items { get { return prioritiesInView; } }
+            public override int ItemCount
+            {
+                get { return prioritiesInView.Count; }
+            }
+
+            public List<Priority> Items
+            {
+                get { return prioritiesInView; }
+            }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -203,22 +220,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get
-                {
-                    return selected;
-                }
+                get { return selected; }
             }
 
             readonly AppCompatTextView nameTextView;
 
             readonly View selectedOverlay;
 
-            public PriorityViewHolder(View itemView) : base(itemView)
+            public PriorityViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.search_list_item_priority_name);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
-
     }
 }

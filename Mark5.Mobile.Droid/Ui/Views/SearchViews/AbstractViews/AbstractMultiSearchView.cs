@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
@@ -23,10 +24,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly protected AppCompatTextView TopTextView;
         readonly protected AppCompatEditText BottomEditText;
 
-        protected AbstractMultiSearchView(Android.Content.Context context,
-                                         int topTextResId,
-                                         int bottomEditResId,
-                                         int textArrayResId) : base(context)
+        protected AbstractMultiSearchView(Android.Content.Context context, int topTextResId, int bottomEditResId, int textArrayResId)
+            : base(context)
         {
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);
@@ -36,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(searchIconSize, searchIconSize)
                 {
-                    Gravity = (int)GravityFlags.Bottom,
+                    Gravity = (int) GravityFlags.Bottom,
                     RightMargin = DistanceLarge,
                 }
             };
@@ -58,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 Orientation = Horizontal,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int)GravityFlags.Start,
+                    Gravity = (int) GravityFlags.Start,
                 }
             };
             topRightLayout.DescendantFocusability = DescendantFocusability.BeforeDescendants;
@@ -70,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
                 {
-                    Gravity = (int)GravityFlags.Start,
+                    Gravity = (int) GravityFlags.Start,
                 }
             };
             TopTextView.Text = context.GetString(topTextResId);
@@ -82,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int)GravityFlags.End,
+                    Gravity = (int) GravityFlags.End,
                     Weight = 1.0f,
                     LeftMargin = ConversionUtils.ConvertDpToPixels(2),
                 }
@@ -90,9 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var drawable = Spinner.Background.GetConstantState().NewDrawable();
             drawable.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)), PorterDuff.Mode.SrcAtop);
             Spinner.Background = drawable;
-            Spinner.Adapter = CustomArrayAdapter.Create(context, textArrayResId,
-                                                        Resource.Layout.search_spinner_item_multi,
-                                                        Resource.Layout.support_simple_spinner_dropdown_item);
+            Spinner.Adapter = CustomArrayAdapter.Create(context, textArrayResId, Resource.Layout.search_spinner_item_multi, Resource.Layout.support_simple_spinner_dropdown_item);
 
             topRightLayout.AddView(Spinner);
 
@@ -100,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             BottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
             BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             {
-                Gravity = (int)GravityFlags.End,
+                Gravity = (int) GravityFlags.End,
             };
             BottomEditText.SetPadding(0, 0, 0, 0);
             BottomEditText.SetBackgroundColor(Color.Transparent);
@@ -122,7 +119,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             public event EventHandler BackPressed = delegate { };
 
 
-            public CustomEditText(Context context) : base(context)
+            public CustomEditText(Context context)
+                : base(context)
             {
             }
 

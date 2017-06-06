@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: AuthenticationManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -13,13 +13,10 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Authenticator
 {
-
     class Authenticator : IAuthenticator
     {
-
         public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default(CancellationToken))
         {
             return (await GetConnectionInfoAsync(ct)) != null;
@@ -67,4 +64,3 @@ namespace Mark5.Mobile.Common.Authenticator
         }
     }
 }
-

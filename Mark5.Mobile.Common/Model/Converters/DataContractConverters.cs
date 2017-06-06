@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: DataContractConverters.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Linq;
 using Mark5.Mobile.Common.Extensions;
@@ -12,18 +12,15 @@ using DataContract = Mark5.ServiceReference.DataContract;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model.Converters
 {
-
     public static class DataContractConverters
     {
-
         #region Enums
 
         public static T ConvertEnum<T>(this Enum obj) where T : struct
         {
-            return (T)Enum.Parse(typeof(T), obj.ToString());
+            return (T) Enum.Parse(typeof(T), obj.ToString());
         }
 
         #endregion
@@ -487,7 +484,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                     CanContainTasks = ceop.CanContainTasks
                 };
             }
-
             return null;
         }
 
@@ -694,7 +690,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), kv => kv.Value),
                 IsEncrypted = doc.IsEncrypted
             };
-
         }
 
         public static DataContract.DocumentPreview Convert(this DocumentPreview dp)
@@ -975,7 +970,5 @@ namespace Mark5.Mobile.Common.Model.Converters
         }
 
         #endregion
-
     }
 }
-

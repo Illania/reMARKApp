@@ -1,18 +1,14 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: OptionalParameters.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     public abstract class OptionalParameters : ICopiable<OptionalParameters>
     {
-
         #region ICopiable
 
         public virtual OptionalParameters DeepCopy()
@@ -23,14 +19,11 @@ namespace Mark5.Mobile.Common.Model
         public abstract OptionalParameters ShallowCopy();
 
         #endregion
-
     }
 
     public class CalendarEventOptionalParameters : OptionalParameters
     {
-
         public bool CanContainAppointments { get; set; }
-
         public bool CanContainTasks { get; set; }
 
         #region ICopiable
@@ -45,7 +38,5 @@ namespace Mark5.Mobile.Common.Model
         }
 
         #endregion
-
     }
 }
-

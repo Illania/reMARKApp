@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using Android.Graphics;
@@ -48,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_country);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_country);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCountryFragment)}");
         }
@@ -71,8 +72,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void CountrySelected(CountryInfo c)
         {
-            if (CloseRequest != null) CloseRequest(c.FaxPrefix);
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(c.FaxPrefix);
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Retained State
@@ -88,8 +90,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             readonly List<CountryInfo> countriesInView = new List<CountryInfo>(500);
 
-            public override int ItemCount { get { return countriesInView.Count; } }
-            public List<CountryInfo> Items { get { return countriesInView; } }
+            public override int ItemCount
+            {
+                get { return countriesInView.Count; }
+            }
+
+            public List<CountryInfo> Items
+            {
+                get { return countriesInView; }
+            }
 
             readonly PickCountryFragment parent;
 
@@ -131,15 +140,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public string Name
             {
-                set
-                {
-                    nameTextView.Text = value;
-                }
+                set { nameTextView.Text = value; }
             }
 
             readonly AppCompatTextView nameTextView;
 
-            public CountryViewHolder(View itemView) : base(itemView)
+            public CountryViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.search_list_item_country_name);
             }

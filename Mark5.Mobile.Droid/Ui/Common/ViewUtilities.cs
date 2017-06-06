@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Content.Res;
 using Android.OS;
@@ -12,10 +13,8 @@ using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public static class ViewUtilities
     {
-
         public static void SetTextAppearanceCompat(this TextView view, Context context, int resourceId)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)

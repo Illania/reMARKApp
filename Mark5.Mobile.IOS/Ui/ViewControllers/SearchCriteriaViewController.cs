@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -16,10 +17,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class SearchCriteriaViewController : AbstractViewController
     {
-
         UISegmentedControl segmentedControl;
         UIViewController[] viewControllers;
 
@@ -31,10 +30,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            segmentedControl = new UISegmentedControl(new[] { Localization.GetString("documents"), Localization.GetString("contacts"), Localization.GetString("shortcodes") });
+            segmentedControl = new UISegmentedControl(new[]
+            {
+                Localization.GetString("documents"),
+                Localization.GetString("contacts"),
+                Localization.GetString("shortcodes")
+            });
             segmentedControl.Frame = new CGRect(0f, 0f, 0f, 26f);
-            segmentedControl.SetTitleTextAttributes(new UITextAttributes { Font = Theme.DefaultFont.WithRelativeSize(-3f), TextColor = Theme.White }, UIControlState.Normal);
-            segmentedControl.SetTitleTextAttributes(new UITextAttributes { Font = Theme.DefaultFont.WithRelativeSize(-3f), TextColor = Theme.White }, UIControlState.Selected);
+            segmentedControl.SetTitleTextAttributes(new UITextAttributes
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(-3f),
+                TextColor = Theme.White
+            }, UIControlState.Normal);
+            segmentedControl.SetTitleTextAttributes(new UITextAttributes
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(-3f),
+                TextColor = Theme.White
+            }, UIControlState.Selected);
             segmentedControl.TintColor = Theme.DarkBlue;
             segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);

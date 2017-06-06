@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
@@ -45,6 +46,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateBottomTextView(categoriesId.Count);
             UpdateCriteria();
         }
-
     }
 }

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Globalization;
 using Mark5.Mobile.Common.Model;
@@ -14,10 +15,8 @@ using Newtonsoft.Json.Converters;
 
 namespace Mark5.Mobile.Droid.Model
 {
-
     public class PushNotification
     {
-
         public PushNotificationNotification Notification { get; set; }
 
         public PushNotificationData Data { get; set; }
@@ -26,7 +25,6 @@ namespace Mark5.Mobile.Droid.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class PushNotificationNotification
     {
-
         [JsonProperty("icon")]
         public string Icon { get; set; }
 
@@ -40,16 +38,12 @@ namespace Mark5.Mobile.Droid.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class PushNotificationData
     {
-
         [JsonProperty("silent")]
         public int Silent { get; set; }
 
         public bool IsSilent
         {
-            get
-            {
-                return Silent > 0;
-            }
+            get { return Silent > 0; }
         }
 
         [JsonProperty("guid")]

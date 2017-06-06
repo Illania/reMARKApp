@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: CommonActionsManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +17,10 @@ using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     class CommonActionsManager : AbstractManager, ICommonActionsManager
     {
-
         readonly IDocumentsDataAccess documentsDataAccess;
         readonly IContactsDataAccess contactsDataAccess;
         readonly IShortcodesDataAccess shortcodesDataAccess;
@@ -40,7 +37,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<ObjectAction>> GetObjectActionsAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -53,18 +51,17 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.ObjectActions.WhereNotNull().Select(oa => oa.Convert()).ToList();
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<ObjectLink>> GetObjectLinksAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -77,18 +74,17 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.ObjectLinks.WhereNotNull().Select(ol => ol.Convert()).ToList();
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -103,18 +99,17 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -133,63 +128,54 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), fromFolder);
                 }
-
                 var documents = businessEntities.OfType<Document>();
                 if (documents.Any())
                 {
                     await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), fromFolder);
                 }
-
                 var contactPreviews = businessEntities.OfType<ContactPreview>();
                 if (contactPreviews.Any())
                 {
                     await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), fromFolder);
                 }
-
                 var contacts = businessEntities.OfType<Contact>();
                 if (contacts.Any())
                 {
                     await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), fromFolder);
                 }
-
                 var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
                 if (shortcodePreviews.Any())
                 {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), fromFolder);
                 }
-
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
                 {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), fromFolder);
                 }
-
                 var appointments = businessEntities.OfType<CalendarAppointment>();
                 if (appointments.Any())
                 {
                     await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), fromFolder);
                 }
-
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
                 {
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), fromFolder);
                 }
-
                 return;
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -202,18 +188,17 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -228,18 +213,17 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -256,63 +240,54 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), folder);
                 }
-
                 var documents = businessEntities.OfType<Document>();
                 if (documents.Any())
                 {
                     await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), folder);
                 }
-
                 var contactPreviews = businessEntities.OfType<ContactPreview>();
                 if (contactPreviews.Any())
                 {
                     await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), folder);
                 }
-
                 var contacts = businessEntities.OfType<Contact>();
                 if (contacts.Any())
                 {
                     await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), folder);
                 }
-
                 var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
                 if (shortcodePreviews.Any())
                 {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), folder);
                 }
-
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
                 {
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), folder);
                 }
-
                 var appointments = businessEntities.OfType<CalendarAppointment>();
                 if (appointments.Any())
                 {
                     await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), folder);
                 }
-
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
                 {
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), folder);
                 }
-
                 return;
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -328,43 +303,36 @@ namespace Mark5.Mobile.Common.Managers
                 {
                     await documentsDataAccess.DeleteAsync(documentPreviews.ToList());
                 }
-
                 var documents = businessEntities.OfType<Document>();
                 if (documents.Any())
                 {
                     await documentsDataAccess.DeleteAsync(documents.ToList());
                 }
-
                 var contactPreviews = businessEntities.OfType<ContactPreview>();
                 if (contactPreviews.Any())
                 {
                     await contactsDataAccess.DeleteAsync(contactPreviews.ToList());
                 }
-
                 var contacts = businessEntities.OfType<Contact>();
                 if (contacts.Any())
                 {
                     await contactsDataAccess.DeleteAsync(contacts.ToList());
                 }
-
                 var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
                 if (shortcodePreviews.Any())
                 {
                     await shortcodesDataAccess.DeleteAsync(shortcodePreviews.ToList());
                 }
-
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
                 {
                     await shortcodesDataAccess.DeleteAsync(shortcodes.ToList());
                 }
-
                 var appointments = businessEntities.OfType<CalendarAppointment>();
                 if (appointments.Any())
                 {
                     await calendarDataAccess.DeleteAsync(appointments.ToList());
                 }
-
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
                 {
@@ -372,14 +340,11 @@ namespace Mark5.Mobile.Common.Managers
                 }
                 return;
             }
-
             if (sourceType == SourceType.Local)
             {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }
 }
-

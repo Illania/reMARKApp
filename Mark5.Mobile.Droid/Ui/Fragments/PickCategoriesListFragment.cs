@@ -26,17 +26,15 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
-
     public class PickCategoriesListFragment : RetainableStateFragment
     {
-
         public ObjectType ObjectType { get; set; }
         public int[] PreselectedCategoryIds { get; set; }
         public Action<List<Category>> CloseRequest { get; set; }
 
         CategoriesListAdapter CurrentAdapter
         {
-            get { return (CategoriesListAdapter)recyclerView.GetAdapter(); }
+            get { return (CategoriesListAdapter) recyclerView.GetAdapter(); }
         }
 
         SwipeRefreshLayout refreshLayout;
@@ -73,7 +71,7 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
         }
@@ -114,8 +112,9 @@ namespace Mark5.Mobile.Droid
 
         void CloseFragment()
         {
-            if (CloseRequest != null) CloseRequest(selectedCategories.Values.ToList());
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(selectedCategories.Values.ToList());
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Refresh methods
@@ -222,7 +221,6 @@ namespace Mark5.Mobile.Droid
 
         class AvailableCategoriesListFragmentState : IRetainableState
         {
-
             public Dictionary<int, Category> SelectedCategories { get; set; }
 
             public List<Category> AvailableCategories { get; set; }
@@ -237,8 +235,15 @@ namespace Mark5.Mobile.Droid
             readonly List<Category> categoriesInView = new List<Category>(200);
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
-            public override int ItemCount { get { return categoriesInView.Count; } }
-            public List<Category> Items { get { return categoriesInView; } }
+            public override int ItemCount
+            {
+                get { return categoriesInView.Count; }
+            }
+
+            public List<Category> Items
+            {
+                get { return categoriesInView; }
+            }
 
             public event EventHandler<Category> ItemClicked = delegate { };
 
@@ -342,10 +347,7 @@ namespace Mark5.Mobile.Droid
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get
-                {
-                    return selected;
-                }
+                get { return selected; }
             }
 
             readonly View colorImageView;
@@ -354,7 +356,8 @@ namespace Mark5.Mobile.Droid
 
             readonly View selectedOverlay;
 
-            public CategoryViewHolder(View itemView) : base(itemView)
+            public CategoryViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_category_name);
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
@@ -364,6 +367,5 @@ namespace Mark5.Mobile.Droid
         }
 
         #endregion
-
     }
 }

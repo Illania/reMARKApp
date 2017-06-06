@@ -1,20 +1,17 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: BusinessEntityPreview.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     public abstract class BusinessEntityPreview : IBusinessEntity
     {
-
         [Column("Id"), PrimaryKey]
         public int Id { get; set; } = -1;
 

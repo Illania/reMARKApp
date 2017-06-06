@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Mark5.Mobile.Common.Model;
 
@@ -15,7 +16,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public ToView(Context context)
             : base(context, DocumentAddressType.To)
         {
-
         }
     }
 }

@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5E2E279C-8BBE-4F87-8C1D-B921758790B3}</ProjectGuid>
+    <ProjectGuid>{5DDB3BAE-617A-417A-B6AA-68F82B48E3AF}</ProjectGuid>
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>SVProgressHUD</RootNamespace>
@@ -20,24 +20,28 @@
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchFastDev>true</MtouchFastDev>
-    <IOSDebuggerPort>45580</IOSDebuggerPort>
+    <IOSDebuggerPort>39916</IOSDebuggerPort>
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
-    <MtouchLink></MtouchLink>
-    <MtouchHttpClientHandler></MtouchHttpClientHandler>
-    <MtouchTlsProvider></MtouchTlsProvider>
+    <MtouchLink>
+    </MtouchLink>
+    <MtouchHttpClientHandler>
+    </MtouchHttpClientHandler>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchLink>SdkOnly</MtouchLink>
-    <MtouchHttpClientHandler></MtouchHttpClientHandler>
-    <MtouchTlsProvider></MtouchTlsProvider>
+    <MtouchHttpClientHandler>
+    </MtouchHttpClientHandler>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -50,26 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RadialGradientLayer.cs" />
-    <Compile Include="ProgressAnimatedView.cs" />
-    <Compile Include="IndefiniteAnimatedView.cs" />
-    <Compile Include="Enums.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="ProgressHUD.cs" />
-    <Compile Include="NSObjectExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BundleResource Include="Resources\angle-mask.png" />
-    <BundleResource Include="Resources\angle-mask%402x.png" />
-    <BundleResource Include="Resources\angle-mask%403x.png" />
-    <BundleResource Include="Resources\error.png" />
-    <BundleResource Include="Resources\error%402x.png" />
-    <BundleResource Include="Resources\error%403x.png" />
-    <BundleResource Include="Resources\info.png" />
-    <BundleResource Include="Resources\info%402x.png" />
-    <BundleResource Include="Resources\info%403x.png" />
-    <BundleResource Include="Resources\success.png" />
-    <BundleResource Include="Resources\success%402x.png" />
-    <BundleResource Include="Resources\success%403x.png" />
+    <Compile Include="RadialGradientLayer.cs" />
+    <Compile Include="IndefiniteAnimatedView.cs" />
+    <Compile Include="ProgressAnimatedView.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

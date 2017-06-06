@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly CustomButton departmentButton;
         readonly CustomButton companyButton;
 
-        public ContactTypeSearchView(Android.Content.Context context) : base(context)
+        public ContactTypeSearchView(Android.Content.Context context)
+            : base(context)
         {
             personButton = new CustomButton(context, Resource.String.search_contact_person, HandleClick);
             departmentButton = new CustomButton(context, Resource.String.search_contact_department, HandleClick);
@@ -29,7 +31,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         bool HandleClick(CustomButton b)
         {
-            var otherButtons = new List<CustomButton> { personButton, departmentButton, companyButton };
+            var otherButtons = new List<CustomButton>
+            {
+                personButton,
+                departmentButton,
+                companyButton
+            };
             otherButtons.Remove(b);
 
             if (b.Selected && otherButtons.All(bu => bu.Selected == false))

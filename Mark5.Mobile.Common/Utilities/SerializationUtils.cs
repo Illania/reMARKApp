@@ -1,23 +1,20 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: SerializationUtils.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
-
     public static class SerializationUtils
     {
-
         static readonly JsonSerializer jsonSerializer;
 
         static SerializationUtils()
@@ -49,10 +46,7 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static Task<string> SerializeAsync<T>(T obj)
         {
-            return Task.Run(() =>
-            {
-                return Serialize(obj);
-            });
+            return Task.Run(() => { return Serialize(obj); });
         }
 
         public static T Deserialize<T>(string str)
@@ -61,7 +55,6 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return default(T);
             }
-
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -77,7 +70,6 @@ namespace Mark5.Mobile.Common.Utilities
                 {
                     return default(T);
                 }
-
                 return Deserialize<T>(str);
             });
         }
@@ -88,7 +80,6 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return null;
             }
-
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -104,7 +95,6 @@ namespace Mark5.Mobile.Common.Utilities
                 {
                     return null;
                 }
-
                 return Deserialize(str, type);
             });
         }
@@ -119,7 +109,6 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return null;
             }
-
             return GetBytes(Serialize(obj));
         }
 
@@ -129,7 +118,6 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 return null;
             }
-
             return Deserialize<T>(GetString(bytes));
         }
 
@@ -148,7 +136,5 @@ namespace Mark5.Mobile.Common.Utilities
         }
 
         #endregion
-
     }
 }
-

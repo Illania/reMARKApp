@@ -15,10 +15,8 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public class SimpleLogger : AbstractLogger
     {
-
         const string Tag = "MARK5";
 
         protected override void WriteToLog(LogLevel logLevel, string message, Exception exception, bool includeStackTrace = false)

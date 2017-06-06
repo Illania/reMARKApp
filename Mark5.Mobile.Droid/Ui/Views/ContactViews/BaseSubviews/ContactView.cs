@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common.Model;
@@ -12,10 +13,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-
     public abstract class ContactView : LinearLayoutCompat
     {
-
         protected int DistanceVeryLarge;
         protected int DistanceLarge;
         protected int DistanceNormal;

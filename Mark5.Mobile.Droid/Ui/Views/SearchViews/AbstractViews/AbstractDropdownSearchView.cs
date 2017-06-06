@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -21,7 +22,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         readonly string emptyText;
 
-        protected AbstractDropdownSearchView(Context context, int titleResId, int emptyResId, ISearchCriteriaFragment f) : base(context)
+        protected AbstractDropdownSearchView(Context context, int titleResId, int emptyResId, ISearchCriteriaFragment f)
+            : base(context)
         {
             ParentFragment = f;
             emptyText = context.GetString(emptyResId);

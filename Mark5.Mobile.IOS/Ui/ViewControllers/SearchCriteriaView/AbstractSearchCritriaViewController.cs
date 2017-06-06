@@ -1,11 +1,11 @@
-﻿
-//
+﻿//
 // Project: Mark5.Mobile.IOS
 // File: AbstractSearchCritriaViewController.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.IO;
 using System.Linq;
@@ -17,10 +17,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-
     public abstract class AbstractSearchCriteriaViewController : AbstractViewController
     {
-
         const float BottomViewSize = 64f;
 
         UIBarButtonItem closeItem;
@@ -192,7 +190,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             foreach (var view in StackView.Subviews.OfType<AbstractSearchView>())
                 view.Activated -= View_Activated;
 
-            NSNotificationCenter.DefaultCenter.RemoveObservers(new[] { didShowNotificationObserver, willChangeFrameNotificationObserver, willHideNotification });
+            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
+            {
+                didShowNotificationObserver,
+                willChangeFrameNotificationObserver,
+                willHideNotification
+            });
         }
 
         public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
@@ -201,7 +204,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
             {
-                if (scrollView == null) return;
+                if (scrollView == null)
+                    return;
 
                 scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
                 scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);

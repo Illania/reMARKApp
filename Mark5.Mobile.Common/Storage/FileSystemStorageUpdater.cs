@@ -1,5 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: FileSystemStorageUpdater.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -9,13 +8,10 @@
 using System.Threading.Tasks;
 using PCLStorage;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Storage
 {
-
     public static class FileSystemStorageUpdater
     {
-
         const int RequiredFileSystemStorageVersion = 100;
         const string FileSystemStorageVersionFile = "filesystem_version";
 
@@ -27,7 +23,6 @@ namespace Mark5.Mobile.Common.Storage
             {
                 return false;
             }
-
             // Here add update logic for next versions.
             // Remember to be as *low-level* in update logic as possible to minimize risk of failure.
 

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Firebase.Messaging;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model;
@@ -13,10 +14,8 @@ using System;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public static class PushNotificationsConverter
     {
-
         public static Notification ConvertToNotification(this RemoteMessage m)
         {
             return m.ConvertToPushNotification().ConvertToNotification();

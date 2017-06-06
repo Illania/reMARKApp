@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -22,7 +23,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static T UniversalDeepCopy<T>(this T original)
         {
-            return (T)UniversalDeepCopy((Object)original);
+            return (T) UniversalDeepCopy((Object) original);
         }
 
         #region Private methods
@@ -44,13 +45,12 @@ namespace Mark5.Mobile.IOS.Utilities
                 var arrayType = typeToReflect.GetElementType();
                 if (IsPrimitive(arrayType))
                 {
-                    var clonedArray = (Array)cloneObject;
+                    var clonedArray = (Array) cloneObject;
                     for (int i = 0; i < clonedArray.Length; i++)
                     {
                         clonedArray.SetValue(InternalCopy(clonedArray.GetValue(i), visited), i);
                     }
                 }
-
             }
             visited.Add(originalObject, cloneObject);
             CopyFields(originalObject, visited, cloneObject, typeToReflect);
@@ -58,12 +58,7 @@ namespace Mark5.Mobile.IOS.Utilities
             return cloneObject;
         }
 
-        static void CopyFields(object originalObject,
-                               IDictionary<object, object> visited,
-                               object cloneObject,
-                               IReflect typeToReflect,
-                               BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy,
-                               Func<FieldInfo, bool> filter = null)
+        static void CopyFields(object originalObject, IDictionary<object, object> visited, object cloneObject, IReflect typeToReflect, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy, Func<FieldInfo, bool> filter = null)
         {
             foreach (FieldInfo fieldInfo in typeToReflect.GetFields(bindingFlags))
             {
@@ -77,10 +72,7 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        static void RecursiveCopyBaseTypePrivateFields(object originalObject,
-                                                       IDictionary<object, object> visited,
-                                                       object cloneObject,
-                                                       Type typeToReflect)
+        static void RecursiveCopyBaseTypePrivateFields(object originalObject, IDictionary<object, object> visited, object cloneObject, Type typeToReflect)
         {
             if (typeToReflect.BaseType != null)
             {
@@ -95,12 +87,10 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         #endregion
-
     }
 
     class ReferenceEqualityComparer : EqualityComparer<Object>
     {
-
         public override bool Equals(object x, object y)
         {
             return ReferenceEquals(x, y);

@@ -18,17 +18,18 @@ using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class CopyMoveToFolderListFragment : FoldersListFragment
     {
-
         public enum ActionType
         {
             Copy,
             Move,
         };
 
-        protected override bool LoadRemoteFromCache { get { return true; } }
+        protected override bool LoadRemoteFromCache
+        {
+            get { return true; }
+        }
 
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Folder FromFolder { get; set; }
@@ -40,11 +41,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (RemoteFolder.Root)
             {
-                AvailableSections = new List<Section> { Section.Favourites, Section.Remote };
+                AvailableSections = new List<Section>
+                {
+                    Section.Favourites,
+                    Section.Remote
+                };
             }
             else
             {
-                AvailableSections = new List<Section> { Section.Remote };
+                AvailableSections = new List<Section>
+                {
+                    Section.Remote
+                };
             }
 
             Adapter.SetSections(AvailableSections);
@@ -222,6 +230,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-
     }
 }

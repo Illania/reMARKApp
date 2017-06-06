@@ -1,33 +1,24 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: SearchContactsCriteria.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System.Collections.Generic;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     public class SearchContactsCriteria
     {
-
         public string SavedSearchFilterHash { get; set; }
-
         public int MaxToFetch { get; set; } = -1;
 
         public string Name { get; set; }
-
         public string FirstName { get; set; }
-
         public string LastName { get; set; }
-
         public string ShortId { get; set; }
-
         public string Description { get; set; }
-
         HashSet<ContactType> contactTypes;
 
         public HashSet<ContactType> ContactTypes
@@ -38,25 +29,16 @@ namespace Mark5.Mobile.Common.Model
                 {
                     contactTypes = new HashSet<ContactType>();
                 }
-
                 return contactTypes;
             }
-            set
-            {
-                contactTypes = value;
-            }
+            set { contactTypes = value; }
         }
 
         public string ComAddress { get; set; }
-
         public string PostAddress { get; set; }
-
         public string Comment { get; set; }
-
         public string Vat { get; set; }
-
         public string Ledger { get; set; }
-
         List<int> categoryIds;
 
         public List<int> CategoryIds
@@ -67,13 +49,9 @@ namespace Mark5.Mobile.Common.Model
                 {
                     categoryIds = new List<int>();
                 }
-
                 return categoryIds;
             }
-            set
-            {
-                categoryIds = value;
-            }
+            set { categoryIds = value; }
         }
 
         List<int> mustHaveCategoryIds;
@@ -88,16 +66,11 @@ namespace Mark5.Mobile.Common.Model
                 }
                 return mustHaveCategoryIds;
             }
-            set
-            {
-                mustHaveCategoryIds = value;
-            }
+            set { mustHaveCategoryIds = value; }
         }
 
         public FiledInFolderType FiledInFolderType { get; set; }
-
         public FiledInFolderFolderType FiledInFolderFolderType { get; set; }
-
         List<int> filedInFolderIds;
 
         public List<int> FiledInFolderIds
@@ -108,13 +81,9 @@ namespace Mark5.Mobile.Common.Model
                 {
                     filedInFolderIds = new List<int>();
                 }
-
                 return filedInFolderIds;
             }
-            set
-            {
-                filedInFolderIds = value;
-            }
+            set { filedInFolderIds = value; }
         }
 
         public int CountryPrefix { get; set; } = -1;
@@ -129,14 +98,9 @@ namespace Mark5.Mobile.Common.Model
                 {
                     responsibleIds = new List<int>();
                 }
-
                 return responsibleIds;
             }
-            set
-            {
-                responsibleIds = value;
-            }
+            set { responsibleIds = value; }
         }
     }
 }
-

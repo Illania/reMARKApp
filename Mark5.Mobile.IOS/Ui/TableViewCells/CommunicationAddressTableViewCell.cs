@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.IO;
 using System.Linq;
@@ -16,10 +17,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class CommunicationAddressTableViewCell : UITableViewCell
     {
-
         public static readonly NSString Key = new NSString("CommunicationAddressTableViewCell");
         public static readonly UINib Nib = UINib.FromName("CommunicationAddressTableViewCell", NSBundle.MainBundle);
 
@@ -30,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static CommunicationAddressTableViewCell Create()
         {
-            var cell = (CommunicationAddressTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (CommunicationAddressTableViewCell) Nib.Instantiate(null, null)[0];
             cell.TypeLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-3f);
             cell.NameLabel.Font = Theme.DefaultFont;
             cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-1f);

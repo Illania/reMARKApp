@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,10 +46,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             };
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+            });
 
             stackView = new UIStackView
             {
@@ -61,12 +62,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             };
             ContainerView.AddSubview(stackView);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerMargin),
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+            });
 
             Hidden = true;
         }
@@ -153,8 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             UIButton filenameButton;
             UIButton deleteButton;
 
-            public AttachmentsSubView(IAttachmentDescription attachmentDescription, Action<AttachmentsSubView, IAttachmentDescription> attachmentClickedAction,
-                                      Action<AttachmentsSubView, IAttachmentDescription> deleteAttachmentClickedAction)
+            public AttachmentsSubView(IAttachmentDescription attachmentDescription, Action<AttachmentsSubView, IAttachmentDescription> attachmentClickedAction, Action<AttachmentsSubView, IAttachmentDescription> deleteAttachmentClickedAction)
             {
                 this.attachmentDescription = attachmentDescription;
                 this.attachmentClickedAction = attachmentClickedAction;
@@ -184,7 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 deleteButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "remove.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 deleteButton.TouchUpInside += (sender, e) => deleteAttachmentClickedAction(this, attachmentDescription);
-                deleteButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                deleteButton.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 AddArrangedSubview(deleteButton);
             }
         }

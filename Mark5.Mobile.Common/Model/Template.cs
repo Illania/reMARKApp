@@ -1,21 +1,18 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: Template.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     [Table("Template")]
     public class Template
     {
-
         [Column("Id"), PrimaryKey]
         public int Id { get; set; } = -1;
 
@@ -40,4 +37,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

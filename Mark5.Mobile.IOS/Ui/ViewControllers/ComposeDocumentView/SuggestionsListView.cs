@@ -5,15 +5,15 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -23,10 +23,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
-    
     public class SuggestionsListView : UIView
     {
-    
         UIView spaceView;
         SuggestionsTextView suggestionsTextView;
         SeparatorSubView separator;
@@ -75,23 +73,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
             AddSubview(spaceView);
             AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f),
-                    spaceHeightConstraint
-                });
+            {
+                NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f),
+                spaceHeightConstraint
+            });
 
             suggestionsTextView = new SuggestionsTextView();
             suggestionsTextView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(suggestionsTextView);
             AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spaceView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 20f)
-                });
+            {
+                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spaceView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
+                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 20f)
+            });
 
             suggestionsTextView.SearchRequested += (sender, e) => DoSearch(e);
             suggestionsTextView.CommaOrEnterPressed += (sender, e) => Dismiss();
@@ -101,12 +99,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             separator.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(separator);
             AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, suggestionsTextView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
-                    NSLayoutConstraint.Create(separator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
-                });
+            {
+                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, suggestionsTextView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
+                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
+            });
         }
 
         void InitializeListView()
@@ -116,16 +114,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsTableView.RowHeight = UITableView.AutomaticDimension;
             suggestionsTableView.EstimatedRowHeight = 44f;
             suggestionsTableView.TableFooterView = new UIView(CGRect.Empty); //Used to avoid showing empty rows at the bottom
-            suggestionsTableView.Source = suggestionsListViewSource = new SuggestionsListViewSource(this, suggestionsTableView);;
+            suggestionsTableView.Source = suggestionsListViewSource = new SuggestionsListViewSource(this, suggestionsTableView);
+            ;
             suggestionsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(suggestionsTableView);
             AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, separator, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, separator, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
+                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
         }
 
         public void Initialize(RecipientsView targetRecipientsView, string initialSearchString)
@@ -186,10 +185,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             BeginInvokeOnMainThread(() =>
-                {
-                    suggestionsListViewSource.Clean();
-                    suggestionsListViewSource.ReloadData();
-                });
+            {
+                suggestionsListViewSource.Clean();
+                suggestionsListViewSource.ReloadData();
+            });
 
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -213,10 +212,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             BeginInvokeOnMainThread(() =>
-                {
-                    suggestionsListViewSource.RefreshData(newSuggestions);
-                    suggestionsListViewSource.ReloadData();
-                });
+            {
+                suggestionsListViewSource.RefreshData(newSuggestions);
+                suggestionsListViewSource.ReloadData();
+            });
         }
 
         public void SuggestionSelected(PrintableSuggestion printableSuggestion)
@@ -225,11 +224,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             Dismiss();
 
             BeginInvokeOnMainThread(() =>
-                {
-                    suggestionsListViewSource.Searching = false;
-                    suggestionsListViewSource.Clean();
-                    suggestionsListViewSource.ReloadData();
-                });
+            {
+                suggestionsListViewSource.Searching = false;
+                suggestionsListViewSource.Clean();
+                suggestionsListViewSource.ReloadData();
+            });
         }
 
         #endregion
@@ -246,8 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.LayoutSubviews();
 
             nfloat offset = 0f;
-            if (viewController != null && viewController.NavigationController != null && viewController.NavigationController.NavigationBar != null
-                && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
+            if (viewController != null && viewController.NavigationController != null && viewController.NavigationController.NavigationBar != null && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
             {
                 offset = viewController.NavigationController.NavigationBar.Frame.Bottom;
             }
@@ -260,24 +258,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
     {
         public bool Empty
         {
-            get
-            {
-                return !suggestions.Any();
-            }
+            get { return !suggestions.Any(); }
         }
 
-        public bool Searching
-        {
-            get;
-            set;
-        }
+        public bool Searching { get; set; }
 
         public bool Loading
         {
-            get
-            {
-                return answersReceived < 3 && Searching;
-            }
+            get { return answersReceived < 3 && Searching; }
         }
 
         int answersReceived;
@@ -289,14 +277,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         public SuggestionsObservableCollection Suggestions
         {
-            get
-            {
-                return suggestions;
-            }
-            set
-            {
-                suggestions = value;
-            }
+            get { return suggestions; }
+            set { suggestions = value; }
         }
 
         public SuggestionsListViewSource(SuggestionsListView emailCompositionView, UITableView suggestionsTableView)
@@ -378,7 +360,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
     public class SuggestionsObservableCollection : SortedObservableCollection<PrintableSuggestion>
     {
-
         public SuggestionsObservableCollection()
             : base(PrintableSuggestion.LookupComparison, PrintableSuggestion.SortingComparison)
         {
@@ -387,7 +368,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
     public class SuggestionsTextView : RecipientsView
     {
-        
         string originalState;
 
         public event EventHandler ReachedOriginalState = delegate { };
@@ -403,7 +383,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public void AddSuggestion(PrintableSuggestion printableSuggestion)
         {
             var text = TextView.Text;
-            var splittedRecipients = text.Split(new[] { EmailSeparator }, StringSplitOptions.None).ToList();
+            var splittedRecipients = text.Split(new[]
+                {
+                    EmailSeparator
+                }, StringSplitOptions.None)
+                .ToList();
             splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
             splittedRecipients.Add(printableSuggestion.ToString());
             TextView.Text = string.Join(EmailSeparator, splittedRecipients) + EmailSeparator;
@@ -440,6 +424,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
         #endregion
-
     }
 }

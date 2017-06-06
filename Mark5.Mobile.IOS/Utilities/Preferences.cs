@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
@@ -12,10 +13,8 @@ using System;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public class Preferences
     {
-
         public enum TemplateUsageMode
         {
             DontUse = 0,
@@ -71,32 +70,69 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var defaultsDictionary = new NSMutableDictionary
             {
-                { new NSString(Keys.ShowCreatorOutgoing), NSNumber.FromBoolean(false) },
-                { new NSString(Keys.UseServerTimezoneKey), NSNumber.FromBoolean(false) },
-                { new NSString(Keys.DocumentsToDownloadKey), NSNumber.FromInt16(250) },
-                { new NSString(Keys.UnreadIndicatorMeKey), NSNumber.FromBoolean(true) },
-                { new NSString(Keys.MarkAsReadDelaySecondsKey), NSNumber.FromInt16(2) },
-                { new NSString(Keys.CompactDocumentsListKey), NSNumber.FromBoolean(false) },
-                { new NSString(Keys.DocumentBodyRequestTypeKey), NSNumber.FromBoolean(false) },
-                { new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true) },
-                { new NSString(Keys.HideReadNotificationsKey), NSNumber.FromBoolean(false) },
-
-                { new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true) },
-
-                { new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false) },
-
-                { new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false) },
-                { new NSString(Keys.RemoveLineKey), NSNumber.FromBoolean(true) },
-                { new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1) },
-
-                { new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250) },
-                { new NSString(Keys.ContactsToSearchKey), NSNumber.FromInt16(250) },
-                { new NSString(Keys.ShortcodesToSearchKey), NSNumber.FromInt16(250) },
-                { new NSString(Keys.PartialWordSearchKey), NSNumber.FromBoolean(false) },
-
-                { new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7) },
-                { new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false) },
-                { new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true) }
+                {
+                    new NSString(Keys.ShowCreatorOutgoing), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.UseServerTimezoneKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.DocumentsToDownloadKey), NSNumber.FromInt16(250)
+                },
+                {
+                    new NSString(Keys.UnreadIndicatorMeKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.MarkAsReadDelaySecondsKey), NSNumber.FromInt16(2)
+                },
+                {
+                    new NSString(Keys.CompactDocumentsListKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.DocumentBodyRequestTypeKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.HideReadNotificationsKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.RemoveLineKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1)
+                },
+                {
+                    new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250)
+                },
+                {
+                    new NSString(Keys.ContactsToSearchKey), NSNumber.FromInt16(250)
+                },
+                {
+                    new NSString(Keys.ShortcodesToSearchKey), NSNumber.FromInt16(250)
+                },
+                {
+                    new NSString(Keys.PartialWordSearchKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.CleanCacheIntervalDaysKey), NSNumber.FromInt16(7)
+                },
+                {
+                    new NSString(Keys.ClearCacheKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true)
+                }
             };
             ud.RegisterDefaults(defaultsDictionary);
         }
@@ -117,123 +153,78 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool ShowCreatorOutgoing
         {
-            get
-            {
-                return ud.BoolForKey(Keys.ShowCreatorOutgoing);
-            }
+            get { return ud.BoolForKey(Keys.ShowCreatorOutgoing); }
         }
 
 
         public bool UseServerTimezone
         {
-            get
-            {
-                return ud.BoolForKey(Keys.UseServerTimezoneKey);
-            }
+            get { return ud.BoolForKey(Keys.UseServerTimezoneKey); }
         }
 
         public int DocumentsToDownload
         {
-            get
-            {
-                return (int)ud.IntForKey(Keys.DocumentsToDownloadKey);
-            }
+            get { return (int) ud.IntForKey(Keys.DocumentsToDownloadKey); }
         }
 
         public int MarkAsReadDelaySeconds
         {
-            get
-            {
-                return (int)ud.IntForKey(Keys.MarkAsReadDelaySecondsKey);
-            }
+            get { return (int) ud.IntForKey(Keys.MarkAsReadDelaySecondsKey); }
         }
 
         public bool UnreadIndicatorMe
         {
-            get
-            {
-                return ud.BoolForKey(Keys.UnreadIndicatorMeKey);
-            }
+            get { return ud.BoolForKey(Keys.UnreadIndicatorMeKey); }
         }
 
         public bool CompactDocumentsList
         {
-            get
-            {
-                return ud.BoolForKey(Keys.CompactDocumentsListKey);
-            }
+            get { return ud.BoolForKey(Keys.CompactDocumentsListKey); }
         }
 
         public bool LargeAttachmentWarning
         {
-            get
-            {
-                return ud.BoolForKey(Keys.LargeAttachmentWarningKey);
-            }
+            get { return ud.BoolForKey(Keys.LargeAttachmentWarningKey); }
         }
 
         public DocumentBodyTypeRequest DocumentBodyRequestType
         {
-            get
-            {
-                return ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
-            }
+            get { return ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly; }
         }
 
         public bool HideReadNotifications
         {
-            get
-            {
-                return ud.BoolForKey(Keys.HideReadNotificationsKey);
-            }
+            get { return ud.BoolForKey(Keys.HideReadNotificationsKey); }
         }
 
         public bool SynchroniseContacts
         {
-            get
-            {
-                return ud.BoolForKey(Keys.SynchroniseContactsKey);
-            }
+            get { return ud.BoolForKey(Keys.SynchroniseContactsKey); }
         }
 
         public bool SynchroniseShortcodes
         {
-            get
-            {
-                return ud.BoolForKey(Keys.SynchroniseShortcodesKey);
-            }
+            get { return ud.BoolForKey(Keys.SynchroniseShortcodesKey); }
         }
 
         public bool ComposePriorityEnabled
         {
-            get
-            {
-                return ud.BoolForKey(Keys.ComposePriorityEnabledKey);
-            }
+            get { return ud.BoolForKey(Keys.ComposePriorityEnabledKey); }
         }
 
         public bool RemoveLine
         {
-            get
-            {
-                return ud.BoolForKey(Keys.RemoveLineKey);
-            }
+            get { return ud.BoolForKey(Keys.RemoveLineKey); }
         }
 
         public TemplateUsageMode UseTemplate
         {
-            get
-            {
-                return (TemplateUsageMode)(int)ud.IntForKey(Keys.UseTemplateKey);
-            }
+            get { return (TemplateUsageMode) (int) ud.IntForKey(Keys.UseTemplateKey); }
         }
 
         public string LocalTemplate
         {
-            get
-            {
-                return ud.StringForKey(Keys.LocalTemplateKey);
-            }
+            get { return ud.StringForKey(Keys.LocalTemplateKey); }
             set
             {
                 ud.SetString(value, Keys.LocalTemplateKey);
@@ -243,50 +234,32 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public int DocumentsToSearch
         {
-            get
-            {
-                return (int)ud.IntForKey(Keys.DocumentsToSearchKey);
-            }
+            get { return (int) ud.IntForKey(Keys.DocumentsToSearchKey); }
         }
 
         public int ContactsToSearch
         {
-            get
-            {
-                return (int)ud.IntForKey(Keys.ContactsToSearchKey);
-            }
+            get { return (int) ud.IntForKey(Keys.ContactsToSearchKey); }
         }
 
         public int ShortcodesToSearch
         {
-            get
-            {
-                return (int)ud.IntForKey(Keys.ShortcodesToSearchKey);
-            }
+            get { return (int) ud.IntForKey(Keys.ShortcodesToSearchKey); }
         }
 
         public bool PartialWordSearch
         {
-            get
-            {
-                return ud.BoolForKey(Keys.PartialWordSearchKey);
-            }
+            get { return ud.BoolForKey(Keys.PartialWordSearchKey); }
         }
 
         public int CleanCacheIntervalDays
         {
-            get
-            {
-                return (int)ud.IntForKey(Keys.CleanCacheIntervalDaysKey);
-            }
+            get { return (int) ud.IntForKey(Keys.CleanCacheIntervalDaysKey); }
         }
 
         public bool ClearCache
         {
-            get
-            {
-                return ud.BoolForKey(Keys.ClearCacheKey);
-            }
+            get { return ud.BoolForKey(Keys.ClearCacheKey); }
             set
             {
                 ud.SetBool(value, Keys.ClearCacheKey);
@@ -296,18 +269,12 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool EnableReporting
         {
-            get
-            {
-                return ud.BoolForKey(Keys.EnableReportingKey);
-            }
+            get { return ud.BoolForKey(Keys.EnableReportingKey); }
         }
 
         public string PushNotificationToken
         {
-            get
-            {
-                return ud.StringForKey(Keys.PushNotificationTokenKey);
-            }
+            get { return ud.StringForKey(Keys.PushNotificationTokenKey); }
             set
             {
                 ud.SetString(value, Keys.PushNotificationTokenKey);
@@ -317,10 +284,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool ResetOnLaunch
         {
-            get
-            {
-                return ud.BoolForKey(Keys.ResetOnLaunchKey);
-            }
+            get { return ud.BoolForKey(Keys.ResetOnLaunchKey); }
             set
             {
                 ud.SetBool(value, Keys.ResetOnLaunchKey);
@@ -329,4 +293,3 @@ namespace Mark5.Mobile.IOS.Utilities
         }
     }
 }
-

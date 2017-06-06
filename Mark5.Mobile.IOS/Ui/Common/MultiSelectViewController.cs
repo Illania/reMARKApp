@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-
     public class MultiSelectViewController<T> : UITableViewController
     {
-        
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
@@ -31,7 +30,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
 
-        public Task<T[]> Task { get { return tcs.Task; } }
+        public Task<T[]> Task
+        {
+            get { return tcs.Task; }
+        }
 
         public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
             : base(UITableViewStyle.Grouped)

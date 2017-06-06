@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
-
     public class RecipentsView : DocumentView
     {
-
         TableLayout compactLayout;
         TableLayout extendedLayout;
         TableRow tableRowLine;
@@ -62,7 +61,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             Orientation = Vertical;
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
 
-            var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+            var typedArray = Context.ObtainStyledAttributes(new int[]
+            {
+                Resource.Attribute.selectableItemBackground
+            });
             SetBackgroundResource(typedArray.GetResourceId(0, 0));
             typedArray.Recycle();
 
@@ -352,7 +354,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowReplyTo.Visibility = string.IsNullOrWhiteSpace(replyToText) ? ViewStates.Gone : ViewStates.Visible;
                 replyToValue.Text = replyToText;
 
-                var readByUsernames = Document.ReadByUserNames.Values.SelectMany(s => s.Split('|')).OrderBy(s=>s).Select(s =>s.ToUpper());
+                var readByUsernames = Document.ReadByUserNames.Values.SelectMany(s => s.Split('|')).OrderBy(s => s).Select(s => s.ToUpper());
                 var readByText = string.Join(", ", readByUsernames);
                 tableRowReadBy.Visibility = string.IsNullOrWhiteSpace(readByText) ? ViewStates.Gone : ViewStates.Visible;
                 readByValue.Text = readByText;

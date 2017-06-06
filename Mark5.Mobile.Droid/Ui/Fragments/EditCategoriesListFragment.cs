@@ -20,25 +20,23 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
-
     public class EditCategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
         public Action CloseRequest { get; set; }
 
         CategoriesListAdapter CurrentAdapter
         {
-            get { return (CategoriesListAdapter)recyclerView.GetAdapter(); }
+            get { return (CategoriesListAdapter) recyclerView.GetAdapter(); }
         }
 
         SwipeRefreshLayout refreshLayout;
@@ -86,8 +84,8 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(EditCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
@@ -111,7 +109,7 @@ namespace Mark5.Mobile.Droid
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -145,7 +143,8 @@ namespace Mark5.Mobile.Droid
                 }
 
                 dismissAction();
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
             catch (Exception ex)
             {
@@ -243,17 +242,18 @@ namespace Mark5.Mobile.Droid
 
         void UpdateControls()
         {
-            if (!IsAdded || IsDetached || IsRemoving) return;
+            if (!IsAdded || IsDetached || IsRemoving)
+                return;
 
             if (selectedCategories.Count < 1)
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_categories);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_categories);
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
             }
             else
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.categories_selected, selectedCategories.Count, selectedCategories.Count);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.categories_selected, selectedCategories.Count, selectedCategories.Count);
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
             }
         }
 
@@ -354,7 +354,6 @@ namespace Mark5.Mobile.Droid
 
         class AvailableCategoriesListFragmentState : IRetainableState
         {
-
             public BusinessEntityPreview BusinessEntityPreview { get; set; }
 
             public Dictionary<int, Category> SelectedCategories { get; set; }
@@ -368,12 +367,18 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-
             readonly List<Category> categoriesInView = new List<Category>();
             readonly Dictionary<int, Category> selectedCategoriesInView;
 
-            public override int ItemCount { get { return categoriesInView.Count; } }
-            public List<Category> Items { get { return categoriesInView; } }
+            public override int ItemCount
+            {
+                get { return categoriesInView.Count; }
+            }
+
+            public List<Category> Items
+            {
+                get { return categoriesInView; }
+            }
 
             public event EventHandler<Category> ItemClicked = delegate { };
 
@@ -435,13 +440,9 @@ namespace Mark5.Mobile.Droid
 
         class CategoryViewHolder : RecyclerView.ViewHolder
         {
-
             public string Name
             {
-                set
-                {
-                    nameTextView.Text = value;
-                }
+                set { nameTextView.Text = value; }
             }
 
             public string Description
@@ -475,10 +476,7 @@ namespace Mark5.Mobile.Droid
 
             public bool Selected
             {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
+                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
             }
 
             readonly View colorImageView;
@@ -486,7 +484,8 @@ namespace Mark5.Mobile.Droid
             readonly AppCompatTextView descriptionTextView;
             readonly View selectedOverlay;
 
-            public CategoryViewHolder(View itemView) : base(itemView)
+            public CategoryViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_category_name);
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
@@ -496,6 +495,5 @@ namespace Mark5.Mobile.Droid
         }
 
         #endregion
-
     }
 }

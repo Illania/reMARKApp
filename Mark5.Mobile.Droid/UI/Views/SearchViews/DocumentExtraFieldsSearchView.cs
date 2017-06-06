@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews

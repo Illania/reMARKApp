@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using Android.Animation;
@@ -58,9 +59,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
             var bottomPadding = ConversionUtils.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
-            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
 
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
@@ -72,8 +73,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
             fab.Visibility = ViewStates.Visible;
 
-            var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
-            p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            var p = (CoordinatorLayout.LayoutParams) fab.LayoutParameters;
+            p.Gravity = (int) (GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
@@ -154,8 +155,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
 
             CommonConfig.Logger.Info($"Created {nameof(ContactsSearchCriteriaFragment)}");
         }
@@ -214,7 +215,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchCriteria = new SearchContactsCriteria();
             containerLinearLayout.RequestFocus();
-            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
 
             try
@@ -248,13 +249,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void ReplaceFragment(Fragment f, string tag)
         {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
 
-            fragmentManager.BeginTransaction()
-                                       .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
-                                       .Replace(Resource.Id.fragment_container, f, tag)
-                                       .AddToBackStack(tag)
-                                       .Commit();
+            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
 
         void HandleSearchButtonClicked()
@@ -310,4 +307,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

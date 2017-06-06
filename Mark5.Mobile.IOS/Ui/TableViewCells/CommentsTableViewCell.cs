@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Globalization;
 using Foundation;
@@ -17,28 +18,23 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
     public partial class CommentsTableViewCell : UITableViewCell
     {
-
         public const float Height = 68f;
-        
+
         public static readonly NSString Key = new NSString("CommentsTableViewCell");
         public static readonly UINib Nib = UINib.FromName("CommentsTableViewCell", NSBundle.MainBundle);
 
-        public Comment Comment
-        {
-            get;
-            private set;
-        }
+        public Comment Comment { get; private set; }
 
-        protected CommentsTableViewCell(IntPtr handle) : base(handle)
+        protected CommentsTableViewCell(IntPtr handle)
+            : base(handle)
         {
         }
 
         public static CommentsTableViewCell Create()
         {
-            var cell = (CommentsTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (CommentsTableViewCell) Nib.Instantiate(null, null)[0];
 
             cell.CommentAuthorLabel.Font = Theme.DefaultBoldFont;
             cell.DateAddedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
@@ -58,13 +54,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             Comment = comment;
 
-            CommentAuthorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id
-                                  ? Localization.GetString("me")
-                                  : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
-            DateAddedLabel.Text = comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()
-                                                            .ConvertUtcToUserTime()
-                                                            .ConvertDateTimeToTimestampMilliseconds()
-                                                            .FormatUserTimestampAsCompactLongDateTimeString();
+            CommentAuthorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id ? Localization.GetString("me") : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
+            DateAddedLabel.Text = comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
             CommentContentLabel.Text = comment.Content;
         }
     }

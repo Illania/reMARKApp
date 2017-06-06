@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Globalization;
 using Android.Content;
@@ -19,7 +20,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractButtonsSearchView<T> : AbstractSearchView<T>
     {
-        protected AbstractButtonsSearchView(Context context) : base(context)
+        protected AbstractButtonsSearchView(Context context)
+            : base(context)
         {
             Orientation = Horizontal;
             SetPadding(0, 0, 0, 0);
@@ -88,8 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 UpdateTextAppearance();
             }
 
-            void IOnLayoutChangeListener.OnLayoutChange
-                                        (View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
+            void IOnLayoutChangeListener.OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
             {
                 var maxTextSize = TextSize;
                 var targetWidth = Width - PaddingLeft - PaddingRight;

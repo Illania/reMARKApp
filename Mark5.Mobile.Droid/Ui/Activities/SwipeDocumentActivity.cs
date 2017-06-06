@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using Android.Content.PM;
@@ -22,11 +23,9 @@ using Newtonsoft.Json;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Android.App.Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class SwipeDocumentActivity : BaseAppCompatActivity, ViewPager.IOnPageChangeListener
     {
-
         public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
         public const string DocumentIdIntentKey = "DocumentId_690fc3d6-ae73-4f5e-844a-06bdc44b6747";
@@ -96,14 +95,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                         foreach (var previousId in previousIds)
                         {
-                            activityState.FragmentStates.Insert(0, new DocumentFragmentState { DocumentId = previousId });
+                            activityState.FragmentStates.Insert(0, new DocumentFragmentState
+                            {
+                                DocumentId = previousId
+                            });
                             activityState.Position++;
                         }
 
                         var nextIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, mainFragmentState.DocumentPreview.Id, false, true, MaxNeighbours);
 
                         foreach (var nextId in nextIds)
-                            activityState.FragmentStates.Add(new DocumentFragmentState { DocumentId = nextId });
+                            activityState.FragmentStates.Add(new DocumentFragmentState
+                            {
+                                DocumentId = nextId
+                            });
                     }
                     catch (Exception ex)
                     {
@@ -117,7 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 // We need to call OnPageSelected manually due to a possible bug in ViewPager
                 if (pager.CurrentItem == 0)
-                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener) this).OnPageSelected(pager.CurrentItem));
             }
             else
             {
@@ -130,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 // We need to call OnPageSelected manually due to a possible bug in ViewPager
                 if (pager.CurrentItem == 0)
-                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener) this).OnPageSelected(pager.CurrentItem));
 
                 CommonConfig.Logger.Info($"Restored {nameof(SwipeDocumentActivity)}");
             }
@@ -167,8 +172,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         class PagerAdapter : FragmentStatePagerAdapter
         {
-
-            public override int Count { get { return state.FragmentStates.Count; } }
+            public override int Count
+            {
+                get { return state.FragmentStates.Count; }
+            }
 
             readonly SwipeDocumentActivityState state;
 
@@ -199,7 +206,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         class SwipeDocumentActivityState
         {
-
             public int? FolderId { get; set; }
             public Folder Folder { get; set; }
 
@@ -212,7 +218,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         class DocumentFragmentState
         {
-
             public int? DocumentId { get; set; }
             public DocumentPreview DocumentPreview { get; set; }
 

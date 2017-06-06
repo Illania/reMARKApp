@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,11 +30,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Android.App.Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
-
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -104,15 +103,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 OnNavigationItemSelected(initialMenuItem);
 
                 Task.Run(async () =>
-                {
-                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-                    return ss;
-                }).ContinueWith(t =>
-                {
-                    var ss = t.Result;
+                    {
+                        var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                        return ss;
+                    })
+                    .ContinueWith(t =>
+                    {
+                        var ss = t.Result;
 
-                    navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
@@ -137,19 +137,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (permissionsAsked)
                 return;
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted
-                || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted))
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted))
             {
-
                 Action permissionRequestAction = () =>
                 {
 #pragma warning disable XA0001 // Find issues with Android API usage
-                    RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.ReadContacts }, 769);
+                    RequestPermissions(new string[]
+                    {
+                        Manifest.Permission.ReadExternalStorage,
+                        Manifest.Permission.ReadContacts
+                    }, 769);
 #pragma warning restore XA0001 // Find issues with Android API usage
                 };
 
-                var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, Snackbar.LengthIndefinite)
-                                       .SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
+                var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, Snackbar.LengthIndefinite).SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
 
                 snackbar.SetActionTextColor(ContextCompat.GetColor(this, Resource.Color.lightblue));
                 snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.darkblue)));
@@ -275,7 +276,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
                     if (SupportFragmentManager.BackStackEntryCount > 0)
-                        SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
+                        SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) Android.App.PopBackStackFlags.Inclusive);
 
                     stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
@@ -308,7 +309,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         class MainActivityState
         {
-
             public string NavHeaderTitle { get; set; }
 
             public int LastSelectedItemId { get; set; }
@@ -324,7 +324,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         class MenuItemContent
         {
-
             protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
             protected readonly List<string> SavedTags = new List<string>();
 
@@ -363,9 +362,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 RetainableStateFragment f = null;
 
                 if (ModuleType == ModuleType.Documents)
-                    f = new FoldersNotificationsListFragment { RemoteFolder = Folder.RootForModule(ModuleType) };
+                    f = new FoldersNotificationsListFragment
+                    {
+                        RemoteFolder = Folder.RootForModule(ModuleType)
+                    };
                 else if (ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
-                    f = new FoldersListFragment { RemoteFolder = Folder.RootForModule(ModuleType) };
+                    f = new FoldersListFragment
+                    {
+                        RemoteFolder = Folder.RootForModule(ModuleType)
+                    };
 
                 var tag = f.GenerateTag();
                 var ft = fm.BeginTransaction();
@@ -377,7 +382,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             void Restore(FragmentManager fm)
             {
-                var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new { State = state, Tag = tag });
+                var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new
+                {
+                    State = state,
+                    Tag = tag
+                });
 
                 foreach (var item in backStackStatesAndTags)
                 {
@@ -406,7 +415,5 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
 
         #endregion
-
     }
 }
-

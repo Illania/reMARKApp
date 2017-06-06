@@ -1,5 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: DateTimeUtilities.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -8,12 +7,10 @@
 
 using System;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Utilities
 {
     public static class DateTimeUtils
     {
-
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 
@@ -28,14 +25,12 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 throw new ArgumentException($"Invalid {nameof(dateTime)}.{nameof(DateTime.Kind)}!");
             }
-
             if (dateTime == default(DateTime))
             {
                 return -1;
             }
-
             var elapsed = dateTime - epoch;
-            return (long)elapsed.TotalMilliseconds;
+            return (long) elapsed.TotalMilliseconds;
         }
     }
 }

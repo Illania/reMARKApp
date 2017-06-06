@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -18,10 +19,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
-
     public class AttachmentsView : DocumentView
     {
-
         LinearLayoutCompat container;
 
         public event EventHandler<AttachmentDescription> AttachmentClicked = delegate { };
@@ -84,7 +83,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
-
             public AttachmentView(Context context, AttachmentDescription attachmentDescription, int distanceLarge, int distanceNormal)
                 : base(context)
             {
@@ -110,7 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     LayoutParameters = new LayoutParams(imageSize, imageSize)
                     {
                         RightMargin = innerMargin,
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     }
                 };
                 image.SetImageResource(Resource.Drawable.attachment);
@@ -121,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     },
                     Text = attachmentDescription.Name,
                     Ellipsize = TextUtils.TruncateAt.End,
@@ -135,7 +133,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     },
                     Text = " (" + Formatters.FormatFileSize(attachmentDescription.SizeInBytes) + ")",
                 };

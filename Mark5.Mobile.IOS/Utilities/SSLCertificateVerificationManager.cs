@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
@@ -14,10 +15,8 @@ using ModernHttpClient;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public class SSLCertificateVerificationManager
     {
-
         readonly RemoteCertificateValidationCallback remoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => { return true; };
 
         public void EnableSelfSignedCertificates()

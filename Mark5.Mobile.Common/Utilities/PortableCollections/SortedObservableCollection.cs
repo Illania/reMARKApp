@@ -1,10 +1,10 @@
 ﻿//
-// Project: Mark5.Mobile.Common
 // File: SortedObservableCollection.cs
 // Author: Ferdinando Papale fp@nordic-it.com
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -68,7 +68,6 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
             {
                 i++;
             }
-
             InsertItem(i, item);
         }
 
@@ -81,7 +80,6 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
                     return i;
                 }
             }
-
             return -1;
         }
 

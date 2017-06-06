@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -16,10 +17,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
     public partial class ObjectActionsTableViewCell : UITableViewCell
     {
-    
         public static readonly UINib Nib = UINib.FromName("ObjectActionsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ObjectActionsTableViewCell");
 
@@ -30,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static ObjectActionsTableViewCell Create()
         {
-            var cell = (ObjectActionsTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (ObjectActionsTableViewCell) Nib.Instantiate(null, null)[0];
 
             cell.UsernameLabel.Font = Theme.DefaultBoldFont;
             cell.DateLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
@@ -43,11 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public void Initialize(ObjectAction action)
         {
             UsernameLabel.Text = action.Username ?? action.UserId.ToString();
-            DateLabel.Text = action.ActionTimeTimestamp
-                         .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToUserTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatUserTimestampAsCompactShortDateTimeString();
+            DateLabel.Text = action.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
             DescriptionLabel.Text = action.Description;
         }
     }

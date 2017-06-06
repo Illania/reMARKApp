@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -23,10 +25,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class CategoriesListViewController : AbstractViewController, IUISearchResultsUpdating
     {
-
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
 
         UIBarButtonItem dismissButtonItem;
@@ -74,8 +74,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
-            
-            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length);
+
+            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -84,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource) tableView.Source;
             if (ds.Empty)
                 await RefreshData();
         }
@@ -95,6 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             DeInitializeHandlers();
         }
+
         #endregion
 
         #region Init methods
@@ -127,12 +128,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
         }
 
         void InitializeSearchBar()
@@ -307,7 +308,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 catch (Exception ex)
                 {
                     CommonConfig.Logger.Error($"Error while updating categories [entity={BusinessEntityPreview}]", ex);
-                    
+
                     dismissAction();
 
                     await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -363,14 +364,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void        async void DoSearchCategory(string searchText, CancellationTokenSource ct)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void DoSearchCategory(string searchText, CancellationTokenSource ct)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             searchDataSource.Reset();
 
             await Task.Delay(100);
 
-            if (ct.IsCancellationRequested) return;
+            if (ct.IsCancellationRequested)
+                return;
 
             var matchingCategories = availableCategories.FindAll(c => MatchesQuery(c, searchText));
 
@@ -391,27 +394,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            
-            public bool CategoriesChanged
-            {
-                get;
-                private set;
-            }
+            public bool CategoriesChanged { get; private set; }
 
             public bool Empty
             {
-                get
-                {
-                    return !sectionIndexes.Any() || !categoriesInView.Any();
-                }
+                get { return !sectionIndexes.Any() || !categoriesInView.Any(); }
             }
 
             public List<Category> SelectedCategories
             {
-                get
-                {
-                    return selectedCategories.ToList();
-                }
+                get { return selectedCategories.ToList(); }
             }
 
             readonly UITableView tableView;
@@ -478,20 +470,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override nint NumberOfSections(UITableView tableView)
             {
                 return Empty ? 1 : sectionIndexes.Count;
-
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                return Empty ? 1 : categoriesInView[sectionIndexes[(int)section]].Count;
-
+                return Empty ? 1 : categoriesInView[sectionIndexes[(int) section]].Count;
             }
 
             public override string[] SectionIndexTitles(UITableView tableView)
             {
                 if (Empty)
                 {
-                    return new[] { string.Empty };
+                    return new[]
+                    {
+                        string.Empty
+                    };
                 }
 
                 return sectionIndexes.Count < 5 ? null : sectionIndexes.ToArray();
@@ -499,7 +492,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                return Empty ? string.Empty : sectionIndexes[(int)section];
+                return Empty ? string.Empty : sectionIndexes[(int) section];
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
@@ -608,7 +601,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIView.TransitionNotify(tableView, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, tableView.ReloadData, null);
 
                 selectedCategories.AddRange(assignedCategories);
-
             }
 
             public void EditingWillEnd()
@@ -678,10 +670,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             public bool Empty
             {
-                get
-                {
-                    return !sectionIndexes.Any() || !categoriesInView.Any();
-                }
+                get { return !sectionIndexes.Any() || !categoriesInView.Any(); }
             }
 
             List<string> sectionIndexes;
@@ -737,20 +726,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override nint NumberOfSections(UITableView tableView)
             {
                 return Empty ? 1 : sectionIndexes.Count;
-
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                return Empty ? 1 : categoriesInView[sectionIndexes[(int)section]].Count;
-
+                return Empty ? 1 : categoriesInView[sectionIndexes[(int) section]].Count;
             }
 
             public override string[] SectionIndexTitles(UITableView tableView)
             {
                 if (Empty)
                 {
-                    return new[] { string.Empty };
+                    return new[]
+                    {
+                        string.Empty
+                    };
                 }
 
                 return sectionIndexes.Count < 5 ? null : sectionIndexes.ToArray();
@@ -758,7 +748,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                return Empty ? string.Empty : sectionIndexes[(int)section];
+                return Empty ? string.Empty : sectionIndexes[(int) section];
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
@@ -828,8 +818,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 this.selectedCategories = selectedCategories;
 
                 sectionIndexes = filteredCategories.Select(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture)).Distinct().OrderBy(i => i).ToList();
-                categoriesInView = filteredCategories.GroupBy(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture))
-                                                     .ToDictionary(g => g.Key, g => g.OrderBy(c => c.Name).ToList(), StringComparer.OrdinalIgnoreCase);
+                categoriesInView = filteredCategories.GroupBy(c => c.Name.SafeSubstring(0, 1).ToUpper(CultureInfo.CurrentCulture)).ToDictionary(g => g.Key, g => g.OrderBy(c => c.Name).ToList(), StringComparer.OrdinalIgnoreCase);
             }
 
             public void Reset()

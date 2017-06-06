@@ -1,23 +1,21 @@
 //
-// Project: Mark5.Mobile.ServiceReference
 // File: AppServiceClient.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.ServiceReference.AppService
 {
-
     partial class AppServiceClient : ClientBase<IAppServiceClient>, IAppServiceClient
     {
-
-        public AppServiceClient(Binding binding, EndpointAddress remoteAddress) : base(binding, remoteAddress)
+        public AppServiceClient(Binding binding, EndpointAddress remoteAddress)
+            : base(binding, remoteAddress)
         {
         }
 
@@ -559,7 +557,5 @@ namespace Mark5.ServiceReference.AppService
         }
 
         #endregion
-
     }
 }
-

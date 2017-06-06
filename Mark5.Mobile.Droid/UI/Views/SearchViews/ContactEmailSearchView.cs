@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
@@ -14,7 +15,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         public ContactEmailSearchView(Android.Content.Context context)
             : base(context, Resource.String.search_contact_com_address, Resource.String.search_contact_com_address_hint)
         {
-
         }
 
         public override void Refresh()

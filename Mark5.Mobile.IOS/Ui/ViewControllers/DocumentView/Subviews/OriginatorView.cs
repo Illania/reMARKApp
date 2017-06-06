@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System.Linq;
 using Mark5.Mobile.IOS.Ui.Common;
 

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,10 +29,8 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class NotificationsListFragment : RetainableStateFragment
     {
-
         public ObjectType[] ObjectTypes { get; set; }
 
         SwipeRefreshLayout refreshLayout;
@@ -64,7 +63,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             adapter = new NotificationsAdapter(Context);
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
-                if (recyclerView.GetAdapter() != adapter) return;
+                if (recyclerView.GetAdapter() != adapter)
+                    return;
 
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
@@ -83,8 +83,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!(view.Parent is ViewPager))
             {
-                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.notifications);
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.notifications);
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
             }
 
             CommonConfig.Logger.Info($"Created {nameof(NotificationsListFragment)}");
@@ -267,7 +267,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationsFragmentState : IRetainableState
         {
-
             public ObjectType[] ObjectTypes { get; set; }
 
             public List<Notification> Notifications { get; set; }
@@ -279,21 +278,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationsAdapter : RecyclerView.Adapter
         {
-
             public List<Notification> Items
             {
-                get
-                {
-                    return notificationsInView;
-                }
+                get { return notificationsInView; }
             }
 
             public override int ItemCount
             {
-                get
-                {
-                    return notificationsInView.Count;
-                }
+                get { return notificationsInView.Count; }
             }
 
             readonly List<Notification> notificationsInView = new List<Notification>(200);
@@ -309,7 +301,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var cpvh = holder as NotificationViewHolder;
-                if (cpvh == null) return;
+                if (cpvh == null)
+                    return;
 
                 var n = notificationsInView[position];
 
@@ -322,11 +315,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 cpvh.MessageFirstLine = splitMessage.ElementAtOrDefault(0);
                 cpvh.MessageSecondLine = splitMessage.ElementAtOrDefault(1);
 
-                cpvh.DateTime = n.DateTimeTimestamp
-                    .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsCompactShortDateTimeString(context);
+                cpvh.DateTime = n.DateTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString(context);
                 cpvh.UnreadIndicator = !n.IsRead;
             }
 
@@ -342,7 +331,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (filter != null)
                     items = items.Where(filter).ToList();
-                
+
                 notificationsInView.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
@@ -376,7 +365,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationViewHolder : RecyclerView.ViewHolder
         {
-
             public string Title
             {
                 set
@@ -427,18 +415,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public string DateTime
             {
-                set
-                {
-                    dateTimeTextView.Text = value;
-                }
+                set { dateTimeTextView.Text = value; }
             }
 
             public bool UnreadIndicator
             {
-                set
-                {
-                    unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible;
-                }
+                set { unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible; }
             }
 
             readonly AppCompatImageView unreadImageView;
@@ -448,7 +430,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatTextView dateTimeTextView;
 
             public NotificationViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_notification_unread);
                 titleTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_title);
@@ -461,4 +443,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

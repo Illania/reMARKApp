@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using CoreGraphics;
 using Foundation;
@@ -14,10 +15,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
-
     public class RecipientsView : MailViewerSubview
     {
-
         public enum Type
         {
             To,
@@ -42,15 +41,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             titleLabel.TextColor = UIColor.LightGray;
             titleLabel.Opaque = false;
             titleLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            titleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            titleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            titleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            titleLabel.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+            });
 
             var textStorage = new NSTextStorage();
             textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, 0));
@@ -71,12 +70,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Right, 1f, InnerMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Right, 1f, InnerMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+            });
 
             var textViewTapGestureRecognizer = new UITapGestureRecognizer();
             textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
@@ -117,15 +116,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 textView.TextStorage.EndEditing();
 
                 Animate(0.2d, () =>
-                    {
-                        textView.TextContainer.MaximumNumberOfLines = 0;
-                        textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+                {
+                    textView.TextContainer.MaximumNumberOfLines = 0;
+                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                        Superview.SetNeedsLayout();
-                        Superview.LayoutIfNeeded();
+                    Superview.SetNeedsLayout();
+                    Superview.LayoutIfNeeded();
 
-                        expanded = true;
-                    });
+                    expanded = true;
+                });
             }
         }
 

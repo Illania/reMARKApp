@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +32,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-
         public Folder RemoteFolder { get; set; }
 
         protected View Container;
@@ -53,6 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         List<int> recoveredSelectedItemsPosition;
 
         protected virtual bool LoadRemoteFromCache { get; }
+
         protected FolderListAdapter CurrentAdapter
         {
             get { return SearchEnabled ? SearchAdapter : Adapter; }
@@ -83,7 +83,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter = new FolderListAdapter(Context, RecyclerView);
             Adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
-                if (RecyclerView.GetAdapter() != Adapter) return;
+                if (RecyclerView.GetAdapter() != Adapter)
+                    return;
 
                 emptyView.Visibility = Adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 RecyclerView.Visibility = Adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
@@ -106,7 +107,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual View InflateView(LayoutInflater inflater, ViewGroup container)
         {
-            return inflater.Inflate(Resource.Layout.list, container, false); ;
+            return inflater.Inflate(Resource.Layout.list, container, false);
+            ;
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -130,8 +132,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         break;
                 }
 
-                ((AppCompatActivity)Activity).SupportActionBar.Title = title;
-                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
+                ((AppCompatActivity) Activity).SupportActionBar.Title = title;
+                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
             }
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
@@ -143,7 +145,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            fab = ((View)Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View) Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             if (RemoteFolder?.Module == ModuleType.Documents)
             {
                 fab.SetImageResource(Resource.Drawable.action_new);
@@ -178,7 +180,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            SearchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            SearchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
 
@@ -285,7 +287,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (remoteFolders != null)
                     Adapter.Refresh(remoteFolders, Section.Remote);
-
             }
             else
             {
@@ -330,7 +331,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (RemoteFolder.Root)
             {
-                AvailableSections = new List<Section> { Section.Favourites, Section.Remote };
+                AvailableSections = new List<Section>
+                {
+                    Section.Favourites,
+                    Section.Remote
+                };
                 if (RemoteFolder.Module == ModuleType.Documents)
                 {
                     AvailableSections.Add(Section.Local);
@@ -338,7 +343,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                AvailableSections = new List<Section> { Section.Remote };
+                AvailableSections = new List<Section>
+                {
+                    Section.Remote
+                };
             }
 
             Adapter.SetSections(AvailableSections);
@@ -346,15 +354,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void NavigateToFolder(Folder folder)
         {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
             var foldersListFragment = GetFolderFragment(folder);
             var tag = foldersListFragment.GenerateTag();
 
-            fragmentManager.BeginTransaction()
-                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
-                           .Replace(Resource.Id.fragment_container, foldersListFragment, tag)
-                           .AddToBackStack(tag)
-                           .Commit();
+            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, foldersListFragment, tag).AddToBackStack(tag).Commit();
         }
 
         protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
@@ -505,7 +509,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (section != Section.Favourites)
             {
-
                 var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsFolderOfflineAsync(f.Module, f)));
 
                 if (foldersAvailableOfflineState.Any(v => v))
@@ -529,7 +532,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
                     }
-
                 }
             }
             return true;
@@ -599,28 +601,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var module = selectedFolders.First().Module;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
 
-            Task.Run(async () =>
-            {
-                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
-
-            }).ContinueWith(t =>
-            {
-                if (t.IsFaulted)
+            Task.Run(async () => { await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled); })
+                .ContinueWith(t =>
                 {
-                    dismissAction();
+                    if (t.IsFaulted)
+                    {
+                        dismissAction();
 
-                    CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception.InnerException);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-                }
-                else
-                {
-                    dismissAction();
-                    Adapter.RefreshFolders(selectedFolders, enabled);
-                    SearchAdapter.RefreshFolders(selectedFolders, enabled);
-                }
+                        CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception.InnerException);
+                        Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
+                    }
+                    else
+                    {
+                        dismissAction();
+                        Adapter.RefreshFolders(selectedFolders, enabled);
+                        SearchAdapter.RefreshFolders(selectedFolders, enabled);
+                    }
 
-                actionMode.Finish();
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                    actionMode.Finish();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void SetFolderOfflineStatusForSelection(bool offline)
@@ -634,33 +633,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Setting offline status of {selectedFolders.Count} folders to {offline}");
 
             Task.Run(async () =>
-            {
-                foreach (var folder in selectedFolders)
                 {
-                    if (offline)
+                    foreach (var folder in selectedFolders)
                     {
-                        await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
+                        if (offline)
+                        {
+                            await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
+                        }
+                        else
+                        {
+                            await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
+                        }
+                    }
+                })
+                .ContinueWith(t =>
+                {
+                    if (t.IsFaulted)
+                    {
+                        CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception.InnerException);
+                        Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                     }
                     else
                     {
-                        await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
+                        Adapter.RefreshFolders(selectedFolders);
+                        SearchAdapter.RefreshFolders(selectedFolders);
                     }
-                }
-            }).ContinueWith(t =>
-            {
-                if (t.IsFaulted)
-                {
-                    CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception.InnerException);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-                }
-                else
-                {
-                    Adapter.RefreshFolders(selectedFolders);
-                    SearchAdapter.RefreshFolders(selectedFolders);
-                }
 
-                actionMode.Finish();
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                    actionMode.Finish();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void SetFolderFavouriteStatusForSelection(bool favourite)
@@ -674,35 +674,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
             Task.Run(async () =>
-            {
-                foreach (var folder in selectedFolders)
                 {
-                    if (favourite)
+                    foreach (var folder in selectedFolders)
                     {
-                        await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+                        if (favourite)
+                        {
+                            await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+                        }
+                        else
+                        {
+                            await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                        }
+                    }
+                })
+                .ContinueWith(async (t) =>
+                {
+                    if (t.IsFaulted)
+                    {
+                        CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception.InnerException);
+                        Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
                     }
                     else
                     {
-                        await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
-                    }
-                }
-            }).ContinueWith(async (t) =>
-            {
-                if (t.IsFaulted)
-                {
-                    CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception.InnerException);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-                }
-                else
-                {
-                    actionMode.Finish();
+                        actionMode.Finish();
 
-                    if (AvailableSections.Contains(Section.Favourites))
-                    {
-                        await RefreshFavorites();
+                        if (AvailableSections.Contains(Section.Favourites))
+                        {
+                            await RefreshFavorites();
+                        }
                     }
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #endregion
@@ -864,26 +865,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override int ItemCount
             {
-                get
-                {
-                    return foldersInSection.Sum(f => f.Value.Count) + (sectionsInView.Count == 1 ? 0 : sectionsInView.Count);
-                }
+                get { return foldersInSection.Sum(f => f.Value.Count) + (sectionsInView.Count == 1 ? 0 : sectionsInView.Count); }
             }
 
             public int SelectedItemsCount
             {
-                get
-                {
-                    return selectedItemPositions.Count;
-                }
+                get { return selectedItemPositions.Count; }
             }
 
             public List<int> SelectedItemPositions
             {
-                get
-                {
-                    return selectedItemPositions.ToList();
-                }
+                get { return selectedItemPositions.ToList(); }
             }
 
             #region Overrides
@@ -1222,9 +1214,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class SearchFolderListAdapter : FolderListAdapter
         {
-            public SearchFolderListAdapter(Context context, RecyclerView parentRecyclerView) : base(context, parentRecyclerView)
+            public SearchFolderListAdapter(Context context, RecyclerView parentRecyclerView)
+                : base(context, parentRecyclerView)
             {
-                sectionsInView = new List<Section> { Section.None };
+                sectionsInView = new List<Section>
+                {
+                    Section.None
+                };
                 foldersInSection[Section.None] = new List<Folder>();
             }
 
@@ -1257,7 +1253,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public event EventHandler<View> ItemClicked = delegate { };
             public event EventHandler<View> ItemLongClicked = delegate { };
 
-            public FolderViewHolder(View itemView) : base(itemView)
+            public FolderViewHolder(View itemView)
+                : base(itemView)
             {
                 // Locate and cache view references
                 ExpandButton = itemView.FindViewById<AppCompatImageButton>(Resource.Id.list_item_folder_expand);
@@ -1280,7 +1277,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public AppCompatTextView SectionTitle { get; private set; }
 
-            public SectionViewHolder(View itemView) : base(itemView)
+            public SectionViewHolder(View itemView)
+                : base(itemView)
             {
                 // Locate and cache view references
                 SectionTitle = itemView as AppCompatTextView;
@@ -1288,7 +1286,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-
     }
 
     public enum Section

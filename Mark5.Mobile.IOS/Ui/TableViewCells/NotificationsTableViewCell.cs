@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.IO;
 using System.Linq;
@@ -18,21 +19,15 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class NotificationsTableViewCell : UITableViewCell
     {
-
         public static readonly UINib Nib = UINib.FromName("NotificationsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("NotificationsTableViewCell");
 
         static nfloat firstLineHeightConstraintConstant;
         static nfloat firstLineBottomConstraintConstant;
 
-        public Notification Notification
-        {
-            get;
-            private set;
-        }
+        public Notification Notification { get; private set; }
 
         public NotificationsTableViewCell(IntPtr handle)
             : base(handle)
@@ -41,7 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static NotificationsTableViewCell Create()
         {
-            var cell = (NotificationsTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (NotificationsTableViewCell) Nib.Instantiate(null, null)[0];
 
             cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
             cell.SecondLineLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-1f);
@@ -99,11 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 FirstLineBottomConstraint.Constant = firstLineBottomConstraintConstant;
             }
 
-            DateReceivedLabel.Text = notification.DateTimeTimestamp
-                    .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsCompactShortDateTimeString();
+            DateReceivedLabel.Text = notification.DateTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
 
             ReadImageView.Image = notification.IsRead ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             SelectionStyle = notification.ObjectType == ObjectType.Document ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;

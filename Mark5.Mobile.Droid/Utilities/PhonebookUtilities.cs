@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System.Collections.Generic;
 using System.Linq;
 using Android;
@@ -16,8 +17,7 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
-    public class PhonebookUtilities : Java.Lang.Object, IPhonebookUtilities
+    public class PhonebookUtilities : Java.Lang.Object, IPhonebookUtils
     {
         readonly Uri contactsUri = ContactsContract.CommonDataKinds.Email.ContentUri;
 
@@ -50,11 +50,11 @@ namespace Mark5.Mobile.Droid.Utilities
             if (permissionCheck == Android.Content.PM.Permission.Granted)
             {
                 string[] projection =
-                    {
-                        ContactIdColumn,
-                        ContactsNameColumn,
-                        ContactEmailColumn,
-                    };
+                {
+                    ContactIdColumn,
+                    ContactsNameColumn,
+                    ContactEmailColumn,
+                };
 
                 var cursor = Android.App.Application.Context.ContentResolver.Query(contactsUri, projection, selection, null, null);
 
@@ -79,12 +79,11 @@ namespace Mark5.Mobile.Droid.Utilities
                         else
                         {
                             var newContact = new Contact();
-                            newContact.Id = (int)contactId;
+                            newContact.Id = (int) contactId;
                             newContact.FirstName = contactName;
                             newContact.CommunicationAddresses.Add(new CommunicationAddress(contactEmail, CommunicationAddressType.Email));
                             contacts.Add(newContact);
                         }
-
                     } while (cursor.MoveToNext());
 
                     cursor.Close();
@@ -95,7 +94,5 @@ namespace Mark5.Mobile.Droid.Utilities
         }
 
         #endregion
-
     }
-
 }

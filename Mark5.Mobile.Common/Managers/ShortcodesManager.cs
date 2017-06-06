@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: ShortcodesManager.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +18,10 @@ using Mark5.Mobile.Common.Model.Converters;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     class ShortcodesManager : AbstractManager, IShortcodesManager
     {
-
         public int MaxToFetch { get; set; } = 100;
 
         readonly IShortcodesDataAccess shortcodesDataAccess;
@@ -37,7 +34,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -55,45 +53,43 @@ namespace Mark5.Mobile.Common.Managers
 
                 return shortcodePreviews;
             }
-
             if (sourceType == SourceType.Local)
             {
                 return await shortcodesDataAccess.GetShortcodePreviewsAsync(folder, startRowId, MaxToFetch);
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public void GetAllShortcodePreviews(Folder folder, Action<List<ShortcodePreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
             Task.Run(async () =>
-            {
-                var stopLoop = false;
-
-                while (!stopLoop && !ct.IsCancellationRequested)
                 {
-                    var previews = await GetShortcodePreviewsAsync(folder, startRowId, sourceType);
+                    var stopLoop = false;
 
-                    if (ct.IsCancellationRequested) continue;
-
-                    callback(previews);
-
-                    if (previews.Count > 0)
+                    while (!stopLoop && !ct.IsCancellationRequested)
                     {
-                        startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
+                        var previews = await GetShortcodePreviewsAsync(folder, startRowId, sourceType);
+
+                        if (ct.IsCancellationRequested)
+                            continue;
+
+                        callback(previews);
+
+                        if (previews.Count > 0)
+                        {
+                            startRowId = previews.LastOrDefault()?.RowId + 1 ?? -1;
+                        }
+                        stopLoop = previews.Count < MaxToFetch;
                     }
-
-                    stopLoop = previews.Count < MaxToFetch;
-                }
-            }).ContinueWith(t =>
-            {
-                if (t.IsFaulted)
+                })
+                .ContinueWith(t =>
                 {
-                    errorCallback(t.Exception.InnerException);
-                }
-
-                finishedCallback();
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                    if (t.IsFaulted)
+                    {
+                        errorCallback(t.Exception.InnerException);
+                    }
+                    finishedCallback();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
@@ -103,7 +99,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<Shortcode> GetShortcodeAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -121,12 +118,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return shortcode;
             }
-
             if (sourceType == SourceType.Local)
             {
                 return await shortcodesDataAccess.GetShortcodeAsync(shortcodeId);
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -137,7 +132,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -158,14 +154,11 @@ namespace Mark5.Mobile.Common.Managers
 
                 return container;
             }
-
             if (sourceType == SourceType.Local)
             {
                 return await shortcodesDataAccess.GetShortcodeWithPreviewAsync(shortcodeId);
             }
-
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }
 }
-

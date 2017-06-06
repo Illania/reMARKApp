@@ -5,18 +5,17 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.App;
 using Android.Content;
 using Android.Net;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.Droid.Services
 {
-
     public class ReachabilityBroadcastReceiver : BroadcastReceiver
     {
-
         bool registered;
 
         public void Register()
@@ -59,4 +58,3 @@ namespace Mark5.Mobile.Droid.Services
         }
     }
 }
-

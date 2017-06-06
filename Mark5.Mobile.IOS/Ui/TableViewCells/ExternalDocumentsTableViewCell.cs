@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -18,12 +19,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
     public partial class ExternalDocumentsTableViewCell : UITableViewCell
     {
-
         public const float Height = 65f;
-        
+
         public static readonly UINib Nib = UINib.FromName("ExternalDocumentsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ExternalDocumentsTableViewCell");
 
@@ -34,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static ExternalDocumentsTableViewCell Create()
         {
-            var cell = (ExternalDocumentsTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (ExternalDocumentsTableViewCell) Nib.Instantiate(null, null)[0];
 
             cell.NameLabel.Font = Theme.DefaultBoldFont;
             cell.DateReceivedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
@@ -48,11 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             NameLabel.Text = documentPreview.Subject;
             PreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
-            DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp
-                         .ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToUserTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatUserTimestampAsCompactShortDateTimeString();
+            DateReceivedLabel.Text = documentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
 
             UpdateCategoriesView(documentPreview);
         }
@@ -99,11 +94,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, previousView, NSLayoutAttribute.Bottom, 1f, 0f));
 
                 CategoriesView.AddConstraints(new[]
-                    {
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1f, 0f),
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1f, 0f),
-                        NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
-                    });
+                {
+                    NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
+                });
 
                 views.Add(categoryView);
                 previousView = categoryView;

@@ -5,14 +5,13 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using HockeyApp.Android;
 
 namespace Mark5.Mobile.Droid.Utilities.Hockey
 {
-
     public class CustomCrashManagerListener : CrashManagerListener
     {
-
         public override bool OnHandleAlertView()
         {
             return true;
@@ -25,11 +24,7 @@ namespace Mark5.Mobile.Droid.Utilities.Hockey
 
         public override string Description
         {
-            get
-            {
-                return SystemReportCollector.CreateLogCatReport();
-            }
+            get { return SystemReportCollector.CreateLogCatReport(); }
         }
     }
 }
-

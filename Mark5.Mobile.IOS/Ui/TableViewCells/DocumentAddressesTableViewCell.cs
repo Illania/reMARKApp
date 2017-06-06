@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.IO;
 using Foundation;
@@ -15,10 +16,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    
     public partial class DocumentAddressesTableViewCell : UITableViewCell
     {
-    
         public static readonly NSString Key = new NSString("DocumentAddressesTableViewCell");
         public static readonly UINib Nib = UINib.FromName("DocumentAddressesTableViewCell", NSBundle.MainBundle);
 
@@ -29,7 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static DocumentAddressesTableViewCell Create()
         {
-            var cell = (DocumentAddressesTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (DocumentAddressesTableViewCell) Nib.Instantiate(null, null)[0];
             cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
             cell.IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             return cell;

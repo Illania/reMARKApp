@@ -5,15 +5,14 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Foundation;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public static class StringExtensions
     {
-
         public static NSAttributedString ToNSAttributedString(this string str, UIFont font = null)
         {
             var attrstr = new NSMutableAttributedString(str);
@@ -25,6 +24,5 @@ namespace Mark5.Mobile.IOS.Utilities
 
             return attrstr;
         }
-
     }
 }

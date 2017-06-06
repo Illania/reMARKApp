@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: ShortcodesDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,19 +15,17 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Links;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
-
     class ShortcodesDataAccess : IShortcodesDataAccess
     {
-
         readonly DatabaseConnectionProvider shortcodesDatabase;
 
         public ShortcodesDataAccess(DatabaseConnectionProvider shortcodesDatabase)
         {
             this.shortcodesDatabase = shortcodesDatabase;
         }
+
         public async Task SaveShortcodePreviewsAsync(Folder folder, List<ShortcodePreview> shortcodePreviews, bool clean)
         {
             try
@@ -36,11 +34,13 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     if (clean)
                     {
-                        c.Table<FolderShortcodeLink>()
-                         .Delete(fdl => fdl.FolderId == folder.Id);
+                        c.Table<FolderShortcodeLink>().Delete(fdl => fdl.FolderId == folder.Id);
                     }
-
-                    c.InsertOrReplaceAll(shortcodePreviews.Select(cp => new FolderShortcodeLink { FolderId = folder.Id, ShortcodeId = cp.Id }));
+                    c.InsertOrReplaceAll(shortcodePreviews.Select(cp => new FolderShortcodeLink
+                    {
+                        FolderId = folder.Id,
+                        ShortcodeId = cp.Id
+                    }));
                     c.InsertOrReplaceAll(shortcodePreviews);
                 });
             }
@@ -49,6 +49,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error saving shortcodes.", ex);
             }
         }
+
         public async Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId, int maxItems)
         {
             try
@@ -57,10 +58,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select * " +
-                                $"from {nameof(ShortcodePreview)}, {nameof(FolderShortcodeLink)} " +
-                                $"where {nameof(FolderShortcodeLink.FolderId)} = {folder.Id} " +
-                                $"     and {nameof(ShortcodePreview)}.{nameof(ShortcodePreview.Id)} = {nameof(FolderShortcodeLink)}.{nameof(FolderShortcodeLink.ShortcodeId)} ";
+                    var query = $"select * " + $"from {nameof(ShortcodePreview)}, {nameof(FolderShortcodeLink)} " + $"where {nameof(FolderShortcodeLink.FolderId)} = {folder.Id} " + $"     and {nameof(ShortcodePreview)}.{nameof(ShortcodePreview.Id)} = {nameof(FolderShortcodeLink)}.{nameof(FolderShortcodeLink.ShortcodeId)} ";
 
                     query += $"order by {nameof(ShortcodePreview.Name)} ";
 
@@ -68,19 +66,16 @@ namespace Mark5.Mobile.Common.DataAccess
                     {
                         query += $"limit {maxItems - 1} ";
                     }
-
                     if (startRowId > 0)
                     {
                         query += $"offset {startRowId} ";
                     }
-
                     var result = c.Query<ShortcodePreview>(query);
 
                     if (result == null || result.Count < 1)
                     {
                         throw new DataNotFoundException("Shortcode previews could not be found.");
                     }
-
                     shortcodePreviews = result;
 
                     startRowId = startRowId < 1 ? 1 : startRowId;
@@ -102,10 +97,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                await shortcodesDatabase.RunInConnectionAsync(c =>
-                {
-                    c.InsertOrReplace(shortcode);
-                });
+                await shortcodesDatabase.RunInConnectionAsync(c => { c.InsertOrReplace(shortcode); });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -122,13 +114,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
                     var result = c.Find<Shortcode>(shortcodeId);
-
-                    if (result == null)
-                    {
-                        throw new DataNotFoundException("Shortcode could not be found.");
-                    }
-
-                    shortcode = result;
+                    shortcode = result ?? throw new DataNotFoundException("Shortcode could not be found.");
                 });
 
                 return shortcode;
@@ -168,13 +154,11 @@ namespace Mark5.Mobile.Common.DataAccess
                     {
                         throw new DataNotFoundException("ShortcodePreview could not be found.");
                     }
-
                     var shortcode = c.Find<Shortcode>(shortcodeId);
                     if (shortcode == null)
                     {
                         throw new DataNotFoundException("Shortcode could not be found.");
                     }
-
                     container = new ShortcodeContainer(shortcodePreview, shortcode);
                 });
 
@@ -212,7 +196,6 @@ namespace Mark5.Mobile.Common.DataAccess
                             c.Table<ShortcodePreview>().Delete(sp => sp.Id == id);
                             c.Table<Shortcode>().Delete(s => s.Id == id);
                         }
-
                         c.Table<FolderShortcodeLink>().Delete(fsl => fsl.ShortcodeId == id && fsl.FolderId == folderId);
                     }
                 });
@@ -260,9 +243,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderShortcodeLink.FolderId)} as '{nameof(IdValue.Id)}'" +
-                                      $"   from {nameof(FolderShortcodeLink)}" +
-                                      $"   where {nameof(FolderShortcodeLink.ShortcodeId)} not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})";
+                    var queryString = $"select {nameof(FolderShortcodeLink.FolderId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderShortcodeLink)}" + $"   where {nameof(FolderShortcodeLink.ShortcodeId)} not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})";
 
                     var result = c.Query<IdValue>(queryString);
 
@@ -306,11 +287,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    var folderCondition = $"{ nameof(FolderShortcodeLink.FolderId)} = ?";
-                    var inCondition = $"{nameof(FolderShortcodeLink.ShortcodeId)} not in (select {nameof(Shortcode.Id)} from { nameof(Shortcode)})";
-                    var queryString = $"select {nameof(FolderShortcodeLink.ShortcodeId)} as '{nameof(IdValue.Id)}'" +
-                                      $"   from {nameof(FolderShortcodeLink)}" +
-                                      $"   where {folderCondition} and {inCondition}";
+                    var folderCondition = $"{nameof(FolderShortcodeLink.FolderId)} = ?";
+                    var inCondition = $"{nameof(FolderShortcodeLink.ShortcodeId)} not in (select {nameof(Shortcode.Id)} from {nameof(Shortcode)})";
+                    var queryString = $"select {nameof(FolderShortcodeLink.ShortcodeId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderShortcodeLink)}" + $"   where {folderCondition} and {inCondition}";
 
                     var result = c.Query<IdValue>(queryString, folderId);
                     shortcodeIds = result.Select(v => v.Id).ToList();
@@ -340,7 +319,6 @@ namespace Mark5.Mobile.Common.DataAccess
                     var cmd2 = c.CreateCommand(outerDeleteQueryShortcode);
                     cmd2.ExecuteNonQuery();
                 });
-
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -359,4 +337,3 @@ namespace Mark5.Mobile.Common.DataAccess
         }
     }
 }
-

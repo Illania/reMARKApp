@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,12 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-
     public class CopyMoveToFolderListViewController : AbstractFoldersListViewController
     {
-        protected override bool LoadRemoteFromCache { get { return true; } }
+        protected override bool LoadRemoteFromCache
+        {
+            get { return true; }
+        }
 
         readonly List<IBusinessEntity> businessEntities;
         readonly Folder fromFolder;
@@ -123,9 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (folder.Local)
                 return true;
 
-            if (folder.InternalType != FolderInternalType.FilterView
-                && folder.InternalType != FolderInternalType.Static
-                && folder.InternalType != FolderInternalType.Worktray)
+            if (folder.InternalType != FolderInternalType.FilterView && folder.InternalType != FolderInternalType.Static && folder.InternalType != FolderInternalType.Worktray)
                 return true;
 
             return false;
@@ -154,7 +155,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
 
             var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_copy_to_folder"), Localization.GetString(key));
-            if (!confirmed) return;
+            if (!confirmed)
+                return;
 
             CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying___"));
@@ -198,7 +200,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
 
             var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_move_to_folder"), Localization.GetString(key));
-            if (!confirmed) return;
+            if (!confirmed)
+                return;
 
             CommonConfig.Logger.Info($"Moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("moving___"));

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -41,7 +42,6 @@ namespace Mark5.Mobile.IOS.Utilities
                     CommonConfig.Logger.Error($"Error while sending notification for failed send document: {err}");
                 }
             });
-
         }
     }
 }

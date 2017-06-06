@@ -5,22 +5,24 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.App;
 using Android.Content;
 using Firebase.Iid;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Services
 {
-
-    [Service, IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
+    [Service, IntentFilter(new[]
+    {
+        "com.google.firebase.INSTANCE_ID_EVENT"
+    })]
     public class PushNotificationInstanceIdService : FirebaseInstanceIdService
     {
-
         public override void OnTokenRefresh()
         {
             try

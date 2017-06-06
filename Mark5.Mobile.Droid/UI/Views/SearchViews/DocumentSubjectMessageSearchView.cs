@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
@@ -18,13 +19,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public override void Refresh()
         {
-            Spinner.SetSelection((int)Criteria.SubjectMessageClause);
+            Spinner.SetSelection((int) Criteria.SubjectMessageClause);
             BottomEditText.Text = Criteria.SubjectMessageField;
         }
 
         public override void UpdateCriteria()
         {
-            Criteria.SubjectMessageClause = (SubjectMessageClause)Spinner.SelectedItemPosition;
+            Criteria.SubjectMessageClause = (SubjectMessageClause) Spinner.SelectedItemPosition;
             Criteria.SubjectMessageField = BottomEditText.Text;
         }
     }

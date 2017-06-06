@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -15,10 +16,8 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public class ConsoleAndFileLogger : AbstractLogger
     {
-
         readonly string logPath;
         readonly string logFilePath;
         readonly object logFileLock = new object();
@@ -36,7 +35,8 @@ namespace Mark5.Mobile.IOS.Utilities
                 if (!fm.FileExists(logPath))
                 {
                     fm.CreateDirectory(logPath, true, new NSFileAttributes(), out err);
-                    if (err != null) throw new NSErrorException(err);
+                    if (err != null)
+                        throw new NSErrorException(err);
                 }
 
                 logFilePath = $"{logPath}/mark5_ios_{DateTime.Now.ToString("yyyy_M_dd")}.log";
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 Console.WriteLine(ex);
             }
         }
-        
+
         protected override void WriteToLog(LogLevel logLevel, string message, Exception exception, bool includeStackTrace = false)
         {
             if (!Enabled || Level < logLevel)
@@ -68,7 +68,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
             // Build message
             var logMessageBuilder = new StringBuilder();
-            logMessageBuilder.Append ("[").Append (DateTime.Now.ToString ("yyyy-MM-dd HH:mm:ss.ffff")).Append ("] ");
+            logMessageBuilder.Append("[").Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")).Append("] ");
             logMessageBuilder.Append("[").Append(logLevel).Append("] ");
             logMessageBuilder.Append("[").Append(Thread.CurrentThread.ManagedThreadId).Append("] ");
             logMessageBuilder.Append("[").Append(GetStackInfo(3)).Append("] ");
@@ -92,7 +92,8 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             lock (logFileLock)
             {
-                if (string.IsNullOrWhiteSpace(logFilePath)) return;
+                if (string.IsNullOrWhiteSpace(logFilePath))
+                    return;
 
                 try
                 {
@@ -114,7 +115,8 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             lock (logFileLock)
             {
-                if (string.IsNullOrWhiteSpace(logFilePath)) return string.Empty;
+                if (string.IsNullOrWhiteSpace(logFilePath))
+                    return string.Empty;
 
                 try
                 {
@@ -136,7 +138,8 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             lock (logFileLock)
             {
-                if (string.IsNullOrWhiteSpace(logPath)) return false;
+                if (string.IsNullOrWhiteSpace(logPath))
+                    return false;
 
                 try
                 {
@@ -144,13 +147,15 @@ namespace Mark5.Mobile.IOS.Utilities
                     var fm = NSFileManager.DefaultManager;
 
                     var contents = fm.GetDirectoryContent(logPath, out err);
-                    if (err != null) throw new NSErrorException(err);
+                    if (err != null)
+                        throw new NSErrorException(err);
 
                     var sorted = contents.Where(s => s.StartsWith("mark5_ios_", StringComparison.CurrentCulture)).OrderBy(s => s).ToArray();
                     for (var i = 0; i < sorted.Length - 3; i++)
                     {
                         fm.Remove(logPath + "/" + sorted[i], out err);
-                        if (err != null) throw new NSErrorException(err);
+                        if (err != null)
+                            throw new NSErrorException(err);
                     }
 
                     return true;

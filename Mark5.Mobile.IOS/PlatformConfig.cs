@@ -13,10 +13,8 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.IOS
 {
-
     public static class PlatformConfig
     {
-
         public const string HockeyId = "c81873e5ee604880bf15a59e957f4d79";
 
         public static SSLCertificateVerificationManager SSLCertificateVerificationManager { get; set; }
@@ -28,4 +26,3 @@ namespace Mark5.Mobile.IOS
         public static ITinyMessengerHub MessengerHub { get; set; }
     }
 }
-

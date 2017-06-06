@@ -1,5 +1,4 @@
 ﻿//
-// Project: FastScrollRecycler
 // File: FastScrollerPosition.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
@@ -8,7 +7,6 @@
 
 namespace FastScrollRecycler
 {
-    
     public enum FastScrollerPosition
     {
         Adjacent = 0,

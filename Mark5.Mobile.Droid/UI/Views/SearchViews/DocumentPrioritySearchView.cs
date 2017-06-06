@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Fragments;

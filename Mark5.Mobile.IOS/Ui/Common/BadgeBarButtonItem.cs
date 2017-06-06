@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using CoreAnimation;
 using CoreGraphics;
@@ -15,13 +16,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public sealed class BadgeBarButtonItem : UIBarButtonItem
     {
-
         public string BadgeValue
         {
-            get
-            {
-                return badgeValue;
-            }
+            get { return badgeValue; }
             set
             {
                 badgeValue = value;
@@ -31,10 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public UIColor BadgeBackgroundColor
         {
-            get
-            {
-                return badgeBackgroundColor;
-            }
+            get { return badgeBackgroundColor; }
             set
             {
                 badgeBackgroundColor = value;
@@ -48,10 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public UIColor BadgeTextColor
         {
-            get
-            {
-                return badgeTextColor;
-            }
+            get { return badgeTextColor; }
             set
             {
                 badgeTextColor = value;
@@ -65,10 +56,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public UIFont BadgeFont
         {
-            get
-            {
-                return badgeFont;
-            }
+            get { return badgeFont; }
             set
             {
                 badgeFont = value;
@@ -82,10 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public nfloat BadgePadding
         {
-            get
-            {
-                return badgePadding;
-            }
+            get { return badgePadding; }
             set
             {
                 badgePadding = value;
@@ -99,10 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public nfloat BadgeMinSize
         {
-            get
-            {
-                return badgeMinSize;
-            }
+            get { return badgeMinSize; }
             set
             {
                 badgeMinSize = value;
@@ -116,10 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public nfloat BadgeOriginX
         {
-            get
-            {
-                return badgeOriginX;
-            }
+            get { return badgeOriginX; }
             set
             {
                 badgeOriginX = value;
@@ -133,10 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public nfloat BadgeOriginY
         {
-            get
-            {
-                return badgeOriginY;
-            }
+            get { return badgeOriginY; }
             set
             {
                 badgeOriginY = value;
@@ -150,10 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public bool ShouldHideBadgeAtZero
         {
-            get
-            {
-                return shouldHideBadgeAtZero;
-            }
+            get { return shouldHideBadgeAtZero; }
             set
             {
                 shouldHideBadgeAtZero = value;
@@ -166,10 +139,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public bool ShouldAnimateBadge
         {
-            get
-            {
-                return shouldAnimateBadge;
-            }
+            get { return shouldAnimateBadge; }
             set
             {
                 shouldAnimateBadge = value;
@@ -297,19 +267,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (badge != null)
             {
-                UIView.AnimateNotify(0.15f, 0f,
-                    UIViewAnimationOptions.CurveEaseIn, () =>
+                UIView.AnimateNotify(0.15f, 0f, UIViewAnimationOptions.CurveEaseIn, () => { badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f); }, completed =>
+                {
+                    if (badge != null)
                     {
-                        badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f);
-                    }, completed =>
-                    {
-                        if (badge != null)
-                        {
-                            badge.RemoveFromSuperview();
-                            badge = null;
-                        }
+                        badge.RemoveFromSuperview();
+                        badge = null;
                     }
-                );
+                });
             }
         }
 

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Text.Format;
@@ -12,10 +13,8 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public static class DateTimeUtils
     {
-
         public static bool UseServerTimezone = true;
 
         static readonly int LocalUtcOffset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Hours;

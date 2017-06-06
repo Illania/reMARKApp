@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -18,11 +19,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CommentsListActivity : BaseAppCompatActivity
     {
-
         public const string EntityIntentKey = "EntityIntent_20c8514c-b644-47db-842f-f2df4204d93a";
         public const string CommentsResultKey = "CommentsResult_593d8c70-d45c-425e-8e36-7389e3cc0c62";
 
@@ -58,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                cf = (CommentsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                cf = (CommentsListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CommentsListActivity)}");
             }
         }

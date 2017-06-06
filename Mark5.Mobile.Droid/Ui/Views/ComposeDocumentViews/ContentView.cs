@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.IO;
 using System.Linq;
@@ -79,10 +80,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             newContentWebView.SetBackgroundColor(Color.Transparent);
             newContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             var customWebViewClient = new CustomWebViewClient();
-            customWebViewClient.PageFinishedLoading += (sender, e) =>
-            {
-                NewSetGetContentAsyncSemaphore.Release();
-            };
+            customWebViewClient.PageFinishedLoading += (sender, e) => { NewSetGetContentAsyncSemaphore.Release(); };
             newContentWebView.SetWebViewClient(customWebViewClient);
             newContentWebView.Settings.JavaScriptEnabled = true;
             newContentWebView.Settings.DomStorageEnabled = true;
@@ -92,7 +90,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
-            var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+            var typedArray = Context.ObtainStyledAttributes(new int[]
+            {
+                Resource.Attribute.selectableItemBackground
+            });
             showOldContentButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
             typedArray.Recycle();
             showOldContentButton.SetTextAppearanceCompat(context, Resource.Style.fontSmallBold);
@@ -107,10 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
             var oldContentWebViewClient = new CustomWebViewClient();
-            oldContentWebViewClient.PageFinishedLoading += (sender, e) =>
-            {
-                OldSetGetContentAsyncSemaphore.Release();
-            };
+            oldContentWebViewClient.PageFinishedLoading += (sender, e) => { OldSetGetContentAsyncSemaphore.Release(); };
             oldContentWebView.SetWebViewClient(oldContentWebViewClient);
             oldContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             oldContentWebView.Settings.JavaScriptEnabled = true;
@@ -271,10 +269,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         string GetHtmlHeader()
         {
-            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp
-                                                                        .ConvertTimestampMillisecondsToDateTime()
-                                                                        .ConvertUtcToUserTime()
-                                                                        .ConvertDateTimeToTimestampMilliseconds();
+            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
             var date = processedDateReceivedTimestamp.FormatUserTimestampAsTimeAndDateString(Context);
 
             var header = new StringBuilder();
@@ -324,7 +319,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task SetNewHtmlContentAsync(string htmlString)
         {
             await NewSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity)context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+            ((Activity) context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
         async Task<string> GetNewHtmlContentAsync(bool processing)
@@ -332,7 +327,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             try
             {
                 await NewSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity)context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
+                ((Activity) context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
 
                 await newGetHtmlContentInterfaceSemaphore.WaitAsync();
             }
@@ -347,7 +342,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task SetOldHtmlContentAsync(string htmlString)
         {
             await OldSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+            ((Activity) context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
         async Task<string> GetOldHtmlContentAsync(bool processing)
@@ -355,7 +350,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             try
             {
                 await OldSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
+                ((Activity) context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
 
                 await oldGetHtmlContentInterfaceSemaphore.WaitAsync();
             }
@@ -540,13 +535,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void FinalizeGetNewHtmlContent(Java.Lang.String content)
         {
-            newContent = (string)content;
+            newContent = (string) content;
             newGetHtmlContentInterfaceSemaphore.Release();
         }
 
         public void FinalizeGetOldHtmlContent(Java.Lang.String content)
         {
-            oldContent = (string)content;
+            oldContent = (string) content;
             oldGetHtmlContentInterfaceSemaphore.Release();
         }
 
@@ -557,6 +552,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         class GetHtmlContentInterface : Java.Lang.Object
         {
             public const string NewContentJavascript = "javascript:window.GetHtmlContentInterface.getNewHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
+
             public const string OldContentJavascript = "javascript:window.GetHtmlContentInterface.getOldHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
 
             readonly ContentView view;

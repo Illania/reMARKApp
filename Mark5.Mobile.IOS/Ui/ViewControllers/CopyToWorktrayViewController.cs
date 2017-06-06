@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +21,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class CopyToWorktrayViewController : AbstractViewController
     {
-
         public List<IBusinessEntity> BusinessEntities { get; set; }
 
         UIBarButtonItem cancelItem;
@@ -53,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBarTitle();
             InitializeHandlers();
 
-            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length);
+            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -64,7 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(CopyToWorktrayViewController)} appeared");
 
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource) tableView.Source;
             if (ds.Empty)
                 await RefreshData();
         }
@@ -109,12 +108,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
         }
 
         void InitializeNavigationBarTitle()
@@ -147,7 +146,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void DoneItem_Clicked(object sender, EventArgs e)
         {
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource) tableView.Source;
 
             if (ds.IsOwnSelected)
             {
@@ -196,7 +195,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                var ds = (DataSource)tableView.Source;
+                var ds = (DataSource) tableView.Source;
                 ds.SetItems(usersDepartments.Users);
 
                 var firstItemIndexPath = NSIndexPath.FromRowSection(0, 0);
@@ -217,21 +216,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-
             public bool Empty
             {
-                get
-                {
-                    return systemUsersInView.Count < 1;
-                }
+                get { return systemUsersInView.Count < 1; }
             }
 
             public bool IsOwnSelected
             {
-                get
-                {
-                    return tableView.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0));
-                }
+                get { return tableView.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0)); }
             }
 
             public List<SystemUser> SelectedItems

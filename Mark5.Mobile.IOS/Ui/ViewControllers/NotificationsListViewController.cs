@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,10 +23,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class NotificationsListViewController : AbstractViewController
     {
-
         readonly ObjectType[] objectTypes;
 
         UIBarButtonItem markAsReadItem;
@@ -73,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
                     tableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -93,7 +92,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             newNotificationsMessageToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
 
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource) tableView.Source;
             await RefreshData();
         }
 
@@ -142,12 +141,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
 
             refreshControl = new UIRefreshControl();
             refreshControl.BackgroundColor = UIColor.White;
@@ -196,7 +195,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task RefreshData()
         {
-            if (refreshing) return;
+            if (refreshing)
+                return;
 
             refreshing = true;
             refreshControl.ValueChanged -= RefreshControl_ValueChanged;
@@ -207,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
-                var ds = (DataSource)tableView.Source;
+                var ds = (DataSource) tableView.Source;
                 ds.SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
@@ -228,7 +228,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public async void NotificationSelected(Notification notification, NSIndexPath row)
         {
             await Managers.NotificationsManager.MarkAsRead(notification);
-            tableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
+            tableView.ReloadRows(new[]
+            {
+                row
+            }, UITableViewRowAnimation.Fade);
 
             switch (notification.ObjectType)
             {
@@ -276,21 +279,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-
             public bool Empty
             {
-                get
-                {
-                    return notificationsInView.Count < 1;
-                }
+                get { return notificationsInView.Count < 1; }
             }
 
             public List<Notification> Items
             {
-                get
-                {
-                    return notificationsInView;
-                }
+                get { return notificationsInView; }
             }
 
             NotificationsListViewController viewController;
@@ -342,7 +338,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
+                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
 
                 var n = notificationsInView[indexPath.Row];
                 viewController.NotificationSelected(n, indexPath);

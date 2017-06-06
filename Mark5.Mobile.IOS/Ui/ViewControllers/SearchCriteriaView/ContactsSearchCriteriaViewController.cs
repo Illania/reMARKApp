@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Linq;
 using CoreGraphics;
@@ -19,10 +20,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-
     public class ContactsSearchCriteriaViewController : AbstractSearchCriteriaViewController
     {
-
         SearchContactsCriteria criteria = new SearchContactsCriteria();
 
         public override void LoadView()
@@ -59,7 +58,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new ContactsSearchResultsViewController { Criteria = criteria }, true);
+            NavigationController.PushViewController(new ContactsSearchResultsViewController
+            {
+                Criteria = criteria
+            }, true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -95,7 +97,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         abstract class AbstractContactsSearchView : AbstractSearchView
         {
-
             protected SearchContactsCriteria Criteria;
 
             public void SetCriteria(SearchContactsCriteria criteria)
@@ -107,7 +108,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class ContactTypesSearchView : AbstractContactsSearchView
         {
-
             readonly UILabel personView;
             readonly UILabel departmentView;
             readonly UILabel companyView;
@@ -171,7 +171,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var types = Criteria.ContactTypes;
 
                 if (!types.Any())
-                    types.UnionWith(new[] { ContactType.Person, ContactType.Department, ContactType.Company });
+                    types.UnionWith(new[]
+                    {
+                        ContactType.Person,
+                        ContactType.Department,
+                        ContactType.Company
+                    });
 
                 SetLabelActive(personView, types.Contains(ContactType.Person));
                 SetLabelActive(departmentView, types.Contains(ContactType.Department));
@@ -212,7 +217,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class NameSearchView : AbstractContactsSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -243,7 +247,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -309,7 +316,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class AddressSearchView : AbstractContactsSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -340,7 +346,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -406,7 +415,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class ShortIdDescriptionPhysicalAddressView : AbstractContactsSearchView
         {
-
             readonly UIView shortIdView;
             readonly UILabel shortIdLabel;
             readonly UITextField shortIdTextField;
@@ -443,7 +451,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 shortIdTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -493,7 +504,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 descriptionTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -543,7 +557,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 physicalAddressTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -688,7 +705,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class CountryCategoriesView : AbstractContactsSearchView
         {
-
             readonly UIViewController parentViewController;
 
             readonly UIView countryView;
@@ -719,9 +735,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     Items = new[]
                     {
-                        new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
+                        new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        },
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
+                        new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        }
                     }
                 };
 
@@ -891,7 +913,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             class Source : UIPickerViewDataSource, IUIPickerViewDelegate
             {
-
                 readonly CountryInfo[] countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries.OrderBy(ci => ci.Name).ToArray();
 
                 public override nint GetComponentCount(UIPickerView pickerView)

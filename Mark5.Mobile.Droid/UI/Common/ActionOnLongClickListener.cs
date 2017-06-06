@@ -5,15 +5,14 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public class ActionOnLongClickListener : Java.Lang.Object, View.IOnLongClickListener
     {
-
         readonly Action action;
 
         public ActionOnLongClickListener(Action action)

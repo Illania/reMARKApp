@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: Tester.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +13,10 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Tester
 {
-
     public class Tester : ITester
     {
-
         public async Task<bool> CanTest(CancellationToken ct = default(CancellationToken))
         {
             return (await FileSystemStorage.GetConnectionInfoAsync(ct)) != null;
@@ -33,7 +30,6 @@ namespace Mark5.Mobile.Common.Tester
                 {
                     return false;
                 }
-
                 var ci = await FileSystemStorage.GetConnectionInfoAsync(ct);
 
                 var proxy = AppServiceProxyFactory.Create(ci.SslMode != SslMode.Off, ci.Hostname, ci.Port, CommonConfig.HttpClientHandler);
@@ -50,4 +46,3 @@ namespace Mark5.Mobile.Common.Tester
         }
     }
 }
-

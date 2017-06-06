@@ -1,10 +1,10 @@
 //
-// Project: Mark5.Mobile.ServiceReference
 // File: FileTransferServiceProxy.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,13 +18,10 @@ using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Newtonsoft.Json;
 
-#pragma warning disable CS1701
 namespace Mark5.ServiceReference.FileTransferService
 {
-
     class FileTransferServiceProxy : IFileTransferServiceProxy
     {
-
         static class Segments
         {
             public const string Version = "version";
@@ -84,7 +81,6 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 throw new FileTransferServiceException(ex);
             }
-
         }
 
         public async Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, Func<Stream, Task> saveHandler, CancellationToken ct = default(CancellationToken))
@@ -92,7 +88,10 @@ namespace Mark5.ServiceReference.FileTransferService
             try
             {
                 if (currentServiceVersion == null)
-                    currentServiceVersion = (await GetServiceVersionAsync(new GetServiceVersionRequest { Token = req.Token })).Version;
+                    currentServiceVersion = (await GetServiceVersionAsync(new GetServiceVersionRequest
+                    {
+                        Token = req.Token
+                    })).Version;
             }
             catch (Exception ex)
             {
@@ -164,7 +163,8 @@ namespace Mark5.ServiceReference.FileTransferService
                         request.Headers.Add(Headers.Token, req.Token);
                         var res = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
 
-                        if (res.StatusCode != HttpStatusCode.OK) return null;
+                        if (res.StatusCode != HttpStatusCode.OK)
+                            return null;
 
                         var result = new GetAttachmentResponse();
 
@@ -206,7 +206,10 @@ namespace Mark5.ServiceReference.FileTransferService
             try
             {
                 if (currentServiceVersion == null)
-                    currentServiceVersion = (await GetServiceVersionAsync(new GetServiceVersionRequest { Token = req.Token })).Version;
+                    currentServiceVersion = (await GetServiceVersionAsync(new GetServiceVersionRequest
+                    {
+                        Token = req.Token
+                    })).Version;
             }
             catch (Exception ex)
             {
@@ -305,7 +308,6 @@ namespace Mark5.ServiceReference.FileTransferService
 
     static class UriExtensions
     {
-
         public static Uri AppendPathSegments(this Uri uri, params object[] segments)
         {
             foreach (var segment in segments)
@@ -334,7 +336,6 @@ namespace Mark5.ServiceReference.FileTransferService
 
     static class StringExtensions
     {
-
         public static string Base64Encode(this string plainText)
         {
             var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
@@ -349,5 +350,4 @@ namespace Mark5.ServiceReference.FileTransferService
     }
 
     #endregion
-
 }

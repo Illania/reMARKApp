@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,12 +31,12 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-
     public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
-
         readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
+
         readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
+
         readonly static NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
 
         UIButton expandButton;
@@ -127,14 +128,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
 
-            newContentWebView.NavigationDelegate = new WebViewNavigationDelegate { DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); } };
+            newContentWebView.NavigationDelegate = new WebViewNavigationDelegate
+            {
+                DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); }
+            };
             ContainerView.AddSubview(newContentWebView);
             AddConstraints(new[]
-                {
+            {
                 newContentHeightConstraint = NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 200f),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+                NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(newContentWebView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
             });
 
             newContentWebView.LoadHtmlString(DefaultEditContent, null);
@@ -380,10 +384,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         string GetHtmlHeader()
         {
-            var date = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
-                         .ConvertUtcToUserTime()
-                         .ConvertDateTimeToTimestampMilliseconds()
-                         .FormatUserTimestampAsCompactLongDateTimeString();
+            var date = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
 
             var header = new StringBuilder();
             header.Append("<br/><hr/>");
@@ -698,7 +699,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         class WebViewNavigationDelegate : WKNavigationDelegate
         {
-
             public Action DidFinishNavigationAction { get; set; }
 
             public override void DidFinishNavigation(WKWebView webView, WKNavigation navigation)

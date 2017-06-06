@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -13,10 +14,8 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
-
     public class SubjectView : DocumentView
     {
-
         AppCompatTextView subjectTextView;
 
         public SubjectView(Context context)

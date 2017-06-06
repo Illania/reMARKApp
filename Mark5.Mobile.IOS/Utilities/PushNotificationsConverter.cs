@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -14,10 +15,8 @@ using UserNotifications;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public static class PushNotificationsConverter
     {
-        
         public static Notification ConvertToNotification(this NSDictionary dict)
         {
             return dict.ConvertToPushNotification().ConvertToNotification();

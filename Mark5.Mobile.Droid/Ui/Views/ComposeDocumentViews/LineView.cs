@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -181,11 +182,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             public Line Line
             {
-                get
-                {
-                    return line;
-                }
+                get { return line; }
             }
+
             public LineInView(Line line)
             {
                 this.line = line;
@@ -206,7 +205,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             readonly int hiddenItemIndex;
 
             public CustomAdapter(Context context, int textViewResourceId, IList objects, int hiddenItemIndex)
-              : base(context, textViewResourceId, objects)
+                : base(context, textViewResourceId, objects)
             {
                 this.hiddenItemIndex = hiddenItemIndex;
             }

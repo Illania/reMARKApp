@@ -1,26 +1,22 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: NotificationsDataAccess.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
-
     class NotificationsDataAccess : INotificationsDataAccess
     {
-
         readonly DatabaseConnectionProvider systemDatabase;
 
         public NotificationsDataAccess(DatabaseConnectionProvider systemDatabase)
@@ -62,7 +58,6 @@ namespace Mark5.Mobile.Common.DataAccess
                     var guids = readNotificationInfos.Select(rni => rni.NotificationGuid);
                     notifications.ForEach(n => n.IsRead = guids.Contains(n.Guid));
                 }
-
                 return notifications;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -77,10 +72,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 List<ReadNotificationInfo> rnis = null;
 
-                await systemDatabase.RunInConnectionAsync(c =>
-                {
-                    rnis = c.Table<ReadNotificationInfo>().ToList();
-                });
+                await systemDatabase.RunInConnectionAsync(c => { rnis = c.Table<ReadNotificationInfo>().ToList(); });
 
                 return rnis.Select(rni => rni.NotificationGuid).ToList();
             }
@@ -96,7 +88,10 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
-                    c.InsertOrReplace(new ReadNotificationInfo { NotificationGuid = notificationGuid });
+                    c.InsertOrReplace(new ReadNotificationInfo
+                    {
+                        NotificationGuid = notificationGuid
+                    });
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -111,7 +106,10 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
-                    c.InsertOrReplace(new ReadNotificationInfo { NotificationGuid = notification.Guid });
+                    c.InsertOrReplace(new ReadNotificationInfo
+                    {
+                        NotificationGuid = notification.Guid
+                    });
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -130,7 +128,10 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Query<GuidValue>(query);
 
                     c.DeleteAll<ReadNotificationInfo>();
-                    c.InsertOrReplaceAll(result.Select(r => new ReadNotificationInfo { NotificationGuid = r.Guid }));
+                    c.InsertOrReplaceAll(result.Select(r => new ReadNotificationInfo
+                    {
+                        NotificationGuid = r.Guid
+                    }));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -140,4 +141,3 @@ namespace Mark5.Mobile.Common.DataAccess
         }
     }
 }
-

@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Threading.Tasks;
 using Android.Content;
@@ -28,16 +29,17 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback, ISharedPreferencesOnSharedPreferenceChangeListener
     {
-
         static class RequestCodes
         {
             public const int NotificationRingtoneRequest = 1;
         }
 
-        public override Fragment CallbackFragment { get { return this; } }
+        public override Fragment CallbackFragment
+        {
+            get { return this; }
+        }
 
         public override void OnResume()
         {
@@ -46,8 +48,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var title = GetString(Resource.String.settings);
             var subtitle = PreferenceScreen.Title == title ? string.Empty : PreferenceScreen.Title;
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = subtitle;
 
             PreferenceManager.SharedPreferences.RegisterOnSharedPreferenceChangeListener(this);
         }
@@ -61,7 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
+            if (resultCode == (int) Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
             {
                 var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
                 PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
@@ -78,51 +80,49 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
             }
 
-            Task.Run(() =>
-            {
-                return AuthenticatorFactory.Create().GetConnectionInfoAsync();
-            }).ContinueWith(t =>
-            {
-                var ci = t.Result;
-
-                var usernamePreference = FindPreference(GetString(Resource.String.pref_key_account_username));
-                if (usernamePreference != null)
+            Task.Run(() => { return AuthenticatorFactory.Create().GetConnectionInfoAsync(); })
+                .ContinueWith(t =>
                 {
-                    usernamePreference.Summary = ci.Username;
-                }
+                    var ci = t.Result;
 
-                var hostnamePreference = FindPreference(GetString(Resource.String.pref_key_account_hostname));
-                if (hostnamePreference != null)
-                {
-                    hostnamePreference.Summary = ci.Hostname;
-                }
-
-                var portPreference = FindPreference(GetString(Resource.String.pref_key_account_port));
-                if (portPreference != null)
-                {
-                    portPreference.Summary = ci.Port.ToString();
-                }
-
-                var sslPreference = FindPreference(GetString(Resource.String.pref_key_account_ssl));
-                if (sslPreference != null)
-                {
-                    switch (ci.SslMode)
+                    var usernamePreference = FindPreference(GetString(Resource.String.pref_key_account_username));
+                    if (usernamePreference != null)
                     {
-                        case SslMode.On:
-                            sslPreference.Summary = GetString(Resource.String.ssl_on);
-                            break;
-                        case SslMode.AllowSelfSigned:
-                            sslPreference.Summary = GetString(Resource.String.ssl_self_signed);
-                            break;
-                        default:
-                            var summary = new SpannableString(GetString(Resource.String.ssl_off));
-                            summary.SetSpan(new StyleSpan(TypefaceStyle.Bold), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
-                            summary.SetSpan(new ForegroundColorSpan(new Color(ContextCompat.GetColor(Context, Resource.Color.brown))), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
-                            sslPreference.SummaryFormatted = summary;
-                            break;
+                        usernamePreference.Summary = ci.Username;
                     }
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                    var hostnamePreference = FindPreference(GetString(Resource.String.pref_key_account_hostname));
+                    if (hostnamePreference != null)
+                    {
+                        hostnamePreference.Summary = ci.Hostname;
+                    }
+
+                    var portPreference = FindPreference(GetString(Resource.String.pref_key_account_port));
+                    if (portPreference != null)
+                    {
+                        portPreference.Summary = ci.Port.ToString();
+                    }
+
+                    var sslPreference = FindPreference(GetString(Resource.String.pref_key_account_ssl));
+                    if (sslPreference != null)
+                    {
+                        switch (ci.SslMode)
+                        {
+                            case SslMode.On:
+                                sslPreference.Summary = GetString(Resource.String.ssl_on);
+                                break;
+                            case SslMode.AllowSelfSigned:
+                                sslPreference.Summary = GetString(Resource.String.ssl_self_signed);
+                                break;
+                            default:
+                                var summary = new SpannableString(GetString(Resource.String.ssl_off));
+                                summary.SetSpan(new StyleSpan(TypefaceStyle.Bold), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
+                                summary.SetSpan(new ForegroundColorSpan(new Color(ContextCompat.GetColor(Context, Resource.Color.brown))), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
+                                sslPreference.SummaryFormatted = summary;
+                                break;
+                        }
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)
@@ -136,13 +136,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.clear_contacts_cache_title, Resource.String.clear_contacts_cache_summary, async () =>
                 {
-
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_contacts_cache, Resource.String.please_wait);
 
                     try
                     {
                         await Managers.CleanUpManager.ClearContactsCache();
-                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Contacts });
+                        await Managers.CleanUpManager.CleanUp(new[]
+                        {
+                            ModuleType.Contacts
+                        });
 
                         dismissAction();
                     }
@@ -166,7 +168,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     try
                     {
                         await Managers.CleanUpManager.ClearShortcodeCache();
-                        await Managers.CleanUpManager.CleanUp(new[] { ModuleType.Shortcodes });
+                        await Managers.CleanUpManager.CleanUp(new[]
+                        {
+                            ModuleType.Shortcodes
+                        });
 
                         dismissAction();
                     }
@@ -184,7 +189,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
             {
                 var i = new Intent(RingtoneManager.ActionRingtonePicker);
-                i.PutExtra(RingtoneManager.ExtraRingtoneType, (int)RingtoneType.Notification);
+                i.PutExtra(RingtoneManager.ExtraRingtoneType, (int) RingtoneType.Notification);
                 i.PutExtra(RingtoneManager.ExtraRingtoneTitle, GetString(Resource.String.pref_notification_ringtone_title));
                 i.PutExtra(RingtoneManager.ExtraRingtoneDefaultUri, Settings.System.DefaultNotificationUri);
                 if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
@@ -209,18 +214,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
 
-                Task.Run(() =>
-                {
-                    return SystemReportCollector.CreateFullReport();
-                }).ContinueWith(t =>
-                {
-                    dismissAction();
-
-                    if (!t.IsFaulted)
+                Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                    .ContinueWith(t =>
                     {
-                        StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        dismissAction();
+
+                        if (!t.IsFaulted)
+                        {
+                            StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 return true;
             }
@@ -229,35 +232,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
-                            {
-                                try
-                                {
-                                    FirebaseInstanceId.Instance?.DeleteInstanceId();
-                                    var _nullToken = FirebaseInstanceId.Instance?.Token; // Token will be null, but it will cause refresh
-                                }
-                                catch (Exception ex)
-                                {
-                                    CommonConfig.Logger.Error("Could not reset Firebase token!", ex);
-                                }
+                {
+                    try
+                    {
+                        FirebaseInstanceId.Instance?.DeleteInstanceId();
+                        var _nullToken = FirebaseInstanceId.Instance?.Token; // Token will be null, but it will cause refresh
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Could not reset Firebase token!", ex);
+                    }
 
-                                try
-                                {
-                                    var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
-                                    ServerConfig.SystemSettings = ss;
+                    try
+                    {
+                        var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
+                        ServerConfig.SystemSettings = ss;
 
-                                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
+                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
 
-                                    dismissAction();
-                                }
-                                catch (Exception ex)
-                                {
-                                    dismissAction();
+                        dismissAction();
+                    }
+                    catch (Exception ex)
+                    {
+                        dismissAction();
 
-                                    CommonConfig.Logger.Error("Could not retrieve system settings!", ex);
+                        CommonConfig.Logger.Error("Could not retrieve system settings!", ex);
 
-                                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                                }
-                            });
+                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                    }
+                });
 
                 return true;
             }
@@ -337,7 +340,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var args = new Bundle();
             args.PutString(ArgPreferenceRoot, pref.Key);
-            var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
+            var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
             ft.Replace(Resource.Id.fragment_container, new PreferenceFragment
             {

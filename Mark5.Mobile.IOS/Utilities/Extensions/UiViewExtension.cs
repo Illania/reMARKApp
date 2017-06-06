@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System.Collections.Generic;
 using System.Linq;
 using UIKit;
@@ -74,7 +75,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static bool IsConstraintRelevant(NSLayoutConstraint constraint)
         {
-            var attributes = new[] { NSLayoutAttribute.Top, NSLayoutAttribute.Bottom, NSLayoutAttribute.Height, NSLayoutAttribute.CenterY, NSLayoutAttribute.Baseline };
+            var attributes = new[]
+            {
+                NSLayoutAttribute.Top,
+                NSLayoutAttribute.Bottom,
+                NSLayoutAttribute.Height,
+                NSLayoutAttribute.CenterY,
+                NSLayoutAttribute.Baseline
+            };
             return attributes.Contains(constraint.FirstAttribute) || attributes.Contains(constraint.SecondAttribute);
         }
 

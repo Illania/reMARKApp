@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using CoreFoundation;
 using CoreGraphics;
@@ -17,11 +18,10 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-
     public class ContentView : DocumentSubView, IWKNavigationDelegate, IWKScriptMessageHandler
     {
-
         readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
+
         readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
 
         WKWebView webView;
@@ -73,13 +73,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             webView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(webView);
             ContainerView.AddConstraints(new[]
-                {
-                    webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
-                });
+            {
+                webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
+            });
         }
 
         #region IWKNavigationDelegate
@@ -108,7 +108,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 {
                     if (wv.IsLoading)
                     {
-
                         resizeAction(wv, nslc);
                     }
                     else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
@@ -226,7 +225,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         }
 
         #endregion
-
     }
-
 }

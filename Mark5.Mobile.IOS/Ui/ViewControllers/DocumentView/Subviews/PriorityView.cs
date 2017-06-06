@@ -5,16 +5,15 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
-
     public class PriorityView : TextSubView
     {
-        
         public PriorityView()
             : base(Localization.GetString("priority"))
         {

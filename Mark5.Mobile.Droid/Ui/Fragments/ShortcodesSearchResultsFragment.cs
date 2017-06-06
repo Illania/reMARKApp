@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -24,10 +26,8 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class ShortcodesSearchResultsFragment : RetainableStateFragment
     {
-
         public SearchShortcodesCriteria Criteria { get; set; }
         public Action CloseRequest { get; set; }
 
@@ -62,8 +62,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes_result);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes_result);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchResultsFragment)} [criteria={Criteria}]");
         }
@@ -138,7 +138,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (shortcodePreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_shortcodes);
-                    if (CloseRequest != null) CloseRequest();
+                    if (CloseRequest != null)
+                        CloseRequest();
                     return;
                 }
 
@@ -153,7 +154,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
             finally
             {
@@ -180,7 +182,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodeSearchResultsFragmentState : IRetainableState
         {
-
             public SearchShortcodesCriteria Criteria { get; set; }
 
             public List<ShortcodePreview> ShortcodePreviews { get; set; }
@@ -192,24 +193,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodeSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-
             public List<ShortcodePreview> Items
             {
-                get
-                {
-                    return shortcodePreviewsInView;
-                }
+                get { return shortcodePreviewsInView; }
             }
 
             public override int ItemCount
             {
-                get
-                {
-                    return shortcodePreviewsInView.Count;
-                }
+                get { return shortcodePreviewsInView.Count; }
             }
 
             readonly List<ShortcodePreview> shortcodePreviewsInView = new List<ShortcodePreview>(1000);
+
             readonly Dictionary<int, ShortcodePreview> selectedShortcodesInView = new Dictionary<int, ShortcodePreview>();
 
             public event EventHandler<ShortcodePreview> ItemClicked = delegate { };
@@ -217,7 +212,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var cpvh = holder as ShortcodePreviewViewHolder;
-                if (cpvh == null) return;
+                if (cpvh == null)
+                    return;
 
                 var cp = shortcodePreviewsInView[position];
 
@@ -249,28 +245,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder
         {
-
             public string Name
             {
-                set
-                {
-                    nameTextView.Text = value;
-                }
+                set { nameTextView.Text = value; }
             }
 
             public bool Selected
             {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
+                set { selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
             }
 
             readonly AppCompatTextView nameTextView;
             readonly View selectedOverlay;
 
             public ShortcodePreviewViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_shortcode_name);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
@@ -280,4 +269,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

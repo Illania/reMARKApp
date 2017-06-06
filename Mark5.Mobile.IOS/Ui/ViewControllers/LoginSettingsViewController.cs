@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,10 +19,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    
     public class LoginSettingsViewController : AppSettingsViewController, ISettingsDelegate
     {
-
         const string SslEnabledKey = "sslEnabled";
         const string AcceptSelfSignedKey = "acceptSelfSigned";
         const string CreateReportKey = "createReport";
@@ -30,12 +29,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public class SettingsValues
         {
-
             public SslMode SslMode { get; set; }
         }
 
         public event EventHandler<SettingsValues> RestrictedSettingsValuesUpdated;
-        
+
         NSObject observer;
 
         public LoginSettingsViewController(SettingsValues values)
@@ -71,9 +69,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            if (observer != null) NSNotificationCenter.DefaultCenter.RemoveObserver(observer);
+            if (observer != null)
+                NSNotificationCenter.DefaultCenter.RemoveObserver(observer);
         }
-        
+
         public void SettingsViewControllerDidEnd(AppSettingsViewController sender)
         {
             if (RestrictedSettingsValuesUpdated != null)
@@ -110,7 +109,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!sslEnabled)
                 {
-                    SetHiddenKeys(new [] { AcceptSelfSignedKey }, true);
+                    SetHiddenKeys(new[]
+                    {
+                        AcceptSelfSignedKey
+                    }, true);
                     SettingsStore.SetBool(false, AcceptSelfSignedKey);
                 }
                 else
@@ -157,20 +159,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
 
-                Task.Run(() =>
-                {
-                    return SystemReportCollector.CreateFullReport();
-                }).ContinueWith(t =>
-                {
-                    if (dismissAction != null) dismissAction();
-
-                    if (!t.IsFaulted)
+                Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                    .ContinueWith(t =>
                     {
-                        var src = SystemReportCollector.CreateShareReportController(t.Result);
-                        if (src.PopoverPresentationController != null) src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
-                        PresentViewController(src, true, null);
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (dismissAction != null)
+                            dismissAction();
+
+                        if (!t.IsFaulted)
+                        {
+                            var src = SystemReportCollector.CreateShareReportController(t.Result);
+                            if (src.PopoverPresentationController != null)
+                                src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                            PresentViewController(src, true, null);
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
             }
 
             if (specifier.Key == OpenSettingsAppKey)
@@ -199,9 +201,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class InMemorySettingsStore : AbstractSettingsStore
         {
-
             readonly Dictionary<string, NSObject> values = new Dictionary<string, NSObject>();
-            
+
             public override NSObject GetObject(string key)
             {
                 return values.ContainsKey(key) ? values[key] : null;

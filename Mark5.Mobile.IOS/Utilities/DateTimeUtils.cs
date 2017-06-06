@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Utilities;
@@ -12,10 +13,8 @@ using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public static class DateTimeUtils
     {
-
         public static bool UseServerTimezone = true;
 
         static readonly int LocalUtcOffset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Hours;

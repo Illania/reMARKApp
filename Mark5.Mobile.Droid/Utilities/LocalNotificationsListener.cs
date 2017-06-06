@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Mark5.Mobile.Common.Managers;
 using Android.Support.V4.App;
@@ -19,10 +20,8 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    
     public static class LocalNotificationsListener
     {
-        
         public const int FailedSendingNotificationId = 11;
 
         static public void Initialize()
@@ -40,15 +39,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 var title = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_title);
                 var content = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_content);
-                var nb = new NotificationCompat.Builder(Application.Context)
-                               .SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon)
-                               .SetColor(ContextCompat.GetColor(Application.Context, Resource.Color.darkerblue))
-                               .SetContentIntent(pi)
-                               .SetContentTitle(title).SetContentText(content)
-                               .SetAutoCancel(true)
-                               .SetPriority((int)NotificationPriority.High)
-                               .SetStyle(new NotificationCompat.BigTextStyle()
-                                         .BigText(content));
+                var nb = new NotificationCompat.Builder(Application.Context).SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon).SetColor(ContextCompat.GetColor(Application.Context, Resource.Color.darkerblue)).SetContentIntent(pi).SetContentTitle(title).SetContentText(content).SetAutoCancel(true).SetPriority((int) NotificationPriority.High).SetStyle(new NotificationCompat.BigTextStyle().BigText(content));
 
                 if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
                 {
@@ -56,11 +47,15 @@ namespace Mark5.Mobile.Droid.Utilities
                 }
                 if (PlatformConfig.Preferences.NotificationsVibrate)
                 {
-                    nb.SetVibrate(new[] { 500L, 250L, 500L });
+                    nb.SetVibrate(new[]
+                    {
+                        500L,
+                        250L,
+                        500L
+                    });
                 }
-                var nm = (NotificationManager)Application.Context.GetSystemService(Context.NotificationService);
+                var nm = (NotificationManager) Application.Context.GetSystemService(Context.NotificationService);
                 nm.Notify(FailedSendingNotificationId, nb.Build());
-
             }
             catch (Exception ex)
             {

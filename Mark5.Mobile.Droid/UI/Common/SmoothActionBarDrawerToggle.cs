@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -12,10 +13,8 @@ using Android.Support.V4.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public class SmoothActionBarDrawerToggle : ActionBarDrawerToggle
     {
-
         public Action action;
 
         public SmoothActionBarDrawerToggle(IntPtr javaReference, Android.Runtime.JniHandleOwnership transfer)

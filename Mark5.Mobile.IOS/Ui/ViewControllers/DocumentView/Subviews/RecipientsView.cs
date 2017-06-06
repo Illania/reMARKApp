@@ -5,12 +5,14 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -48,15 +50,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             titleLabel.TextColor = UIColor.LightGray;
             titleLabel.Opaque = false;
             titleLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            titleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            titleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            titleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            titleLabel.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+            });
 
             var textStorage = new NSTextStorage();
             textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, 0));
@@ -77,12 +79,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Right, 1f, InnerMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                    NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Right, 1f, InnerMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+            });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
             textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
@@ -151,8 +153,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             var tapPosition = textView.GetClosestPositionToPoint(textViewTapGestureRecognizer.LocationInView(textView));
             var offset = textView.GetOffsetFromPosition(textView.BeginningOfDocument, tapPosition);
 
-            var beforeSubstring = textView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
-            var afterSubstring = textView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var beforeSubstring = textView.Text.SafeSubstring(0, (int) offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = textView.Text.SafeSubstring((int) offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
@@ -218,29 +220,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             textView.TextStorage.EndEditing();
 
             Animate(0.2d, () =>
-                {
-                    textView.TextContainer.MaximumNumberOfLines = 0;
-                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+            {
+                textView.TextContainer.MaximumNumberOfLines = 0;
+                textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                Superview.SetNeedsLayout();
+                Superview.LayoutIfNeeded();
 
-                    expanded = true;
-                });
+                expanded = true;
+            });
         }
 
         #endregion
-
     }
 
     public class RecipentTappedEventArgs : EventArgs
     {
-
-        public string Recipent
-        {
-            get;
-            private set;
-        }
+        public string Recipent { get; private set; }
 
         public RecipentTappedEventArgs(string recipent)
         {

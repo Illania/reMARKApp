@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,15 +28,9 @@ using Mark5.Mobile.Droid.Ui.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class ObjectLinksFragment : RetainableStateFragment
     {
-
-        public IBusinessEntity BusinessEntity
-        {
-            get;
-            set;
-        }
+        public IBusinessEntity BusinessEntity { get; set; }
 
         public Action CloseRequest { get; set; }
 
@@ -55,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-            var padding = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 10f, Resources.DisplayMetrics) + 0.5f);
+            var padding = (int) (TypedValue.ApplyDimension(ComplexUnitType.Dip, 10f, Resources.DisplayMetrics) + 0.5f);
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             return rootView;
@@ -65,8 +60,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.links);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.links);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
         }
@@ -96,7 +91,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
         }
 
@@ -215,7 +211,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ObjectLinksFragmentState : IRetainableState
         {
-
             public IBusinessEntity BusinessEntity { get; set; }
 
             public List<ObjectLink> ObjectLinks { get; set; }

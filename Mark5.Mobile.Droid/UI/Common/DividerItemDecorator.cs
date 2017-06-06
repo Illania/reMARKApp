@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -16,10 +17,8 @@ using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public class DividerItemDecorator : RecyclerView.ItemDecoration
     {
-
         readonly Drawable divider;
         readonly int[] idToSkip;
 
@@ -50,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     continue;
                 }
 
-                var p = (RecyclerView.LayoutParams)child.LayoutParameters;
+                var p = (RecyclerView.LayoutParams) child.LayoutParameters;
 
                 var top = child.Bottom + p.BottomMargin;
                 var bottom = top + divider.IntrinsicHeight;

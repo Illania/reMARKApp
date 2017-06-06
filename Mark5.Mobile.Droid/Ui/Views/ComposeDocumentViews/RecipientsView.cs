@@ -25,6 +25,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -32,10 +33,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-
     public class RecipientsView : ComposeDocumentView
     {
-
         public event EventHandler Edited = delegate { };
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
@@ -52,18 +51,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public bool Empty
         {
-            get
-            {
-                return !Validator.ContainsValidEmail(emailEditor.Text);
-            }
+            get { return !Validator.ContainsValidEmail(emailEditor.Text); }
         }
 
         public bool AllEmailsValid
         {
-            get
-            {
-                return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s));
-            }
+            get { return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)); }
         }
 
         public RecipientsView(Context context, DocumentAddressType type)
@@ -132,8 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
-                || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
                 return Task.CompletedTask;
             }
@@ -203,7 +195,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public override Task UpdateDocument()
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == this.AddressType);
-            GetEmails().ForEach(s => DocumentPreview.Addresses.Add(new DocumentAddress { Address = s, AddressType = this.AddressType, Type = CommunicationAddressType.Email }));
+            GetEmails()
+                .ForEach(s => DocumentPreview.Addresses.Add(new DocumentAddress
+                {
+                    Address = s,
+                    AddressType = this.AddressType,
+                    Type = CommunicationAddressType.Email
+                }));
             return Task.CompletedTask;
         }
 
@@ -249,7 +247,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         IEnumerable<string> GetRecipents()
         {
-            return emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Where(s => Validator.ContainsValidEmail(s)).Select(s => s.Trim());
+            return emailEditor.Text.Split(new[]
+                {
+                    EmailSeparator
+                }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(s => Validator.ContainsValidEmail(s))
+                .Select(s => s.Trim());
         }
 
         void SetRecipients(IEnumerable<string> recipients)
@@ -333,8 +336,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 char lastChar;
 
-                while ((lastChar = spannable.LastOrDefault()) != default(char)
-                       && (lastChar == ' ' || lastChar == ',' || lastChar == '\t' || lastChar.ToString() == System.Environment.NewLine))
+                while ((lastChar = spannable.LastOrDefault()) != default(char) && (lastChar == ' ' || lastChar == ',' || lastChar == '\t' || lastChar.ToString() == System.Environment.NewLine))
                 {
                     textHasChangedFlag = true;
 
@@ -461,18 +463,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             public Filter Filter
             {
-                get
-                {
-                    return filter;
-                }
+                get { return filter; }
             }
 
             public override int Count
             {
-                get
-                {
-                    return suggestions.Count;
-                }
+                get { return suggestions.Count; }
             }
 
             public string ActualConstraint;
@@ -484,8 +480,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             public override View GetView(int position, View convertView, ViewGroup parent)
             {
-                var view = convertView ?? LayoutInflater.From(parent.Context).Inflate(
-                                        Resource.Layout.suggestion_dropdown, parent, false);
+                var view = convertView ?? LayoutInflater.From(parent.Context).Inflate(Resource.Layout.suggestion_dropdown, parent, false);
 
                 var suggestionNameTextView = view.FindViewById<AppCompatTextView>(Resource.Id.suggestionName);
                 var suggestionAddressTextView = view.FindViewById<AppCompatTextView>(Resource.Id.suggestionAddress);
@@ -558,11 +553,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             public override PrintableSuggestion this[int position]
             {
-                get
-                {
-                    return suggestions[position];
-                }
-
+                get { return suggestions[position]; }
             }
 
             public void AddSuggestions(List<PrintableSuggestion> newSuggestions)
@@ -577,20 +568,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             public void Clean()
             {
                 new Handler(Looper.MainLooper).Post(() =>
-                  {
-                      suggestions.Clear();
-                      NotifyDataSetInvalidated();
-                  });
+                {
+                    suggestions.Clear();
+                    NotifyDataSetInvalidated();
+                });
             }
 
             public class SuggestionsFilter : Filter
             {
                 public bool Loading
                 {
-                    get
-                    {
-                        return answersReceived < 3;
-                    }
+                    get { return answersReceived < 3; }
                 }
 
                 readonly SuggestionsAdapter suggestionsAdapter;
@@ -659,17 +647,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 #endregion
             }
+
             #endregion
         }
 
         public class SuggestionsObservableCollection : SortedObservableCollection<PrintableSuggestion>
         {
-
             public SuggestionsObservableCollection()
                 : base(PrintableSuggestion.LookupComparison, PrintableSuggestion.SortingComparison)
             {
             }
         }
-
     }
 }

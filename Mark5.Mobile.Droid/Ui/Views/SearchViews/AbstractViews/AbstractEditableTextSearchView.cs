@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -26,7 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         readonly string emptyText;
 
-        protected AbstractEditableTextSearchView(Context context, int topTextResId, LinearLayoutCompat containerLayout = null) : base(context)
+        protected AbstractEditableTextSearchView(Context context, int topTextResId, LinearLayoutCompat containerLayout = null)
+            : base(context)
         {
             this.containerLayout = containerLayout;
             emptyText = context.GetString(Resource.String.search_editable_empty);
@@ -82,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int)GravityFlags.CenterVertical,
+                    Gravity = (int) GravityFlags.CenterVertical,
                 }
             };
 
@@ -109,7 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             if (!e.HasFocus)
             {
-                ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow((sender as View).WindowToken, HideSoftInputFlags.None);
+                ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow((sender as View).WindowToken, HideSoftInputFlags.None);
             }
             else
             {
@@ -164,7 +166,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bottomEditText.RequestFocus();
             bottomEditText.SetSelection(bottomEditText.Text.Length);
 
-            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).ShowSoftInput(bottomEditText, ShowFlags.Implicit);
+            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).ShowSoftInput(bottomEditText, ShowFlags.Implicit);
 
             cancelIconLayout.Visibility = ViewStates.Visible;
         }

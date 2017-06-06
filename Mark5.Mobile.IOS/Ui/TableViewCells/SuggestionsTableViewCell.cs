@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -14,18 +15,12 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class SuggestionsTableViewCell : UITableViewCell
     {
-        
         public static readonly UINib Nib = UINib.FromName("SuggestionsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("SuggestionsTableViewCell");
 
-        public PrintableSuggestion PrintableSuggestion
-        {
-            get;
-            private set;
-        }
+        public PrintableSuggestion PrintableSuggestion { get; private set; }
 
         public SuggestionsTableViewCell(IntPtr handle)
             : base(handle)
@@ -34,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static SuggestionsTableViewCell Create()
         {
-            var cell = (SuggestionsTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (SuggestionsTableViewCell) Nib.Instantiate(null, null)[0];
 
             cell.BackgroundColor = UIColor.Clear;
             cell.SuggestionName.Font = Theme.DefaultFont;
@@ -64,7 +59,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
                 SuggestionAddressAlternative.Hidden = true;
             }
-
         }
 
         #endregion

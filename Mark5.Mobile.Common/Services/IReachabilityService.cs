@@ -1,24 +1,19 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: IReachabilityService.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Threading.Tasks;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Services
 {
-
     public interface IReachabilityService
     {
-
         bool IsReachable { get; }
-
         bool IsCheckingReachability { get; }
-
         event EventHandler RefreshingReachability;
 
         event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;
@@ -28,18 +23,8 @@ namespace Mark5.Mobile.Common.Services
 
     public class ReachabilityRefreshedEventArgs : EventArgs
     {
-
-        public bool Changed
-        {
-            get;
-            private set;
-        }
-
-        public bool IsReachable
-        {
-            get;
-            private set;
-        }
+        public bool Changed { get; private set; }
+        public bool IsReachable { get; private set; }
 
         public ReachabilityRefreshedEventArgs(bool changed, bool isReachable)
         {
@@ -57,4 +42,3 @@ namespace Mark5.Mobile.Common.Services
         Service = 8
     }
 }
-

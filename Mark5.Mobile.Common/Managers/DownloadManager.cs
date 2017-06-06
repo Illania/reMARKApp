@@ -1,10 +1,10 @@
-//
-// Project: Mark5.Mobile.Common
+﻿//
 // File: DownloadManager.cs
 // Author: Ferdinando Papale <fp@nordic-it.com>
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -14,19 +14,13 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.PortableCollections;
 using Mark5.Mobile.Common.Services;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
-
     class DownloadManager : IDownloadManager
     {
-
         public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies
         {
-            get
-            {
-                return downloadPolicies;
-            }
+            get { return downloadPolicies; }
         }
 
         CancellationTokenSource cts;
@@ -49,7 +43,10 @@ namespace Mark5.Mobile.Common
             this.documentsDataAccess = documentsDataAccess;
 
             semaphore = new SemaphoreSlim(1);
-            queue = (IPortableConcurrentQueue<DownloadItemInfo>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(DownloadItemInfo) }));
+            queue = (IPortableConcurrentQueue<DownloadItemInfo>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[]
+            {
+                typeof(DownloadItemInfo)
+            }));
             downloadPolicies = new Dictionary<ObjectType, DownloadPolicy>();
         }
 
@@ -74,17 +71,25 @@ namespace Mark5.Mobile.Common
             {
                 return;
             }
-
             switch (objectType)
             {
                 case ObjectType.Document:
-                    AddToQueue(new DocumentDownloadInfo { FolderId = folderId });
+                    AddToQueue(new DocumentDownloadInfo
+                    {
+                        FolderId = folderId
+                    });
                     break;
                 case ObjectType.Contact:
-                    AddToQueue(new ContactDownloadInfo { FolderId = folderId });
+                    AddToQueue(new ContactDownloadInfo
+                    {
+                        FolderId = folderId
+                    });
                     break;
                 case ObjectType.Shortcode:
-                    AddToQueue(new ShortcodeDownloadInfo { FolderId = folderId });
+                    AddToQueue(new ShortcodeDownloadInfo
+                    {
+                        FolderId = folderId
+                    });
                     break;
                 default:
                     throw new ArgumentException("Provided object type is not supported");
@@ -97,17 +102,14 @@ namespace Mark5.Mobile.Common
             {
                 return false;
             }
-
             if (DownloadPolicies[objectType] is DownloadAllPolicy)
             {
                 return true;
             }
-
             if (DownloadPolicies[objectType] is DownloadFoldersPolicy)
             {
-                return ((DownloadFoldersPolicy)DownloadPolicies[objectType]).FolderIds.Contains(folderId);
+                return ((DownloadFoldersPolicy) DownloadPolicies[objectType]).FolderIds.Contains(folderId);
             }
-
             return false;
         }
 
@@ -124,7 +126,6 @@ namespace Mark5.Mobile.Common
                     CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
                     subscribed = true;
                 }
-
                 StartDownloadTask();
             }
             finally
@@ -145,7 +146,6 @@ namespace Mark5.Mobile.Common
                     CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityRefreshed;
                     subscribed = false;
                 }
-
                 active = false;
             }
             finally
@@ -164,24 +164,22 @@ namespace Mark5.Mobile.Common
             {
                 return;
             }
-
             if (!CommonConfig.ReachabilityService.IsReachable)
             {
                 return;
             }
-
             cts = new CancellationTokenSource();
 
-            downloadTask = Task.Run(async () => await DownloadAction()).ContinueWith(async (t) =>
-            {
-                downloadTask = null;
-
-                if (t.IsFaulted)
+            downloadTask = Task.Run(async () => await DownloadAction())
+                .ContinueWith(async (t) =>
                 {
-                    await Start();
-                }
+                    downloadTask = null;
 
-            });
+                    if (t.IsFaulted)
+                    {
+                        await Start();
+                    }
+                });
         }
 
         async Task StopDownloadTask()
@@ -191,7 +189,6 @@ namespace Mark5.Mobile.Common
                 cts.Cancel();
                 cts = null;
             }
-
             if (downloadTask != null)
             {
                 await downloadTask;
@@ -212,14 +209,12 @@ namespace Mark5.Mobile.Common
 
                 while (!cts.IsCancellationRequested)
                 {
-                    DownloadItemInfo downloadInfo;
-                    queue.TryTake(out downloadInfo, -1, cts.Token);
+                    queue.TryTake(out DownloadItemInfo downloadInfo, -1, cts.Token);
 
                     if (!ShouldBeDownloaded(downloadInfo.Type, downloadInfo.FolderId))
                     {
                         continue;
                     }
-
                     switch (downloadInfo.Type)
                     {
                         case ObjectType.Document:
@@ -258,12 +253,10 @@ namespace Mark5.Mobile.Common
                 {
                     return;
                 }
-
                 if (await documentsDataAccess.IsDocumentCached(documentId))
                 {
                     continue;
                 }
-
                 await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId);
             }
         }
@@ -278,12 +271,10 @@ namespace Mark5.Mobile.Common
                 {
                     return;
                 }
-
                 if (await contactsDataAccess.IsContactCached(contactId))
                 {
                     continue;
                 }
-
                 await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, contactId);
             }
         }
@@ -298,12 +289,10 @@ namespace Mark5.Mobile.Common
                 {
                     return;
                 }
-
                 if (await shortcodesDataAccess.IsShortcodeCached(shosrtcodeId))
                 {
                     continue;
                 }
-
                 await Managers.Managers.ShortcodesManager.GetShortcodeAsync(itemInfo.FolderId, shosrtcodeId);
             }
         }
@@ -332,7 +321,10 @@ namespace Mark5.Mobile.Common
             {
                 if (ShouldBeDownloaded(ObjectType.Document, id))
                 {
-                    AddToQueue(new DocumentDownloadInfo { FolderId = id });
+                    AddToQueue(new DocumentDownloadInfo
+                    {
+                        FolderId = id
+                    });
                 }
             }
         }
@@ -344,7 +336,10 @@ namespace Mark5.Mobile.Common
             {
                 if (ShouldBeDownloaded(ObjectType.Contact, id))
                 {
-                    AddToQueue(new ContactDownloadInfo { FolderId = id });
+                    AddToQueue(new ContactDownloadInfo
+                    {
+                        FolderId = id
+                    });
                 }
             }
         }
@@ -356,7 +351,10 @@ namespace Mark5.Mobile.Common
             {
                 if (ShouldBeDownloaded(ObjectType.Shortcode, id))
                 {
-                    AddToQueue(new ShortcodeDownloadInfo { FolderId = id });
+                    AddToQueue(new ShortcodeDownloadInfo
+                    {
+                        FolderId = id
+                    });
                 }
             }
         }
@@ -392,7 +390,6 @@ namespace Mark5.Mobile.Common
             {
                 return;
             }
-
             if (e.IsReachable)
             {
                 StartDownloadTask();
@@ -404,7 +401,5 @@ namespace Mark5.Mobile.Common
         }
 
         #endregion
-
     }
 }
-

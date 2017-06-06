@@ -18,10 +18,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-
     public static class Dialogs
     {
-
         public static void Initialize()
         {
             ProgressHUD.DefaultStyle = Style.Light;
@@ -146,25 +144,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() =>
-                    {
-                        return SystemReportCollector.CreateFullReport();
-                    }).ContinueWith(t =>
-                    {
-                        dismissAction();
-
-                        if (!t.IsFaulted)
+                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                        .ContinueWith(t =>
                         {
-                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () =>
+                            dismissAction();
+
+                            if (!t.IsFaulted)
+                            {
+                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                            }
+                            else
                             {
                                 tcs.SetResult(true);
-                            });
-                        }
-                        else
-                        {
-                            tcs.SetResult(true);
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            }
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
@@ -183,18 +176,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() =>
-                    {
-                        return SystemReportCollector.CreateFullReport();
-                    }).ContinueWith(t =>
-                    {
-                        dismissAction();
-
-                        if (!t.IsFaulted)
+                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                        .ContinueWith(t =>
                         {
-                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            dismissAction();
+
+                            if (!t.IsFaulted)
+                            {
+                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                            }
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
@@ -291,6 +282,5 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         #endregion
-
     }
 }

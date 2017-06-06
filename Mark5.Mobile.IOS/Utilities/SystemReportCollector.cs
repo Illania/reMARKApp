@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,33 +18,32 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public static class SystemReportCollector
     {
-
         public static bool CanMailReport
         {
-            get
-            {
-                return MFMailComposeViewController.CanSendMail;
-            }
+            get { return MFMailComposeViewController.CanSendMail; }
         }
 
         public static UIActivityViewController CreateShareReportController(string report)
         {
-            var avc = new UIActivityViewController(new[] { new NSString(report) }, null)
+            var avc = new UIActivityViewController(new[]
             {
-                ExcludedActivityTypes = new[] {
-                                        UIActivityType.AddToReadingList,
-                                        UIActivityType.AssignToContact,
-                                        UIActivityType.OpenInIBooks,
-                                        UIActivityType.PostToFacebook,
-                                        UIActivityType.PostToTencentWeibo,
-                                        UIActivityType.PostToTwitter,
-                                        UIActivityType.PostToVimeo,
-                                        UIActivityType.PostToWeibo,
-                                        UIActivityType.SaveToCameraRoll
-                                    }
+                new NSString(report)
+            }, null)
+            {
+                ExcludedActivityTypes = new[]
+                {
+                    UIActivityType.AddToReadingList,
+                    UIActivityType.AssignToContact,
+                    UIActivityType.OpenInIBooks,
+                    UIActivityType.PostToFacebook,
+                    UIActivityType.PostToTencentWeibo,
+                    UIActivityType.PostToTwitter,
+                    UIActivityType.PostToVimeo,
+                    UIActivityType.PostToWeibo,
+                    UIActivityType.SaveToCameraRoll
+                }
             };
             return avc;
         }
@@ -51,7 +51,10 @@ namespace Mark5.Mobile.IOS.Utilities
         public static MFMailComposeViewController CreateMailReportController(string report)
         {
             var mc = new MFMailComposeViewController();
-            mc.SetToRecipients(new[] { "support@nordic-it.com" });
+            mc.SetToRecipients(new[]
+            {
+                "support@nordic-it.com"
+            });
             mc.SetSubject("MARK5 for iOS Feedback");
             mc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");
             mc.Finished += (sender2, e) => e.Controller.DismissViewController(true, null);
@@ -72,10 +75,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static Task<string> CreateFullReportAsync()
         {
-            return Task.Run(() =>
-            {
-                return CreateFullReport();
-            });
+            return Task.Run(() => { return CreateFullReport(); });
         }
 
         public static string CreateSystemInfoReport()
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine();
 
             sb.AppendLine("===== Memory information =====");
-            sb.AppendLine("Free disk space: " + Integration.GetFreeDiskSpace() / 1024 /1024);
+            sb.AppendLine("Free disk space: " + Integration.GetFreeDiskSpace() / 1024 / 1024);
             sb.AppendLine("Total disk space: " + Integration.GetTotalDiskSpace() / 1024 / 1024);
             sb.AppendLine("[MONO] Total memory: " + GC.GetTotalMemory(false) / 1024);
             sb.AppendLine("[MONO] Total memory after GC: " + GC.GetTotalMemory(true) / 1024);
@@ -128,7 +128,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 sb.AppendLine(kv.Key + ": " + kv.Value);
             }
             sb.AppendLine();
-            
+
             return sb.ToString();
         }
 
@@ -136,7 +136,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var sb = new StringBuilder();
             sb.Append("===== log =====");
-            sb.AppendLine(((ConsoleAndFileLogger)CommonConfig.Logger).ReadLogFile());
+            sb.AppendLine(((ConsoleAndFileLogger) CommonConfig.Logger).ReadLogFile());
             return sb.ToString();
         }
     }

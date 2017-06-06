@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -31,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected int TextStyleBottomLineResourceId = Resource.Style.searchViewBottomLine;
 
         protected AbstractSearchView(Context context)
-                : base(context)
+            : base(context)
         {
             LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 

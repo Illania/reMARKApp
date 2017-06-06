@@ -1,10 +1,10 @@
 ﻿//
-// Project: SVProgressHUD
 // File: ProgressAnimatedView.cs
 // Author: Bartosz Cichecki <bgc@nordic-it.com>
 //
 // Copyright (c) 2017 Nordic IT
 //
+
 using System;
 using CoreAnimation;
 using CoreGraphics;
@@ -13,17 +13,12 @@ using UIKit;
 
 namespace SVProgressHUD
 {
-
     [Register("ProgressAnimatedView")]
     class ProgressAnimatedView : UIView
     {
-
         public override CGRect Frame
         {
-            get
-            {
-                return base.Frame;
-            }
+            get { return base.Frame; }
             set
             {
                 if (base.Frame != value)
@@ -37,17 +32,13 @@ namespace SVProgressHUD
         }
 
         float _radius;
+
         public float Radius
         {
-            get
-            {
-                return _radius;
-            }
+            get { return _radius; }
             set
             {
-#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-            if (_radius != value)
-#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
+                if (_radius != value)
                 {
                     _radius = value;
 
@@ -61,12 +52,10 @@ namespace SVProgressHUD
         }
 
         float _strokeThickness;
+
         public float StrokeThickness
         {
-            get
-            {
-                return _strokeThickness;
-            }
+            get { return _strokeThickness; }
 
             set
             {
@@ -77,12 +66,10 @@ namespace SVProgressHUD
         }
 
         UIColor _strokeColor;
+
         public UIColor StrokeColor
         {
-            get
-            {
-                return _strokeColor;
-            }
+            get { return _strokeColor; }
 
             set
             {
@@ -93,12 +80,10 @@ namespace SVProgressHUD
         }
 
         float _strokeEnd;
+
         public float StrokeEnd
         {
-            get
-            {
-                return _strokeEnd;
-            }
+            get { return _strokeEnd; }
 
             set
             {
@@ -142,7 +127,7 @@ namespace SVProgressHUD
             if (ringAnimatedLayer == null)
             {
                 var arcCenter = new CGPoint(Radius + StrokeThickness / 2 + 5, Radius + StrokeThickness / 2 + 5);
-                var smoothedPath = UIBezierPath.FromArc(arcCenter, Radius, (nfloat)(-Math.PI / 2d), (nfloat)(Math.PI * 1.5d), true);
+                var smoothedPath = UIBezierPath.FromArc(arcCenter, Radius, (nfloat) (-Math.PI / 2d), (nfloat) (Math.PI * 1.5d), true);
 
                 ringAnimatedLayer = new CAShapeLayer
                 {

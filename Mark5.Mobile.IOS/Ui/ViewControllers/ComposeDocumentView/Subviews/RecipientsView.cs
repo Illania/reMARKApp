@@ -5,6 +5,7 @@
 //
 // Copyright (c) 2016 Nordic IT
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -22,7 +24,6 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-
     public class RecipientsView : ComposeDocumentSubView
     {
         protected const string EmailSeparator = ", ";
@@ -50,10 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public bool Empty
         {
-            get
-            {
-                return !Validator.ContainsValidEmail(TextView.Text);
-            }
+            get { return !Validator.ContainsValidEmail(TextView.Text); }
         }
 
         public RecipientsView(DocumentAddressType type)
@@ -70,15 +68,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Label.TextColor = UIColor.LightGray;
             Label.Opaque = false;
             Label.TranslatesAutoresizingMaskIntoConstraints = false;
-            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            Label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            Label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(Label);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+            });
 
             var textStorage = new NSTextStorage();
             textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, 0));
@@ -110,12 +108,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             TextView.ShouldChangeText += HandleShouldTextViewChange;
             ContainerView.AddSubview(TextView);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1f, InnerMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                    NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1f, InnerMargin),
+                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+            });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
             textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
@@ -141,8 +139,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task RefreshView()
         {
-            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
-                || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
                 return Task.CompletedTask;
             }
@@ -214,7 +211,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
             foreach (var email in GetEmails())
             {
-                DocumentPreview.Addresses.Add(new DocumentAddress { Address = email, AddressType = AddressType, Type = CommunicationAddressType.Email });
+                DocumentPreview.Addresses.Add(new DocumentAddress
+                {
+                    Address = email,
+                    AddressType = AddressType,
+                    Type = CommunicationAddressType.Email
+                });
             }
             return Task.CompletedTask;
         }
@@ -234,8 +236,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var tapPosition = TextView.GetClosestPositionToPoint(textViewTapGestureRecognizer.LocationInView(TextView));
             var offset = TextView.GetOffsetFromPosition(TextView.BeginningOfDocument, tapPosition);
 
-            var beforeSubstring = TextView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
-            var afterSubstring = TextView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var beforeSubstring = TextView.Text.SafeSubstring(0, (int) offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = TextView.Text.SafeSubstring((int) offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
@@ -260,8 +262,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             if (TextView.Text.Length > selection.Location)
             {
-                var beforeCursorString = TextView.Text.SafeSubstring(0, (int)selection.Location);
-                var afterCursorString = TextView.Text.SafeSubstring((int)selection.Location, TextView.Text.Length - (int)selection.Location - 1);
+                var beforeCursorString = TextView.Text.SafeSubstring(0, (int) selection.Location);
+                var afterCursorString = TextView.Text.SafeSubstring((int) selection.Location, TextView.Text.Length - (int) selection.Location - 1);
 
                 var indexInSecondPartString = afterCursorString.IndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
                 if (indexInSecondPartString == -1)
@@ -304,7 +306,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
             }
 
-            var textSubstring = TextView.Text.SafeSubstring(0, (int)(TextView.SelectedRange.Location + TextView.SelectedRange.Length));
+            var textSubstring = TextView.Text.SafeSubstring(0, (int) (TextView.SelectedRange.Location + TextView.SelectedRange.Length));
             if (textSubstring.EndsWith(EmailSeparator.Trim(), StringComparison.CurrentCultureIgnoreCase))
             {
                 var startIndex = TextView.Text.LastIndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
@@ -323,14 +325,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         bool HandleShouldTextViewChange(UITextView textViewToChange, NSRange range, string text)
         {
-
             if (textViewToChange.Text.Length > range.Location && text.Length == 1) //The second condition is needed to avoid problems when deleting
             {
                 textViewToChange.SelectedRange = new NSRange(textViewToChange.Text.Length, 0);
             }
             else if (textViewToChange == TextView && (text == Environment.NewLine || text == "," || text == "\t"))
             {
-                var splittedField = textViewToChange.Text.Split(new[] { EmailSeparator }, StringSplitOptions.None);
+                var splittedField = textViewToChange.Text.Split(new[]
+                {
+                    EmailSeparator
+                }, StringSplitOptions.None);
                 if (splittedField.Last().Equals(string.Empty))
                 {
                     CommaOrEnterPressed(this, EventArgs.Empty);
@@ -374,7 +378,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         string GetStringToSearch()
         {
             var text = TextView.Text;
-            var splittedField = text.Split(new[] { EmailSeparator }, StringSplitOptions.None);
+            var splittedField = text.Split(new[]
+            {
+                EmailSeparator
+            }, StringSplitOptions.None);
             if (splittedField.Any())
             {
                 var last = splittedField.Last();
@@ -427,15 +434,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
             Animate(duration, () =>
-                {
-                    TextView.TextContainer.MaximumNumberOfLines = 0;
-                    TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+            {
+                TextView.TextContainer.MaximumNumberOfLines = 0;
+                TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                Superview.SetNeedsLayout();
+                Superview.LayoutIfNeeded();
 
-                    expanded = true;
-                });
+                expanded = true;
+            });
         }
 
         public void CollapseView()
@@ -447,15 +454,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
             Animate(duration, () =>
-                {
-                    TextView.TextContainer.MaximumNumberOfLines = 1;
-                    TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
+            {
+                TextView.TextContainer.MaximumNumberOfLines = 1;
+                TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                Superview.SetNeedsLayout();
+                Superview.LayoutIfNeeded();
 
-                    expanded = false;
-                });
+                expanded = false;
+            });
         }
 
         #endregion
@@ -464,7 +471,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public bool ContainsInvalidEmail()
         {
-            return TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Any(a => !Validator.ContainsValidEmails(a));
+            return TextView.Text.Split(new[]
+                {
+                    EmailSeparator
+                }, StringSplitOptions.RemoveEmptyEntries)
+                .Any(a => !Validator.ContainsValidEmails(a));
         }
 
         public IEnumerable<string> GetEmails()
@@ -475,7 +486,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public IEnumerable<string> GetRecipents()
         {
-            return TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries).Where(Validator.ContainsValidEmails).Select(s => s.Trim());
+            return TextView.Text.Split(new[]
+                {
+                    EmailSeparator
+                }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(Validator.ContainsValidEmails)
+                .Select(s => s.Trim());
         }
 
         public void SetEmails(IEnumerable<string> emails)
@@ -673,12 +689,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         }
 
         #endregion
-
     }
 
     public class CustomUITextView : UITextView
     {
-
         public event EventHandler WillDeleteBackward = delegate { };
         public event EventHandler<int> DeletedBackward = delegate { };
 
@@ -701,12 +715,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
     public class AddButtonTappedEventArgs : EventArgs
     {
-
-        public RecipientsView ParentView
-        {
-            get;
-            private set;
-        }
+        public RecipientsView ParentView { get; private set; }
 
         public AddButtonTappedEventArgs(RecipientsView parentView)
         {
@@ -716,12 +725,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
     public class RecipentTappedEventArgs : EventArgs
     {
-
-        public string Recipent
-        {
-            get;
-            private set;
-        }
+        public string Recipent { get; private set; }
 
         public RecipentTappedEventArgs(string recipent)
         {
