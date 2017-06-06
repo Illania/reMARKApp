@@ -108,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         NSObject observeDidShowNotification;
         NSObject observeWillChangeNotification;
-        NSObject observeWillHideNotification; //TODO move
+        NSObject observeWillHideNotification;
         NSObject observeWillShowNotification;
 
         public override void ViewWillAppear(bool animated)
@@ -1011,6 +1011,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 CommonConfig.Logger.Info("Document opened in edit mode, no need to add template");
+                return;
+            }
+
+            if (CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments)
+            {
+                CommonConfig.Logger.Info("Documeny copied from new with text and attachments, no need to have templates");
                 return;
             }
 
