@@ -1,26 +1,15 @@
-//
-// Project: Mark5.Mobile.Common
-// File: IDocumentsManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     public interface IDocumentsManager
     {
-
         int MaxToFetch { get; set; }
-
         DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
 
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto);
@@ -92,4 +81,3 @@ namespace Mark5.Mobile.Common.Managers
         Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
     }
 }
-

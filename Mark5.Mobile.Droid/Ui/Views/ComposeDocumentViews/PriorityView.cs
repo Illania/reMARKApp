@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PriorityView.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,12 +11,16 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    
     public class PriorityView : ComposeDocumentView
     {
-    
         readonly AppCompatSpinner prioritySpinner;
-        readonly List<Priority> priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
+
+        readonly List<Priority> priorities = new List<Priority>
+        {
+            Priority.Low,
+            Priority.Normal,
+            Priority.Urgent
+        };
 
         public PriorityView(Context context)
             : base(context)
@@ -62,7 +59,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                var possiblePriorities = new[] { Priority.Urgent, Priority.Normal, Priority.Low };
+                var possiblePriorities = new[]
+                {
+                    Priority.Urgent,
+                    Priority.Normal,
+                    Priority.Low
+                };
                 var previousDocumentPriority = PreviousDocumentPreview.Priority;
 
                 if (!possiblePriorities.Contains(previousDocumentPriority))
@@ -84,7 +86,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Utilities
 
-        void SetPriority(Priority priority) => prioritySpinner.SetSelection(priorities.IndexOf(priority));
+        void SetPriority(Priority priority)
+        {
+            prioritySpinner.SetSelection(priorities.IndexOf(priority));
+        }
 
         Priority GetPriority()
         {

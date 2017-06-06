@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PhysicalAddressesSubview.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using Android.Content;
@@ -20,7 +13,6 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-
     public class PhysicalAddressesSubview : ContactView
     {
         public event EventHandler<PhysicalAddress> PhysicalAddressClicked = delegate { };
@@ -54,13 +46,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class PhysicalAddressesSubSubview : LinearLayoutCompat
         {
-
             public PhysicalAddressesSubSubview(Context context, PhysicalAddress physicalAddress, int distanceSmall, int distanceNormal, int distanceLarge, int distanceVeryLarge)
                 : base(context)
             {
                 Clickable = true;
-                
-                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+
+                var typedArray = Context.ObtainStyledAttributes(new int[]
+                {
+                    Resource.Attribute.selectableItemBackground
+                });
                 SetBackgroundResource(typedArray.GetResourceId(0, 0));
                 typedArray.Recycle();
 
@@ -85,7 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 addressTextView.Text = GetAddressText(physicalAddress);
                 addressTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
                 innerLayout.AddView(addressTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-                
+
                 var typeTextView = new AppCompatTextView(context);
                 typeTextView.Text = physicalAddress.Type.Name;
                 typeTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
@@ -104,25 +98,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             {
                 var sb = new StringBuilder();
                 if (!string.IsNullOrWhiteSpace(address.Street))
-                {
                     sb.Append(address.Street);
-                }
                 if (!string.IsNullOrWhiteSpace(address.Area))
-                {
                     sb.AppendLine().Append(address.Area);
-                }
                 if (!string.IsNullOrWhiteSpace(address.ZipCode))
-                {
                     sb.AppendLine().Append(address.ZipCode);
-                }
                 if (!string.IsNullOrWhiteSpace(address.City))
-                {
                     sb.Append(" ").Append(address.City);
-                }
                 if (address.Country != null && address.Country.Id != 0)
-                {
                     sb.AppendLine().Append(address.Country.Name);
-                }
                 return sb.ToString();
             }
         }

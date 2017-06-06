@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DocumentHandledSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 
@@ -16,7 +9,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly CustomButton handledButton;
         readonly CustomButton unHandledButton;
 
-        public DocumentHandledSearchView(Android.Content.Context context) : base(context)
+        public DocumentHandledSearchView(Android.Content.Context context)
+            : base(context)
         {
             allButton = new CustomButton(context, Resource.String.search_document_handled_none_selected, ButtonAction);
             handledButton = new CustomButton(context, Resource.String.search_document_handled, ButtonAction);
@@ -30,13 +24,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             if (button.Selected)
                 return false;
 
-            var buttonsList = new List<CustomButton> { allButton, handledButton, unHandledButton };
+            var buttonsList = new List<CustomButton>
+            {
+                allButton,
+                handledButton,
+                unHandledButton
+            };
             buttonsList.Remove(button);
 
             foreach (var otherButton in buttonsList)
-            {
                 otherButton.UpdateSelectedState(false);
-            }
 
             return true;
         }

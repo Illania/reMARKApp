@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: Dialogs.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,10 +18,8 @@ using Mark5.ServiceReference.Exceptions;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public static class Dialogs
     {
-
         #region Awaitable dialogs
 
         public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
@@ -93,11 +84,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackSingleChoice(-1, new SingleChoiceCallback(si =>
-            {
-                if (si >= 0)
-                    tcs.SetResult(values[si]);
-            }));
+            builder.ItemsCallbackSingleChoice(-1,
+                new SingleChoiceCallback(si =>
+                {
+                    if (si >= 0)
+                        tcs.SetResult(values[si]);
+                }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(selected)));
@@ -106,6 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             for (var i = 0; i < values.Count; i++)
                 if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
                     selectedIndex = i;
+
             md.SelectedIndex = selectedIndex;
             builder.Cancelable(false);
             md.Show();
@@ -119,12 +112,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackMultiChoice(null, new MultiChoiceCallback(si =>
-            {
-                foreach (var i in si)
-                    result.Add(values[i]);
-                tcs.SetResult(result);
-            }));
+            builder.ItemsCallbackMultiChoice(null,
+                new MultiChoiceCallback(si =>
+                {
+                    foreach (var i in si)
+                        result.Add(values[i]);
+
+                    tcs.SetResult(result);
+                }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(selected)));
@@ -135,8 +130,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 for (var i = 0; i < values.Count; i++)
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
+
                 md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
             }
+
             builder.Cancelable(false);
             md.Show();
             return tcs.Task;
@@ -150,9 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(itemsId);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
-            {
                 builder.NegativeText(Resource.String.cancel);
-            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -166,9 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(itemsId);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
-            {
                 builder.NegativeText(Resource.String.cancel);
-            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -182,9 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(items);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
-            {
                 builder.NegativeText(Resource.String.cancel);
-            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -194,16 +185,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var tcs = new TaskCompletionSource<long>();
             var datePicker = new DatePicker(context);
-            if (initialTimestamp >= 0) datePicker.DateTime = initialTimestamp.ConvertTimestampMillisecondsToDateTime();
-            if (minTimestamp >= 0) datePicker.MinDate = minTimestamp;
-            if (maxTimestamp >= 0) datePicker.MaxDate = maxTimestamp;
+            if (initialTimestamp >= 0)
+                datePicker.DateTime = initialTimestamp.ConvertTimestampMillisecondsToDateTime();
+            if (minTimestamp >= 0)
+                datePicker.MinDate = minTimestamp;
+            if (maxTimestamp >= 0)
+                datePicker.MaxDate = maxTimestamp;
             var builder = new MaterialDialog.Builder(context);
             builder.CustomView(datePicker, false);
             builder.PositiveText(Resource.String.ok);
-            builder.OnPositive(new SingleButtonCallback(() =>
-            {
-                tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds());
-            }));
+            builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds()); }));
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(initialTimestamp)));
             builder.Cancelable(false);
@@ -215,8 +206,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         #region Non-awaitable dialogs
 
-        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null,
-                                          int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
+        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
@@ -230,8 +220,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Show();
         }
 
-        public static void ShowEditTextDialog(Context context, int titleId, string startText, Action<string> positiveAction, Action negativeAction = null,
-                                              int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
+        public static void ShowEditTextDialog(Context context, int titleId, string startText, Action<string> positiveAction, Action negativeAction = null, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var editTextView = new AppCompatEditText(context);
             editTextView.Text = startText;
@@ -276,19 +265,20 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return dialog.Dismiss;
         }
 
-        public static void ShowMultiSelectDialog<T>(Context context, int titleId, List<T> values, Action<List<T>> positiveAction, Action negativeAction = null,
-                                            List<T> selected = null, IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
+        public static void ShowMultiSelectDialog<T>(Context context, int titleId, List<T> values, Action<List<T>> positiveAction, Action negativeAction = null, List<T> selected = null, IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
         {
             var result = new List<T>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackMultiChoice(null, new MultiChoiceCallback(si =>
-            {
-                foreach (var i in si)
-                    result.Add(values[i]);
-                positiveAction(result);
-            }));
+            builder.ItemsCallbackMultiChoice(null,
+                new MultiChoiceCallback(si =>
+                {
+                    foreach (var i in si)
+                        result.Add(values[i]);
+
+                    positiveAction(result);
+                }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(negativeAction));
@@ -299,8 +289,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 for (var i = 0; i < values.Count; i++)
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
+
                 md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
             }
+
             builder.Cancelable(false);
             md.Show();
         }
@@ -323,20 +315,17 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 builder.OnNeutral(new SingleButtonCallback(() =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
-                    Task.Run(() =>
-                    {
-                        return SystemReportCollector.CreateFullReport();
-                    }).ContinueWith(t =>
-                    {
-                        dismissAction();
+                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                        .ContinueWith(t =>
+                            {
+                                dismissAction();
 
-                        if (!t.IsFaulted)
-                        {
-                            activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
-                        }
+                                if (!t.IsFaulted)
+                                    activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
 
-                        tcs.SetResult(true);
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                                tcs.SetResult(true);
+                            },
+                            TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);
@@ -358,20 +347,18 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 builder.OnNeutral(new SingleButtonCallback(() =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
-                    Task.Run(() =>
-                    {
-                        return SystemReportCollector.CreateFullReport();
-                    }).ContinueWith(t =>
-                    {
-                        dismissAction();
+                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                        .ContinueWith(t =>
+                            {
+                                dismissAction();
 
-                        if (!t.IsFaulted)
-                        {
-                            activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
-                        }
+                                if (!t.IsFaulted)
+                                    activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
 
-                        if (action != null) action();
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                                if (action != null)
+                                    action();
+                            },
+                            TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);
@@ -381,33 +368,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
         static string GetErrorTitle(Context context, Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return context.GetString(Resource.String.appserviceexception_title);
-            }
             if (ex is HttpAppServiceException)
-            {
                 return context.GetString(Resource.String.appserviceexception_title);
-            }
             if (ex is FileTransferServiceException)
-            {
                 return context.GetString(Resource.String.filetransferserviceexception_title);
-            }
             if (ex is DataNotFoundException)
-            {
                 return context.GetString(Resource.String.datanotfoundexception_title);
-            }
             if (ex is DataAccessException)
-            {
                 return context.GetString(Resource.String.dataaccessexception_title);
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return context.GetString(Resource.String.invalidsourcetypeexception_title);
-            }
             if (ex is MailViewerException)
-            {
                 return context.GetString(Resource.String.couldnotopenemlmsg_title);
-            }
 
             return context.GetString(Resource.String.generalexception_title);
         }
@@ -415,33 +388,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
         static string GetErrorMessage(Context context, Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is HttpAppServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is FileTransferServiceException)
-            {
                 return ex.Message;
-            }
             if (ex is DataNotFoundException)
-            {
                 return context.GetString(Resource.String.datanotfoundexception_message);
-            }
             if (ex is DataAccessException)
-            {
                 return ex.Message;
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return context.GetString(Resource.String.invalidsourcetypeexception_message);
-            }
             if (ex is MailViewerException)
-            {
                 return ex.Message;
-            }
 
             return ex.Message;
         }
@@ -449,33 +408,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
         static bool ShouldShowCreateReport(Exception ex)
         {
             if (ex is WcfAppServiceException)
-            {
                 return true;
-            }
             if (ex is HttpAppServiceException)
-            {
                 return true;
-            }
             if (ex is FileTransferServiceException)
-            {
                 return true;
-            }
             if (ex is DataNotFoundException)
-            {
                 return false;
-            }
             if (ex is DataAccessException)
-            {
                 return true;
-            }
             if (ex is InvalidSourceTypeException)
-            {
                 return false;
-            }
             if (ex is MailViewerException)
-            {
                 return true;
-            }
 
             return true;
         }
@@ -486,7 +431,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         class SingleButtonCallback : Java.Lang.Object, MaterialDialog.ISingleButtonCallback
         {
-
             readonly Action action;
 
             public SingleButtonCallback(Action action)
@@ -503,7 +447,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         class SingleChoiceCallback : Java.Lang.Object, MaterialDialog.IListCallbackSingleChoice
         {
-
             readonly Action<int> action;
 
             public SingleChoiceCallback(Action<int> action)
@@ -521,7 +464,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         class MultiChoiceCallback : Java.Lang.Object, MaterialDialog.IListCallbackMultiChoice
         {
-
             readonly Action<int[]> action;
 
             public MultiChoiceCallback(Action<int[]> action)
@@ -548,14 +490,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             public void OnSelection(MaterialDialog p0, View p1, int p2, Java.Lang.ICharSequence p3)
             {
-
                 if (action != null)
                     action(p2);
             }
         }
 
         #endregion
-
     }
 }
-

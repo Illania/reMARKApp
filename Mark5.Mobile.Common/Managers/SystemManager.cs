@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: SystemManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Extensions;
@@ -15,13 +8,10 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     class SystemManager : AbstractManager, ISystemManager
     {
-
         public SystemManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy)
             : base(connectionInfo, appServiceProxy)
         {
@@ -29,7 +19,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<SystemSettings> GetSystemSettingsAsync(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -54,16 +45,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 return await FileSystemStorage.GetSystemSettingsAsync();
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -82,12 +72,9 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 return await FileSystemStorage.GetSystemUsersDepartmentsAsync();
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }
 }
-

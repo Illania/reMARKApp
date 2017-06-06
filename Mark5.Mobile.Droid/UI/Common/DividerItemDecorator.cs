@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: DividerItemDecorator.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using Android.Content;
 using Android.Graphics;
@@ -16,10 +9,8 @@ using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public class DividerItemDecorator : RecyclerView.ItemDecoration
     {
-
         readonly Drawable divider;
         readonly int[] idToSkip;
 
@@ -39,18 +30,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 var child = parent.GetChildAt(i);
 
                 if (child != null && idToSkip.Contains(child.Id))
-                {
                     continue;
-                }
 
                 var nextChild = parent.GetChildAt(i + 1);
 
                 if (nextChild != null && idToSkip.Contains(nextChild.Id))
-                {
                     continue;
-                }
 
-                var p = (RecyclerView.LayoutParams)child.LayoutParameters;
+                var p = (RecyclerView.LayoutParams) child.LayoutParameters;
 
                 var top = child.Bottom + p.BottomMargin;
                 var bottom = top + divider.IntrinsicHeight;

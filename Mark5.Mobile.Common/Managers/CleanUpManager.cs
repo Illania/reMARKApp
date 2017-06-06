@@ -1,24 +1,14 @@
-//
-// Project: Mark5.Mobile.Common
-// File: CleanUpManager.cs
-// Author: Ferdinando Papale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Storage;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common
 {
-
     class CleanUpManager : ICleanUpManager
     {
-
         readonly IDocumentsDataAccess documentsDataAccess;
         readonly IContactsDataAccess contactsDataAccess;
         readonly IShortcodesDataAccess shortcodesDataAccess;
@@ -56,7 +46,6 @@ namespace Mark5.Mobile.Common
             else
             {
                 foreach (var module in modules)
-                {
                     switch (module)
                     {
                         case ModuleType.Documents:
@@ -74,7 +63,6 @@ namespace Mark5.Mobile.Common
                         default:
                             throw new ArgumentException("Module not supported");
                     }
-                }
             }
 
             await FileSystemStorage.SaveLastCacheCleanUpAsync(DateTime.UtcNow);
@@ -91,4 +79,3 @@ namespace Mark5.Mobile.Common
         }
     }
 }
-

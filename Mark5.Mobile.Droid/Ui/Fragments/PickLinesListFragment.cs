@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PickLineListFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Graphics;
@@ -50,7 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_lines);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_lines);
 
             CommonConfig.Logger.Info($"Created {nameof(PickLinesListFragment)}");
         }
@@ -93,8 +86,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (CloseRequest != null) CloseRequest(adapter.SelectedLinesGuid);
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(adapter.SelectedLinesGuid);
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Retained State
@@ -111,9 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-            {
                 SelectedLinesGuid = clfs.SelectedLinesGuid;
-            }
         }
 
         public override string GenerateTag()
@@ -130,22 +122,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class LinesListViewAdapter : RecyclerView.Adapter
         {
-            readonly List<Line> linesInView = new List<Line>(10);
-            readonly List<Guid> selectedLinesGuid = new List<Guid>(10);
+            public List<Guid> SelectedLinesGuid { get; } = new List<Guid>(10);
 
-            public List<Guid> SelectedLinesGuid { get { return selectedLinesGuid; } }
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount { get { return linesInView.Count; } }
-            public List<Line> Items { get { return linesInView; } }
+            public List<Line> Items { get; } = new List<Line>(10);
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var l = linesInView[position];
+                var l = Items[position];
                 var lvh = holder as LineViewHolder;
 
                 lvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => HandleClick(l, position)));
 
-                lvh.Selected = selectedLinesGuid.Contains(l.Guid);
+                lvh.Selected = SelectedLinesGuid.Contains(l.Guid);
                 lvh.Name = l.Name;
             }
 
@@ -157,31 +147,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetSelectedLinesGuid(List<Guid> selectedLineGuids)
             {
-                this.selectedLinesGuid.Clear();
-                this.selectedLinesGuid.AddRange(selectedLineGuids);
+                SelectedLinesGuid.Clear();
+                SelectedLinesGuid.AddRange(selectedLineGuids);
             }
 
             public void SetItems(List<Line> lines)
             {
-                var count = linesInView.Count;
-                linesInView.AddRange(lines.OrderBy(c => c.Name));
+                var count = Items.Count;
+                Items.AddRange(lines.OrderBy(c => c.Name));
                 NotifyItemRangeInserted(count, lines.Count);
             }
 
             void HandleClick(Line l, int position)
             {
-                if (selectedLinesGuid.Contains(l.Guid))
-                {
-                    selectedLinesGuid.Remove(l.Guid);
-                }
+                if (SelectedLinesGuid.Contains(l.Guid))
+                    SelectedLinesGuid.Remove(l.Guid);
                 else
-                {
-                    selectedLinesGuid.Add(l.Guid);
-                }
+                    SelectedLinesGuid.Add(l.Guid);
 
                 NotifyItemChanged(position);
             }
-
         }
 
         class LineViewHolder : RecyclerView.ViewHolder
@@ -204,17 +189,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     selected = value;
                     selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
                 }
-                get
-                {
-                    return selected;
-                }
+                get => selected;
             }
 
             readonly AppCompatTextView nameTextView;
 
             readonly View selectedOverlay;
 
-            public LineViewHolder(View itemView) : base(itemView)
+            public LineViewHolder(View itemView)
+                : base(itemView)
             {
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.search_list_item_line_name);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);

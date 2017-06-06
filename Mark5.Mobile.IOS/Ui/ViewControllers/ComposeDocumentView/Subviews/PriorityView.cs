@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: PriorityView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +10,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
-
     public class PriorityView : ComposeDocumentSubView
     {
-
         Priority selectedPriority = Priority.Normal;
 
         public event EventHandler Edited = delegate { };
@@ -46,15 +37,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             label.Opaque = false;
             label.Lines = 0;
             label.TranslatesAutoresizingMaskIntoConstraints = false;
-            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+            });
 
             selectedPriorityLabel = new UILabel();
             selectedPriorityLabel.Text = UI.PriorityString(selectedPriority);
@@ -66,12 +57,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             selectedPriorityLabel.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(selectedPriorityLabel);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, label, NSLayoutAttribute.Right, 1f, InnerMargin),
-                    NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                    NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, label, NSLayoutAttribute.Right, 1f, InnerMargin),
+                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+            });
         }
 
         #region Overrides
@@ -80,7 +71,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                var possiblePriorities = new[] { Priority.Urgent, Priority.Normal, Priority.Low };
+                var possiblePriorities = new[]
+                {
+                    Priority.Urgent,
+                    Priority.Normal,
+                    Priority.Low
+                };
                 var previousDocumentPriority = PreviousDocumentPreview.Priority;
 
                 if (!possiblePriorities.Contains(previousDocumentPriority))
@@ -112,7 +108,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             HandleScrollToView(this, EventArgs.Empty);
             ActionSheetWillAppear(this, EventArgs.Empty);
 
-            var priorityStrings = new [] { UI.PriorityString(Priority.Urgent), UI.PriorityString(Priority.Normal), UI.PriorityString(Priority.Low) };
+            var priorityStrings = new[]
+            {
+                UI.PriorityString(Priority.Urgent),
+                UI.PriorityString(Priority.Normal),
+                UI.PriorityString(Priority.Low)
+            };
 
             var result = await Dialogs.ShowListDialogAsync(viewController, null, priorityStrings, selectedPriorityLabel);
             switch (result)
@@ -144,6 +145,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         }
 
         #endregion
-
     }
 }

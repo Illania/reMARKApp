@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ContactViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,13 +20,11 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class ContactViewController : AbstractViewController, ISecondaryViewController
     {
-
         public bool Modal { get; set; }
 
-        public bool Empty { get { return folderId == null && folder == null && contactId == null && contactPreview == null && contact == null; } }
+        public bool Empty => folderId == null && folder == null && contactId == null && contactPreview == null && contact == null;
 
         int? folderId;
         Folder folder;
@@ -119,14 +110,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillTransitionToSize(toSize, coordinator);
 
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
-            {
-                if (tableView == null) return;
+            coordinator.AnimateAlongsideTransition(ctx => { },
+                ctx =>
+                {
+                    if (tableView == null)
+                        return;
 
-                headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-                tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            });
+                    headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
+                    tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                    tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                });
         }
 
         void InitializeView()
@@ -147,22 +140,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.EstimatedRowHeight = 60f;
             tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
+            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed)
+            {
+                MinimumPressDuration = 1f
+            });
 
             View.AddSubview(tableView);
             View.AddSubview(headerView);
 
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
-                    headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, NavigationController.NavigationBar.Frame.Bottom),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 140f)
-                });
+            {
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
+                headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, NavigationController.NavigationBar.Frame.Bottom),
+                NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 140f)
+            });
 
             nameLabel = new UILabel();
             nameLabel.Font = Theme.DefaultFont.WithRelativeSize(6f);
@@ -172,12 +168,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             nameLabel.TranslatesAutoresizingMaskIntoConstraints = false;
             headerView.AddSubview(nameLabel);
             headerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Top, 1f, 10f),
-                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 25f)
-                });
+            {
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Top, 1f, 10f),
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 25f)
+            });
 
             nameSubLabel = new UILabel();
             nameSubLabel.Font = Theme.DefaultFont.WithRelativeSize(-2f);
@@ -187,21 +183,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             nameSubLabel.TranslatesAutoresizingMaskIntoConstraints = false;
             headerView.AddSubview(nameSubLabel);
             headerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 5f),
-                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 20f)
-                });
+            {
+                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 5f),
+                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 20f)
+            });
 
             var buttonsView = new UIView();
             buttonsView.TranslatesAutoresizingMaskIntoConstraints = false;
             headerView.AddSubview(buttonsView);
             headerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameSubLabel, NSLayoutAttribute.Bottom, 1f, 10f),
-                    NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameSubLabel, NSLayoutAttribute.Bottom, 1f, 10f),
+                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f)
+            });
 
             button1 = new UIButton();
             button1.Enabled = false;
@@ -211,13 +207,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button1.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button1);
             buttonsView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Left, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60),
-                    NSLayoutConstraint.Create(button1, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
-                });
+            {
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Left, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+            });
 
             button2 = new UIButton();
             button2.Enabled = false;
@@ -227,13 +223,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button2.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button2);
             buttonsView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button1, NSLayoutAttribute.Right, 1f, 15f),
-                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
-                    NSLayoutConstraint.Create(button2, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
-                });
+            {
+                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button1, NSLayoutAttribute.Right, 1f, 15f),
+                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
+                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+            });
 
             button3 = new UIButton();
             button3.Enabled = false;
@@ -243,13 +239,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button3.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button3);
             buttonsView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button2, NSLayoutAttribute.Right, 1f, 15f),
-                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
-                    NSLayoutConstraint.Create(button3, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
-                });
+            {
+                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button2, NSLayoutAttribute.Right, 1f, 15f),
+                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
+                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+            });
 
             button4 = new UIButton();
             button4.Enabled = false;
@@ -259,14 +255,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button4.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button4);
             buttonsView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button3, NSLayoutAttribute.Right, 1f, 15f),
-                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Right, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
-                    NSLayoutConstraint.Create(button4, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
-                });
+            {
+                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button3, NSLayoutAttribute.Right, 1f, 15f),
+                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Right, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
+                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+            });
 
 
             assignCategoryButton = new UIBarButtonItem();
@@ -293,16 +289,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             toolbar.BarTintColor = Theme.Gray;
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
-                });
+            {
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
+            });
         }
 
         void InitializeNavigationBar()
@@ -370,7 +366,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
         {
-            if (gr.State != UIGestureRecognizerState.Began) return;
+            if (gr.State != UIGestureRecognizerState.Began)
+                return;
 
             var location = gr.LocationInView(tableView);
             var indexPath = tableView?.IndexPathForRowAtPoint(location);
@@ -389,7 +386,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var vc = new ComposeDocumentViewController
             {
-                PreconfiguredEmailAddresses = new string[] { communicationAddress.Address },
+                PreconfiguredEmailAddresses = new string[]
+                {
+                    communicationAddress.Address
+                },
                 CreationModeFlag = DocumentCreationModeFlag.New
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -397,24 +397,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
-            var formattedNumbers = contact.CommunicationAddresses
-                                 .Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
-                                 .Select(ca => AddressUtilities.FormatCommunicationAddress(ca))
-                                 .ToArray();
+            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressUtils.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
                 return;
 
             if (formattedNumbers.Length == 1)
             {
-                Integration.Call(this, (UIButton)sender, formattedNumbers[0]);
+                Integration.Call(this, (UIButton) sender, formattedNumbers[0]);
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("call"), formattedNumbers, (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("call"), formattedNumbers, (UIButton) sender);
             if (selectedItem < 0)
                 return;
 
-            Integration.Call(this, (UIButton)sender, formattedNumbers[selectedItem]);
+            Integration.Call(this, (UIButton) sender, formattedNumbers[selectedItem]);
         }
 
         void Button3_TouchUpInside(object sender, EventArgs e)
@@ -423,7 +420,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (communicationAddresses == null)
                 return;
 
-            Integration.Text(this, (UIButton)sender, AddressUtilities.FormatCommunicationAddress(communicationAddresses));
+            Integration.Text(this, (UIButton) sender, AddressUtils.FormatCommunicationAddress(communicationAddresses));
         }
 
         async void Button4_TouchUpInside(object sender, EventArgs e)
@@ -434,20 +431,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (physicalAddress.Length == 1)
             {
-                Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[0]);
+                Integration.ShowOnMap(this, (UIButton) sender, physicalAddress[0]);
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("show_on_map"), physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("show_on_map"), physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton) sender);
             if (selectedItem < 0)
                 return;
 
-            Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
+            Integration.ShowOnMap(this, (UIButton) sender, physicalAddress[selectedItem]);
         }
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
         {
-            var vc = new CategoriesListViewController { BusinessEntityPreview = contactPreview };
+            var vc = new CategoriesListViewController
+            {
+                BusinessEntityPreview = contactPreview
+            };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -455,48 +455,65 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { contact } };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    var vc = new CopyToWorktrayViewController
+                    {
+                        BusinessEntities = new List<IBusinessEntity>
+                        {
+                            contact
+                        }
+                    };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                    {
+                        contactPreview
+                    });
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
 
-            if (folder?.InternalType == FolderInternalType.FilterView
-                || folder?.InternalType == FolderInternalType.Static
-                || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview }, folder);
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                            {
+                                contactPreview
+                            },
+                            folder);
+                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    }));
 
-            if (folder?.InternalType == FolderInternalType.FilterView
-                || folder?.InternalType == FolderInternalType.Static
-                || folder?.InternalType == FolderInternalType.Worktray)
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
 
             PresentViewController(eas, true, null);
         }
 
         async void ActionsLinksButton_Clicked(object sender, EventArgs e)
         {
-            var actionLinksListString = new string[] { Localization.GetString( "actions"),
-                    Localization.GetString("links") };
+            var actionLinksListString = new string[]
+            {
+                Localization.GetString("actions"),
+                Localization.GetString("links")
+            };
 
             var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, actionsLinksButton);
 
@@ -529,24 +546,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = new ComposeDocumentViewController
                 {
-                    PreconfiguredEmailAddresses = new string[] { ca.Address },
+                    PreconfiguredEmailAddresses = new string[]
+                    {
+                        ca.Address
+                    },
                     CreationModeFlag = DocumentCreationModeFlag.New
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }
 
             if (ca.Type == CommunicationAddressType.Phone)
-            {
                 Integration.Call(this, tv, cell, ca.Address);
-            }
 
             if (ca.Type == CommunicationAddressType.Mobile)
-            {
                 Integration.CallOrText(this, tv, cell, ca.Address);
-            }
         }
 
-        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
+        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
+        {
+            Integration.ShowOnMap(this, tv, cell, pa);
+        }
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
@@ -557,9 +576,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationController.PushViewController(vc, true);
         }
 
-        public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress) => Integration.OpenUrl(this, tableView, cell, webPageAddress);
+        public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress)
+        {
+            Integration.OpenUrl(this, tableView, cell, webPageAddress);
+        }
 
-        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
+        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text)
+        {
+            Integration.CopyToClipboard(this, tableView, cell, text);
+        }
 
         public void SetData(int folderId, int contactId)
         {
@@ -621,7 +646,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info("Loading contact...");
 
-            var ds = (DataSource)tableView?.Source;
+            var ds = (DataSource) tableView?.Source;
 
             try
             {
@@ -635,14 +660,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 if (folder != null && contactPreview != null)
-                {
                     contact = await Managers.ContactsManager.GetContactAsync(folder, contactPreview.Id);
-                }
 
                 if (folderId == null && folder == null && contactPreview != null)
-                {
                     contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
-                }
 
                 if (folderId == null && folder == null && contactPreview == null)
                 {
@@ -653,7 +674,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 contact.CommunicationAddresses = contact.CommunicationAddresses.OrderBy(ca => ca.Address).ToList();
 
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested)
+                    return;
 
                 if (this.contactPreview.Type == ContactType.Person || this.contactPreview.Type == ContactType.Department)
                 {
@@ -689,7 +711,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested)
+                    return;
 
                 CommonConfig.Logger.Error($"Could not load contact", ex);
 
@@ -759,20 +782,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to remove contact from folder [contactId={contact.Id}, folderId={folder.Id}]");
 
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { contact }, folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
+                    {
+                        contact
+                    },
+                    folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, folder.Id, new List<int> { contact.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Contact,
+                    folder.Id,
+                    new List<int>
+                    {
+                        contact.Id
+                    }));
 
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -798,20 +827,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to delete contact [contactId={contact.Id}]");
 
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { contact });
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity>
+                {
+                    contact
+                });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Contact, new List<int> { contact.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                    ObjectType.Contact,
+                    new List<int>
+                    {
+                        contact.Id
+                    }));
 
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -826,7 +859,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-
             ContactViewController viewController;
             UITableView tableView;
 
@@ -863,7 +895,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                return sections[(int)section].Rows.Count;
+                return sections[(int) section].Rows.Count;
             }
 
             public override nint NumberOfSections(UITableView tableView)
@@ -880,7 +912,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None) return;
+                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
 
                 sections[indexPath.Section].Rows[indexPath.Row].OnClicked(viewController, tableView, cell, indexPath);
 
@@ -898,7 +931,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void EndRefresh(ContactPreview contactPreview, Contact contact)
             {
-                var allSections = new AbstractSection[] {
+                var allSections = new AbstractSection[]
+                {
                     new CommunicationAddressSection(),
                     new PhysicalAddressSection(),
                     new LinkedContactSection(),
@@ -982,7 +1016,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public abstract class AbstractSection
             {
-
                 WeakReference<ContactPreview> weakContactPreview;
                 WeakReference<Contact> weakContact;
 
@@ -993,10 +1026,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         ContactPreview result = null;
                         return (weakContactPreview?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set
-                    {
-                        weakContactPreview = new WeakReference<ContactPreview>(value);
-                    }
+                    set => weakContactPreview = new WeakReference<ContactPreview>(value);
                 }
 
                 public Contact Contact
@@ -1006,10 +1036,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Contact result = null;
                         return (weakContact?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set
-                    {
-                        weakContact = new WeakReference<Contact>(value);
-                    }
+                    set => weakContact = new WeakReference<Contact>(value);
                 }
 
                 public abstract bool Empty { get; }
@@ -1021,8 +1048,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class CommunicationAddressSection : AbstractSection
             {
-
-                readonly CommunicationAddressType[] supportedSections = {
+                readonly CommunicationAddressType[] supportedSections =
+                {
                     CommunicationAddressType.Mobile,
                     CommunicationAddressType.Phone,
                     CommunicationAddressType.Email,
@@ -1037,7 +1064,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void InitializeRows()
                 {
-                    if (Empty) return;
+                    if (Empty)
+                        return;
 
                     var cas = Contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Mobile);
                     foreach (var ca in cas)
@@ -1071,29 +1099,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class PhysicalAddressSection : AbstractSection
             {
-
-                public override bool Empty { get { return !Contact?.PhysicalAddresses?.Any() ?? true; } }
+                public override bool Empty => !Contact?.PhysicalAddresses?.Any() ?? true;
 
                 public override void InitializeRows()
                 {
-                    if (Empty) return;
+                    if (Empty)
+                        return;
 
                     var pas = Contact.PhysicalAddresses.ToArray();
                     foreach (var pa in pas)
-                    {
                         Rows.Add(new PhysicalAddressRow(ContactPreview, Contact, pa));
-                    }
                 }
             }
 
             public class LinkedContactSection : AbstractSection
             {
-
-                public override bool Empty { get { return Contact?.PrimaryPerson == null && (!Contact?.Children?.Any() ?? true); } }
+                public override bool Empty => Contact?.PrimaryPerson == null && (!Contact?.Children?.Any() ?? true);
 
                 public override void InitializeRows()
                 {
-                    if (Empty) return;
+                    if (Empty)
+                        return;
 
                     if (Contact.PrimaryPerson != null)
                         Rows.Add(new LinkedContactRow(ContactPreview, Contact, Contact.PrimaryPerson));
@@ -1114,20 +1140,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class ExtraSection : AbstractSection
             {
-                public override bool Empty
-                {
-                    get
-                    {
-                        return string.IsNullOrWhiteSpace(ContactPreview?.Description)
-                                     && string.IsNullOrWhiteSpace(ContactPreview?.ShortId)
-                                     && (!Contact?.ResponsibleUsers?.Any() ?? true)
-                                     && (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1)
-                                     && string.IsNullOrWhiteSpace(Contact?.WebPageAddress)
-                                     && string.IsNullOrWhiteSpace(Contact?.Vat)
-                                     && string.IsNullOrWhiteSpace(Contact?.Ledger)
-                                     && string.IsNullOrWhiteSpace(Contact?.Account);
-                    }
-                }
+                public override bool Empty => string.IsNullOrWhiteSpace(ContactPreview?.Description) && string.IsNullOrWhiteSpace(ContactPreview?.ShortId) && (!Contact?.ResponsibleUsers?.Any() ?? true) && (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1) && string.IsNullOrWhiteSpace(Contact?.WebPageAddress) && string.IsNullOrWhiteSpace(Contact?.Vat) && string.IsNullOrWhiteSpace(Contact?.Ledger) && string.IsNullOrWhiteSpace(Contact?.Account);
 
                 public override void InitializeRows()
                 {
@@ -1156,7 +1169,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public abstract class AbstractRow
             {
-
                 WeakReference<ContactPreview> weakContactPreview;
                 WeakReference<Contact> weakContact;
 
@@ -1167,10 +1179,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         ContactPreview result = null;
                         return (weakContactPreview?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set
-                    {
-                        weakContactPreview = new WeakReference<ContactPreview>(value);
-                    }
+                    set => weakContactPreview = new WeakReference<ContactPreview>(value);
                 }
 
                 public Contact Contact
@@ -1180,10 +1189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Contact result = null;
                         return (weakContact?.TryGetTarget(out result) ?? false) ? result : null;
                     }
-                    set
-                    {
-                        weakContact = new WeakReference<Contact>(value);
-                    }
+                    set => weakContact = new WeakReference<Contact>(value);
                 }
 
                 protected AbstractRow(ContactPreview contactPreview, Contact contact)
@@ -1192,7 +1198,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact = contact;
                 }
 
-                public virtual string Key { get { return ContactInfoTableViewCell.Key; } }
+                public virtual string Key => ContactInfoTableViewCell.Key;
 
                 public virtual UITableViewCell CreateCell()
                 {
@@ -1204,15 +1210,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public abstract void Bind(UITableViewCell cell);
 
-                public virtual void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
+                public virtual void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                }
 
-                public virtual void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
-
+                public virtual void OnLongClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                }
             }
 
             public class DescriptionRow : AbstractRow
             {
-
                 public DescriptionRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
@@ -1220,7 +1228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(Localization.GetString("description").ToUpper(), ContactPreview.Description, true);
                 }
 
@@ -1232,7 +1240,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class CommunicationAddressRow : AbstractRow
             {
-
                 readonly WeakReference<CommunicationAddress> weakCommunicationAddress;
 
                 public CommunicationAddressRow(ContactPreview contactPreview, Contact contact, CommunicationAddress communicationAddress)
@@ -1249,9 +1256,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         weakCommunicationAddress.TryGetTarget(out ca);
 
                         if (string.IsNullOrWhiteSpace(ca.Description))
-                        {
                             return CommunicationAddressCompactTableViewCell.Key;
-                        }
 
                         return CommunicationAddressTableViewCell.Key;
                     }
@@ -1263,9 +1268,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakCommunicationAddress.TryGetTarget(out ca);
 
                     if (string.IsNullOrWhiteSpace(ca.Description))
-                    {
                         return CommunicationAddressCompactTableViewCell.Create();
-                    }
 
                     return CommunicationAddressTableViewCell.Create();
                 }
@@ -1277,12 +1280,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (string.IsNullOrWhiteSpace(ca.Description))
                     {
-                        var cactcv = (CommunicationAddressCompactTableViewCell)cell;
+                        var cactcv = (CommunicationAddressCompactTableViewCell) cell;
                         cactcv.Initialize(ca);
                     }
                     else
                     {
-                        var catcv = (CommunicationAddressTableViewCell)cell;
+                        var catcv = (CommunicationAddressTableViewCell) cell;
                         catcv.Initialize(ca);
                     }
                 }
@@ -1290,7 +1293,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     CommunicationAddress ca;
-                    if (!weakCommunicationAddress.TryGetTarget(out ca)) return;
+                    if (!weakCommunicationAddress.TryGetTarget(out ca))
+                        return;
 
                     viewController.CommunicationAddressClicked(tableView, cell, ca);
                 }
@@ -1303,7 +1307,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class PhysicalAddressRow : AbstractRow
             {
-
                 readonly WeakReference<PhysicalAddress> weakPhysicalAddress;
 
                 public PhysicalAddressRow(ContactPreview contactPreview, Contact contact, PhysicalAddress physicalAddress)
@@ -1312,7 +1315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakPhysicalAddress = new WeakReference<PhysicalAddress>(physicalAddress);
                 }
 
-                public override string Key { get { return PhysicalAddressTableViewCell.Key; } }
+                public override string Key => PhysicalAddressTableViewCell.Key;
 
                 public override UITableViewCell CreateCell()
                 {
@@ -1324,14 +1327,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PhysicalAddress pa;
                     weakPhysicalAddress.TryGetTarget(out pa);
 
-                    var patvc = (PhysicalAddressTableViewCell)cell;
+                    var patvc = (PhysicalAddressTableViewCell) cell;
                     patvc.Initialize(pa);
                 }
 
                 public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     PhysicalAddress pa;
-                    if (!weakPhysicalAddress.TryGetTarget(out pa)) return;
+                    if (!weakPhysicalAddress.TryGetTarget(out pa))
+                        return;
 
                     viewController.PhysicalAddressClicked(tableView, cell, pa);
                 }
@@ -1344,7 +1348,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class LinkedContactRow : AbstractRow
             {
-
                 readonly WeakReference<ContactPreview> weakLinkedContactPreview;
 
                 public LinkedContactRow(ContactPreview contactPreview, Contact contact, ContactPreview linkedContactPreview)
@@ -1353,7 +1356,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakLinkedContactPreview = new WeakReference<ContactPreview>(linkedContactPreview);
                 }
 
-                public override string Key { get { return base.Key + "_LinkedContact"; } }
+                public override string Key => base.Key + "_LinkedContact";
 
                 public override UITableViewCell CreateCell()
                 {
@@ -1378,14 +1381,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                         type = Localization.GetString("company");
 
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(type.ToUpper(), cp.Name);
                 }
 
                 public override void OnClicked(ContactViewController viewController, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     ContactPreview cp;
-                    if (!weakLinkedContactPreview.TryGetTarget(out cp)) return;
+                    if (!weakLinkedContactPreview.TryGetTarget(out cp))
+                        return;
 
                     viewController.LinkedContactClicked(cp);
                 }
@@ -1393,13 +1397,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class WebPageRow : AbstractRow
             {
-
                 public WebPageRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
                 }
 
-                public override string Key { get { return base.Key + "_WebPage"; } }
+                public override string Key => base.Key + "_WebPage";
 
                 public override UITableViewCell CreateCell()
                 {
@@ -1410,7 +1413,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(Localization.GetString("webpage").ToUpper(), new NSAttributedString(Contact.WebPageAddress, foregroundColor: Theme.DarkBlue, underlineStyle: NSUnderlineStyle.Single));
                 }
 
@@ -1427,7 +1430,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class BirthdateRow : AbstractRow
             {
-
                 public BirthdateRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
@@ -1435,18 +1437,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
-                    cic.Initialize(Localization.GetString("birthdate").ToUpper(), Contact.BirthDateTimestamp
-                                                                                     .ConvertTimestampMillisecondsToDateTime()
-                                                                                     .ConvertUtcToUserTime()
-                                                                                     .ConvertDateTimeToTimestampMilliseconds()
-                                                                                     .FormatUserTimestampAsLongDateString());
+                    var cic = (ContactInfoTableViewCell) cell;
+                    cic.Initialize(Localization.GetString("birthdate").ToUpper(), Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsLongDateString());
                 }
             }
 
             public class AccountRow : AbstractRow
             {
-
                 public AccountRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
@@ -1454,7 +1451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(Localization.GetString("account").ToUpper(), Contact.Account);
                 }
 
@@ -1466,7 +1463,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class LedgerRow : AbstractRow
             {
-
                 public LedgerRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
@@ -1474,7 +1470,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(Localization.GetString("ledger").ToUpper(), Contact.Ledger);
                 }
 
@@ -1486,7 +1482,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class VatRow : AbstractRow
             {
-
                 public VatRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
@@ -1494,7 +1489,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(Localization.GetString("vat").ToUpper(), Contact.Vat);
                 }
 
@@ -1506,7 +1501,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class ResponsibleUsersRow : AbstractRow
             {
-
                 public ResponsibleUsersRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
@@ -1514,14 +1508,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(Localization.GetString("responsible_users").ToUpper(), string.Join(", ", Contact.ResponsibleUsers.Values.OrderBy(s => s)));
                 }
             }
 
             public class ShortIdRow : AbstractRow
             {
-
                 public ShortIdRow(ContactPreview contactPreview, Contact contact)
                     : base(contactPreview, contact)
                 {
@@ -1529,14 +1522,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ContactInfoTableViewCell) cell;
                     cic.Initialize(Localization.GetString("short_id").ToUpper(), ContactPreview.ShortId);
                 }
             }
 
             #endregion
-
         }
-
     }
 }

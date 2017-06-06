@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CommunicationAddressesSubview.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Globalization;
 using System.Linq;
@@ -22,10 +14,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-
     public class CommunicationAddressesSubview : ContactView
     {
-
         readonly CommunicationAddressType addressType;
 
         public event EventHandler<CommunicationAddress> AddressClicked = delegate { };
@@ -62,13 +52,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         class CommunicationAddressesSubSubview : LinearLayoutCompat
         {
-
             public CommunicationAddressesSubSubview(Context context, CommunicationAddress communicationAddress, int distanceSmall, int distanceNormal, int distanceLarge, int distanceVeryLarge)
                 : base(context)
             {
                 Clickable = true;
 
-                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                var typedArray = Context.ObtainStyledAttributes(new int[]
+                {
+                    Resource.Attribute.selectableItemBackground
+                });
                 SetBackgroundResource(typedArray.GetResourceId(0, 0));
                 typedArray.Recycle();
 
@@ -91,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 AddView(innerLayout);
 
                 var titleTextView = new AppCompatTextView(context);
-                titleTextView.Text = AddressUtilities.FormatCommunicationAddress(communicationAddress);
+                titleTextView.Text = AddressUtils.FormatCommunicationAddress(communicationAddress);
                 titleTextView.SetTextAppearanceCompat(context, communicationAddress.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
                 innerLayout.AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
@@ -105,7 +97,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     var descriptionTextView = new AppCompatTextView(context);
                     descriptionTextView.Text = communicationAddress.Description;
                     descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-                    innerLayout.AddView(descriptionTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent) { TopMargin = distanceSmall / 2 });
+                    innerLayout.AddView(descriptionTextView,
+                        new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                        {
+                            TopMargin = distanceSmall / 2
+                        });
                 }
 
                 LongClickable = true;

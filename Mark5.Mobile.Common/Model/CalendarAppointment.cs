@@ -1,38 +1,17 @@
-//
-// Project: Mark5.Mobile.Common
-// File: CalendarAppointment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     public class CalendarAppointment : BusinessEntity
     {
         [Ignore]
-        public override ObjectType ObjectType
-        {
-            get
-            {
-                return ObjectType.CalendarAppointment;
-            }
-        }
+        public override ObjectType ObjectType => ObjectType.CalendarAppointment;
 
         [Ignore]
-        public override ModuleType ModuleType
-        {
-            get
-            {
-                return ModuleType.Calendar;
-            }
-        }
+        public override ModuleType ModuleType => ModuleType.Calendar;
 
         [Column("Subject")]
         public string Subject { get; set; }
@@ -78,16 +57,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (resources == null)
-                {
                     resources = new List<CalendarResource>();
-                }
-
                 return resources;
             }
-            set
-            {
-                resources = value;
-            }
+            set => resources = value;
         }
 
         [Column("ReminderDateTimestamp")]
@@ -104,58 +77,22 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (participants == null)
-                {
                     participants = new List<Participant>();
-                }
-
                 return participants;
             }
-            set
-            {
-                participants = value;
-            }
+            set => participants = value;
         }
 
         #region Serialization
 
         [Column("CategoryString")]
-        public string CategoryString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(Category);
-            }
-            set
-            {
-                Category = SerializationUtils.Deserialize<CalendarCategory>(value);
-            }
-        }
+        public string CategoryString { get => SerializationUtils.Serialize(Category); set => Category = SerializationUtils.Deserialize<CalendarCategory>(value); }
 
         [Column("ResourcesString")]
-        public string ResourcesString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(Resources);
-            }
-            set
-            {
-                Resources = SerializationUtils.Deserialize<List<CalendarResource>>(value);
-            }
-        }
+        public string ResourcesString { get => SerializationUtils.Serialize(Resources); set => Resources = SerializationUtils.Deserialize<List<CalendarResource>>(value); }
 
         [Column("ParticipantsString")]
-        public string ParticipantsString
-        {
-            get
-            {
-                return SerializationUtils.Serialize(Participants);
-            }
-            set
-            {
-                Participants = SerializationUtils.Deserialize<List<Participant>>(value);
-            }
-        }
+        public string ParticipantsString { get => SerializationUtils.Serialize(Participants); set => Participants = SerializationUtils.Deserialize<List<Participant>>(value); }
 
         #endregion
 
@@ -165,4 +102,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: MailViewerViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +11,7 @@ using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.Exceptions;
@@ -30,10 +24,8 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
-
     public class MailViewerViewController : AbstractViewController
     {
-
         const long MaxSize = 5 * 1024 * 1024; // 5MB
 
         readonly NSUrl url;
@@ -86,12 +78,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             };
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
 
             stackViewBeforeContent = new UIStackView
             {
@@ -103,11 +95,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             };
             mainScrollView.AddSubview(stackViewBeforeContent);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
+            });
 
             contentView = new ContentView(DecidePolicyForNavigationAction);
             mainScrollView.AddSubview(contentView);
@@ -129,12 +121,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             };
             mainScrollView.AddSubview(stackViewAfterContent);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
 
             stackViewBeforeContent.AddArrangedSubview(new SubjectView());
             stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.From));
@@ -175,13 +167,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             shareItem.Clicked -= ShareItem_Clicked;
         }
 
-        void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        void CloseItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
 
         void ShareItem_Clicked(object sender, EventArgs e)
         {
-            var avc = new UIActivityViewController(new NSObject[] { url }, null);
+            var avc = new UIActivityViewController(new NSObject[]
+                {
+                    url
+                },
+                null);
             if (avc.PopoverPresentationController != null)
-                avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
             PresentViewController(avc, true, null);
         }
 
@@ -190,110 +189,112 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
             Task.Run(async () =>
-            {
-                var auth = AuthenticatorFactory.Create();
-                if (!(await auth.IsAuthenticatedAsync()))
-                    throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
-
-                if (url == null)
-                    throw new MailViewerException("File could not be loaded.");
-
-                NSObject sizeObject;
-                NSError _error;
-                var result = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
-
-                if (!result)
-                    throw new MailViewerException(_error.ToString());
-
-                var name = url.LastPathComponent;
-                var size = int.Parse(sizeObject.ToString());
-
-                if (size > MaxSize)
                 {
-                    CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
+                    var auth = AuthenticatorFactory.Create();
+                    if (!await auth.IsAuthenticatedAsync())
+                        throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
 
-                    throw new MailViewerException("File too large.");
-                }
+                    if (url == null)
+                        throw new MailViewerException("File could not be loaded.");
 
-                if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    byte[] bytes;
-                    using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
-                        bytes = ReadToEnd(stream);
+                    NSObject sizeObject;
+                    NSError _error;
+                    var result = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
 
-                    try
+                    if (!result)
+                        throw new MailViewerException(_error.ToString());
+
+                    var name = url.LastPathComponent;
+                    var size = int.Parse(sizeObject.ToString());
+
+                    if (size > MaxSize)
                     {
-                        var mm = new MailMessage();
-                        mm.ThrowExceptions = true;
-                        mm.LoadMessage(bytes);
-                        bytes = null;
-                        MakeHtmlSafe(mm);
-                        InlineImages(mm);
-                        return mm;
+                        CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
+
+                        throw new MailViewerException("File too large.");
                     }
-                    catch (MailBeeException ex)
-                    {
-                        throw new MailViewerException("File could not be loaded.", ex);
-                    }
-                }
 
-                if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                    if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        using (var msgStream = new MemoryStream())
+                        byte[] bytes;
+                        using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
                         {
-                            inputStream.CopyTo(msgStream);
-                            inputStream.Dispose();
+                            bytes = ReadToEnd(stream);
+                        }
 
-                            using (var emlStream = new MemoryStream())
+                        try
+                        {
+                            var mm = new MailMessage();
+                            mm.ThrowExceptions = true;
+                            mm.LoadMessage(bytes);
+                            bytes = null;
+                            MakeHtmlSafe(mm);
+                            InlineImages(mm);
+                            return mm;
+                        }
+                        catch (MailBeeException ex)
+                        {
+                            throw new MailViewerException("File could not be loaded.", ex);
+                        }
+                    }
+
+                    if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
+                        using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                        {
+                            using (var msgStream = new MemoryStream())
                             {
-                                try
-                                {
-                                    var msgConverter = new MsgConvert();
-                                    msgConverter.MsgToEml(msgStream, emlStream);
-                                    msgStream.Dispose();
+                                inputStream.CopyTo(msgStream);
+                                inputStream.Dispose();
 
-                                    emlStream.Position = 0;
-
-                                    var mm = new MailMessage();
-                                    mm.ThrowExceptions = true;
-                                    mm.LoadMessage(emlStream.ToArray());
-                                    emlStream.Dispose();
-                                    MakeHtmlSafe(mm);
-                                    InlineImages(mm);
-                                    return mm;
-                                }
-                                catch (MailBeeException ex)
+                                using (var emlStream = new MemoryStream())
                                 {
-                                    throw new MailViewerException("File could not be loaded.", ex);
+                                    try
+                                    {
+                                        var msgConverter = new MsgConvert();
+                                        msgConverter.MsgToEml(msgStream, emlStream);
+                                        msgStream.Dispose();
+
+                                        emlStream.Position = 0;
+
+                                        var mm = new MailMessage();
+                                        mm.ThrowExceptions = true;
+                                        mm.LoadMessage(emlStream.ToArray());
+                                        emlStream.Dispose();
+                                        MakeHtmlSafe(mm);
+                                        InlineImages(mm);
+                                        return mm;
+                                    }
+                                    catch (MailBeeException ex)
+                                    {
+                                        throw new MailViewerException("File could not be loaded.", ex);
+                                    }
                                 }
                             }
                         }
-                    }
-                }
 
-                throw new MailViewerException("Unsupported file.");
-            }).ContinueWith(t =>
-            {
-                dismissAction();
+                    throw new MailViewerException("Unsupported file.");
+                })
+                .ContinueWith(t =>
+                    {
+                        dismissAction();
 
-                if (t.IsFaulted)
-                {
-                    var ex = t.Exception.InnerException;
-                    mailMessage = null;
+                        if (t.IsFaulted)
+                        {
+                            var ex = t.Exception.InnerException;
+                            mailMessage = null;
 
-                    CommonConfig.Logger.Error(ex);
+                            CommonConfig.Logger.Error(ex);
 
-                    Dialogs.ShowErrorDialog(this, ex);
-                }
-                else
-                {
-                    mailMessage = t.Result;
+                            Dialogs.ShowErrorDialog(this, ex);
+                        }
+                        else
+                        {
+                            mailMessage = t.Result;
 
-                    RefreshView();
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                            RefreshView();
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void RefreshView()
@@ -319,23 +320,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
         {
-            if (navigationAction.NavigationType == WKNavigationType.LinkActivated
-                || navigationAction.NavigationType == WKNavigationType.BackForward
-                || navigationAction.NavigationType == WKNavigationType.FormSubmitted
-                || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
+            if (navigationAction.NavigationType == WKNavigationType.LinkActivated || navigationAction.NavigationType == WKNavigationType.BackForward || navigationAction.NavigationType == WKNavigationType.FormSubmitted || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
             {
                 if (navigationAction.Request.Url.Scheme == "mailto")
                 {
                     var address = navigationAction.Request.Url.ResourceSpecifier;
-                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
+                    PresentComposeViewWithPreconfiguredAddresses(new string[]
+                    {
+                        address
+                    });
                 }
                 else
                 {
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-                    Integration.OpenLink(navigationAction.Request.Url,
-                                                      async () => await Dialogs.ShowConfirmDialogAsync(this,
-                                                                                                       Localization.GetString("unable_open_link_title"),
-                                                                                                       Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
+                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                 }
 
@@ -343,9 +341,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             }
 
             if (navigationAction.NavigationType == WKNavigationType.Reload)
-            {
                 return WKNavigationActionPolicy.Cancel;
-            }
 
             return WKNavigationActionPolicy.Allow;
         }
@@ -432,7 +428,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 MailBee.Mime.Attachment matchingAtt = null;
                 foreach (var obj in atts)
                 {
-                    var att = (MailBee.Mime.Attachment)obj;
+                    var att = (MailBee.Mime.Attachment) obj;
                     if (att.ContentID == cid)
                     {
                         matchingAtt = att;
@@ -463,12 +459,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         static byte[] ReadToEnd(Stream input)
         {
-            byte[] buffer = new byte[16 * 1024];
-            using (MemoryStream ms = new MemoryStream())
+            var buffer = new byte[16 * 1024];
+            using (var ms = new MemoryStream())
             {
                 int read;
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
                     ms.Write(buffer, 0, read);
+
                 return ms.ToArray();
             }
         }
@@ -489,14 +486,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             var cacheFile = specificDir.Append(filename, false);
 
             using (var stream = new FileStream(cacheFile.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, 4096, true))
+            {
                 await stream.WriteAsync(bytes, 0, bytes.Length);
+            }
 
             return cacheFile;
         }
 
         class DocumentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
         {
-
             readonly UIViewController parentController;
 
             public DocumentInteractionControllerDelegate(UIViewController parentController)

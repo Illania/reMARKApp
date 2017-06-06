@@ -1,0 +1,2 @@
+﻿[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Potential Code Quality Issues", "RECS0018:Comparison of floating point numbers with equality operator")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Code Notifications", "iOSAndMacApiUsageIssue:Find issues with Mac and iOS API usage")]

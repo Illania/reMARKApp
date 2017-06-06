@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: FoldersNotificationsListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using CoreGraphics;
+﻿using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -17,10 +10,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class FoldersNotificationsListViewController : AbstractViewController
     {
-
         readonly ModuleType moduleType;
 
         UISegmentedControl segmentedControl;
@@ -39,10 +30,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             AutomaticallyAdjustsScrollViewInsets = false;
 
-            segmentedControl = new UISegmentedControl(new[] { Localization.GetString("folders"), Localization.GetString("notifications") });
+            segmentedControl = new UISegmentedControl(new[]
+            {
+                Localization.GetString("folders"),
+                Localization.GetString("notifications")
+            });
             segmentedControl.Frame = new CGRect(0f, 0f, 0f, 26f);
-            segmentedControl.SetTitleTextAttributes(new UITextAttributes { Font = Theme.DefaultFont.WithRelativeSize(-3f), TextColor = Theme.White }, UIControlState.Normal);
-            segmentedControl.SetTitleTextAttributes(new UITextAttributes { Font = Theme.DefaultFont.WithRelativeSize(-3f), TextColor = Theme.White }, UIControlState.Selected);
+            segmentedControl.SetTitleTextAttributes(new UITextAttributes
+                {
+                    Font = Theme.DefaultFont.WithRelativeSize(-3f),
+                    TextColor = Theme.White
+                },
+                UIControlState.Normal);
+            segmentedControl.SetTitleTextAttributes(new UITextAttributes
+                {
+                    Font = Theme.DefaultFont.WithRelativeSize(-3f),
+                    TextColor = Theme.White
+                },
+                UIControlState.Selected);
             segmentedControl.TintColor = Theme.DarkBlue;
             segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
@@ -62,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            
+
             ExtendedLayoutIncludesOpaqueBars = true;
 
             var vc = viewControllers[0];

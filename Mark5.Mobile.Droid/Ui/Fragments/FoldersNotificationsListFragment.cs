@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: FoldersNotificationsListFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using Android.OS;
+﻿using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
@@ -18,11 +11,13 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class FoldersNotificationsListFragment : RetainableStateFragment
     {
-
-        static readonly int[] tabTitles = { Resource.String.folders, Resource.String.notifications };
+        static readonly int[] tabTitles =
+        {
+            Resource.String.folders,
+            Resource.String.notifications
+        };
 
         public Folder RemoteFolder { get; set; }
 
@@ -45,9 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
 
             for (var i = 0; i < 2; i++)
-            {
                 tabLayout.AddTab(tabLayout.NewTab().SetText(tabTitles[i]));
-            }
+
             tabLayout.TabGravity = TabLayout.GravityFill;
 
             return rootView;
@@ -72,8 +66,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     break;
             }
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersNotificationsRetainableState)}");
         }
@@ -104,7 +98,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class FoldersNotificationsRetainableState : IRetainableState
         {
-
             public Folder Folder { get; set; }
 
             public int SelectedTab { get; set; }
@@ -112,8 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PagerAdapter : FragmentPagerAdapter
         {
-
-            public override int Count { get { return 2; } }
+            public override int Count => 2;
 
             readonly Folder folder;
 
@@ -128,9 +120,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 switch (position)
                 {
                     case 0:
-                        return new FoldersListFragment { RemoteFolder = folder };
+                        return new FoldersListFragment
+                        {
+                            RemoteFolder = folder
+                        };
                     case 1:
-                        return new NotificationsListFragment { ObjectTypes = folder.Module.ObjectTypes() };
+                        return new NotificationsListFragment
+                        {
+                            ObjectTypes = folder.Module.ObjectTypes()
+                        };
                     default:
                         return null;
                 }

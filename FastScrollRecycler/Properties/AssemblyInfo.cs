@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nordic IT")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Nordic IT")]
+[assembly: AssemblyCopyright("2017 Nordic IT")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

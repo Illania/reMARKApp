@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: EntityRemovedFromFolderMessage.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
@@ -13,23 +6,11 @@ namespace Mark5.Mobile.IOS.Model.HubMessages
 {
     public class EntityRemovedFromFolderMessage : TinyMessageBase
     {
-        public ObjectType ObjectType
-        {
-            get;
-            private set;
-        }
+        public ObjectType ObjectType { get; }
 
-        public int FromFolderId
-        {
-            get;
-            private set;
-        }
+        public int FromFolderId { get; }
 
-        public List<int> EntitiesId
-        {
-            get;
-            private set;
-        }
+        public List<int> EntitiesId { get; }
 
         public EntityRemovedFromFolderMessage(object sender, ObjectType objectType, int fromFolderId, List<int> entitiesId)
             : base(sender)

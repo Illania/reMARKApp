@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: FoldersDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,13 +7,10 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using SQLite;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
-
     class FoldersDataAccess : IFoldersDataAccess
     {
-
         readonly Func<ModuleType, DatabaseConnectionProvider> databaseForModuleType;
 
         public FoldersDataAccess(Func<ModuleType, DatabaseConnectionProvider> databaseForModuleType)
@@ -32,11 +22,12 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
-                {
-                    DeleteRecursively(c, parentFolder?.Id ?? 0);
-                    InsertOrReplaceRecursively(c, folders);
-                });
+                await databaseForModuleType(moduleType)
+                    .RunInConnectionAsync(c =>
+                    {
+                        DeleteRecursively(c, parentFolder?.Id ?? 0);
+                        InsertOrReplaceRecursively(c, folders);
+                    });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -50,20 +41,13 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 List<Folder> list = null;
 
-                await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
-                {
-                    list = GetRecursively(c, parentFolder?.Id ?? 0, depth);
-                });
+                await databaseForModuleType(moduleType).RunInConnectionAsync(c => { list = GetRecursively(c, parentFolder?.Id ?? 0, depth); });
 
                 if (parentFolder != null)
-                {
                     parentFolder.SubFolders = list;
-                }
 
                 if (list == null || list.Count < 1)
-                {
                     throw new DataNotFoundException("Folders could not be found.");
-                }
 
                 return list;
             }
@@ -77,14 +61,13 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
-                {
-                    var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" +
-                                              $"set \"{nameof(Folder.Subscribed)}\" = @subscribed " +
-                                              $"where \"{nameof(Folder.Id)}\" in ({string.Join(",", folders.Select(f => f.Id))})");
-                    cmd.Bind("@subscribed", subscribed);
-                    cmd.ExecuteNonQuery();
-                });
+                await databaseForModuleType(moduleType)
+                    .RunInConnectionAsync(c =>
+                    {
+                        var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" + $"set \"{nameof(Folder.Subscribed)}\" = @subscribed " + $"where \"{nameof(Folder.Id)}\" in ({string.Join(",", folders.Select(f => f.Id))})");
+                        cmd.Bind("@subscribed", subscribed);
+                        cmd.ExecuteNonQuery();
+                    });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -96,16 +79,19 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                foreach (var moduleType in new[] { ModuleType.Documents, ModuleType.Contacts, ModuleType.Shortcodes })
+                foreach (var moduleType in new[]
                 {
-                    await databaseForModuleType(moduleType).RunInConnectionAsync(c =>
-                    {
-                        var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" +
-                                                  $"set \"{nameof(Folder.Subscribed)}\" = @subscribed");
-                        cmd.Bind("@subscribed", false);
-                        cmd.ExecuteNonQuery();
-                    });
-                }
+                    ModuleType.Documents,
+                    ModuleType.Contacts,
+                    ModuleType.Shortcodes
+                })
+                    await databaseForModuleType(moduleType)
+                        .RunInConnectionAsync(c =>
+                        {
+                            var cmd = c.CreateCommand($"update \"{nameof(Folder)}\"" + $"set \"{nameof(Folder.Subscribed)}\" = @subscribed");
+                            cmd.Bind("@subscribed", false);
+                            cmd.ExecuteNonQuery();
+                        });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -123,9 +109,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             else
             {
-                var cmd = c.CreateCommand($"select \"{nameof(Folder.Id)}\" " +
-                                          $"from \"{nameof(Folder)}\" " +
-                                          $"where \"{nameof(Folder.ParentFolderId)}\" = @parentFolderId");
+                var cmd = c.CreateCommand($"select \"{nameof(Folder.Id)}\" " + $"from \"{nameof(Folder)}\" " + $"where \"{nameof(Folder.ParentFolderId)}\" = @parentFolderId");
                 cmd.Bind("@parentFolderId", parentFolderId);
                 var subFolderIds = cmd.ExecuteQuery<IdValue>().Select(id => id.Id);
 
@@ -151,18 +135,12 @@ namespace Mark5.Mobile.Common.DataAccess
             var subFolders = c.Table<Folder>().Where(f => f.ParentFolderId == parentFolderId).OrderBy(f => f.Position).ToList();
 
             if (depth > 0)
-            {
                 foreach (var subFolder in subFolders)
-                {
                     subFolder.SubFolders = GetRecursively(c, subFolder.Id, depth - 1);
-                }
-            }
 
             return subFolders;
         }
 
         #endregion
-
     }
 }
-

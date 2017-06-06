@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: Integration.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Linq;
 using System.Text;
@@ -20,10 +13,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
     public static class Integration
     {
-
         #region iPhone/iPad recognition
 
         const float IPhonePlusMaxBounds = 736f;
@@ -73,14 +64,14 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber)dict.FreeSize).LongValue;
+            return ((NSNumber) dict.FreeSize).LongValue;
         }
 
         public static long GetTotalDiskSpace()
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber)dict.Size).LongValue;
+            return ((NSNumber) dict.Size).LongValue;
         }
 
         public static void ClearData()
@@ -105,13 +96,13 @@ namespace Mark5.Mobile.IOS.Utilities
         public static void OpenLink(NSUrl url, Action failureCompletionHandler)
         {
             var options = new UIApplicationOpenUrlOptions();
-            UIApplication.SharedApplication.OpenUrl(url, options, (result) =>
-            {
-                if (!result)
+            UIApplication.SharedApplication.OpenUrl(url,
+                options,
+                (result) =>
                 {
-                    failureCompletionHandler();
-                }
-            });
+                    if (!result)
+                        failureCompletionHandler();
+                });
         }
 
         #endregion
@@ -296,25 +287,17 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 var qb = new StringBuilder();
                 if (!string.IsNullOrEmpty(physicalAddress.Street))
-                {
                     qb.Append(physicalAddress.Street).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.ZipCode))
                 {
                     qb.Append(physicalAddress.ZipCode);
                     if (string.IsNullOrEmpty(physicalAddress.City))
-                    {
                         qb.Append(", ");
-                    }
                 }
                 if (!string.IsNullOrEmpty(physicalAddress.City))
-                {
                     qb.Append(" ").Append(physicalAddress.City).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.Country?.Name))
-                {
                     qb.Append(physicalAddress.Country.Name);
-                }
 
                 var address = Uri.EscapeUriString(qb.ToString());
 
@@ -352,25 +335,17 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 var qb = new StringBuilder();
                 if (!string.IsNullOrEmpty(physicalAddress.Street))
-                {
                     qb.Append(physicalAddress.Street).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.ZipCode))
                 {
                     qb.Append(physicalAddress.ZipCode);
                     if (string.IsNullOrEmpty(physicalAddress.City))
-                    {
                         qb.Append(", ");
-                    }
                 }
                 if (!string.IsNullOrEmpty(physicalAddress.City))
-                {
                     qb.Append(" ").Append(physicalAddress.City).Append(", ");
-                }
                 if (!string.IsNullOrEmpty(physicalAddress.Country?.Name))
-                {
                     qb.Append(physicalAddress.Country.Name);
-                }
 
                 var address = Uri.EscapeUriString(qb.ToString());
 
@@ -447,6 +422,5 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         #endregion
-
     }
 }

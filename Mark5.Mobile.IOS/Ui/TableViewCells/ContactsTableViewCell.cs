@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Common.iOS
-// File: ContactsTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +9,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class ContactsTableViewCell : UITableViewCell
     {
-
         public const float Height = 50f;
 
         public static readonly UINib Nib = UINib.FromName("ContactsTableViewCell", NSBundle.MainBundle);
@@ -34,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static ContactsTableViewCell Create()
         {
-            var cell = (ContactsTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (ContactsTableViewCell) Nib.Instantiate(null, null)[0];
             cell.NameLabel.Font = Theme.DefaultFont;
             return cell;
         }
@@ -86,12 +77,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 foreach (var subView in CategoriesView.Subviews)
                     subView.RemoveFromSuperview();
+
                 return;
             }
 
             if (CategoriesView.Subviews.Length == categoriesColors.Length)
             {
-                for (int i = 0; i < CategoriesView.Subviews.Length; i++)
+                for (var i = 0; i < CategoriesView.Subviews.Length; i++)
                     CategoriesView.Subviews[i].BackgroundColor = categoriesColors[i];
             }
             else
@@ -114,7 +106,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                         CategoriesView.AddConstraint(NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, previousView, NSLayoutAttribute.Bottom, 1f, 0f));
 
                     CategoriesView.AddConstraints(new[]
-                        {
+                    {
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Left, 1f, 0f),
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Right, 1f, 0f),
                         NSLayoutConstraint.Create(categoryView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
@@ -127,12 +119,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 if (previousView != null)
                     CategoriesView.AddConstraint(NSLayoutConstraint.Create(previousView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, CategoriesView, NSLayoutAttribute.Bottom, 1f, 0f));
 
-                for (int i = 1; i < views.Count; i++)
+                for (var i = 1; i < views.Count; i++)
                     CategoriesView.AddConstraint(NSLayoutConstraint.Create(views[0], NSLayoutAttribute.Height, NSLayoutRelation.Equal, views[i], NSLayoutAttribute.Height, 1f, 0f));
             }
         }
 
         #endregion
-
     }
 }

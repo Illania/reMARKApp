@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: NotificationsManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,14 +12,14 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     class NotificationsManager : AbstractManager, INotificationsManager
     {
-
-        public ObjectType[] EnabledObjectTypes { get { return new[] { ObjectType.Document }; } }
+        public ObjectType[] EnabledObjectTypes => new[]
+        {
+            ObjectType.Document
+        };
 
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
@@ -42,7 +35,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -58,16 +52,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task UnSubscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -83,16 +76,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<Notification>> GetNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -109,10 +101,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 var readGuids = await notificationsDataAccess.GetReadNotificationGuids();
                 if (readGuids.Count > 0)
-                {
                     notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
-                }
-
                 return notifications;
             }
 
@@ -126,10 +115,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 var readGuids = await notificationsDataAccess.GetReadNotificationGuids();
                 if (readGuids.Count > 0)
-                {
                     notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
-                }
-
                 return notifications;
             }
 
@@ -138,7 +124,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<Dictionary<ModuleType, List<Folder>>> GetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -158,16 +145,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task SetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, ModuleType moduleType, List<Folder> folders, bool enabled, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -191,12 +177,8 @@ namespace Mark5.Mobile.Common.Managers
 
                 List<Folder> moduleFavoriteFolders;
                 if (favoriteFolders.TryGetValue(moduleType, out moduleFavoriteFolders))
-                {
                     foreach (var item in moduleFavoriteFolders.Where(f => folderIds.Contains(f.Id)))
-                    {
                         item.Subscribed = enabled;
-                    }
-                }
 
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
 
@@ -204,16 +186,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<bool> GetCalendarNotificationsEnabledAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -244,7 +225,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task SetCalendarNotificationsEnabledAsync(DeviceType deviceType, string pushToken, bool enabled, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -264,16 +246,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<string> GetNotificationsSoundAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -304,7 +285,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task SetNotificationsSoundAsync(DeviceType deviceType, string pushToken, string soundName, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -324,16 +306,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -348,9 +329,8 @@ namespace Mark5.Mobile.Common.Managers
 
                 var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync() ?? new Dictionary<ModuleType, List<Folder>>();
                 foreach (var favoriteFolder in favoriteFolders.Values.SelectMany(f => f))
-                {
                     favoriteFolder.Subscribed = false;
-                }
+
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
                 await FileSystemStorage.SaveNotificationSettingsAsync(new NotificationSettings());
 
@@ -358,16 +338,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -387,6 +366,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new DocumentContainer(result.DocumentPreview.Convert(), result.Document.Convert());
                 }
+
                 if (notification.ObjectType == ObjectType.Contact)
                 {
                     var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
@@ -399,6 +379,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new ContactContainer(result.ContactPreview.Convert(), result.Contact.Convert());
                 }
+
                 if (notification.ObjectType == ObjectType.Shortcode)
                 {
                     var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
@@ -411,6 +392,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new ShortcodeContainer(result.ShortcodePreview.Convert(), result.Shortcode.Convert());
                 }
+
                 if (notification.ObjectType == ObjectType.CalendarTask)
                 {
                     var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
@@ -422,6 +404,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return result.CalendarTask.Convert();
                 }
+
                 if (notification.ObjectType == ObjectType.CalendarAppointment)
                 {
                     var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
@@ -436,16 +419,17 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task SaveNotification(Notification notification)
         {
-            await notificationsDataAccess.SaveNotifications(new List<Notification> { notification });
+            await notificationsDataAccess.SaveNotifications(new List<Notification>
+            {
+                notification
+            });
         }
 
         public async Task MarkAsRead(Guid notificationGuid)
@@ -466,4 +450,3 @@ namespace Mark5.Mobile.Common.Managers
         }
     }
 }
-

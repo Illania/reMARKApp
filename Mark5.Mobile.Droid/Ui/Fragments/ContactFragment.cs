@@ -1,11 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContactViewFragment.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +23,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class ContactFragment : RetainableStateFragment
     {
-
         static class RequestCodes
         {
             public const int CommentsRequest = 1;
@@ -105,8 +95,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = null;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}...");
         }
@@ -120,8 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Result.Ok)
-            {
+            if (resultCode == (int) Result.Ok)
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
                     var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
@@ -132,7 +121,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
                 }
-            }
         }
 
         #region Options menu
@@ -152,39 +140,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            if (ContactPreview == null) return;
+            if (ContactPreview == null)
+                return;
 
             menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
-            if (Folder?.InternalType == FolderInternalType.FilterView
-                || Folder?.InternalType == FolderInternalType.Static
-                || Folder?.InternalType == FolderInternalType.Worktray)
-            {
+            if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-            }
             menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
 
             if (Contact != null)
-            {
                 menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
-            }
 
             menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
             menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
 
-            if (Folder?.InternalType == FolderInternalType.FilterView
-                || Folder?.InternalType == FolderInternalType.Static
-                || Folder?.InternalType == FolderInternalType.Worktray)
-            {
+            if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-            }
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-            {
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
         }
 
         public override void OnPrepareOptionsMenu(IMenu menu)
@@ -204,9 +180,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    }));
                 StartActivity(i);
 
                 return true;
@@ -215,9 +195,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    }));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
 
@@ -287,7 +271,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 try
                 {
-                    await Managers.CommonActionsManager.CopyToWorktray(new List<IBusinessEntity> { ContactPreview });
+                    await Managers.CommonActionsManager.CopyToWorktray(new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    });
 
                     dismissAction();
                 }
@@ -302,18 +289,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-            {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity> { ContactPreview }));
-            }
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
+                    new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    }));
         }
 
         async void DeleteFromFolderAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [contactPreview={ContactPreview}]...");
 
@@ -321,9 +308,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { ContactPreview }, Folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    },
+                    Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, Folder.Id, new List<int> { ContactPreview.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Contact,
+                    Folder.Id,
+                    new List<int>
+                    {
+                        ContactPreview.Id
+                    }));
 
                 dismissAction();
             }
@@ -341,9 +338,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
-            {
                 return;
-            }
 
             CommonConfig.Logger.Info($"Attempting to delete [contactPreview={ContactPreview}]...");
 
@@ -351,12 +346,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { ContactPreview });
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity>
+                {
+                    ContactPreview
+                });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Contact, new List<int> { ContactPreview.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                    ObjectType.Contact,
+                    new List<int>
+                    {
+                        ContactPreview.Id
+                    }));
 
                 dismissAction();
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
             catch (Exception ex)
             {
@@ -551,8 +555,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = ContactPreview?.Name;
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
 
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
@@ -591,7 +595,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void RefreshCardView(CardView cardView)
         {
             var internalLayout = cardView.GetChildAt(0) as LinearLayoutCompat;
-            for (int i = 0; i < internalLayout.ChildCount; i++)
+            for (var i = 0; i < internalLayout.ChildCount; i++)
             {
                 var subview = internalLayout.GetChildAt(i) as ContactView;
                 if (subview != null)
@@ -626,15 +630,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: new List<string> { communicationAddress.Address }));
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                DocumentCreationModeFlag.New,
+                DocumentDirection.None,
+                preconfiguredEmailToAddresses: new List<string>
+                {
+                    communicationAddress.Address
+                }));
         }
 
         async void Button2Layout_Click(object sender, EventArgs e)
         {
-            var formattedNumbers = Contact.CommunicationAddresses
-                                 .Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
-                                 .Select(ca => AddressUtilities.FormatCommunicationAddress(ca))
-                                 .ToArray();
+            var formattedNumbers = Contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressUtils.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
             {
                 Toast.MakeText(Context, Resource.String.no_primary_mobile_or_phone, ToastLength.Short).Show();
@@ -663,7 +670,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            Integration.TextNumber(Context, AddressUtilities.FormatCommunicationAddress(communicationAddresses));
+            Integration.TextNumber(Context, AddressUtils.FormatCommunicationAddress(communicationAddresses));
         }
 
         async void Button4Layout_Click(object sender, EventArgs e)
@@ -677,7 +684,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (physicalAddress.Length == 1)
             {
-                Integration.OpenMap(Context, AddressUtilities.FormatPhysicalAddress(physicalAddress[0]));
+                Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(physicalAddress[0]));
                 return;
             }
 
@@ -685,7 +692,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedItem < 0)
                 return;
 
-            Integration.OpenMap(Context, AddressUtilities.FormatPhysicalAddress(physicalAddress[selectedItem]));
+            Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(physicalAddress[selectedItem]));
         }
 
         async void AddressClicked(object sender, CommunicationAddress e)
@@ -698,13 +705,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: new List<string> { e.Address }));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                    DocumentCreationModeFlag.New,
+                    DocumentDirection.None,
+                    preconfiguredEmailToAddresses: new List<string>
+                    {
+                        e.Address
+                    }));
                 return;
             }
 
             if (e.Type == CommunicationAddressType.Mobile)
             {
-                var formattedAddress = AddressUtilities.FormatCommunicationAddress(e);
+                var formattedAddress = AddressUtils.FormatCommunicationAddress(e);
 
                 var selection = await Dialogs.ShowListDialog(Context, formattedAddress, Resource.Array.call_or_text, true);
                 if (selection < 0)
@@ -718,16 +731,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (e.Type == CommunicationAddressType.Phone)
-            {
-                Integration.DialNumber(Context, AddressUtilities.FormatCommunicationAddress(e));
-            }
+                Integration.DialNumber(Context, AddressUtils.FormatCommunicationAddress(e));
         }
 
-        void PhysicalAddressClicked(object sender, PhysicalAddress e) => Integration.OpenMap(Context, AddressUtilities.FormatPhysicalAddress(e));
+        void PhysicalAddressClicked(object sender, PhysicalAddress e)
+        {
+            Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(e));
+        }
 
         void ContactClicked(object sender, ContactPreview cp)
         {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
 
             var cf = new ContactFragment
@@ -801,7 +815,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactFragmentState : IRetainableState
         {
-
             public int? FolderId { get; set; }
 
             public Folder Folder { get; set; }
@@ -815,5 +828,4 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
     }
-
 }

@@ -1,19 +1,10 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ActionAnimatorListenerAdapter.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using Android.Animation;
 
 namespace FastScrollRecycler
 {
-    
     class ActionAnimatorListenerAdapter : AnimatorListenerAdapter
     {
-
         readonly Action actionCancel;
         readonly Action actionEnd;
 
@@ -27,16 +18,14 @@ namespace FastScrollRecycler
         {
             base.OnAnimationCancel(animation);
 
-            if (actionCancel != null)
-                actionCancel();
+            actionCancel?.Invoke();
         }
 
         public override void OnAnimationEnd(Animator animation)
         {
             base.OnAnimationEnd(animation);
 
-            if (actionEnd != null)
-                actionEnd();
+            actionEnd?.Invoke();
         }
     }
 }

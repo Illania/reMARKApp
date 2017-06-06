@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContactSearchResultsFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +12,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -27,10 +21,8 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-
     public class ContactsSearchResultsFragment : RetainableStateFragment
     {
-
         public SearchContactsCriteria Criteria { get; set; }
         public Action CloseRequest { get; set; }
 
@@ -65,8 +57,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts_result);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts_result);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactsSearchResultsFragment)} [criteria={Criteria}]");
         }
@@ -141,7 +133,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (contactPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_contacts);
-                    if (CloseRequest != null) CloseRequest();
+                    if (CloseRequest != null)
+                        CloseRequest();
                     return;
                 }
 
@@ -156,7 +149,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null) CloseRequest();
+                if (CloseRequest != null)
+                    CloseRequest();
             }
             finally
             {
@@ -183,7 +177,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactSearchResultsFragmentState : IRetainableState
         {
-            
             public SearchContactsCriteria Criteria { get; set; }
 
             public List<ContactPreview> ContactPreviews { get; set; }
@@ -195,24 +188,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ContactSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
+            public List<ContactPreview> Items { get; } = new List<ContactPreview>(1000);
 
-            public List<ContactPreview> Items
-            {
-                get
-                {
-                    return contactPreviewsInView;
-                }
-            }
+            public override int ItemCount => Items.Count;
 
-            public override int ItemCount
-            {
-                get
-                {
-                    return contactPreviewsInView.Count;
-                }
-            }
-
-            readonly List<ContactPreview> contactPreviewsInView = new List<ContactPreview>(1000);
             readonly Dictionary<int, ContactPreview> selectedContactsInView = new Dictionary<int, ContactPreview>();
 
             public event EventHandler<ContactPreview> ItemClicked = delegate { };
@@ -220,9 +199,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var cpvh = holder as ContactPreviewViewHolder;
-                if (cpvh == null) return;
+                if (cpvh == null)
+                    return;
 
-                var cp = contactPreviewsInView[position];
+                var cp = Items[position];
 
                 cpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, cp)));
 
@@ -241,20 +221,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void AppendItems(List<ContactPreview> items)
             {
-                var count = contactPreviewsInView.Count;
-                contactPreviewsInView.AddRange(items);
+                var count = Items.Count;
+                Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return contactPreviewsInView[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
         }
 
         class ContactPreviewViewHolder : RecyclerView.ViewHolder
         {
-            
             public ContactType Type
             {
                 set
@@ -277,13 +256,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public string Name
-            {
-                set
-                {
-                    nameTextView.Text = value;
-                }
-            }
+            public string Name { set => nameTextView.Text = value; }
 
             public List<Category> Categories
             {
@@ -303,13 +276,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool Selected
-            {
-                set
-                {
-                    selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-                }
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatImageView iconImageView;
             readonly AppCompatTextView nameTextView;
@@ -317,7 +284,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly View selectedOverlay;
 
             public ContactPreviewViewHolder(View itemView)
-                    : base(itemView)
+                : base(itemView)
             {
                 iconImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_contact_icon);
                 nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_contact_name);
@@ -329,4 +296,3 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
     }
 }
-

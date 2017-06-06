@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: PushNotification.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Globalization;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -14,10 +7,8 @@ using Newtonsoft.Json.Converters;
 
 namespace Mark5.Mobile.Droid.Model
 {
-
     public class PushNotification
     {
-
         public PushNotificationNotification Notification { get; set; }
 
         public PushNotificationData Data { get; set; }
@@ -26,7 +17,6 @@ namespace Mark5.Mobile.Droid.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class PushNotificationNotification
     {
-
         [JsonProperty("icon")]
         public string Icon { get; set; }
 
@@ -40,17 +30,10 @@ namespace Mark5.Mobile.Droid.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class PushNotificationData
     {
-
         [JsonProperty("silent")]
         public int Silent { get; set; }
 
-        public bool IsSilent
-        {
-            get
-            {
-                return Silent > 0;
-            }
-        }
+        public bool IsSilent => Silent > 0;
 
         [JsonProperty("guid")]
         public Guid Guid { get; set; }
@@ -77,9 +60,7 @@ namespace Mark5.Mobile.Droid.Model
             get
             {
                 if (string.IsNullOrWhiteSpace(RemindOn))
-                {
                     return 0;
-                }
 
                 return DateTime.ParseExact(RemindOn, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture).ConvertDateTimeToTimestampMilliseconds();
             }

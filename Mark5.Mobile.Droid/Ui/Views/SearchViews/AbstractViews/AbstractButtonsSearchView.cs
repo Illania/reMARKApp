@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AbstractButtonsSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Globalization;
 using Android.Content;
 using Android.Support.V4.Content;
@@ -19,7 +12,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public abstract class AbstractButtonsSearchView<T> : AbstractSearchView<T>
     {
-        protected AbstractButtonsSearchView(Context context) : base(context)
+        protected AbstractButtonsSearchView(Context context)
+            : base(context)
         {
             Orientation = Horizontal;
             SetPadding(0, 0, 0, 0);
@@ -31,9 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected void AddButtons(params CustomButton[] buttons)
         {
             foreach (var button in buttons)
-            {
                 AddView(button, new LayoutParams(0, ViewGroup.LayoutParams.MatchParent, 1));
-            }
         }
 
         public class CustomButton : AppCompatTextView, IOnLayoutChangeListener
@@ -69,9 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             void CustomButton_Click(object sender, EventArgs e)
             {
                 if (clickedAction == null || clickedAction(this))
-                {
                     Selected = !Selected;
-                }
                 UpdateTextAppearance();
             }
 
@@ -88,8 +78,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 UpdateTextAppearance();
             }
 
-            void IOnLayoutChangeListener.OnLayoutChange
-                                        (View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
+            void IOnLayoutChangeListener.OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
             {
                 var maxTextSize = TextSize;
                 var targetWidth = Width - PaddingLeft - PaddingRight;

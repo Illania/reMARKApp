@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AbstractEditableLargeSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -19,9 +12,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly AppCompatTextView topTextView;
         readonly AppCompatEditText bottomEditText;
 
-        protected AbstractEditableLargeSearchView(Android.Content.Context context,
-                                                 int topTextResId,
-                                                 int bottomEditResId) : base(context)
+        protected AbstractEditableLargeSearchView(Android.Content.Context context, int topTextResId, int bottomEditResId)
+            : base(context)
         {
             Orientation = Vertical;
             SetBackgroundColor(BackgroundColorNormalState);
@@ -30,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
                 {
-                    Gravity = (int)GravityFlags.Start,
+                    Gravity = (int) GravityFlags.Start,
                 }
             };
             topTextView.Text = context.GetString(topTextResId);
@@ -42,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
             bottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             {
-                Gravity = (int)GravityFlags.End,
+                Gravity = (int) GravityFlags.End,
             };
             bottomEditText.SetPadding(0, 0, 0, 0);
             bottomEditText.SetBackgroundColor(Color.Transparent);
@@ -52,9 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bottomEditText.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)
-                {
                     bottomEditText.ClearFocus();
-                }
             };
             AddView(bottomEditText);
         }

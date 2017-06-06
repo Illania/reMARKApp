@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: PickDateRangeFragment.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using Android.Animation;
 using Android.Content;
@@ -74,7 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.date);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.date);
 
             CommonConfig.Logger.Info($"Created {nameof(PickDateRangeFragment)}");
         }
@@ -168,9 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void FromDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            FromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 0, DateTimeKind.Unspecified)
-                            .ConvertUserTimeToUtc()
-                            .ConvertDateTimeToTimestampMilliseconds();
+            FromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 0, DateTimeKind.Unspecified).ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             UpdateDatePickersLimits();
@@ -180,9 +171,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ToDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            ToTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Unspecified)
-                            .ConvertUserTimeToUtc()
-                            .ConvertDateTimeToTimestampMilliseconds();
+            ToTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Unspecified).ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             CloseFragment();
@@ -216,8 +205,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (CloseRequest != null) CloseRequest(FromTimestamp, ToTimestamp);
-            ((AppCompatActivity)Activity).OnBackPressed();
+            if (CloseRequest != null)
+                CloseRequest(FromTimestamp, ToTimestamp);
+            ((AppCompatActivity) Activity).OnBackPressed();
         }
 
         #region Retained State
@@ -256,6 +246,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-
     }
 }

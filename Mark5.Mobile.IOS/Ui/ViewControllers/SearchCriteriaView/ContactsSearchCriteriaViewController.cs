@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ContactsSearchCriteriaViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
@@ -19,10 +12,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-
     public class ContactsSearchCriteriaViewController : AbstractSearchCriteriaViewController
     {
-
         SearchContactsCriteria criteria = new SearchContactsCriteria();
 
         public override void LoadView()
@@ -59,7 +50,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new ContactsSearchResultsViewController { Criteria = criteria }, true);
+            NavigationController.PushViewController(new ContactsSearchResultsViewController
+                {
+                    Criteria = criteria
+                },
+                true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -95,7 +90,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         abstract class AbstractContactsSearchView : AbstractSearchView
         {
-
             protected SearchContactsCriteria Criteria;
 
             public void SetCriteria(SearchContactsCriteria criteria)
@@ -107,7 +101,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class ContactTypesSearchView : AbstractContactsSearchView
         {
-
             readonly UILabel personView;
             readonly UILabel departmentView;
             readonly UILabel companyView;
@@ -171,7 +164,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var types = Criteria.ContactTypes;
 
                 if (!types.Any())
-                    types.UnionWith(new[] { ContactType.Person, ContactType.Department, ContactType.Company });
+                    types.UnionWith(new[]
+                    {
+                        ContactType.Person,
+                        ContactType.Department,
+                        ContactType.Company
+                    });
 
                 SetLabelActive(personView, types.Contains(ContactType.Person));
                 SetLabelActive(departmentView, types.Contains(ContactType.Department));
@@ -184,26 +182,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var types = Criteria.ContactTypes;
 
                 if (recognizer.View == personView)
-                {
                     if (types.Contains(ContactType.Person))
                         types.Remove(ContactType.Person);
                     else
                         types.Add(ContactType.Person);
-                }
                 else if (recognizer.View == departmentView)
-                {
                     if (types.Contains(ContactType.Department))
                         types.Remove(ContactType.Department);
                     else
                         types.Add(ContactType.Department);
-                }
                 else if (recognizer.View == companyView)
-                {
                     if (types.Contains(ContactType.Company))
                         types.Remove(ContactType.Company);
                     else
                         types.Add(ContactType.Company);
-                }
 
 
                 UpdateRow();
@@ -212,7 +204,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class NameSearchView : AbstractContactsSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -243,7 +234,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -309,7 +304,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class AddressSearchView : AbstractContactsSearchView
         {
-
             readonly UIView view;
             readonly UILabel label;
             readonly UITextField text;
@@ -340,7 +334,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -406,7 +404,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class ShortIdDescriptionPhysicalAddressView : AbstractContactsSearchView
         {
-
             readonly UIView shortIdView;
             readonly UILabel shortIdLabel;
             readonly UITextField shortIdTextField;
@@ -443,7 +440,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 shortIdTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -493,7 +494,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 descriptionTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -543,7 +548,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 physicalAddressTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes { ForegroundColor = Theme.LightGray }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -581,43 +590,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void Tapped(UITapGestureRecognizer recognizer)
             {
                 if (recognizer.View == shortIdView)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        descriptionView.Hidden = true;
-                        physicalAddressView.Hidden = true;
-                    }, ch =>
-                    {
-                        shortIdTextField.UserInteractionEnabled = true;
-                        shortIdTextField.BecomeFirstResponder();
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            descriptionView.Hidden = true;
+                            physicalAddressView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            shortIdTextField.UserInteractionEnabled = true;
+                            shortIdTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == descriptionView)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = true;
-                        physicalAddressView.Hidden = true;
-                    }, ch =>
-                    {
-                        descriptionTextField.UserInteractionEnabled = true;
-                        descriptionTextField.BecomeFirstResponder();
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = true;
+                            physicalAddressView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            descriptionTextField.UserInteractionEnabled = true;
+                            descriptionTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == physicalAddressView)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = true;
-                        descriptionView.Hidden = true;
-                    }, ch =>
-                    {
-                        physicalAddressTextField.UserInteractionEnabled = true;
-                        physicalAddressTextField.BecomeFirstResponder();
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = true;
+                            descriptionView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            physicalAddressTextField.UserInteractionEnabled = true;
+                            physicalAddressTextField.BecomeFirstResponder();
+                        });
 
                 UpdateRow();
                 SetAsActive();
@@ -646,49 +655,48 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void TextFieldDidEndEditing(UITextField textField)
             {
                 if (textField == shortIdTextField)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        descriptionView.Hidden = false;
-                        physicalAddressView.Hidden = false;
-                    }, ch =>
-                    {
-                        shortIdTextField.ResignFirstResponder();
-                        shortIdTextField.UserInteractionEnabled = false;
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            descriptionView.Hidden = false;
+                            physicalAddressView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            shortIdTextField.ResignFirstResponder();
+                            shortIdTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == descriptionTextField)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = false;
-                        physicalAddressView.Hidden = false;
-                    }, ch =>
-                    {
-                        descriptionTextField.ResignFirstResponder();
-                        descriptionTextField.UserInteractionEnabled = false;
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = false;
+                            physicalAddressView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            descriptionTextField.ResignFirstResponder();
+                            descriptionTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == physicalAddressTextField)
-                {
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = false;
-                        descriptionView.Hidden = false;
-                    }, ch =>
-                    {
-                        physicalAddressTextField.ResignFirstResponder();
-                        physicalAddressTextField.UserInteractionEnabled = false;
-                    });
-                }
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = false;
+                            descriptionView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            physicalAddressTextField.ResignFirstResponder();
+                            physicalAddressTextField.UserInteractionEnabled = false;
+                        });
             }
         }
 
         class CountryCategoriesView : AbstractContactsSearchView
         {
-
             readonly UIViewController parentViewController;
 
             readonly UIView countryView;
@@ -719,9 +727,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     Items = new[]
                     {
-                        new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:")) { TintColor = Theme.DarkerBlue },
+                        new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        },
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:")) { TintColor = Theme.DarkerBlue }
+                        new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        }
                     }
                 };
 
@@ -891,7 +905,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             class Source : UIPickerViewDataSource, IUIPickerViewDelegate
             {
-
                 readonly CountryInfo[] countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries.OrderBy(ci => ci.Name).ToArray();
 
                 public override nint GetComponentCount(UIPickerView pickerView)
@@ -918,14 +931,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 public void SelectCountryByFaxPrefix(UIPickerView picker, int faxPrefix)
                 {
                     var index = 0;
-                    for (int i = 0; i < countries.Length; i++)
-                    {
+                    for (var i = 0; i < countries.Length; i++)
                         if (countries[i].FaxPrefix == faxPrefix)
                         {
                             index = i;
                             break;
                         }
-                    }
 
                     picker.Select(index, 0, true);
                 }
@@ -938,7 +949,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 public CountryInfo CountryByPrefix(int faxPrefix)
                 {
-                    for (int i = 0; i < countries.Length; i++)
+                    for (var i = 0; i < countries.Length; i++)
                         if (countries[i].FaxPrefix == faxPrefix)
                             return countries[i];
 

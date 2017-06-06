@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CopyToUserWorktrayActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;
@@ -19,11 +12,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CopyToUserWorktrayActivity : BaseAppCompatActivity
     {
-
         const string BusinessEntitiesIntentKey = "BusinessEntities_79eb003f-6e04-4835-8820-fdd4e53a013b";
 
         public static Intent CreateIntent(Context context, List<IBusinessEntity> businessEntities)

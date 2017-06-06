@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: FoldersManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,13 +10,10 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     class FoldersManager : AbstractManager, IFoldersManager
     {
-
         readonly IFoldersDataAccess foldersDataAccess;
 
         public FoldersManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFoldersDataAccess foldersDataAccess)
@@ -34,7 +24,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 1, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -56,9 +47,7 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 return await foldersDataAccess.GetRecursively(parentFolder.Module, parentFolder, depth);
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -71,11 +60,8 @@ namespace Mark5.Mobile.Common.Managers
             {
                 var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
 
-                List<Folder> moduleFavoriteFolders;
-                if (!favoriteFolders.TryGetValue(module, out moduleFavoriteFolders))
-                {
+                if (!favoriteFolders.TryGetValue(module, out List<Folder> moduleFavoriteFolders))
                     return new List<Folder>();
-                }
 
                 rootFavoriteFolder.SubFolders.AddRange(moduleFavoriteFolders.OrderBy(f => f.Position));
             }
@@ -90,14 +76,11 @@ namespace Mark5.Mobile.Common.Managers
             var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
 
             for (var i = 0; i < moduleFavoriteFolders.Count; i++)
-            {
                 moduleFavoriteFolders[i].Position = i;
-            }
 
             favoriteFolders[module] = moduleFavoriteFolders;
 
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
-
         }
 
         public async Task AddFavoriteFolderAsync(ModuleType module, Folder folder)
@@ -105,16 +88,12 @@ namespace Mark5.Mobile.Common.Managers
             var moduleFavoriteFolders = await GetFavoriteFoldersAsync(module);
 
             if (moduleFavoriteFolders.FirstOrDefault(f => f.Id == folder.Id) == null)
-            {
                 moduleFavoriteFolders.Add(folder.ShallowCopy());
-            }
 
             var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
-            
+
             for (var i = 0; i < moduleFavoriteFolders.Count; i++)
-            {
                 moduleFavoriteFolders[i].Position = i;
-            }
 
             favoriteFolders[module] = moduleFavoriteFolders;
 
@@ -129,9 +108,7 @@ namespace Mark5.Mobile.Common.Managers
             var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync();
 
             for (var i = 0; i < moduleFavoriteFolders.Count; i++)
-            {
                 moduleFavoriteFolders[i].Position = i;
-            }
 
             favoriteFolders[module] = moduleFavoriteFolders;
 
@@ -153,17 +130,13 @@ namespace Mark5.Mobile.Common.Managers
         {
             var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
 
-            List<Folder> moduleOfflineFolders;
-            if (!offlineFolders.TryGetValue(module, out moduleOfflineFolders))
+            if (!offlineFolders.TryGetValue(module, out List<Folder> moduleOfflineFolders))
             {
                 moduleOfflineFolders = new List<Folder>();
                 offlineFolders[module] = moduleOfflineFolders;
             }
-
             if (moduleOfflineFolders.FirstOrDefault(f => f.Id == folder.Id) == null)
-            {
                 moduleOfflineFolders.Add(folder.ShallowCopy());
-            }
 
             await FileSystemStorage.SaveOfflineFoldersAsync(offlineFolders);
         }
@@ -172,13 +145,11 @@ namespace Mark5.Mobile.Common.Managers
         {
             var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
 
-            List<Folder> moduleOfflineFolders;
-            if (!offlineFolders.TryGetValue(module, out moduleOfflineFolders))
+            if (!offlineFolders.TryGetValue(module, out List<Folder> moduleOfflineFolders))
             {
                 moduleOfflineFolders = new List<Folder>();
                 offlineFolders[module] = moduleOfflineFolders;
             }
-
             moduleOfflineFolders.RemoveAll(f => f.Id == folder.Id);
 
             await FileSystemStorage.SaveOfflineFoldersAsync(offlineFolders);
@@ -193,11 +164,8 @@ namespace Mark5.Mobile.Common.Managers
         {
             var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
 
-            List<Folder> moduleOfflineFolders;
-            if (!offlineFolders.TryGetValue(module, out moduleOfflineFolders))
-            {
+            if (!offlineFolders.TryGetValue(module, out List<Folder> moduleOfflineFolders))
                 return false;
-            }
 
             return moduleOfflineFolders.Any(f => f.Id == folderId);
         }
@@ -212,14 +180,10 @@ namespace Mark5.Mobile.Common.Managers
                 folder.ParentFolderId = parentFolder?.Id ?? 0;
                 folder.Path = parentPath + CommonConfig.PathSeparator + folder.Name;
                 if (folder.HasSubFolders && folder.SubFolders.Count > 0)
-                {
                     ProcessFolders(folder.SubFolders, folder);
-                }
             }
         }
 
         #endregion
-
     }
 }
-

@@ -1,20 +1,11 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: SplitMainViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System.IO;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class SplitMainViewController : AbstractMainViewController
     {
-
         DocumentsSplitViewController documentSplitViewController;
         ContactsSplitViewController contactSplitViewController;
         ShortcodesSplitViewController shortcodeSplitViewController;

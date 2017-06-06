@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: EntityDeletedMessage.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
@@ -13,18 +6,9 @@ namespace Mark5.Mobile.IOS.Model.HubMessages
 {
     public class EntityDeletedMessage : TinyMessageBase
     {
+        public ObjectType ObjectType { get; }
 
-        public ObjectType ObjectType
-        {
-            get;
-            private set;
-        }
-
-        public List<int> EntitiesId
-        {
-            get;
-            private set;
-        }
+        public List<int> EntitiesId { get; }
 
         public EntityDeletedMessage(object sender, ObjectType objectType, List<int> entitiesId)
             : base(sender)

@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: FastScroller.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using Android.Animation;
 using Android.Content;
 using Android.Graphics;
@@ -16,14 +9,12 @@ using Java.Interop;
 
 namespace FastScrollRecycler
 {
-
     class FastScroller : Java.Lang.Object
     {
-
         const int DefaultAutoHideDelay = 1500;
 
-        FastScrollRecyclerView recyclerView;
-        FastScrollPopup popup;
+        readonly FastScrollRecyclerView recyclerView;
+        readonly FastScrollPopup popup;
 
         int thumbHeight;
         int width;
@@ -81,7 +72,7 @@ namespace FastScrollRecycler
                 var popupTextColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextColor, colorffffffff);
                 var popupTextSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextSize, Utils.ToPixels(resources, 56f));
                 var popupBackgroundSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundSize, Utils.ToPixels(resources, 88f));
-                var popupPosition = (FastScrollerPosition)typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupPosition, (int)FastScrollerPosition.Adjacent);
+                var popupPosition = (FastScrollerPosition) typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupPosition, (int) FastScrollerPosition.Adjacent);
 
                 track.Color = trackColor;
                 thumb.Color = thumbColor;
@@ -110,10 +101,7 @@ namespace FastScrollRecycler
                 autoHideAnimator.Start();
             };
 
-            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy, objects) =>
-            {
-                Show();
-            }));
+            recyclerView.AddOnScrollListener(new ActionOnScrollListener((rv, dx, dy, objects) => { Show(); }));
         }
 
         public int GetThumbHeight()
@@ -133,11 +121,10 @@ namespace FastScrollRecycler
 
         public void HandleTouchEvent(MotionEvent ev, int downX, int downY, int lastY, IOnFastScrollStateChangeListener stateChangedListener)
         {
-
             var config = ViewConfiguration.Get(recyclerView.Context);
 
             var action = ev.Action;
-            var y = (int)ev.GetY();
+            var y = (int) ev.GetY();
 
             switch (action)
             {
@@ -150,7 +137,7 @@ namespace FastScrollRecycler
                     {
                         recyclerView.Parent.RequestDisallowInterceptTouchEvent(true);
                         isDragging = true;
-                        touchOffset += (lastY - downY);
+                        touchOffset += lastY - downY;
                         popup.AnimateVisibility(true);
                         stateChangedListener?.OnFastScrollStart();
                     }
@@ -158,7 +145,7 @@ namespace FastScrollRecycler
                     {
                         var top = 0;
                         var bottom = recyclerView.Height - thumbHeight;
-                        var boundedY = (float)Math.Max(top, Math.Min(bottom, y - touchOffset));
+                        var boundedY = (float) Math.Max(top, Math.Min(bottom, y - touchOffset));
                         var sectionName = recyclerView.ScrollToPositionAtProgress((boundedY - top) / (bottom - top));
                         popup.SetSectionName(sectionName);
                         popup.AnimateVisibility(!string.IsNullOrEmpty(sectionName));
@@ -176,7 +163,6 @@ namespace FastScrollRecycler
                     }
                     break;
             }
-
         }
 
         public void Draw(Canvas canvas)
@@ -191,8 +177,7 @@ namespace FastScrollRecycler
 
         bool IsNearPoint(int x, int y)
         {
-            tmpRect.Set(thumbPosition.X, thumbPosition.Y, thumbPosition.X + width,
-                        thumbPosition.Y + thumbHeight);
+            tmpRect.Set(thumbPosition.X, thumbPosition.Y, thumbPosition.X + width, thumbPosition.Y + thumbHeight);
             tmpRect.Inset(touchInset, touchInset);
             return tmpRect.Contains(x, y);
         }
@@ -222,7 +207,10 @@ namespace FastScrollRecycler
         }
 
         [Export("setOffsetX")]
-        public void SetOffsetX(int x) => SetOffset(x, offset.Y);
+        public void SetOffsetX(int x)
+        {
+            SetOffset(x, offset.Y);
+        }
 
         [Export("getOffsetX")]
         public int GetOffsetX()
@@ -258,7 +246,10 @@ namespace FastScrollRecycler
             recyclerView.PostDelayed(hideAction, autoHideDelay);
         }
 
-        void CancelAutoHide() => recyclerView?.RemoveCallbacks(hideAction);
+        void CancelAutoHide()
+        {
+            recyclerView?.RemoveCallbacks(hideAction);
+        }
 
         public void SetThumbColor(Color color)
         {
@@ -272,13 +263,25 @@ namespace FastScrollRecycler
             recyclerView?.Invalidate(invalidateRect);
         }
 
-        public void SetPopupBackgroundColor(Color color) => popup.SetBackgroundColor(color);
+        public void SetPopupBackgroundColor(Color color)
+        {
+            popup.SetBackgroundColor(color);
+        }
 
-        public void SetPopupTextColor(Color color) => popup.SetTextColor(color);
+        public void SetPopupTextColor(Color color)
+        {
+            popup.SetTextColor(color);
+        }
 
-        public void SetPopupTextSize(int size) => popup.SetTextSize(size);
+        public void SetPopupTextSize(int size)
+        {
+            popup.SetTextSize(size);
+        }
 
-        public void SetPopupTypeface(Typeface typeface) => popup.SetTypeFace(typeface);
+        public void SetPopupTypeface(Typeface typeface)
+        {
+            popup.SetTypeFace(typeface);
+        }
 
         public void SetAutoHideDelay(int autoHideDelay)
         {
@@ -298,6 +301,9 @@ namespace FastScrollRecycler
                 CancelAutoHide();
         }
 
-        public void SetPopupPosition(FastScrollerPosition position) => popup.SetPopupPosition(position);
+        public void SetPopupPosition(FastScrollerPosition position)
+        {
+            popup.SetPopupPosition(position);
+        }
     }
 }

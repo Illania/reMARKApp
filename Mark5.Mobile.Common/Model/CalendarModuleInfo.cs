@@ -1,19 +1,9 @@
-//
-// Project: Mark5.Mobile.Common
-// File: CalendarModuleInfo.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Model
 {
-
     public class CalendarModuleInfo
     {
-
         List<CalendarCategory> calendarCategories;
 
         public List<CalendarCategory> CalendarCategories
@@ -21,16 +11,10 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (calendarCategories == null)
-                {
                     calendarCategories = new List<CalendarCategory>();
-                }
                 return calendarCategories;
             }
-
-            set
-            {
-                calendarCategories = value;
-            }
+            set => calendarCategories = value;
         }
 
         List<CalendarResource> calendarResources;
@@ -40,20 +24,12 @@ namespace Mark5.Mobile.Common.Model
             get
             {
                 if (calendarResources == null)
-                {
                     calendarResources = new List<CalendarResource>();
-                }
-
                 return calendarResources;
             }
-
-            set
-            {
-                calendarResources = value;
-            }
+            set => calendarResources = value;
         }
 
         public Permissions Permissions { get; set; }
     }
 }
-

@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ContactViewBaseTextSubview.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
-using Android.Content;
+﻿using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -13,28 +6,14 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 {
-
     public abstract class DescriptionCardSubview : ContactView
     {
-
         readonly AppCompatTextView titleTextView;
         protected readonly AppCompatTextView ContentTextView;
 
-        public string Title
-        {
-            set
-            {
-                titleTextView.Text = value;
-            }
-        }
+        public string Title { set => titleTextView.Text = value; }
 
-        public string Content
-        {
-            set
-            {
-                ContentTextView.Text = value;
-            }
-        }
+        public string Content { set => ContentTextView.Text = value; }
 
         protected DescriptionCardSubview(Context context)
             : base(context)
@@ -48,9 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             LongClick += (sender, e) =>
             {
                 if (!string.IsNullOrWhiteSpace(ContentTextView.Text))
-                {
                     Integration.CopyToClipboard(context, ContentTextView.Text);
-                }
             };
 
             titleTextView = new AppCompatTextView(context);
@@ -62,5 +39,4 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             AddView(ContentTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
     }
-
 }

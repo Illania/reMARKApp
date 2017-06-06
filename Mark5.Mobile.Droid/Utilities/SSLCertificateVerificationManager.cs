@@ -1,21 +1,12 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: SSLCertificateVerificationManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Net;
+﻿using System.Net;
 using System.Net.Security;
 using Mark5.Mobile.Common;
 using Xamarin.Android.Net;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public class SSLCertificateVerificationManager
     {
-
         readonly RemoteCertificateValidationCallback remoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => { return true; };
 
         public void EnableSelfSignedCertificates()
@@ -35,4 +26,3 @@ namespace Mark5.Mobile.Droid.Utilities
         }
     }
 }
-

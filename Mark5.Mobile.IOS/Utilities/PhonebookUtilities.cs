@@ -1,24 +1,16 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: PhonebookUtilities.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Contacts;
 using Foundation;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-
-    public class PhonebookUtilities : IPhonebookUtilities
+    public class PhonebookUtilities : IPhonebookUtils
     {
-
         #region IPhonebookUtilities implementation
 
         public List<Contact> GetPhonebookContacts()
@@ -44,21 +36,17 @@ namespace Mark5.Mobile.IOS.Utilities
             var status = CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts);
 
             if (status == CNAuthorizationStatus.Denied || status == CNAuthorizationStatus.Restricted)
-            {
                 return null;
-            }
 
             using (var store = new CNContactStore())
             {
-
                 if (status == CNAuthorizationStatus.NotDetermined)
                 {
-                    store.RequestAccess(CNEntityType.Contacts, (granted, error) =>
+                    store.RequestAccess(CNEntityType.Contacts,
+                        (granted, error) =>
                         {
                             if (granted)
-                            {
                                 contacts = GetContactsFromContactStore(store, phrase);
-                            }
                             authorizationSemaphore.Release();
                         });
                 }
@@ -79,7 +67,8 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var cnContacts = new List<CNContact>();
 
-            var keys = new[] {
+            var keys = new[]
+            {
                 CNContactKey.GivenName,
                 CNContactKey.FamilyName,
                 CNContactKey.EmailAddresses
@@ -88,25 +77,24 @@ namespace Mark5.Mobile.IOS.Utilities
             NSError error;
             var containers = store.GetContainers(null, out error);
 
-            if (error != null) return null;
+            if (error != null)
+                return null;
 
             foreach (var container in containers)
             {
                 var fetchPredicate = CNContact.GetPredicateForContactsInContainer(container.Identifier);
                 var cnContactsTemp = store.GetUnifiedContacts(fetchPredicate, keys, out error);
 
-                if (error != null) return null;
+                if (error != null)
+                    return null;
 
                 cnContacts.AddRange(cnContactsTemp);
-
             }
 
             var contacts = cnContacts.Select(ConvertToContact);
 
             if (!string.IsNullOrEmpty(phrase))
-            {
                 contacts = contacts.Where(c => c.FirstName.ContainsCaseInsensitive(phrase) || c.LastName.ContainsCaseInsensitive(phrase) || c.CommunicationAddresses.Any(ca => ca.Address.ContainsCaseInsensitive(phrase)));
-            }
             return contacts.ToList();
         }
 

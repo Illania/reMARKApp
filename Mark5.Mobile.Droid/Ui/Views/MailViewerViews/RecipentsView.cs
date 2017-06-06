@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: RecipentsView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -16,10 +9,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
 {
-
     public class RecipentsView : MailViewerView
     {
-
         TableLayout compactLayout;
         TableRow tableRowFrom;
         TableRow tableRowTo;

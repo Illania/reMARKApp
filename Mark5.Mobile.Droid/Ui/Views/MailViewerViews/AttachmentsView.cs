@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AttachmentsView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Linq;
 using Android.Content;
 using Android.Graphics;
@@ -19,10 +12,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
 {
-
     public class AttachmentsView : MailViewerView
     {
-
         LinearLayoutCompat container;
 
         public event EventHandler<Attachment> AttachmentClicked = delegate { };
@@ -85,7 +76,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
 
         class AttachmentView : LinearLayoutCompat
         {
-
             public AttachmentView(Context context, Attachment att, int distanceLarge, int distanceNormal)
                 : base(context)
             {
@@ -111,7 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                     LayoutParameters = new LayoutParams(imageSize, imageSize)
                     {
                         RightMargin = innerMargin,
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     }
                 };
                 image.SetImageResource(Resource.Drawable.attachment);
@@ -122,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     },
                     Text = att.Name,
                     Ellipsize = TextUtils.TruncateAt.End,
@@ -136,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     },
                     Text = " (" + Formatters.FormatFileSize(att.Size) + ")",
                 };

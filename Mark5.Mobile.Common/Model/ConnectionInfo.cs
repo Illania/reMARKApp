@@ -1,32 +1,14 @@
-//
-// Project: Mark5.Mobile.Common
-// File: ConnectionInfo.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-
-#pragma warning disable CS1701
-namespace Mark5.Mobile.Common.Model
+﻿namespace Mark5.Mobile.Common.Model
 {
-
     public class ConnectionInfo
     {
-
         public string Token { get; set; }
-
         public string Username { get; set; }
-
         public string Hostname { get; set; }
-
         public int Port { get; set; }
-
         public SslMode SslMode { get; set; }
-
         public DeviceType DeviceType { get; set; }
-
         public string FriendlyDeviceName { get; set; }
-
         public string InstallationId { get; set; }
 
         public override string ToString()
@@ -35,4 +17,3 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 }
-

@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: CustomArrayAdapter.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using Android.Views;
+﻿using Android.Views;
 using Android.Widget;
 using Android.Content;
 using System.Collections;
@@ -13,10 +6,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public class CustomArrayAdapter : ArrayAdapter
     {
-
         public static ArrayAdapter Create(Context context, int textArrayResId, int textViewResId, int dropDownViewResId)
         {
             var strings = context.Resources.GetStringArray(textArrayResId);

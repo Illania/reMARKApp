@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: AttachmentsView.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +15,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-
     public class AttachmentsView : ComposeDocumentView
     {
-
         LinearLayoutCompat container;
         List<IAttachmentDescription> attachmentsDescription = new List<IAttachmentDescription>();
 
@@ -147,8 +138,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
-
-            public IAttachmentDescription AttachmentDescription { get; private set; }
+            public IAttachmentDescription AttachmentDescription { get; }
 
             public AttachmentView(Context context, IAttachmentDescription attachmentDescription, int distanceLarge, int distanceNormal)
                 : base(context)
@@ -177,7 +167,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     LayoutParameters = new LayoutParams(imageSize, imageSize)
                     {
                         RightMargin = innerMargin,
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     }
                 };
                 image.SetImageResource(Resource.Drawable.attachment);
@@ -188,7 +178,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     },
                     Text = attachmentDescription.Name,
                     Ellipsize = TextUtils.TruncateAt.End,
@@ -202,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (int) GravityFlags.Center
                     },
                     Text = " (" + Formatters.FormatFileSize(attachmentDescription.SizeInBytes) + ")",
                 };
@@ -213,6 +203,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         }
 
         #endregion
-
     }
 }

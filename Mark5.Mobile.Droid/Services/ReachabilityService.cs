@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ReachabilityService.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -20,23 +13,13 @@ using Mark5.Mobile.Common.Tester;
 
 namespace Mark5.Mobile.Droid.Services
 {
-
     public class ReachabilityService : IReachabilityService
     {
-
         const string GoogleRequestUrl = "http://clients3.google.com/generate_204";
 
-        public bool IsReachable
-        {
-            get;
-            private set;
-        }
+        public bool IsReachable { get; private set; }
 
-        public bool IsCheckingReachability
-        {
-            get;
-            private set;
-        }
+        public bool IsCheckingReachability { get; private set; }
 
         public event EventHandler RefreshingReachability = delegate { };
 
@@ -82,7 +65,7 @@ namespace Mark5.Mobile.Droid.Services
 
         public bool CheckNetworkAvailability()
         {
-            var cm = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
+            var cm = (ConnectivityManager) Application.Context.GetSystemService(Context.ConnectivityService);
             var result = cm.ActiveNetworkInfo?.IsConnected ?? false;
 
             CommonConfig.Logger.Info($"Network availability: {result}");
@@ -128,8 +111,7 @@ namespace Mark5.Mobile.Droid.Services
                 })
                 using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
-                    var result = response.StatusCode == HttpStatusCode.OK ||
-                                         response.StatusCode == HttpStatusCode.BadRequest;
+                    var result = response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest;
 
                     CommonConfig.Logger.Info($"Service connection availability: {result}. [status={response.StatusCode}]");
 
@@ -171,4 +153,3 @@ namespace Mark5.Mobile.Droid.Services
         }
     }
 }
-

@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: ContentView.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.IO;
 using System.Linq;
@@ -57,7 +50,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                                                 <head>
                                                 </head>
                                                 <body style=""min-height: 500px;"">
-                                                    <div class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
+                                                    <div class=""" +
+                                          NewEditableContentClass +
+                                          @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
                                                 </body>
                                             </html>";
 
@@ -80,10 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             newContentWebView.SetBackgroundColor(Color.Transparent);
             newContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             var customWebViewClient = new CustomWebViewClient();
-            customWebViewClient.PageFinishedLoading += (sender, e) =>
-            {
-                NewSetGetContentAsyncSemaphore.Release();
-            };
+            customWebViewClient.PageFinishedLoading += (sender, e) => { NewSetGetContentAsyncSemaphore.Release(); };
             newContentWebView.SetWebViewClient(customWebViewClient);
             newContentWebView.Settings.JavaScriptEnabled = true;
             newContentWebView.Settings.DomStorageEnabled = true;
@@ -93,7 +85,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
-            var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+            var typedArray = Context.ObtainStyledAttributes(new int[]
+            {
+                Resource.Attribute.selectableItemBackground
+            });
             showOldContentButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
             typedArray.Recycle();
             showOldContentButton.SetTextAppearanceCompat(context, Resource.Style.fontSmallBold);
@@ -108,10 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
             var oldContentWebViewClient = new CustomWebViewClient();
-            oldContentWebViewClient.PageFinishedLoading += (sender, e) =>
-            {
-                OldSetGetContentAsyncSemaphore.Release();
-            };
+            oldContentWebViewClient.PageFinishedLoading += (sender, e) => { OldSetGetContentAsyncSemaphore.Release(); };
             oldContentWebView.SetWebViewClient(oldContentWebViewClient);
             oldContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             oldContentWebView.Settings.JavaScriptEnabled = true;
@@ -151,13 +143,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                {
                     await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
-                }
                 else
-                {
                     await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
-                }
             }
             else
             {
@@ -165,7 +153,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     showOldContentButton.Visibility = ViewStates.Visible;
                 }
-
                 await LoadOldContent();
             }
         }
@@ -197,17 +184,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 string oldContentString = null;
 
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                {
                     oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                }
                 else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                {
                     oldContentString = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
-                }
                 else
-                {
                     oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                }
 
                 await SetOldHtmlContentAsync(oldContentString);
                 oldContentLoaded = true;
@@ -273,26 +254,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         string GetHtmlHeader()
         {
-            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp
-                                                                        .ConvertTimestampMillisecondsToDateTime()
-                                                                        .ConvertUtcToUserTime()
-                                                                        .ConvertDateTimeToTimestampMilliseconds();
+            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
             var date = processedDateReceivedTimestamp.FormatUserTimestampAsTimeAndDateString(Context);
 
             var header = new StringBuilder();
             header.Append("<br/><hr/>");
             var fromText = PreviousDocumentPreview.Direction == DocumentDirection.Incoming ? GetAddressTextFromPreviousDocument(DocumentAddressType.From) : GetLinesTextFromPreviousDocument();
             if (!string.IsNullOrWhiteSpace(fromText))
-            {
                 header.Append($"<b>From</b>: {fromText}").Append("</br>");
-            }
             header.Append($"<b>Date</b>: {date}").Append("</br>");
             header.Append($"<b>To</b>: {GetAddressTextFromPreviousDocument(DocumentAddressType.To)}").Append("</br>");
             var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
             if (!string.IsNullOrWhiteSpace(ccText))
-            {
                 header.Append($"<b>Cc</b>: {ccText}").Append("</br>");
-            }
             header.Append($"<b>Subject</b>: {PreviousDocumentPreview.Subject}").Append("</br>");
             header.Append("<br/><br/>");
 
@@ -326,7 +300,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task SetNewHtmlContentAsync(string htmlString)
         {
             await NewSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity)context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+            ((Activity) context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
         async Task<string> GetNewHtmlContentAsync(bool processing)
@@ -334,7 +308,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             try
             {
                 await NewSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity)context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
+                ((Activity) context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
 
                 await newGetHtmlContentInterfaceSemaphore.WaitAsync();
             }
@@ -349,7 +323,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task SetOldHtmlContentAsync(string htmlString)
         {
             await OldSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+            ((Activity) context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
         async Task<string> GetOldHtmlContentAsync(bool processing)
@@ -357,7 +331,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             try
             {
                 await OldSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
+                ((Activity) context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
 
                 await oldGetHtmlContentInterfaceSemaphore.WaitAsync();
             }
@@ -387,9 +361,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             if (parentElements.Length > 1)
-            {
                 CommonConfig.Logger.Warning("Found more than one div element with class: " + parentElementClass);
-            }
 
             var parentElement = parentElements[0];
             parentElement.Children.ForEach(c => c.Remove());
@@ -431,9 +403,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
             foreach (var matchingElement in matchingElements)
-            {
                 matchingElement.Attributes.RemoveNamedItem("contenteditable");
-            }
 
             var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
 
@@ -446,9 +416,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
             if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
-            {
                 CommonConfig.Logger.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
-            }
 
             tcs.SetResult(inlineResult.Html);
             return tcs.Task;
@@ -466,23 +434,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var sb = new StringBuilder();
             var addresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == addressType).ToList();
-            for (int i = 0; i < addresses.Count; i++)
+            for (var i = 0; i < addresses.Count; i++)
             {
                 var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
                 if (hasName)
-                {
                     sb.Append(addresses[i].Name).Append(" &lt;");
-                }
                 sb.Append(addresses[i].Address);
                 if (hasName)
-                {
                     sb.Append("&gt;");
-                }
                 if (i < addresses.Count - 1)
-                {
                     sb.Append(", ");
-                }
             }
+
             return sb.ToString();
         }
 
@@ -506,9 +469,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             await SetNewHtmlContentAsync(contentViewState.NewContent);
 
             if (oldContentLoaded)
-            {
                 await SetOldHtmlContentAsync(contentViewState.OldContent);
-            }
         }
 
         public override IComposeDocumentViewState ReturnState()
@@ -542,13 +503,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void FinalizeGetNewHtmlContent(Java.Lang.String content)
         {
-            newContent = (string)content;
+            newContent = (string) content;
             newGetHtmlContentInterfaceSemaphore.Release();
         }
 
         public void FinalizeGetOldHtmlContent(Java.Lang.String content)
         {
-            oldContent = (string)content;
+            oldContent = (string) content;
             oldGetHtmlContentInterfaceSemaphore.Release();
         }
 
@@ -559,6 +520,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         class GetHtmlContentInterface : Java.Lang.Object
         {
             public const string NewContentJavascript = "javascript:window.GetHtmlContentInterface.getNewHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
+
             public const string OldContentJavascript = "javascript:window.GetHtmlContentInterface.getOldHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
 
             readonly ContentView view;

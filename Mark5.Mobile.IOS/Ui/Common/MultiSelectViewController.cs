@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: MultiSelectViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,10 +7,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-
     public class MultiSelectViewController<T> : UITableViewController
     {
-        
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
@@ -31,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
 
-        public Task<T[]> Task { get { return tcs.Task; } }
+        public Task<T[]> Task => tcs.Task;
 
         public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
             : base(UITableViewStyle.Grouped)
@@ -70,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             TableView.ReloadData();
 
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 var d = data[i];
                 if (preselected.Contains(d, equalityComparer))

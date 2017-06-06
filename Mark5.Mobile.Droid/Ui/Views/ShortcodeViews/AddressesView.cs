@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AddressesView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Linq;
 using Android.Content;
 using Android.Graphics;
@@ -19,10 +12,8 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 {
-
     public class AddressesView : ShortcodeView
     {
-
         readonly DocumentAddressType type;
         LinearLayoutCompat AddressesLayout;
 
@@ -80,11 +71,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
 
         class AddressView : LinearLayoutCompat
         {
-
             public AddressView(Context context, DocumentAddress address, int distanceVeryLarge, int distanceNormal)
                 : base(context)
             {
-                var typedArray = Context.ObtainStyledAttributes(new int[] { Resource.Attribute.selectableItemBackground });
+                var typedArray = Context.ObtainStyledAttributes(new int[]
+                {
+                    Resource.Attribute.selectableItemBackground
+                });
                 SetBackgroundResource(typedArray.GetResourceId(0, 0));
                 typedArray.Recycle();
 
@@ -119,9 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 LongClick += (sender, e) =>
                 {
                     if (!string.IsNullOrWhiteSpace(addressView.Text))
-                    {
                         Integration.CopyToClipboard(context, addressView.Text);
-                    }
                 };
             }
         }

@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: ContactsDataAccess.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,13 +8,10 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Links;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.DataAccess
 {
-
     class ContactsDataAccess : IContactsDataAccess
     {
-
         readonly DatabaseConnectionProvider contactsDatabase;
 
         public ContactsDataAccess(DatabaseConnectionProvider contactsDatabase)
@@ -36,12 +26,12 @@ namespace Mark5.Mobile.Common.DataAccess
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
+                        c.Table<FolderContactLink>().Delete(fdl => fdl.FolderId == folder.Id);
+                    c.InsertOrReplaceAll(contactPreviews.Select(cp => new FolderContactLink
                     {
-                        c.Table<FolderContactLink>()
-                         .Delete(fdl => fdl.FolderId == folder.Id);
-                    }
-
-                    c.InsertOrReplaceAll(contactPreviews.Select(cp => new FolderContactLink { FolderId = folder.Id, ContactId = cp.Id }));
+                        FolderId = folder.Id,
+                        ContactId = cp.Id
+                    }));
                     c.InsertOrReplaceAll(contactPreviews);
                 });
             }
@@ -59,37 +49,24 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select * " +
-                                $"from {nameof(ContactPreview)}, {nameof(FolderContactLink)} " +
-                                $"where {nameof(FolderContactLink.FolderId)} = {folder.Id} " +
-                                $"     and {nameof(ContactPreview)}.{nameof(ContactPreview.Id)} = {nameof(FolderContactLink)}.{nameof(FolderContactLink.ContactId)} ";
+                    var query = $"select * " + $"from {nameof(ContactPreview)}, {nameof(FolderContactLink)} " + $"where {nameof(FolderContactLink.FolderId)} = {folder.Id} " + $"     and {nameof(ContactPreview)}.{nameof(ContactPreview.Id)} = {nameof(FolderContactLink)}.{nameof(FolderContactLink.ContactId)} ";
 
                     query += $"order by {nameof(ContactPreview.Name)} ";
 
                     if (maxItems > 0)
-                    {
                         query += $"limit {maxItems - 1} ";
-                    }
-
                     if (startRowId > 0)
-                    {
                         query += $"offset {startRowId} ";
-                    }
-
                     var result = c.Query<ContactPreview>(query);
 
                     if (result == null || result.Count < 1)
-                    {
                         throw new DataNotFoundException("Contact previews could not be found.");
-                    }
 
                     contactPreviews = result;
 
                     startRowId = startRowId < 1 ? 1 : startRowId;
                     foreach (var contactPreview in contactPreviews)
-                    {
                         contactPreview.RowId = startRowId++;
-                    }
                 });
 
                 return contactPreviews;
@@ -110,10 +87,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == contact.Id);
 
-                    var contactCommunicationAddresses = contact.CommunicationAddresses
-                                                               .Select(ca => new ContactCommunicationAddress(contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    var contactCommunicationAddresses = contact.CommunicationAddresses.Select(ca => new ContactCommunicationAddress(contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
                     c.InsertAll(contactCommunicationAddresses);
-
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -131,25 +106,13 @@ namespace Mark5.Mobile.Common.DataAccess
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
                     var result = c.Find<Contact>(contactId);
+                    contact = result ?? throw new DataNotFoundException("Contact could not be found.");
 
-                    if (result == null)
-                    {
-                        throw new DataNotFoundException("Contact could not be found.");
-                    }
-
-                    contact = result;
-
-                    var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " +
-                                              $"\"{nameof(ContactCommunicationAddress.Description)}\"," +
-                                              $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " +
-                                              $"\"{nameof(ContactCommunicationAddress.Type)}\" " +
-                                              $"from \"{nameof(ContactCommunicationAddress)}\" " +
-                                              $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
+                    var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " + $"\"{nameof(ContactCommunicationAddress.Description)}\"," + $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " + $"\"{nameof(ContactCommunicationAddress.Type)}\" " + $"from \"{nameof(ContactCommunicationAddress)}\" " + $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
                     cmd.Bind("@contactId", contactId);
                     var addresses = cmd.ExecuteQuery<CommunicationAddress>();
 
                     contact.CommunicationAddresses.AddRange(addresses);
-
                 });
 
                 return contact;
@@ -169,8 +132,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     c.InsertOrReplace(container.Contact);
                     c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == container.Contact.Id);
 
-                    var contactCommunicationAddresses = container.Contact.CommunicationAddresses
-                                                               .Select(ca => new ContactCommunicationAddress(container.Contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    var contactCommunicationAddresses = container.Contact.CommunicationAddresses.Select(ca => new ContactCommunicationAddress(container.Contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
                     c.InsertAll(contactCommunicationAddresses);
 
 
@@ -193,16 +155,9 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var contact = c.Find<Contact>(contactId);
                     if (contact == null)
-                    {
                         throw new DataNotFoundException("Contact could not be found.");
-                    }
 
-                    var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " +
-                          $"\"{nameof(ContactCommunicationAddress.Description)}\"," +
-                          $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " +
-                          $"\"{nameof(ContactCommunicationAddress.Type)}\" " +
-                          $"from \"{nameof(ContactCommunicationAddress)}\" " +
-                          $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
+                    var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " + $"\"{nameof(ContactCommunicationAddress.Description)}\"," + $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " + $"\"{nameof(ContactCommunicationAddress.Type)}\" " + $"from \"{nameof(ContactCommunicationAddress)}\" " + $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
                     cmd.Bind("@contactId", contactId);
                     var addresses = cmd.ExecuteQuery<CommunicationAddress>();
 
@@ -210,9 +165,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     var contactPreview = c.Find<ContactPreview>(contactId);
                     if (contactPreview == null)
-                    {
                         throw new DataNotFoundException("Contact preview could not be found.");
-                    }
 
                     container = new ContactContainer(contactPreview, contact);
                 });
@@ -252,7 +205,6 @@ namespace Mark5.Mobile.Common.DataAccess
                             c.Table<Contact>().Delete(ct => ct.Id == id);
                             c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == id);
                         }
-
                         c.Table<FolderContactLink>().Delete(fcl => fcl.ContactId == id && fcl.FolderId == folderId);
                     }
                 });
@@ -315,10 +267,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 List<Category> categories = null;
 
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    categories = c.Table<Category>().ToList();
-                });
+                await contactsDatabase.RunInConnectionAsync(c => { categories = c.Table<Category>().ToList(); });
 
                 return categories;
             }
@@ -334,10 +283,12 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
-                                              $"set \"{nameof(ContactPreview.CategoriesString)}\" = @categoriesString " +
-                                              $"where \"{nameof(ContactPreview.Id)}\" = @contactPreviewId");
-                    cmd.Bind("@categoriesString", new CategoriesValue { Categories = categories }.CategoriesString);
+                    var cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " + $"set \"{nameof(ContactPreview.CategoriesString)}\" = @categoriesString " + $"where \"{nameof(ContactPreview.Id)}\" = @contactPreviewId");
+                    cmd.Bind("@categoriesString",
+                        new CategoriesValue
+                        {
+                            Categories = categories
+                        }.CategoriesString);
                     cmd.Bind("@contactPreviewId", contactPreview.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -354,31 +305,27 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " +
-                                              $"from \"{nameof(Contact)}\" " +
-                                              $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " + $"from \"{nameof(Contact)}\" " + $"where \"{nameof(Contact.Id)}\" = @contactId");
                     cmd.Bind("@contactId", contact.Id);
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
 
                     var comments = result.First().Comments;
 
                     comments.Add(comment);
 
-                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                          $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " +
-                                          $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
+                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " + $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " + $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
 
-                    cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
-                                          $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
-                                          $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
+                    cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " + $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " + $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
                     cmd.Bind("@commentsCount", comments.Count);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
@@ -396,16 +343,12 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " +
-                                    $"from \"{nameof(Contact)}\" " +
-                                    $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " + $"from \"{nameof(Contact)}\" " + $"where \"{nameof(Contact.Id)}\" = @contactId");
                     cmd.Bind("@contactId", contact.Id);
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
 
                     var comments = result.First().Comments;
 
@@ -413,10 +356,12 @@ namespace Mark5.Mobile.Common.DataAccess
                     comments.Add(comment);
                     comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
-                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                          $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " +
-                                          $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
+                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " + $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " + $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -433,31 +378,27 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " +
-                                    $"from \"{nameof(Contact)}\" " +
-                                    $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    var cmd = c.CreateCommand($"select \"{nameof(Contact.CommentsString)}\" " + $"from \"{nameof(Contact)}\" " + $"where \"{nameof(Contact.Id)}\" = @contactId");
                     cmd.Bind("@contactId", contact.Id);
                     var result = cmd.ExecuteQuery<CommentsValue>();
 
                     if (result == null || result.Count < 1)
-                    {
                         return;
-                    }
 
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
 
-                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " +
-                                          $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " +
-                                          $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsString", new CommentsValue { Comments = comments }.CommentsString);
+                    cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " + $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " + $"where \"{nameof(Contact.Id)}\" = @contactId");
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
 
-                    cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " +
-                                          $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " +
-                                          $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
+                    cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " + $"set \"{nameof(ContactPreview.CommentsCount)}\" = @commentsCount " + $"where \"{nameof(ContactPreview.Id)}\" = @contactId");
                     cmd.Bind("@commentsCount", comments.Count);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
@@ -477,9 +418,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderContactLink.FolderId)} as '{nameof(IdValue.Id)}'" +
-                                      $"   from {nameof(FolderContactLink)}" +
-                                      $"   where {nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
+                    var queryString = $"select {nameof(FolderContactLink.FolderId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderContactLink)}" + $"   where {nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
 
                     var result = c.Query<IdValue>(queryString);
 
@@ -498,7 +437,7 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                bool found = false;
+                var found = false;
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
@@ -522,11 +461,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var folderCondition = $"{ nameof(FolderContactLink.FolderId)} = ?";
-                    var inCondition = $"{nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from { nameof(Contact)})";
-                    var queryString = $"select {nameof(FolderContactLink.ContactId)} as '{nameof(IdValue.Id)}'" +
-                                      $"   from {nameof(FolderContactLink)}" +
-                                      $"   where {folderCondition} and {inCondition}";
+                    var folderCondition = $"{nameof(FolderContactLink.FolderId)} = ?";
+                    var inCondition = $"{nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
+                    var queryString = $"select {nameof(FolderContactLink.ContactId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderContactLink)}" + $"   where {folderCondition} and {inCondition}";
 
                     var result = c.Query<IdValue>(queryString, folderId);
                     contactIds = result.Select(v => v.Id).ToList();
@@ -560,7 +497,6 @@ namespace Mark5.Mobile.Common.DataAccess
                     var cmd3 = c.CreateCommand(outerDeleteQueryContactCommunicationAddresses);
                     cmd3.ExecuteNonQuery();
                 });
-
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -576,20 +512,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(PrintableSuggestion.Name)}," +
-                       $" CP.{nameof(ContactPreview.ShortId)} as {nameof(PrintableSuggestion.ShortId)}, " +
-                         $" CP.{nameof(ContactPreview.Description)} as {nameof(PrintableSuggestion.ContactDescription)}, " +
-                         $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(PrintableSuggestion.Address)}, " +
-                         $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(PrintableSuggestion.AddressDescription)} " +
-                         $" from {nameof(ContactPreview)} CP inner join {nameof(ContactCommunicationAddress)} CA" +
-                         $" on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)}" +
-                         $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) AND " +
-                         $" ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase)" +
-                         $" OR (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase))  " +
-                         "COLLATE Nocase";
+                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(PrintableSuggestion.Name)}," + $" CP.{nameof(ContactPreview.ShortId)} as {nameof(PrintableSuggestion.ShortId)}, " + $" CP.{nameof(ContactPreview.Description)} as {nameof(PrintableSuggestion.ContactDescription)}, " + $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(PrintableSuggestion.Address)}, " + $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(PrintableSuggestion.AddressDescription)} " + $" from {nameof(ContactPreview)} CP inner join {nameof(ContactCommunicationAddress)} CA" + $" on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)}" + $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) AND " + $" ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase)" + $" OR (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase))  " + "COLLATE Nocase";
                     var cmd = c.CreateCommand(commandString);
                     cmd.Bind("@phrase", $"%{phrase}%");
-                    cmd.Bind("@addressType", (int)CommunicationAddressType.Email);
+                    cmd.Bind("@addressType", (int) CommunicationAddressType.Email);
                     var result = cmd.ExecuteQuery<PrintableSuggestion>();
                     suggestions = result;
                 });
@@ -614,5 +540,3 @@ namespace Mark5.Mobile.Common.DataAccess
         }
     }
 }
-
-

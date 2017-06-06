@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: RetainedFragment.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using Android.OS;
 using Android.Support.V4.App;
@@ -12,10 +5,8 @@ using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
-
     public class RetainedFragment<Y> : Fragment where Y : class
     {
-
         const string TagPrefix = "RF_";
 
         public Y State { get; set; }
@@ -30,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             if (fragmentManager == null)
                 throw new ArgumentNullException(nameof(fragmentManager));
-            
+
             if (string.IsNullOrEmpty(parentTag))
                 throw new ArgumentNullException(nameof(parentTag));
 
@@ -64,6 +55,4 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
         }
     }
-
 }
-

@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ObjectLinksTableViewCell.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -13,10 +6,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-
     public partial class ObjectLinksTableViewCell : UITableViewCell
     {
-
         public static readonly UINib Nib = UINib.FromName("ObjectLinksTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ObjectLinksTableViewCell");
 
@@ -27,7 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static ObjectLinksTableViewCell Create()
         {
-            var cell = (ObjectLinksTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (ObjectLinksTableViewCell) Nib.Instantiate(null, null)[0];
 
             cell.TitleLabel.Font = Theme.DefaultBoldFont;
 
@@ -41,13 +32,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             var clickable = false;
             if (link.IsReverse)
-            {
-                clickable = (link.FromObjectType == ObjectType.Document || link.FromObjectType == ObjectType.Contact || link.FromObjectType == ObjectType.Shortcode);
-            }
+                clickable = link.FromObjectType == ObjectType.Document || link.FromObjectType == ObjectType.Contact || link.FromObjectType == ObjectType.Shortcode;
             else
-            {
-                clickable = (link.ToObjectType == ObjectType.Document || link.ToObjectType == ObjectType.Contact || link.ToObjectType == ObjectType.Shortcode);
-            }
+                clickable = link.ToObjectType == ObjectType.Document || link.ToObjectType == ObjectType.Contact || link.ToObjectType == ObjectType.Shortcode;
 
             SelectionStyle = clickable ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }

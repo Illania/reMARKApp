@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: ShortcodeViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,13 +19,11 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class ShortcodeViewController : AbstractViewController, ISecondaryViewController
     {
-        
         public bool Modal { get; set; }
 
-        public bool Empty { get { return folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null; } }
+        public bool Empty => folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null;
 
         int? folderId;
         Folder folder;
@@ -80,7 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
-            
+
             tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
 
@@ -110,13 +101,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillTransitionToSize(toSize, coordinator);
 
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
-            {
-                if (tableView == null) return;
+            coordinator.AnimateAlongsideTransition(ctx => { },
+                ctx =>
+                {
+                    if (tableView == null)
+                        return;
 
-                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            });
+                    tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                    tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                });
         }
 
         void InitializeNavigationBar()
@@ -147,15 +140,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.EstimatedRowHeight = 60f;
             tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed) { MinimumPressDuration = 1f });
+            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed)
+            {
+                MinimumPressDuration = 1f
+            });
             View.AddSubview(tableView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
 
             fileToButton = new UIBarButtonItem();
             fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
@@ -171,16 +167,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             toolbar.BarTintColor = Theme.Gray;
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
-                });
+            {
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
+            });
         }
 
         void InitializeNavigationBarTitle()
@@ -214,7 +210,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
         {
-            if (gr.State != UIGestureRecognizerState.Began) return;
+            if (gr.State != UIGestureRecognizerState.Began)
+                return;
 
             var location = gr.LocationInView(tableView);
             var indexPath = tableView?.IndexPathForRowAtPoint(location);
@@ -229,51 +226,71 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                PreconfiguredEmailAddresses = new string[] { documentAddress.FullAddress },
+                PreconfiguredEmailAddresses = new string[]
+                {
+                    documentAddress.FullAddress
+                },
                 CreationModeFlag = DocumentCreationModeFlag.New
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
+        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text)
+        {
+            Integration.CopyToClipboard(this, tableView, cell, text);
+        }
 
         void FileToButton_Clicked(object sender, EventArgs e)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { shortcode } };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview });
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    var vc = new CopyToWorktrayViewController
+                    {
+                        BusinessEntities = new List<IBusinessEntity>
+                        {
+                            shortcode
+                        }
+                    };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                    {
+                        shortcodePreview
+                    });
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
 
-            if (folder?.InternalType == FolderInternalType.FilterView
-                || folder?.InternalType == FolderInternalType.Static
-                || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview }, folder);
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                            {
+                                shortcodePreview
+                            },
+                            folder);
+                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    }));
 
-            if (folder?.InternalType == FolderInternalType.FilterView
-                || folder?.InternalType == FolderInternalType.Static
-                || folder?.InternalType == FolderInternalType.Worktray)
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
 
             PresentViewController(eas, true, null);
         }
@@ -354,7 +371,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info("Loading shortcode...");
 
-            var ds = (DataSource)tableView?.Source;
+            var ds = (DataSource) tableView?.Source;
 
             try
             {
@@ -368,14 +385,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 if (folder != null && shortcodePreview != null)
-                {
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folder, shortcodePreview.Id);
-                }
 
                 if (folderId == null && folder == null && shortcodePreview != null)
-                {
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id);
-                }
 
                 if (folderId == null && folder == null && shortcodePreview == null)
                 {
@@ -395,7 +408,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
                 var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
 
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested)
+                    return;
 
                 InitializeNavigationBarTitle();
 
@@ -409,7 +423,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested)
+                    return;
 
                 CommonConfig.Logger.Error($"Could not load shortcode", ex);
 
@@ -466,20 +481,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to remove shortcode from folder [shortcodeId={shortcode.Id}, folderId={folder.Id}]");
 
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { shortcode }, folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
+                    {
+                        shortcode
+                    },
+                    folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, folder.Id, new List<int> { shortcode.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Shortcode,
+                    folder.Id,
+                    new List<int>
+                    {
+                        shortcode.Id
+                    }));
 
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -505,20 +526,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to delete shortcode [shortcodeId={shortcode.Id}]");
 
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { shortcode });
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity>
+                {
+                    shortcode
+                });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Shortcode, new List<int> { shortcode.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                    ObjectType.Shortcode,
+                    new List<int>
+                    {
+                        shortcode.Id
+                    }));
 
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -533,7 +558,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-
             ShortcodeViewController viewController;
             UITableView tableView;
 
@@ -665,13 +689,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                if (empty) return string.Empty;
-                if (loading) return string.Empty;
+                if (empty)
+                    return string.Empty;
+                if (loading)
+                    return string.Empty;
 
-                if (section == 0) return Localization.GetString("description");
-                if (section == 1) return Localization.GetString("to");
-                if (section == 2) return Localization.GetString("cc");
-                if (section == 3) return Localization.GetString("bcc");
+                if (section == 0)
+                    return Localization.GetString("description");
+                if (section == 1)
+                    return Localization.GetString("to");
+                if (section == 2)
+                    return Localization.GetString("cc");
+                if (section == 3)
+                    return Localization.GetString("bcc");
 
                 return string.Empty;
             }
@@ -687,7 +717,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None) return;
+                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
 
                 DocumentAddress documentAddress = null;
 
@@ -698,7 +729,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (indexPath.Section == 3)
                     documentAddress = bccAddresses[indexPath.Row];
 
-                if (documentAddress == null) return;
+                if (documentAddress == null)
+                    return;
 
                 viewController.DocumentAddressClicked(documentAddress);
 

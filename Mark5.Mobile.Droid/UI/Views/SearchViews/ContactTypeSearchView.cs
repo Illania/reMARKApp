@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: ContactTypeSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common.Model;
@@ -18,7 +11,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         readonly CustomButton departmentButton;
         readonly CustomButton companyButton;
 
-        public ContactTypeSearchView(Android.Content.Context context) : base(context)
+        public ContactTypeSearchView(Android.Content.Context context)
+            : base(context)
         {
             personButton = new CustomButton(context, Resource.String.search_contact_person, HandleClick);
             departmentButton = new CustomButton(context, Resource.String.search_contact_department, HandleClick);
@@ -29,7 +23,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         bool HandleClick(CustomButton b)
         {
-            var otherButtons = new List<CustomButton> { personButton, departmentButton, companyButton };
+            var otherButtons = new List<CustomButton>
+            {
+                personButton,
+                departmentButton,
+                companyButton
+            };
             otherButtons.Remove(b);
 
             if (b.Selected && otherButtons.All(bu => bu.Selected == false))
@@ -59,19 +58,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             ResetButtons(false);
 
             if (Criteria.ContactTypes.Contains(ContactType.Person))
-            {
                 personButton.UpdateSelectedState(true);
-            }
 
             if (Criteria.ContactTypes.Contains(ContactType.Company))
-            {
                 companyButton.UpdateSelectedState(true);
-            }
 
             if (Criteria.ContactTypes.Contains(ContactType.Department))
-            {
                 departmentButton.UpdateSelectedState(true);
-            }
         }
 
         public override void UpdateCriteria()
@@ -79,19 +72,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var types = new List<ContactType>();
 
             if (personButton.Selected)
-            {
                 types.Add(ContactType.Person);
-            }
 
             if (departmentButton.Selected)
-            {
                 types.Add(ContactType.Department);
-            }
 
             if (companyButton.Selected)
-            {
                 types.Add(ContactType.Company);
-            }
 
             Criteria.ContactTypes = new HashSet<ContactType>(types);
         }

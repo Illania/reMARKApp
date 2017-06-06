@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: AbstractCategoriesSearchView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
 using Mark5.Mobile.Common.Model;
@@ -36,7 +29,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             ParentFragment.ReplaceFragment(pclf, pclf.GenerateTag());
         }
 
-        protected void UpdateCategories(List<Category> categories) => UpdateCategories(categories.Select(c => c.Id).ToList());
+        protected void UpdateCategories(List<Category> categories)
+        {
+            UpdateCategories(categories.Select(c => c.Id).ToList());
+        }
 
         protected void UpdateCategories(List<int> categoriesId)
         {
@@ -45,6 +41,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateBottomTextView(categoriesId.Count);
             UpdateCriteria();
         }
-
     }
 }

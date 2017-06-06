@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.ServiceReference
-// File: WcfAppServiceProxy.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -13,14 +6,11 @@ using System.Threading.Tasks;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 
-#pragma warning disable CS1701
 namespace Mark5.ServiceReference.AppService
 {
-
     class WcfAppServiceProxy : IAppServiceProxy
     {
-
-        public Version Version { get { return new Version(3, 0, 0); } }
+        public Version Version => new Version(3, 0, 0);
 
         readonly Binding binding = new BasicHttpBinding
         {
@@ -496,8 +486,7 @@ namespace Mark5.ServiceReference.AppService
             return new AppServiceClient(shortTimeouts ? shortTimeoutsBinding : binding, endpoint);
         }
 
-        async Task<TResult> InvokeAsync<TResult, TParameter>(AppServiceClient client, Func<TParameter, AsyncCallback, object, IAsyncResult> beginMethod,
-                                                             Func<IAsyncResult, TResult> endMethod, TParameter parameters, CancellationToken ct = default(CancellationToken))
+        async Task<TResult> InvokeAsync<TResult, TParameter>(AppServiceClient client, Func<TParameter, AsyncCallback, object, IAsyncResult> beginMethod, Func<IAsyncResult, TResult> endMethod, TParameter parameters, CancellationToken ct = default(CancellationToken))
         {
             var success = false;
             try
@@ -505,7 +494,7 @@ namespace Mark5.ServiceReference.AppService
                 ct.ThrowIfCancellationRequested();
 
                 var result = await Task.Factory.FromAsync(beginMethod, endMethod, parameters, null);
-                ((ICommunicationObject)client).Close();
+                ((ICommunicationObject) client).Close();
                 success = true;
                 return result;
             }
@@ -513,13 +502,13 @@ namespace Mark5.ServiceReference.AppService
             {
                 try
                 {
-                    ((ICommunicationObject)client)?.Close();
+                    ((ICommunicationObject) client)?.Close();
                 }
                 catch
                 {
                     try
                     {
-                        ((ICommunicationObject)client)?.Abort();
+                        ((ICommunicationObject) client)?.Abort();
                     }
                     catch
                     {
@@ -531,22 +520,18 @@ namespace Mark5.ServiceReference.AppService
             catch (Exception ex)
             {
                 if (!success)
-                {
                     try
                     {
-                        ((ICommunicationObject)client)?.Abort();
+                        ((ICommunicationObject) client)?.Abort();
                     }
                     catch
                     {
                         // Nothing to do here
                     }
-                }
                 throw new WcfAppServiceException(ex);
             }
         }
 
         #endregion
-
     }
 }
-

@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: DeviceInfoProvider.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using Android.App;
+﻿using Android.App;
 using Android.Bluetooth;
 using Android.OS;
 using Android.Provider;
@@ -14,10 +7,8 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-
     public class DeviceInfoProvider : IDeviceInfoProvider
     {
-
         public DeviceType GetDeviceType()
         {
             return DeviceType.Android;
@@ -41,4 +32,3 @@ namespace Mark5.Mobile.Droid.Utilities
         }
     }
 }
-

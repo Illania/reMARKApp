@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: SearchManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,23 +11,21 @@ using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Storage;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Managers
 {
-
     class SearchManager : AbstractManager, ISearchManager
     {
-
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
         public SearchManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy)
-                : base(connectionInfo, appServiceProxy)
+            : base(connectionInfo, appServiceProxy)
         {
         }
 
         public async Task<List<SavedSearch>> GetSavedSearches(SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -47,9 +38,7 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -86,7 +75,8 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<List<DocumentPreview>> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -112,7 +102,8 @@ namespace Mark5.Mobile.Common.Managers
                     MustHaveCategoryIds = criteria.MustHaveCategoryIds.ToList(),
                     LineGuids = criteria.LineGuids.ToList(),
                     CreatorGuids = criteria.CreatorGuids.ToList(),
-                    DateRange = {
+                    DateRange =
+                    {
                         Enabled = criteria.DateRange?.Enabled ?? false,
                         Start = criteria.DateRange?.StartTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime),
                         End = criteria.DateRange?.EndTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime)
@@ -129,16 +120,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<ContactPreview>> SearchContactsAsync(SearchContactsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -171,16 +161,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<ShortcodePreview>> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -202,16 +191,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<CalendarTask>> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -230,7 +218,8 @@ namespace Mark5.Mobile.Common.Managers
                     CalendarCategoryIds = criteria.CalendarCategoryIds,
                     Location = criteria.Location,
                     ParticipantUserIds = criteria.ParticipantUserIds,
-                    DateRange = {
+                    DateRange =
+                    {
                         Enabled = criteria.DateRange?.Enabled ?? false,
                         Start = criteria.DateRange?.StartTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime),
                         End = criteria.DateRange?.EndTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime)
@@ -244,17 +233,15 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
-
         }
 
         public async Task<List<CalendarAppointment>> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
-            if (sourceType == SourceType.Auto) sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.ReachabilityService.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
@@ -273,7 +260,8 @@ namespace Mark5.Mobile.Common.Managers
                     CalendarCategoryIds = criteria.CalendarCategoryIds,
                     Location = criteria.Location,
                     ParticipantUserIds = criteria.ParticipantUserIds,
-                    DateRange = {
+                    DateRange =
+                    {
                         Enabled = criteria.DateRange?.Enabled ?? false,
                         Start = criteria.DateRange?.StartTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime),
                         End = criteria.DateRange?.EndTimestamp.ConvertTimestampMillisecondsToDateTime() ?? default(DateTime)
@@ -287,12 +275,9 @@ namespace Mark5.Mobile.Common.Managers
             }
 
             if (sourceType == SourceType.Local)
-            {
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
-            }
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }
 }
-

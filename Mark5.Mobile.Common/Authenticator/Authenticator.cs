@@ -1,11 +1,4 @@
-//
-// Project: Mark5.Mobile.Common
-// File: AuthenticationManager.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
@@ -13,16 +6,13 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-#pragma warning disable CS1701
 namespace Mark5.Mobile.Common.Authenticator
 {
-
     class Authenticator : IAuthenticator
     {
-
         public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default(CancellationToken))
         {
-            return (await GetConnectionInfoAsync(ct)) != null;
+            return await GetConnectionInfoAsync(ct) != null;
         }
 
         public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
@@ -33,13 +23,14 @@ namespace Mark5.Mobile.Common.Authenticator
 
             var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off, hostname, port, CommonConfig.HttpClientHandler);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticateParameters
-            {
-                Username = username,
-                Password = password,
-                DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
-                FriendlyDeviceName = deviceName,
-                InstallationId = deviceId
-            }, ct);
+                {
+                    Username = username,
+                    Password = password,
+                    DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
+                    FriendlyDeviceName = deviceName,
+                    InstallationId = deviceId
+                },
+                ct);
 
             var connectionInfo = new ConnectionInfo
             {
@@ -67,4 +58,3 @@ namespace Mark5.Mobile.Common.Authenticator
         }
     }
 }
-

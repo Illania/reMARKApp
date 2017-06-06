@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: CopyMoveToFolderListActivity.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System.Collections.Generic;
 using Android.App;
 using Android.Content.PM;
@@ -18,11 +11,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CopyMoveToFolderListActivity : BaseAppCompatActivity
     {
-
         public enum ModeType
         {
             Copy = 1,
@@ -53,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var listMode = (ModeType)Intent.Extras.GetInt(ModeIntentKey);
+                var listMode = (ModeType) Intent.Extras.GetInt(ModeIntentKey);
                 var moduleType = SerializationUtils.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
                 var be = Intent.HasExtra(BusinessEntitiesIntentKey) ? SerializationUtils.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey)) : null;
                 var fromFolder = Intent.HasExtra(FromFolderIntentKey) ? SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FromFolderIntentKey)) : null;

@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.Droid
-// File: PreferenceActivity.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -15,11 +8,9 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class PreferenceActivity : BaseAppCompatActivity
     {
-
         Toolbar toolbar;
 
         protected override void OnCreate(Bundle savedInstanceState)

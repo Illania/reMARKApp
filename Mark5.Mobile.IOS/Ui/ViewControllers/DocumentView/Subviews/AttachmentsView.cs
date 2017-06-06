@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: AttachmentsView.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
 using System;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -38,10 +31,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             };
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+            });
 
             stackView = new UIStackView
             {
@@ -54,26 +47,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             };
             ContainerView.AddSubview(stackView);
             ContainerView.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerMargin),
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                    NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
-                });
+            {
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+            });
         }
 
         public override void RefreshView()
         {
             if (Document == null)
-            {
                 return;
-            }
 
             stackView.ArrangedSubviews.ForEach(v =>
-                {
-                    stackView.RemoveArrangedSubview(v);
-                    v.RemoveFromSuperview();
-                });
+            {
+                stackView.RemoveArrangedSubview(v);
+                v.RemoveFromSuperview();
+            });
 
             foreach (var ad in Document.Attachments)
             {
@@ -82,13 +73,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             }
 
             if (Container != null)
-            {
                 foreach (var ad in Container.LocalAttachments)
                 {
                     var alssv = new AttachmentsSubView(this, ad);
                     stackView.AddArrangedSubview(alssv);
                 }
-            }
         }
 
         public override void UpdateVisibility()
@@ -117,24 +106,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
     class AttachmentsSubView : UIView
     {
-
-        public IAttachmentDescription Attachment
-        {
-            get
-            {
-                return attachmentDescription;
-            }
-        }
+        public IAttachmentDescription Attachment { get; }
 
         readonly AttachmentsView view;
-        readonly IAttachmentDescription attachmentDescription;
 
         UIButton attachmentButton;
 
         public AttachmentsSubView(AttachmentsView view, IAttachmentDescription attachmentDescription)
         {
             this.view = view;
-            this.attachmentDescription = attachmentDescription;
+            Attachment = attachmentDescription;
 
             InitSubViews();
         }
@@ -146,30 +127,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             attachmentButton = UIButton.FromType(UIButtonType.RoundedRect);
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
-            attachmentButton.SetTitle(attachmentDescription.Name + " (" + UI.PrettyFileSize(attachmentDescription.SizeInBytes) + ")", UIControlState.Normal);
+            attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
             attachmentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-            attachmentButton.TouchUpInside += (sender, e) => view.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(attachmentDescription));
+            attachmentButton.TouchUpInside += (sender, e) => view.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(Attachment));
             attachmentButton.Opaque = false;
             attachmentButton.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(attachmentButton);
             AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f)
+            });
         }
     }
 
     public class AttachmentButtonTappedEventArgs : EventArgs
     {
-
-        public IAttachmentDescription Attachment
-        {
-            get;
-            private set;
-        }
+        public IAttachmentDescription Attachment { get; }
 
         public AttachmentButtonTappedEventArgs(IAttachmentDescription attachment)
         {

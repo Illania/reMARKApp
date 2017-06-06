@@ -1,11 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: ContentView.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
+﻿using System;
 using CoreFoundation;
 using CoreGraphics;
 using Foundation;
@@ -16,12 +9,11 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
-
     public class ContentView : MailViewerSubview, IWKNavigationDelegate, IWKScriptMessageHandler
     {
+        static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
 
-        readonly static NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
-        readonly static NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
+        static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
 
         WKWebView webView;
         NSLayoutConstraint webViewHeightConstraint;
@@ -71,19 +63,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             webView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(webView);
             ContainerView.AddConstraints(new[]
-                {
-                    webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
-                });
+            {
+                webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
+            });
         }
 
         #region IWKNavigationDelegate
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
-        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler) => decisionHandler(navigationActionDelegate(navigationAction));
+        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
+        {
+            decisionHandler(navigationActionDelegate(navigationAction));
+        }
 
         #endregion
 
@@ -99,23 +94,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
 
-            if ((justLoadedNumber != null && justLoadedNumber.BoolValue) || (resizedNumber != null && resizedNumber.BoolValue))
+            if (justLoadedNumber != null && justLoadedNumber.BoolValue || resizedNumber != null && resizedNumber.BoolValue)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
-                {
-                    if (wv.IsLoading)
+                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
+                    () =>
                     {
+                        if (wv.IsLoading)
+                        {
+                            resizeAction(wv, nslc);
+                        }
+                        else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
+                        {
+                            nslc.Constant = wv.ScrollView.ContentSize.Height;
 
-                        resizeAction(wv, nslc);
-                    }
-                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
-                    {
-                        nslc.Constant = wv.ScrollView.ContentSize.Height;
-
-                        SetNeedsLayout();
-                    }
-                });
+                            SetNeedsLayout();
+                        }
+                    });
                 resizeAction(webView, webViewHeightConstraint);
             }
         }
@@ -127,14 +122,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         public override void RefreshView()
         {
             if (MailMessage == null)
-            {
                 return;
-            }
 
             CreateWebView();
 
             SetContent(MailMessage.BodyPlainText, MailMessage.BodyHtmlText);
-
         }
 
         public override void UpdateVisibility()
@@ -216,6 +208,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         }
 
         #endregion
-
     }
 }

@@ -1,19 +1,10 @@
-﻿//
-// Project: Mark5.Mobile.IOS
-// File: BrowseFoldersListViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
-using Mark5.Mobile.Common.Model;
+﻿using Mark5.Mobile.Common.Model;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-
     public class BrowseFoldersListViewController : AbstractFoldersListViewController
     {
-
         public BrowseFoldersListViewController(ModuleType module)
             : base(module, false, false, false)
         {
@@ -34,20 +25,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (folder.Local)
                     vc = new OutgoingDocumentListViewController();
                 else
-                    vc = new DocumentsListViewController { Folder = folder };
+                    vc = new DocumentsListViewController
+                    {
+                        Folder = folder
+                    };
 
                 NavigationController.PushViewController(vc, true);
             }
 
             if (folder.Module == ModuleType.Contacts)
             {
-                var vc = new ContactsListViewController { Folder = folder };
+                var vc = new ContactsListViewController
+                {
+                    Folder = folder
+                };
                 NavigationController.PushViewController(vc, true);
             }
 
             if (folder.Module == ModuleType.Shortcodes)
             {
-                var vc = new ShortcodesListViewController { Folder = folder };
+                var vc = new ShortcodesListViewController
+                {
+                    Folder = folder
+                };
                 NavigationController.PushViewController(vc, true);
             }
         }

@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: DocumentViewController.cs
-// Author: Bartosz Cichecki <bgc@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,23 +22,14 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-
     public class DocumentViewController : AbstractViewController, ISecondaryViewController
     {
-
         public bool Modal { get; set; }
 
         GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview { get; set; }
         GetNextDocumentPreviewDelegate getNextDocumentPreview { get; set; }
 
-        public bool Empty
-        {
-            get
-            {
-                return document == null && documentPreview == null && folderId == null
-                    && folder == null && documentId == null && notificationGuid == default(Guid);
-            }
-        }
+        public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null && notificationGuid == default(Guid);
 
         int? folderId { get; set; } //TODO correct naming after merge
         Folder folder { get; set; }
@@ -98,6 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIDocumentInteractionController attachmentInteractionController;
 
         public delegate DocumentPreview GetPreviousDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
+
         public delegate DocumentPreview GetNextDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
 
         public event EventHandler<ReadStatusUpdatedEventArgs> ReadStatusUpdated;
@@ -172,13 +157,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillTransitionToSize(toSize, coordinator);
 
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
-            {
-                if (mainScrollView == null) return;
+            coordinator.AnimateAlongsideTransition(ctx => { },
+                ctx =>
+                {
+                    if (mainScrollView == null)
+                        return;
 
-                mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            });
+                    mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                    mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                });
         }
 
         public override void DidReceiveMemoryWarning()
@@ -252,12 +239,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
 
             stackViewBeforeContent = new UIStackView
             {
@@ -269,11 +256,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             mainScrollView.AddSubview(stackViewBeforeContent);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
+            });
 
             contentView = new ContentView(DecidePolicyForNavigationAction);
             mainScrollView.AddSubview(contentView);
@@ -295,12 +282,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             mainScrollView.AddSubview(stackViewAfterContent);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
-                    NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
+                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
         }
 
         void InitSubViews()
@@ -395,16 +382,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             toolbar.BarTintColor = Theme.Gray;
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
-                });
+            {
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
+            });
         }
 
         void InitBackgroundView()
@@ -414,12 +401,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             backgroundView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(backgroundView);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+            });
             View.BringSubviewToFront(backgroundView);
 
             spinner = new UIActivityIndicatorView();
@@ -427,10 +414,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
             backgroundView.AddSubview(spinner);
             View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
-                    NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
-                });
+            {
+                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
+                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
+            });
         }
 
         void InitializeHandlers()
@@ -490,8 +477,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        public void SetData(Folder folder, DocumentPreview documentPreview,
-                            GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
             documentId = null;
             document = null;
@@ -515,8 +501,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.documentId = documentId;
         }
 
-        public void SetData(DocumentPreview documentPreview,
-                    GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
             document = null;
             documentId = null;
@@ -615,9 +600,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 StartRefreshing();
 
                 if (notificationGuid != default(Guid))
-                {
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
-                }
 
                 if (outgoingDocumentIdentifier != default(Guid))
                 {
@@ -635,12 +618,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     if (documentPreview != null && document == null)
-                    {
                         document = await Managers.DocumentsManager.GetDocumentAsync(folderId ?? folder?.Id, documentPreview.Id);
-                    }
                 }
 
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested)
+                    return;
 
                 RefreshView();
 
@@ -659,13 +641,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Dialogs.ShowErrorDialogAsync(this, ex);
 
                 if (Modal)
-                {
                     DismissViewController(true, null);
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
         }
 
@@ -674,11 +652,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             spinner.StartAnimating();
 
             View.BringSubviewToFront(backgroundView);
-            UIView.Animate(0.25, () =>
-            {
-                backgroundView.Alpha = 1f;
-                mainScrollView.Alpha = 0f;
-            });
+            UIView.Animate(0.25,
+                () =>
+                {
+                    backgroundView.Alpha = 1f;
+                    mainScrollView.Alpha = 0f;
+                });
         }
 
         void EndRefreshing(bool withError = false)
@@ -689,11 +668,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             View.SendSubviewToBack(backgroundView);
-            UIView.Animate(0.25, () =>
-            {
-                backgroundView.Alpha = 0f;
-                mainScrollView.Alpha = 1f;
-            });
+            UIView.Animate(0.25,
+                () =>
+                {
+                    backgroundView.Alpha = 0f;
+                    mainScrollView.Alpha = 1f;
+                });
         }
 
         void MarkAsReadIfNecessary()
@@ -714,22 +694,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 try
                 {
                     if (dp.IsReadByCurrent)
-                    {
                         return;
-                    }
 
                     var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
-                    if (delaySeconds < 0) return;
+                    if (delaySeconds < 0)
+                        return;
 
                     await Task.Delay(delaySeconds * 1000);
 
-                    if (token.IsCancellationRequested) return;
+                    if (token.IsCancellationRequested)
+                        return;
+
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
 
                     BeginInvokeOnMainThread(() =>
                     {
-                        if (token.IsCancellationRequested) return;
-                        if (dp == null) return;
+                        if (token.IsCancellationRequested)
+                            return;
+                        if (dp == null)
+                            return;
 
                         readByView.RefreshView();
                         readByView.UpdateVisibility();
@@ -778,30 +761,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void RefreshNavigationBar()
         {
             if (Modal)
-            {
                 return;
-            }
 
             bool _na;
             bool _pa;
 
             if (getNextDocumentPreview != null)
-            {
                 nextDocumentButtonItem.Enabled = getNextDocumentPreview(documentPreview, out _na, out _pa) != null;
-            }
             else
-            {
                 nextDocumentButtonItem.Enabled = false;
-            }
 
             if (getPreviousDocumentPreview != null)
-            {
                 previousDocumentButtonItem.Enabled = getPreviousDocumentPreview(documentPreview, out _na, out _pa) != null;
-            }
             else
-            {
                 previousDocumentButtonItem.Enabled = false;
-            }
 
 
             if (outgoingDocumentIdentifier != default(Guid))
@@ -810,7 +783,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 rightButtons[0] = editDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, true);
             }
-            else if (document == null || (documentPreview.Direction != DocumentDirection.Draft))
+            else if (document == null || documentPreview.Direction != DocumentDirection.Draft)
             {
                 var rightButtons = new UIBarButtonItem[2];
                 rightButtons[0] = nextDocumentButtonItem;
@@ -849,10 +822,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (string.IsNullOrWhiteSpace(path))
                     {
-                        if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                            && PlatformConfig.Preferences.LargeAttachmentWarning
-                            && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"),
-                                                                   string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(remoteAttachment.SizeInBytes))))
+                        if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes && PlatformConfig.Preferences.LargeAttachmentWarning && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(remoteAttachment.SizeInBytes))))
                         {
                             dismissAction();
                             return;
@@ -868,9 +838,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
-                {
                     throw new Exception("Unable to get attachment path.");
-                }
 
                 var url = NSUrl.FromFilename(path);
 
@@ -912,36 +880,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RecipeintsView_RecipientTapped(object sender, RecipentTappedEventArgs e)
         {
-            PresentComposeViewWithPreconfiguredAddresses(new string[] { e.Recipent });
+            PresentComposeViewWithPreconfiguredAddresses(new string[]
+            {
+                e.Recipent
+            });
         }
 
         WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
         {
-            if (navigationAction.NavigationType == WKNavigationType.LinkActivated
-            || navigationAction.NavigationType == WKNavigationType.BackForward
-            || navigationAction.NavigationType == WKNavigationType.FormSubmitted
-            || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
+            if (navigationAction.NavigationType == WKNavigationType.LinkActivated || navigationAction.NavigationType == WKNavigationType.BackForward || navigationAction.NavigationType == WKNavigationType.FormSubmitted || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
             {
                 if (navigationAction.Request.Url.Scheme == "mailto")
                 {
                     var address = navigationAction.Request.Url.ResourceSpecifier;
-                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
+                    PresentComposeViewWithPreconfiguredAddresses(new string[]
+                    {
+                        address
+                    });
                 }
                 else
                 {
-                    Integration.OpenLink(navigationAction.Request.Url,
-                                                      async () => await Dialogs.ShowConfirmDialogAsync(this,
-                                                                                                       Localization.GetString("unable_open_link_title"),
-                                                                                                       Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
+                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
                 }
 
                 return WKNavigationActionPolicy.Cancel;
             }
 
             if (navigationAction.NavigationType == WKNavigationType.Reload)
-            {
                 return WKNavigationActionPolicy.Cancel;
-            }
 
             return WKNavigationActionPolicy.Allow;
         }
@@ -965,8 +931,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async void Flag_Clicked(object sender, EventArgs e)
         {
             var isRead = documentPreview.IsReadByCurrent;
-            var flagListStrings = new string[] { Localization.GetString(isRead ? "mark_as_unread" : "mark_as_read"),
-                    Localization.GetString("categories") };
+            var flagListStrings = new string[]
+            {
+                Localization.GetString(isRead ? "mark_as_unread" : "mark_as_read"),
+                Localization.GetString("categories")
+            };
 
             var result = await Dialogs.ShowListDialogAsync(this, null, flagListStrings, flag);
 
@@ -986,7 +955,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void ReplyActions_Clicked(object sender, EventArgs e)
         {
-            var replyListStrings = new string[] { Localization.GetString("reply"),
+            var replyListStrings = new string[]
+            {
+                Localization.GetString("reply"),
                 Localization.GetString("reply_all"),
                 Localization.GetString("forward"),
                 Localization.GetString("copy_to_new")};
@@ -1017,7 +988,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async void ShowPriorityActionSheet(UIBarButtonItem barButtonItem)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
+            var priorities = new List<Priority>
+            {
+                Priority.Low,
+                Priority.Normal,
+                Priority.Urgent
+            };
             var priorityStrings = priorities.Select(p => UI.PriorityString(p));
             var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), barButtonItem);
 
@@ -1036,7 +1012,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 CommonConfig.Logger.Info($"Attempting to setting priority for document [documentId={document.Id}]");
-                await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview> { documentPreview }, priority);
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview>
+                    {
+                        documentPreview
+                    },
+                    priority);
 
                 UpdatePriority();
 
@@ -1061,41 +1041,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { document } };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { document });
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    var vc = new CopyToWorktrayViewController
+                    {
+                        BusinessEntities = new List<IBusinessEntity>
+                        {
+                            document
+                        }
+                    };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                    {
+                        document
+                    });
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
 
-            if (folder?.InternalType == FolderInternalType.FilterView
-                || folder?.InternalType == FolderInternalType.Static
-                || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { document }, folder);
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                            {
+                                document
+                            },
+                            folder);
+                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem) sender)));
 
-            if (folder?.InternalType == FolderInternalType.FilterView
-                || folder?.InternalType == FolderInternalType.Static
-                || folder?.InternalType == FolderInternalType.Worktray)
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator
-                || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
 
             PresentViewController(eas, true, null);
         }
@@ -1144,7 +1138,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             ComposeDocumentViewController vc = null;
             if (outgoingDocumentIdentifier != default(Guid))
-            {
                 vc = new ComposeDocumentViewController
                 {
                     LocalDocument = true,
@@ -1152,9 +1145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentDirection = container.DocumentPreview.Direction,
                     OutgoingDocumentGuid = container.Info.Identifier
                 };
-            }
             else
-            {
                 vc = new ComposeDocumentViewController
                 {
                     PreviousDocumentPreview = documentPreview,
@@ -1163,7 +1154,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PreviousDocumentDirection = documentPreview.Direction,
                     PreviousDocumentFolderId = folder.Id
                 };
-            }
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -1216,8 +1206,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void UserActions_Clicked(object sender, EventArgs e)
         {
-            var actionLinksListString = new string[] { Localization.GetString( "actions"),
-                    Localization.GetString("links") };
+            var actionLinksListString = new string[]
+            {
+                Localization.GetString("actions"),
+                Localization.GetString("links")
+            };
 
             var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, userActions);
 
@@ -1304,7 +1297,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CopyToWorktray()
         {
-            var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { document } };
+            var vc = new CopyToWorktrayViewController
+            {
+                BusinessEntities = new List<IBusinessEntity>
+                {
+                    document
+                }
+            };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -1323,20 +1322,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to remove documnet from folder [documentId={document.Id}, folderId={folder.Id}]");
 
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { document }, folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
+                    {
+                        document
+                    },
+                    folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Document, folder.Id, new List<int> { document.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Document,
+                    folder.Id,
+                    new List<int>
+                    {
+                        document.Id
+                    }));
 
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -1362,20 +1367,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to delete document [documentId={document.Id}]");
 
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { document });
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity>
+                {
+                    document
+                });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Document, new List<int> { document.Id }));
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                    ObjectType.Document,
+                    new List<int>
+                    {
+                        document.Id
+                    }));
 
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
-                {
                     ClearData();
-                }
                 else
-                {
                     NavigationController.PopViewController(true);
-                }
             }
             catch (Exception ex)
             {
@@ -1391,7 +1400,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     class AttachmentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
     {
-
         readonly UIViewController parentController;
         readonly IAttachmentDescription attachmentDescription;
 
@@ -1429,16 +1437,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
-
     }
 
     public class ReadStatusUpdatedEventArgs : EventArgs
     {
-        public DocumentPreview DocumentPreview
-        {
-            get;
-            private set;
-        }
+        public DocumentPreview DocumentPreview { get; }
 
         public ReadStatusUpdatedEventArgs(DocumentPreview documentPreview)
         {
@@ -1446,4 +1449,3 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
     }
 }
-

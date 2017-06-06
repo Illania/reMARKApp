@@ -1,10 +1,3 @@
-//
-// Project: Mark5.Mobile.IOS
-// File: UiViewExtension.cs
-// Author: ferdinandopapale <fp@nordic-it.com>
-//
-// Copyright (c) 2016 Nordic IT
-//
 using System.Collections.Generic;
 using System.Linq;
 using UIKit;
@@ -29,14 +22,13 @@ namespace Mark5.Mobile.IOS.Utilities
                 }
 
                 if (view.Subviews != null && view.Subviews.Length > 0)
-                {
                     foreach (var subview in view.Subviews)
                     {
                         var subviewBackup = subview.BackupConstaints();
                         backup = backup.Concat(subviewBackup).ToDictionary(entry => entry.Key, entry => entry.Value);
                     }
-                }
             }
+
             return backup;
         }
 
@@ -48,20 +40,14 @@ namespace Mark5.Mobile.IOS.Utilities
                 if (constraints.TryGetValue(view, out subviewConstraints))
                 {
                     if (view.Constraints != null && view.Constraints.Length > 0)
-                    {
                         view.RemoveConstraints(view.Constraints.Where(IsConstraintRelevant).ToArray());
-                    }
 
                     view.AddConstraints(subviewConstraints);
                 }
 
                 if (view.Subviews != null && view.Subviews.Length > 0)
-                {
                     foreach (var subview in view.Subviews)
-                    {
                         subview.RestoreConstaints(constraints);
-                    }
-                }
             }
         }
 
@@ -74,7 +60,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static bool IsConstraintRelevant(NSLayoutConstraint constraint)
         {
-            var attributes = new[] { NSLayoutAttribute.Top, NSLayoutAttribute.Bottom, NSLayoutAttribute.Height, NSLayoutAttribute.CenterY, NSLayoutAttribute.Baseline };
+            var attributes = new[]
+            {
+                NSLayoutAttribute.Top,
+                NSLayoutAttribute.Bottom,
+                NSLayoutAttribute.Height,
+                NSLayoutAttribute.CenterY,
+                NSLayoutAttribute.Baseline
+            };
             return attributes.Contains(constraint.FirstAttribute) || attributes.Contains(constraint.SecondAttribute);
         }
 
