@@ -638,8 +638,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case 2:
                         option = CopyToNewOptions.KeepOnlyAttachments;
                         break;
-                    default:
-                        break;
                 }
 
                 var intent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentPreview.Direction, Document.Id,

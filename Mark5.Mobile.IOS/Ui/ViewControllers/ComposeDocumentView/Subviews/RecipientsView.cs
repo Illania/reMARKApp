@@ -142,7 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task RefreshView()
         {
-            if (CreationModeFlag == DocumentCreationModeFlag.New || CreationModeFlag == DocumentCreationModeFlag.None
+            if (CreationModeFlag == DocumentCreationModeFlag.None
                 || CreationModeFlag == DocumentCreationModeFlag.Forward)
             {
                 return Task.CompletedTask;

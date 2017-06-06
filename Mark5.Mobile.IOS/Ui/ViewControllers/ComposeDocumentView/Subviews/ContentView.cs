@@ -287,7 +287,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             else
             {
-                expandButton.Hidden &= PreviousDocument == null;
+                expandButton.Hidden = PreviousDocument == null || CreationModeFlag == DocumentCreationModeFlag.New;
                 separatorBeforeExpand.Hidden = expandButton.Hidden;
 
                 await LoadOldContent();
@@ -310,7 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         async Task LoadOldContent()
         {
-            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && PreviousDocument != null)
+            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && CreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
             {
                 string oldContent = null;
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
@@ -536,9 +536,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             parentElement.Children.ForEach(c => c.Remove());
             parentElement.TextContent = string.Empty;
 
-            var nodes = await ProcessInsertedContent(htmlParser, contentType, content);
+            var processedContent = await ProcessInsertedContent(htmlParser, contentType, content);
 
-            parentElement.Append(nodes.ToArray());
+            parentElement.InnerHtml = processedContent;
 
             var textWriter = new StringWriter();
             currentHtmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
@@ -547,19 +547,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             newContentWebView.LoadHtmlString(textWriter.ToString(), null);
         }
 
-        static async Task<IHtmlCollection<IElement>> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)
+        static async Task<string> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)
         {
             if (contentToInsertType == ContentType.Html)
             {
                 var inlinedContentToInsert = InlineStyles(contentToInsert);
                 var htmlDocument = await htmlParser.ParseAsync(inlinedContentToInsert);
-                return htmlDocument.Body.Children;
+                return htmlDocument.Body.InnerHtml;
             }
 
             if (contentToInsertType == ContentType.PlainText)
             {
                 var htmlDocument = await htmlParser.ParseAsync("<div><pre>" + contentToInsert + "</pre></div>");
-                return htmlDocument.Body.Children;
+                return htmlDocument.Body.InnerHtml;
             }
 
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
