@@ -188,5 +188,12 @@ Global
 		$0.StandardHeader = $2
 		$2.IncludeInNewFiles = False
 		$0.TextStylePolicy = $4
+		$0.TextStylePolicy = $5
+		$5.FileWidth = 180
+		$5.TabsToSpaces = True
+		$5.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $6
+		$6.scope = text/x-csharp
+		$6.SpaceAfterCast = True
 	EndGlobalSection
 EndGlobal
