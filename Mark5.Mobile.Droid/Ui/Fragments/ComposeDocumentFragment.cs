@@ -756,7 +756,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (templatesPreviews != null)
             {
-                var templatesForCreationMode = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag));
+                var templatesForCreationMode = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None);
                 if (templatesForCreationMode.Any())
                 {
                     var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
