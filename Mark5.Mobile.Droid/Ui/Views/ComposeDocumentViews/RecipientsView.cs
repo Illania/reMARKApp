@@ -139,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOptions.KeepOnlyAddresses))
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepOnlyAddresses))
             {
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
             }

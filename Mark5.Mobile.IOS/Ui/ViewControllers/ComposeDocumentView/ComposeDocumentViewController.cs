@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public string[] PreconfiguredEmailAddresses { get; set; }
         public Shortcode PreConfiguredShortcode;
         public Document PreviousDocument { get; set; }
-        public CopyToNewOptions CopyToNewOptions { get; set; }
+        public CopyToNewOption CopyToNewOption { get; set; }
 
         public DocumentPreview PreviousDocumentPreview { get; set; }
 
@@ -398,7 +398,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 subView.PreviousDocument = PreviousDocument;
                 subView.PreviousDocumentPreview = PreviousDocumentPreview;
                 subView.CreationModeFlag = CreationModeFlag;
-                subView.CopyToNewOptions = CopyToNewOptions;
+                subView.CopyToNewOptions = CopyToNewOption;
                 await subView.RefreshView();
             }
 
@@ -1014,7 +1014,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return;
             }
 
-            if (CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments)
+            if (CopyToNewOption == CopyToNewOption.KeepTextAndAttachments)
             {
                 CommonConfig.Logger.Info("Documeny copied from new with text and attachments, no need to have templates");
                 return;

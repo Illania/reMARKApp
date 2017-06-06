@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                           List<string> preconfiguredEmailToAddresses = null,
                                           List<string> preconfiguredEmailCcAddresses = null,
                                           List<string> preconfiguredEmailBccAddresses = null,
-                                          CopyToNewOptions copyToNewOptions = CopyToNewOptions.None)
+                                          CopyToNewOption copyToNewOptions = CopyToNewOption.None)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
             intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     cdf.PreconfiguredEmailBccAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailBccAddressesIntentKey);
 
                 if (Intent.HasExtra(CopyToNewOptionsIntentKey))
-                    cdf.CopyToNewOptions = (CopyToNewOptions)Intent.Extras.GetInt(CopyToNewOptionsIntentKey);
+                    cdf.CopyToNewOptions = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey);
 
                 if (Intent.HasExtra(OutgoingDocumentGuidIntentKey))
                 {

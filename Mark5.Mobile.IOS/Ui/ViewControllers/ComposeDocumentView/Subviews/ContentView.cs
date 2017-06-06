@@ -278,7 +278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public override async Task RefreshView()
         {
             if (CreationModeFlag == DocumentCreationModeFlag.Edit
-                || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments)
+                || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                     await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);

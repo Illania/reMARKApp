@@ -89,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             switch (CreationModeFlag)
             {
                 case DocumentCreationModeFlag.New:
-                    textView.Text = CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments ? PreviousDocumentPreview.Subject : string.Empty;
+                    textView.Text = CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments ? PreviousDocumentPreview.Subject : string.Empty;
                     break;
                 case DocumentCreationModeFlag.Edit:
                     textView.Text = PreviousDocumentPreview.Subject;

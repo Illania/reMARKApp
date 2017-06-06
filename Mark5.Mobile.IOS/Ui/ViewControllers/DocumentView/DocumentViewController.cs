@@ -1274,17 +1274,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (result < 0)
                 return;
 
-            CopyToNewOptions option = CopyToNewOptions.None;
+            CopyToNewOption option = CopyToNewOption.None;
             switch (result)
             {
                 case 0:
-                    option = CopyToNewOptions.KeepOnlyAddresses;
+                    option = CopyToNewOption.KeepOnlyAddresses;
                     break;
                 case 1:
-                    option = CopyToNewOptions.KeepTextAndAttachments;
+                    option = CopyToNewOption.KeepTextAndAttachments;
                     break;
                 case 2:
-                    option = CopyToNewOptions.KeepOnlyAttachments;
+                    option = CopyToNewOption.KeepOnlyAttachments;
                     break;
             }
 
@@ -1296,7 +1296,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocument = document,
                 PreviousDocumentPreview = documentPreview,
-                CopyToNewOptions = option, //TODO rename copy to new options
+                CopyToNewOption = option, //TODO rename copy to new options
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

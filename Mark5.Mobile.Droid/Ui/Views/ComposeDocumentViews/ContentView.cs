@@ -148,7 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             await SetNewHtmlContentAsync(DefaultEditContent);
 
             if (CreationModeFlag == DocumentCreationModeFlag.Edit
-                || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments)
+                || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments)
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                 {

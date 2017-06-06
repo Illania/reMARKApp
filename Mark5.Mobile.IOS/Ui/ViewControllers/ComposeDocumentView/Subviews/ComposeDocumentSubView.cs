@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public Document PreviousDocument { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
-        public CopyToNewOptions CopyToNewOptions { get; set; }
+        public CopyToNewOption CopyToNewOptions { get; set; }
 
         protected float MinimumHeight = 21f;
         protected float HorizontalMargin = 15f;

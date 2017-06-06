@@ -626,17 +626,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (choice >= 0)
             {
-                CopyToNewOptions option = CopyToNewOptions.None;
+                CopyToNewOption option = CopyToNewOption.None;
                 switch (choice)
                 {
                     case 0:
-                        option = CopyToNewOptions.KeepOnlyAddresses;
+                        option = CopyToNewOption.KeepOnlyAddresses;
                         break;
                     case 1:
-                        option = CopyToNewOptions.KeepTextAndAttachments;
+                        option = CopyToNewOption.KeepTextAndAttachments;
                         break;
                     case 2:
-                        option = CopyToNewOptions.KeepOnlyAttachments;
+                        option = CopyToNewOption.KeepOnlyAttachments;
                         break;
                 }
 

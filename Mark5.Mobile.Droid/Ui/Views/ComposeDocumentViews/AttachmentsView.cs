@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.New
-                && (CopyToNewOptions == CopyToNewOptions.KeepOnlyAttachments || CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments))
+                && (CopyToNewOptions == CopyToNewOption.KeepOnlyAttachments || CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments))
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);

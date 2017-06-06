@@ -8,7 +8,7 @@
 using System;
 namespace Mark5.Mobile.Common.Model.Support
 {
-    public enum CopyToNewOptions
+    public enum CopyToNewOption
     {
         None = 0,
         KeepOnlyAddresses = 1,

@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public Document PreviousDocument { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
-        public CopyToNewOptions CopyToNewOptions { get; set; }
+        public CopyToNewOption CopyToNewOptions { get; set; }
         public IComposeDocumentViewState State { get; set; }
 
         protected int DistanceNone;

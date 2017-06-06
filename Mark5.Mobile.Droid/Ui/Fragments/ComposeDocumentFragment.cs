@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public string[] PreconfiguredEmailToAddresses { get; set; }
         public string[] PreconfiguredEmailCcAddresses { get; set; }
         public string[] PreconfiguredEmailBccAddresses { get; set; }
-        public CopyToNewOptions CopyToNewOptions { get; set; } //Ignored if CreationModeFlag != New
+        public CopyToNewOption CopyToNewOptions { get; set; } //Ignored if CreationModeFlag != New
         public Action CloseRequest { get; set; }
 
         Document PreviousDocument { get; set; }
@@ -185,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadDocument()
         {
-            if (PreviousDocument != null || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOptions.None))
+            if (PreviousDocument != null || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.None))
             {
                 await ShowDocument();
                 return;
@@ -963,7 +963,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public DocumentCreationModeFlag CreationModeFlag { get; set; }
             public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; }
             public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
-            public CopyToNewOptions CopyToNewOptions { get; set; }
+            public CopyToNewOption CopyToNewOptions { get; set; }
             public IComposeDocumentViewState ToState { get; set; }
             public IComposeDocumentViewState CcState { get; set; }
             public IComposeDocumentViewState BccState { get; set; }

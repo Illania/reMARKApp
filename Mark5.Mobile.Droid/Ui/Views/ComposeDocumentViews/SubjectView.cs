@@ -66,7 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             switch (CreationModeFlag)
             {
                 case DocumentCreationModeFlag.New:
-                    subjectTextView.Text = CopyToNewOptions == CopyToNewOptions.KeepTextAndAttachments ? PreviousDocumentPreview.Subject : string.Empty;
+                    subjectTextView.Text = CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments ? PreviousDocumentPreview.Subject : string.Empty;
                     break;
                 case DocumentCreationModeFlag.Edit:
                     subjectTextView.Text = PreviousDocumentPreview.Subject;
