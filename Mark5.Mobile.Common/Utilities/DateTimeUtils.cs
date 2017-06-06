@@ -16,8 +16,10 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (dateTime.Kind != DateTimeKind.Utc && dateTime.Kind != DateTimeKind.Unspecified)
                 throw new ArgumentException($"Invalid {nameof(dateTime)}.{nameof(DateTime.Kind)}!");
+
             if (dateTime == default(DateTime))
                 return -1;
+
             var elapsed = dateTime - epoch;
             return (long) elapsed.TotalMilliseconds;
         }

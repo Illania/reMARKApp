@@ -27,6 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             };
             foreach (var constraint in constraints)
                 constraint.Priority = 500;
+
             AddConstraints(constraints);
         }
     }

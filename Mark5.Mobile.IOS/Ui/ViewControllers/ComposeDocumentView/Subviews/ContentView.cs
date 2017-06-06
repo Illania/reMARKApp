@@ -65,7 +65,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"">
                                                 </head>
                                                 <body>
-                                                    <div id=""editable-one"" class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
+                                                    <div id=""editable-one"" class=""" +
+                                          NewEditableContentClass +
+                                          @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
                                                 </body >
                                             </html>";
 
@@ -411,6 +413,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 if (i < addresses.Count - 1)
                     sb.Append(", ");
             }
+
             return sb.ToString();
         }
 
@@ -470,6 +473,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 return textWriter.ToString();
             }
+
             return string.Empty;
         }
 
@@ -647,18 +651,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (justLoaded || resized || mutated)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)), () =>
-                {
-                    if (wv.IsLoading)
+                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)),
+                    () =>
                     {
-                        resizeAction(wv, nslc);
-                    }
-                    else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
-                    {
-                        nslc.Constant = wv.ScrollView.ContentSize.Height;
-                        SetNeedsLayout();
-                    }
-                });
+                        if (wv.IsLoading)
+                        {
+                            resizeAction(wv, nslc);
+                        }
+                        else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
+                        {
+                            nslc.Constant = wv.ScrollView.ContentSize.Height;
+                            SetNeedsLayout();
+                        }
+                    });
 
                 if (userContentController == newContentWebView.Configuration.UserContentController)
                 {

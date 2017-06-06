@@ -37,6 +37,7 @@ namespace Mark5.Mobile.Common.Model
                 var fullName = $"{contact.FirstName}{(string.IsNullOrEmpty(contact.Patronymic) ? string.Empty : " " + contact.Patronymic)}" + $"{(string.IsNullOrEmpty(contact.LastName) ? "" : " " + contact.LastName)}";
                 suggestions.Add(new PrintableSuggestion(fullName, address.Address, type));
             }
+
             return suggestions;
         }
 
@@ -50,6 +51,7 @@ namespace Mark5.Mobile.Common.Model
                 return true;
             if (obj.GetType() != typeof(PrintableSuggestion))
                 return false;
+
             var other = (PrintableSuggestion) obj;
             return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase) && string.Equals(Address, other.Address, StringComparison.CurrentCultureIgnoreCase) && Type == other.Type;
         }
@@ -76,6 +78,7 @@ namespace Mark5.Mobile.Common.Model
                 return -1;
             if (x.Type != SuggestionType.RecentAddress && y.Type == SuggestionType.RecentAddress)
                 return 1;
+
             var nameX = string.IsNullOrEmpty(x.Name) ? x.Address : x.Name;
             var nameY = string.IsNullOrEmpty(y.Name) ? y.Address : y.Name;
 

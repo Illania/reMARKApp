@@ -51,9 +51,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new ContactsSearchResultsViewController
-            {
-                Criteria = criteria
-            }, true);
+                {
+                    Criteria = criteria
+                },
+                true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -233,10 +234,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -332,10 +334,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -437,10 +440,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 shortIdTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -490,10 +494,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 descriptionTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -543,10 +548,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 physicalAddressTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -584,37 +590,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void Tapped(UITapGestureRecognizer recognizer)
             {
                 if (recognizer.View == shortIdView)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        descriptionView.Hidden = true;
-                        physicalAddressView.Hidden = true;
-                    }, ch =>
-                    {
-                        shortIdTextField.UserInteractionEnabled = true;
-                        shortIdTextField.BecomeFirstResponder();
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            descriptionView.Hidden = true;
+                            physicalAddressView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            shortIdTextField.UserInteractionEnabled = true;
+                            shortIdTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == descriptionView)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = true;
-                        physicalAddressView.Hidden = true;
-                    }, ch =>
-                    {
-                        descriptionTextField.UserInteractionEnabled = true;
-                        descriptionTextField.BecomeFirstResponder();
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = true;
+                            physicalAddressView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            descriptionTextField.UserInteractionEnabled = true;
+                            descriptionTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == physicalAddressView)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = true;
-                        descriptionView.Hidden = true;
-                    }, ch =>
-                    {
-                        physicalAddressTextField.UserInteractionEnabled = true;
-                        physicalAddressTextField.BecomeFirstResponder();
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = true;
+                            descriptionView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            physicalAddressTextField.UserInteractionEnabled = true;
+                            physicalAddressTextField.BecomeFirstResponder();
+                        });
 
                 UpdateRow();
                 SetAsActive();
@@ -643,37 +655,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void TextFieldDidEndEditing(UITextField textField)
             {
                 if (textField == shortIdTextField)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        descriptionView.Hidden = false;
-                        physicalAddressView.Hidden = false;
-                    }, ch =>
-                    {
-                        shortIdTextField.ResignFirstResponder();
-                        shortIdTextField.UserInteractionEnabled = false;
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            descriptionView.Hidden = false;
+                            physicalAddressView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            shortIdTextField.ResignFirstResponder();
+                            shortIdTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == descriptionTextField)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = false;
-                        physicalAddressView.Hidden = false;
-                    }, ch =>
-                    {
-                        descriptionTextField.ResignFirstResponder();
-                        descriptionTextField.UserInteractionEnabled = false;
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = false;
+                            physicalAddressView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            descriptionTextField.ResignFirstResponder();
+                            descriptionTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == physicalAddressTextField)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        shortIdView.Hidden = false;
-                        descriptionView.Hidden = false;
-                    }, ch =>
-                    {
-                        physicalAddressTextField.ResignFirstResponder();
-                        physicalAddressTextField.UserInteractionEnabled = false;
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            shortIdView.Hidden = false;
+                            descriptionView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            physicalAddressTextField.ResignFirstResponder();
+                            physicalAddressTextField.UserInteractionEnabled = false;
+                        });
             }
         }
 

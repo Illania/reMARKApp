@@ -54,18 +54,10 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("CategoriesString")]
-        public string CategoriesString
-        {
-            get => SerializationUtils.Serialize(Categories);
-            set => Categories = SerializationUtils.Deserialize<List<Category>>(value);
-        }
+        public string CategoriesString { get => SerializationUtils.Serialize(Categories); set => Categories = SerializationUtils.Deserialize<List<Category>>(value); }
 
         [Column("PrimaryAddressString")]
-        public string PrimaryAddressString
-        {
-            get => SerializationUtils.Serialize(PrimaryAddress);
-            set => PrimaryAddress = SerializationUtils.Deserialize<CommunicationAddress>(value);
-        }
+        public string PrimaryAddressString { get => SerializationUtils.Serialize(PrimaryAddress); set => PrimaryAddress = SerializationUtils.Deserialize<CommunicationAddress>(value); }
 
         #endregion
 

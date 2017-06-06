@@ -13,11 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         UILabel label;
         UITextView textView;
 
-        public string Subject
-        {
-            get => textView.Text;
-            set => textView.Text = value;
-        }
+        public string Subject { get => textView.Text; set => textView.Text = value; }
 
         public bool Empty => string.IsNullOrEmpty(textView?.Text);
 

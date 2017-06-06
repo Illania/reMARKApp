@@ -49,7 +49,6 @@ namespace SVProgressHUD
         public float StrokeThickness
         {
             get => _strokeThickness;
-
             set
             {
                 _strokeThickness = value;
@@ -63,7 +62,6 @@ namespace SVProgressHUD
         public UIColor StrokeColor
         {
             get => _strokeColor;
-
             set
             {
                 _strokeColor = value;
@@ -77,7 +75,6 @@ namespace SVProgressHUD
         public float StrokeEnd
         {
             get => _strokeEnd;
-
             set
             {
                 _strokeEnd = value;

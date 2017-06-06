@@ -39,10 +39,7 @@ namespace Mark5.Mobile.Common.Model
         public string Path { get; set; }
 
         [Ignore]
-        public bool Local
-        {
-            get { return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id); }
-        }
+        public bool Local { get { return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id); } }
 
         List<Folder> subFolders;
 
@@ -70,11 +67,7 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("OptionalParametersString")]
-        public string OptionalParametersString
-        {
-            get => SerializationUtils.Serialize(OptionalParameters);
-            set => OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value);
-        }
+        public string OptionalParametersString { get => SerializationUtils.Serialize(OptionalParameters); set => OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value); }
 
         #endregion
 

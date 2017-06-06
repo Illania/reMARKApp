@@ -194,14 +194,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         {
             base.ViewWillTransitionToSize(toSize, coordinator);
 
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
-            {
-                if (scrollView == null)
-                    return;
+            coordinator.AnimateAlongsideTransition(ctx => { },
+                ctx =>
+                {
+                    if (scrollView == null)
+                        return;
 
-                scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
-                scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
-            });
+                    scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+                    scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+                });
         }
 
         void View_Activated(object sender, EventArgs e)
@@ -255,11 +256,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             var duration = UI.KeyboardAnimationDurationFromNotification(notification);
             var options = UI.KeyboardAnimationOptionsFromNotification(notification);
-            UIView.AnimateNotify(duration, 0.0d, options, () =>
-            {
-                bottomLayoutConstraint.Constant = -keyboardHeight;
-                View.LayoutIfNeeded();
-            }, null);
+            UIView.AnimateNotify(duration,
+                0.0d,
+                options,
+                () =>
+                {
+                    bottomLayoutConstraint.Constant = -keyboardHeight;
+                    View.LayoutIfNeeded();
+                },
+                null);
 
             if (correctOffset && activeField != null)
             {
@@ -303,11 +308,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             protected void SetLabelActive(UILabel label, bool active)
             {
-                TransitionNotify(label, AnimationLength, UIViewAnimationOptions.TransitionCrossDissolve, () =>
-                {
-                    label.TextColor = active ? ActiveTextColor : InactiveTextColor;
-                    label.BackgroundColor = active ? ActiveBackgroundColor : InactiveBackgroundColor;
-                }, null);
+                TransitionNotify(label,
+                    AnimationLength,
+                    UIViewAnimationOptions.TransitionCrossDissolve,
+                    () =>
+                    {
+                        label.TextColor = active ? ActiveTextColor : InactiveTextColor;
+                        label.BackgroundColor = active ? ActiveBackgroundColor : InactiveBackgroundColor;
+                    },
+                    null);
             }
 
             protected void SetAsActive()

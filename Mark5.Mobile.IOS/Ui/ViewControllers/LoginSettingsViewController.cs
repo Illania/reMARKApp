@@ -96,9 +96,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (!sslEnabled)
                 {
                     SetHiddenKeys(new[]
-                    {
-                        AcceptSelfSignedKey
-                    }, true);
+                        {
+                            AcceptSelfSignedKey
+                        },
+                        true);
                     SettingsStore.SetBool(false, AcceptSelfSignedKey);
                 }
                 else
@@ -147,18 +148,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                     .ContinueWith(t =>
-                    {
-                        if (dismissAction != null)
-                            dismissAction();
-
-                        if (!t.IsFaulted)
                         {
-                            var src = SystemReportCollector.CreateShareReportController(t.Result);
-                            if (src.PopoverPresentationController != null)
-                                src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
-                            PresentViewController(src, true, null);
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            if (dismissAction != null)
+                                dismissAction();
+
+                            if (!t.IsFaulted)
+                            {
+                                var src = SystemReportCollector.CreateShareReportController(t.Result);
+                                if (src.PopoverPresentationController != null)
+                                    src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                                PresentViewController(src, true, null);
+                            }
+                        },
+                        TaskScheduler.FromCurrentSynchronizationContext());
             }
 
             if (specifier.Key == OpenSettingsAppKey)

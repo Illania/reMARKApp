@@ -49,7 +49,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                                                 <head>
                                                 </head>
                                                 <body style=""min-height: 500px;"">
-                                                    <div class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
+                                                    <div class=""" +
+                                          NewEditableContentClass +
+                                          @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
                                                 </body>
                                             </html>";
 
@@ -440,6 +442,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 if (i < addresses.Count - 1)
                     sb.Append(", ");
             }
+
             return sb.ToString();
         }
 

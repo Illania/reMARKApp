@@ -63,6 +63,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         throw new DataNotFoundException("Document previews could not be found.");
+
                     documentPreviews = result;
                 });
 
@@ -141,6 +142,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null)
                         throw new DataNotFoundException("Document could not be found.");
+
                     document = result;
                 });
 
@@ -179,9 +181,11 @@ namespace Mark5.Mobile.Common.DataAccess
                     var documentPreview = c.Find<DocumentPreview>(documentId);
                     if (documentPreview == null)
                         throw new DataNotFoundException("DocumentPreview could not be found.");
+
                     var document = c.Find<Document>(documentId);
                     if (document == null)
                         throw new DataNotFoundException("Document could not be found.");
+
                     container = new DocumentContainer(documentPreview, document);
                 });
 
@@ -359,6 +363,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         throw new DataNotFoundException("Template previews could not be found.");
+
                     templatePreviews = result;
                 });
 
@@ -394,6 +399,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null)
                         throw new DataNotFoundException("Template could not be found.");
+
                     template = result;
                 });
 
@@ -440,12 +446,14 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (info == null)
                         throw new DataNotFoundException("Default template info could not be found.");
+
                     if (info.Available)
                     {
                         var result = c.Find<Template>(info.TemplateId);
 
                         if (result == null)
                             throw new DataNotFoundException("Default template could not be found.");
+
                         template = result;
                     }
                 });
@@ -529,10 +537,11 @@ namespace Mark5.Mobile.Common.DataAccess
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
                     var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.CategoriesString)}\" = @categoriesString " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
-                    cmd.Bind("@categoriesString", new CategoriesValue
-                    {
-                        Categories = categories
-                    }.CategoriesString);
+                    cmd.Bind("@categoriesString",
+                        new CategoriesValue
+                        {
+                            Categories = categories
+                        }.CategoriesString);
                     cmd.Bind("@documentPreviewId", documentPreview.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -555,16 +564,18 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         return;
+
                     var comments = result.First().Comments;
 
                     comments.Add(comment);
                     comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
                     cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.CommentsString)}\" = @commentsString " + $"where \"{nameof(Document.Id)}\" = @documentId");
-                    cmd.Bind("@commentsString", new CommentsValue
-                    {
-                        Comments = comments
-                    }.CommentsString);
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
 
@@ -592,6 +603,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         return;
+
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
@@ -599,10 +611,11 @@ namespace Mark5.Mobile.Common.DataAccess
                     comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
                     cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.CommentsString)}\" = @commentsString " + $"where \"{nameof(Document.Id)}\" = @documentId");
-                    cmd.Bind("@commentsString", new CommentsValue
-                    {
-                        Comments = comments
-                    }.CommentsString);
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -625,15 +638,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         return;
+
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
 
                     cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.CommentsString)}\" = @commentsString " + $"where \"{nameof(Document.Id)}\" = @documentId");
-                    cmd.Bind("@commentsString", new CommentsValue
-                    {
-                        Comments = comments
-                    }.CommentsString);
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@documentId", document.Id);
                     cmd.ExecuteNonQuery();
 

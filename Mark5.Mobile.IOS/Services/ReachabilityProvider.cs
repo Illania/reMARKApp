@@ -33,6 +33,7 @@ namespace Mark5.Mobile.IOS.Services
                 if (r.TryGetFlags(out NetworkReachabilityFlags flags))
                     return IsReachableWithoutRequiringConnection(flags);
             }
+
             return false;
         }
 

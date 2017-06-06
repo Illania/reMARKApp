@@ -196,6 +196,7 @@ namespace Mark5.Mobile.Common.Storage
             var lastCacheCleanUpString = await GetAsync<string>(Filenames.LastCacheCleanUp, ct);
             if (lastCacheCleanUpString == null)
                 return DateTime.SpecifyKind(default(DateTime), DateTimeKind.Utc);
+
             return DateTime.SpecifyKind(Convert.ToDateTime(lastCacheCleanUpString), DateTimeKind.Utc);
         }
 
@@ -248,6 +249,7 @@ namespace Mark5.Mobile.Common.Storage
         {
             if (!await OutgoingFolderExistsAsync(id))
                 return null;
+
             try
             {
                 var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
@@ -258,6 +260,7 @@ namespace Mark5.Mobile.Common.Storage
                     await outgoingDocumentFolder.DeleteAsync();
                     return null;
                 }
+
                 var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
                 var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
 
@@ -305,6 +308,7 @@ namespace Mark5.Mobile.Common.Storage
                         attachments.Add(attachment);
                     }
                 }
+
                 return new OutgoingDocumentContainer
                 {
                     Document = document,
@@ -333,6 +337,7 @@ namespace Mark5.Mobile.Common.Storage
                 if (container != null && container.Info.State != OutgoingDocumentState.AutoSaved)
                     outgoingDocumentContainers.Add(container);
             }
+
             return outgoingDocumentContainers;
         }
 
@@ -341,6 +346,7 @@ namespace Mark5.Mobile.Common.Storage
             var identifiers = new List<Guid>();
             foreach (var folder in await CommonConfig.OutgoingFolder.GetFoldersAsync())
                 identifiers.Add(new Guid(folder.Name));
+
             return identifiers;
         }
 
@@ -369,6 +375,7 @@ namespace Mark5.Mobile.Common.Storage
                 attachment.Size = (int) attachment.Stream.Length;
                 attachments.Add(attachment);
             }
+
             return attachments;
         }
 
@@ -378,6 +385,7 @@ namespace Mark5.Mobile.Common.Storage
             var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
             if (fileExists == ExistenceCheckResult.FileExists)
                 return Path.Combine(attachmentsFolder.Path, filename);
+
             var file = await attachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
             using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
             {
@@ -393,6 +401,7 @@ namespace Mark5.Mobile.Common.Storage
             var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
             if (fileExists != ExistenceCheckResult.FileExists)
                 return;
+
             var file = await attachmentsFolder.GetFileAsync(filename, ct);
             await file.DeleteAsync(ct);
 
@@ -477,6 +486,7 @@ namespace Mark5.Mobile.Common.Storage
                 if (await folder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists)
                     return id;
             }
+
             return Guid.Empty;
         }
 
@@ -532,12 +542,14 @@ namespace Mark5.Mobile.Common.Storage
 
                 if (objectCache.ContainsKey(filename))
                     return (T) objectCache[filename];
+
                 var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
                 if (fileExists == ExistenceCheckResult.FileExists)
                 {
                     var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
                     return await SerializationUtils.DeserializeAsync<T>(await file.ReadAllTextAsync());
                 }
+
                 return null;
             }
             finally

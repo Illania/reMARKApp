@@ -77,6 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 foreach (var subView in CategoriesView.Subviews)
                     subView.RemoveFromSuperview();
+
                 return;
             }
 

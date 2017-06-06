@@ -322,10 +322,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    DocumentPreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        DocumentPreview
+                    }));
                 StartActivity(i);
 
                 return true;
@@ -336,10 +337,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    DocumentPreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        DocumentPreview
+                    }));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
 
@@ -483,10 +485,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity>
-                {
-                    DocumentPreview
-                }));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
+                    new List<IBusinessEntity>
+                    {
+                        DocumentPreview
+                    }));
         }
 
         async void SetPriority()
@@ -513,9 +516,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview>
-                {
-                    DocumentPreview
-                }, priority);
+                    {
+                        DocumentPreview
+                    },
+                    priority);
 
                 RefreshView<PriorityView>();
                 PlatformConfig.MessengerHub.Publish(new DocumentPreviewPriorityChangedMessage(this, DocumentPreview.Id, DocumentPreview.Priority));
@@ -545,14 +549,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                {
-                    DocumentPreview
-                }, Folder);
+                    {
+                        DocumentPreview
+                    },
+                    Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Document, Folder.Id, new List<int>
-                {
-                    DocumentPreview.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Document,
+                    Folder.Id,
+                    new List<int>
+                    {
+                        DocumentPreview.Id
+                    }));
 
                 dismissAction();
             }
@@ -583,10 +591,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     DocumentPreview
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Document, new List<int>
-                {
-                    DocumentPreview.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                    ObjectType.Document,
+                    new List<int>
+                    {
+                        DocumentPreview.Id
+                    }));
 
                 dismissAction();
                 if (CloseRequest != null)

@@ -242,17 +242,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var rows = tableView.IndexPathsForSelectedRows.ToArray();
             var selectedContacts = rows.Select(ip => ((DataSource) tableView.Source).FindItemAtIndexPath(ip)).ToList();
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToWorktray(selectedContacts);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToWorktray(selectedContacts);
+                    EndEditing();
+                }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedContacts);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedContacts);
+                    EndEditing();
+                }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContacts)));
@@ -357,17 +361,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToWorktray(selectedContact);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToWorktray(selectedContact);
+                    EndEditing();
+                }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedContact);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedContact);
+                    EndEditing();
+                }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContact)));
@@ -415,15 +423,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return !contactPreviewsInView.SelectMany(v => v).Any(); }
-            }
+            public bool Empty { get { return !contactPreviewsInView.SelectMany(v => v).Any(); } }
 
-            public IEnumerable<ContactPreview> Items
-            {
-                get { return contactPreviewsInView.SelectMany(i => i); }
-            }
+            public IEnumerable<ContactPreview> Items { get { return contactPreviewsInView.SelectMany(i => i); } }
 
             ContactsSearchResultsViewController viewController;
             UITableView tableView;
@@ -521,11 +523,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray_ml"), (a, ip) =>
-                {
-                    viewController.CopyToWorktray(contactPreview);
-                    viewController.EndEditing();
-                });
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                    Localization.GetString("copy_to_worktray_ml"),
+                    (a, ip) =>
+                    {
+                        viewController.CopyToWorktray(contactPreview);
+                        viewController.EndEditing();
+                    });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
 
@@ -576,9 +580,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                     {
                         tableView.DeleteRows(new NSIndexPath[]
-                        {
-                            indexPath
-                        }, UITableViewRowAnimation.Automatic);
+                            {
+                                indexPath
+                            },
+                            UITableViewRowAnimation.Automatic);
                     }
                 }
 

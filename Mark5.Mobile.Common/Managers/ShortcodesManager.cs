@@ -46,8 +46,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return shortcodePreviews;
             }
+
             if (sourceType == SourceType.Local)
                 return await shortcodesDataAccess.GetShortcodePreviewsAsync(folder, startRowId, MaxToFetch);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -72,11 +74,12 @@ namespace Mark5.Mobile.Common.Managers
                     }
                 })
                 .ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                        errorCallback(t.Exception.InnerException);
-                    finishedCallback();
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                    {
+                        if (t.IsFaulted)
+                            errorCallback(t.Exception.InnerException);
+                        finishedCallback();
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public async Task<Shortcode> GetShortcodeAsync(Folder folder, int shortcodeId, SourceType sourceType = SourceType.Auto)
@@ -105,8 +108,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return shortcode;
             }
+
             if (sourceType == SourceType.Local)
                 return await shortcodesDataAccess.GetShortcodeAsync(shortcodeId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -139,8 +144,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return container;
             }
+
             if (sourceType == SourceType.Local)
                 return await shortcodesDataAccess.GetShortcodeWithPreviewAsync(shortcodeId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

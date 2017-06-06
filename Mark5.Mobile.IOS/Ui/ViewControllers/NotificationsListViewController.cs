@@ -224,9 +224,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             await Managers.NotificationsManager.MarkAsRead(notification);
             tableView.ReloadRows(new[]
-            {
-                row
-            }, UITableViewRowAnimation.Fade);
+                {
+                    row
+                },
+                UITableViewRowAnimation.Fade);
 
             switch (notification.ObjectType)
             {

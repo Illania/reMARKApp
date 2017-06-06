@@ -18,10 +18,11 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
-            sendIntent.PutExtra(Intent.ExtraEmail, new[]
-            {
-                "support@nordic-it.com"
-            });
+            sendIntent.PutExtra(Intent.ExtraEmail,
+                new[]
+                {
+                    "support@nordic-it.com"
+                });
             sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android System report");
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
@@ -84,6 +85,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("===== Preferences =====");
             foreach (var kv in PlatformConfig.Preferences.All)
                 sb.AppendLine(kv.Key + ": " + kv.Value);
+
             sb.AppendLine();
 
             sb.AppendLine("===== Memory information =====");
@@ -125,6 +127,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 sb.AppendLine("  Failover:" + networkInfo.IsFailover);
                 sb.AppendLine("  Extra info:" + networkInfo.ExtraInfo);
             }
+
             sb.AppendLine();
 
             sb.AppendLine("===== Properties =====");

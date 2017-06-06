@@ -60,9 +60,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new DocumentsSearchResultsViewController
-            {
-                Criteria = criteria
-            }, true);
+                {
+                    Criteria = criteria
+                },
+                true);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -307,10 +308,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -490,10 +492,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1218,10 +1221,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 referenceTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1271,10 +1275,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 commentTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1324,10 +1329,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 attachmentNameTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1365,37 +1371,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void Tapped(UITapGestureRecognizer recognizer)
             {
                 if (recognizer.View == referenceView)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        commentView.Hidden = true;
-                        attachmentNameView.Hidden = true;
-                    }, ch =>
-                    {
-                        referenceTextField.UserInteractionEnabled = true;
-                        referenceTextField.BecomeFirstResponder();
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            commentView.Hidden = true;
+                            attachmentNameView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            referenceTextField.UserInteractionEnabled = true;
+                            referenceTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == commentView)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = true;
-                        attachmentNameView.Hidden = true;
-                    }, ch =>
-                    {
-                        commentTextField.UserInteractionEnabled = true;
-                        commentTextField.BecomeFirstResponder();
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = true;
+                            attachmentNameView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            commentTextField.UserInteractionEnabled = true;
+                            commentTextField.BecomeFirstResponder();
+                        });
 
                 if (recognizer.View == attachmentNameView)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = true;
-                        commentView.Hidden = true;
-                    }, ch =>
-                    {
-                        attachmentNameTextField.UserInteractionEnabled = true;
-                        attachmentNameTextField.BecomeFirstResponder();
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = true;
+                            commentView.Hidden = true;
+                        },
+                        ch =>
+                        {
+                            attachmentNameTextField.UserInteractionEnabled = true;
+                            attachmentNameTextField.BecomeFirstResponder();
+                        });
 
                 UpdateRow();
                 SetAsActive();
@@ -1423,37 +1435,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             void TextFieldDidEndEditing(UITextField textField)
             {
                 if (textField == referenceTextField)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        commentView.Hidden = false;
-                        attachmentNameView.Hidden = false;
-                    }, ch =>
-                    {
-                        referenceTextField.ResignFirstResponder();
-                        referenceTextField.UserInteractionEnabled = false;
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            commentView.Hidden = false;
+                            attachmentNameView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            referenceTextField.ResignFirstResponder();
+                            referenceTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == commentTextField)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = false;
-                        attachmentNameView.Hidden = false;
-                    }, ch =>
-                    {
-                        commentTextField.ResignFirstResponder();
-                        commentTextField.UserInteractionEnabled = false;
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = false;
+                            attachmentNameView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            commentTextField.ResignFirstResponder();
+                            commentTextField.UserInteractionEnabled = false;
+                        });
 
                 if (textField == attachmentNameTextField)
-                    AnimateNotify(AnimationLength, () =>
-                    {
-                        referenceView.Hidden = false;
-                        commentView.Hidden = false;
-                    }, ch =>
-                    {
-                        attachmentNameTextField.ResignFirstResponder();
-                        attachmentNameTextField.UserInteractionEnabled = false;
-                    });
+                    AnimateNotify(AnimationLength,
+                        () =>
+                        {
+                            referenceView.Hidden = false;
+                            commentView.Hidden = false;
+                        },
+                        ch =>
+                        {
+                            attachmentNameTextField.ResignFirstResponder();
+                            attachmentNameTextField.UserInteractionEnabled = false;
+                        });
             }
         }
 
@@ -1489,10 +1507,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
-                    {
-                        ForegroundColor = Theme.LightGray
-                    }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
+                        new UIStringAttributes
+                        {
+                            ForegroundColor = Theme.LightGray
+                        }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,

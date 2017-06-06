@@ -189,6 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     AddressType = AddressType,
                     Type = CommunicationAddressType.Email
                 });
+
             return Task.CompletedTask;
         }
 
@@ -293,9 +294,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             else if (textViewToChange == TextView && (text == Environment.NewLine || text == "," || text == "\t"))
             {
                 var splittedField = textViewToChange.Text.Split(new[]
-                {
-                    EmailSeparator
-                }, StringSplitOptions.None);
+                    {
+                        EmailSeparator
+                    },
+                    StringSplitOptions.None);
                 if (splittedField.Last().Equals(string.Empty))
                 {
                     CommaOrEnterPressed(this, EventArgs.Empty);
@@ -340,16 +342,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             var text = TextView.Text;
             var splittedField = text.Split(new[]
-            {
-                EmailSeparator
-            }, StringSplitOptions.None);
+                {
+                    EmailSeparator
+                },
+                StringSplitOptions.None);
             if (splittedField.Any())
             {
                 var last = splittedField.Last();
                 if (string.IsNullOrEmpty(last))
                     return string.Empty;
+
                 return last.Last() != ',' ? last : string.Empty;
             }
+
             return string.Empty;
         }
 
@@ -388,16 +393,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             TextView.TextStorage.EndEditing();
 
             var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
-            Animate(duration, () =>
-            {
-                TextView.TextContainer.MaximumNumberOfLines = 0;
-                TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+            Animate(duration,
+                () =>
+                {
+                    TextView.TextContainer.MaximumNumberOfLines = 0;
+                    TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                Superview.SetNeedsLayout();
-                Superview.LayoutIfNeeded();
+                    Superview.SetNeedsLayout();
+                    Superview.LayoutIfNeeded();
 
-                expanded = true;
-            });
+                    expanded = true;
+                });
         }
 
         public void CollapseView()
@@ -406,16 +412,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return;
 
             var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
-            Animate(duration, () =>
-            {
-                TextView.TextContainer.MaximumNumberOfLines = 1;
-                TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
+            Animate(duration,
+                () =>
+                {
+                    TextView.TextContainer.MaximumNumberOfLines = 1;
+                    TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
 
-                Superview.SetNeedsLayout();
-                Superview.LayoutIfNeeded();
+                    Superview.SetNeedsLayout();
+                    Superview.LayoutIfNeeded();
 
-                expanded = false;
-            });
+                    expanded = false;
+                });
         }
 
         #endregion
@@ -425,9 +432,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public bool ContainsInvalidEmail()
         {
             return TextView.Text.Split(new[]
-                {
-                    EmailSeparator
-                }, StringSplitOptions.RemoveEmptyEntries)
+                    {
+                        EmailSeparator
+                    },
+                    StringSplitOptions.RemoveEmptyEntries)
                 .Any(a => !Validator.ContainsValidEmails(a));
         }
 
@@ -440,9 +448,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public IEnumerable<string> GetRecipents()
         {
             return TextView.Text.Split(new[]
-                {
-                    EmailSeparator
-                }, StringSplitOptions.RemoveEmptyEntries)
+                    {
+                        EmailSeparator
+                    },
+                    StringSplitOptions.RemoveEmptyEntries)
                 .Where(Validator.ContainsValidEmails)
                 .Select(s => s.Trim());
         }
@@ -652,7 +661,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
     public class AddButtonTappedEventArgs : EventArgs
     {
-        public RecipientsView ParentView { get; private set; }
+        public RecipientsView ParentView { get; }
 
         public AddButtonTappedEventArgs(RecipientsView parentView)
         {
@@ -662,7 +671,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
     public class RecipentTappedEventArgs : EventArgs
     {
-        public string Recipent { get; private set; }
+        public string Recipent { get; }
 
         public RecipentTappedEventArgs(string recipent)
         {

@@ -70,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
         }
 
-        void SearchButton_TouchUpInside(object sender, System.EventArgs e)
+        void SearchButton_TouchUpInside(object sender, EventArgs e)
         {
             var nc = new NavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
             {

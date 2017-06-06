@@ -45,8 +45,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return folders;
             }
+
             if (sourceType == SourceType.Local)
                 return await foldersDataAccess.GetRecursively(parentFolder.Module, parentFolder, depth);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -63,6 +65,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 rootFavoriteFolder.SubFolders.AddRange(moduleFavoriteFolders.OrderBy(f => f.Position));
             }
+
             return rootFavoriteFolder.SubFolders;
         }
 

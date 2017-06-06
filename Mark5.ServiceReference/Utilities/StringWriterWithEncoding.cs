@@ -9,7 +9,7 @@ namespace Mark5.ServiceReference.Utilities
 
         public StringWriterWithEncoding(Encoding encoding)
         {
-            this.Encoding = encoding;
+            Encoding = encoding;
         }
     }
 }

@@ -58,6 +58,7 @@ namespace Mark5.Mobile.Common
         {
             if (!ShouldBeDownloaded(objectType, folderId))
                 return;
+
             switch (objectType)
             {
                 case ObjectType.Document:
@@ -91,6 +92,7 @@ namespace Mark5.Mobile.Common
                 return true;
             if (DownloadPolicies[objectType] is DownloadFoldersPolicy)
                 return ((DownloadFoldersPolicy) DownloadPolicies[objectType]).FolderIds.Contains(folderId);
+
             return false;
         }
 
@@ -145,6 +147,7 @@ namespace Mark5.Mobile.Common
                 return;
             if (!CommonConfig.ReachabilityService.IsReachable)
                 return;
+
             cts = new CancellationTokenSource();
 
             downloadTask = Task.Run(async () => await DownloadAction())
@@ -188,6 +191,7 @@ namespace Mark5.Mobile.Common
 
                     if (!ShouldBeDownloaded(downloadInfo.Type, downloadInfo.FolderId))
                         continue;
+
                     switch (downloadInfo.Type)
                     {
                         case ObjectType.Document:
@@ -224,8 +228,10 @@ namespace Mark5.Mobile.Common
             {
                 if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
                     return;
+
                 if (await documentsDataAccess.IsDocumentCached(documentId))
                     continue;
+
                 await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId);
             }
         }
@@ -238,8 +244,10 @@ namespace Mark5.Mobile.Common
             {
                 if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
                     return;
+
                 if (await contactsDataAccess.IsContactCached(contactId))
                     continue;
+
                 await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, contactId);
             }
         }
@@ -252,8 +260,10 @@ namespace Mark5.Mobile.Common
             {
                 if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
                     return;
+
                 if (await shortcodesDataAccess.IsShortcodeCached(shosrtcodeId))
                     continue;
+
                 await Managers.Managers.ShortcodesManager.GetShortcodeAsync(itemInfo.FolderId, shosrtcodeId);
             }
         }
@@ -333,6 +343,7 @@ namespace Mark5.Mobile.Common
         {
             if (!active || !e.Changed)
                 return;
+
             if (e.IsReachable)
                 StartDownloadTask();
             else

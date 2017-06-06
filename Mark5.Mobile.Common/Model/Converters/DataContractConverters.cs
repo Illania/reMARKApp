@@ -475,6 +475,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                     CanContainAppointments = ceop.CanContainAppointments,
                     CanContainTasks = ceop.CanContainTasks
                 };
+
             return null;
         }
 

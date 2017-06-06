@@ -28,6 +28,7 @@ namespace Mark5.Mobile.IOS.Utilities
                         backup = backup.Concat(subviewBackup).ToDictionary(entry => entry.Key, entry => entry.Value);
                     }
             }
+
             return backup;
         }
 

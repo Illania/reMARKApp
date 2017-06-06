@@ -421,11 +421,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RefreshHiddenSettings()
         {
             SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
-                ? null
-                : new[]
-                {
-                    LocalTemplateKey
-                }, false);
+                    ? null
+                    : new[]
+                    {
+                        LocalTemplateKey
+                    },
+                false);
         }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController

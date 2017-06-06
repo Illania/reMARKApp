@@ -244,27 +244,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (force)
                 adapter.Clear();
 
-            Managers.ShortcodesManager.GetAllShortcodePreviews(Folder, cps =>
-            {
-                CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
+            Managers.ShortcodesManager.GetAllShortcodePreviews(Folder,
+                cps =>
+                {
+                    CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
 
-                Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
-                Activity.RunOnUiThread(() => adapter.AppendItems(cps));
-            }, () =>
-            {
-                refreshLayout.Refreshing = false;
-                refreshing = false;
+                    Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
+                    Activity.RunOnUiThread(() => adapter.AppendItems(cps));
+                },
+                () =>
+                {
+                    refreshLayout.Refreshing = false;
+                    refreshing = false;
 
-                CommonConfig.Logger.Info($"Refresh finished");
-            }, ex =>
-            {
-                CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
+                    CommonConfig.Logger.Info($"Refresh finished");
+                },
+                ex =>
+                {
+                    CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
-                Dialogs.ShowErrorDialog(Activity, ex);
+                    Dialogs.ShowErrorDialog(Activity, ex);
 
-                if (CloseRequest != null && adapter.ItemCount < 1)
-                    CloseRequest();
-            }, startRowId, cts.Token);
+                    if (CloseRequest != null && adapter.ItemCount < 1)
+                        CloseRequest();
+                },
+                startRowId,
+                cts.Token);
         }
 
         #endregion
@@ -531,12 +536,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
-            {
-                if (string.IsNullOrWhiteSpace(newText))
-                    searchAdapter.ReplaceItems(adapter.Items);
-                else
-                    searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-            }, 500);
+                {
+                    if (string.IsNullOrWhiteSpace(newText))
+                        searchAdapter.ReplaceItems(adapter.Items);
+                    else
+                        searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+                },
+                500);
             return false;
         }
 
@@ -768,6 +774,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         position = i;
                         break;
                     }
+
                 return position;
             }
 
@@ -779,15 +786,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder
         {
-            public string Name
-            {
-                set => nameTextView.Text = value;
-            }
+            public string Name { set => nameTextView.Text = value; }
 
-            public bool Selected
-            {
-                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatTextView nameTextView;
             readonly View selectedOverlay;

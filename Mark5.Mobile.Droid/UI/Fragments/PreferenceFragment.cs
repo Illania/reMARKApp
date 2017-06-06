@@ -69,39 +69,40 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Task.Run(() => { return AuthenticatorFactory.Create().GetConnectionInfoAsync(); })
                 .ContinueWith(t =>
-                {
-                    var ci = t.Result;
+                    {
+                        var ci = t.Result;
 
-                    var usernamePreference = FindPreference(GetString(Resource.String.pref_key_account_username));
-                    if (usernamePreference != null)
-                        usernamePreference.Summary = ci.Username;
+                        var usernamePreference = FindPreference(GetString(Resource.String.pref_key_account_username));
+                        if (usernamePreference != null)
+                            usernamePreference.Summary = ci.Username;
 
-                    var hostnamePreference = FindPreference(GetString(Resource.String.pref_key_account_hostname));
-                    if (hostnamePreference != null)
-                        hostnamePreference.Summary = ci.Hostname;
+                        var hostnamePreference = FindPreference(GetString(Resource.String.pref_key_account_hostname));
+                        if (hostnamePreference != null)
+                            hostnamePreference.Summary = ci.Hostname;
 
-                    var portPreference = FindPreference(GetString(Resource.String.pref_key_account_port));
-                    if (portPreference != null)
-                        portPreference.Summary = ci.Port.ToString();
+                        var portPreference = FindPreference(GetString(Resource.String.pref_key_account_port));
+                        if (portPreference != null)
+                            portPreference.Summary = ci.Port.ToString();
 
-                    var sslPreference = FindPreference(GetString(Resource.String.pref_key_account_ssl));
-                    if (sslPreference != null)
-                        switch (ci.SslMode)
-                        {
-                            case SslMode.On:
-                                sslPreference.Summary = GetString(Resource.String.ssl_on);
-                                break;
-                            case SslMode.AllowSelfSigned:
-                                sslPreference.Summary = GetString(Resource.String.ssl_self_signed);
-                                break;
-                            default:
-                                var summary = new SpannableString(GetString(Resource.String.ssl_off));
-                                summary.SetSpan(new StyleSpan(TypefaceStyle.Bold), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
-                                summary.SetSpan(new ForegroundColorSpan(new Color(ContextCompat.GetColor(Context, Resource.Color.brown))), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
-                                sslPreference.SummaryFormatted = summary;
-                                break;
-                        }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        var sslPreference = FindPreference(GetString(Resource.String.pref_key_account_ssl));
+                        if (sslPreference != null)
+                            switch (ci.SslMode)
+                            {
+                                case SslMode.On:
+                                    sslPreference.Summary = GetString(Resource.String.ssl_on);
+                                    break;
+                                case SslMode.AllowSelfSigned:
+                                    sslPreference.Summary = GetString(Resource.String.ssl_self_signed);
+                                    break;
+                                default:
+                                    var summary = new SpannableString(GetString(Resource.String.ssl_off));
+                                    summary.SetSpan(new StyleSpan(TypefaceStyle.Bold), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
+                                    summary.SetSpan(new ForegroundColorSpan(new Color(ContextCompat.GetColor(Context, Resource.Color.brown))), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
+                                    sslPreference.SummaryFormatted = summary;
+                                    break;
+                            }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)
@@ -110,54 +111,60 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Dialogs.ShowConfirmDialog(Context, Resource.String.dialog_restart_required_title, Resource.String.dialog_restart_required_content);
 
             if (preference.Key == GetString(Resource.String.pref_key_contacts_synchronised) && !PlatformConfig.Preferences.SynchroniseContacts)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.clear_contacts_cache_title, Resource.String.clear_contacts_cache_summary, async () =>
-                {
-                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_contacts_cache, Resource.String.please_wait);
-
-                    try
+                Dialogs.ShowYesNoDialog(Context,
+                    Resource.String.clear_contacts_cache_title,
+                    Resource.String.clear_contacts_cache_summary,
+                    async () =>
                     {
-                        await Managers.CleanUpManager.ClearContactsCache();
-                        await Managers.CleanUpManager.CleanUp(new[]
+                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_contacts_cache, Resource.String.please_wait);
+
+                        try
                         {
-                            ModuleType.Contacts
-                        });
+                            await Managers.CleanUpManager.ClearContactsCache();
+                            await Managers.CleanUpManager.CleanUp(new[]
+                            {
+                                ModuleType.Contacts
+                            });
 
-                        dismissAction();
-                    }
-                    catch (Exception ex)
-                    {
-                        dismissAction();
+                            dismissAction();
+                        }
+                        catch (Exception ex)
+                        {
+                            dismissAction();
 
-                        CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
+                            CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
 
-                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    }
-                });
+                            await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                        }
+                    });
 
             if (preference.Key == GetString(Resource.String.pref_key_shortcodes_synchronised) && !PlatformConfig.Preferences.SynchroniseShortcodes)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.clear_shortcodes_cache_title, Resource.String.clear_shortcodes_cache_summary, async () =>
-                {
-                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_shortcodes_cache, Resource.String.please_wait);
-
-                    try
+                Dialogs.ShowYesNoDialog(Context,
+                    Resource.String.clear_shortcodes_cache_title,
+                    Resource.String.clear_shortcodes_cache_summary,
+                    async () =>
                     {
-                        await Managers.CleanUpManager.ClearShortcodeCache();
-                        await Managers.CleanUpManager.CleanUp(new[]
+                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_shortcodes_cache, Resource.String.please_wait);
+
+                        try
                         {
-                            ModuleType.Shortcodes
-                        });
+                            await Managers.CleanUpManager.ClearShortcodeCache();
+                            await Managers.CleanUpManager.CleanUp(new[]
+                            {
+                                ModuleType.Shortcodes
+                            });
 
-                        dismissAction();
-                    }
-                    catch (Exception ex)
-                    {
-                        dismissAction();
+                            dismissAction();
+                        }
+                        catch (Exception ex)
+                        {
+                            dismissAction();
 
-                        CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
+                            CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
 
-                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    }
-                });
+                            await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                        }
+                    });
 
             if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
             {
@@ -187,12 +194,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                     .ContinueWith(t =>
-                    {
-                        dismissAction();
+                        {
+                            dismissAction();
 
-                        if (!t.IsFaulted)
-                            StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            if (!t.IsFaulted)
+                                StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
+                        },
+                        TaskScheduler.FromCurrentSynchronizationContext());
 
                 return true;
             }
@@ -236,21 +244,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_account_logout))
             {
-                Dialogs.ShowYesNoDialog(Activity, Resource.String.dialog_logout_title, Resource.String.dialog_logout_content, async () =>
-                {
-                    Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
-
-                    try
+                Dialogs.ShowYesNoDialog(Activity,
+                    Resource.String.dialog_logout_title,
+                    Resource.String.dialog_logout_content,
+                    async () =>
                     {
-                        if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                            await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
-                    }
-                    catch
-                    {
-                    }
+                        Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
-                    Integration.ClearDataAndStop();
-                });
+                        try
+                        {
+                            if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                                await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                        }
+                        catch
+                        {
+                        }
+
+                        Integration.ClearDataAndStop();
+                    });
                 return true;
             }
 
@@ -297,10 +308,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             args.PutString(ArgPreferenceRoot, pref.Key);
             var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
-            ft.Replace(Resource.Id.fragment_container, new PreferenceFragment
-            {
-                Arguments = args
-            });
+            ft.Replace(Resource.Id.fragment_container,
+                new PreferenceFragment
+                {
+                    Arguments = args
+                });
             ft.AddToBackStack(pref.Key);
             ft.Commit();
             return true;

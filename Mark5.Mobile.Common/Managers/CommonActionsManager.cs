@@ -44,8 +44,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.ObjectActions.WhereNotNull().Select(oa => oa.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -65,8 +67,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.ObjectLinks.WhereNotNull().Select(ol => ol.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -88,8 +92,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -136,8 +142,10 @@ namespace Mark5.Mobile.Common.Managers
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), fromFolder);
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -157,8 +165,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -180,8 +190,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -226,8 +238,10 @@ namespace Mark5.Mobile.Common.Managers
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), folder);
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -271,8 +285,10 @@ namespace Mark5.Mobile.Common.Managers
                     await calendarDataAccess.DeleteAsync(tasks.ToList());
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

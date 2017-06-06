@@ -101,14 +101,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillTransitionToSize(toSize, coordinator);
 
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
-            {
-                if (tableView == null)
-                    return;
+            coordinator.AnimateAlongsideTransition(ctx => { },
+                ctx =>
+                {
+                    if (tableView == null)
+                        return;
 
-                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            });
+                    tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                    tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                });
         }
 
         void InitializeNavigationBar()
@@ -243,35 +244,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyToWorktrayViewController
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    BusinessEntities = new List<IBusinessEntity>
+                    var vc = new CopyToWorktrayViewController
                     {
-                        shortcode
-                    }
-                };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
-                {
-                    shortcodePreview
-                });
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-
-            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+                        BusinessEntities = new List<IBusinessEntity>
+                        {
+                            shortcode
+                        }
+                    };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
                     var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
                     {
                         shortcodePreview
-                    }, folder);
+                    });
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                            {
+                                shortcodePreview
+                            },
+                            folder);
+                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    }));
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
@@ -474,14 +482,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Attempting to remove shortcode from folder [shortcodeId={shortcode.Id}, folderId={folder.Id}]");
 
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                {
-                    shortcode
-                }, folder);
+                    {
+                        shortcode
+                    },
+                    folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, folder.Id, new List<int>
-                {
-                    shortcode.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Shortcode,
+                    folder.Id,
+                    new List<int>
+                    {
+                        shortcode.Id
+                    }));
 
                 dismissAction();
 
@@ -519,10 +531,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     shortcode
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Shortcode, new List<int>
-                {
-                    shortcode.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                    ObjectType.Shortcode,
+                    new List<int>
+                    {
+                        shortcode.Id
+                    }));
 
                 dismissAction();
 

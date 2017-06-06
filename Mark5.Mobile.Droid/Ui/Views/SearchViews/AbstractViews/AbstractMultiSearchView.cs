@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         protected readonly AppCompatTextView TopTextView;
         protected readonly AppCompatEditText BottomEditText;
 
-        protected AbstractMultiSearchView(Android.Content.Context context, int topTextResId, int bottomEditResId, int textArrayResId)
+        protected AbstractMultiSearchView(Context context, int topTextResId, int bottomEditResId, int textArrayResId)
             : base(context)
         {
             Orientation = Horizontal;

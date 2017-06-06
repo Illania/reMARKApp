@@ -159,8 +159,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetSelectedPriorities(List<Priority> priorities)
             {
-                this.SelectedPriorities.Clear();
-                this.SelectedPriorities.AddRange(priorities);
+                SelectedPriorities.Clear();
+                SelectedPriorities.AddRange(priorities);
             }
 
             void HandleClick(Priority p, int position)

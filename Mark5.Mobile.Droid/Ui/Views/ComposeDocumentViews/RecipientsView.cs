@@ -43,10 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public bool Empty => !Validator.ContainsValidEmail(emailEditor.Text);
 
-        public bool AllEmailsValid
-        {
-            get { return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)); }
-        }
+        public bool AllEmailsValid { get { return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)); } }
 
         public RecipientsView(Context context, DocumentAddressType type)
             : base(context)
@@ -167,12 +164,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
-            DocumentPreview.Addresses.RemoveAll(a => a.AddressType == this.AddressType);
+            DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
             GetEmails()
                 .ForEach(s => DocumentPreview.Addresses.Add(new DocumentAddress
                 {
                     Address = s,
-                    AddressType = this.AddressType,
+                    AddressType = AddressType,
                     Type = CommunicationAddressType.Email
                 }));
             return Task.CompletedTask;
@@ -213,9 +210,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         IEnumerable<string> GetRecipents()
         {
             return emailEditor.Text.Split(new[]
-                {
-                    EmailSeparator
-                }, StringSplitOptions.RemoveEmptyEntries)
+                    {
+                        EmailSeparator
+                    },
+                    StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => Validator.ContainsValidEmail(s))
                 .Select(s => s.Trim());
         }

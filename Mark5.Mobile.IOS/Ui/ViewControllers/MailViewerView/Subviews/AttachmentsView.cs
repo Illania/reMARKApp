@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
     public class AttachmentButtonTappedEventArgs : EventArgs
     {
-        public Attachment Attachment { get; private set; }
+        public Attachment Attachment { get; }
 
         public AttachmentButtonTappedEventArgs(Attachment attachment)
         {

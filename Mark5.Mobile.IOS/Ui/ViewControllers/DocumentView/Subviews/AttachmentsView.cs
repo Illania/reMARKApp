@@ -115,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         public AttachmentsSubView(AttachmentsView view, IAttachmentDescription attachmentDescription)
         {
             this.view = view;
-            this.Attachment = attachmentDescription;
+            Attachment = attachmentDescription;
 
             InitSubViews();
         }
@@ -145,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
     public class AttachmentButtonTappedEventArgs : EventArgs
     {
-        public IAttachmentDescription Attachment { get; private set; }
+        public IAttachmentDescription Attachment { get; }
 
         public AttachmentButtonTappedEventArgs(IAttachmentDescription attachment)
         {

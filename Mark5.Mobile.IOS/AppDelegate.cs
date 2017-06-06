@@ -234,6 +234,7 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                             var numBytes = 0;
                             while (Marshal.ReadByte(fsPtr, numBytes) != 0)
                                 numBytes++;
+
                             var utf8Bytes = new byte[numBytes];
                             Marshal.Copy(fsPtr, utf8Bytes, 0, numBytes);
                             return Encoding.UTF8.GetString(utf8Bytes).SafeSubstringAfterLast(Path.DirectorySeparatorChar);
@@ -343,18 +344,19 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     {
                         CommonConfig.Logger.Info("Refreshing APNS token...");
 
-                        UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
-                        {
-                            if (result)
+                        UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
+                            (result, error) =>
                             {
-                                BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
-                            }
-                            else
-                            {
-                                if (error != null)
-                                    CommonConfig.Logger.Error(new NSErrorException(error));
-                            }
-                        });
+                                if (result)
+                                {
+                                    BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
+                                }
+                                else
+                                {
+                                    if (error != null)
+                                        CommonConfig.Logger.Error(new NSErrorException(error));
+                                }
+                            });
                     });
 
                     CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");

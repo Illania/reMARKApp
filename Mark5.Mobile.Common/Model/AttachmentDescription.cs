@@ -44,8 +44,10 @@ namespace Mark5.Mobile.Common.Model
                         if (char.IsControl(c) || Array.IndexOf(invalidChars, c) >= 0)
                             chars[i] = '_';
                     }
+
                     safeName = new string(chars);
                 }
+
                 return safeName;
             }
         }

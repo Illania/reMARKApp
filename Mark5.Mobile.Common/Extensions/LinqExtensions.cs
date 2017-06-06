@@ -32,7 +32,8 @@ namespace Mark5.Mobile.Common.Extensions
                        })
                        .Where(s => predicate(s.value))
                        .Select(s => s.index)
-                       .FirstOrDefault() - 1;
+                       .FirstOrDefault() -
+                   1;
         }
     }
 }

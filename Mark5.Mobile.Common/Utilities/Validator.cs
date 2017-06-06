@@ -30,6 +30,7 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (string.IsNullOrEmpty(hostName))
                 return false;
+
             return Regex.Match(hostName, OnlyIpAddressRegex).Success || Regex.Match(hostName, OnlyHostnameRegex).Success;
         }
 
@@ -37,6 +38,7 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (string.IsNullOrEmpty(port))
                 return false;
+
             return Regex.Match(port, OnlyPortRegex).Success && IsPortValid(int.Parse(port));
         }
 
@@ -49,6 +51,7 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (string.IsNullOrEmpty(email))
                 return false;
+
             return Regex.Match(email, OnlyEmailAddressRegex, RegexOptions.IgnoreCase).Success;
         }
 

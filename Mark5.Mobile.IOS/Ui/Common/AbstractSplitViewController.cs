@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 var secondaryNavigationController = new NavigationController();
                 foreach (var poppedViewController in poppedViewControllers)
                     secondaryNavigationController.PushViewController(poppedViewController, false);
+
                 return secondaryNavigationController;
             }
 

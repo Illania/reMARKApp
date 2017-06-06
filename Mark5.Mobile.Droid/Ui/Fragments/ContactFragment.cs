@@ -182,10 +182,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    ContactPreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    }));
                 StartActivity(i);
 
                 return true;
@@ -196,10 +197,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    ContactPreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    }));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
 
@@ -287,10 +289,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity>
-                {
-                    ContactPreview
-                }));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
+                    new List<IBusinessEntity>
+                    {
+                        ContactPreview
+                    }));
         }
 
         async void DeleteFromFolderAction()
@@ -306,14 +309,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                {
-                    ContactPreview
-                }, Folder);
+                    {
+                        ContactPreview
+                    },
+                    Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, Folder.Id, new List<int>
-                {
-                    ContactPreview.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Contact,
+                    Folder.Id,
+                    new List<int>
+                    {
+                        ContactPreview.Id
+                    }));
 
                 dismissAction();
             }
@@ -344,10 +351,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     ContactPreview
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Contact, new List<int>
-                {
-                    ContactPreview.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                    ObjectType.Contact,
+                    new List<int>
+                    {
+                        ContactPreview.Id
+                    }));
 
                 dismissAction();
                 if (CloseRequest != null)
@@ -621,10 +630,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: new List<string>
-            {
-                communicationAddress.Address
-            }));
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                DocumentCreationModeFlag.New,
+                DocumentDirection.None,
+                preconfiguredEmailToAddresses: new List<string>
+                {
+                    communicationAddress.Address
+                }));
         }
 
         async void Button2Layout_Click(object sender, EventArgs e)
@@ -693,10 +705,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: new List<string>
-                {
-                    e.Address
-                }));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                    DocumentCreationModeFlag.New,
+                    DocumentDirection.None,
+                    preconfiguredEmailToAddresses: new List<string>
+                    {
+                        e.Address
+                    }));
                 return;
             }
 

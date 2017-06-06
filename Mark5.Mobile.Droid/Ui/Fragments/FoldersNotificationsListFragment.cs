@@ -41,6 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < 2; i++)
                 tabLayout.AddTab(tabLayout.NewTab().SetText(tabTitles[i]));
+
             tabLayout.TabGravity = TabLayout.GravityFill;
 
             return rootView;

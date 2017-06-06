@@ -14,6 +14,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 if (CommonConfig.DataFolder == null)
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
+
                 return documentsDatabase.Value;
             }
         }
@@ -24,6 +25,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 if (CommonConfig.DataFolder == null)
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
+
                 return contactsDatabase.Value;
             }
         }
@@ -34,6 +36,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 if (CommonConfig.DataFolder == null)
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
+
                 return shortcodesDatabase.Value;
             }
         }
@@ -44,6 +47,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 if (CommonConfig.DataFolder == null)
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
+
                 return calendarDatabase.Value;
             }
         }
@@ -54,6 +58,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 if (CommonConfig.DataFolder == null)
                     throw new InvalidOperationException("Data and/or cache folder is not configured.");
+
                 return systemDatabase.Value;
             }
         }

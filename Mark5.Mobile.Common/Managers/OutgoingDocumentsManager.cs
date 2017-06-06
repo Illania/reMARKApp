@@ -108,6 +108,7 @@ namespace Mark5.Mobile.Common.Managers
                 return;
             if (!CommonConfig.ReachabilityService.IsReachable)
                 return;
+
             cts = new CancellationTokenSource();
 
             sendTask = Task.Run(async () => await SendAction())
@@ -162,6 +163,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     if (container == null || container.Info.State == OutgoingDocumentState.Failed || container.Info.State == OutgoingDocumentState.AutoSaved || container.Info.Locked)
                         continue;
+
                     var document = container.Document;
                     var documentPreview = container.DocumentPreview;
                     var info = container.Info;
@@ -178,6 +180,7 @@ namespace Mark5.Mobile.Common.Managers
                             var attachmentGuid = await Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
                             attachmentGuids.Add(attachmentGuid);
                         }
+
                         await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PreviousDocumentId, info.PreviousDocumentdFolderId, info.SendOnTimestamp, info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
                         sendSuccessful = true;
                     }
@@ -189,6 +192,7 @@ namespace Mark5.Mobile.Common.Managers
 
                         DocumentSendingFailed(this, container);
                     }
+
                     if (sendSuccessful)
                     {
                         await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
@@ -212,6 +216,7 @@ namespace Mark5.Mobile.Common.Managers
         {
             if (!active || !e.Changed)
                 return;
+
             if (e.IsReachable)
                 StartSendTask();
             else

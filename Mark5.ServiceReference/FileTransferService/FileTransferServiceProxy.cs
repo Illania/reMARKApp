@@ -301,6 +301,7 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             foreach (var segment in segments)
                 uri = uri.AppendPathSegment(segment);
+
             return uri;
         }
 

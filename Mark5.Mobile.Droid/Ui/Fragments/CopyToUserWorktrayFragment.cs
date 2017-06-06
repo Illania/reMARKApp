@@ -265,12 +265,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
-            {
-                if (string.IsNullOrWhiteSpace(newText))
-                    searchAdapter.ReplaceItems(adapter.Items);
-                else
-                    searchAdapter.ReplaceItems(adapter.Items.Where(su => MatchesQuery(su, newText)).ToList());
-            }, 500);
+                {
+                    if (string.IsNullOrWhiteSpace(newText))
+                        searchAdapter.ReplaceItems(adapter.Items);
+                    else
+                        searchAdapter.ReplaceItems(adapter.Items.Where(su => MatchesQuery(su, newText)).ToList());
+                },
+                500);
             return false;
         }
 
@@ -376,6 +377,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         position = i;
                         break;
                     }
+
                 return position;
             }
 
@@ -387,20 +389,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class UserViewHolder : RecyclerView.ViewHolder
         {
-            public string FullName
-            {
-                set => fullnameTextView.Text = value;
-            }
+            public string FullName { set => fullnameTextView.Text = value; }
 
-            public string Username
-            {
-                set => username.Text = value;
-            }
+            public string Username { set => username.Text = value; }
 
-            public bool Selected
-            {
-                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatTextView fullnameTextView;
             readonly AppCompatTextView username;

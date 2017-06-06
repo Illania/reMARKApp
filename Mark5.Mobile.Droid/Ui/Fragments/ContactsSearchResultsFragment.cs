@@ -256,10 +256,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public string Name
-            {
-                set => nameTextView.Text = value;
-            }
+            public string Name { set => nameTextView.Text = value; }
 
             public List<Category> Categories
             {
@@ -279,10 +276,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool Selected
-            {
-                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatImageView iconImageView;
             readonly AppCompatTextView nameTextView;

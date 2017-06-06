@@ -229,15 +229,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder
         {
-            public string Name
-            {
-                set => nameTextView.Text = value;
-            }
+            public string Name { set => nameTextView.Text = value; }
 
-            public bool Selected
-            {
-                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatTextView nameTextView;
             readonly View selectedOverlay;

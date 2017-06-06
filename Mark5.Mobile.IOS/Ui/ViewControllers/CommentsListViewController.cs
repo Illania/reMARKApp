@@ -334,19 +334,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                 })
                 .ContinueWith(async t =>
-                {
-                    dismissAction();
+                    {
+                        dismissAction();
 
-                    if (t.IsFaulted)
-                    {
-                        CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                        await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
-                    }
-                    else
-                    {
-                        (commentsTableView.Source as DataSource).RemoveComment(comment);
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
+                        }
+                        else
+                        {
+                            (commentsTableView.Source as DataSource).RemoveComment(comment);
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void StartEditComment(Comment comment, UITableView tableView, NSIndexPath indexPath)
@@ -404,23 +405,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return result;
                 })
                 .ContinueWith(async t =>
-                {
-                    dismissAction();
+                    {
+                        dismissAction();
 
-                    if (t.IsFaulted)
-                    {
-                        CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={oldComment.Id}, comment.Content={oldComment.Content}] ", t.Exception.InnerException);
-                        await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
-                    }
-                    else if (t.Result)
-                    {
-                        (commentsTableView.Source as DataSource).EditComment(newComment);
-                    }
-                    else
-                    {
-                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible"));
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={oldComment.Id}, comment.Content={oldComment.Content}] ", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
+                        }
+                        else if (t.Result)
+                        {
+                            (commentsTableView.Source as DataSource).EditComment(newComment);
+                        }
+                        else
+                        {
+                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible"));
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #endregion
@@ -579,14 +581,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (Items.Count == 1)
                     tableView.ReloadRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(Items.Count - 1, 0)
-                    }, UITableViewRowAnimation.Fade);
+                        {
+                            NSIndexPath.FromRowSection(Items.Count - 1, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
                 else
                     tableView.InsertRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(Items.Count - 1, 0)
-                    }, UITableViewRowAnimation.Fade);
+                        {
+                            NSIndexPath.FromRowSection(Items.Count - 1, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
             }
 
             public void RemoveComment(Comment comment)
@@ -598,14 +602,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (Items.Count == 0)
                         tableView.ReloadRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(position, 0)
-                        }, UITableViewRowAnimation.Fade);
+                            {
+                                NSIndexPath.FromRowSection(position, 0)
+                            },
+                            UITableViewRowAnimation.Fade);
                     else
                         tableView.DeleteRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(position, 0)
-                        }, UITableViewRowAnimation.Fade);
+                            {
+                                NSIndexPath.FromRowSection(position, 0)
+                            },
+                            UITableViewRowAnimation.Fade);
                 }
             }
 
@@ -617,9 +623,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Items[position].Content = editedContent.Content;
 
                     tableView.ReloadRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(position, 0)
-                    }, UITableViewRowAnimation.Fade);
+                        {
+                            NSIndexPath.FromRowSection(position, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
                 }
             }
 

@@ -4,8 +4,8 @@ namespace Mark5.Mobile.Common.Model.Containers
 {
     public class ShortcodeContainer
     {
-        public ShortcodePreview ShortcodePreview { get; private set; }
-        public Shortcode Shortcode { get; private set; }
+        public ShortcodePreview ShortcodePreview { get; }
+        public Shortcode Shortcode { get; }
 
         public ShortcodeContainer(ShortcodePreview shortcodePreview, Shortcode shortcode)
         {
@@ -15,6 +15,7 @@ namespace Mark5.Mobile.Common.Model.Containers
                 throw new ArgumentNullException(nameof(shortcode));
             if (shortcodePreview.Id != shortcode.Id)
                 throw new ArgumentException("ShortcodePreview and Shortcode do not match.");
+
             ShortcodePreview = shortcodePreview;
             Shortcode = shortcode;
         }

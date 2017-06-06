@@ -137,6 +137,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 var nsdict = ud.ToDictionary();
                 foreach (var kv in nsdict)
                     dict.Add(kv.Key.ToString(), kv.Value.ToString());
+
                 return dict;
             }
         }

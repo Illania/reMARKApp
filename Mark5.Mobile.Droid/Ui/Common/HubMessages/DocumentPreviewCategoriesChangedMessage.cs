@@ -5,9 +5,9 @@ namespace Mark5.Mobile.Droid.Ui.Common.HubMessages
 {
     public class DocumentPreviewPriorityChangedMessage : TinyMessageBase
     {
-        public int DocumentPreviewId { get; private set; }
+        public int DocumentPreviewId { get; }
 
-        public Priority Priority { get; private set; }
+        public Priority Priority { get; }
 
         public DocumentPreviewPriorityChangedMessage(object sender, int documentPreviewId, Priority priority)
             : base(sender)

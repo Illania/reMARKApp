@@ -134,46 +134,22 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("PrimaryPersonString")]
-        public string PrimaryPersonString
-        {
-            get => SerializationUtils.Serialize(PrimaryPerson);
-            set => PrimaryPerson = SerializationUtils.Deserialize<ContactPreview>(value);
-        }
+        public string PrimaryPersonString { get => SerializationUtils.Serialize(PrimaryPerson); set => PrimaryPerson = SerializationUtils.Deserialize<ContactPreview>(value); }
 
         [Column("ChildrenString")]
-        public string ChildrenString
-        {
-            get => SerializationUtils.Serialize(Children);
-            set => Children = SerializationUtils.Deserialize<List<ContactPreview>>(value);
-        }
+        public string ChildrenString { get => SerializationUtils.Serialize(Children); set => Children = SerializationUtils.Deserialize<List<ContactPreview>>(value); }
 
         [Column("ResponsibleUserIdsString")]
-        public string ResponsibleUserIdsString
-        {
-            get => SerializationUtils.Serialize(ResponsibleUserIds);
-            set => ResponsibleUserIds = SerializationUtils.Deserialize<List<int>>(value);
-        }
+        public string ResponsibleUserIdsString { get => SerializationUtils.Serialize(ResponsibleUserIds); set => ResponsibleUserIds = SerializationUtils.Deserialize<List<int>>(value); }
 
         [Column("ResponsibleUsersString")]
-        public string ResponsibleUsersString
-        {
-            get => SerializationUtils.Serialize(ResponsibleUsers);
-            set => ResponsibleUsers = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
-        }
+        public string ResponsibleUsersString { get => SerializationUtils.Serialize(ResponsibleUsers); set => ResponsibleUsers = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
 
         [Column("PhysicalAddressesString")]
-        public string PhysicalAddressesString
-        {
-            get => SerializationUtils.Serialize(PhysicalAddresses);
-            set => PhysicalAddresses = SerializationUtils.Deserialize<List<PhysicalAddress>>(value);
-        }
+        public string PhysicalAddressesString { get => SerializationUtils.Serialize(PhysicalAddresses); set => PhysicalAddresses = SerializationUtils.Deserialize<List<PhysicalAddress>>(value); }
 
         [Column("CommentsString")]
-        public string CommentsString
-        {
-            get => SerializationUtils.Serialize(Comments);
-            set => Comments = SerializationUtils.Deserialize<List<Comment>>(value);
-        }
+        public string CommentsString { get => SerializationUtils.Serialize(Comments); set => Comments = SerializationUtils.Deserialize<List<Comment>>(value); }
 
         #endregion
 

@@ -221,8 +221,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 var animation = new CABasicAnimation
                 {
                     KeyPath = @"transform.scale",
-                    From = NSObject.FromObject(1.5),
-                    To = NSObject.FromObject(1),
+                    From = FromObject(1.5),
+                    To = FromObject(1),
                     Duration = 0.2,
                     TimingFunction = new CAMediaTimingFunction(0.4f, 1.3f, 1f, 1f)
                 };
@@ -238,14 +238,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
         void RemoveBadge()
         {
             if (badge != null)
-                UIView.AnimateNotify(0.15f, 0f, UIViewAnimationOptions.CurveEaseIn, () => { badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f); }, completed =>
-                {
-                    if (badge != null)
+                UIView.AnimateNotify(0.15f,
+                    0f,
+                    UIViewAnimationOptions.CurveEaseIn,
+                    () => { badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f); },
+                    completed =>
                     {
-                        badge.RemoveFromSuperview();
-                        badge = null;
-                    }
-                });
+                        if (badge != null)
+                        {
+                            badge.RemoveFromSuperview();
+                            badge = null;
+                        }
+                    });
         }
 
         static UILabel DuplicateLabel(UILabel labelToCopy)

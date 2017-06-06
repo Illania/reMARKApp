@@ -110,15 +110,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillTransitionToSize(toSize, coordinator);
 
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
-            {
-                if (tableView == null)
-                    return;
+            coordinator.AnimateAlongsideTransition(ctx => { },
+                ctx =>
+                {
+                    if (tableView == null)
+                        return;
 
-                headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-                tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            });
+                    headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
+                    tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                    tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                });
         }
 
         void InitializeView()
@@ -454,36 +455,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyToWorktrayViewController
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    BusinessEntities = new List<IBusinessEntity>
+                    var vc = new CopyToWorktrayViewController
                     {
-                        contact
-                    }
-                };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+                        BusinessEntities = new List<IBusinessEntity>
+                        {
+                            contact
+                        }
+                    };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
-                {
-                    contactPreview
-                });
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-
-            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
                     var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
                     {
                         contactPreview
-                    }, folder);
+                    });
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                            {
+                                contactPreview
+                            },
+                            folder);
+                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    }));
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
@@ -775,14 +783,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Attempting to remove contact from folder [contactId={contact.Id}, folderId={folder.Id}]");
 
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                {
-                    contact
-                }, folder);
+                    {
+                        contact
+                    },
+                    folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, folder.Id, new List<int>
-                {
-                    contact.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Contact,
+                    folder.Id,
+                    new List<int>
+                    {
+                        contact.Id
+                    }));
 
                 dismissAction();
 
@@ -820,10 +832,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     contact
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Contact, new List<int>
-                {
-                    contact.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                    ObjectType.Contact,
+                    new List<int>
+                    {
+                        contact.Id
+                    }));
 
                 dismissAction();
 
@@ -1046,10 +1060,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 };
 
 
-                public override bool Empty
-                {
-                    get { return !Contact?.CommunicationAddresses?.Any(ca => supportedSections.Contains(ca.Type)) ?? true; }
-                }
+                public override bool Empty { get { return !Contact?.CommunicationAddresses?.Any(ca => supportedSections.Contains(ca.Type)) ?? true; } }
 
                 public override void InitializeRows()
                 {

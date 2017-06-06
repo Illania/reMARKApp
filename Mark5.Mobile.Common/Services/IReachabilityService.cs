@@ -16,8 +16,8 @@ namespace Mark5.Mobile.Common.Services
 
     public class ReachabilityRefreshedEventArgs : EventArgs
     {
-        public bool Changed { get; private set; }
-        public bool IsReachable { get; private set; }
+        public bool Changed { get; }
+        public bool IsReachable { get; }
 
         public ReachabilityRefreshedEventArgs(bool changed, bool isReachable)
         {

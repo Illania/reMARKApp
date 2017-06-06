@@ -138,10 +138,11 @@ namespace TinyMessenger
                 {
                     var unsubscribeMethod = typeof(ITinyMessengerHub).GetTypeInfo().GetDeclaredMethods("Unsubscribe").First(mi => mi.GetParameters().Length == 1);
                     unsubscribeMethod = unsubscribeMethod.MakeGenericMethod(_MessageType);
-                    unsubscribeMethod.Invoke(hubTarget, new object[]
-                    {
-                        this
-                    });
+                    unsubscribeMethod.Invoke(hubTarget,
+                        new object[]
+                        {
+                            this
+                        });
                 }
 
             GC.SuppressFinalize(this);
@@ -492,8 +493,8 @@ namespace TinyMessenger
 
         class SubscriptionItem
         {
-            public ITinyMessageProxy Proxy { get; set; }
-            public ITinyMessageSubscription Subscription { get; set; }
+            public ITinyMessageProxy Proxy { get; }
+            public ITinyMessageSubscription Subscription { get; }
 
             public SubscriptionItem(ITinyMessageProxy proxy, ITinyMessageSubscription subscription)
             {

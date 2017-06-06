@@ -146,10 +146,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    ShortcodePreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ShortcodePreview
+                    }));
                 StartActivity(i);
 
                 return true;
@@ -160,10 +161,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    ShortcodePreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ShortcodePreview
+                    }));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
 
@@ -175,10 +177,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    ShortcodePreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ShortcodePreview
+                    }));
                 StartActivity(i);
 
                 return true;
@@ -189,10 +192,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(new List<IBusinessEntity>
-                {
-                    ShortcodePreview
-                }));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
+                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    {
+                        ShortcodePreview
+                    }));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
                 StartActivity(i);
 
@@ -262,10 +266,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, new List<IBusinessEntity>
-                {
-                    ShortcodePreview
-                }));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
+                    new List<IBusinessEntity>
+                    {
+                        ShortcodePreview
+                    }));
         }
 
         async void DeleteFromFolderAction()
@@ -281,14 +286,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                {
-                    ShortcodePreview
-                }, Folder);
+                    {
+                        ShortcodePreview
+                    },
+                    Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, Folder.Id, new List<int>
-                {
-                    ShortcodePreview.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Shortcode,
+                    Folder.Id,
+                    new List<int>
+                    {
+                        ShortcodePreview.Id
+                    }));
 
                 dismissAction();
             }
@@ -319,10 +328,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     ShortcodePreview
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Shortcode, new List<int>
-                {
-                    ShortcodePreview.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                    ObjectType.Shortcode,
+                    new List<int>
+                    {
+                        ShortcodePreview.Id
+                    }));
 
                 dismissAction();
                 if (CloseRequest != null)
@@ -350,10 +361,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: new List<string>
-                {
-                    e.Address
-                }));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                    DocumentCreationModeFlag.New,
+                    DocumentDirection.None,
+                    preconfiguredEmailToAddresses: new List<string>
+                    {
+                        e.Address
+                    }));
             }
         }
 

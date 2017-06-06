@@ -107,16 +107,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 textView.TextStorage.DeleteRange(new NSRange(0, 1));
                 textView.TextStorage.EndEditing();
 
-                Animate(0.2d, () =>
-                {
-                    textView.TextContainer.MaximumNumberOfLines = 0;
-                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+                Animate(0.2d,
+                    () =>
+                    {
+                        textView.TextContainer.MaximumNumberOfLines = 0;
+                        textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                        Superview.SetNeedsLayout();
+                        Superview.LayoutIfNeeded();
 
-                    expanded = true;
-                });
+                        expanded = true;
+                    });
             }
         }
 

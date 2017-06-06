@@ -78,6 +78,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         throw new DataNotFoundException("Calendar appointments could not be found.");
+
                     appointments = result;
                 });
 
@@ -109,6 +110,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         throw new DataNotFoundException("Calendar tasks could not be found.");
+
                     tasks = result;
                 });
 

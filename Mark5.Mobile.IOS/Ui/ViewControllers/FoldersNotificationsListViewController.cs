@@ -37,15 +37,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
             segmentedControl.Frame = new CGRect(0f, 0f, 0f, 26f);
             segmentedControl.SetTitleTextAttributes(new UITextAttributes
-            {
-                Font = Theme.DefaultFont.WithRelativeSize(-3f),
-                TextColor = Theme.White
-            }, UIControlState.Normal);
+                {
+                    Font = Theme.DefaultFont.WithRelativeSize(-3f),
+                    TextColor = Theme.White
+                },
+                UIControlState.Normal);
             segmentedControl.SetTitleTextAttributes(new UITextAttributes
-            {
-                Font = Theme.DefaultFont.WithRelativeSize(-3f),
-                TextColor = Theme.White
-            }, UIControlState.Selected);
+                {
+                    Font = Theme.DefaultFont.WithRelativeSize(-3f),
+                    TextColor = Theme.White
+                },
+                UIControlState.Selected);
             segmentedControl.TintColor = Theme.DarkBlue;
             segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);

@@ -36,8 +36,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.SavedSearches.WhereNotNull().OrderBy(ss => ss.Name).Select(ss => ss.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -116,8 +118,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.SearchResults.WhereNotNull().OrderByDescending(dp => dp.DateReceived).Select(dp => dp.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -155,8 +159,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.SearchResults.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -183,8 +189,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.ShortcodePreviews.WhereNotNull().OrderBy(sp => sp.RowId).Select(sp => sp.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -223,8 +231,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.CalendarTasks.WhereNotNull().Select(ct => ct.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -263,8 +273,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.CalendarAppointments.WhereNotNull().Select(ct => ct.Convert()).ToList();
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

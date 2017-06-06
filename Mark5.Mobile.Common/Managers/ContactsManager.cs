@@ -47,8 +47,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return contactPreviews;
             }
+
             if (sourceType == SourceType.Local)
                 return await contactsDataAccess.GetContactPreviewsAsync(folder, startRowId, MaxToFetch);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -73,11 +75,12 @@ namespace Mark5.Mobile.Common.Managers
                     }
                 })
                 .ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                        errorCallback(t.Exception.InnerException);
-                    finishedCallback();
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                    {
+                        if (t.IsFaulted)
+                            errorCallback(t.Exception.InnerException);
+                        finishedCallback();
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public async Task<Contact> GetContactAsync(Folder folder, int contactId, SourceType sourceType = SourceType.Auto)
@@ -106,8 +109,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return contact;
             }
+
             if (sourceType == SourceType.Local)
                 return await contactsDataAccess.GetContactAsync(contactId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -140,8 +145,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return container;
             }
+
             if (sourceType == SourceType.Local)
                 return await contactsDataAccess.GetContactWithPreviewAsync(contactId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -168,8 +175,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.Updated;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided");
         }
 
@@ -192,8 +201,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return categories;
             }
+
             if (sourceType == SourceType.Local)
                 return await contactsDataAccess.GetAllCategoriesAsync();
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -219,8 +230,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -246,8 +259,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return comment;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -278,8 +293,10 @@ namespace Mark5.Mobile.Common.Managers
                 }
                 return editSuccess;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -304,8 +321,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 

@@ -84,11 +84,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackSingleChoice(-1, new SingleChoiceCallback(si =>
-            {
-                if (si >= 0)
-                    tcs.SetResult(values[si]);
-            }));
+            builder.ItemsCallbackSingleChoice(-1,
+                new SingleChoiceCallback(si =>
+                {
+                    if (si >= 0)
+                        tcs.SetResult(values[si]);
+                }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(selected)));
@@ -97,6 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             for (var i = 0; i < values.Count; i++)
                 if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
                     selectedIndex = i;
+
             md.SelectedIndex = selectedIndex;
             builder.Cancelable(false);
             md.Show();
@@ -110,12 +112,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackMultiChoice(null, new MultiChoiceCallback(si =>
-            {
-                foreach (var i in si)
-                    result.Add(values[i]);
-                tcs.SetResult(result);
-            }));
+            builder.ItemsCallbackMultiChoice(null,
+                new MultiChoiceCallback(si =>
+                {
+                    foreach (var i in si)
+                        result.Add(values[i]);
+
+                    tcs.SetResult(result);
+                }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(selected)));
@@ -126,8 +130,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 for (var i = 0; i < values.Count; i++)
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
+
                 md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
             }
+
             builder.Cancelable(false);
             md.Show();
             return tcs.Task;
@@ -265,12 +271,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackMultiChoice(null, new MultiChoiceCallback(si =>
-            {
-                foreach (var i in si)
-                    result.Add(values[i]);
-                positiveAction(result);
-            }));
+            builder.ItemsCallbackMultiChoice(null,
+                new MultiChoiceCallback(si =>
+                {
+                    foreach (var i in si)
+                        result.Add(values[i]);
+
+                    positiveAction(result);
+                }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(negativeAction));
@@ -281,8 +289,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 for (var i = 0; i < values.Count; i++)
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
+
                 md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
             }
+
             builder.Cancelable(false);
             md.Show();
         }
@@ -307,14 +317,15 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(t =>
-                        {
-                            dismissAction();
+                            {
+                                dismissAction();
 
-                            if (!t.IsFaulted)
-                                activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
+                                if (!t.IsFaulted)
+                                    activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
 
-                            tcs.SetResult(true);
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                                tcs.SetResult(true);
+                            },
+                            TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);
@@ -338,15 +349,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(t =>
-                        {
-                            dismissAction();
+                            {
+                                dismissAction();
 
-                            if (!t.IsFaulted)
-                                activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
+                                if (!t.IsFaulted)
+                                    activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
 
-                            if (action != null)
-                                action();
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                                if (action != null)
+                                    action();
+                            },
+                            TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);

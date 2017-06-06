@@ -13,21 +13,22 @@ namespace Mark5.Mobile.Common.Utilities
             var synch = new ExclusiveSynchronizationContext();
             SynchronizationContext.SetSynchronizationContext(synch);
             synch.Post(async _ =>
-            {
-                try
                 {
-                    await task();
-                }
-                catch (Exception e)
-                {
-                    synch.InnerException = e;
-                    throw;
-                }
-                finally
-                {
-                    synch.EndMessageLoop();
-                }
-            }, null);
+                    try
+                    {
+                        await task();
+                    }
+                    catch (Exception e)
+                    {
+                        synch.InnerException = e;
+                        throw;
+                    }
+                    finally
+                    {
+                        synch.EndMessageLoop();
+                    }
+                },
+                null);
             synch.BeginMessageLoop();
 
             SynchronizationContext.SetSynchronizationContext(oldContext);
@@ -40,21 +41,22 @@ namespace Mark5.Mobile.Common.Utilities
             SynchronizationContext.SetSynchronizationContext(synch);
             var ret = default(T);
             synch.Post(async _ =>
-            {
-                try
                 {
-                    ret = await task();
-                }
-                catch (Exception e)
-                {
-                    synch.InnerException = e;
-                    throw;
-                }
-                finally
-                {
-                    synch.EndMessageLoop();
-                }
-            }, null);
+                    try
+                    {
+                        ret = await task();
+                    }
+                    catch (Exception e)
+                    {
+                        synch.InnerException = e;
+                        throw;
+                    }
+                    finally
+                    {
+                        synch.EndMessageLoop();
+                    }
+                },
+                null);
             synch.BeginMessageLoop();
             SynchronizationContext.SetSynchronizationContext(oldContext);
             return ret;

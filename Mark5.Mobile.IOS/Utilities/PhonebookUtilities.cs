@@ -42,12 +42,13 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 if (status == CNAuthorizationStatus.NotDetermined)
                 {
-                    store.RequestAccess(CNEntityType.Contacts, (granted, error) =>
-                    {
-                        if (granted)
-                            contacts = GetContactsFromContactStore(store, phrase);
-                        authorizationSemaphore.Release();
-                    });
+                    store.RequestAccess(CNEntityType.Contacts,
+                        (granted, error) =>
+                        {
+                            if (granted)
+                                contacts = GetContactsFromContactStore(store, phrase);
+                            authorizationSemaphore.Release();
+                        });
                 }
                 else //Authorized
                 {

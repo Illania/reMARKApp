@@ -41,8 +41,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         public DocumentPreview PreviousDocumentPreview { get; set; }
 
-        Document Document { get; set; } = new Document();
-        DocumentPreview DocumentPreview { get; set; } = new DocumentPreview();
+        Document Document { get; } = new Document();
+        DocumentPreview DocumentPreview { get; } = new DocumentPreview();
 
         UIScrollView scrollView;
         UIStackView stackView;
@@ -226,15 +226,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (LocalDocument)
                 NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                {
-                    attachmentButtonItem
-                }, false);
+                    {
+                        attachmentButtonItem
+                    },
+                    false);
             else
                 NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                {
-                    sendButtonItem,
-                    attachmentButtonItem
-                }, false);
+                    {
+                        sendButtonItem,
+                        attachmentButtonItem
+                    },
+                    false);
         }
 
         void InitSubViews()
@@ -350,17 +352,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     {
                         await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
                         NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                        {
-                            sendButtonItem,
-                            attachmentButtonItem
-                        }, false);
+                            {
+                                sendButtonItem,
+                                attachmentButtonItem
+                            },
+                            false);
                     }
                     if (outgoingContainer.Info.State == OutgoingDocumentState.AutoSaved)
                         NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                        {
-                            sendButtonItem,
-                            attachmentButtonItem
-                        }, false);
+                            {
+                                sendButtonItem,
+                                attachmentButtonItem
+                            },
+                            false);
                     if (outgoingContainer.LocalAttachments != null)
                         OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
                 }
@@ -582,54 +586,61 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void AttachmentButtonItem_Clicked(object sender, EventArgs e)
         {
             var sourceChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("take_photo"), UIAlertActionStyle.Default, a =>
-            {
-                var picker = new UIImagePickerController
+            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("take_photo"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    AllowsEditing = false,
-                    SourceType = UIImagePickerControllerSourceType.Camera,
-                    CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo,
-                    CameraDevice = UIImagePickerControllerCameraDevice.Rear,
-                    Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
-                    ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-                };
-                if (picker.PopoverPresentationController != null)
-                    picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
-                PresentViewController(picker, true, null);
-            }));
-            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("existing_photo"), UIAlertActionStyle.Default, a =>
-            {
-                var picker = new UIImagePickerController
-                {
-                    AllowsEditing = false,
-                    SourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum,
-                    MediaTypes = new[]
+                    var picker = new UIImagePickerController
                     {
-                        UTType.Image.ToString()
-                    },
-                    Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
-                    ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-                };
-                if (picker.PopoverPresentationController != null)
-                    picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
-                PresentViewController(picker, true, null);
-            }));
-            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"), UIAlertActionStyle.Default, a =>
-            {
-                var picker = new DocumentMenuViewController(new[]
+                        AllowsEditing = false,
+                        SourceType = UIImagePickerControllerSourceType.Camera,
+                        CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo,
+                        CameraDevice = UIImagePickerControllerCameraDevice.Rear,
+                        Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
+                        ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                    };
+                    if (picker.PopoverPresentationController != null)
+                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                    PresentViewController(picker, true, null);
+                }));
+            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("existing_photo"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    "public.content",
-                    "public.data",
-                    "public.msg",
-                    "public.eml"
-                }, UIDocumentPickerMode.Import)
+                    var picker = new UIImagePickerController
+                    {
+                        AllowsEditing = false,
+                        SourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum,
+                        MediaTypes = new[]
+                        {
+                            UTType.Image.ToString()
+                        },
+                        Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
+                        ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                    };
+                    if (picker.PopoverPresentationController != null)
+                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                    PresentViewController(picker, true, null);
+                }));
+            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
-                };
-                if (picker.PopoverPresentationController != null)
-                    picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
-                PresentViewController(picker, true, null);
-            }));
+                    var picker = new DocumentMenuViewController(new[]
+                        {
+                            "public.content",
+                            "public.data",
+                            "public.msg",
+                            "public.eml"
+                        },
+                        UIDocumentPickerMode.Import)
+                    {
+                        Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
+                    };
+                    if (picker.PopoverPresentationController != null)
+                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                    PresentViewController(picker, true, null);
+                }));
             sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (sourceChooser.PopoverPresentationController != null)
@@ -1181,9 +1192,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     if (referenceUrl != null)
                     {
                         var results = PHAsset.FetchAssets(new[]
-                        {
-                            referenceUrl
-                        }, null);
+                            {
+                                referenceUrl
+                            },
+                            null);
                         var asset = (PHAsset) results.firstObject;
 
                         var assetResources = PHAssetResource.GetAssetResources(asset);

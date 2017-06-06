@@ -11,15 +11,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         readonly AppCompatTextView titleTextView;
         protected readonly AppCompatTextView ContentTextView;
 
-        public string Title
-        {
-            set => titleTextView.Text = value;
-        }
+        public string Title { set => titleTextView.Text = value; }
 
-        public string Content
-        {
-            set => ContentTextView.Text = value;
-        }
+        public string Content { set => ContentTextView.Text = value; }
 
         protected DescriptionCardSubview(Context context)
             : base(context)

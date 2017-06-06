@@ -187,6 +187,7 @@ namespace Mark5.Mobile.Droid
                 selectedCategories.Clear();
                 foreach (var kv in clfs.SelectedCategories)
                     selectedCategories.Add(kv.Key, kv.Value);
+
                 adapter.SetItems(clfs.AvailableCategories);
             }
         }

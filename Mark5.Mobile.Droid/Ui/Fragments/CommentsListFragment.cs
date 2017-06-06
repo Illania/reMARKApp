@@ -221,19 +221,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 })
                 .ContinueWith(async t =>
-                {
-                    dismissAction();
+                    {
+                        dismissAction();
 
-                    if (t.IsFaulted)
-                    {
-                        CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                        await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                    }
-                    else
-                    {
-                        adapter.RemoveItem(comment);
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                        }
+                        else
+                        {
+                            adapter.RemoveItem(comment);
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void EditComment(Comment comment, string newContent)
@@ -260,19 +261,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 })
                 .ContinueWith(async t =>
-                {
-                    dismissAction();
+                    {
+                        dismissAction();
 
-                    if (t.IsFaulted)
-                    {
-                        CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                        await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                    }
-                    else
-                    {
-                        adapter.EditItem(newComment);
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                        }
+                        else
+                        {
+                            adapter.EditItem(newComment);
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -412,20 +414,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView contentTextView;
 
-            public string Username
-            {
-                set => usernameTextView.Text = value;
-            }
+            public string Username { set => usernameTextView.Text = value; }
 
-            public string Date
-            {
-                set => dateTextView.Text = value;
-            }
+            public string Date { set => dateTextView.Text = value; }
 
-            public string Content
-            {
-                set => contentTextView.Text = value;
-            }
+            public string Content { set => contentTextView.Text = value; }
 
             public CommentViewHolder(View itemView)
                 : base(itemView)

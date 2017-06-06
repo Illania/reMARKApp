@@ -137,6 +137,7 @@ namespace Mark5.Mobile.Common.DataAccess
             if (depth > 0)
                 foreach (var subFolder in subFolders)
                     subFolder.SubFolders = GetRecursively(c, subFolder.Id, depth - 1);
+
             return subFolders;
         }
 

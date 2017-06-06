@@ -62,16 +62,17 @@ namespace Mark5.ServiceReference.AppService
 
             var dcs = new DataContractSerializer(typeof(P));
             var sw = new StringWriterWithEncoding(Encoding.UTF8);
-            using (var w = XmlWriter.Create(sw, new XmlWriterSettings
-            {
-                OmitXmlDeclaration = false,
-                Encoding = Encoding.UTF8,
-                ConformanceLevel = ConformanceLevel.Document,
-                NewLineHandling = NewLineHandling.None,
-                NamespaceHandling = NamespaceHandling.OmitDuplicates,
-                CheckCharacters = true,
-                Indent = false
-            }))
+            using (var w = XmlWriter.Create(sw,
+                new XmlWriterSettings
+                {
+                    OmitXmlDeclaration = false,
+                    Encoding = Encoding.UTF8,
+                    ConformanceLevel = ConformanceLevel.Document,
+                    NewLineHandling = NewLineHandling.None,
+                    NamespaceHandling = NamespaceHandling.OmitDuplicates,
+                    CheckCharacters = true,
+                    Indent = false
+                }))
             {
                 w.WriteStartDocument();
                 w.WriteStartElement("s", "Envelope", "http://schemas.xmlsoap.org/soap/envelope/");
@@ -122,11 +123,12 @@ namespace Mark5.ServiceReference.AppService
 
                 var dcs = new DataContractSerializer(typeof(R));
                 var sb = new StringReader(resultContent);
-                using (var r = XmlReader.Create(sb, new XmlReaderSettings
-                {
-                    CheckCharacters = false,
-                    ConformanceLevel = ConformanceLevel.Fragment
-                }))
+                using (var r = XmlReader.Create(sb,
+                    new XmlReaderSettings
+                    {
+                        CheckCharacters = false,
+                        ConformanceLevel = ConformanceLevel.Fragment
+                    }))
                 {
                     var result = dcs.ReadObject(r);
                     return (R) result;
@@ -156,11 +158,12 @@ namespace Mark5.ServiceReference.AppService
 
                 var dcs = new DataContractSerializer(typeof(AppServiceFaultDetail));
                 var sb = new StringReader(faultDetailContent);
-                using (var r = XmlReader.Create(sb, new XmlReaderSettings
-                {
-                    CheckCharacters = false,
-                    ConformanceLevel = ConformanceLevel.Fragment
-                }))
+                using (var r = XmlReader.Create(sb,
+                    new XmlReaderSettings
+                    {
+                        CheckCharacters = false,
+                        ConformanceLevel = ConformanceLevel.Fragment
+                    }))
                 {
                     var result = dcs.ReadObject(r);
                     faultDetail = (AppServiceFaultDetail) result;

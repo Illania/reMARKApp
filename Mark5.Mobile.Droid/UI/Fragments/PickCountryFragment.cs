@@ -122,10 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CountryViewHolder : RecyclerView.ViewHolder
         {
-            public string Name
-            {
-                set => nameTextView.Text = value;
-            }
+            public string Name { set => nameTextView.Text = value; }
 
             readonly AppCompatTextView nameTextView;
 

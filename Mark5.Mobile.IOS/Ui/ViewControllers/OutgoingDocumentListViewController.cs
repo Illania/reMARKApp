@@ -280,10 +280,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var rows = tableView.IndexPathsForSelectedRows.ToArray();
             var selectedDocuments = rows.Select(ip => ((DataSource) tableView.Source).Items[ip.Row]).ToList();
 
-            var result = await Dialogs.ShowListDialogAsync(this, null, new string[]
-            {
-                Localization.GetString("delete")
-            }, editItem);
+            var result = await Dialogs.ShowListDialogAsync(this,
+                null,
+                new string[]
+                {
+                    Localization.GetString("delete")
+                },
+                editItem);
 
             if (result == 0)
                 await Delete(selectedDocuments);
@@ -464,11 +467,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var documentPreview = Items[indexPath.Row];
 
-                var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("delete"), (a, ip) =>
-                {
-                    viewController.Delete(documentPreview);
-                    viewController.EndEditing();
-                });
+                var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                    Localization.GetString("delete"),
+                    (a, ip) =>
+                    {
+                        viewController.Delete(documentPreview);
+                        viewController.EndEditing();
+                    });
                 deleteAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(deleteAction);
 
@@ -515,9 +520,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void UpdateRow(int row)
             {
                 documentsTableView.ReloadRows(new NSIndexPath[]
-                {
-                    NSIndexPath.FromRowSection(row, 0)
-                }, UITableViewRowAnimation.Fade);
+                    {
+                        NSIndexPath.FromRowSection(row, 0)
+                    },
+                    UITableViewRowAnimation.Fade);
             }
 
             public void RemoveRow(int row)
@@ -526,9 +532,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UpdateRow(0); //We always keep a row for the empty table cell
                 else
                     documentsTableView.DeleteRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(row, 0)
-                    }, UITableViewRowAnimation.Fade);
+                        {
+                            NSIndexPath.FromRowSection(row, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
             }
         }
     }

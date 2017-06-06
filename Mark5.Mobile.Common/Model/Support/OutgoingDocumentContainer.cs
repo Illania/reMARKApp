@@ -13,6 +13,7 @@ namespace Mark5.Mobile.Common.Model
             {
                 if (LoadMode != LoadMode.Complete)
                     throw new InvalidOperationException($"The document is not set in LoadMode:{LoadMode}!");
+
                 return document;
             }
             set => document = value;
@@ -26,6 +27,7 @@ namespace Mark5.Mobile.Common.Model
             {
                 if (LoadMode != LoadMode.Complete)
                     throw new InvalidOperationException($"The attachments are not set in LoadMode:{LoadMode}!");
+
                 return localAttachments;
             }
             set => localAttachments = value;

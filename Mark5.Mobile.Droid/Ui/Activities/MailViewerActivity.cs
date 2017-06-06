@@ -28,17 +28,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(Label = "MARK5 Mail Viewer", ScreenOrientation = ScreenOrientation.Portrait, Exported = true)]
     [IntentFilter(new[]
-    {
-        Intent.ActionView,
-        Intent.ActionSend
-    }, Categories = new[]
-    {
-        Intent.CategoryDefault
-    }, DataMimeTypes = new[]
-    {
-        "application/octet-stream",
-        "message/rfc822"
-    })]
+        {
+            Intent.ActionView,
+            Intent.ActionSend
+        },
+        Categories = new[]
+        {
+            Intent.CategoryDefault
+        },
+        DataMimeTypes = new[]
+        {
+            "application/octet-stream",
+            "message/rfc822"
+        })]
     public class MailViewerActivity : BaseAppCompatActivity
     {
         const long MaxSize = 5 * 1024 * 1024; // 5MB
@@ -178,27 +180,28 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     throw new MailViewerException("Unsupported file.");
                 })
                 .ContinueWith(async t =>
-                {
-                    dismissAction();
-
-                    if (t.IsFaulted)
                     {
-                        var ex = t.Exception.InnerException;
-                        mailMessage = null;
+                        dismissAction();
 
-                        CommonConfig.Logger.Error(ex);
+                        if (t.IsFaulted)
+                        {
+                            var ex = t.Exception.InnerException;
+                            mailMessage = null;
 
-                        await Dialogs.ShowErrorDialogAsync(this, ex);
+                            CommonConfig.Logger.Error(ex);
 
-                        Finish();
-                    }
-                    else
-                    {
-                        mailMessage = t.Result;
+                            await Dialogs.ShowErrorDialogAsync(this, ex);
 
-                        RefreshView();
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                            Finish();
+                        }
+                        else
+                        {
+                            mailMessage = t.Result;
+
+                            RefreshView();
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void RefreshView()
@@ -295,6 +298,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 int read;
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
                     ms.Write(buffer, 0, read);
+
                 return ms.ToArray();
             }
         }

@@ -21,6 +21,7 @@ namespace Mark5.Mobile.Common.Tester
             {
                 if (!await CanTest(ct))
                     return false;
+
                 var ci = await FileSystemStorage.GetConnectionInfoAsync(ct);
 
                 var proxy = AppServiceProxyFactory.Create(ci.SslMode != SslMode.Off, ci.Hostname, ci.Port, CommonConfig.HttpClientHandler);

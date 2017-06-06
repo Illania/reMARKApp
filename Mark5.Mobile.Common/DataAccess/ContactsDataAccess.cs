@@ -61,6 +61,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         throw new DataNotFoundException("Contact previews could not be found.");
+
                     contactPreviews = result;
 
                     startRowId = startRowId < 1 ? 1 : startRowId;
@@ -155,6 +156,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var contact = c.Find<Contact>(contactId);
                     if (contact == null)
                         throw new DataNotFoundException("Contact could not be found.");
+
                     var cmd = c.CreateCommand($"select \"{nameof(ContactCommunicationAddress.Address)}\", " + $"\"{nameof(ContactCommunicationAddress.Description)}\"," + $" \"{nameof(ContactCommunicationAddress.IsPrimary)}\", " + $"\"{nameof(ContactCommunicationAddress.Type)}\" " + $"from \"{nameof(ContactCommunicationAddress)}\" " + $"where \"{nameof(ContactCommunicationAddress.ContactId)}\" = @contactId");
                     cmd.Bind("@contactId", contactId);
                     var addresses = cmd.ExecuteQuery<CommunicationAddress>();
@@ -164,6 +166,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var contactPreview = c.Find<ContactPreview>(contactId);
                     if (contactPreview == null)
                         throw new DataNotFoundException("Contact preview could not be found.");
+
                     container = new ContactContainer(contactPreview, contact);
                 });
 
@@ -281,10 +284,11 @@ namespace Mark5.Mobile.Common.DataAccess
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
                     var cmd = c.CreateCommand($"update \"{nameof(ContactPreview)}\" " + $"set \"{nameof(ContactPreview.CategoriesString)}\" = @categoriesString " + $"where \"{nameof(ContactPreview.Id)}\" = @contactPreviewId");
-                    cmd.Bind("@categoriesString", new CategoriesValue
-                    {
-                        Categories = categories
-                    }.CategoriesString);
+                    cmd.Bind("@categoriesString",
+                        new CategoriesValue
+                        {
+                            Categories = categories
+                        }.CategoriesString);
                     cmd.Bind("@contactPreviewId", contactPreview.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -307,15 +311,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         return;
+
                     var comments = result.First().Comments;
 
                     comments.Add(comment);
 
                     cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " + $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " + $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsString", new CommentsValue
-                    {
-                        Comments = comments
-                    }.CommentsString);
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
 
@@ -343,6 +349,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         return;
+
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
@@ -350,10 +357,11 @@ namespace Mark5.Mobile.Common.DataAccess
                     comments = comments.OrderBy(cm => cm.DateAddedTimestamp).ToList();
 
                     cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " + $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " + $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsString", new CommentsValue
-                    {
-                        Comments = comments
-                    }.CommentsString);
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
                 });
@@ -376,15 +384,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         return;
+
                     var comments = result.First().Comments;
 
                     comments.RemoveAll(cm => cm.Id == comment.Id);
 
                     cmd = c.CreateCommand($"update \"{nameof(Contact)}\" " + $"set \"{nameof(Contact.CommentsString)}\" = @commentsString " + $"where \"{nameof(Contact.Id)}\" = @contactId");
-                    cmd.Bind("@commentsString", new CommentsValue
-                    {
-                        Comments = comments
-                    }.CommentsString);
+                    cmd.Bind("@commentsString",
+                        new CommentsValue
+                        {
+                            Comments = comments
+                        }.CommentsString);
                     cmd.Bind("@contactId", contact.Id);
                     cmd.ExecuteNonQuery();
 

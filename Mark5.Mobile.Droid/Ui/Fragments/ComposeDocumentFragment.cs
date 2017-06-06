@@ -393,19 +393,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
                     })
                     .ContinueWith(async t =>
-                    {
-                        dismissAction();
+                        {
+                            dismissAction();
 
-                        if (t.IsFaulted)
-                        {
-                            CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
-                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                        }
-                        else
-                        {
-                            Activity.Finish();
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            if (t.IsFaulted)
+                            {
+                                CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                                await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                            }
+                            else
+                            {
+                                Activity.Finish();
+                            }
+                        },
+                        TaskScheduler.FromCurrentSynchronizationContext());
             };
 
             if (new RecipientsView[]
@@ -433,17 +434,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
                 })
                 .ContinueWith(async t =>
-                {
-                    if (t.IsFaulted)
                     {
-                        CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
-                        await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                    }
-                    else
-                    {
-                        Activity.Finish();
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", t.Exception.InnerException);
+                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                        }
+                        else
+                        {
+                            Activity.Finish();
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public void AskIfShouldSave()
@@ -550,20 +552,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     };
                 })
                 .ContinueWith(async t =>
-                {
-                    stream?.Dispose();
+                    {
+                        stream?.Dispose();
 
-                    if (t.IsFaulted)
-                    {
-                        CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
-                        var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
-                        await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
-                    }
-                    else
-                    {
-                        attachmentsView.AddAttachment(attachment);
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                        if (t.IsFaulted)
+                        {
+                            CommonConfig.Logger.Error($"Failed to save attachment to memory [AttachmentName={attachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", t.Exception.InnerException);
+                            var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
+                            await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
+                        }
+                        else
+                        {
+                            attachmentsView.AddAttachment(attachment);
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public void DeleteAutoSavedDocument()

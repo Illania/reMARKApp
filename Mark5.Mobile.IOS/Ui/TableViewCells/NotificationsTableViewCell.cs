@@ -58,6 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     icon = UIImage.FromBundle(Path.Combine("icons", "notifications-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
             }
+
             IconImageView.Image = icon;
 
             var splitMessage = notification.Message.Split('\n');

@@ -15,6 +15,7 @@ namespace Mark5.Mobile.Common.Utilities
                         addressParts[0] = "+" + addressParts[0];
                     return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
                 }
+
             return ca.Address;
         }
 

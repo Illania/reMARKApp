@@ -100,11 +100,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         return ss;
                     })
                     .ContinueWith(t =>
-                    {
-                        var ss = t.Result;
+                        {
+                            var ss = t.Result;
 
-                        navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+                        },
+                        TaskScheduler.FromCurrentSynchronizationContext());
 
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
@@ -135,10 +136,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
 #pragma warning disable XA0001 // Find issues with Android API usage
                     RequestPermissions(new string[]
-                    {
-                        Manifest.Permission.ReadExternalStorage,
-                        Manifest.Permission.ReadContacts
-                    }, 769);
+                        {
+                            Manifest.Permission.ReadExternalStorage,
+                            Manifest.Permission.ReadContacts
+                        },
+                        769);
 #pragma warning restore XA0001 // Find issues with Android API usage
                 };
 
@@ -255,20 +257,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Switching to {menuItem.TitleFormatted}...");
 
             drawerToggle.RunWhenIdle(() =>
-            {
-                if (lastSelectedItem != menuItem)
                 {
-                    if (lastSelectedItem != null)
-                        stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
+                    if (lastSelectedItem != menuItem)
+                    {
+                        if (lastSelectedItem != null)
+                            stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
-                    if (SupportFragmentManager.BackStackEntryCount > 0)
-                        SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) Android.App.PopBackStackFlags.Inclusive);
+                        if (SupportFragmentManager.BackStackEntryCount > 0)
+                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) Android.App.PopBackStackFlags.Inclusive);
 
-                    stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
+                        stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
-                    lastSelectedItem = menuItem;
-                }
-            }, lastSelectedItem == null);
+                        lastSelectedItem = menuItem;
+                    }
+                },
+                lastSelectedItem == null);
 
             drawer.CloseDrawer(GravityCompat.Start);
 
@@ -313,7 +316,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
             protected readonly List<string> SavedTags = new List<string>();
 
-            protected ModuleType ModuleType { get; private set; }
+            protected ModuleType ModuleType { get; }
 
             public MenuItemContent(ModuleType moduleType)
             {
@@ -368,11 +371,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             void Restore(FragmentManager fm)
             {
-                var backStackStatesAndTags = BackstackStates.Zip(SavedTags, (state, tag) => new
-                {
-                    State = state,
-                    Tag = tag
-                });
+                var backStackStatesAndTags = BackstackStates.Zip(SavedTags,
+                    (state, tag) => new
+                    {
+                        State = state,
+                        Tag = tag
+                    });
 
                 foreach (var item in backStackStatesAndTags)
                 {

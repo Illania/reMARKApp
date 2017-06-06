@@ -175,9 +175,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         void ShareItem_Clicked(object sender, EventArgs e)
         {
             var avc = new UIActivityViewController(new NSObject[]
-            {
-                url
-            }, null);
+                {
+                    url
+                },
+                null);
             if (avc.PopoverPresentationController != null)
                 avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
             PresentViewController(avc, true, null);
@@ -274,25 +275,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                     throw new MailViewerException("Unsupported file.");
                 })
                 .ContinueWith(t =>
-                {
-                    dismissAction();
-
-                    if (t.IsFaulted)
                     {
-                        var ex = t.Exception.InnerException;
-                        mailMessage = null;
+                        dismissAction();
 
-                        CommonConfig.Logger.Error(ex);
+                        if (t.IsFaulted)
+                        {
+                            var ex = t.Exception.InnerException;
+                            mailMessage = null;
 
-                        Dialogs.ShowErrorDialog(this, ex);
-                    }
-                    else
-                    {
-                        mailMessage = t.Result;
+                            CommonConfig.Logger.Error(ex);
 
-                        RefreshView();
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                            Dialogs.ShowErrorDialog(this, ex);
+                        }
+                        else
+                        {
+                            mailMessage = t.Result;
+
+                            RefreshView();
+                        }
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void RefreshView()
@@ -463,6 +465,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 int read;
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
                     ms.Write(buffer, 0, read);
+
                 return ms.ToArray();
             }
         }

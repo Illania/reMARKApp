@@ -315,24 +315,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var rows = tableView.IndexPathsForSelectedRows.ToArray();
             var selectedContacts = rows.Select(ip => ((DataSource) tableView.Source).FindItemAtIndexPath(ip)).ToList();
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToWorktray(selectedContacts);
-                EndEditing();
-            }));
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedContacts);
-                EndEditing();
-            }));
-
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    MoveToFolder(selectedContacts);
+                    CopyToWorktray(selectedContacts);
                     EndEditing();
                 }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedContacts);
+                    EndEditing();
+                }));
+
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MoveToFolder(selectedContacts);
+                        EndEditing();
+                    }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedContacts)));
@@ -377,37 +383,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.Reset();
             }
 
-            Managers.ContactsManager.GetAllContactPreviews(Folder, cps =>
-            {
-                Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
-                InvokeOnMainThread(() =>
+            Managers.ContactsManager.GetAllContactPreviews(Folder,
+                cps =>
                 {
-                    var ds = (DataSource) tableView.Source;
-                    ds.AppendItems(cps);
-                });
-            }, () =>
-            {
-                refreshControl.EndRefreshing();
-                refreshControl.ValueChanged += RefreshControl_ValueChanged;
+                    Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
+                    InvokeOnMainThread(() =>
+                    {
+                        var ds = (DataSource) tableView.Source;
+                        ds.AppendItems(cps);
+                    });
+                },
+                () =>
+                {
+                    refreshControl.EndRefreshing();
+                    refreshControl.ValueChanged += RefreshControl_ValueChanged;
 
-                refreshing = false;
+                    refreshing = false;
 
-                CommonConfig.Logger.Info($"Refresh finished");
+                    CommonConfig.Logger.Info($"Refresh finished");
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            }, async ex =>
+                },
+                async ex =>
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-            {
-                refreshControl.EndRefreshing();
-                refreshControl.ValueChanged += RefreshControl_ValueChanged;
+                {
+                    refreshControl.EndRefreshing();
+                    refreshControl.ValueChanged += RefreshControl_ValueChanged;
 
-                refreshing = false;
+                    refreshing = false;
 
-                CommonConfig.Logger.Error($"Could not refresh folders [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
+                    CommonConfig.Logger.Error($"Could not refresh folders [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorDialogAsync(this, ex);
 
-                NavigationController?.PopViewController(true);
-            }, startRowId, cts.Token);
+                    NavigationController?.PopViewController(true);
+                },
+                startRowId,
+                cts.Token);
         }
 
         #endregion
@@ -632,24 +643,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"), UIAlertActionStyle.Default, a =>
-            {
-                ShowCategories(selectedContact);
-                EndEditing();
-            }));
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedContact);
-                EndEditing();
-            }));
-
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    MoveToFolder(selectedContact);
+                    ShowCategories(selectedContact);
                     EndEditing();
                 }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedContact);
+                    EndEditing();
+                }));
+
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MoveToFolder(selectedContact);
+                        EndEditing();
+                    }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedContact)));
@@ -700,9 +717,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var selectedRow = tableView.IndexPathForSelectedRow;
 
                     tableView.ReloadRows(new[]
-                    {
-                        indexPath
-                    }, UITableViewRowAnimation.Fade);
+                        {
+                            indexPath
+                        },
+                        UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
                         tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
@@ -734,15 +752,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return !contactPreviewsInView.SelectMany(v => v).Any(); }
-            }
+            public bool Empty { get { return !contactPreviewsInView.SelectMany(v => v).Any(); } }
 
-            public IEnumerable<ContactPreview> Items
-            {
-                get { return contactPreviewsInView.SelectMany(i => i); }
-            }
+            public IEnumerable<ContactPreview> Items { get { return contactPreviewsInView.SelectMany(i => i); } }
 
             ContactsListViewController viewController;
             UITableView tableView;
@@ -840,11 +852,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray_ml"), (a, ip) =>
-                {
-                    viewController.CopyToWorktray(contactPreview);
-                    viewController.EndEditing();
-                });
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                    Localization.GetString("copy_to_worktray_ml"),
+                    (a, ip) =>
+                    {
+                        viewController.CopyToWorktray(contactPreview);
+                        viewController.EndEditing();
+                    });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
 
@@ -895,9 +909,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                     {
                         tableView.DeleteRows(new NSIndexPath[]
-                        {
-                            indexPath
-                        }, UITableViewRowAnimation.Automatic);
+                            {
+                                indexPath
+                            },
+                            UITableViewRowAnimation.Automatic);
                     }
                 }
 

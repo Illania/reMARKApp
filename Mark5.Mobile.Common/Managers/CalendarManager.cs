@@ -46,6 +46,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 return appointments;
             }
+
             if (sourceType == SourceType.Local)
             {
                 List<CalendarAppointment> appointments = null;
@@ -54,6 +55,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 return appointments;
             }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -80,6 +82,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 return tasks;
             }
+
             if (sourceType == SourceType.Local)
             {
                 List<CalendarTask> tasks = null;
@@ -88,6 +91,7 @@ namespace Mark5.Mobile.Common.Managers
 
                 return tasks;
             }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -111,8 +115,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return appointment;
             }
+
             if (sourceType == SourceType.Local)
                 return await calendarDataAccess.GetCalendarAppointmentAsync(calendarAppointmentId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -136,8 +142,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return task;
             }
+
             if (sourceType == SourceType.Local)
                 return await calendarDataAccess.GetCalendarTaskAsync(calendarTaskId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -160,8 +168,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.Updated;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -184,8 +194,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.Updated;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

@@ -50,8 +50,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -72,8 +74,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -100,6 +104,7 @@ namespace Mark5.Mobile.Common.Managers
                     notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
                 return notifications;
             }
+
             if (sourceType == SourceType.Local)
             {
                 var result = await notificationsDataAccess.GetNotifications();
@@ -113,6 +118,7 @@ namespace Mark5.Mobile.Common.Managers
                     notifications.ForEach(n => n.IsRead = readGuids.Contains(n.Guid));
                 return notifications;
             }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -137,8 +143,10 @@ namespace Mark5.Mobile.Common.Managers
                     [ModuleType.Shortcodes] = result.ShortcodeFolders?.WhereNotNull().Select(f => f.Convert()).ToList() ?? new List<Folder>()
                 };
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -171,12 +179,15 @@ namespace Mark5.Mobile.Common.Managers
                 if (favoriteFolders.TryGetValue(moduleType, out moduleFavoriteFolders))
                     foreach (var item in moduleFavoriteFolders.Where(f => folderIds.Contains(f.Id)))
                         item.Subscribed = enabled;
+
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -202,11 +213,13 @@ namespace Mark5.Mobile.Common.Managers
 
                 return enabled;
             }
+
             if (sourceType == SourceType.Local)
             {
                 var notificationSettings = await FileSystemStorage.GetNotificationSettingsAsync() ?? new NotificationSettings();
                 return notificationSettings.CalendarNotificationsEnabled;
             }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -231,8 +244,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -258,11 +273,13 @@ namespace Mark5.Mobile.Common.Managers
 
                 return soundName;
             }
+
             if (sourceType == SourceType.Local)
             {
                 var notificationSettings = await FileSystemStorage.GetNotificationSettingsAsync() ?? new NotificationSettings();
                 return notificationSettings.SoundName;
             }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -287,8 +304,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -311,13 +330,16 @@ namespace Mark5.Mobile.Common.Managers
                 var favoriteFolders = await FileSystemStorage.GetFavoriteFoldersAsync() ?? new Dictionary<ModuleType, List<Folder>>();
                 foreach (var favoriteFolder in favoriteFolders.Values.SelectMany(f => f))
                     favoriteFolder.Subscribed = false;
+
                 await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
                 await FileSystemStorage.SaveNotificationSettingsAsync(new NotificationSettings());
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -344,6 +366,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new DocumentContainer(result.DocumentPreview.Convert(), result.Document.Convert());
                 }
+
                 if (notification.ObjectType == ObjectType.Contact)
                 {
                     var result = await AppServiceProxy.GetContactAsync(new DataContract.GetContactParameters
@@ -356,6 +379,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new ContactContainer(result.ContactPreview.Convert(), result.Contact.Convert());
                 }
+
                 if (notification.ObjectType == ObjectType.Shortcode)
                 {
                     var result = await AppServiceProxy.GetShortcodeAsync(new DataContract.GetShortcodeParameters
@@ -368,6 +392,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return new ShortcodeContainer(result.ShortcodePreview.Convert(), result.Shortcode.Convert());
                 }
+
                 if (notification.ObjectType == ObjectType.CalendarTask)
                 {
                     var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
@@ -379,6 +404,7 @@ namespace Mark5.Mobile.Common.Managers
 
                     return result.CalendarTask.Convert();
                 }
+
                 if (notification.ObjectType == ObjectType.CalendarAppointment)
                 {
                     var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
@@ -391,8 +417,10 @@ namespace Mark5.Mobile.Common.Managers
                     return result.CalendarAppointment.Convert();
                 }
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 

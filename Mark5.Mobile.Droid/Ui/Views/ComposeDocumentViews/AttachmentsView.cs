@@ -134,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
-            public IAttachmentDescription AttachmentDescription { get; private set; }
+            public IAttachmentDescription AttachmentDescription { get; }
 
             public AttachmentView(Context context, IAttachmentDescription attachmentDescription, int distanceLarge, int distanceNormal)
                 : base(context)

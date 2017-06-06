@@ -24,6 +24,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             if (originalObject == null)
                 return null;
+
             var typeToReflect = originalObject.GetType();
             if (IsPrimitive(typeToReflect))
                 return originalObject;
@@ -31,6 +32,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 return visited[originalObject];
             if (typeof(Delegate).IsAssignableFrom(typeToReflect))
                 return null;
+
             var cloneObject = CloneMethod.Invoke(originalObject, null);
             if (typeToReflect.IsArray)
             {
@@ -42,6 +44,7 @@ namespace Mark5.Mobile.IOS.Utilities
                         clonedArray.SetValue(InternalCopy(clonedArray.GetValue(i), visited), i);
                 }
             }
+
             visited.Add(originalObject, cloneObject);
             CopyFields(originalObject, visited, cloneObject, typeToReflect);
             RecursiveCopyBaseTypePrivateFields(originalObject, visited, cloneObject, typeToReflect);
@@ -56,6 +59,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     continue;
                 if (IsPrimitive(fieldInfo.FieldType))
                     continue;
+
                 var originalFieldValue = fieldInfo.GetValue(originalObject);
                 var clonedFieldValue = InternalCopy(originalFieldValue, visited);
                 fieldInfo.SetValue(cloneObject, clonedFieldValue);

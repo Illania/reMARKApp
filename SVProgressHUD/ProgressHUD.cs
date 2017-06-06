@@ -70,6 +70,7 @@ namespace SVProgressHUD
             {
                 if (_instanceLazy == null)
                     throw new InvalidOperationException("ProgressHUD was not initialized yet.");
+
                 return _instanceLazy.Value;
             }
         }
@@ -613,18 +614,19 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 };
 
                 var dispatchTime = new DispatchTime(DispatchTime.Now, TimeSpan.FromSeconds(delay));
-                DispatchQueue.MainQueue.DispatchAfter(dispatchTime, () =>
-                {
-                    if (FadeOutAnimationDuration > 0)
+                DispatchQueue.MainQueue.DispatchAfter(dispatchTime,
+                    () =>
                     {
-                        AnimateNotify(FadeOutAnimationDuration, 0d, UIViewAnimationOptions.AllowUserInteraction | UIViewAnimationOptions.CurveEaseOut | UIViewAnimationOptions.BeginFromCurrentState, animation, completion);
-                    }
-                    else
-                    {
-                        animation();
-                        completion(true);
-                    }
-                });
+                        if (FadeOutAnimationDuration > 0)
+                        {
+                            AnimateNotify(FadeOutAnimationDuration, 0d, UIViewAnimationOptions.AllowUserInteraction | UIViewAnimationOptions.CurveEaseOut | UIViewAnimationOptions.BeginFromCurrentState, animation, completion);
+                        }
+                        else
+                        {
+                            animation();
+                            completion(true);
+                        }
+                    });
 
                 strongThis.SetNeedsDisplay();
             });
@@ -665,10 +667,13 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
             {
                 var constraintSize = new CGSize(200f, 300f);
-                labelRect = new NSString(StatusLabel.Text).GetBoundingRect(constraintSize, NSStringDrawingOptions.UsesFontLeading | NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes
-                {
-                    Font = StatusLabel.Font
-                }, null);
+                labelRect = new NSString(StatusLabel.Text).GetBoundingRect(constraintSize,
+                    NSStringDrawingOptions.UsesFontLeading | NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin,
+                    new UIStringAttributes
+                    {
+                        Font = StatusLabel.Font
+                    },
+                    null);
                 labelHeight = (float) Math.Ceiling(labelRect.Height);
                 labelWidth = (float) Math.Ceiling(labelRect.Width);
             }
@@ -782,11 +787,15 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             var newCenter = new CGPoint(posX, posY);
 
             if (notification != null)
-                AnimateNotify(animationDuration, 0f, UIViewAnimationOptions.AllowUserInteraction | UIViewAnimationOptions.BeginFromCurrentState, () =>
-                {
-                    MoveToPoint(newCenter, rotateAngle);
-                    HudView.SetNeedsDisplay();
-                }, null);
+                AnimateNotify(animationDuration,
+                    0f,
+                    UIViewAnimationOptions.AllowUserInteraction | UIViewAnimationOptions.BeginFromCurrentState,
+                    () =>
+                    {
+                        MoveToPoint(newCenter, rotateAngle);
+                        HudView.SetNeedsDisplay();
+                    },
+                    null);
             else
                 MoveToPoint(newCenter, rotateAngle);
         }
@@ -878,6 +887,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             {
                 if (possibleKeyboard.IsKindOfClass(new Class("UIPeripheralHostView")) || possibleKeyboard.IsKindOfClass(new Class("UIKeyboard")))
                     return (float) possibleKeyboard.Bounds.Height;
+
                 if (possibleKeyboard.IsKindOfClass(new Class("UIInputSetContainerView")))
                     foreach (var possibleKeyboardSubview in possibleKeyboard.Subviews)
                         if (possibleKeyboardSubview.IsKindOfClass(new Class("UIInputSetHostView")))

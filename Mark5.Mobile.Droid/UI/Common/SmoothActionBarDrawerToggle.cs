@@ -14,12 +14,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
         }
 
-        public SmoothActionBarDrawerToggle(Android.App.Activity activity, Android.Support.V4.Widget.DrawerLayout drawerLayout, Toolbar toolbar, int openDrawerContentDescRes, int closeDrawerContentDescRes)
+        public SmoothActionBarDrawerToggle(Android.App.Activity activity, DrawerLayout drawerLayout, Toolbar toolbar, int openDrawerContentDescRes, int closeDrawerContentDescRes)
             : base(activity, drawerLayout, toolbar, openDrawerContentDescRes, closeDrawerContentDescRes)
         {
         }
 
-        public SmoothActionBarDrawerToggle(Android.App.Activity activity, Android.Support.V4.Widget.DrawerLayout drawerLayout, int openDrawerContentDescRes, int closeDrawerContentDescRes)
+        public SmoothActionBarDrawerToggle(Android.App.Activity activity, DrawerLayout drawerLayout, int openDrawerContentDescRes, int closeDrawerContentDescRes)
             : base(activity, drawerLayout, openDrawerContentDescRes, closeDrawerContentDescRes)
         {
         }

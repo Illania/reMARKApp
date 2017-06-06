@@ -14,6 +14,7 @@ namespace Mark5.Mobile.Common.Services
         {
             if (token.IsCancellationRequested)
                 return;
+
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
@@ -23,6 +24,7 @@ namespace Mark5.Mobile.Common.Services
         {
             if (token.IsCancellationRequested)
                 return;
+
             Task.Run(async () =>
             {
                 var filtered = new List<PrintableSuggestion>();
@@ -43,6 +45,7 @@ namespace Mark5.Mobile.Common.Services
         {
             if (token.IsCancellationRequested)
                 return;
+
             Task.Run(() =>
             {
                 var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Contact>();
@@ -55,6 +58,7 @@ namespace Mark5.Mobile.Common.Services
         {
             if (token.IsCancellationRequested)
                 return;
+
             Task.Run(async () =>
             {
                 var filtered = new List<PrintableSuggestion>();

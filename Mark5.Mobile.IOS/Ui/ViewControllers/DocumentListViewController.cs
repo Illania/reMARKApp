@@ -381,36 +381,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var selectedDocuments = rows.Select(ip => ((DataSource) tableView.Source).Items[ip.Row]).ToList();
 
             if (selectedDocuments.Any(dp => !dp.IsReadByCurrent))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"), UIAlertActionStyle.Default, a =>
-                {
-                    MarkAsRead(selectedDocuments, rows);
-                    EndEditing();
-                }));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MarkAsRead(selectedDocuments, rows);
+                        EndEditing();
+                    }));
 
             if (selectedDocuments.Any(dp => dp.IsReadByCurrent))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"), UIAlertActionStyle.Default, a =>
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MarkAsUnread(selectedDocuments, rows);
+                        EndEditing();
+                    }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    MarkAsUnread(selectedDocuments, rows);
+                    CopyToWorktray(selectedDocuments);
                     EndEditing();
                 }));
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToWorktray(selectedDocuments);
-                EndEditing();
-            }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedDocuments);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedDocuments);
+                    EndEditing();
+                }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
-                {
-                    MoveToFolder(selectedDocuments);
-                    EndEditing();
-                }));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MoveToFolder(selectedDocuments);
+                        EndEditing();
+                    }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem) sender)));
 
@@ -469,9 +479,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var priority = priorities[result];
 
             await SetPriority(new List<DocumentPreview>
-            {
-                selectedDocument
-            }, priority);
+                {
+                    selectedDocument
+                },
+                priority);
         }
 
         async Task SetPriority(List<DocumentPreview> selectedDocuments, Priority priority)
@@ -657,12 +668,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row)
         {
             MarkAsRead(new List<DocumentPreview>
-            {
-                documentPreview
-            }, new[]
-            {
-                row
-            });
+                {
+                    documentPreview
+                },
+                new[]
+                {
+                    row
+                });
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -687,12 +699,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void MarkAsUnread(DocumentPreview documentPreview, NSIndexPath row)
         {
             MarkAsUnread(new List<DocumentPreview>
-            {
-                documentPreview
-            }, new[]
-            {
-                row
-            });
+                {
+                    documentPreview
+                },
+                new[]
+                {
+                    row
+                });
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -718,40 +731,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"), UIAlertActionStyle.Default, a =>
-            {
-                ShowCategories(selectedDocument);
-                EndEditing();
-            }));
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply"), UIAlertActionStyle.Default, a =>
-            {
-                Reply(selectedDocument, DocumentCreationModeFlag.Reply);
-                EndEditing();
-            }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"), UIAlertActionStyle.Default, a =>
-            {
-                Reply(selectedDocument, DocumentCreationModeFlag.ReplyAll);
-                EndEditing();
-            }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"), UIAlertActionStyle.Default, a =>
-            {
-                Reply(selectedDocument, DocumentCreationModeFlag.Forward);
-                EndEditing();
-            }));
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedDocument);
-                EndEditing();
-            }));
-
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    MoveToFolder(selectedDocument);
+                    ShowCategories(selectedDocument);
                     EndEditing();
                 }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    Reply(selectedDocument, DocumentCreationModeFlag.Reply);
+                    EndEditing();
+                }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    Reply(selectedDocument, DocumentCreationModeFlag.ReplyAll);
+                    EndEditing();
+                }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    Reply(selectedDocument, DocumentCreationModeFlag.Forward);
+                    EndEditing();
+                }));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedDocument);
+                    EndEditing();
+                }));
+
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MoveToFolder(selectedDocument);
+                        EndEditing();
+                    }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, tableView, tableView.CellAt(indexPath))));
 
@@ -934,9 +959,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var selectedRow = tableView.IndexPathForSelectedRow;
 
                     tableView.ReloadRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(index, 0)
-                    }, UITableViewRowAnimation.Fade);
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
                         tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
@@ -960,9 +986,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var selectedRow = tableView.IndexPathForSelectedRow;
 
                     tableView.ReloadRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(index, 0)
-                    }, UITableViewRowAnimation.Fade);
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
                         tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
@@ -1170,31 +1197,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray_ml"), (a, ip) =>
-                {
-                    viewController.CopyToWorktray(documentPreview);
-                    viewController.EndEditing();
-                });
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                    Localization.GetString("copy_to_worktray_ml"),
+                    (a, ip) =>
+                    {
+                        viewController.CopyToWorktray(documentPreview);
+                        viewController.EndEditing();
+                    });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
 
                 if (documentPreview.IsReadByCurrent)
                 {
-                    var markAsUnreadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("mark_as_unread_ml"), (a, ip) =>
-                    {
-                        viewController.MarkAsUnread(documentPreview, indexPath);
-                        viewController.EndEditing();
-                    });
+                    var markAsUnreadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                        Localization.GetString("mark_as_unread_ml"),
+                        (a, ip) =>
+                        {
+                            viewController.MarkAsUnread(documentPreview, indexPath);
+                            viewController.EndEditing();
+                        });
                     markAsUnreadAction.BackgroundColor = Theme.Brown;
                     actions.Add(markAsUnreadAction);
                 }
                 else
                 {
-                    var markAsReadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("mark_as_read_ml"), (a, ip) =>
-                    {
-                        viewController.MarkAsRead(documentPreview, indexPath);
-                        viewController.EndEditing();
-                    });
+                    var markAsReadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                        Localization.GetString("mark_as_read_ml"),
+                        (a, ip) =>
+                        {
+                            viewController.MarkAsRead(documentPreview, indexPath);
+                            viewController.EndEditing();
+                        });
                     markAsReadAction.BackgroundColor = Theme.Brown;
                     actions.Add(markAsReadAction);
                 }
@@ -1351,9 +1384,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
 
                 documentsTableView.ReloadRows(new NSIndexPath[]
-                {
-                    NSIndexPath.FromRowSection(documentRow, 0)
-                }, UITableViewRowAnimation.Fade);
+                    {
+                        NSIndexPath.FromRowSection(documentRow, 0)
+                    },
+                    UITableViewRowAnimation.Fade);
             }
         }
 

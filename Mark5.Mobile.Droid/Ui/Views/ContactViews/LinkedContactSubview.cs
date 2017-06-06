@@ -89,10 +89,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 var titleTextView = new AppCompatTextView(context);
                 titleTextView.Text = contactPreview.Name;
                 titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-                AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                {
-                    LeftMargin = distanceLarge
-                });
+                AddView(titleTextView,
+                    new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        LeftMargin = distanceLarge
+                    });
             }
 
             int GetDrawableIdForContactType(LinkedContactType type)

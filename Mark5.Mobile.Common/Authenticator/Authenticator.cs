@@ -23,13 +23,14 @@ namespace Mark5.Mobile.Common.Authenticator
 
             var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off, hostname, port, CommonConfig.HttpClientHandler);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticateParameters
-            {
-                Username = username,
-                Password = password,
-                DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
-                FriendlyDeviceName = deviceName,
-                InstallationId = deviceId
-            }, ct);
+                {
+                    Username = username,
+                    Password = password,
+                    DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
+                    FriendlyDeviceName = deviceName,
+                    InstallationId = deviceId
+                },
+                ct);
 
             var connectionInfo = new ConnectionInfo
             {

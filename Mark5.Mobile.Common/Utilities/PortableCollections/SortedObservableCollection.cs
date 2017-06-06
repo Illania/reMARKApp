@@ -51,6 +51,7 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
             var i = 0;
             while (i < Items.Count && sortingComparison(Items[i], item) < 0)
                 i++;
+
             InsertItem(i, item);
         }
 
@@ -59,6 +60,7 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
             for (var i = 0; i < Items.Count; i++)
                 if (lookupComparison(Items[i], item) == 0)
                     return i;
+
             return -1;
         }
 

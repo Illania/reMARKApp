@@ -67,21 +67,22 @@ namespace FastScrollRecycler
                 }
 
                 disableRefreshLayoutListener = new ActionOnScrollListener((rv, dx, dy, objects) =>
-                {
-                    var rl = (SwipeRefreshLayout) objects[0];
-
-                    if (scrollbar?.IsDragging() ?? false)
                     {
-                        rl.Enabled = false;
-                        return;
-                    }
+                        var rl = (SwipeRefreshLayout) objects[0];
 
-                    if (rv.GetLayoutManager() is LinearLayoutManager llm)
-                    {
-                        llm = (LinearLayoutManager) rv.GetLayoutManager();
-                        rl.Enabled = llm.FindFirstCompletelyVisibleItemPosition() == 0;
-                    }
-                }, refreshLayout);
+                        if (scrollbar?.IsDragging() ?? false)
+                        {
+                            rl.Enabled = false;
+                            return;
+                        }
+
+                        if (rv.GetLayoutManager() is LinearLayoutManager llm)
+                        {
+                            llm = (LinearLayoutManager) rv.GetLayoutManager();
+                            rl.Enabled = llm.FindFirstCompletelyVisibleItemPosition() == 0;
+                        }
+                    },
+                    refreshLayout);
                 AddOnScrollListener(disableRefreshLayoutListener);
             }
         }
@@ -136,6 +137,7 @@ namespace FastScrollRecycler
                     scrollbar.HandleTouchEvent(ev, downX, downY, lastY, stateChangeListener);
                     break;
             }
+
             return scrollbar.IsDragging();
         }
 

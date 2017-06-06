@@ -17,9 +17,10 @@ namespace Mark5.Mobile.IOS.Utilities
         public static UIActivityViewController CreateShareReportController(string report)
         {
             var avc = new UIActivityViewController(new[]
-            {
-                new NSString(report)
-            }, null)
+                {
+                    new NSString(report)
+                },
+                null)
             {
                 ExcludedActivityTypes = new[]
                 {
@@ -114,6 +115,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("===== Preferences =====");
             foreach (var kv in PlatformConfig.Preferences.All)
                 sb.AppendLine(kv.Key + ": " + kv.Value);
+
             sb.AppendLine();
 
             return sb.ToString();

@@ -142,12 +142,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     return true;
                 })
                 .ContinueWith(t =>
-                {
-                    if (t.Result)
-                        StartActivity(new Intent(this, typeof(MainActivity)));
-                    else
-                        StartActivity(new Intent(this, typeof(LoginActivity)));
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                    {
+                        if (t.Result)
+                            StartActivity(new Intent(this, typeof(MainActivity)));
+                        else
+                            StartActivity(new Intent(this, typeof(LoginActivity)));
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
         }

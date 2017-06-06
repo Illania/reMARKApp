@@ -172,6 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
                     return;
                 }
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, outgoingDocumentContainer.DocumentPreview.Direction, outgoingDocumentGuid: outgoingDocumentContainer.Info.Identifier));
             }
         }
@@ -233,10 +234,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(selectedOutgoingDocumentContainer.Info.Identifier);
                 })
                 .ContinueWith(async t =>
-                {
-                    await RefreshData();
-                    actionMode.Finish();
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                    {
+                        await RefreshData();
+                        actionMode.Finish();
+                    },
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #endregion
@@ -449,6 +451,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         position = i;
                         break;
                     }
+
                 return position;
             }
 
@@ -460,55 +463,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class OutgoingDocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
-            public string Recipient
-            {
-                set => recipentTextView.Text = value;
-            }
+            public string Recipient { set => recipentTextView.Text = value; }
 
-            public string Subject
-            {
-                set => subjectTextView.Text = value;
-            }
+            public string Subject { set => subjectTextView.Text = value; }
 
-            public string Date
-            {
-                set => dateTextView.Text = value;
-            }
+            public string Date { set => dateTextView.Text = value; }
 
-            public string Preview
-            {
-                set => previewTextView.Text = value;
-            }
+            public string Preview { set => previewTextView.Text = value; }
 
 
-            public bool AttachmentIndicator
-            {
-                set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool AttachmentIndicator { set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
 
-            public bool WaitingIndicator
-            {
-                set => waitingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool WaitingIndicator { set => waitingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
 
-            public bool FailedIndicator
-            {
-                set => failedImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool FailedIndicator { set => failedImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
 
-            public bool SendingIndicator
-            {
-                set => sendingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool SendingIndicator { set => sendingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
 
-            public bool Selected
-            {
-                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             readonly AppCompatTextView recipentTextView;
             readonly AppCompatTextView dateTextView;

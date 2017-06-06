@@ -806,12 +806,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
-            {
-                if (string.IsNullOrWhiteSpace(newText))
-                    searchAdapter.ReplaceItems(adapter.Items);
-                else
-                    searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-            }, 500);
+                {
+                    if (string.IsNullOrWhiteSpace(newText))
+                        searchAdapter.ReplaceItems(adapter.Items);
+                    else
+                        searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+                },
+                500);
             return false;
         }
 
@@ -1253,6 +1254,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         position = i;
                         break;
                     }
+
                 return position;
             }
 
@@ -1356,10 +1358,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 adapter.NotifyItemChanged(position);
 
                 viewHolder.ItemView.PostDelayed(() =>
-                {
-                    adapter.ResetSwipedState();
-                    adapter.NotifyItemChanged(position);
-                }, 400);
+                    {
+                        adapter.ResetSwipedState();
+                        adapter.NotifyItemChanged(position);
+                    },
+                    400);
             }
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
@@ -1408,9 +1411,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
 
                     var iconWidth = text.Split(new string[]
-                        {
-                            "\n"
-                        }, StringSplitOptions.None)
+                            {
+                                "\n"
+                            },
+                            StringSplitOptions.None)
                         .Select(s => (int) (paint.MeasureText(s) + 0.5f))
                         .Max();
 
@@ -1430,22 +1434,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
-            public string Recipent
-            {
-                set => recipentTextView.Text = value;
-            }
+            public string Recipent { set => recipentTextView.Text = value; }
 
-            public string Date
-            {
-                set => dateTextView.Text = value;
-            }
+            public string Date { set => dateTextView.Text = value; }
 
             public string BubbleDate { get; set; }
 
-            public string Subject
-            {
-                set => subjectTextView.Text = value;
-            }
+            public string Subject { set => subjectTextView.Text = value; }
 
             public string Preview
             {
@@ -1482,35 +1477,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool IncomingIndicator
-            {
-                set => incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool IncomingIndicator { set => incomingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool OutgoingIndicator
-            {
-                set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool OutgoingIndicator { set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool DraftIndicator
-            {
-                set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool DraftIndicator { set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool UnreadIndicator
-            {
-                set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool UnreadIndicator { set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool AttachmentIndicator
-            {
-                set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool AttachmentIndicator { set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool CommentIndicator
-            {
-                set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool Compact
             {
@@ -1522,10 +1499,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool Selected
-            {
-                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public int SwipedDirection
             {
@@ -1585,22 +1559,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ExternalDocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
-            public string Name
-            {
-                set => nameTextView.Text = value;
-            }
+            public string Name { set => nameTextView.Text = value; }
 
-            public string Date
-            {
-                set => dateTextView.Text = value;
-            }
+            public string Date { set => dateTextView.Text = value; }
 
             public string BubbleDate { get; set; }
 
-            public string Preview
-            {
-                set => previewTextView.Text = value;
-            }
+            public string Preview { set => previewTextView.Text = value; }
 
             public List<Category> Categories
             {
@@ -1620,15 +1585,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public bool CommentIndicator
-            {
-                set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
-            public bool Selected
-            {
-                set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone;
-            }
+            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public int SwipedDirection
             {

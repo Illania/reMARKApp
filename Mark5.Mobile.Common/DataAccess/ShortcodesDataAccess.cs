@@ -61,6 +61,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     if (result == null || result.Count < 1)
                         throw new DataNotFoundException("Shortcode previews could not be found.");
+
                     shortcodePreviews = result;
 
                     startRowId = startRowId < 1 ? 1 : startRowId;
@@ -135,9 +136,11 @@ namespace Mark5.Mobile.Common.DataAccess
                     var shortcodePreview = c.Find<ShortcodePreview>(shortcodeId);
                     if (shortcodePreview == null)
                         throw new DataNotFoundException("ShortcodePreview could not be found.");
+
                     var shortcode = c.Find<Shortcode>(shortcodeId);
                     if (shortcode == null)
                         throw new DataNotFoundException("Shortcode could not be found.");
+
                     container = new ShortcodeContainer(shortcodePreview, shortcode);
                 });
 

@@ -156,14 +156,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillTransitionToSize(toSize, coordinator);
 
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx =>
-            {
-                if (mainScrollView == null)
-                    return;
+            coordinator.AnimateAlongsideTransition(ctx => { },
+                ctx =>
+                {
+                    if (mainScrollView == null)
+                        return;
 
-                mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            });
+                    mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                    mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                });
         }
 
         public override void DidReceiveMemoryWarning()
@@ -651,11 +652,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             spinner.StartAnimating();
 
             View.BringSubviewToFront(backgroundView);
-            UIView.Animate(0.25, () =>
-            {
-                backgroundView.Alpha = 1f;
-                mainScrollView.Alpha = 0f;
-            });
+            UIView.Animate(0.25,
+                () =>
+                {
+                    backgroundView.Alpha = 1f;
+                    mainScrollView.Alpha = 0f;
+                });
         }
 
         void EndRefreshing(bool withError = false)
@@ -666,11 +668,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             View.SendSubviewToBack(backgroundView);
-            UIView.Animate(0.25, () =>
-            {
-                backgroundView.Alpha = 0f;
-                mainScrollView.Alpha = 1f;
-            });
+            UIView.Animate(0.25,
+                () =>
+                {
+                    backgroundView.Alpha = 0f;
+                    mainScrollView.Alpha = 1f;
+                });
         }
 
         void MarkAsReadIfNecessary()
@@ -701,6 +704,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (token.IsCancellationRequested)
                         return;
+
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
 
                     BeginInvokeOnMainThread(() =>
@@ -1006,9 +1010,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to setting priority for document [documentId={document.Id}]");
                 await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview>
-                {
-                    documentPreview
-                }, priority);
+                    {
+                        documentPreview
+                    },
+                    priority);
 
                 UpdatePriority();
 
@@ -1033,35 +1038,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyToWorktrayViewController
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    BusinessEntities = new List<IBusinessEntity>
+                    var vc = new CopyToWorktrayViewController
                     {
-                        document
-                    }
-                };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
-                {
-                    document
-                });
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-
-            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"), UIAlertActionStyle.Default, a =>
+                        BusinessEntities = new List<IBusinessEntity>
+                        {
+                            document
+                        }
+                    };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
                     var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
                     {
                         document
-                    }, folder);
+                    });
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
+
+            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
+                            {
+                                document
+                            },
+                            folder);
+                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    }));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem) sender)));
 
@@ -1267,14 +1279,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Attempting to remove documnet from folder [documentId={document.Id}, folderId={folder.Id}]");
 
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                {
-                    document
-                }, folder);
+                    {
+                        document
+                    },
+                    folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Document, folder.Id, new List<int>
-                {
-                    document.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                    ObjectType.Document,
+                    folder.Id,
+                    new List<int>
+                    {
+                        document.Id
+                    }));
 
                 dismissAction();
 
@@ -1312,10 +1328,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     document
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Document, new List<int>
-                {
-                    document.Id
-                }));
+                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                    ObjectType.Document,
+                    new List<int>
+                    {
+                        document.Id
+                    }));
 
                 dismissAction();
 
@@ -1379,7 +1397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     public class ReadStatusUpdatedEventArgs : EventArgs
     {
-        public DocumentPreview DocumentPreview { get; private set; }
+        public DocumentPreview DocumentPreview { get; }
 
         public ReadStatusUpdatedEventArgs(DocumentPreview documentPreview)
         {

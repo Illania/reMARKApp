@@ -18,10 +18,12 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 httpsConn.HostnameVerifier = new InsecureHostnameVerifier();
                 var sslContext = SSLContext.GetInstance("TLS");
-                sslContext.Init(null, new ITrustManager[]
-                {
-                    new InsecureTrustManager()
-                }, null);
+                sslContext.Init(null,
+                    new ITrustManager[]
+                    {
+                        new InsecureTrustManager()
+                    },
+                    null);
                 httpsConn.SSLSocketFactory = sslContext.SocketFactory;
             }
 

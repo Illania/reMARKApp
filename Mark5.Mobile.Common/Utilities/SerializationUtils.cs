@@ -46,6 +46,7 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (string.IsNullOrWhiteSpace(str))
                 return default(T);
+
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -59,6 +60,7 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 if (string.IsNullOrWhiteSpace(str))
                     return default(T);
+
                 return Deserialize<T>(str);
             });
         }
@@ -67,6 +69,7 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (string.IsNullOrWhiteSpace(str))
                 return null;
+
             using (var sr = new StringReader(str))
             using (var jr = new JsonTextReader(sr))
             {
@@ -80,6 +83,7 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 if (string.IsNullOrWhiteSpace(str))
                     return null;
+
                 return Deserialize(str, type);
             });
         }
@@ -92,6 +96,7 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (obj == null)
                 return null;
+
             return GetBytes(Serialize(obj));
         }
 
@@ -99,6 +104,7 @@ namespace Mark5.Mobile.Common.Utilities
         {
             if (bytes == null || bytes.Length < 1)
                 return null;
+
             return Deserialize<T>(GetString(bytes));
         }
 

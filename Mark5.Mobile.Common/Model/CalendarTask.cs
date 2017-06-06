@@ -123,32 +123,16 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("UserIdsString")]
-        public string UserIdsString
-        {
-            get => SerializationUtils.Serialize(UserIds);
-            set => UserIds = SerializationUtils.Deserialize<List<int>>(value);
-        }
+        public string UserIdsString { get => SerializationUtils.Serialize(UserIds); set => UserIds = SerializationUtils.Deserialize<List<int>>(value); }
 
         [Column("UsersString")]
-        public string UsersString
-        {
-            get => SerializationUtils.Serialize(Users);
-            set => Users = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
-        }
+        public string UsersString { get => SerializationUtils.Serialize(Users); set => Users = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
 
         [Column("DepartmentIdsString")]
-        public string DepartmentIdsString
-        {
-            get => SerializationUtils.Serialize(DepartmentIds);
-            set => DepartmentIds = SerializationUtils.Deserialize<List<int>>(value);
-        }
+        public string DepartmentIdsString { get => SerializationUtils.Serialize(DepartmentIds); set => DepartmentIds = SerializationUtils.Deserialize<List<int>>(value); }
 
         [Column("DepartmentsString")]
-        public string DepartmentsString
-        {
-            get => SerializationUtils.Serialize(Departments);
-            set => Departments = SerializationUtils.Deserialize<Dictionary<int, string>>(value);
-        }
+        public string DepartmentsString { get => SerializationUtils.Serialize(Departments); set => Departments = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
 
         #endregion
 

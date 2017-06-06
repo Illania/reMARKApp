@@ -132,20 +132,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
             if (ShouldShowCreateReport(ex))
-                alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
-                {
-                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                        .ContinueWith(t =>
-                        {
-                            dismissAction();
+                alert.AddAction(UIAlertAction.Create(Localization.GetString("report"),
+                    UIAlertActionStyle.Cancel,
+                    a =>
+                    {
+                        var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                            .ContinueWith(t =>
+                                {
+                                    dismissAction();
 
-                            if (!t.IsFaulted)
-                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
-                            else
-                                tcs.SetResult(true);
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
-                }));
+                                    if (!t.IsFaulted)
+                                        vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                                    else
+                                        tcs.SetResult(true);
+                                },
+                                TaskScheduler.FromCurrentSynchronizationContext());
+                    }));
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
             return tcs.Task;
         }
@@ -158,18 +161,21 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, null));
             if (ShouldShowCreateReport(ex))
-                alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
-                {
-                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                        .ContinueWith(t =>
-                        {
-                            dismissAction();
+                alert.AddAction(UIAlertAction.Create(Localization.GetString("report"),
+                    UIAlertActionStyle.Cancel,
+                    a =>
+                    {
+                        var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                            .ContinueWith(t =>
+                                {
+                                    dismissAction();
 
-                            if (!t.IsFaulted)
-                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
-                }));
+                                    if (!t.IsFaulted)
+                                        vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                                },
+                                TaskScheduler.FromCurrentSynchronizationContext());
+                    }));
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
         }
 

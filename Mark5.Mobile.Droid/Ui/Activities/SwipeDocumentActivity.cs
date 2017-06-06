@@ -86,10 +86,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                         foreach (var previousId in previousIds)
                         {
-                            activityState.FragmentStates.Insert(0, new DocumentFragmentState
-                            {
-                                DocumentId = previousId
-                            });
+                            activityState.FragmentStates.Insert(0,
+                                new DocumentFragmentState
+                                {
+                                    DocumentId = previousId
+                                });
                             activityState.Position++;
                         }
 
@@ -197,7 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             public Folder Folder { get; set; }
 
             public int Position { get; set; } = -1;
-            public List<DocumentFragmentState> FragmentStates { get; set; } = new List<DocumentFragmentState>();
+            public List<DocumentFragmentState> FragmentStates { get; } = new List<DocumentFragmentState>();
 
             [JsonIgnore]
             public Action CloseRequest { get; set; }

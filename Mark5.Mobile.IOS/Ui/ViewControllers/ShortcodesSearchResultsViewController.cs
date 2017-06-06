@@ -242,17 +242,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var rows = tableView.IndexPathsForSelectedRows.ToArray();
             var selectedShortcodes = rows.Select(ip => ((DataSource) tableView.Source).FindItemAtIndexPath(ip)).ToList();
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToWorktray(selectedShortcodes);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToWorktray(selectedShortcodes);
+                    EndEditing();
+                }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedShortcodes);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedShortcodes);
+                    EndEditing();
+                }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes)));
@@ -357,17 +361,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToWorktray(selectedShortcode);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToWorktray(selectedShortcode);
+                    EndEditing();
+                }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"), UIAlertActionStyle.Default, a =>
-            {
-                CopyToFolder(selectedShortcode);
-                EndEditing();
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedShortcode);
+                    EndEditing();
+                }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode)));
@@ -415,15 +423,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty
-            {
-                get { return !shortcodePreviewsInView.SelectMany(v => v).Any(); }
-            }
+            public bool Empty { get { return !shortcodePreviewsInView.SelectMany(v => v).Any(); } }
 
-            public IEnumerable<ShortcodePreview> Items
-            {
-                get { return shortcodePreviewsInView.SelectMany(i => i); }
-            }
+            public IEnumerable<ShortcodePreview> Items { get { return shortcodePreviewsInView.SelectMany(i => i); } }
 
             ShortcodesSearchResultsViewController viewController;
             UITableView tableView;
@@ -521,11 +523,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 moreAction.BackgroundColor = Theme.DarkerBlue;
                 actions.Add(moreAction);
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("copy_to_worktray_ml"), (a, ip) =>
-                {
-                    viewController.CopyToWorktray(shortcodePreview);
-                    viewController.EndEditing();
-                });
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                    Localization.GetString("copy_to_worktray_ml"),
+                    (a, ip) =>
+                    {
+                        viewController.CopyToWorktray(shortcodePreview);
+                        viewController.EndEditing();
+                    });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
 
@@ -576,9 +580,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                     {
                         tableView.DeleteRows(new NSIndexPath[]
-                        {
-                            indexPath
-                        }, UITableViewRowAnimation.Automatic);
+                            {
+                                indexPath
+                            },
+                            UITableViewRowAnimation.Automatic);
                     }
                 }
 

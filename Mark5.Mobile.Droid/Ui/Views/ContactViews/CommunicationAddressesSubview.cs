@@ -97,10 +97,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                     var descriptionTextView = new AppCompatTextView(context);
                     descriptionTextView.Text = communicationAddress.Description;
                     descriptionTextView.SetTextAppearanceCompat(context, Resource.Style.fontSmallLight);
-                    innerLayout.AddView(descriptionTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                    {
-                        TopMargin = distanceSmall / 2
-                    });
+                    innerLayout.AddView(descriptionTextView,
+                        new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                        {
+                            TopMargin = distanceSmall / 2
+                        });
                 }
 
                 LongClickable = true;

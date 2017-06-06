@@ -43,8 +43,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result;
             }
+
             if (sourceType == SourceType.Local)
                 return await FileSystemStorage.GetSystemSettingsAsync();
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -68,8 +70,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result;
             }
+
             if (sourceType == SourceType.Local)
                 return await FileSystemStorage.GetSystemUsersDepartmentsAsync();
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

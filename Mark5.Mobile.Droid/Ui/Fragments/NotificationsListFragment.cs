@@ -333,6 +333,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         position = i;
                         break;
                     }
+
                 return position;
             }
 
@@ -394,15 +395,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            public string DateTime
-            {
-                set => dateTimeTextView.Text = value;
-            }
+            public string DateTime { set => dateTimeTextView.Text = value; }
 
-            public bool UnreadIndicator
-            {
-                set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible;
-            }
+            public bool UnreadIndicator { set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible; }
 
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatTextView titleTextView;

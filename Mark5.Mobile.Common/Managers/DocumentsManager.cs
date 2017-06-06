@@ -55,8 +55,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return documentPreviews;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetDocumentPreviewsAsync(folder, startId, endId, MaxToFetch);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -97,8 +99,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return document;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetDocumentAsync(documentId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -132,8 +136,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return container;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetDocumentWithPreviewAsync(documentId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -166,8 +172,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided");
         }
 
@@ -285,8 +293,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -335,12 +345,15 @@ namespace Mark5.Mobile.Common.Managers
                     dp.IsReadByCurrent = isRead;
                     dp.IsReadByAnyone = dp.IsReadByAnyone || isRead;
                 }
+
                 await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews);
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -364,8 +377,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -386,8 +401,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -409,8 +426,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return templatePreviews;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetTemplatePreviewsAsync();
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -434,8 +453,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return template;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetTemplateAsync(templateId);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -459,8 +480,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return template;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetDefaultTemplateAsync(creationModeFlag);
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -482,8 +505,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return recentAddresses;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetRecentAddressesAsync();
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -506,8 +531,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return categories;
             }
+
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetAllCategoriesAsync();
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -533,8 +560,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -561,8 +590,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return comment;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -593,8 +624,10 @@ namespace Mark5.Mobile.Common.Managers
                 }
                 return editSuccess;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -618,8 +651,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -632,19 +667,22 @@ namespace Mark5.Mobile.Common.Managers
             {
                 var path = string.Empty;
                 await fileTransferServiceProxy.GetAttachmentAsync(new DataContract.GetAttachmentRequest
-                {
-                    Token = Token,
-                    Id = attachmentDescription.Id,
-                    DocumentId = document.Id
-                }, async stream => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream); });
+                    {
+                        Token = Token,
+                        Id = attachmentDescription.Id,
+                        DocumentId = document.Id
+                    },
+                    async stream => { path = await FileSystemStorage.SaveAttachmentAsync(attachmentDescription, stream); });
 
                 return path;
             }
+
             if (sourceType == SourceType.Local)
             {
                 var path = await FileSystemStorage.CheckAttachmentsExistsAsync(attachmentDescription);
                 return path;
             }
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
@@ -665,8 +703,10 @@ namespace Mark5.Mobile.Common.Managers
 
                 return result.Guid;
             }
+
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
+
             throw new ArgumentException("Invalid sourceType provided.");
         }
     }

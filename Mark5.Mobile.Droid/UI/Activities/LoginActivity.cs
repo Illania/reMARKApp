@@ -120,12 +120,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                     .ContinueWith(t =>
-                    {
-                        dismissAction();
+                        {
+                            dismissAction();
 
-                        if (!t.IsFaulted)
-                            StartActivity(SystemReportCollector.CreateShareReportIntent(this, t.Result));
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            if (!t.IsFaulted)
+                                StartActivity(SystemReportCollector.CreateShareReportIntent(this, t.Result));
+                        },
+                        TaskScheduler.FromCurrentSynchronizationContext());
 
                 return true;
             }

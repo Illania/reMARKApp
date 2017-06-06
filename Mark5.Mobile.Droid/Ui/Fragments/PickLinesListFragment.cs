@@ -147,8 +147,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void SetSelectedLinesGuid(List<Guid> selectedLineGuids)
             {
-                this.SelectedLinesGuid.Clear();
-                this.SelectedLinesGuid.AddRange(selectedLineGuids);
+                SelectedLinesGuid.Clear();
+                SelectedLinesGuid.AddRange(selectedLineGuids);
             }
 
             public void SetItems(List<Line> lines)

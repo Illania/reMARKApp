@@ -30,6 +30,7 @@ namespace Mark5.Mobile.Common
                 await FileSystemStorage.SaveLastCacheCleanUpAsync(DateTime.UtcNow);
                 return false;
             }
+
             return lastCacheCleanUp.AddDays(intervalDays) <= DateTime.UtcNow;
         }
 
@@ -63,6 +64,7 @@ namespace Mark5.Mobile.Common
                             throw new ArgumentException("Module not supported");
                     }
             }
+
             await FileSystemStorage.SaveLastCacheCleanUpAsync(DateTime.UtcNow);
         }
 

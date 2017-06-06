@@ -75,6 +75,7 @@ namespace Mark5.Mobile.Droid.Utilities
             foreach (var path in paths)
                 if (new Java.IO.File(path).Exists())
                     return true;
+
             return false;
         }
 
@@ -92,6 +93,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 var br = new Java.IO.BufferedReader(new Java.IO.InputStreamReader(process.InputStream));
                 if (br.ReadLine() != null)
                     return true;
+
                 return false;
             }
             catch (Exception)
