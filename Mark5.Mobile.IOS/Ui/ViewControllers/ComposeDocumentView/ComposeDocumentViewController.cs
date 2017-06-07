@@ -827,8 +827,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RecipientView_AddButtonTapped(object sender, EventArgs e)
         {
-            var strings = new[] { Localization.GetString("contact_picker_recent_addreses"),
-                Localization.GetString("contact_picker_contact"),
+            var strings = new[] { Localization.GetString("contact_picker_recent_addresses"),
+                Localization.GetString("contact_picker_contacts"),
                 Localization.GetString("contact_picker_shortcodes"),
                 Localization.GetString("contact_picker_phonebook"),
             };
@@ -1011,7 +1011,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void DoOpenRecents(RecipientsView recipientsView)
         {
-            throw new NotImplementedException();
+            var vc = new RecentAddressesListViewController();
+            NavigationController.PushViewController(vc, true);
         }
 
         #endregion

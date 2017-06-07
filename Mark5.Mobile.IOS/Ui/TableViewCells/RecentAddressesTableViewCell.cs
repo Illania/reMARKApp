@@ -13,6 +13,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString Key = new NSString("RecentAddressesTableViewCell");
         public static readonly UINib Nib = UINib.FromName("RecentAddressesTableViewCell", NSBundle.MainBundle);
 
+        public const float Height = 60f;
+
         protected RecentAddressesTableViewCell(IntPtr handle) : base(handle)
         {
         }

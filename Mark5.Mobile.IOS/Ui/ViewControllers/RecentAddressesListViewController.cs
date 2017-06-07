@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.Common.Extensions;
 using UIKit;
-using System.Threading;
-using Mark5.Mobile.Common;
-using System.Threading.Tasks;
-using Mark5.Mobile.Common.Managers;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -142,13 +141,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var addresses = await Managers.DocumentsManager.GetRecentAddressesAsync();
 
-                var ds = (DataSource) tableView.DataSource;
+                var ds = (DataSource) tableView.Source;
                 ds.SetItems(addresses);
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while retrieving recent addresses", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
+                NavigationController?.PopViewController(true);
             }
             finally
             {
@@ -215,22 +215,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
-            public override nint NumberOfSections(UITableView tableView)
-            {
-                return 1;
-            }
-
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading)
                     return 1;
 
                 return recentAddressesInView.Count;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return ShortcodesTableViewCell.Height;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
@@ -245,6 +235,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var ra = recentAddressesInView[indexPath.Row];
                 viewController.RecentAddressSelected(ra);
+            }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return RecentAddressesTableViewCell.Height;
             }
 
             public void SetItems(List<RecentAddress> recentAddresses)
