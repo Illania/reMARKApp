@@ -279,12 +279,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentButtonItem.Clicked += AttachmentButtonItem_Clicked;
 
             //Subviews
+            toView.AddButtonTapped += RecipientView_AddButtonTapped;
             toView.SearchRequested += RecipientView_SearchRequested;
             toView.Edited += Subview_Edited;
 
+            ccView.AddButtonTapped += RecipientView_AddButtonTapped;
             ccView.SearchRequested += RecipientView_SearchRequested;
             ccView.Edited += Subview_Edited;
 
+            bccView.AddButtonTapped += RecipientView_AddButtonTapped;
             bccView.SearchRequested += RecipientView_SearchRequested;
             bccView.Edited += Subview_Edited;
 
@@ -304,12 +307,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentButtonItem.Clicked -= AttachmentButtonItem_Clicked;
 
             //Subviews
+            toView.AddButtonTapped -= RecipientView_AddButtonTapped;
             toView.SearchRequested -= RecipientView_SearchRequested;
             toView.Edited -= Subview_Edited;
 
+            ccView.AddButtonTapped -= RecipientView_AddButtonTapped;
             ccView.SearchRequested -= RecipientView_SearchRequested;
             ccView.Edited -= Subview_Edited;
 
+            bccView.AddButtonTapped -= RecipientView_AddButtonTapped;
             bccView.SearchRequested -= RecipientView_SearchRequested;
             bccView.Edited -= Subview_Edited;
 
@@ -816,6 +822,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
         }
 
+        async void RecipientView_AddButtonTapped(object sender, EventArgs e)
+        {
+            var strings = new[] { Localization.GetString("contact_picker_recent_addreses"),
+                Localization.GetString("contact_picker_contact"),
+                Localization.GetString("contact_picker_shortcodes"),
+                Localization.GetString("contact_picker_phonebook"),
+            };
+
+            var choice = await Dialogs.ShowListDialogAsync(this, string.Empty, strings, sender as UIView);
+
+            if (choice < 0)
+                return;
+
+            switch (choice)
+            {
+                case 0:
+                    DoOpenRecents(sender as RecipientsView);
+                    break;
+                case 1:
+                    DoOpenContacts(sender as RecipientsView);
+                    break;
+                case 2:
+                    DoOpenShortcodes(sender as RecipientsView);
+                    break;
+                case 3:
+                    DoOpenPhonebook(sender as RecipientsView);
+                    break;
+            }
+        }
+
         void RecipientView_SearchRequested(object sender, string initialSearchString)
         {
             if (string.IsNullOrEmpty(initialSearchString))
@@ -949,6 +985,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var remoteAttachment = attachment as AttachmentDescription;
                 attachmentsView.RemoveAttachment(sender, remoteAttachment);
             }
+        }
+
+        #endregion
+
+        #region Picker methods
+
+        void DoOpenPhonebook(RecipientsView recipientsView)
+        {
+            throw new NotImplementedException();
+        }
+
+        void DoOpenShortcodes(RecipientsView recipientsView)
+        {
+            throw new NotImplementedException();
+        }
+
+        void DoOpenContacts(RecipientsView recipientsView)
+        {
+            throw new NotImplementedException();
+        }
+
+        void DoOpenRecents(RecipientsView recipientsView)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

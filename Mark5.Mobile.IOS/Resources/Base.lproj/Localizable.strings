@@ -60,6 +60,10 @@
 "connection_status" = "Connection status";
 "contacts" = "Contacts";
 "continue" = "Continue";
+"contact_picker_recent_addresses" = "Recent addresses";
+"contact_picker_contacts" = "Contacts";
+"contact_picker_shortcodes" = "Shortcodes";
+"contact_picker_phonebook" = "Phonebook";
 "copy_to_clipboard" = "Copy to clipboard";
 "copy_to_folder" = "Copy to folder";
 "copy_to_worktray" = "Copy to worktray";
@@ -201,6 +205,8 @@
 "responsible_users" = "Responsible users";
 "restart_required_content" = "You need to restart MARK5, for this setting to take effect.";
 "restart_required_title" = "Restart required";
+"recent_addresses_empty" = "No recent addresses";
+"recent_addresses_title" = "Recent addresses";
 "safari" = "Open in Safari";
 "save_draft" = "Save draft";
 "save_modifications" = "Save modifications";
