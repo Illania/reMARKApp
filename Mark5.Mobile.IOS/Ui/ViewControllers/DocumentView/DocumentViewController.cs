@@ -1259,8 +1259,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (document == null || documentPreview == null)
                 return;
 
-            var modes = new[] { Localization.GetString("copy_to_new_addresses"),
-                Localization.GetString("copy_to_new_text"), Localization.GetString("copy_to_new_attachments") };
+            var hasAttachments = document.Attachments.Any();
+
+            string[] modes = null;
+
+            if (hasAttachments)
+            {
+                modes = new[] { Localization.GetString("copy_to_new_addresses"),
+                Localization.GetString("copy_to_new_text_and_attachments"), Localization.GetString("copy_to_new_attachments") };
+            }
+            else
+            {
+                modes = new[] { Localization.GetString("copy_to_new_addresses"),
+                Localization.GetString("copy_to_new_text") };
+            }
 
             var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("copy_to_new_title"), modes, replyActions);
 
