@@ -716,25 +716,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                templatesPreviews = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None)
+                                                     .OrderByDescending(tp => tp.Private).ThenBy(tp => tp.Name)
+                                                     .ToList();
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
-            finally
-            {
-                dismissAction();
-            }
 
-            if (templatesPreviews != null)
-            {
-                var templatesForCreationMode = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None);
-                if (templatesForCreationMode.Any())
+                if (templatesPreviews.Any())
                 {
-                    var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
+                    var templateNames = templatesPreviews.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
+
                     var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true);
                     var selectedPreview = templatesPreviews[result];
                     await GetTemplate(selectedPreview);
@@ -743,6 +735,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.no_templates_title, Resource.String.no_templates_content);
                 }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 
