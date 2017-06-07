@@ -996,7 +996,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void DoOpenPhonebook(RecipientsView recipientsView)
         {
-            throw new NotImplementedException();
+            var vc = new PhonebookContactsListViewController(recipientsView.AddRecipent);
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         void DoOpenShortcodes(RecipientsView recipientsView)
@@ -1012,7 +1013,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void DoOpenRecents(RecipientsView recipientsView)
         {
             var vc = new RecentAddressesListViewController(recipientsView.AddRecipent);
-            NavigationController.PushViewController(vc, true);
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         #endregion

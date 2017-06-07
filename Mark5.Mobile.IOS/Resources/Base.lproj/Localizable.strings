@@ -192,6 +192,12 @@
 "password" = "Password";
 "person" = "Person";
 "phone" = "Phone";
+"phonebook_contacts_empty" = "No Phonebook contacts";
+"phonebook_contacts_title" = "Phonebook";
+
+"phonebook_contacts_no_access_title" = "Phonebook access refused";
+"phonebook_contacts_no_access_content" = "You need to grant MARK5 access to the Phonebook in order to use this functionality";
+
 "please_restart" = "Please restart MARK5 app";
 "please_wait___" = "Please wait...";
 "port" = "Port";

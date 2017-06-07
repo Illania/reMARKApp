@@ -32,11 +32,11 @@ namespace Mark5.Mobile.Common.Model
         {
             var suggestions = new List<PrintableSuggestion>();
             foreach (var contact in contacts)
-            foreach (var address in contact.CommunicationAddresses)
-            {
-                var fullName = $"{contact.FirstName}{(string.IsNullOrEmpty(contact.Patronymic) ? string.Empty : " " + contact.Patronymic)}" + $"{(string.IsNullOrEmpty(contact.LastName) ? "" : " " + contact.LastName)}";
-                suggestions.Add(new PrintableSuggestion(fullName, address.Address, type));
-            }
+                foreach (var address in contact.CommunicationAddresses)
+                {
+                    var fullName = contact.FullName;
+                    suggestions.Add(new PrintableSuggestion(fullName, address.Address, type));
+                }
 
             return suggestions;
         }

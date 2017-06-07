@@ -255,6 +255,7 @@
 		<Compile Include="Ui\TableViewCells\RecentAddressesTableViewCell.designer.cs">
 		  <DependentUpon>RecentAddressesTableViewCell.cs</DependentUpon>
 		</Compile>
+		<Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

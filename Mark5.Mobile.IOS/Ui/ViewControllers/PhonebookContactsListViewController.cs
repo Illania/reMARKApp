@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -13,18 +12,18 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class RecentAddressesListViewController : AbstractViewController
+    public class PhonebookContactsListViewController : AbstractViewController
     {
         UIBarButtonItem exitEditItem;
         UITableView tableView;
 
         CancellationTokenSource cts;
 
-        Action<string, string> recentAddressSelectedAction;
+        Action<string, string> phonebookContactSelectedAction;
 
-        public RecentAddressesListViewController(Action<string, string> recentAddressClickedAction)
+        public PhonebookContactsListViewController(Action<string, string> recentAddressClickedAction)
         {
-            this.recentAddressSelectedAction = recentAddressClickedAction;
+            this.phonebookContactSelectedAction = recentAddressClickedAction;
         }
 
         #region UIViewControllerOverrides
@@ -43,15 +42,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
-
-            //TODO do we need reachability bar here?
         }
 
         public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(RecentAddressesListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(PhonebookContactsListViewController)} appeared");
 
             var ds = (DataSource) tableView.Source;
             if (ds.Empty)
@@ -69,7 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(RecentAddressesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(PhonebookContactsListViewController)} received memory warning!");
 
             var ds = tableView?.Source as DataSource;
             ds?.Reset();
@@ -94,7 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             tableView = new UITableView();
             tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("recent_addresses_empty"));
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("phonebook_contacts_empty"));
             tableView.AllowsSelectionDuringEditing = false;
             tableView.AllowsMultipleSelectionDuringEditing = true;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -111,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeNavigationBarTitle()
         {
             UIView.AnimationsEnabled = false;
-            NavigationItem.Title = Localization.GetString("recent_addresses_title");
+            NavigationItem.Title = Localization.GetString("phonebook_contacts_title");
             NavigationItem.Prompt = null;
             UIView.AnimationsEnabled = true;
         }
@@ -139,16 +136,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var addresses = await Managers.DocumentsManager.GetRecentAddressesAsync();
+                var contacts = CommonConfig.PhonebookUtilities.GetPhonebookContacts();
+
+                if (contacts == null)
+                {
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
+                                                         Localization.GetString("phonebook_contacts_no_access_content"));
+                    DismissViewController(true, null);
+                }
 
                 var ds = (DataSource) tableView.Source;
-                ds.SetItems(addresses);
+                ds.SetItems(contacts.OrderBy(c => c.FullName).ToList());
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while retrieving recent addresses", ex);
+                CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
-                DismissViewController(true, null);
+                NavigationController?.PopViewController(true);
             }
             finally
             {
@@ -160,10 +164,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void RecentAddressSelected(RecentAddress ra)
+        public async void PhonebookAddressSelected(Contact pb, UITableViewCell cell)
         {
-            recentAddressSelectedAction(ra.Name, ra.Address);
-            DismissViewController(true, null);
+            string address = null;
+            if (pb.CommunicationAddresses.Count > 1)
+            {
+                var addresses = pb.CommunicationAddresses.Select(a => a.Address).ToArray();
+                var index = await Dialogs.ShowListDialogAsync(this, string.Empty, addresses, cell);
+
+                if (index < 0)
+                    return;
+
+                address = addresses[index];
+            }
+            else
+            {
+                address = pb.CommunicationAddresses.First().Address;
+            }
+
+            var name = $"{pb.FirstName}{  pb.LastName}";
         }
 
         #endregion
@@ -179,16 +198,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty { get { return !recentAddressesInView.Any(); } }
+            public bool Empty { get { return !phonebookContactsInView.Any(); } }
 
-            RecentAddressesListViewController viewController;
+            PhonebookContactsListViewController viewController;
             UITableView tableView;
             readonly string emptyText;
 
             bool loading = true;
-            List<RecentAddress> recentAddressesInView = new List<RecentAddress>(25);
+            List<Contact> phonebookContactsInView = new List<Contact>(25);
 
-            public DataSource(RecentAddressesListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(PhonebookContactsListViewController viewController, UITableView tableView, string emptyText)
             {
                 this.viewController = viewController;
                 this.tableView = tableView;
@@ -207,9 +226,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var ra = recentAddressesInView[indexPath.Row];
+                var ra = phonebookContactsInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(RecentAddressesTableViewCell.Key) as RecentAddressesTableViewCell ?? RecentAddressesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ContactsTableViewCell.Key) as ContactsTableViewCell ?? ContactsTableViewCell.Create();
                 cell.Initialize(ra);
 
                 return cell;
@@ -220,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return recentAddressesInView.Count;
+                return phonebookContactsInView.Count;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
@@ -233,23 +252,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView.Editing)
                     return;
 
-                var ra = recentAddressesInView[indexPath.Row];
-                viewController.RecentAddressSelected(ra);
+                var ra = phonebookContactsInView[indexPath.Row];
+                viewController.PhonebookAddressSelected(ra, tableView.CellAt(indexPath));
             }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return RecentAddressesTableViewCell.Height;
+                return ContactsTableViewCell.Height;
             }
 
-            public void SetItems(List<RecentAddress> recentAddresses)
+            public void SetItems(List<Contact> phonebookContacts)
             {
-                loading = false; //TODO should we sort them?
+                loading = false;
 
-                var isInputListPopulated = recentAddresses.Any();
+                var isInputListPopulated = phonebookContacts.Any();
 
                 if (isInputListPopulated)
-                    recentAddressesInView.AddRange(recentAddresses);
+                    phonebookContactsInView.AddRange(phonebookContacts);
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
@@ -258,9 +277,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                var count = recentAddressesInView.Count;
+                var count = phonebookContactsInView.Count;
 
-                recentAddressesInView.Clear();
+                phonebookContactsInView.Clear();
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
@@ -274,7 +293,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 viewController = null;
                 tableView = null;
-                recentAddressesInView = null;
+                phonebookContactsInView = null;
             }
         }
     }

@@ -14,6 +14,10 @@ namespace Mark5.Mobile.Common.Model
         [Ignore]
         public override ModuleType ModuleType => ModuleType.Contacts;
 
+        [Ignore]
+        public string FullName => $"{FirstName}{(string.IsNullOrEmpty(Patronymic) ? string.Empty : " " + Patronymic)}" + $"{(string.IsNullOrEmpty(LastName) ? "" : " " + LastName)}";
+        //TODO should we keep it as a property?
+
         [Column("FirstName")]
         public string FirstName { get; set; }
 

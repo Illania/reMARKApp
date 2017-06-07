@@ -74,8 +74,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 CNContactKey.EmailAddresses
             };
 
-            NSError error;
-            var containers = store.GetContainers(null, out error);
+            var containers = store.GetContainers(null, out NSError error);
 
             if (error != null)
                 return null;
@@ -100,11 +99,12 @@ namespace Mark5.Mobile.IOS.Utilities
 
         Contact ConvertToContact(CNContact cnContact)
         {
-            var contact = new Contact();
-            contact.FirstName = cnContact.GivenName;
-            contact.LastName = cnContact.FamilyName;
-            contact.CommunicationAddresses = cnContact.EmailAddresses.Where(el => Validator.IsEmailValid(el.Value)).Select(el => new CommunicationAddress(el.Value, CommunicationAddressType.Email)).ToList();
-
+            var contact = new Contact()
+            {
+                FirstName = cnContact.GivenName,
+                LastName = cnContact.FamilyName,
+                CommunicationAddresses = cnContact.EmailAddresses.Where(el => Validator.IsEmailValid(el.Value)).Select(el => new CommunicationAddress(el.Value, CommunicationAddressType.Email)).ToList()
+            };
             return contact;
         }
 

@@ -40,6 +40,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             UpdateCategoriesColors();
         }
 
+        public void Initialize(Contact contact)
+        {
+            NameLabel.Text = contact.FullName;
+        }
+
         #endregion
 
         #region UITableViewCell overrides
