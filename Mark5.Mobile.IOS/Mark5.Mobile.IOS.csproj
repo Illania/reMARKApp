@@ -515,6 +515,8 @@
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd47.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
+		<BundleResource Include="Resources\icons\add%402x.png" />
+		<BundleResource Include="Resources\icons\add%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">

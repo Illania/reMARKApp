@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -76,6 +77,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
+            var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            var AddButton = new UIButton();
+            AddButton.SetImage(addButtonIcon, UIControlState.Normal);
+            AddButton.BackgroundColor = UIColor.Clear;
+            //AddButton.TouchUpInside += HandleAddButtonTapped;
+            AddButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            AddButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
+            AddButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            AddButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            AddButton.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContainerView.AddSubview(AddButton);
+            ContainerView.AddConstraints(new[]
+                 {
+                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin - AddButton.ContentEdgeInsets.Top),
+                        NSLayoutConstraint.Create(AddButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin - AddButton.ContentEdgeInsets.Right),
+                    });
+
             TextView = new CustomUITextView(CGRect.Empty, textContainer);
             TextView.AutocapitalizationType = UITextAutocapitalizationType.None;
             TextView.AutocorrectionType = UITextAutocorrectionType.No;
@@ -101,7 +119,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1f, InnerMargin),
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
+                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, AddButton, NSLayoutAttribute.Left, 1f, -InnerMargin)
             });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
