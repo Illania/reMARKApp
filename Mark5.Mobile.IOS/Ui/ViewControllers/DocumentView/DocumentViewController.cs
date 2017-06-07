@@ -9,6 +9,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -30,7 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null && notificationGuid == default(Guid);
 
-        int? folderId { get; set; }
+        int? folderId { get; set; } //TODO correct naming after merge
         Folder folder { get; set; }
         int? documentId { get; set; }
         DocumentPreview documentPreview { get; set; }
@@ -190,7 +191,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 nextDocumentButtonItem = null;
                 previousDocumentButtonItem = null;
-
 
                 nextDocumentButtonItem = new UIBarButtonItem();
                 nextDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-down.png"));
@@ -959,8 +959,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 Localization.GetString("reply"),
                 Localization.GetString("reply_all"),
-                Localization.GetString("forward")
-            };
+                Localization.GetString("forward"),
+                Localization.GetString("copy_to_new")};
 
             var result = await Dialogs.ShowListDialogAsync(this, null, replyListStrings, replyActions);
 
@@ -977,6 +977,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     break;
                 case 2:
                     DoReply(DocumentCreationModeFlag.Forward);
+                    break;
+                case 3:
+                    CopyToNew();
                     break;
             }
         }
@@ -1246,6 +1249,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocument = document,
                 PreviousDocumentPreview = documentPreview
+            };
+
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        async void CopyToNew()
+        {
+            if (document == null || documentPreview == null)
+                return;
+
+            var hasAttachments = document.Attachments.Any();
+
+            string[] modes = null;
+
+            if (hasAttachments)
+            {
+                modes = new[] { Localization.GetString("copy_to_new_addresses"),
+                Localization.GetString("copy_to_new_text_and_attachments"), Localization.GetString("copy_to_new_attachments") };
+            }
+            else
+            {
+                modes = new[] { Localization.GetString("copy_to_new_addresses"),
+                Localization.GetString("copy_to_new_text") };
+            }
+
+            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("copy_to_new_title"), modes, replyActions);
+
+            if (result < 0)
+                return;
+
+            CopyToNewOption option = CopyToNewOption.None;
+            switch (result)
+            {
+                case 0:
+                    option = CopyToNewOption.KeepOnlyAddresses;
+                    break;
+                case 1:
+                    option = CopyToNewOption.KeepTextAndAttachments;
+                    break;
+                case 2:
+                    option = CopyToNewOption.KeepOnlyAttachments;
+                    break;
+            }
+
+            var vc = new ComposeDocumentViewController
+            {
+                PreviousDocumentId = documentPreview.Id,
+                CreationModeFlag = DocumentCreationModeFlag.New,
+                PreviousDocumentFolderId = folderId ?? folder?.Id,
+                PreviousDocumentDirection = documentPreview.Direction,
+                PreviousDocument = document,
+                PreviousDocumentPreview = documentPreview,
+                CopyToNewOption = option,
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

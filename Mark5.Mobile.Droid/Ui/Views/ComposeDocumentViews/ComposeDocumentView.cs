@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
@@ -15,6 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public Document PreviousDocument { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
+        public CopyToNewOption CopyToNewOptions { get; set; }
         public IComposeDocumentViewState State { get; set; }
 
         protected int DistanceNone;

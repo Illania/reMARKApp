@@ -8,6 +8,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -32,15 +33,26 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string PreconfiguredEmailCcAddressesIntentKey = "PreconfiguredEmailCcAddressesIntent_051636c4-f032-4736-9d05-b9c0427bba5b";
 
         const string PreconfiguredEmailBccAddressesIntentKey = "PreconfiguredEmailBccAddressesIntent_c7d5b5ce-497c-460d-bcbd-331b3e01b656";
+        const string CopyToNewOptionsIntentKey = "CopyToNewOptionsIntent_f298d024-4df0-431d-ad3d-1834eb0dede0";
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
 
-        public static Intent CreateIntent(Context context, DocumentCreationModeFlag creationModeFlag, DocumentDirection previousDocumentDirection, int? precedingDocumentId = null, int? precedingDocumentFolderId = null, Guid outgoingDocumentGuid = default(Guid), List<string> preconfiguredEmailToAddresses = null, List<string> preconfiguredEmailCcAddresses = null, List<string> preconfiguredEmailBccAddresses = null)
+        public static Intent CreateIntent(Context context,
+                                          DocumentCreationModeFlag creationModeFlag,
+                                          DocumentDirection previousDocumentDirection,
+                                          int? precedingDocumentId = null,
+                                          int? precedingDocumentFolderId = null,
+                                          Guid outgoingDocumentGuid = default(Guid),
+                                          List<string> preconfiguredEmailToAddresses = null,
+                                          List<string> preconfiguredEmailCcAddresses = null,
+                                          List<string> preconfiguredEmailBccAddresses = null,
+                                          CopyToNewOption copyToNewOptions = CopyToNewOption.None)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
-            intent.PutExtra(CreationModeFlagIntentKey, (int) creationModeFlag);
-            intent.PutExtra(PreviousDocumentDirectionIntentKey, (int) previousDocumentDirection);
+            intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
+            intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
+            intent.PutExtra(CopyToNewOptionsIntentKey, (int)copyToNewOptions);
 
             if (precedingDocumentId != null)
                 intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
@@ -101,6 +113,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(PreconfiguredEmailBccAddressesIntentKey))
                     cdf.PreconfiguredEmailBccAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailBccAddressesIntentKey);
+
+                if (Intent.HasExtra(CopyToNewOptionsIntentKey))
+                    cdf.CopyToNewOption = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey);
 
                 if (Intent.HasExtra(OutgoingDocumentGuidIntentKey))
                 {

@@ -16,6 +16,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -211,16 +212,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int GoToNext = 6;
             public const int MarkAsRead = 10;
             public const int MarkAsUnread = 11;
-            public const int CopyToWorktray = 20;
-            public const int CopyToFolder = 30;
-            public const int MoveToFolder = 31;
-            public const int SetPriority = 40;
-            public const int Categories = 50;
-            public const int Comments = 60;
-            public const int Actions = 70;
-            public const int Links = 80;
-            public const int DeleteFromFolder = 90;
-            public const int Delete = 91;
+            public const int CopyToNew = 20;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int Comments = 70;
+            public const int Actions = 80;
+            public const int Links = 90;
+            public const int DeleteFromFolder = 100;
+            public const int Delete = 101;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -263,6 +265,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || DocumentPreview.Direction == DocumentDirection.Draft)
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+
+            menu.Add(Menu.None, MenuItemActions.CopyToNew, MenuItemActions.CopyToNew, Resource.String.copy_to_new);
+
         }
 
         public override async void OnPrepareOptionsMenu(IMenu menu)
@@ -399,6 +404,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Delete)
             {
                 DeleteAction();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.CopyToNew)
+            {
+                CopyToNew();
                 return true;
             }
 
@@ -610,6 +621,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
+        }
+
+        async void CopyToNew()
+        {
+            if (Document == null || DocumentPreview == null)
+                return;
+
+            var hasAttachments = Document.Attachments.Any();
+
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_new_mode_title,
+                                                      hasAttachments ? Resource.Array.copy_to_new_modes : Resource.Array.copy_to_new_modes_no_attachments, true);
+
+            if (choice < 0)
+                return;
+
+            CopyToNewOption option = CopyToNewOption.None;
+            switch (choice)
+            {
+                case 0:
+                    option = CopyToNewOption.KeepOnlyAddresses;
+                    break;
+                case 1:
+                    option = CopyToNewOption.KeepTextAndAttachments;
+                    break;
+                case 2:
+                    option = CopyToNewOption.KeepOnlyAttachments;
+                    break;
+            }
+
+            var intent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentPreview.Direction, Document.Id,
+                                                         FolderId ?? Folder?.Id, copyToNewOptions: option);
+            StartActivity(intent);
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
