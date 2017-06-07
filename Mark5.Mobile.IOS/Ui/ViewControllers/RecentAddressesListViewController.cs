@@ -20,6 +20,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        Action<RecentAddress> recentAddressClickedAction;
+
+        public RecentAddressesListViewController(Action<RecentAddress> recentAddressClickedAction)
+        {
+            this.recentAddressClickedAction = recentAddressClickedAction;
+        }
+
         #region UIViewControllerOverrides
 
         public override void LoadView()
@@ -29,13 +36,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeNavigationBarTitle();
             InitializeView();
-        }
-
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            //TODO check
         }
 
         public override void ViewWillAppear(bool animated)
@@ -163,6 +163,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void RecentAddressSelected(RecentAddress address)
         {
             //TODO...
+
+            NavigationController?.PopViewController(true);
         }
 
         #endregion
@@ -171,11 +173,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ExitEditItem_Clicked(object sender, EventArgs e)
         {
-            //TODO close
+            NavigationController?.PopViewController(true);
         }
 
         #endregion
-
 
         class DataSource : UITableViewSource, IDisposable
         {
@@ -244,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void SetItems(List<RecentAddress> recentAddresses)
             {
-                loading = false;
+                loading = false; //TODO should we sort them?
 
                 var isInputListPopulated = recentAddresses.Any();
 
