@@ -268,7 +268,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             if (d.ReadByUserIds != null)
                 result.ReadByUserIds.AddRange(d.ReadByUserIds);
             if (d.ReadByUserNames != null)
-                result.ReadByUserNames = new Dictionary<int, string>(d.ReadByUserNames);
+                result.ReadByUserNames = d.ReadByUserNames.Where(kv => !string.IsNullOrWhiteSpace(kv.Value)).ToDictionary(kv => kv.Key, kv => kv.Value);
             if (d.Attachments != null)
                 result.Attachments.AddRange(d.Attachments.WhereNotNull().Select(Convert));
             if (d.Comments != null)
