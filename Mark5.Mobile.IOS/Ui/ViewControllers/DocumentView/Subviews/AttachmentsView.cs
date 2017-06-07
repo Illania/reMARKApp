@@ -76,7 +76,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 }
 
                 var showMoreButton = UIButton.FromType(UIButtonType.RoundedRect);
-                showMoreButton.SetTitle("Show more...", UIControlState.Normal);
+                showMoreButton.SetTitle(Localization.GetString("show_more___"), UIControlState.Normal);
                 showMoreButton.TintColor = Theme.DarkBlue;
                 showMoreButton.TouchUpInside += HandleShowMoreButtonTapped;
                 stackView.AddArrangedSubview(showMoreButton);
