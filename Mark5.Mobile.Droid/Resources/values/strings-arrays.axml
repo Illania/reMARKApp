@@ -28,4 +28,8 @@
 		<item>Text and attachments</item>
 		<item>Attachments</item>
 	</string-array>
+	<string-array name="copy_to_new_modes_no_attachments">
+		<item>Addresses</item>
+		<item>Text</item>
+	</string-array>
 </resources>

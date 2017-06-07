@@ -265,9 +265,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || DocumentPreview.Direction == DocumentDirection.Draft)
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
-            }
 
             menu.Add(Menu.None, MenuItemActions.CopyToNew, MenuItemActions.CopyToNew, Resource.String.copy_to_new);
+
         }
 
         public override async void OnPrepareOptionsMenu(IMenu menu)
@@ -628,29 +628,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Document == null || DocumentPreview == null)
                 return;
 
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_new_mode_title, Resource.Array.copy_to_new_modes, true);
+            var hasAttachments = Document.Attachments.Any();
 
-            if (choice >= 0)
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_new_mode_title,
+                                                      hasAttachments ? Resource.Array.copy_to_new_modes : Resource.Array.copy_to_new_modes_no_attachments, true);
+
+            if (choice < 0)
+                return;
+
+            CopyToNewOption option = CopyToNewOption.None;
+            switch (choice)
             {
-                CopyToNewOption option = CopyToNewOption.None;
-                switch (choice)
-                {
-                    case 0:
-                        option = CopyToNewOption.KeepOnlyAddresses;
-                        break;
-                    case 1:
-                        option = CopyToNewOption.KeepTextAndAttachments;
-                        break;
-                    case 2:
-                        option = CopyToNewOption.KeepOnlyAttachments;
-                        break;
-                }
-
-                var intent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentPreview.Direction, Document.Id,
-                                                             FolderId ?? Folder?.Id, copyToNewOptions: option);
-                StartActivity(intent);
+                case 0:
+                    option = CopyToNewOption.KeepOnlyAddresses;
+                    break;
+                case 1:
+                    option = CopyToNewOption.KeepTextAndAttachments;
+                    break;
+                case 2:
+                    option = CopyToNewOption.KeepOnlyAttachments;
+                    break;
             }
 
+            var intent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentPreview.Direction, Document.Id,
+                                                         FolderId ?? Folder?.Id, copyToNewOptions: option);
+            StartActivity(intent);
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
