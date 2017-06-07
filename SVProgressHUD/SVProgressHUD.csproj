@@ -62,5 +62,19 @@
     <Compile Include="Enums.cs" />
     <Compile Include="GlobalSuppressions.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\angle-mask.png" />
+    <BundleResource Include="Resources\angle-mask%402x.png" />
+    <BundleResource Include="Resources\angle-mask%403x.png" />
+    <BundleResource Include="Resources\error.png" />
+    <BundleResource Include="Resources\error%402x.png" />
+    <BundleResource Include="Resources\error%403x.png" />
+    <BundleResource Include="Resources\info.png" />
+    <BundleResource Include="Resources\info%402x.png" />
+    <BundleResource Include="Resources\info%403x.png" />
+    <BundleResource Include="Resources\success.png" />
+    <BundleResource Include="Resources\success%402x.png" />
+    <BundleResource Include="Resources\success%403x.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

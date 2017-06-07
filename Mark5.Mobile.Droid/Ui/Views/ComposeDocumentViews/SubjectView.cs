@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
@@ -45,11 +46,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.None || CreationModeFlag == DocumentCreationModeFlag.New)
+            if (CreationModeFlag == DocumentCreationModeFlag.None)
                 return Task.CompletedTask;
 
             switch (CreationModeFlag)
             {
+                case DocumentCreationModeFlag.New:
+                    subjectTextView.Text = CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments ? PreviousDocumentPreview.Subject : string.Empty;
+                    break;
                 case DocumentCreationModeFlag.Edit:
                     subjectTextView.Text = PreviousDocumentPreview.Subject;
                     break;

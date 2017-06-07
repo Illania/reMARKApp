@@ -273,9 +273,6 @@
 		<Reference Include="PCLStorage">
 			<HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
 		</Reference>
-		<Reference Include="MailBee.NET">
-			<HintPath>..\packages\MailBee.NET.11.0.1\lib\netstandard1.3\MailBee.NET.dll</HintPath>
-		</Reference>
 		<Reference Include="SQLitePCLRaw.core">
 			<HintPath>..\packages\SQLitePCLRaw.core.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
 		</Reference>
@@ -311,6 +308,9 @@
 		</Reference>
 		<Reference Include="PreMailer.Net">
 			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
+		</Reference>
+		<Reference Include="MailBee.NET">
+		  <HintPath>..\packages\MailBee.NET.11.1.0\lib\netstandard1.3\MailBee.NET.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
