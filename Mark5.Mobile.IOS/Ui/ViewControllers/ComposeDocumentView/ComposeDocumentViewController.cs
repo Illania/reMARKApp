@@ -1011,7 +1011,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void DoOpenRecents(RecipientsView recipientsView)
         {
-            var vc = new RecentAddressesListViewController(ra => recipientsView.AddRecipent(ra.Name, ra.Address));
+            var vc = new RecentAddressesListViewController(recipientsView.AddRecipent);
             NavigationController.PushViewController(vc, true);
         }
 

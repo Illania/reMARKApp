@@ -20,9 +20,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
-        Action<RecentAddress> recentAddressClickedAction;
+        Action<string, string> recentAddressClickedAction;
 
-        public RecentAddressesListViewController(Action<RecentAddress> recentAddressClickedAction)
+        public RecentAddressesListViewController(Action<string, string> recentAddressClickedAction)
         {
             this.recentAddressClickedAction = recentAddressClickedAction;
         }
@@ -160,10 +160,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void RecentAddressSelected(RecentAddress address)
+        public void RecentAddressSelected(RecentAddress ra)
         {
-            //TODO...
-
+            recentAddressClickedAction(ra.Name, ra.Address);
             NavigationController?.PopViewController(true);
         }
 
