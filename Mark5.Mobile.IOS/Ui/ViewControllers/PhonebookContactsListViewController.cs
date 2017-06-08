@@ -200,7 +200,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void PhonebookAddressSelected(PrintableSuggestion pb, UITableViewCell cell)
         {
             phonebookContactSelectedAction(pb.Name, pb.Address);
-            DismissViewController(true, null);
+            PresentingViewController.DismissViewController(true, null);
         }
 
         #endregion
