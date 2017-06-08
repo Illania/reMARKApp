@@ -102,14 +102,14 @@ namespace Mark5.Mobile.Common
             {
                 await semaphore.WaitAsync();
 
-                active = true;
+                //active = true;
 
-                if (!subscribed)
-                {
-                    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
-                    subscribed = true;
-                }
-                StartDownloadTask();
+                //if (!subscribed)
+                //{
+                //    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
+                //    subscribed = true;
+                //}
+                //StartDownloadTask();
             }
             finally
             {

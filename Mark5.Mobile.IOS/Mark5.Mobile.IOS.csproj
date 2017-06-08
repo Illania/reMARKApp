@@ -250,6 +250,7 @@
 		<Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+		<Compile Include="Ui\ViewControllers\DownloadViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

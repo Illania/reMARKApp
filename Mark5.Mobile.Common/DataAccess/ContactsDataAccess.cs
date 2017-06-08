@@ -54,7 +54,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     query += $"order by {nameof(ContactPreview.Name)} ";
 
                     if (maxItems > 0)
-                        query += $"limit {maxItems - 1} ";
+                        query += $"limit {maxItems} ";
                     if (startRowId > 0)
                         query += $"offset {startRowId} ";
                     var result = c.Query<ContactPreview>(query);

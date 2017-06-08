@@ -653,6 +653,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public async void EnableCaching(Folder folder)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
+            NavigationController.PresentViewController(new NavigationController(new DownloadViewController { Folder = folder}, UIModalPresentationStyle.FormSheet), true, null);
+
+            /*
             try
             {
                 await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
@@ -681,6 +684,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
+            */
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -973,6 +977,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         action.BackgroundColor = Theme.DarkerBlue;
                         actions.Add(action);
                     }
+                }
+
+                if (module == ModuleType.Contacts)
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+						Localization.GetString("enable_caching"),
+						(a, ip) =>
+						{
+						    viewController.EnableCaching(foldersInView[ip.Row]);
+						    tableView.SetEditing(false, true);
+						});
+                    action.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(action);
                 }
 
                 return actions.ToArray();
@@ -1290,6 +1307,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                             action.BackgroundColor = Theme.DarkerBlue;
                             actions.Add(action);
                         }
+                    }
+
+                    if (module == ModuleType.Contacts)
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                            Localization.GetString("enable_caching"),
+                            (a, ip) =>
+                            {
+                                viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]);
+                                tableView.SetEditing(false, true);
+                            });
+                        action.BackgroundColor = Theme.DarkBlue;
+                        actions.Add(action);
                     }
                 }
 
