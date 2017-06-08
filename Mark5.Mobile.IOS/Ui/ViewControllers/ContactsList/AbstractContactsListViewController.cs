@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,27 +15,34 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
-    public class ContactsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public abstract class AbstractContactsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
+        protected readonly bool DisableRowActions;
+
         public Folder Folder { get; set; }
 
-        UIBarButtonItem exitEditItem;
-        UIBarButtonItem editItem;
+        protected UIBarButtonItem exitEditItem;
+        protected UIBarButtonItem editItem;
 
-        UIRefreshControl refreshControl;
-        UITableView tableView;
-        UISearchController searchController;
-        UITableViewController searchResultsController;
-        DataSource searchResultsDataSource;
+        protected UIRefreshControl refreshControl;
+        protected UITableView tableView;
+        protected UISearchController searchController;
+        protected UITableViewController searchResultsController;
+        protected DataSource searchResultsDataSource; //TODO put capital letters
 
-        CancellationTokenSource searchCancellationTokenSource;
+        protected CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         bool refreshing;
 
         CancellationTokenSource cts;
+
+        protected AbstractContactsListViewController(bool disableRowActions)
+        {
+            DisableRowActions = disableRowActions;
+        }
 
         #region UIViewController overrides
 
@@ -134,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             tableView = new UITableView();
             tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"));
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"), DisableRowActions);
             tableView.AllowsSelectionDuringEditing = false;
             tableView.AllowsMultipleSelectionDuringEditing = true;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -164,7 +171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_contacts"));
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_contacts"), DisableRowActions);
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -223,37 +230,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void ContactSelected(UITableView tableView, ContactPreview contactPreview)
+        public virtual void ContactSelected(UITableView tableView, ContactPreview contactPreview)
         {
-            if (tableView == searchResultsController.TableView)
-            {
-                var ds = (DataSource) tableView.Source;
-                var indexPath = ds.FindItemIndexPath(contactPreview);
-                if (indexPath != null)
-                    tableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
-            }
-
-            if (SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
-                nc.PopToRootViewController(false);
-
-                var vc = (ContactViewController) nc.ViewControllers[0];
-
-                if (vc.IsShowingContactWithId(contactPreview.Id))
-                    return;
-
-                vc.ClearData();
-                vc.SetData(Folder, contactPreview);
-                vc.RefreshData();
-            }
-            else
-            {
-                var vc = new ContactViewController();
-                vc.SetData(Folder, contactPreview);
-                vc.SetRefreshDataOnAppear();
-                NavigationController.PushViewController(vc, true);
-            }
         }
 
         [Export("longPressed:")]
@@ -749,24 +727,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        protected class DataSource : UITableViewSource, IDisposable
         {
             public bool Empty { get { return !contactPreviewsInView.SelectMany(v => v).Any(); } }
 
             public IEnumerable<ContactPreview> Items { get { return contactPreviewsInView.SelectMany(i => i); } }
 
-            ContactsListViewController viewController;
+            AbstractContactsListViewController viewController;
             UITableView tableView;
             readonly string emptyText;
 
             bool loading = true;
+            bool disableRowActions;
             List<List<ContactPreview>> contactPreviewsInView = new List<List<ContactPreview>>(25);
 
-            public DataSource(ContactsListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(AbstractContactsListViewController viewController, UITableView tableView, string emptyText, bool disableRowActions)
             {
                 this.viewController = viewController;
                 this.tableView = tableView;
                 this.emptyText = emptyText;
+                this.disableRowActions = disableRowActions;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -838,7 +818,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return true;
+                return !disableRowActions;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)

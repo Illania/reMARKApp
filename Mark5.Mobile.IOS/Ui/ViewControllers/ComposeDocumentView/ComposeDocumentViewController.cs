@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
@@ -844,7 +845,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DoOpenRecents(sender as RecipientsView);
                     break;
                 case 1:
-                    DoOpenContacts(sender as RecipientsView);
+                    await DoOpenContacts(sender as RecipientsView);
                     break;
                 case 2:
                     DoOpenShortcodes(sender as RecipientsView);
@@ -1005,9 +1006,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             throw new NotImplementedException();
         }
 
-        void DoOpenContacts(RecipientsView recipientsView)
+        async Task DoOpenContacts(RecipientsView recipientsView)
         {
-            throw new NotImplementedException();
+            var vc = new PickerContactsFolderListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Task;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+
+            DismissViewController(true, null);
         }
 
         void DoOpenRecents(RecipientsView recipientsView)
