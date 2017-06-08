@@ -60,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 container.RemoveViews(0, container.ChildCount);
 
-                if (Document.Attachments.Count > 3)
+                if (Document.Attachments.Count > 4)
                 {
                     foreach (var ad in Document.Attachments.Take(3))
                     {

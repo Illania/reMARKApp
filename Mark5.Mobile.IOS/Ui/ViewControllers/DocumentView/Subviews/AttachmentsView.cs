@@ -67,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 v.RemoveFromSuperview();
             });
 
-            if (Document.Attachments.Count > 3)
+            if (Document.Attachments.Count > 4)
             {
                 foreach (var ad in Document.Attachments.Take(3))
                 {
