@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -95,6 +96,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.AllowsSelectionDuringEditing = false;
             tableView.AllowsMultipleSelectionDuringEditing = true;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            tableView.EstimatedRowHeight = 44f;
+            tableView.RowHeight = UITableView.AutomaticDimension;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
             {
@@ -146,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var ds = (DataSource) tableView.Source;
-                ds.SetItems(contacts.OrderBy(c => c.FullName).ToList());
+                ds.SetItems(contacts.OrderBy(c => c.Name).ToList());
             }
             catch (Exception ex)
             {
@@ -164,25 +167,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public async void PhonebookAddressSelected(Contact pb, UITableViewCell cell)
+        public void PhonebookAddressSelected(PrintableSuggestion pb, UITableViewCell cell)
         {
-            string address = null;
-            if (pb.CommunicationAddresses.Count > 1)
-            {
-                var addresses = pb.CommunicationAddresses.Select(a => a.Address).ToArray();
-                var index = await Dialogs.ShowListDialogAsync(this, string.Empty, addresses, cell);
-
-                if (index < 0)
-                    return;
-
-                address = addresses[index];
-            }
-            else
-            {
-                address = pb.CommunicationAddresses.First().Address;
-            }
-
-            var name = $"{pb.FirstName}{  pb.LastName}";
+            phonebookContactSelectedAction(pb.Name, pb.Address);
+            DismissViewController(true, null);
         }
 
         #endregion
@@ -198,14 +186,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty { get { return !phonebookContactsInView.Any(); } }
+            public bool Empty { get { return !phonebookContactsInView.SelectMany(v => v).Any(); } }
 
             PhonebookContactsListViewController viewController;
             UITableView tableView;
             readonly string emptyText;
 
             bool loading = true;
-            List<Contact> phonebookContactsInView = new List<Contact>(25);
+            List<List<PrintableSuggestion>> phonebookContactsInView = new List<List<PrintableSuggestion>>(25);
 
             public DataSource(PhonebookContactsListViewController viewController, UITableView tableView, string emptyText)
             {
@@ -226,12 +214,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var ra = phonebookContactsInView[indexPath.Row];
+                var ra = phonebookContactsInView[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ContactsTableViewCell.Key) as ContactsTableViewCell ?? ContactsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
                 cell.Initialize(ra);
 
                 return cell;
+            }
+
+            public override nint NumberOfSections(UITableView tableView)
+            {
+                if (loading || Empty)
+                    return 1;
+
+                return phonebookContactsInView.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -239,7 +235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return phonebookContactsInView.Count;
+                return phonebookContactsInView[(int) section].Count;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
@@ -252,25 +248,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView.Editing)
                     return;
 
-                var ra = phonebookContactsInView[indexPath.Row];
+                var ra = phonebookContactsInView[indexPath.Section][indexPath.Row];
                 viewController.PhonebookAddressSelected(ra, tableView.CellAt(indexPath));
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+            public override string[] SectionIndexTitles(UITableView tableView)
             {
-                return ContactsTableViewCell.Height;
+                return phonebookContactsInView.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper()).ToArray();
             }
 
-            public void SetItems(List<Contact> phonebookContacts)
+            public void SetItems(List<PrintableSuggestion> phonebookContacts)
             {
                 loading = false;
 
-                var isInputListPopulated = phonebookContacts.Any();
-
-                if (isInputListPopulated)
-                    phonebookContactsInView.AddRange(phonebookContacts);
-
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                phonebookContactsInView = phonebookContacts.GroupBy(cp => cp.Name.SafeSubstring(0, 1)).Select(s => s.ToList()).ToList();
+                tableView.ReloadData();
             }
 
             public void Reset()

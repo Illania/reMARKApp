@@ -48,9 +48,8 @@ namespace Mark5.Mobile.Common.Services
 
             Task.Run(() =>
             {
-                var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Contact>();
-                var filtered = PrintableSuggestion.GetPrintableSuggestionsFromContacts(phonebookContacts, SuggestionType.Phonebook);
-                handler(filtered, token);
+                var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<PrintableSuggestion>();
+                handler(phonebookContacts, token);
             });
         }
 

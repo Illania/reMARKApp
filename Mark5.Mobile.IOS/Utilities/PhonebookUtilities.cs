@@ -13,12 +13,12 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         #region IPhonebookUtilities implementation
 
-        public List<Contact> GetPhonebookContacts()
+        public List<PrintableSuggestion> GetPhonebookContacts()
         {
             return GetiOSContacts();
         }
 
-        public List<Contact> GetFilteredPhonebookContacts(string phrase)
+        public List<PrintableSuggestion> GetFilteredPhonebookContacts(string phrase)
         {
             return GetiOSContacts(phrase);
         }
@@ -27,11 +27,11 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Helper methods
 
-        List<Contact> GetiOSContacts(string phrase = null)
+        List<PrintableSuggestion> GetiOSContacts(string phrase = null)
         {
             var authorizationSemaphore = new SemaphoreSlim(0, 1);
 
-            var contacts = new List<Contact>();
+            var contacts = new List<PrintableSuggestion>();
 
             var status = CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts);
 
@@ -63,7 +63,7 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
 
-        List<Contact> GetContactsFromContactStore(CNContactStore store, string phrase)
+        List<PrintableSuggestion> GetContactsFromContactStore(CNContactStore store, string phrase)
         {
             var cnContacts = new List<CNContact>();
 
@@ -90,22 +90,28 @@ namespace Mark5.Mobile.IOS.Utilities
                 cnContacts.AddRange(cnContactsTemp);
             }
 
-            var contacts = cnContacts.Select(ConvertToContact);
+            var contacts = cnContacts.Select(ConvertToContact).SelectMany(i => i);
 
             if (!string.IsNullOrEmpty(phrase))
-                contacts = contacts.Where(c => c.FirstName.ContainsCaseInsensitive(phrase) || c.LastName.ContainsCaseInsensitive(phrase) || c.CommunicationAddresses.Any(ca => ca.Address.ContainsCaseInsensitive(phrase)));
+                contacts = contacts.Where(c => c.Name.ContainsCaseInsensitive(phrase) || c.Address.ContainsCaseInsensitive(phrase));
             return contacts.ToList();
         }
 
-        Contact ConvertToContact(CNContact cnContact)
+        List<PrintableSuggestion> ConvertToContact(CNContact cnContact)
         {
-            var contact = new Contact()
+            var phonebookContacts = new List<PrintableSuggestion>();
+            var addresses = cnContact.EmailAddresses.Where(el => Validator.IsEmailValid(el.Value)).Select(el => el.Value).ToList();
+            foreach (var address in addresses)
             {
-                FirstName = cnContact.GivenName,
-                LastName = cnContact.FamilyName,
-                CommunicationAddresses = cnContact.EmailAddresses.Where(el => Validator.IsEmailValid(el.Value)).Select(el => new CommunicationAddress(el.Value, CommunicationAddressType.Email)).ToList()
-            };
-            return contact;
+                phonebookContacts.Add(new PrintableSuggestion()
+                {
+                    Address = address,
+                    Type = SuggestionType.Phonebook,
+                    Name = string.Join(" ", new[] { cnContact.GivenName, cnContact.FamilyName }.Where(v => !string.IsNullOrEmpty(v))),
+                });
+            }
+
+            return phonebookContacts;
         }
 
         #endregion

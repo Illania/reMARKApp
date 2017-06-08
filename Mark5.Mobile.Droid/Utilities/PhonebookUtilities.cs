@@ -19,12 +19,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region IPhonebookUtilities implementation
 
-        public List<Contact> GetPhonebookContacts()
+        public List<PrintableSuggestion> GetPhonebookContacts()
         {
             return GetAndroidContacts(null);
         }
 
-        public List<Contact> GetFilteredPhonebookContacts(string phrase)
+        public List<PrintableSuggestion> GetFilteredPhonebookContacts(string phrase)
         {
             var selection = string.Format("{0} like \"%{2}%\" OR {1} like \"%{2}%\" COLLATE NOCASE", ContactsNameColumn, ContactEmailColumn, phrase);
             return GetAndroidContacts(selection);
@@ -34,9 +34,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Helper methods
 
-        List<Contact> GetAndroidContacts(string selection = null)
+        List<PrintableSuggestion> GetAndroidContacts(string selection = null)
         {
-            var contacts = new List<Contact>();
+            var phonebookContacts = new List<PrintableSuggestion>();
             var permissionCheck = ContextCompat.CheckSelfPermission(Android.App.Application.Context, Manifest.Permission.ReadContacts);
 
             if (permissionCheck == Android.Content.PM.Permission.Granted)
@@ -62,27 +62,22 @@ namespace Mark5.Mobile.Droid.Utilities
                         var contactName = cursor.GetString(contactsNameIndex);
                         var contactEmail = cursor.GetString(contactsEmailIndex);
 
-                        var preExisting = contacts.FirstOrDefault(c => c.Id == contactId);
+                        var phonebookContact = new PrintableSuggestion
+                        {
+                            Type = SuggestionType.Phonebook,
+                            Address = contactEmail,
+                            Name = contactName,
+                        };
 
-                        if (preExisting != null)
-                        {
-                            preExisting.CommunicationAddresses.Add(new CommunicationAddress(contactEmail, CommunicationAddressType.Email));
-                        }
-                        else
-                        {
-                            var newContact = new Contact();
-                            newContact.Id = (int) contactId;
-                            newContact.FirstName = contactName;
-                            newContact.CommunicationAddresses.Add(new CommunicationAddress(contactEmail, CommunicationAddressType.Email));
-                            contacts.Add(newContact);
-                        }
+                        phonebookContacts.Add(phonebookContact);
+
                     } while (cursor.MoveToNext());
 
                     cursor.Close();
                 }
             }
 
-            return contacts;
+            return phonebookContacts;
         }
 
         #endregion
