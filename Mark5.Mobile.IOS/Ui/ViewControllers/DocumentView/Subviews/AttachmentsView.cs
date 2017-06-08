@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -66,10 +67,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 v.RemoveFromSuperview();
             });
 
-            foreach (var ad in Document.Attachments)
+            if (Document.Attachments.Count > 4)
             {
-                var alssv = new AttachmentsSubView(this, ad);
-                stackView.AddArrangedSubview(alssv);
+                foreach (var ad in Document.Attachments.Take(3))
+                {
+                    var alssv = new AttachmentsSubView(this, ad);
+                    stackView.AddArrangedSubview(alssv);
+                }
+
+                var showMoreButton = UIButton.FromType(UIButtonType.RoundedRect);
+                showMoreButton.SetTitle(Localization.GetString("show_more___"), UIControlState.Normal);
+                showMoreButton.TintColor = Theme.DarkBlue;
+                showMoreButton.TouchUpInside += HandleShowMoreButtonTapped;
+                stackView.AddArrangedSubview(showMoreButton);
+            }
+            else
+            {
+                foreach (var ad in Document.Attachments)
+                {
+                    var alssv = new AttachmentsSubView(this, ad);
+                    stackView.AddArrangedSubview(alssv);
+                }
             }
 
             if (Container != null)
@@ -96,12 +114,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         #region Event handlers
 
-        public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs)
+        public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs) => AttachmentTapped(this, eventArgs);
+
+        void HandleShowMoreButtonTapped(object sender, EventArgs e)
         {
-            AttachmentTapped(this, eventArgs);
+            var btn = (UIButton) sender;
+            btn.TouchUpInside -= HandleShowMoreButtonTapped;
+            stackView.RemoveArrangedSubview(btn);
+            btn.RemoveFromSuperview();
+
+            foreach (var ad in Document.Attachments.Skip(3))
+            {
+                var alssv = new AttachmentsSubView(this, ad);
+                stackView.AddArrangedSubview(alssv);
+            }
         }
 
         #endregion
+
     }
 
     class AttachmentsSubView : UIView

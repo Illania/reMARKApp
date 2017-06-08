@@ -8,6 +8,8 @@ using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using System.Linq;
+using Android.Animation;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -58,12 +60,36 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 container.RemoveViews(0, container.ChildCount);
 
-                foreach (var ad in Document.Attachments)
+                if (Document.Attachments.Count > 4)
                 {
-                    var av = new AttachmentView(Context, ad, DistanceLarge, DistanceNormal);
-                    av.Click += (sender, e) => AttachmentClicked(this, ad);
-                    av.LongClick += (sender, e) => AttachmentLongClicked(this, ad);
-                    container.AddView(av);
+                    foreach (var ad in Document.Attachments.Take(3))
+                    {
+                        var av = new AttachmentView(Context, ad, DistanceLarge, DistanceNormal);
+                        av.Click += (sender, e) => AttachmentClicked(this, ad);
+                        av.LongClick += (sender, e) => AttachmentLongClicked(this, ad);
+                        container.AddView(av);
+                    }
+
+                    var showHideButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
+                    {
+                        LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                        Text = Context.GetString(Resource.String.show_more)
+                    };
+                    showHideButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
+                    showHideButton.SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNone);
+                    showHideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+                    showHideButton.Click += ShowHideButton_Click;
+                    container.AddView(showHideButton);
+                }
+                else
+                {
+                    foreach (var ad in Document.Attachments)
+                    {
+                        var av = new AttachmentView(Context, ad, DistanceLarge, DistanceNormal);
+                        av.Click += (sender, e) => AttachmentClicked(this, ad);
+                        av.LongClick += (sender, e) => AttachmentLongClicked(this, ad);
+                        container.AddView(av);
+                    }
                 }
             }
             else
@@ -71,6 +97,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Visibility = ViewStates.Gone;
                 container.RemoveViews(0, container.ChildCount);
             }
+        }
+
+        void ShowHideButton_Click(object sender, EventArgs e)
+        {
+            container.LayoutTransition = new LayoutTransition();
+
+            foreach (var ad in Document.Attachments.Skip(3))
+            {
+                var av = new AttachmentView(Context, ad, DistanceLarge, DistanceNormal);
+                av.Click += (sender2, e2) => AttachmentClicked(this, ad);
+                av.LongClick += (sender2, e2) => AttachmentLongClicked(this, ad);
+                container.AddView(av);
+            }
+
+            var btn = (AppCompatButton) sender;
+            btn.Click -= ShowHideButton_Click;
+            container.RemoveView(btn);
         }
 
         class AttachmentView : LinearLayoutCompat
