@@ -156,7 +156,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             };
             showHideButton.SetTextAppearanceCompat(Context, Resource.Style.fontSmall);
 
-            showHideButton.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            showHideButton.SetPadding(DistanceNone, DistanceNormal, DistanceNone, DistanceNone);
             showHideButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
             compactLayout.AddView(showHideButton);
 
