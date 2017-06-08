@@ -175,6 +175,7 @@
 "no_matching_shortcodes" = "There are no matching shortcodes";
 "no_matching_users" = "There are no matching users";
 "no_notifications" = "There are no new notifications";
+"no_phonebook_matching" = "No matching phonebook contacts";
 "no_object_actions" = "There are no actions";
 "no_object_links" = "There are no links";
 "no_subject" = "No subject";

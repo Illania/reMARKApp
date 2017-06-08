@@ -13,18 +13,25 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class PhonebookContactsListViewController : AbstractViewController
+    public class PhonebookContactsListViewController : AbstractViewController, IUISearchResultsUpdating
     {
         UIBarButtonItem exitEditItem;
         UITableView tableView;
 
+        UITableViewController searchResultsController;
+        DataSource searchResultsDataSource;
+        UISearchController searchController;
+
         CancellationTokenSource cts;
+
+        CancellationTokenSource searchCancellationTokenSource;
+        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         Action<string, string> phonebookContactSelectedAction;
 
-        public PhonebookContactsListViewController(Action<string, string> recentAddressClickedAction)
+        public PhonebookContactsListViewController(Action<string, string> phonebookContactSelectedAction)
         {
-            this.phonebookContactSelectedAction = recentAddressClickedAction;
+            this.phonebookContactSelectedAction = phonebookContactSelectedAction;
         }
 
         #region UIViewControllerOverrides
@@ -36,6 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeNavigationBarTitle();
             InitializeView();
+            InitializeSearchBar();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -116,6 +124,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             UIView.AnimationsEnabled = true;
         }
 
+        void InitializeSearchBar()
+        {
+            DefinesPresentationContext = true;
+
+            searchResultsController = new UITableViewController();
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_phonebook_matching"));
+            searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 44f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
+
+            searchController = new UISearchController(searchResultsController)
+            {
+                HidesNavigationBarDuringPresentation = true,
+                DimsBackgroundDuringPresentation = true,
+                ObscuresBackgroundDuringPresentation = true,
+                SearchResultsUpdater = this
+            };
+            searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            tableView.TableHeaderView = searchController.SearchBar;
+        }
+
         void InitializeHandlers()
         {
             if (exitEditItem != null)
@@ -184,16 +214,80 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+        #region Filter
+
+        public void UpdateSearchResultsForSearchController(UISearchController searchController)
+        {
+            var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+                searchResultsDataSource.Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
+                {
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
+
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                DoSearchContacts(searchText, searchCancellationTokenSource.Token);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void DoSearchContacts(string searchText, CancellationToken ct)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            searchResultsDataSource.Reset();
+
+            await Task.Delay(500);
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            var ds = (DataSource) tableView.Source;
+            var filteredContacts = ds.Items.Where(cp => MatchesQuery(cp, searchText)).ToList();
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            searchResultsDataSource.SetItems(filteredContacts);
+        }
+
+        static bool MatchesQuery(PrintableSuggestion cp, string query)
+        {
+            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.Address?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
+        }
+
+        #endregion
+
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty { get { return !phonebookContactsInView.SelectMany(v => v).Any(); } }
+            public bool Empty => !phonebookContactsInView.SelectMany(v => v).Any();
+
+            public List<PrintableSuggestion> Items => phonebookContactsInView.SelectMany(v => v).ToList();
 
             PhonebookContactsListViewController viewController;
             UITableView tableView;
             readonly string emptyText;
 
-            bool loading = true;
             List<List<PrintableSuggestion>> phonebookContactsInView = new List<List<PrintableSuggestion>>(25);
+
+            bool loading = true;
 
             public DataSource(PhonebookContactsListViewController viewController, UITableView tableView, string emptyText)
             {
@@ -272,11 +366,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var count = phonebookContactsInView.Count;
 
                 phonebookContactsInView.Clear();
-
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-
-                tableView.EndUpdates();
+                tableView.ReloadData();
             }
 
             protected override void Dispose(bool disposing)
