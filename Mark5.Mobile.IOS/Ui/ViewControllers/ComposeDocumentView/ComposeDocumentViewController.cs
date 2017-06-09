@@ -434,9 +434,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return;
 
             var addresses = shortcode.Addresses;
-            toView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
-            ccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
-            bccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
+            toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+            ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+            bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
         bool IsFormValid()
@@ -848,7 +848,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await DoOpenContacts(sender as RecipientsView);
                     break;
                 case 2:
-                    await DoOpenShortcodes(sender as RecipientsView);
+                    await DoOpenShortcodes();
                     break;
                 case 3:
                     await DoOpenPhonebook(sender as RecipientsView);
@@ -1005,12 +1005,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 
             DismissViewController(true, null);
-
         }
 
-        async Task DoOpenShortcodes(RecipientsView recipientsView)
+        async Task DoOpenShortcodes()
         {
-            throw new NotImplementedException();
+            var vc = new PickerShortcodesFolderListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var sc = await vc.Task;
+            if (sc != null)
+                AddAddressesFromShortcode(sc);
+
+            DismissViewController(true, null);
         }
 
         async Task DoOpenContacts(RecipientsView recipientsView)

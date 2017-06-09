@@ -1,5 +1,6 @@
 ﻿using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
