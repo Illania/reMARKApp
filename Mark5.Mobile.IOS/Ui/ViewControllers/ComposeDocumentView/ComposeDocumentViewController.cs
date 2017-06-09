@@ -1000,7 +1000,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var vc = new PhonebookContactsListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var pa = await vc.Task;
+            var pa = await vc.ReturnTask;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 

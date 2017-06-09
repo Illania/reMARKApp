@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
 
-        public Task<Recipient> Task => tcs.Task;
+        public Task<Recipient> ReturnTask => tcs.Task;
 
         UIBarButtonItem exitEditItem;
         UITableView tableView;
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeHandlers();
         }
 
-        public override async void ViewDidAppear(bool animated)
+        public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var ds = (DataSource) tableView.Source;
             if (ds.Empty)
-                await RefreshData();
+                RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -159,34 +159,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-        async Task RefreshData()
+        void RefreshData()
         {
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            try
-            {
-                var contacts = CommonConfig.PhonebookUtilities.GetPhonebookContacts();
+            List<Recipient> contacts = null;
 
-                if (contacts == null)
-                {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
-                                                         Localization.GetString("phonebook_contacts_no_access_content"));
-                    tcs.SetResult(null);
-                }
-                else
-                {
-                    var ds = (DataSource) tableView.Source;
-                    ds.SetItems(contacts.OrderBy(c => c.Name).ToList());
-                }
+            Task.Run(() =>
+              {
+                  contacts = CommonConfig.PhonebookUtilities.GetPhonebookContacts();
+              }).ContinueWith(t =>
+           {
+               InvokeOnMainThread(async () =>
+               {
+                   if (t.IsFaulted)
+                   {
+                       var ex = t.Exception.InnerException;
+                       CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
+                       await Dialogs.ShowErrorDialogAsync(this, ex);
+                       tcs.SetResult(null);
+                   }
 
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-                tcs.SetResult(null);
-            }
+                   if (contacts == null)
+                   {
+                       await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
+                                                            Localization.GetString("phonebook_contacts_no_access_content"));
+                       tcs.SetResult(null);
+                   }
+                   else
+                   {
+                       var ds = (DataSource) tableView.Source;
+                       ds.SetItems(contacts.OrderBy(c => c.Name).ToList());
+                   }
+               });
+
+           });
         }
 
         #endregion
@@ -243,7 +251,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             searchResultsDataSource.Reset();
 
-            await System.Threading.Tasks.Task.Delay(500);
+            await Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
