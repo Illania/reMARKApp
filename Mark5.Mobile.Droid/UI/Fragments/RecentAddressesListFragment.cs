@@ -1,12 +1,14 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -54,11 +56,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.recent_addresses);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(RecentAddressesListFragment)}");
         }
+
+        public override async void OnResume()
+        {
+            base.OnResume();
+
+            if (adapter.ItemCount < 1)
+            {
+                CommonConfig.Logger.Info($"Refreshing {nameof(RecentAddressesListFragment)}");
+                await RefreshView();
+            }
+        }
+
+        async Task RefreshView()
+        {
+            try
+            {
+                var addresses = await Managers.DocumentsManager.GetRecentAddressesAsync();
+                adapter.SetItems(addresses);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while retrieving recent addresses", ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
         #region Retainable State
 
         public override string GenerateTag()
@@ -76,20 +104,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                throw new NotImplementedException();
+                var viewHolder = holder as RecentAddressViewHolder;
+                var ra = Items[position];
+
+                viewHolder.Address = ra.Address;
+                viewHolder.Name = ra.Name;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                throw new NotImplementedException();
+                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_recent_addresses, parent, false);
+                return new RecentAddressViewHolder(itemView);
+            }
+
+            public void SetItems(List<RecentAddress> recentAddresses)
+            {
+                Items.Clear();
+                Items.AddRange(recentAddresses);
+
+                NotifyItemRangeInserted(0, ItemCount);
             }
 
             class RecentAddressViewHolder : RecyclerView.ViewHolder
             {
-                public string Address
-                {
-                    set { addressTextView.Text = value; }
-                }
+                public string Address { set => addressTextView.Text = value; }
 
                 public string Name
                 {

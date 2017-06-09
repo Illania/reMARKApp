@@ -18,6 +18,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
@@ -27,8 +28,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
+        static class RequestCodes
+        {
+            public const int AttachmentRequestCode = 111;
+            public const int RecentAddressesRequestCode = 222;
+            public const int ContactsRequestCode = 333;
+            public const int ShortcodesRequestCode = 444;
+            public const int PhonebookRequestCode = 555;
+        }
+
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        const int AttachmentRequestCode = 111;
 
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
@@ -175,7 +184,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (requestCode == AttachmentRequestCode && resultCode == (int) Result.Ok)
+            if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int) Result.Ok)
                 HandleLocalAttachment(data);
         }
 
@@ -294,22 +303,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async void DoOpenRecentAddresses(RecipientsView v)
+        void DoOpenRecentAddresses(RecipientsView v)
+        {
+            var i = new Intent(Activity, typeof(RecentAddressesListActivity));
+            StartActivityForResult(i, RequestCodes.RecentAddressesRequestCode);
+        }
+
+        void DoOpenContacts(RecipientsView v)
         {
 
         }
 
-        async void DoOpenContacts(RecipientsView v)
+        void DoOpenShortcodes(RecipientsView v)
         {
 
         }
 
-        async void DoOpenShortcodes(RecipientsView v)
-        {
-
-        }
-
-        async void DoOpenPhonebook(RecipientsView v)
+        void DoOpenPhonebook(RecipientsView v)
         {
 
         }
@@ -671,7 +681,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
             var i = Intent.CreateChooser(intent, "File");
-            StartActivityForResult(i, AttachmentRequestCode);
+            StartActivityForResult(i, RequestCodes.AttachmentRequestCode);
         }
 
         void UpdateSendButtonState()
