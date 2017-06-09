@@ -266,7 +266,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cts?.Cancel();
         }
 
-        async Task Download(Folder folder, Action onStartedAction, Action<ProgressInfo> onProgressAction, Action<FinishedInfo> onFinishedAction, Action<Exception> onException, CancellationToken ct)
+        async Task Download(Folder folder,
+                            Action onStartedAction,
+                            Action<ProgressInfo> onProgressAction,
+                            Action<FinishedInfo> onFinishedAction,
+                            Action<Exception> onException,
+                            CancellationToken ct)
         {
             try
             {
