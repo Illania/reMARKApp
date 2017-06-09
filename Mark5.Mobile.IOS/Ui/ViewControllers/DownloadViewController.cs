@@ -8,6 +8,7 @@ using System.Threading;
 using Mark5.Mobile.Common.Managers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -18,16 +19,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         struct ProgressInfo
         {
             public bool Preparing { get; }
-            public int TotalItems { get; }
-            public int LeftItems { get; }
-            public int ErrorsCount { get; }
+            public int TotalItemsCount { get; }
+            public int LeftItemsCount { get; }
+            public int FailedItemsCount { get; }
 
-            public ProgressInfo(bool preparing, int totalItems, int leftItems, int errorsCount)
+            public ProgressInfo(bool preparing, int totalItemsCount, int leftItemsCount, int failedItemsCount)
             {
                 Preparing = preparing;
-                TotalItems = totalItems;
-                LeftItems = leftItems;
-                ErrorsCount = errorsCount;
+                TotalItemsCount = totalItemsCount;
+                LeftItemsCount = leftItemsCount;
+                FailedItemsCount = failedItemsCount;
             }
         }
 
@@ -38,6 +39,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UILabel progress;
         UIButton startButton;
         UIButton stopButton;
+
+        Stopwatch sw;
+        CancellationTokenSource cts;
 
         public override void LoadView()
         {
@@ -92,12 +96,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Text = "Ready",
-                Lines = 4
+                Lines = 5
             };
             View.AddSubview(progress);
             View.AddConstraints(new[] {
                 progress.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                progress.HeightAnchor.ConstraintEqualTo(88f),
+                progress.HeightAnchor.ConstraintEqualTo(120f),
                 progress.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 progress.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
             });
@@ -170,9 +174,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 InvokeOnMainThread(() =>
                 {
+                    doneItem.Enabled = false;
                     progress.Text = "Starting...";
                     startButton.Enabled = false;
                     stopButton.Enabled = true;
+
+                    sw = new Stopwatch();
 
                     UIApplication.SharedApplication.IdleTimerDisabled = false;
                     UIApplication.SharedApplication.IdleTimerDisabled = true;
@@ -181,9 +188,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void OnProgress(ProgressInfo pi)
             {
+                if (!pi.Preparing && pi.LeftItemsCount == pi.TotalItemsCount)
+                    sw.Start();
+
+                if (!pi.Preparing && pi.LeftItemsCount % 5 != 0)
+                    return;
+
+                var timeLeft = -1f;
+
+                if (!pi.Preparing && sw.ElapsedMilliseconds > 3000)
+                    timeLeft = sw.ElapsedMilliseconds / (pi.TotalItemsCount - pi.LeftItemsCount) * pi.LeftItemsCount / 1000 / 60;
+                
                 InvokeOnMainThread(() =>
                 {
-                    progress.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItems}\nLeftItems={pi.LeftItems}\nErrorsCount={pi.ErrorsCount}";
+                    progress.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItemsCount}\nLeftItems={pi.LeftItemsCount}\nErrorsCount={pi.FailedItemsCount}\nETA=around {timeLeft} minutes";
 
                     UIApplication.SharedApplication.IdleTimerDisabled = false;
                     UIApplication.SharedApplication.IdleTimerDisabled = true;
@@ -192,8 +210,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void OnFinish()
             {
+                sw.Stop();
+                sw = null;
+
                 InvokeOnMainThread(() =>
                 {
+                    doneItem.Enabled = true;
                     progress.Text = "Stopped";
                     startButton.Enabled = true;
                     stopButton.Enabled = false;
@@ -202,12 +224,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
             }
 
-            Task.Run(async () => await Download(OnStart, OnProgress, OnFinish, CancellationToken.None));
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            Task.Run(async () => await Download(OnStart, OnProgress, OnFinish, cts.Token));
         }
 
         void StopButton_TouchUpInside(object sender, EventArgs e)
         {
-
+            stopButton.Enabled = false;
+            cts?.Cancel();
         }
 
         async Task Download(Action startedAction, Action<ProgressInfo> progressAction, Action finishedAction, CancellationToken ct)
@@ -216,9 +242,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 startedAction();
 
+                var queue = new Queue<int>();
+
                 var lastBatchCount = -1;
                 var startRowId = -1;
-                var queue = new Queue<int>();
 
                 do
                 {
@@ -231,11 +258,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     result.Clear();
                     result = null;
 
-                    progressAction(new ProgressInfo(true, queue.Count, -1, 0));
+                    progressAction(new ProgressInfo(true, queue.Count, -1, -1));
                 } while (lastBatchCount >= Managers.ContactsManager.MaxToFetch && !ct.IsCancellationRequested);
 
-                var totalItems = queue.Count;
-                var errors = 0;
+                var totalItemsCount = queue.Count;
+                var leftItemsCount = queue.Count;
+                var failedItemsCount = 0;
 
                 if (ct.IsCancellationRequested)
                 {
@@ -243,14 +271,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
                 }
 
-                progressAction(new ProgressInfo(false, totalItems, queue.Count, errors));
+                progressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
 
                 do
                 {
-                    int item = -1;
+                    int item;
                     try
                     {
                         item = queue.Dequeue();
+                        leftItemsCount--;
                     }
                     catch (InvalidOperationException)
                     {
@@ -264,18 +293,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error(ex);
-                        errors++;
+                        failedItemsCount++;
                     }
 
-                    progressAction(new ProgressInfo(false, totalItems, queue.Count, errors));
+                    progressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
                 } while (!ct.IsCancellationRequested);
-
-                finishedAction();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error(ex);
-
+            }
+            finally
+            {
                 finishedAction();
             }
         }
