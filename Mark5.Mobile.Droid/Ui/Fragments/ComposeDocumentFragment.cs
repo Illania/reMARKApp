@@ -87,14 +87,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             toView = new ToView(Context);
+            toView.AddButtonClicked += RecipientView_AddButtonClicked;
             toView.Edited += Subview_Edited;
             subViews.Add(toView);
 
             ccView = new CcView(Context);
+            ccView.AddButtonClicked += RecipientView_AddButtonClicked;
             ccView.Edited += Subview_Edited;
             subViews.Add(ccView);
 
             bccView = new BccView(Context);
+            bccView.AddButtonClicked += RecipientView_AddButtonClicked;
             bccView.Edited += Subview_Edited;
             subViews.Add(bccView);
 
@@ -266,6 +269,50 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #region Subviews event handlers
+
+        async void RecipientView_AddButtonClicked(object sender, EventArgs e)
+        {
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
+
+            if (choice < 0)
+                return;
+
+            switch (choice)
+            {
+                case 0:
+                    DoOpenRecentAddresses(sender as RecipientsView);
+                    break;
+                case 1:
+                    DoOpenContacts(sender as RecipientsView);
+                    break;
+                case 2:
+                    DoOpenShortcodes(sender as RecipientsView);
+                    break;
+                case 3:
+                    DoOpenPhonebook(sender as RecipientsView);
+                    break;
+            }
+        }
+
+        async void DoOpenRecentAddresses(RecipientsView v)
+        {
+
+        }
+
+        async void DoOpenContacts(RecipientsView v)
+        {
+
+        }
+
+        async void DoOpenShortcodes(RecipientsView v)
+        {
+
+        }
+
+        async void DoOpenPhonebook(RecipientsView v)
+        {
+
+        }
 
         void Subview_Edited(object sender, EventArgs e)
         {

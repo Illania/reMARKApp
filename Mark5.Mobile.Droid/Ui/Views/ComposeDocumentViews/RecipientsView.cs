@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public class RecipientsView : ComposeDocumentView
     {
         public event EventHandler Edited = delegate { };
+        public event EventHandler AddButtonClicked = delegate { };
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
@@ -99,6 +100,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.FocusChange += TextView_FocusChange;
 
             AddView(emailEditor, contentLayoutParameters);
+
+            var addButton = new AppCompatImageButton(Context);
+            addButton.Click += AddButton_Click;
+            addButton.SetBackgroundColor(Color.AliceBlue);
+            var addButtonLp = new LinearLayout.LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
+            {
+                Gravity = GravityFlags.CenterVertical
+            };
+            AddView(addButton, addButtonLp);
         }
 
         #region Public Methods
@@ -258,13 +268,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         IEnumerable<string> GetEmails()
         {
-            MatchCollection matches;
-            return Validator.ContainsValidEmails(emailEditor.Text, out matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
+            return Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
         }
 
         #endregion
 
         #region Control event handlers
+
+        void AddButton_Click(object sender, EventArgs e)
+        {
+            AddButtonClicked(this, EventArgs.Empty);
+        }
 
         void TextView_FocusChange(object sender, FocusChangeEventArgs e)
         {

@@ -133,7 +133,7 @@
 "ledger" = "Ledger";
 "line" = "Mailbox";
 "links" = "Links";
-"loading_shortcode___" = "Loading mailing list...";
+"loading_shortcode___" = "Loading shortcode...";
 "loading_contact___" = "Loading contact...";
 "loading_document___" = "Loading email...";
 "loading_template___" = "Loading template...";

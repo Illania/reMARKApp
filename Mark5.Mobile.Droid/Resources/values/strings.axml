@@ -161,6 +161,7 @@
 	<string name="permissions_snackbar_action">Ok</string>
 	<string name="permissions_snackbar_text">Tap to grant permissions</string>
 	<string name="physical_addresses">Addresses</string>
+	<string name="picker_title">Choose source</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid</string>
@@ -170,6 +171,7 @@
 	<string name="priority_normal">Normal</string>
 	<string name="priority_urgent">Urgent</string>
 	<string name="read_by">Read by:</string>
+	<string name="recent_addresses">Recent addresses</string>
 	<string name="read_by_prefix">read by</string>
 	<string name="reference">Ref.</string>
 	<string name="reset">Reset</string>
