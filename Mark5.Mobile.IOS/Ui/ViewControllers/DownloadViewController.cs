@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
-using System.Threading;
-using Mark5.Mobile.Common.Managers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -28,6 +28,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Preparing = preparing;
                 TotalItemsCount = totalItemsCount;
                 LeftItemsCount = leftItemsCount;
+                FailedItemsCount = failedItemsCount;
+            }
+        }
+
+        struct FinishedInfo
+        {
+            public int DownloadedItemsCount { get; }
+            public int FailedItemsCount { get; }
+
+            public FinishedInfo(int downloadedItemsCount, int failedItemsCount)
+            {
+                DownloadedItemsCount = downloadedItemsCount;
                 FailedItemsCount = failedItemsCount;
             }
         }
@@ -198,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!pi.Preparing && sw.ElapsedMilliseconds > 3000)
                     timeLeft = sw.ElapsedMilliseconds / (pi.TotalItemsCount - pi.LeftItemsCount) * pi.LeftItemsCount / 1000 / 60;
-                
+
                 InvokeOnMainThread(() =>
                 {
                     progress.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItemsCount}\nLeftItems={pi.LeftItemsCount}\nErrorsCount={pi.FailedItemsCount}\nETA=around {timeLeft} minutes";
@@ -208,7 +220,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
             }
 
-            void OnFinish()
+            void OnFinished(FinishedInfo fi)
             {
                 sw.Stop();
                 sw = null;
@@ -224,10 +236,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
             }
 
+            void OnException(Exception ex)
+            {
+                sw.Stop();
+                sw = null;
+
+                InvokeOnMainThread(() =>
+                {
+                    doneItem.Enabled = true;
+                    progress.Text = "Exception";
+                    startButton.Enabled = true;
+                    stopButton.Enabled = false;
+
+                    UIApplication.SharedApplication.IdleTimerDisabled = false;
+
+                    Dialogs.ShowErrorDialog(this, ex);
+                });
+            }
+
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            Task.Run(async () => await Download(OnStart, OnProgress, OnFinish, cts.Token));
+            Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, cts.Token));
         }
 
         void StopButton_TouchUpInside(object sender, EventArgs e)
@@ -236,20 +266,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cts?.Cancel();
         }
 
-        async Task Download(Action startedAction, Action<ProgressInfo> progressAction, Action finishedAction, CancellationToken ct)
+        async Task Download(Folder folder, Action onStartedAction, Action<ProgressInfo> onProgressAction, Action<FinishedInfo> onFinishedAction, Action<Exception> onException, CancellationToken ct)
         {
             try
             {
-                startedAction();
+                CommonConfig.Logger.Info($"Starting download of folder {folder.Name} [folder.id={folder.Id}, folder.module={folder.Module}]");
+
+                onStartedAction();
 
                 var queue = new Queue<int>();
 
                 var lastBatchCount = -1;
                 var startRowId = -1;
 
+                CommonConfig.Logger.Info($"Starting preparation to download a folder {folder.Name}. [folder.id={folder.Id}, folder.module={folder.Module}]");
+
                 do
                 {
-                    var result = await Managers.ContactsManager.GetContactPreviewsAsync(Folder, startRowId, SourceType.Remote);
+                    var result = await Managers.ContactsManager.GetContactPreviewsAsync(folder, startRowId, SourceType.Remote);
 
                     result.ForEach(cp => queue.Enqueue(cp.Id));
                     startRowId = result.Last().RowId;
@@ -258,7 +292,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     result.Clear();
                     result = null;
 
-                    progressAction(new ProgressInfo(true, queue.Count, -1, -1));
+                    onProgressAction(new ProgressInfo(true, queue.Count, -1, -1));
                 } while (lastBatchCount >= Managers.ContactsManager.MaxToFetch && !ct.IsCancellationRequested);
 
                 var totalItemsCount = queue.Count;
@@ -267,11 +301,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (ct.IsCancellationRequested)
                 {
-                    finishedAction();
+                    onFinishedAction(new FinishedInfo(0, 0));
                     return;
                 }
 
-                progressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
+                CommonConfig.Logger.Info($"Folder {folder.Name} prepared to download. {totalItemsCount} items to download. [folder.id={folder.Id}, folder.module={folder.Module}]");
+
+                onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
 
                 do
                 {
@@ -288,24 +324,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     try
                     {
-                        await Managers.ContactsManager.GetContactAsync(Folder, item, SourceType.Remote);
+                        await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
                     }
                     catch (Exception ex)
                     {
-                        CommonConfig.Logger.Error(ex);
+                        CommonConfig.Logger.Error($"Item with ID {item} failed to download. [folder.id={folder.Id}, folder.name={folder.Name}, folder.module={folder.Module}]", ex);
                         failedItemsCount++;
                     }
 
-                    progressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
+                    onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
                 } while (!ct.IsCancellationRequested);
+
+                CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItemsCount} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
+
+                onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItemsCount));
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error(ex);
-            }
-            finally
-            {
-                finishedAction();
+                CommonConfig.Logger.Error($"Unexpected exception when downloading a folder. [folder.id={folder.Id}, folder.name={folder.Name}, folder.module={folder.Module}]", ex);
+
+                onException(ex);
             }
         }
     }
