@@ -5,8 +5,8 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public interface IPhonebookUtils
     {
-        List<PrintableSuggestion> GetPhonebookContacts();
+        List<Recipient> GetPhonebookContacts();
 
-        List<PrintableSuggestion> GetFilteredPhonebookContacts(string phrase);
+        List<Recipient> GetFilteredPhonebookContacts(string phrase);
     }
 }

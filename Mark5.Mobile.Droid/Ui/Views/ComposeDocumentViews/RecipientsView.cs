@@ -414,7 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Support class
 
-        public class SuggestionsAdapter : BaseAdapter<PrintableSuggestion>, IFilterable
+        public class SuggestionsAdapter : BaseAdapter<Recipient>, IFilterable
         {
             readonly SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
 
@@ -496,9 +496,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return suggestions[position].GetHashCode();
             }
 
-            public override PrintableSuggestion this[int position] => suggestions[position];
+            public override Recipient this[int position] => suggestions[position];
 
-            public void AddSuggestions(List<PrintableSuggestion> newSuggestions)
+            public void AddSuggestions(List<Recipient> newSuggestions)
             {
                 new Handler(Looper.MainLooper).Post(() =>
                 {
@@ -573,7 +573,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 #region SuggestionService handlers
 
-                void HandleSugguestions(List<PrintableSuggestion> newSuggestions, CancellationToken token)
+                void HandleSugguestions(List<Recipient> newSuggestions, CancellationToken token)
                 {
                     if (token.IsCancellationRequested)
                         return;
@@ -588,10 +588,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             #endregion
         }
 
-        public class SuggestionsObservableCollection : SortedObservableCollection<PrintableSuggestion>
+        public class SuggestionsObservableCollection : SortedObservableCollection<Recipient>
         {
             public SuggestionsObservableCollection()
-                : base(PrintableSuggestion.LookupComparison, PrintableSuggestion.SortingComparison)
+                : base(Recipient.LookupComparison, Recipient.SortingComparison)
             {
             }
         }

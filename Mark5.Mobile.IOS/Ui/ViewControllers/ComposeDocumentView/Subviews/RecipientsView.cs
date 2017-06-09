@@ -46,13 +46,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public bool Empty => !Validator.ContainsValidEmail(TextView.Text);
 
-        public RecipientsView(DocumentAddressType type)
+        public RecipientsView(DocumentAddressType type, bool hideAddButton = false)
         {
             AddressType = type;
-            Initialize();
+            Initialize(hideAddButton);
         }
 
-        void Initialize()
+        void Initialize(bool hideAddButton)
         {
             Label = new UILabel();
             Label.Text = GetTitleFromAddressType();
@@ -79,23 +79,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            var addButton = new UIButton();
-            addButton.SetImage(addButtonIcon, UIControlState.Normal);
-            addButton.BackgroundColor = UIColor.Clear;
-            addButton.TranslatesAutoresizingMaskIntoConstraints = false;
-            addButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
-            addButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            addButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            addButton.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            addButton.TouchUpInside += HandleAddButtonTapped;
+            UIButton addButton = null;
 
-            ContainerView.AddSubview(addButton);
-            ContainerView.AddConstraints(new[]
-                 {
+            if (!hideAddButton)
+            {
+                var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                addButton = new UIButton();
+                addButton.SetImage(addButtonIcon, UIControlState.Normal);
+                addButton.BackgroundColor = UIColor.Clear;
+                addButton.TranslatesAutoresizingMaskIntoConstraints = false;
+                addButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
+                addButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                addButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                addButton.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                addButton.TouchUpInside += HandleAddButtonTapped;
+
+                ContainerView.AddSubview(addButton);
+                ContainerView.AddConstraints(new[]
+                     {
                         NSLayoutConstraint.Create(addButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin - addButton.ContentEdgeInsets.Top),
                         NSLayoutConstraint.Create(addButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin - addButton.ContentEdgeInsets.Right),
                     });
+            }
 
             TextView = new CustomUITextView(CGRect.Empty, textContainer);
             TextView.AutocapitalizationType = UITextAutocapitalizationType.None;
@@ -117,12 +122,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             TextView.Ended += HandleEditingEnded;
             TextView.ShouldChangeText += HandleShouldTextViewChange;
             ContainerView.AddSubview(TextView);
+
+            var rightConstraint = NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right,
+                                                            NSLayoutRelation.Equal, hideAddButton ? ContainerView : addButton, hideAddButton ? NSLayoutAttribute.Right : NSLayoutAttribute.Left, 1f,
+                                                            hideAddButton ? -HorizontalMargin : -InnerMargin);
             ContainerView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1f, InnerMargin),
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addButton, NSLayoutAttribute.Left, 1f, -InnerMargin)
+                rightConstraint,
             });
 
             textViewTapGestureRecognizer = new UITapGestureRecognizer();

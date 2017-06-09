@@ -15,17 +15,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class RecentAddressesListViewController : AbstractViewController
     {
+        readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
+
+        public Task<Recipient> Task => tcs.Task;
+
         UIBarButtonItem exitEditItem;
         UITableView tableView;
 
         CancellationTokenSource cts;
-
-        Action<string, string> recentAddressSelectedAction;
-
-        public RecentAddressesListViewController(Action<string, string> recentAddressClickedAction)
-        {
-            this.recentAddressSelectedAction = recentAddressClickedAction;
-        }
 
         #region UIViewControllerOverrides
 
@@ -43,8 +40,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
-
-            //TODO do we need reachability bar here?
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -95,9 +90,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView = new UITableView();
             tableView.ClipsToBounds = false;
             tableView.Source = new DataSource(this, tableView, Localization.GetString("recent_addresses_empty"));
-            tableView.AllowsSelectionDuringEditing = false;
-            tableView.AllowsMultipleSelectionDuringEditing = true;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            tableView.EstimatedRowHeight = 50f;
+            tableView.RowHeight = UITableView.AutomaticDimension;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
             {
@@ -148,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Error while retrieving recent addresses", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
-                DismissViewController(true, null);
+                tcs.SetResult(null);
             }
             finally
             {
@@ -162,8 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void RecentAddressSelected(RecentAddress ra)
         {
-            recentAddressSelectedAction(ra.Name, ra.Address);
-            DismissViewController(true, null);
+            tcs.SetResult(new Recipient(ra));
         }
 
         #endregion
@@ -172,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ExitEditItem_Clicked(object sender, EventArgs e)
         {
-            DismissViewController(true, null);
+            tcs.SetResult(null);
         }
 
         #endregion
@@ -209,7 +203,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var ra = recentAddressesInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(RecentAddressesTableViewCell.Key) as RecentAddressesTableViewCell ?? RecentAddressesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
                 cell.Initialize(ra);
 
                 return cell;
@@ -237,14 +231,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 viewController.RecentAddressSelected(ra);
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return RecentAddressesTableViewCell.Height;
-            }
-
             public void SetItems(List<RecentAddress> recentAddresses)
             {
-                loading = false; //TODO should we sort them?
+                loading = false;
 
                 var isInputListPopulated = recentAddresses.Any();
 

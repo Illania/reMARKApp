@@ -278,7 +278,7 @@
 
     #region Suggestions
 
-    public enum SuggestionType
+    public enum RecipientType
     {
         Unknown,
         RecentAddress,

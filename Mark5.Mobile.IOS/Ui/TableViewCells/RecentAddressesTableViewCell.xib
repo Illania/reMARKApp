@@ -4,6 +4,7 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -14,38 +15,41 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="60" id="cxk-wN-pdQ" customClass="RecentAddressesTableViewCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="nS4-cP-lgK">
-                        <rect key="frame" x="16" y="8" width="296" height="43.5"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zA7-2f-xqR">
-                                <rect key="frame" x="0.0" y="0.0" width="296" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RWj-js-wsP">
-                                <rect key="frame" x="0.0" y="23" width="296" height="20.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                    </stackView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" verticalCompressionResistancePriority="751" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RWj-js-wsP">
+                        <rect key="frame" x="16" y="28.5" width="296" height="20.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zA7-2f-xqR">
+                        <rect key="frame" x="16" y="11" width="296" height="15.5"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="15.5" id="5Uo-Jh-dpS"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="nS4-cP-lgK" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="0D6-XY-mG8"/>
-                    <constraint firstAttribute="bottomMargin" secondItem="nS4-cP-lgK" secondAttribute="bottom" id="A8e-Ip-cFe"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="nS4-cP-lgK" secondAttribute="trailing" id="IhN-w4-bpg"/>
-                    <constraint firstItem="nS4-cP-lgK" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" id="c9v-M8-esm"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="zA7-2f-xqR" secondAttribute="trailing" id="2lr-EC-Qk8"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="RWj-js-wsP" secondAttribute="trailing" id="MoC-m5-H4Q"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="RWj-js-wsP" secondAttribute="bottom" id="Xkl-QJ-lR7"/>
+                    <constraint firstItem="RWj-js-wsP" firstAttribute="top" secondItem="zA7-2f-xqR" secondAttribute="bottom" constant="2" id="Y13-Au-1Re"/>
+                    <constraint firstItem="RWj-js-wsP" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="pU0-CT-lrW"/>
+                    <constraint firstItem="zA7-2f-xqR" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leadingMargin" constant="8" id="vuc-aG-bvF"/>
+                    <constraint firstItem="zA7-2f-xqR" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="topMargin" id="xYU-mS-RUb"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="AddressLabel" destination="RWj-js-wsP" id="2jq-ho-5Vw"/>
+                <outlet property="DistanceConstraint" destination="Y13-Au-1Re" id="UBZ-1M-U8V"/>
                 <outlet property="NameLabel" destination="zA7-2f-xqR" id="15I-M4-asb"/>
+                <outlet property="NameLabelHeightConstraint" destination="5Uo-Jh-dpS" id="9MN-7s-2Rr"/>
             </connections>
             <point key="canvasLocation" x="144" y="64"/>
         </tableViewCell>

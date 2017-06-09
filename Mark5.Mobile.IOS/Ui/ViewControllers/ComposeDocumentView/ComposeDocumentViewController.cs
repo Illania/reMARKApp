@@ -842,16 +842,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             switch (choice)
             {
                 case 0:
-                    DoOpenRecents(sender as RecipientsView);
+                    await DoOpenRecents(sender as RecipientsView);
                     break;
                 case 1:
                     await DoOpenContacts(sender as RecipientsView);
                     break;
                 case 2:
-                    DoOpenShortcodes(sender as RecipientsView);
+                    await DoOpenShortcodes(sender as RecipientsView);
                     break;
                 case 3:
-                    DoOpenPhonebook(sender as RecipientsView);
+                    await DoOpenPhonebook(sender as RecipientsView);
                     break;
             }
         }
@@ -995,13 +995,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Picker methods
 
-        void DoOpenPhonebook(RecipientsView recipientsView)
+        async Task DoOpenPhonebook(RecipientsView recipientsView)
         {
-            var vc = new PhonebookContactsListViewController(recipientsView.AddRecipent);
+            var vc = new PhonebookContactsListViewController();
             PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Task;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+
+            DismissViewController(true, null);
+
         }
 
-        void DoOpenShortcodes(RecipientsView recipientsView)
+        async Task DoOpenShortcodes(RecipientsView recipientsView)
         {
             throw new NotImplementedException();
         }
@@ -1018,10 +1025,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             DismissViewController(true, null);
         }
 
-        void DoOpenRecents(RecipientsView recipientsView)
+        async Task DoOpenRecents(RecipientsView recipientsView)
         {
-            var vc = new RecentAddressesListViewController(recipientsView.AddRecipent);
+            var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Task;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+
+            DismissViewController(true, null);
         }
 
         #endregion

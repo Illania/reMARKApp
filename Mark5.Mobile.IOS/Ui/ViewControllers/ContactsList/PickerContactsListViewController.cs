@@ -11,9 +11,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
     public class PickerContactsListViewController : AbstractContactsListViewController
     {
-        readonly TaskCompletionSource<PrintableSuggestion> tcs = new TaskCompletionSource<PrintableSuggestion>();
+        readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
 
-        public Task<PrintableSuggestion> Task => tcs.Task;
+        public Task<Recipient> Task => tcs.Task;
 
         public PickerContactsListViewController()
             : base(true)
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                     var address = emailAddresses[index];
 
-                    tcs.SetResult(new PrintableSuggestion(contactPreview.Name, address, SuggestionType.Contact));
+                    tcs.SetResult(new Recipient(contactPreview.Name, address, RecipientType.Contact));
                 }
                 else
                 {

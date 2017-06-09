@@ -13,12 +13,12 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         #region IPhonebookUtilities implementation
 
-        public List<PrintableSuggestion> GetPhonebookContacts()
+        public List<Recipient> GetPhonebookContacts()
         {
             return GetiOSContacts();
         }
 
-        public List<PrintableSuggestion> GetFilteredPhonebookContacts(string phrase)
+        public List<Recipient> GetFilteredPhonebookContacts(string phrase)
         {
             return GetiOSContacts(phrase);
         }
@@ -27,11 +27,11 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Helper methods
 
-        List<PrintableSuggestion> GetiOSContacts(string phrase = null)
+        List<Recipient> GetiOSContacts(string phrase = null)
         {
             var authorizationSemaphore = new SemaphoreSlim(0, 1);
 
-            var contacts = new List<PrintableSuggestion>();
+            var contacts = new List<Recipient>();
 
             var status = CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts);
 
@@ -63,7 +63,7 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
 
-        List<PrintableSuggestion> GetContactsFromContactStore(CNContactStore store, string phrase)
+        List<Recipient> GetContactsFromContactStore(CNContactStore store, string phrase)
         {
             var cnContacts = new List<CNContact>();
 
@@ -97,16 +97,16 @@ namespace Mark5.Mobile.IOS.Utilities
             return contacts.ToList();
         }
 
-        List<PrintableSuggestion> ConvertToContact(CNContact cnContact)
+        List<Recipient> ConvertToContact(CNContact cnContact)
         {
-            var phonebookContacts = new List<PrintableSuggestion>();
+            var phonebookContacts = new List<Recipient>();
             var addresses = cnContact.EmailAddresses.Where(el => Validator.IsEmailValid(el.Value)).Select(el => el.Value).ToList();
             foreach (var address in addresses)
             {
-                phonebookContacts.Add(new PrintableSuggestion()
+                phonebookContacts.Add(new Recipient()
                 {
                     Address = address,
-                    Type = SuggestionType.Phonebook,
+                    Type = RecipientType.Phonebook,
                     Name = string.Join(" ", new[] { cnContact.GivenName, cnContact.FamilyName }.Where(v => !string.IsNullOrEmpty(v))),
                 });
             }

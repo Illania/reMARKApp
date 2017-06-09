@@ -9,9 +9,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public class PickerContactsFolderListViewController : AbstractFoldersListViewController
     {
-        readonly TaskCompletionSource<PrintableSuggestion> tcs = new TaskCompletionSource<PrintableSuggestion>();
+        readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
 
-        public Task<PrintableSuggestion> Task => tcs.Task;
+        public Task<Recipient> Task => tcs.Task;
 
         UIBarButtonItem cancelModeItem;
 

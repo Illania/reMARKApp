@@ -15,6 +15,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class PhonebookContactsListViewController : AbstractViewController, IUISearchResultsUpdating
     {
+        readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
+
+        public Task<Recipient> Task => tcs.Task;
+
         UIBarButtonItem exitEditItem;
         UITableView tableView;
 
@@ -26,13 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
-
-        Action<string, string> phonebookContactSelectedAction;
-
-        public PhonebookContactsListViewController(Action<string, string> phonebookContactSelectedAction)
-        {
-            this.phonebookContactSelectedAction = phonebookContactSelectedAction;
-        }
 
         #region UIViewControllerOverrides
 
@@ -175,21 +172,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
                                                          Localization.GetString("phonebook_contacts_no_access_content"));
-                    DismissViewController(true, null);
+                    tcs.SetResult(null);
+                }
+                else
+                {
+                    var ds = (DataSource) tableView.Source;
+                    ds.SetItems(contacts.OrderBy(c => c.Name).ToList());
                 }
 
-                var ds = (DataSource) tableView.Source;
-                ds.SetItems(contacts.OrderBy(c => c.Name).ToList());
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
-                NavigationController?.PopViewController(true);
-            }
-            finally
-            {
-                CommonConfig.Logger.Info($"Refresh finished");
+                tcs.SetResult(null);
             }
         }
 
@@ -197,10 +193,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void PhonebookAddressSelected(PrintableSuggestion pb, UITableViewCell cell)
+        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell)
         {
-            phonebookContactSelectedAction(pb.Name, pb.Address);
-            PresentingViewController.DismissViewController(true, null);
+            tcs.SetResult(pb);
         }
 
         #endregion
@@ -209,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ExitEditItem_Clicked(object sender, EventArgs e)
         {
-            DismissViewController(true, null);
+            tcs.SetResult(null);
         }
 
         #endregion
@@ -248,7 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             searchResultsDataSource.Reset();
 
-            await Task.Delay(500);
+            await System.Threading.Tasks.Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
@@ -262,7 +257,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchResultsDataSource.SetItems(filteredContacts);
         }
 
-        static bool MatchesQuery(PrintableSuggestion cp, string query)
+        static bool MatchesQuery(Recipient cp, string query)
         {
             if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
                 return true;
@@ -279,13 +274,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             public bool Empty => !phonebookContactsInView.SelectMany(v => v).Any();
 
-            public List<PrintableSuggestion> Items => phonebookContactsInView.SelectMany(v => v).ToList();
+            public List<Recipient> Items => phonebookContactsInView.SelectMany(v => v).ToList();
 
             PhonebookContactsListViewController viewController;
             UITableView tableView;
             readonly string emptyText;
 
-            List<List<PrintableSuggestion>> phonebookContactsInView = new List<List<PrintableSuggestion>>(25);
+            List<List<Recipient>> phonebookContactsInView = new List<List<Recipient>>(25);
 
             bool loading = true;
 
@@ -351,7 +346,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return phonebookContactsInView.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper()).ToArray();
             }
 
-            public void SetItems(List<PrintableSuggestion> phonebookContacts)
+            public void SetItems(List<Recipient> phonebookContacts)
             {
                 loading = false;
 

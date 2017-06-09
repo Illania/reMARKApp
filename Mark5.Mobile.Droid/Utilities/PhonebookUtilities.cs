@@ -19,12 +19,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region IPhonebookUtilities implementation
 
-        public List<PrintableSuggestion> GetPhonebookContacts()
+        public List<Recipient> GetPhonebookContacts()
         {
             return GetAndroidContacts(null);
         }
 
-        public List<PrintableSuggestion> GetFilteredPhonebookContacts(string phrase)
+        public List<Recipient> GetFilteredPhonebookContacts(string phrase)
         {
             var selection = string.Format("{0} like \"%{2}%\" OR {1} like \"%{2}%\" COLLATE NOCASE", ContactsNameColumn, ContactEmailColumn, phrase);
             return GetAndroidContacts(selection);
@@ -34,9 +34,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Helper methods
 
-        List<PrintableSuggestion> GetAndroidContacts(string selection = null)
+        List<Recipient> GetAndroidContacts(string selection = null)
         {
-            var phonebookContacts = new List<PrintableSuggestion>();
+            var phonebookContacts = new List<Recipient>();
             var permissionCheck = ContextCompat.CheckSelfPermission(Android.App.Application.Context, Manifest.Permission.ReadContacts);
 
             if (permissionCheck == Android.Content.PM.Permission.Granted)
@@ -62,9 +62,9 @@ namespace Mark5.Mobile.Droid.Utilities
                         var contactName = cursor.GetString(contactsNameIndex);
                         var contactEmail = cursor.GetString(contactsEmailIndex);
 
-                        var phonebookContact = new PrintableSuggestion
+                        var phonebookContact = new Recipient
                         {
-                            Type = SuggestionType.Phonebook,
+                            Type = RecipientType.Phonebook,
                             Address = contactEmail,
                             Name = contactName,
                         };

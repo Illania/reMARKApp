@@ -250,10 +250,6 @@
 		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
 		<Compile Include="Ui\ViewControllers\RecentAddressesListViewController.cs" />
-		<Compile Include="Ui\TableViewCells\RecentAddressesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\RecentAddressesTableViewCell.designer.cs">
-		  <DependentUpon>RecentAddressesTableViewCell.cs</DependentUpon>
-		</Compile>
 		<Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFolderListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
