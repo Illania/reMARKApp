@@ -81,8 +81,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             emailEditor = new AppCompatMultiAutoCompleteTextView(context);
             emailEditor.SetPadding(0, 0, 0, 0);
-            var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
-            contentLayoutParameters.Weight = 1;
+            var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            {
+                RightMargin = DistanceNormal,
+                Weight = 1
+            };
             emailEditor.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             emailEditor.SetBackgroundColor(Color.Transparent);
 
@@ -107,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             addButton.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
             var addButtonLp = new LinearLayout.LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
-                Gravity = GravityFlags.CenterVertical
+                Gravity = GravityFlags.CenterVertical,
             };
             AddView(addButton, addButtonLp);
         }
@@ -224,54 +227,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 Clear();
         }
 
-        IEnumerable<string> GetRecipents()
-        {
-            return emailEditor.Text.Split(new[]
-                    {
-                        EmailSeparator
-                    },
-                    StringSplitOptions.RemoveEmptyEntries)
-                .Where(s => Validator.ContainsValidEmail(s))
-                .Select(s => s.Trim());
-        }
-
-        void SetRecipients(IEnumerable<string> recipients)
-        {
-            emailEditor.Text = string.Join(", ", recipients);
-        }
-
-        void Clear()
-        {
-            emailEditor.Text = string.Empty;
-        }
-
-        #endregion
-
-        #region Utilities
-
-        void SetEmails(string emails)
-        {
-            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
-            {
-                var sb = new StringBuilder();
-                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-
-                sb.Append(EmailSeparator);
-
-                emailEditor.Text = sb.ToString();
-            }
-            else
-            {
-                CommonConfig.Logger.Info($"No valid emails found in {emails}");
-            }
-        }
-
-        IEnumerable<string> GetEmails()
-        {
-            return Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
-        }
-
-
         public void AddEmails(IEnumerable<string> emails)
         {
             AddEmails(string.Join(EmailSeparator, emails));
@@ -323,13 +278,64 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             Edited(this, EventArgs.Empty);
         }
 
+        public void RequestEditorFocus()
+        {
+            emailEditor.RequestFocus();
+        }
+
+        #endregion
+
+        #region Utilities
+
+        void SetEmails(string emails)
+        {
+            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            {
+                var sb = new StringBuilder();
+                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+
+                sb.Append(EmailSeparator);
+
+                emailEditor.Text = sb.ToString();
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"No valid emails found in {emails}");
+            }
+        }
+
+        IEnumerable<string> GetEmails()
+        {
+            return Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
+        }
+
+        IEnumerable<string> GetRecipents()
+        {
+            return emailEditor.Text.Split(new[]
+                    {
+                        EmailSeparator
+                    },
+                    StringSplitOptions.RemoveEmptyEntries)
+                .Where(s => Validator.ContainsValidEmail(s))
+                .Select(s => s.Trim());
+        }
+
+        void SetRecipients(IEnumerable<string> recipients)
+        {
+            emailEditor.Text = string.Join(", ", recipients);
+        }
+
+        void Clear()
+        {
+            emailEditor.Text = string.Empty;
+        }
+
         #endregion
 
         #region Control event handlers
 
         void AddButton_Click(object sender, EventArgs e)
         {
-            emailEditor.RequestFocus();
             AddButtonClicked(this, EventArgs.Empty);
         }
 

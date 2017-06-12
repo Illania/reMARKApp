@@ -310,12 +310,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     DoOpenContacts(sender as RecipientsView);
                     break;
                 case 2:
-                    DoOpenShortcodes(sender as RecipientsView);
+                    DoOpenShortcodes();
                     break;
                 case 3:
                     DoOpenPhonebook(sender as RecipientsView);
                     break;
             }
+
+            if (choice != 2)
+                focusedRecipientiView.RequestEditorFocus();
         }
 
         void DoOpenRecentAddresses(RecipientsView v)
@@ -329,7 +332,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         }
 
-        void DoOpenShortcodes(RecipientsView v)
+        void DoOpenShortcodes()
         {
 
         }
