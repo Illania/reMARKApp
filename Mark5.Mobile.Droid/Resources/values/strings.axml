@@ -142,7 +142,9 @@
 	<string name="no_primary_email">No primary email address set</string>
 	<string name="no_primary_mobile">No primary mobile number set</string>
 	<string name="no_primary_mobile_or_phone">No primary mobile or phone number set</string>
+	<string name="no_phonebook">There are no phonebook contacts</string>
 	<string name="no_subject">No subject</string>
+	<string name="no_recent_addresses">There are no recent addresses</string>
 	<string name="no_results">No results</string>
 	<string name="no_results_contacts">No contacts were found</string>
 	<string name="no_results_documents">No emails were found</string>
@@ -161,6 +163,7 @@
 	<string name="permissions_snackbar_action">Ok</string>
 	<string name="permissions_snackbar_text">Tap to grant permissions</string>
 	<string name="physical_addresses">Addresses</string>
+	<string name="phonebook">Phonebook</string>
 	<string name="picker_title">Choose source</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="port">Port</string>
@@ -170,6 +173,8 @@
 	<string name="priority_low">Low</string>
 	<string name="priority_normal">Normal</string>
 	<string name="priority_urgent">Urgent</string>
+	<string name="phonebook_contacts_no_access_title">Phonebook access refused</string>
+	<string name="phonebook_contacts_no_access_content">You need to grant MARK5 access to the Phonebook in order to use this functionality</string>
 	<string name="read_by">Read by:</string>
 	<string name="recent_addresses">Recent addresses</string>
 	<string name="read_by_prefix">read by</string>

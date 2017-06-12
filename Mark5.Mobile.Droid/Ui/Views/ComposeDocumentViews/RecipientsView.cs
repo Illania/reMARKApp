@@ -103,8 +103,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             var addButton = new AppCompatImageButton(Context);
             addButton.Click += AddButton_Click;
-            addButton.SetBackgroundColor(Color.AliceBlue);
-            addButton.SetImageResource(Resource.Drawable.arrow_right);
+            addButton.SetImageResource(Resource.Drawable.add);
+            addButton.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
             var addButtonLp = new LinearLayout.LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
                 Gravity = GravityFlags.CenterVertical
@@ -568,7 +568,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 new Handler(Looper.MainLooper).Post(() =>
                 {
-                    suggestions.AddOrReplaceAllSorted(newSuggestions);
+                    suggestions.AddOrReplaceAllSorted(newSuggestions ?? new List<Recipient>());
                     NotifyDataSetChanged();
                 });
             }

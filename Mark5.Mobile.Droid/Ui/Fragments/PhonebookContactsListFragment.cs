@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -9,8 +10,9 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using FastScrollRecycler;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -18,20 +20,19 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class RecentAddressesListFragment : RetainableStateFragment
+    public class PhonebookContactsListFragment : RetainableStateFragment
     {
         RecyclerView recyclerView;
-
-        RecentAddressesListAdapter adapter;
+        PhonebookContactsListAdapter adapter;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(RecentAddressesListFragment)}");
+            CommonConfig.Logger.Info($"Creating {nameof(PhonebookContactsListFragment)}");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
-            emptyView.SetText(Resource.String.no_recent_addresses);
+            emptyView.SetText(Resource.String.no_phonebook);
 
             var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
             refreshLayout.Enabled = false;
@@ -40,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new RecentAddressesListAdapter();
+            adapter = new PhonebookContactsListAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
@@ -61,110 +62,110 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.recent_addresses);
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.phonebook);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(RecentAddressesListFragment)}");
+            CommonConfig.Logger.Info($"Created {nameof(PhonebookContactsListFragment)}");
         }
 
-        public override async void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
 
             if (adapter.ItemCount < 1)
             {
-                CommonConfig.Logger.Info($"Refreshing {nameof(RecentAddressesListFragment)}");
-                await RefreshView();
+                CommonConfig.Logger.Info($"Refreshing {nameof(PhonebookContactsListFragment)}");
+                RefreshView();
             }
         }
 
-        async Task RefreshView()
+        void RefreshView()
         {
-            try
-            {
-                var addresses = await Managers.DocumentsManager.GetRecentAddressesAsync();
-                adapter.SetItems(addresses);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Error while retrieving recent addresses", ex);
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
+            List<Recipient> contacts = null;
+
+            Task.Run(() =>
+              {
+                  contacts = CommonConfig.PhonebookUtilities.GetPhonebookContacts();
+              }).ContinueWith(t =>
+               {
+                   Activity.RunOnUiThread(async () =>
+                   {
+                       if (t.IsFaulted)
+                       {
+                           var ex = t.Exception.InnerException;
+                           CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
+                           await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                       }
+
+                       if (contacts == null)
+                       {
+                           await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.phonebook_contacts_no_access_title,
+                                                                Resource.String.phonebook_contacts_no_access_content);
+                           Activity.Finish();
+                       }
+                       else
+                       {
+                           adapter.SetItems(contacts.OrderBy(c => c.Name.SafeSubstring(0, 1)));
+                       }
+                   });
+               });
         }
 
-        void Adapter_ItemClicked(object sender, RecentAddress ra)
+        void Adapter_ItemClicked(object sender, Recipient r)
         {
             var intent = new Intent();
-            intent.PutExtra(RecentAddressesListActivity.RecipientResultKey, SerializationUtils.Serialize(new Recipient(ra)));
+            intent.PutExtra(PhonebookContactsListActivity.RecipientResultKey, SerializationUtils.Serialize(r));
             Activity.SetResult(Result.Ok, intent);
             Activity.Finish();
         }
 
-        #region Retainable State
+        #region Retainable state
 
         public override string GenerateTag()
         {
-            return $"{nameof(RecentAddressesListFragment)}";
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info("Retaining state");
-            return new RecentAddressesListFragmentState
-            {
-                RecentAddresses = adapter.Items
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is RecentAddressesListFragmentState ralfs)
-            {
-                adapter.SetItems(ralfs.RecentAddresses);
-            }
-        }
-
-        class RecentAddressesListFragmentState : IRetainableState
-        {
-            public List<RecentAddress> RecentAddresses { get; set; }
+            return $"{nameof(PhonebookContactsListFragment)}";
         }
 
         #endregion
 
-        class RecentAddressesListAdapter : RecyclerView.Adapter //TODO need to improve the look of it
+        class PhonebookContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
+            public List<Recipient> Items { get; } = new List<Recipient>();
             public override int ItemCount => Items.Count;
 
-            public List<RecentAddress> Items { get; } = new List<RecentAddress>();
-
-            public event EventHandler<RecentAddress> ItemClicked = delegate { };
+            public event EventHandler<Recipient> ItemClicked = delegate { };
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var viewHolder = holder as RecentAddressViewHolder;
-                var ra = Items[position];
+                var viewHolder = holder as PhonebookContactViewHolder;
+                var recipient = Items[position];
 
-                viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, ra)));
+                viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, recipient)));
 
-                viewHolder.Address = ra.Address;
-                viewHolder.Name = ra.Name;
+                viewHolder.Address = recipient.Address;
+                viewHolder.Name = recipient.Name;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_recipients, parent, false);
-                return new RecentAddressViewHolder(itemView);
+                var itemView = LayoutInflater.FromContext(parent.Context).Inflate(Resource.Layout.list_item_recipients, parent, false);
+                return new PhonebookContactViewHolder(itemView);
             }
 
-            public void SetItems(List<RecentAddress> recentAddresses)
+            public void SetItems(IEnumerable<Recipient> recipients)
             {
                 Items.Clear();
-                Items.AddRange(recentAddresses);
+                Items.AddRange(recipients);
 
-                NotifyItemRangeInserted(0, ItemCount);
+                NotifyItemRangeInserted(0, Items.Count);
             }
 
-            class RecentAddressViewHolder : RecyclerView.ViewHolder
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+            }
+
+            class PhonebookContactViewHolder : RecyclerView.ViewHolder
             {
                 public string Address { set => addressTextView.Text = value; }
 
@@ -187,7 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 readonly AppCompatTextView addressTextView;
                 readonly AppCompatTextView nameTextView;
 
-                public RecentAddressViewHolder(View itemView) : base(itemView)
+                public PhonebookContactViewHolder(View itemView) : base(itemView)
                 {
                     addressTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_address);
                     nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_name);

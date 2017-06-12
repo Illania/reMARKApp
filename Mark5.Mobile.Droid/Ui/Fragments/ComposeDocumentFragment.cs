@@ -189,7 +189,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 HandleLocalAttachment(data);
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int) Result.Ok)
             {
-                var recentAddress = SerializationUtils.Deserialize<RecentAddress>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
+                var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
+            }
+            if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int) Result.Ok)
+            {
+                var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
             }
         }
@@ -331,7 +336,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DoOpenPhonebook(RecipientsView v)
         {
-
+            var i = new Intent(Activity, typeof(PhonebookContactsListActivity));
+            StartActivityForResult(i, RequestCodes.PhonebookRequestCode);
         }
 
         void Subview_Edited(object sender, EventArgs e)
