@@ -258,7 +258,6 @@
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Fragments\ComposeDocumentFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
-    <Compile Include="Ui\Fragments\ContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchResultsFragment.cs" />
     <Compile Include="Ui\Fragments\CopyMoveToFolderListFragment.cs" />
@@ -377,6 +376,12 @@
     <Compile Include="Ui\Fragments\RecentAddressesListFragment.cs" />
     <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PhonebookContactsListFragment.cs" />
+    <Compile Include="Ui\Activities\PickContactFolderListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\PickerContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\AbstractContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\ContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\PickerContactFolderListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -386,6 +391,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
+    <Folder Include="Ui\Fragments\ContactsList\" />
+    <Folder Include="UI\Fragments\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />

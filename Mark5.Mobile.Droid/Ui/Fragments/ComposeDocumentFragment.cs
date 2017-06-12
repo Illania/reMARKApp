@@ -329,7 +329,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DoOpenContacts(RecipientsView v)
         {
-
+            var i = new Intent(Activity, typeof(PickContactFolderListActivity));
+            StartActivityForResult(i, RequestCodes.ContactsRequestCode);
         }
 
         void DoOpenShortcodes()

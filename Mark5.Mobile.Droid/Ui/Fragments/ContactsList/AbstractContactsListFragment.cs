@@ -24,7 +24,7 @@ using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public abstract class AbstractContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
         public Action CloseRequest { get; set; }
@@ -279,7 +279,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Adapter callbacks
 
-        void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
+        virtual void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
         {
             if (actionMode == null)
             {
@@ -304,7 +304,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void Adapter_ItemLongClicked(object sender, ContactPreview contactPreview)
+        virtual void Adapter_ItemLongClicked(object sender, ContactPreview contactPreview)
         {
             if (actionMode == null)
                 actionMode = Activity.StartActionMode(this);
