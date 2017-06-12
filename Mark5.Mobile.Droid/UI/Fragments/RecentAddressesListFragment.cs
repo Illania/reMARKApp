@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -10,6 +12,8 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -37,6 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             adapter = new RecentAddressesListAdapter();
+            adapter.ItemClicked += Adapter_ItemClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
                 if (recyclerView.GetAdapter() != adapter)
@@ -87,6 +92,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        void Adapter_ItemClicked(object sender, RecentAddress e)
+        {
+            var intent = new Intent();
+            intent.PutExtra(RecentAddressesListActivity.RecipientResultKey, SerializationUtils.Serialize(e));
+            Activity.SetResult(Result.Ok, intent);
+            Activity.Finish();
+        }
+
         #region Retainable State
 
         public override string GenerateTag()
@@ -94,18 +107,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return $"{nameof(RecentAddressesListFragment)}";
         }
 
+        public override IRetainableState OnRetainInstanceState()
+        {
+            CommonConfig.Logger.Info("Retaining state");
+            return new RecentAddressesListFragmentState
+            {
+                RecentAddresses = adapter.Items
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            if (restoredState is RecentAddressesListFragmentState ralfs)
+            {
+                adapter.SetItems(ralfs.RecentAddresses);
+            }
+        }
+
+        class RecentAddressesListFragmentState : IRetainableState
+        {
+            public List<RecentAddress> RecentAddresses { get; set; }
+        }
+
         #endregion
 
-        class RecentAddressesListAdapter : RecyclerView.Adapter
+        class RecentAddressesListAdapter : RecyclerView.Adapter //TODO need to improve the look of it
         {
             public override int ItemCount => Items.Count;
 
             public List<RecentAddress> Items { get; } = new List<RecentAddress>();
 
+            public event EventHandler<RecentAddress> ItemClicked = delegate { };
+
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var viewHolder = holder as RecentAddressViewHolder;
                 var ra = Items[position];
+
+                viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, ra)));
 
                 viewHolder.Address = ra.Address;
                 viewHolder.Name = ra.Name;

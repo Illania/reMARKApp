@@ -18,6 +18,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -186,6 +187,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int) Result.Ok)
                 HandleLocalAttachment(data);
+            if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int) Result.Ok)
+            {
+                var recentAddress = SerializationUtils.Deserialize<RecentAddress>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
+            }
         }
 
         async Task LoadDocument()
@@ -279,12 +285,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Subviews event handlers
 
+        RecipientsView focusedRecipientiView;
+
         async void RecipientView_AddButtonClicked(object sender, EventArgs e)
         {
             var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
 
             if (choice < 0)
                 return;
+
+            focusedRecipientiView = sender as RecipientsView;
 
             switch (choice)
             {

@@ -654,6 +654,10 @@
     <AndroidResource Include="Resources\xml\network_security_config.xml" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
     <AndroidResource Include="Resources\layout\list_item_recent_addresses.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

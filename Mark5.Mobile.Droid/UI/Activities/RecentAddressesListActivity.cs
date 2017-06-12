@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class RecentAddressesListActivity : BaseAppCompatActivity
     {
-        public const string RecipientResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
+        public const string RecipientResultKey = "RecipietnResult_73d232bb-d317-48bc-b497-8c490a31e4d3";
 
         Toolbar toolbar;
         RecentAddressesListFragment ralf;
@@ -46,18 +46,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 ralf = (RecentAddressesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(RecentAddressesListActivity)}");
             }
-        }
-
-        public override void OnBackPressed()
-        {
-            //if (clf != null)
-            //{
-            //    var intent = new Intent();
-            //    intent.PutExtra(RecipientResultKey, SerializationUtils.Serialize(clf.Categories));
-            //    SetResult(Result.Ok, intent);
-            //}
-
-            base.OnBackPressed();
         }
 
         public override void Finish()

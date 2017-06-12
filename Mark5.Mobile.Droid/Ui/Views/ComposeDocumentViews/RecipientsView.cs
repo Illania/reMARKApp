@@ -104,6 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var addButton = new AppCompatImageButton(Context);
             addButton.Click += AddButton_Click;
             addButton.SetBackgroundColor(Color.AliceBlue);
+            addButton.SetImageResource(Resource.Drawable.arrow_right);
             var addButtonLp = new LinearLayout.LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
                 Gravity = GravityFlags.CenterVertical
@@ -250,8 +251,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetEmails(string emails)
         {
-            MatchCollection matches;
-            if (Validator.ContainsValidEmails(emails, out matches))
+            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
                 sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
@@ -269,6 +269,58 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         IEnumerable<string> GetEmails()
         {
             return Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
+        }
+
+
+        public void AddEmails(IEnumerable<string> emails)
+        {
+            AddEmails(string.Join(EmailSeparator, emails));
+        }
+
+        public void AddEmails(string emails)
+        {
+            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            {
+                var newEmails = new StringBuilder();
+                newEmails.Append(emailEditor.Text);
+                if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                    newEmails.Append(EmailSeparator);
+                newEmails.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(EmailSeparator);
+
+                emailEditor.Text = newEmails.ToString();
+
+                CorrectMarkup();
+
+                SetCursorAtEnd();
+
+                Edited(this, EventArgs.Empty);
+            }
+            else
+            {
+                CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+            }
+        }
+
+        public void AddRecipent(string name, string address)
+        {
+            var newEmails = new StringBuilder();
+            newEmails.Append(emailEditor.Text);
+            if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                newEmails.Append(EmailSeparator);
+            if (string.IsNullOrWhiteSpace(name))
+                newEmails.Append(address);
+            else
+                newEmails.Append(string.Format(RecipentFormat, name, address));
+            newEmails.Append(EmailSeparator);
+
+            emailEditor.Text = newEmails.ToString();
+
+            CorrectMarkup();
+
+            SetCursorAtEnd();
+
+            Edited(this, EventArgs.Empty);
         }
 
         #endregion
