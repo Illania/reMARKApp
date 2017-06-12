@@ -653,9 +653,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public async void EnableCaching(Folder folder)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            NavigationController.PresentViewController(new NavigationController(new DownloadViewController { Folder = folder}, UIModalPresentationStyle.FormSheet), true, null);
-
-            /*
             try
             {
                 await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
@@ -684,7 +681,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
-            */
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -719,6 +715,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
+        }
+
+        public void SaveOffline(Folder folder)
+        {
+            NavigationController.PresentViewController(new NavigationController(new DownloadViewController { Folder = folder.ShallowCopy() }, UIModalPresentationStyle.FormSheet), true, null);
         }
 
         #endregion
@@ -979,13 +980,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     }
                 }
 
-                if (module == ModuleType.Contacts)
+                if (module == ModuleType.Contacts || module == ModuleType.Shortcodes)
                 {
                     var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-						Localization.GetString("enable_caching"),
+						Localization.GetString("save_offline"),
 						(a, ip) =>
 						{
-						    viewController.EnableCaching(foldersInView[ip.Row]);
+						    viewController.SaveOffline(foldersInView[ip.Row]);
 						    tableView.SetEditing(false, true);
 						});
                     action.BackgroundColor = Theme.DarkBlue;
@@ -1309,13 +1310,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         }
                     }
 
-                    if (module == ModuleType.Contacts)
+                    if (module == ModuleType.Contacts || module == ModuleType.Shortcodes)
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                            Localization.GetString("enable_caching"),
+                            Localization.GetString("save_offline"),
                             (a, ip) =>
                             {
-                                viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]);
+                                viewController.SaveOffline(foldersInView[ip.LongSection][ip.Row]);
                                 tableView.SetEditing(false, true);
                             });
                         action.BackgroundColor = Theme.DarkBlue;
