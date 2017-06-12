@@ -288,14 +288,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 do
                 {
-                    var result = await Managers.ContactsManager.GetContactPreviewsAsync(folder, startRowId, SourceType.Remote);
+                    if (folder.Module == ModuleType.Contacts)
+                    {
+                        var result = await Managers.ContactsManager.GetContactPreviewsAsync(folder, startRowId, SourceType.Remote);
 
-                    result.ForEach(cp => queue.Enqueue(cp.Id));
-                    startRowId = result.Last().RowId;
-                    lastBatchCount = result.Count;
+                        result.ForEach(cp => queue.Enqueue(cp.Id));
+                        startRowId = result.Last().RowId;
+                        lastBatchCount = result.Count;
 
-                    result.Clear();
-                    result = null;
+                        result.Clear();
+                        result = null;
+                    }
+                    if (folder.Module == ModuleType.Shortcodes)
+                    {
+                        var result = await Managers.ShortcodesManager.GetShortcodePreviewsAsync(folder, startRowId, SourceType.Remote);
+
+                        result.ForEach(cp => queue.Enqueue(cp.Id));
+                        startRowId = result.Last().RowId;
+                        lastBatchCount = result.Count;
+
+                        result.Clear();
+                        result = null;
+                    }
 
                     onProgressAction(new ProgressInfo(true, queue.Count, -1, -1));
                 } while (lastBatchCount >= Managers.ContactsManager.MaxToFetch && !ct.IsCancellationRequested);
@@ -329,7 +343,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     try
                     {
-                        await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
+                        if (folder.Module == ModuleType.Contacts)
+                            await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
+                        if (folder.Module == ModuleType.Shortcodes)
+                            await Managers.ShortcodesManager.GetShortcodeAsync(folder, item, SourceType.Remote);
                     }
                     catch (Exception ex)
                     {
@@ -341,6 +358,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 } while (!ct.IsCancellationRequested);
 
                 CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItemsCount} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
+
+                await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
                 onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItemsCount));
             }

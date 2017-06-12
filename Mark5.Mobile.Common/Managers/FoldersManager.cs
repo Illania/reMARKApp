@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -168,6 +169,47 @@ namespace Mark5.Mobile.Common.Managers
                 return false;
 
             return moduleOfflineFolders.Any(f => f.Id == folderId);
+        }
+
+        public async Task AddSavedFolderInfo(Folder folder)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+
+            SavedOfflineFolderInfo existingInfo;
+            if ((existingInfo = infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module)) != null)
+            {
+                existingInfo.FolderName = folder.Name;
+                existingInfo.LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds();
+            }
+            else
+            {
+                infos.Add(new SavedOfflineFolderInfo
+                {
+                    FolderId = folder.Id,
+                    FolderName = folder.Name,
+                    Module = folder.Module,
+                    LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds()
+                });
+            }
+
+            await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
+        }
+
+        public async Task RemoveSavedFolderInfo(Folder folder)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+
+            var removed = infos.RemoveAll(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
+
+            if (removed > 0)
+                await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
+        }
+
+        public async Task<bool> IsSavedFolderInfo(Folder folder)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+
+            return infos.Any(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
         }
 
         #region Helper methods

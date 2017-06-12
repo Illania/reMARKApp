@@ -19,6 +19,7 @@ namespace Mark5.Mobile.Common.Storage
             public const string SystemUserDepartments = "systemUserDepartments.json";
             public const string FavoriteFolders = "favoriteFolders.json";
             public const string OfflineFolders = "offlineFolders.json";
+            public const string SavedOfflineFolderInfos = "savedOfflineFolderInfos.json";
             public const string NotificationSettings = "notificationSettings.json";
             public const string LastCacheCleanUp = "lastCacheCleanUp.json";
 
@@ -43,6 +44,7 @@ namespace Mark5.Mobile.Common.Storage
             [Filenames.SystemUserDepartments] = new SemaphoreSlim(1),
             [Filenames.FavoriteFolders] = new SemaphoreSlim(1),
             [Filenames.OfflineFolders] = new SemaphoreSlim(1),
+            [Filenames.SavedOfflineFolderInfos] = new SemaphoreSlim(1),
             [Filenames.NotificationSettings] = new SemaphoreSlim(1),
             [Filenames.LastCacheCleanUp] = new SemaphoreSlim(1),
             [Filenames.LastSearchDocumentCriteria] = new SemaphoreSlim(1),
@@ -171,6 +173,17 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task SaveOfflineFoldersAsync(Dictionary<ModuleType, List<Folder>> favoriteFolders, CancellationToken ct = default(CancellationToken))
         {
             await SaveAsync(favoriteFolders, Filenames.OfflineFolders, ct);
+        }
+
+        public static async Task<List<SavedOfflineFolderInfo>> GetSavedOfflineFolderInfosAsync(CancellationToken ct = default(CancellationToken))
+        {
+            var infos = await GetAsync<List<SavedOfflineFolderInfo>>(Filenames.SavedOfflineFolderInfos, ct);
+            return infos ?? new List<SavedOfflineFolderInfo>();
+        }
+
+        public static async Task SaveSavedOfflineFolderInfos(List<SavedOfflineFolderInfo> infos, CancellationToken ct = default(CancellationToken))
+        {
+            await SaveAsync(infos, Filenames.SavedOfflineFolderInfos, ct);
         }
 
         #endregion
