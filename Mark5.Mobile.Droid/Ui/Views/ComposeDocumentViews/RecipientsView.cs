@@ -329,6 +329,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void AddButton_Click(object sender, EventArgs e)
         {
+            emailEditor.RequestFocus();
             AddButtonClicked(this, EventArgs.Empty);
         }
 
@@ -459,6 +460,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var recipientsViewState = State as RecipientsViewState;
             emailEditor.Text = recipientsViewState.Content;
             savedRecipient = recipientsViewState.SavedRecipient;
+            if (recipientsViewState.HasFocus)
+            {
+                emailEditor.RequestFocus();
+            }
         }
 
         public override IComposeDocumentViewState ReturnState()
@@ -467,6 +472,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 Content = emailEditor.Text,
                 SavedRecipient = savedRecipient,
+                HasFocus = emailEditor.IsFocused,
             };
         }
 
@@ -474,6 +480,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             public string Content { get; set; }
             public string SavedRecipient { get; set; }
+            public bool HasFocus { get; set; }
         }
 
         #endregion
