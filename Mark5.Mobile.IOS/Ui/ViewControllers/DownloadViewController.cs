@@ -8,6 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -46,6 +47,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Folder Folder { get; set; }
 
+        public Task DidDisappear { get => tcs.Task; }
+
         UIBarButtonItem doneItem;
 
         UILabel progress;
@@ -54,6 +57,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         Stopwatch sw;
         CancellationTokenSource cts;
+
+        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
         public override void LoadView()
         {
@@ -80,9 +85,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ReachabilityBar.Attach(View, null, (float) NavigationController.BottomLayoutGuide.Length);
         }
 
-        public override void ViewDidAppear(bool animated)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public override async void ViewDidAppear(bool animated)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
+
+            var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(Folder);
+            if (info != null)
+                progress.Text = "Last downloaded on: " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString();
 
             CommonConfig.Logger.Info($"{nameof(DownloadViewController)} appeared");
         }
@@ -92,6 +103,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeinitializeHandlers();
+        }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+
+            tcs.SetResult(true);
         }
 
         public override void DidReceiveMemoryWarning()
@@ -344,7 +362,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     try
                     {
                         if (folder.Module == ModuleType.Contacts)
-                            await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
+                        {
+                            var contact = await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
+
+                            async Task DeepDownload(Contact c)
+                            {
+                                foreach (var child in c.Children.Where(cp => cp.Type == ContactType.Department))
+                                {
+                                    var childResult = await Managers.ContactsManager.GetContactWithPreviewAsync(-1, child.Id, SourceType.Remote);
+
+                                    if (childResult.Contact.Children.Any())
+                                        await DeepDownload(childResult.Contact);
+                                }
+
+                                //foreach (var child in c.Children.Where(cp => cp.Type == ContactType.Person))
+                                    //await Managers.ContactsManager.GetContactWithPreviewAsync(-1, child.Id, SourceType.Remote);
+                            }
+
+                            await DeepDownload(contact); // TODO consider making this optional
+                        }
                         if (folder.Module == ModuleType.Shortcodes)
                             await Managers.ShortcodesManager.GetShortcodeAsync(folder, item, SourceType.Remote);
                     }

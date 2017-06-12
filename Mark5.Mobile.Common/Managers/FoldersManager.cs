@@ -188,7 +188,7 @@ namespace Mark5.Mobile.Common.Managers
                     FolderId = folder.Id,
                     FolderName = folder.Name,
                     Module = folder.Module,
-                    LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds()
+                    LastDownloaded = DateTime.Now.ConvertDateTimeToTimestampMilliseconds()
                 });
             }
 
@@ -205,11 +205,16 @@ namespace Mark5.Mobile.Common.Managers
                 await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
         }
 
-        public async Task<bool> IsSavedFolderInfo(Folder folder)
+        public async Task<bool> IsSavedFolderOfflineInfo(Folder folder)
         {
             var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
-
             return infos.Any(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
+        }
+
+        public async Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+            return infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
         }
 
         #region Helper methods

@@ -37,6 +37,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        SourceType sourceType;
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -132,12 +134,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            tableView = new UITableView();
-            tableView.ClipsToBounds = false;
+            tableView = new UITableView
+            {
+                ClipsToBounds = false,
+                AllowsSelectionDuringEditing = false,
+                AllowsMultipleSelectionDuringEditing = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"));
-            tableView.AllowsSelectionDuringEditing = false;
-            tableView.AllowsMultipleSelectionDuringEditing = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
             {
@@ -154,8 +158,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             tableView.AddGestureRecognizer(longPressRecognizer);
 
-            refreshControl = new UIRefreshControl();
-            refreshControl.BackgroundColor = UIColor.White;
+            refreshControl = new UIRefreshControl
+            {
+                BackgroundColor = UIColor.White
+            };
             tableView.AddSubview(refreshControl);
         }
 
@@ -363,13 +369,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RefreshData(forceClear: true);
         }
 
-        void RefreshData(int startRowId = -1, bool forceClear = false)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshData(int startRowId = -1, bool forceClear = false)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (refreshing)
                 return;
 
             refreshing = true;
             refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+
+            if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            {
+                var result = await Dialogs.ShowYesNoCancelDialogAsync(this, "Saved offline", "This folder is saved offline. You can make the folder online again or redownload its contents.", "Make online", "Redownload", "Cancel");
+
+                if (result == 1)
+                    await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
+                if (result == 0)
+                {
+                    var vc = new DownloadViewController { Folder = Folder };
+                    NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    await vc.DidDisappear;
+                }
+                if (result == -1)
+                {
+                    refreshControl.EndRefreshing();
+                    refreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+                    refreshing = false;
+
+                    return;
+                }
+            }
 
             CommonConfig.Logger.Info($"Refreshing contacts list [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]");
 
@@ -381,6 +412,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ds = (DataSource) tableView.Source;
                 ds.Reset();
             }
+
+            sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
 
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
@@ -418,7 +451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 },
                 startRowId,
                 cts.Token,
-                SourceType.Local);
+                sourceType);
         }
 
         #endregion
@@ -944,9 +977,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public NSIndexPath FindItemIndexPath(int id)
             {
                 for (var section = 0; section < contactPreviewsInView.Count; section++)
-                for (var row = 0; row < contactPreviewsInView[section].Count; row++)
-                    if (contactPreviewsInView[section][row].Id == id)
-                        return NSIndexPath.FromRowSection(row, section);
+                    for (var row = 0; row < contactPreviewsInView[section].Count; row++)
+                        if (contactPreviewsInView[section][row].Id == id)
+                            return NSIndexPath.FromRowSection(row, section);
 
                 return null;
             }

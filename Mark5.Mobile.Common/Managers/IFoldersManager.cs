@@ -32,6 +32,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task RemoveSavedFolderInfo(Folder folder);
 
-        Task<bool> IsSavedFolderInfo(Folder folder);
+        Task<bool> IsSavedFolderOfflineInfo(Folder folder);
+
+        Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder);
     }
 }
