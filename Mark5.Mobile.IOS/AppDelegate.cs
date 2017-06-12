@@ -223,8 +223,10 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     CommonConfig.ReachabilityService = new ReachabilityService();
                     CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
-                    CommonConfig.HttpClientHandler = () => { return new NativeMessageHandler(); };
+                    CommonConfig.HttpClientHandler = () => new NativeMessageHandler();
                     CommonConfig.PhonebookUtilities = new PhonebookUtilities();
+                    CommonConfig.OnStartTransmission = ActivityIndicatorUtils.Show;
+                    CommonConfig.OnStopTransmission = ActivityIndicatorUtils.Hide;
 
                     if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                         CommonConfig.Utf8Normalizer = filename =>

@@ -8,6 +8,11 @@ namespace Mark5.Mobile.Common.Managers
 {
     public static class Managers
     {
+        static void HandleFunc()
+        {
+
+        }
+
         public static IFoldersManager FoldersManager { get; private set; }
         public static IDocumentsManager DocumentsManager { get; private set; }
         public static IContactsManager ContactsManager { get; private set; }
@@ -26,8 +31,18 @@ namespace Mark5.Mobile.Common.Managers
         {
             ActiveConnectionInfo = connectionInfo ?? throw new ArgumentNullException(nameof(connectionInfo));
 
-            var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port, CommonConfig.HttpClientHandler);
-            var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off, connectionInfo.Hostname, connectionInfo.Port, CommonConfig.HttpClientHandler);
+            var appServiceProxy = AppServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off,
+                                                                connectionInfo.Hostname,
+                                                                connectionInfo.Port,
+                                                                CommonConfig.HttpClientHandler,
+                                                                CommonConfig.OnStartTransmission,
+                                                                CommonConfig.OnStopTransmission);
+            var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off,
+                                                                                  connectionInfo.Hostname,
+                                                                                  connectionInfo.Port,
+                                                                                  CommonConfig.HttpClientHandler,
+                                                                                  CommonConfig.OnStartTransmission,
+                                                                                  CommonConfig.OnStopTransmission);
 
             var foldersDataAccess = new FoldersDataAccess(DatabaseConnectionProvider.DatabaseForModuleType);
             var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase);

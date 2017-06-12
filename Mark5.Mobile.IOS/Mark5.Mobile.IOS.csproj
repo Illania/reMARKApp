@@ -251,6 +251,7 @@
 		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
 		<Compile Include="Ui\ViewControllers\DownloadViewController.cs" />
+		<Compile Include="Utilities\ActivityIndicatorUtils.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

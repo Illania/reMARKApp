@@ -20,5 +20,7 @@ namespace Mark5.Mobile.Common
         public static Func<HttpMessageHandler> HttpClientHandler { get; set; }
         public static IPhonebookUtils PhonebookUtilities { get; set; }
         public static Func<string, string> Utf8Normalizer { get; set; }
+        public static Action OnStartTransmission { get; set; }
+        public static Action OnStopTransmission { get; set; }
     }
 }
