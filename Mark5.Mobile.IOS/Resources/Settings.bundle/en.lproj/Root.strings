@@ -15,7 +15,6 @@
 "compose_options" = "Compose email options";
 "compose_priority_enabled" = "Show priority field";
 "contact_section_visibility" = "Sections";
-"contacts" = "Contacts";
 "contacts_to_search" = "Contacts search results";
 "create_report" = "Create system report";
 "create_system_report" = "Create system report";
@@ -47,12 +46,9 @@
 "security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server can be intercepted.";
 "send_feedback" = "Send feedback";
 "server" = "Server";
-"shortcodes" = "Shortcodes";
 "shortcodes_to_search" = "Shortcodes search results";
 "show_creator_outgoing" = "Show creator for outgoing documents";
 "ssl" = "SSL";
-"synchronise_contacts" = "Synchronise contacts";
-"synchronise_shortcodes" = "Synchronise shortcodes";
 "unread_indicator_me" = "Unread indicator";
 "update_config" = "Update system configuration";
 "use_server_timezone" = "Use time zone of MARK5 Server";

@@ -66,7 +66,6 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
-
 		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
@@ -87,7 +86,6 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
-
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
@@ -161,38 +159,6 @@
 			<string>hide_read_notifications</string>
 			<key>Key</key>
 			<string>HideReadNotifications</string>
-			<key>DefaultValue</key>
-			<false/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>Title</key>
-			<string>contacts</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>synchronise_contacts</string>
-			<key>Key</key>
-			<string>SynchroniseContacts</string>
-			<key>DefaultValue</key>
-			<false/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>Title</key>
-			<string>shortcodes</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>synchronise_shortcodes</string>
-			<key>Key</key>
-			<string>SynchroniseShortcodes</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>

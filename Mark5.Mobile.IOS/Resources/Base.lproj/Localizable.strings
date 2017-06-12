@@ -23,12 +23,6 @@
 "categories" = "Categories";
 "cc" = "Cc";
 "chrome" = "Open in Google Chrome";
-"clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
-"clear_contacts_cache_title" = "Clear contacts cache";
-"clear_shortcodes_cache_summary" = "Do you want to remove cached shortcodes?";
-"clear_shortcodes_cache_title" = "Clear shortcodes cache";
-"clearing_contacts_cache___" = "Clearing cache...";
-"clearing_shortcodes_cache___" = "Clearing cache...";
 "close" = "Close";
 "comments" = "Comments";
 "company" = "Company";

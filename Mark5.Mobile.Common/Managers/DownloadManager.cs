@@ -19,16 +19,12 @@ namespace Mark5.Mobile.Common
         bool active;
         bool subscribed;
 
-        readonly IContactsDataAccess contactsDataAccess;
-        readonly IShortcodesDataAccess shortcodesDataAccess;
         readonly IDocumentsDataAccess documentsDataAccess;
         readonly SemaphoreSlim semaphore;
         readonly IPortableConcurrentQueue<DownloadItemInfo> queue;
 
-        public DownloadManager(IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess, IShortcodesDataAccess shortcodesDataAccess)
+        public DownloadManager(IDocumentsDataAccess documentsDataAccess)
         {
-            this.contactsDataAccess = contactsDataAccess;
-            this.shortcodesDataAccess = shortcodesDataAccess;
             this.documentsDataAccess = documentsDataAccess;
 
             semaphore = new SemaphoreSlim(1);
@@ -67,18 +63,6 @@ namespace Mark5.Mobile.Common
                         FolderId = folderId
                     });
                     break;
-                case ObjectType.Contact:
-                    AddToQueue(new ContactDownloadInfo
-                    {
-                        FolderId = folderId
-                    });
-                    break;
-                case ObjectType.Shortcode:
-                    AddToQueue(new ShortcodeDownloadInfo
-                    {
-                        FolderId = folderId
-                    });
-                    break;
                 default:
                     throw new ArgumentException("Provided object type is not supported");
             }
@@ -88,8 +72,6 @@ namespace Mark5.Mobile.Common
         {
             if (!DownloadPolicies.ContainsKey(objectType))
                 return false;
-            if (DownloadPolicies[objectType] is DownloadAllPolicy)
-                return true;
             if (DownloadPolicies[objectType] is DownloadFoldersPolicy)
                 return ((DownloadFoldersPolicy) DownloadPolicies[objectType]).FolderIds.Contains(folderId);
 
@@ -102,14 +84,14 @@ namespace Mark5.Mobile.Common
             {
                 await semaphore.WaitAsync();
 
-                //active = true;
+                active = true;
 
-                //if (!subscribed)
-                //{
-                //    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
-                //    subscribed = true;
-                //}
-                //StartDownloadTask();
+                if (!subscribed)
+                {
+                    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
+                    subscribed = true;
+                }
+                StartDownloadTask();
             }
             finally
             {
@@ -197,12 +179,6 @@ namespace Mark5.Mobile.Common
                         case ObjectType.Document:
                             await HandleDocumentsDownload(downloadInfo);
                             break;
-                        case ObjectType.Contact:
-                            await HandleContactsDownload(downloadInfo);
-                            break;
-                        case ObjectType.Shortcode:
-                            await HandleShortcodesDownload(downloadInfo);
-                            break;
                         default:
                             throw new ArgumentException("Object type not supported");
                     }
@@ -236,38 +212,6 @@ namespace Mark5.Mobile.Common
             }
         }
 
-        async Task HandleContactsDownload(DownloadItemInfo itemInfo)
-        {
-            var contactIds = await contactsDataAccess.GetPendingContactsId(itemInfo.FolderId);
-
-            foreach (var contactId in contactIds)
-            {
-                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
-                    return;
-
-                if (await contactsDataAccess.IsContactCached(contactId))
-                    continue;
-
-                await Managers.Managers.ContactsManager.GetContactAsync(itemInfo.FolderId, contactId);
-            }
-        }
-
-        async Task HandleShortcodesDownload(DownloadItemInfo itemInfo)
-        {
-            var shortcodeIds = await shortcodesDataAccess.GetPendingShortcodesId(itemInfo.FolderId);
-
-            foreach (var shosrtcodeId in shortcodeIds)
-            {
-                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
-                    return;
-
-                if (await shortcodesDataAccess.IsShortcodeCached(shosrtcodeId))
-                    continue;
-
-                await Managers.Managers.ShortcodesManager.GetShortcodeAsync(itemInfo.FolderId, shosrtcodeId);
-            }
-        }
-
         #endregion
 
         #region Utilities
@@ -294,28 +238,6 @@ namespace Mark5.Mobile.Common
                     });
         }
 
-        async Task AddPendingContactFoldersToQueue()
-        {
-            var folderIds = await contactsDataAccess.GetPendingFolders();
-            foreach (var id in folderIds)
-                if (ShouldBeDownloaded(ObjectType.Contact, id))
-                    AddToQueue(new ContactDownloadInfo
-                    {
-                        FolderId = id
-                    });
-        }
-
-        async Task AddPendingShortcodeFoldersToQueue()
-        {
-            var folderIds = await shortcodesDataAccess.GetPendingFolders();
-            foreach (var id in folderIds)
-                if (ShouldBeDownloaded(ObjectType.Shortcode, id))
-                    AddToQueue(new ShortcodeDownloadInfo
-                    {
-                        FolderId = id
-                    });
-        }
-
         async Task RetrievePendingFromStorage()
         {
             foreach (var objectType in DownloadPolicies.Keys)
@@ -323,12 +245,6 @@ namespace Mark5.Mobile.Common
                 {
                     case ObjectType.Document:
                         await AddPendingDocumentFoldersToQueue();
-                        break;
-                    case ObjectType.Contact:
-                        await AddPendingContactFoldersToQueue();
-                        break;
-                    case ObjectType.Shortcode:
-                        await AddPendingShortcodeFoldersToQueue();
                         break;
                     default:
                         throw new ArgumentException("Object type not valid");

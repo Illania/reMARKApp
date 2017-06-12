@@ -17,8 +17,8 @@ namespace Mark5.Mobile.Common.Managers
         public static INotificationsManager NotificationsManager { get; private set; }
         public static ISystemManager SystemManager { get; private set; }
         public static ICommonActionsManager CommonActionsManager { get; private set; }
-        public static IOutgoingDocumentsManager OutgoingDocumentsManager { get; private set; }
         public static IDownloadManager DownloadManager { get; private set; }
+        public static IOutgoingDocumentsManager OutgoingDocumentsManager { get; private set; }
         public static ICleanUpManager CleanUpManager { get; private set; }
         public static ConnectionInfo ActiveConnectionInfo { get; private set; }
 
@@ -45,8 +45,8 @@ namespace Mark5.Mobile.Common.Managers
             NotificationsManager = new NotificationsManager(connectionInfo, appServiceProxy, foldersDataAccess, notificationsDataAccess);
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
             CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
+            DownloadManager = new DownloadManager(documentsDataAccess);
             OutgoingDocumentsManager = new OutgoingDocumentsManager();
-            DownloadManager = new DownloadManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             CleanUpManager = new CleanUpManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
         }
     }

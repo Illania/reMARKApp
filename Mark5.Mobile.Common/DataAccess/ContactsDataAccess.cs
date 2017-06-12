@@ -410,100 +410,6 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<IEnumerable<int>> GetPendingFolders()
-        {
-            try
-            {
-                var fIds = new List<int>();
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var queryString = $"select {nameof(FolderContactLink.FolderId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderContactLink)}" + $"   where {nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
-
-                    var result = c.Query<IdValue>(queryString);
-
-                    fIds = result.Select(v => v.Id).ToList();
-                });
-
-                return fIds;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while getting pending folders id for contacts.", ex);
-            }
-        }
-
-        public async Task<bool> IsContactCached(int contactId)
-        {
-            try
-            {
-                var found = false;
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var result = c.Table<Contact>().Count(co => co.Id == contactId);
-                    found = result >= 1;
-                });
-
-                return found;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while checking contact existence.", ex);
-            }
-        }
-
-        public async Task<IEnumerable<int>> GetPendingContactsId(int folderId)
-        {
-            try
-            {
-                var contactIds = new List<int>();
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var folderCondition = $"{nameof(FolderContactLink.FolderId)} = ?";
-                    var inCondition = $"{nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
-                    var queryString = $"select {nameof(FolderContactLink.ContactId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderContactLink)}" + $"   where {folderCondition} and {inCondition}";
-
-                    var result = c.Query<IdValue>(queryString, folderId);
-                    contactIds = result.Select(v => v.Id).ToList();
-                });
-
-                return contactIds;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while getting pending contacts id.", ex);
-            }
-        }
-
-        public async Task RemoveOrphans()
-        {
-            try
-            {
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var innerSelectQueryText = $"select {nameof(FolderContactLink.ContactId)} from {nameof(FolderContactLink)}";
-
-                    var outerDeleteQueryContactPreview = $"delete from {nameof(ContactPreview)} where {nameof(ContactPreview.Id)} not in ({innerSelectQueryText}) ";
-                    var cmd = c.CreateCommand(outerDeleteQueryContactPreview);
-                    cmd.ExecuteNonQuery();
-
-                    var outerDeleteQueryContact = $"delete from {nameof(Contact)} where {nameof(Contact.Id)} not in ({innerSelectQueryText}) ";
-                    var cmd2 = c.CreateCommand(outerDeleteQueryContact);
-                    cmd2.ExecuteNonQuery();
-
-                    var outerDeleteQueryContactCommunicationAddresses = $"delete from {nameof(ContactCommunicationAddress)} where {nameof(ContactCommunicationAddress.ContactId)} not in ({innerSelectQueryText}) ";
-                    var cmd3 = c.CreateCommand(outerDeleteQueryContactCommunicationAddresses);
-                    cmd3.ExecuteNonQuery();
-                });
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error removing orphan contacts and contact previews.", ex);
-            }
-        }
-
         public async Task<List<PrintableSuggestion>> GetSuggestions(string phrase)
         {
             try
@@ -537,6 +443,33 @@ namespace Mark5.Mobile.Common.DataAccess
             catch
             {
                 return new List<PrintableSuggestion>();
+            }
+        }
+
+        public async Task RemoveOrphans()
+        {
+            try
+            {
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var innerSelectQueryText = $"select {nameof(FolderContactLink.ContactId)} from {nameof(FolderContactLink)}";
+
+                    var outerDeleteQueryContactPreview = $"delete from {nameof(ContactPreview)} where {nameof(ContactPreview.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd = c.CreateCommand(outerDeleteQueryContactPreview);
+                    cmd.ExecuteNonQuery();
+
+                    var outerDeleteQueryContact = $"delete from {nameof(Contact)} where {nameof(Contact.Id)} not in ({innerSelectQueryText}) ";
+                    var cmd2 = c.CreateCommand(outerDeleteQueryContact);
+                    cmd2.ExecuteNonQuery();
+
+                    var outerDeleteQueryContactCommunicationAddresses = $"delete from {nameof(ContactCommunicationAddress)} where {nameof(ContactCommunicationAddress.ContactId)} not in ({innerSelectQueryText}) ";
+                    var cmd3 = c.CreateCommand(outerDeleteQueryContactCommunicationAddresses);
+                    cmd3.ExecuteNonQuery();
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing orphan contacts and contact previews.", ex);
             }
         }
 
