@@ -34,6 +34,8 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<bool> IsSavedFolderOfflineInfo(Folder folder);
 
+        Task<bool> IsSavedFolderOfflineInfo(ModuleType module, int folderId);
+
         Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder);
     }
 }

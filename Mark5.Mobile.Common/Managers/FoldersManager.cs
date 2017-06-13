@@ -207,8 +207,13 @@ namespace Mark5.Mobile.Common.Managers
 
         public async Task<bool> IsSavedFolderOfflineInfo(Folder folder)
         {
+            return await IsSavedFolderOfflineInfo(folder.Module, folder.Id);
+        }
+
+        public async Task<bool> IsSavedFolderOfflineInfo(ModuleType module, int folderId)
+        {
             var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
-            return infos.Any(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
+            return infos.Any(sfi => sfi.FolderId == folderId && sfi.Module == module);
         }
 
         public async Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder)

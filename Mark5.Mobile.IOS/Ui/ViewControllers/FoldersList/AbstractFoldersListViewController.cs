@@ -104,10 +104,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             CommonConfig.Logger.Info($"{nameof(AbstractFoldersListViewController)} appeared");
 
-            if (((TableView?.Source as GrouppedDataSource)?.Empty ?? false) || ((TableView?.Source as DataSource)?.Empty ?? false))
+            if (((TableView?.Source as GrouppedDataSource)?.Empty ?? false)
+                || ((TableView?.Source as DataSource)?.Empty ?? false))
                 RefreshData();
-            else if (IsRootOfFoldersList && TableView?.Source as GrouppedDataSource != null)
-                RefreshFavoritesOnly();
+            else if (TableView?.Source as GrouppedDataSource != null)
+                QuickRefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -306,7 +307,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 try
                 {
                     var gds = (GrouppedDataSource) TableView.Source;
-                    await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFavoriteFolders());
+                    await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFolders(GrouppedDataSource.Section.Favorites));
                 }
                 catch (Exception ex)
                 {
@@ -351,9 +352,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 List<Folder> remoteFolders = null;
                 if (!forceRefresh && ParentFolder.HasSubFolders && ParentFolder.SubFolders != null && ParentFolder.SubFolders.Count > 0)
-                {
                     remoteFolders = ParentFolder.SubFolders;
-                }
                 else
                 {
                     if (LoadRemoteFromCache)
@@ -374,32 +373,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         remoteFolders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder);
                 }
 
-                var remoteFolderIds = remoteFolders.Select(f => f.Id);
-
-
                 if (IsRootOfFoldersList)
                 {
                     var gds = (GrouppedDataSource) TableView.Source;
 
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
-                    var favoriteIds = favorites.Select(f => f.Id);
-                    var allIds = favoriteIds.Union(remoteFolderIds).Distinct();
-
-                    var favoritesStatus = new Dictionary<int, bool>();
-                    var offlineStatus = new Dictionary<int, bool>();
-
-                    foreach (var id in allIds)
-                    {
-                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
-                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
-                    }
-
-                    gds.FavoriteStatus = favoritesStatus;
-                    gds.CachingStatus = offlineStatus;
-
                     if (ParentFolder.Module == ModuleType.Documents)
                         gds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
+
                     gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
                     gds.SetFolders(GrouppedDataSource.Section.Folders, remoteFolders);
 
@@ -409,23 +391,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 else
                 {
                     var ds = (DataSource) TableView.Source;
-
-                    var favoritesStatus = new Dictionary<int, bool>();
-                    var offlineStatus = new Dictionary<int, bool>();
-
-                    foreach (var id in remoteFolderIds)
-                    {
-                        favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
-                        offlineStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
-                    }
-
-                    ds.FavoriteStatus = favoritesStatus;
-                    ds.CachingStatus = offlineStatus;
-
                     ds.SetFolders(remoteFolders);
 
                     CommonConfig.Logger.Info($"Refreshed folders list [parentFolder={ParentFolder}]");
                 }
+
+                await Task.Delay(150); // Let animations finish
+                RefreshFoldersInfo();
             }
             catch (Exception ex)
             {
@@ -442,14 +414,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void RefreshFavoritesOnly()
+        async void QuickRefreshData()
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
-                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
                 var gds = (GrouppedDataSource) TableView.Source;
-                gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+                var currentFavorites = gds.GetFolders(GrouppedDataSource.Section.Favorites);
+                var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
+
+                var favortiesSame = currentFavorites.Count == favorites.Count
+                                                    && currentFavorites.All(f => favorites.Any(f2 => f.Id == f2.Id));
+
+                if (!favortiesSame)
+                    gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+
+                await Task.Delay(150); // Let animations finish
+                RefreshFoldersInfo();
             }
             catch (Exception ex)
             {
@@ -459,6 +440,62 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (!IsRootOfFoldersList)
                     NavigationController?.PopViewController(true);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshFoldersInfo()
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            if (IsRootOfFoldersList)
+            {
+                var gds = (GrouppedDataSource) TableView.Source;
+                var ids = gds.FoldersInViewIds;
+
+                var favoritesStatus = new SortedDictionary<int, bool>();
+                var cachingStatus = new SortedDictionary<int, bool>();
+
+                foreach (var id in ids)
+                {
+                    favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
+
+                    if (ParentFolder.Module == ModuleType.Documents)
+                        cachingStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
+                    else
+                        cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
+                }
+
+                if (!gds.FavoriteStatus.SequenceEqual(favoritesStatus) || !gds.CachingStatus.SequenceEqual(cachingStatus))
+                {
+                    gds.FavoriteStatus = favoritesStatus;
+                    gds.CachingStatus = cachingStatus;
+                    gds.Reload();
+                }
+            }
+            else
+            {
+                var ds = (DataSource) TableView.Source;
+                var ids = ds.FoldersInViewIds;
+
+                var favoritesStatus = new SortedDictionary<int, bool>();
+                var cachingStatus = new SortedDictionary<int, bool>();
+
+                foreach (var id in ids)
+                {
+                    favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
+
+                    if (ParentFolder.Module == ModuleType.Documents)
+                        cachingStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
+                    else
+                        cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
+                }
+
+                if (!ds.FavoriteStatus.SequenceEqual(favoritesStatus) || !ds.CachingStatus.SequenceEqual(cachingStatus))
+                {
+                    ds.FavoriteStatus = favoritesStatus;
+                    ds.CachingStatus = cachingStatus;
+                    ds.Reload();
+                }
             }
         }
 
@@ -803,9 +840,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected class DataSource : UITableViewSource, IDisposable
         {
             public bool Empty => foldersInView.Count < 1;
+            public int[] FoldersInViewIds => foldersInView.Select(f => f.Id).Distinct().ToArray();
 
-            public Dictionary<int, bool> FavoriteStatus { get; set; }
-            public Dictionary<int, bool> CachingStatus { get; set; }
+            public SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
+            public SortedDictionary<int, bool> CachingStatus { get; set; } = new SortedDictionary<int, bool>();
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
@@ -899,60 +937,61 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return new UITableViewRowAction[0];
 
                 var f = foldersInView[indexPath.Row];
-
                 var actions = new List<UITableViewRowAction>();
 
-                if (FavoriteStatus[f.Id])
-                {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                        Localization.GetString("remove_from_favorites"),
-                        (a, ip) =>
-                        {
-                            viewController.RemoveFromFavorites(foldersInView[ip.Row]);
-                            tableView.SetEditing(false, true);
-                        });
-                    action.BackgroundColor = Theme.Brown;
-                    actions.Add(action);
-                }
-                else
-                {
-                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                        Localization.GetString("add_to_favorites"),
-                        (a, ip) =>
-                        {
-                            viewController.AddToFavorites(foldersInView[ip.Row]);
-                            tableView.SetEditing(false, true);
-                        });
-                    action.BackgroundColor = Theme.Brown;
-                    actions.Add(action);
-                }
-
-                if (module == ModuleType.Documents)
-                {
-                    if (CachingStatus[f.Id])
+                if (FavoriteStatus.ContainsKey(f.Id))
+                    if (FavoriteStatus[f.Id])
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                            Localization.GetString("disable_caching"),
+                            Localization.GetString("remove_from_favorites"),
                             (a, ip) =>
                             {
-                                viewController.DisableCaching(foldersInView[ip.Row]);
+                                viewController.RemoveFromFavorites(foldersInView[ip.Row]);
                                 tableView.SetEditing(false, true);
                             });
-                        action.BackgroundColor = Theme.DarkBlue;
+                        action.BackgroundColor = Theme.Brown;
                         actions.Add(action);
                     }
                     else
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                            Localization.GetString("enable_caching"),
+                            Localization.GetString("add_to_favorites"),
                             (a, ip) =>
                             {
-                                viewController.EnableCaching(foldersInView[ip.Row]);
+                                viewController.AddToFavorites(foldersInView[ip.Row]);
                                 tableView.SetEditing(false, true);
                             });
-                        action.BackgroundColor = Theme.DarkBlue;
+                        action.BackgroundColor = Theme.Brown;
                         actions.Add(action);
                     }
+
+                if (module == ModuleType.Documents)
+                {
+                    if (CachingStatus.ContainsKey(f.Id))
+                        if (CachingStatus[f.Id])
+                        {
+                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                Localization.GetString("disable_caching"),
+                                (a, ip) =>
+                                {
+                                    viewController.DisableCaching(foldersInView[ip.Row]);
+                                    tableView.SetEditing(false, true);
+                                });
+                            action.BackgroundColor = Theme.DarkBlue;
+                            actions.Add(action);
+                        }
+                        else
+                        {
+                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                Localization.GetString("enable_caching"),
+                                (a, ip) =>
+                                {
+                                    viewController.EnableCaching(foldersInView[ip.Row]);
+                                    tableView.SetEditing(false, true);
+                                });
+                            action.BackgroundColor = Theme.DarkBlue;
+                            actions.Add(action);
+                        }
 
                     if (f.Subscribed)
                     {
@@ -983,12 +1022,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (module == ModuleType.Contacts || module == ModuleType.Shortcodes)
                 {
                     var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-						Localization.GetString("save_offline"),
-						(a, ip) =>
-						{
-						    viewController.SaveOffline(foldersInView[ip.Row]);
-						    tableView.SetEditing(false, true);
-						});
+                        Localization.GetString("save_offline"),
+                        (a, ip) =>
+                        {
+                            viewController.SaveOffline(foldersInView[ip.Row]);
+                            tableView.SetEditing(false, true);
+                        });
                     action.BackgroundColor = Theme.DarkBlue;
                     actions.Add(action);
                 }
@@ -1013,6 +1052,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foldersInView.AddRange(folders);
                 loading = false;
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void Reload()
+            {
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.None);
             }
 
             public void Reset()
@@ -1060,10 +1104,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 public static readonly nint Local = 2;
             }
 
-            public bool Empty { get { return foldersInView.All(kv => kv.Value.Count < 1); } }
+            public bool Empty => foldersInView.All(kv => kv.Value.Count < 1);
+            public int[] FoldersInViewIds => foldersInView.SelectMany(kv => kv.Value).Select(f => f.Id).Distinct().ToArray();
 
-            public Dictionary<int, bool> FavoriteStatus { get; set; }
-            public Dictionary<int, bool> CachingStatus { get; set; }
+            public SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
+            public SortedDictionary<int, bool> CachingStatus { get; set; } = new SortedDictionary<int, bool>();
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
@@ -1226,12 +1271,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (disableRowActions)
                     return new UITableViewRowAction[0];
 
-                var f = foldersInView[indexPath.LongSection][indexPath.Row];
+                if (indexPath.Section == Section.Local)
+                    return new UITableViewRowAction[0];
 
+                var f = foldersInView[indexPath.LongSection][indexPath.Row];
                 var actions = new List<UITableViewRowAction>();
 
-                if (indexPath.Section == Section.Favorites || indexPath.Section == Section.Folders)
-                {
+                if (FavoriteStatus.ContainsKey(f.Id))
                     if (FavoriteStatus[f.Id])
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
@@ -1257,8 +1303,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         actions.Add(action);
                     }
 
-                    if (module == ModuleType.Documents)
-                    {
+                if (module == ModuleType.Documents)
+                {
+                    if (CachingStatus.ContainsKey(f.Id))
                         if (CachingStatus[f.Id])
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
@@ -1284,44 +1331,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                             actions.Add(action);
                         }
 
-                        if (f.Subscribed)
-                        {
-                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("disable_notifications"),
-                                (a, ip) =>
-                                {
-                                    viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]);
-                                    tableView.SetEditing(false, true);
-                                });
-                            action.BackgroundColor = Theme.DarkerBlue;
-                            actions.Add(action);
-                        }
-                        else
-                        {
-                            var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("enable_notifications"),
-                                (a, ip) =>
-                                {
-                                    viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]);
-                                    tableView.SetEditing(false, true);
-                                });
-                            action.BackgroundColor = Theme.DarkerBlue;
-                            actions.Add(action);
-                        }
-                    }
-
-                    if (module == ModuleType.Contacts || module == ModuleType.Shortcodes)
+                    if (f.Subscribed)
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                            Localization.GetString("save_offline"),
+                            Localization.GetString("disable_notifications"),
                             (a, ip) =>
                             {
-                                viewController.SaveOffline(foldersInView[ip.LongSection][ip.Row]);
+                                viewController.DisableNotifications(foldersInView[ip.LongSection][ip.Row]);
                                 tableView.SetEditing(false, true);
                             });
-                        action.BackgroundColor = Theme.DarkBlue;
+                        action.BackgroundColor = Theme.DarkerBlue;
                         actions.Add(action);
                     }
+                    else
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                            Localization.GetString("enable_notifications"),
+                            (a, ip) =>
+                            {
+                                viewController.EnableNotifications(foldersInView[ip.LongSection][ip.Row]);
+                                tableView.SetEditing(false, true);
+                            });
+                        action.BackgroundColor = Theme.DarkerBlue;
+                        actions.Add(action);
+                    }
+                }
+
+                if (module == ModuleType.Contacts || module == ModuleType.Shortcodes)
+                {
+                    var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                        Localization.GetString("save_offline"),
+                        (a, ip) =>
+                        {
+                            viewController.SaveOffline(foldersInView[ip.LongSection][ip.Row]);
+                            tableView.SetEditing(false, true);
+                        });
+                    action.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(action);
                 }
 
                 return actions.ToArray();
@@ -1371,6 +1417,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 tableView.ReloadSections(NSIndexSet.FromIndex(section), UITableViewRowAnimation.Fade);
             }
 
+            public List<Folder> GetFolders(nint section)
+            {
+                return foldersInView[section];
+            }
+
+            public void Reload()
+            {
+                tableView.BeginUpdates();
+                if (module == ModuleType.Documents)
+                    tableView.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.None);
+
+                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.None);
+                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.None);
+                tableView.EndUpdates();
+            }
+
             public void Reset()
             {
                 for (var i = 0; i < loading.Length; i++)
@@ -1405,11 +1467,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public int ItemsInSection(nint section)
             {
                 return foldersInView[section].Count;
-            }
-
-            public List<Folder> GetFavoriteFolders()
-            {
-                return foldersInView[Section.Favorites].Select(f => f.ShallowCopy()).ToList();
             }
 
             public NSIndexPath[] GetIndexPaths(int folderId)
