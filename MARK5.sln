@@ -194,6 +194,5 @@ Global
 		$5.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $6
 		$6.scope = text/x-csharp
-		$6.SpaceAfterCast = True
 	EndGlobalSection
 EndGlobal

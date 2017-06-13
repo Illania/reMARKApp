@@ -229,7 +229,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
-                CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
 
                 await Managers.DownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();

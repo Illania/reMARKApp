@@ -614,14 +614,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                var policies = Managers.DownloadManager.DownloadPolicies;
-                policies[ObjectType.Document] = new DownloadFoldersPolicy();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
-                CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
 
                 await Managers.DownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();

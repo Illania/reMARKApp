@@ -717,7 +717,10 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     var folderCondition = $"{nameof(FolderDocumentLink.FolderId)} = ?";
                     var inCondition = $"{nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
-                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderDocumentLink)}" + $"   where {folderCondition} and {inCondition}";
+                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}'"
+                        + $" from {nameof(FolderDocumentLink)}"
+                        + $" where {folderCondition} and {inCondition}"
+                        + $" order by {nameof(FolderDocumentLink.DocumentId)} desc";
 
                     var result = c.Query<IdValue>(queryString, folderId);
                     documentIds = result.Select(v => v.Id).ToList();

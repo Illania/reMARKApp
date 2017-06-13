@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.PortableCollections;
 using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Storage;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.Common
 {
-    class DownloadManager : IDownloadManager
+    class DocumentsDownloadManager : IDocumentsDownloadManager
     {
-        public Dictionary<ObjectType, DownloadPolicy> DownloadPolicies { get; }
-
         CancellationTokenSource cts;
         Task downloadTask;
 
@@ -23,16 +24,12 @@ namespace Mark5.Mobile.Common
         readonly SemaphoreSlim semaphore;
         readonly IPortableConcurrentQueue<DownloadItemInfo> queue;
 
-        public DownloadManager(IDocumentsDataAccess documentsDataAccess)
+        public DocumentsDownloadManager(IDocumentsDataAccess documentsDataAccess)
         {
             this.documentsDataAccess = documentsDataAccess;
 
             semaphore = new SemaphoreSlim(1);
-            queue = (IPortableConcurrentQueue<DownloadItemInfo>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[]
-            {
-                typeof(DownloadItemInfo)
-            }));
-            DownloadPolicies = new Dictionary<ObjectType, DownloadPolicy>();
+            queue = (IPortableConcurrentQueue<DownloadItemInfo>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new [] { typeof(DownloadItemInfo) }));
         }
 
         #region Public methods
@@ -50,9 +47,9 @@ namespace Mark5.Mobile.Common
             }
         }
 
-        public void Notify(ObjectType objectType, int folderId)
+        public async Task Notify(ObjectType objectType, int folderId)
         {
-            if (!ShouldBeDownloaded(objectType, folderId))
+            if (!(await ShouldBeDownloaded(objectType, folderId)))
                 return;
 
             switch (objectType)
@@ -68,12 +65,10 @@ namespace Mark5.Mobile.Common
             }
         }
 
-        bool ShouldBeDownloaded(ObjectType objectType, int folderId)
+        async Task<bool> ShouldBeDownloaded(ObjectType objectType, int folderId)
         {
-            if (!DownloadPolicies.ContainsKey(objectType))
-                return false;
-            if (DownloadPolicies[objectType] is DownloadFoldersPolicy)
-                return ((DownloadFoldersPolicy) DownloadPolicies[objectType]).FolderIds.Contains(folderId);
+            if (objectType == ObjectType.Document)
+                return (await FileSystemStorage.GetSavedOfflineFolderInfosAsync()).Any(sfi => sfi.Module.ObjectTypes().Contains(objectType) && sfi.FolderId == folderId);
 
             return false;
         }
@@ -165,13 +160,13 @@ namespace Mark5.Mobile.Common
             try
             {
                 queue.Clear();
-                await RetrievePendingFromStorage();
+                await AddPendingDocumentFoldersToQueue();
 
                 while (!cts.IsCancellationRequested)
                 {
                     queue.TryTake(out DownloadItemInfo downloadInfo, -1, cts.Token);
 
-                    if (!ShouldBeDownloaded(downloadInfo.Type, downloadInfo.FolderId))
+                    if (!(await ShouldBeDownloaded(downloadInfo.Type, downloadInfo.FolderId)))
                         continue;
 
                     switch (downloadInfo.Type)
@@ -202,7 +197,7 @@ namespace Mark5.Mobile.Common
 
             foreach (var documentId in documentIds)
             {
-                if (!ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId))
+                if (!(await ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId)))
                     return;
 
                 if (await documentsDataAccess.IsDocumentCached(documentId))
@@ -231,24 +226,11 @@ namespace Mark5.Mobile.Common
         {
             var folderIds = await documentsDataAccess.GetPendingFolders();
             foreach (var id in folderIds)
-                if (ShouldBeDownloaded(ObjectType.Document, id))
+                if (await ShouldBeDownloaded(ObjectType.Document, id))
                     AddToQueue(new DocumentDownloadInfo
                     {
                         FolderId = id
                     });
-        }
-
-        async Task RetrievePendingFromStorage()
-        {
-            foreach (var objectType in DownloadPolicies.Keys)
-                switch (objectType)
-                {
-                    case ObjectType.Document:
-                        await AddPendingDocumentFoldersToQueue();
-                        break;
-                    default:
-                        throw new ArgumentException("Object type not valid");
-                }
         }
 
         #endregion

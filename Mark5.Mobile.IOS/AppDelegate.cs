@@ -303,8 +303,6 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                     Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                     Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    var policies = Managers.DownloadManager.DownloadPolicies;
-                    policies[ObjectType.Document] = new DownloadFoldersPolicy();
 
                     if (PlatformConfig.Preferences.ClearCache)
                     {
@@ -321,7 +319,7 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                         CommonConfig.Logger.Info("Cleaned up cache");
                     }
 
-                    CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+                    CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
                     await Managers.DownloadManager.Start();
                     await Managers.OutgoingDocumentsManager.Start();
 
