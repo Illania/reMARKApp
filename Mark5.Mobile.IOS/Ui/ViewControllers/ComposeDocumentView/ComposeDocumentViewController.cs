@@ -1113,25 +1113,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             try
             {
                 templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                templatesPreviews = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None)
+                                                     .OrderByDescending(tp => tp.Private).ThenBy(tp => tp.Name)
+                                                     .ToList();
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
-            finally
-            {
-                dismissAction();
-            }
 
-            if (templatesPreviews != null)
-            {
-                var templatesForCreationMode = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None);
-                if (templatesForCreationMode.Any())
+                if (templatesPreviews.Any())
                 {
-                    var templateNames = templatesForCreationMode.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
+                    var templateNames = templatesPreviews.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
 
                     var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_question"), templateNames, contentView);
 
@@ -1149,6 +1140,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("no_templates_title"), Localization.GetString("no_templates_content"));
                 }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 

@@ -248,7 +248,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
                 Font = Theme.DefaultFont,
-                AutocapitalizationType = UITextAutocapitalizationType.AllCharacters,
                 AutocorrectionType = UITextAutocorrectionType.No,
                 ClearButtonMode = UITextFieldViewMode.WhileEditing,
                 ReturnKeyType = UIReturnKeyType.Next,
