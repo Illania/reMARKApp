@@ -218,7 +218,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                var policies = Managers.DownloadManager.DownloadPolicies;
+                var policies = Managers.DocumentsDownloadManager.DownloadPolicies;
                 policies[ObjectType.Document] = new DownloadFoldersPolicy();
                 if (PlatformConfig.Preferences.SynchroniseContacts)
                     policies[ObjectType.Contact] = new DownloadAllPolicy();
@@ -231,7 +231,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
 
-                await Managers.DownloadManager.Start();
+                await Managers.DocumentsDownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");

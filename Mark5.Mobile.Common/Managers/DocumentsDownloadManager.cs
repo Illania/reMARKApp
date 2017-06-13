@@ -52,6 +52,9 @@ namespace Mark5.Mobile.Common
             if (!(await ShouldBeDownloaded(folderId)))
                 return;
 
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug($"Adding folder with ID {folderId} to download queue");
+
             AddToQueue(folderId);
         }
 
@@ -64,6 +67,9 @@ namespace Mark5.Mobile.Common
         {
             try
             {
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug("Starting...");
+
                 await semaphore.WaitAsync();
 
                 active = true;
@@ -73,7 +79,11 @@ namespace Mark5.Mobile.Common
                     CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
                     subscribed = true;
                 }
+
                 StartDownloadTask();
+
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug("Started");
             }
             finally
             {
@@ -85,6 +95,9 @@ namespace Mark5.Mobile.Common
         {
             try
             {
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug("Stopping...");
+
                 await semaphore.WaitAsync();
                 await StopDownloadTask();
 
@@ -93,7 +106,11 @@ namespace Mark5.Mobile.Common
                     CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityRefreshed;
                     subscribed = false;
                 }
+
                 active = false;
+
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug("Stopped");
             }
             finally
             {
@@ -150,10 +167,13 @@ namespace Mark5.Mobile.Common
                 while (!cts.IsCancellationRequested)
                 {
                     queue.TryTake(out int folderId, -1, cts.Token);
-
+                    
                     if (!(await ShouldBeDownloaded(folderId)))
                         continue;
-
+                    
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"Downloading folder {folderId}...");
+                    
                     await HandleDocumentsFolderDownload(folderId);
                 }
             }
@@ -176,6 +196,9 @@ namespace Mark5.Mobile.Common
             {
                 if (await documentsDataAccess.IsDocumentCached(documentId))
                     continue;
+
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"Downloading document {documentId} in folder {folderId}...");
 
                 await Managers.Managers.DocumentsManager.GetDocumentAsync(folderId, documentId);
             }

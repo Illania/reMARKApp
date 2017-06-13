@@ -421,7 +421,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
                 {
-                    Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
                     InvokeOnMainThread(() =>
                     {
                         var ds = (DataSource) tableView.Source;

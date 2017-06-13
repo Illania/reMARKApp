@@ -307,7 +307,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkerblue)));
                     snackbar.Show();
 
-                    Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+                    Managers.DocumentsDownloadManager.Notify(ObjectType.Document, Folder.Id);
 
                     Activity?.RunOnUiThread(() => { adapter?.PrependItems(documents); });
                 }
@@ -345,7 +345,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (forceClear)
                     adapter.Clear();
 
-                Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+                Managers.DocumentsDownloadManager.Notify(ObjectType.Document, Folder.Id);
                 adapter.AppendItems(documentPreviews);
             }
             catch (Exception ex)

@@ -420,7 +420,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder,
                 sps =>
                 {
-                    Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
                     InvokeOnMainThread(() =>
                     {
                         var ds = (DataSource) tableView.Source;

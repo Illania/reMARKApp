@@ -621,7 +621,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
 
-                await Managers.DownloadManager.Start();
+                await Managers.DocumentsDownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();
 
                 LocalNotificationsListener.Initialize();

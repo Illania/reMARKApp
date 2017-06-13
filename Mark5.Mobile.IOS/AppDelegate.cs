@@ -320,7 +320,7 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     }
 
                     CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
-                    await Managers.DownloadManager.Start();
+                    await Managers.DocumentsDownloadManager.Start();
                     await Managers.OutgoingDocumentsManager.Start();
 
                     CommonConfig.Logger.Info($"Refreshing reachability status...");

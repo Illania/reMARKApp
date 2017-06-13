@@ -249,7 +249,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
 
-                    Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
+                    Managers.DocumentsDownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
                     Activity.RunOnUiThread(() => adapter.AppendItems(cps));
                 },
                 () =>

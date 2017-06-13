@@ -859,7 +859,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {ds.LoadMoreEnabled}");
 
-                Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+                Managers.DocumentsDownloadManager.Notify(Folder.Id).FireAndForget();
+
                 ds.AppendItems(documentPreviews);
 
                 if (documentPreviews.Any() && newDocumentsAvailableAction != null)
@@ -904,7 +905,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
 
-                    Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+                    Managers.DocumentsDownloadManager.Notify(Folder.Id).FireAndForget();
 
                     var ds = tableView.Source as DataSource;
                     ds?.PrependItems(documents);

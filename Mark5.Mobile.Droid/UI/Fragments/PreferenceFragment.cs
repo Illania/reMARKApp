@@ -292,14 +292,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (key == GetString(Resource.String.pref_key_contacts_synchronised))
                 if (PlatformConfig.Preferences.SynchroniseContacts)
-                    Managers.DownloadManager.DownloadPolicies[ObjectType.Contact] = new DownloadAllPolicy();
+                    Managers.DocumentsDownloadManager.DownloadPolicies[ObjectType.Contact] = new DownloadAllPolicy();
                 else
-                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Contact);
+                    Managers.DocumentsDownloadManager.DownloadPolicies.Remove(ObjectType.Contact);
             if (key == GetString(Resource.String.pref_key_shortcodes_synchronised))
                 if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                    Managers.DownloadManager.DownloadPolicies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                    Managers.DocumentsDownloadManager.DownloadPolicies[ObjectType.Shortcode] = new DownloadAllPolicy();
                 else
-                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
+                    Managers.DocumentsDownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
         }
 
         public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)
