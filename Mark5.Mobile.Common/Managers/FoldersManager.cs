@@ -179,7 +179,7 @@ namespace Mark5.Mobile.Common.Managers
             if ((existingInfo = infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module)) != null)
             {
                 existingInfo.FolderName = folder.Name;
-                existingInfo.LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds();
+                existingInfo.LastDownloaded = DateTime.Now.ConvertDateTimeToTimestampMilliseconds();
             }
             else
             {

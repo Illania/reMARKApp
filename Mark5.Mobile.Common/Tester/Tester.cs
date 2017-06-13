@@ -28,8 +28,8 @@ namespace Mark5.Mobile.Common.Tester
                                                           ci.Hostname,
                                                           ci.Port,
                                                           CommonConfig.HttpClientHandler,
-                                                          CommonConfig.OnStartTransmission,
-                                                          CommonConfig.OnStopTransmission);
+                                                          null,
+                                                          null);
                 await proxy.TestAsync(new DataContract.TestParameters());
 
                 return true;

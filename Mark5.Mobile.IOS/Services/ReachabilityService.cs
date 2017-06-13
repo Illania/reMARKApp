@@ -69,8 +69,6 @@ namespace Mark5.Mobile.IOS.Services
         {
             try
             {
-                CommonConfig.OnStartTransmission?.Invoke();
-
                 using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
                 {
                     Timeout = new TimeSpan(0, 0, 2)
@@ -90,18 +88,12 @@ namespace Mark5.Mobile.IOS.Services
 
                 return false;
             }
-            finally
-            {
-                CommonConfig.OnStopTransmission?.Invoke();
-            }
         }
 
         public async Task<bool> CheckWithServiceConnection()
         {
             try
             {
-                CommonConfig.OnStartTransmission?.Invoke();
-
                 var ci = Managers.ActiveConnectionInfo;
                 var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}:{ci.Port}/app3";
 
@@ -123,10 +115,6 @@ namespace Mark5.Mobile.IOS.Services
                 CommonConfig.Logger.Info($"Service connection availability: false");
 
                 return false;
-            }
-            finally
-            {
-                CommonConfig.OnStopTransmission?.Invoke();
             }
         }
 

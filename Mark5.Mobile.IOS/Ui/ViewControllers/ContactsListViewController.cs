@@ -37,8 +37,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
-        SourceType sourceType;
-
         #region UIViewController overrides
 
         public override void LoadView()
@@ -381,7 +379,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
             {
-                var result = await Dialogs.ShowYesNoCancelDialogAsync(this, "Saved offline", "This folder is saved offline. You can make the folder online again or redownload its contents.", "Make online", "Redownload", "Cancel");
+                var result = await Dialogs.ShowYesNoCancelDialogAsync(this,
+                                                                      Localization.GetString("folder_offline_title"),
+                                                                      Localization.GetString("folder_offline_message"),
+                                                                      Localization.GetString("folder_offline_go_online"),
+                                                                      Localization.GetString("folder_offline_redownload"),
+                                                                      Localization.GetString("cancel"));
 
                 if (result == 1)
                     await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
@@ -413,7 +416,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.Reset();
             }
 
-            sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
+            var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
 
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>

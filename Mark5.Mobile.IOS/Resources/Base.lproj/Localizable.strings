@@ -111,6 +111,10 @@
 "fax" = "Fax";
 "filter" = "Filter";
 "folder_empty" = "Folder is empty";
+"folder_offline_message" = "This folder is saved offline. You can make the folder online again or redownload its contents.";
+"folder_offline_go_online" = "Go online";
+"folder_offline_redownload" = "Redownload";
+"folder_offline_title" = "Folder is offline";
 "folders" = "Folders";
 "forward" = "Forward";
 "from" = "From";

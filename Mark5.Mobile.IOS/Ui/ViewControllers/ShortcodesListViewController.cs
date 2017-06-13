@@ -9,7 +9,6 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -133,12 +132,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            tableView = new UITableView();
-            tableView.ClipsToBounds = false;
+            tableView = new UITableView
+            {
+                ClipsToBounds = false,
+                AllowsSelectionDuringEditing = false,
+                AllowsMultipleSelectionDuringEditing = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"));
-            tableView.AllowsSelectionDuringEditing = false;
-            tableView.AllowsMultipleSelectionDuringEditing = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
             {
@@ -155,8 +156,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             tableView.AddGestureRecognizer(longPressRecognizer);
 
-            refreshControl = new UIRefreshControl();
-            refreshControl.BackgroundColor = UIColor.White;
+            refreshControl = new UIRefreshControl
+            {
+                BackgroundColor = UIColor.White
+            };
             tableView.AddSubview(refreshControl);
         }
 
@@ -363,13 +366,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RefreshData(forceClear: true);
         }
 
-        void RefreshData(int startRowId = -1, bool forceClear = false)
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void RefreshData(int startRowId = -1, bool forceClear = false)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (refreshing)
                 return;
 
             refreshing = true;
             refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+
+            if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            {
+                var result = await Dialogs.ShowYesNoCancelDialogAsync(this,
+                                                                      Localization.GetString("folder_offline_title"),
+                                                                      Localization.GetString("folder_offline_message"),
+                                                                      Localization.GetString("folder_offline_go_online"),
+                                                                      Localization.GetString("folder_offline_redownload"),
+                                                                      Localization.GetString("cancel"));
+
+                if (result == 1)
+                    await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
+                if (result == 0)
+                {
+                    var vc = new DownloadViewController { Folder = Folder };
+                    NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    await vc.DidDisappear;
+                }
+                if (result == -1)
+                {
+                    refreshControl.EndRefreshing();
+                    refreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+                    refreshing = false;
+
+                    return;
+                }
+            }
 
             CommonConfig.Logger.Info($"Refreshing shortcodes list [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]");
 
@@ -381,6 +414,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ds = (DataSource) tableView.Source;
                 ds.Reset();
             }
+
+            var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder,
                 sps =>
@@ -417,7 +452,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationController?.PopViewController(true);
                 },
                 startRowId,
-                cts.Token);
+                cts.Token,
+                sourceType);
         }
 
         #endregion
@@ -886,9 +922,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public NSIndexPath FindItemIndexPath(int id)
             {
                 for (var section = 0; section < shortcodePreviewsInView.Count; section++)
-                for (var row = 0; row < shortcodePreviewsInView[section].Count; row++)
-                    if (shortcodePreviewsInView[section][row].Id == id)
-                        return NSIndexPath.FromRowSection(row, section);
+                    for (var row = 0; row < shortcodePreviewsInView[section].Count; row++)
+                        if (shortcodePreviewsInView[section][row].Id == id)
+                            return NSIndexPath.FromRowSection(row, section);
 
                 return null;
             }
