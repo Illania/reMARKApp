@@ -397,7 +397,7 @@
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
     <Folder Include="Ui\Fragments\ContactsList\" />
-    <Folder Include="UI\Fragments\" />
+    <Folder Include="Ui\Fragments\" />
     <Folder Include="Ui\Fragments\ShortcodesList\" />
     <Folder Include="Ui\Fragments\FoldersList\" />
   </ItemGroup>
