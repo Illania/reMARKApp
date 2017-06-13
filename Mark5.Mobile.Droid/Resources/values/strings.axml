@@ -173,7 +173,6 @@
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid</string>
 	<string name="priority">Priority</string>
-	<string name="priority">Priorities</string>
 	<string name="priority_low">Low</string>
 	<string name="priority_normal">Normal</string>
 	<string name="priority_urgent">Urgent</string>
