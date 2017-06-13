@@ -385,6 +385,8 @@
     <Compile Include="Ui\Fragments\FoldersList\PickerContactFolderListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersList\FoldersListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersList\CopyMoveToFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\PickerShortcodesFolderListFragment.cs" />
+    <Compile Include="Ui\Activities\PickerShortcodesFolderListActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

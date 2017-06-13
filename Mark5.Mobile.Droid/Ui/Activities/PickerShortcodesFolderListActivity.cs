@@ -1,22 +1,20 @@
-﻿
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class PickerContactFolderListActivity : BaseAppCompatActivity
+    public class PickerShortcodesFolderListActivity : BaseAppCompatActivity
     {
-        public const string RecipientResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
+        public const string ShortcodesResultKey = "ShortcodesResult_3e9d47b4-4d50-401e-ac1c-7ae03dedfb4f";
 
-        public const int ContactRequestCode = 123;
+        public const int ShortcodesRequestCode = 123;
 
         Toolbar toolbar;
 
@@ -24,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(PickerContactFolderListActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(PickerShortcodesFolderListActivity)}...");
 
             OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
@@ -38,27 +36,26 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                SupportActionBar.SetTitle(Resource.String.select_folder);
-                var pcflf = new PickerContactFolderListFragment();
+                var pcflf = new PickerShortcodesFolderListFragment();
                 ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(PickerContactFolderListActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(PickerShortcodesFolderListActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(PickerContactFolderListActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(PickerShortcodesFolderListActivity)}");
             }
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            if (requestCode == ContactRequestCode && resultCode == Result.Ok && data.HasExtra(PickerContactsListActivity.RecipientResultKey))
+            if (requestCode == ShortcodesRequestCode && resultCode == Result.Ok && data.HasExtra(PickerShortcodesListActivity.ShortcodeResultKey))
             {
-                var recipientString = data.GetStringExtra(PickerContactsListActivity.RecipientResultKey);
+                var recipientString = data.GetStringExtra(PickerShortcodesListActivity.ShortcodeResultKey);
 
                 var resultIntent = new Intent();
-                resultIntent.PutExtra(RecipientResultKey, recipientString);
+                resultIntent.PutExtra(ShortcodesResultKey, recipientString);
                 SetResult(Result.Ok, resultIntent);
                 Finish();
             }

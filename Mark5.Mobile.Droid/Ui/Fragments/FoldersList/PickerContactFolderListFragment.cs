@@ -10,6 +10,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public PickerContactFolderListFragment()
             : base(true)
         {
+            RemoteFolder = Folder.RootForModule(ModuleType.Contacts);
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)

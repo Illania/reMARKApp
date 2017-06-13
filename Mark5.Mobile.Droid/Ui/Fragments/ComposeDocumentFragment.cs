@@ -189,19 +189,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 HandleLocalAttachment(data);
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
-                var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
-                focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
+                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
             }
             if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
-                var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
-                focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
+                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
             }
             if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
-                var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
-                focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
+                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
             }
+            if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
+            {
+                var shortcode = SerializationUtils.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
+                AddAddressesFromShortcode(shortcode);
+            }
+        }
+
+        void AddAddressesFromShortcode(Shortcode shortcode)
+        {
+            if (shortcode == null || shortcode.Addresses == null || !shortcode.Addresses.Any())
+                return;
+
+            var addresses = shortcode.Addresses;
+            toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+            ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+            bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
         async Task LoadDocument()
@@ -340,7 +356,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DoOpenShortcodes()
         {
-
+            var i = new Intent(Activity, typeof(PickerShortcodesFolderListActivity));
+            StartActivityForResult(i, RequestCodes.ShortcodesRequestCode);
         }
 
         void DoOpenPhonebook(RecipientsView v)
@@ -432,8 +449,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (option == 1) //Remove attachment
             {
-                var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
-                if (outgoingAttachment != null)
+                if (attachment is OutgoingDocumentAttachmentDescription outgoingAttachment)
                 {
                     try
                     {
