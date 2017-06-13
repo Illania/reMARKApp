@@ -22,14 +22,14 @@ namespace Mark5.Mobile.Common
 
         readonly IDocumentsDataAccess documentsDataAccess;
         readonly SemaphoreSlim semaphore;
-        readonly IPortableConcurrentQueue<DownloadItemInfo> queue;
+        readonly IPortableConcurrentQueue<int> queue;
 
         public DocumentsDownloadManager(IDocumentsDataAccess documentsDataAccess)
         {
             this.documentsDataAccess = documentsDataAccess;
 
             semaphore = new SemaphoreSlim(1);
-            queue = (IPortableConcurrentQueue<DownloadItemInfo>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new [] { typeof(DownloadItemInfo) }));
+            queue = (IPortableConcurrentQueue<int>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new[] { typeof(int) }));
         }
 
         #region Public methods
@@ -47,30 +47,17 @@ namespace Mark5.Mobile.Common
             }
         }
 
-        public async Task Notify(ObjectType objectType, int folderId)
+        public async Task Notify(int folderId)
         {
-            if (!(await ShouldBeDownloaded(objectType, folderId)))
+            if (!(await ShouldBeDownloaded(folderId)))
                 return;
 
-            switch (objectType)
-            {
-                case ObjectType.Document:
-                    AddToQueue(new DocumentDownloadInfo
-                    {
-                        FolderId = folderId
-                    });
-                    break;
-                default:
-                    throw new ArgumentException("Provided object type is not supported");
-            }
+            AddToQueue(folderId);
         }
 
-        async Task<bool> ShouldBeDownloaded(ObjectType objectType, int folderId)
+        async Task<bool> ShouldBeDownloaded(int folderId)
         {
-            if (objectType == ObjectType.Document)
-                return (await FileSystemStorage.GetSavedOfflineFolderInfosAsync()).Any(sfi => sfi.Module.ObjectTypes().Contains(objectType) && sfi.FolderId == folderId);
-
-            return false;
+            return (await FileSystemStorage.GetSavedOfflineFolderInfosAsync()).Any(sfi => sfi.Module == ModuleType.Documents && sfi.FolderId == folderId);
         }
 
         public async Task Start()
@@ -139,11 +126,9 @@ namespace Mark5.Mobile.Common
 
         async Task StopDownloadTask()
         {
-            if (cts != null)
-            {
-                cts.Cancel();
-                cts = null;
-            }
+            cts?.Cancel();
+            cts = null;
+
             if (downloadTask != null)
             {
                 await downloadTask;
@@ -164,25 +149,17 @@ namespace Mark5.Mobile.Common
 
                 while (!cts.IsCancellationRequested)
                 {
-                    queue.TryTake(out DownloadItemInfo downloadInfo, -1, cts.Token);
+                    queue.TryTake(out int folderId, -1, cts.Token);
 
-                    if (!(await ShouldBeDownloaded(downloadInfo.Type, downloadInfo.FolderId)))
+                    if (!(await ShouldBeDownloaded(folderId)))
                         continue;
 
-                    switch (downloadInfo.Type)
-                    {
-                        case ObjectType.Document:
-                            await HandleDocumentsDownload(downloadInfo);
-                            break;
-                        default:
-                            throw new ArgumentException("Object type not supported");
-                    }
+                    await HandleDocumentsFolderDownload(folderId);
                 }
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Error in download action", ex);
-
                 throw ex;
             }
         }
@@ -191,19 +168,16 @@ namespace Mark5.Mobile.Common
 
         #region Download handlers
 
-        async Task HandleDocumentsDownload(DownloadItemInfo itemInfo)
+        async Task HandleDocumentsFolderDownload(int folderId)
         {
-            var documentIds = await documentsDataAccess.GetPendingDocumentsId(itemInfo.FolderId);
+            var documentIds = await documentsDataAccess.GetPendingDocumentsId(folderId);
 
             foreach (var documentId in documentIds)
             {
-                if (!(await ShouldBeDownloaded(itemInfo.Type, itemInfo.FolderId)))
-                    return;
-
                 if (await documentsDataAccess.IsDocumentCached(documentId))
                     continue;
 
-                await Managers.Managers.DocumentsManager.GetDocumentAsync(itemInfo.FolderId, documentId);
+                await Managers.Managers.DocumentsManager.GetDocumentAsync(folderId, documentId);
             }
         }
 
@@ -211,26 +185,16 @@ namespace Mark5.Mobile.Common
 
         #region Utilities
 
-        void AddToQueue(IEnumerable<DownloadItemInfo> identifiers)
-        {
-            foreach (var identifier in identifiers)
-                AddToQueue(identifier);
-        }
+        void AddToQueue(IEnumerable<int> folderIds) => folderIds.ForEach(AddToQueue);
 
-        void AddToQueue(DownloadItemInfo identifier)
-        {
-            queue.TryAdd(identifier);
-        }
+        void AddToQueue(int folderId) => queue.TryAdd(folderId);
 
         async Task AddPendingDocumentFoldersToQueue()
         {
             var folderIds = await documentsDataAccess.GetPendingFolders();
-            foreach (var id in folderIds)
-                if (await ShouldBeDownloaded(ObjectType.Document, id))
-                    AddToQueue(new DocumentDownloadInfo
-                    {
-                        FolderId = id
-                    });
+            foreach (var folderId in folderIds)
+                if (await ShouldBeDownloaded(folderId))
+                    AddToQueue(folderId);
         }
 
         #endregion

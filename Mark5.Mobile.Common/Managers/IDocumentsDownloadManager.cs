@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common
 {
     public interface IDocumentsDownloadManager
     {
-        Task Notify(ObjectType objectType, int folderId);
+        Task Notify(int folderId);
         Task<bool> IsRunning();
         Task Start();
         Task Stop();
