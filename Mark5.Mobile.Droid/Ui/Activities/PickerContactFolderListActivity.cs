@@ -38,7 +38,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                SupportActionBar.SetTitle(Resource.String.select_folder);
                 var pcflf = new PickerContactFolderListFragment();
                 ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
                 ft.Commit();

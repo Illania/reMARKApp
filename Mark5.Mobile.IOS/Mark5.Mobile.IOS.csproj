@@ -366,7 +366,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\RecentAddressesTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">
