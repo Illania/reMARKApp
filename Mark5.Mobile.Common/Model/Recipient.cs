@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Common.Model
             foreach (var contact in contacts)
                 foreach (var address in contact.CommunicationAddresses)
                 {
-                    var fullName = contact.FullName;
+                    var fullName = contact.GetFullName();
                     suggestions.Add(new Recipient(fullName, address.Address, type));
                 }
 
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Common.Model
             if (obj.GetType() != typeof(Recipient))
                 return false;
 
-            var other = (Recipient) obj;
+            var other = (Recipient)obj;
             return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase) && string.Equals(Address, other.Address, StringComparison.CurrentCultureIgnoreCase) && Type == other.Type;
         }
 

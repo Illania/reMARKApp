@@ -61,8 +61,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.recent_addresses);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.recent_addresses);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(RecentAddressesListFragment)}");
         }
@@ -131,7 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        class RecentAddressesListAdapter : RecyclerView.Adapter //TODO need to improve the look of it
+        class RecentAddressesListAdapter : RecyclerView.Adapter
         {
             public override int ItemCount => Items.Count;
 

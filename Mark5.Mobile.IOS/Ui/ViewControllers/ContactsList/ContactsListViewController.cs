@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         public override void ContactSelected(UITableView tableView, ContactPreview contactPreview)
         {
-            if (tableView == searchResultsController.TableView)
+            if (tableView == SearchResultsController.TableView)
             {
                 var ds = (DataSource) tableView.Source;
                 var indexPath = ds.FindItemIndexPath(contactPreview);
