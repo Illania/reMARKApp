@@ -458,11 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foreach (var id in ids)
                 {
                     favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
-
-                    if (ParentFolder.Module == ModuleType.Documents)
-                        cachingStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
-                    else
-                        cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
+                    cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
                 }
 
                 if (!gds.FavoriteStatus.SequenceEqual(favoritesStatus) || !gds.CachingStatus.SequenceEqual(cachingStatus))
@@ -483,11 +479,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foreach (var id in ids)
                 {
                     favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
-
-                    if (ParentFolder.Module == ModuleType.Documents)
-                        cachingStatus[id] = await Managers.FoldersManager.IsFolderOfflineAsync(ParentFolder.Module, id);
-                    else
-                        cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
+                    cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
                 }
 
                 if (!ds.FavoriteStatus.SequenceEqual(favoritesStatus) || !ds.CachingStatus.SequenceEqual(cachingStatus))
@@ -692,7 +684,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                await Managers.FoldersManager.AddOfflineFolderAsync(folder.Module, folder);
+                await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
                 var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
@@ -726,7 +718,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                await Managers.FoldersManager.RemoveOfflineFolderAsync(folder.Module, folder);
+                await Managers.FoldersManager.RemoveSavedFolderInfo(folder);
 
                 var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)

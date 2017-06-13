@@ -127,50 +127,6 @@ namespace Mark5.Mobile.Common.Managers
             return moduleFavoriteFolders.FirstOrDefault(f => f.Id == folderId) != null;
         }
 
-        public async Task AddOfflineFolderAsync(ModuleType module, Folder folder)
-        {
-            var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
-
-            if (!offlineFolders.TryGetValue(module, out List<Folder> moduleOfflineFolders))
-            {
-                moduleOfflineFolders = new List<Folder>();
-                offlineFolders[module] = moduleOfflineFolders;
-            }
-            if (moduleOfflineFolders.FirstOrDefault(f => f.Id == folder.Id) == null)
-                moduleOfflineFolders.Add(folder.ShallowCopy());
-
-            await FileSystemStorage.SaveOfflineFoldersAsync(offlineFolders);
-        }
-
-        public async Task RemoveOfflineFolderAsync(ModuleType module, Folder folder)
-        {
-            var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
-
-            if (!offlineFolders.TryGetValue(module, out List<Folder> moduleOfflineFolders))
-            {
-                moduleOfflineFolders = new List<Folder>();
-                offlineFolders[module] = moduleOfflineFolders;
-            }
-            moduleOfflineFolders.RemoveAll(f => f.Id == folder.Id);
-
-            await FileSystemStorage.SaveOfflineFoldersAsync(offlineFolders);
-        }
-
-        public async Task<bool> IsFolderOfflineAsync(ModuleType module, Folder folder)
-        {
-            return await IsFolderOfflineAsync(module, folder.Id);
-        }
-
-        public async Task<bool> IsFolderOfflineAsync(ModuleType module, int folderId)
-        {
-            var offlineFolders = await FileSystemStorage.GetOfflineFoldersAsync();
-
-            if (!offlineFolders.TryGetValue(module, out List<Folder> moduleOfflineFolders))
-                return false;
-
-            return moduleOfflineFolders.Any(f => f.Id == folderId);
-        }
-
         public async Task AddSavedFolderInfo(Folder folder)
         {
             var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
