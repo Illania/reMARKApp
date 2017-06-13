@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -12,16 +13,16 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class PickerContactsListActivity : BaseAppCompatActivity
+    public class PickerShortcodesListActivity : BaseAppCompatActivity
     {
-        public const string RecipientResultKey = "RecipientResult_ecf8b6fd-8908-4330-aef4-d6724b1a97b2";
-        public const string FolderIntentKey = "FromFolderIntent_3a68d401-f581-4094-b526-4478cc43d3f4";
+        public const string ShortcodeResultKey = "ShortcodeResult_6c50b825-28f6-4143-93b5-9d209d365b25";
+        public const string FolderIntentKey = "FolderIntent_be2e7cbe-4825-4df1-a6da-54c4bc7b1ab8";
 
         Toolbar toolbar;
 
         public static Intent Create(Context context, Folder folder)
         {
-            var intent = new Intent(context, typeof(PickerContactsListActivity));
+            var intent = new Intent(context, typeof(PickerShortcodesListActivity));
             intent.PutExtra(FolderIntentKey, SerializationUtils.Serialize(folder));
 
             return intent;
@@ -31,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(PickerContactsListActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(PickerShortcodesListActivity)}...");
 
             OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
@@ -47,18 +48,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                var pcflf = new PickerContactsListFragment
+                var pcflf = new PickerShortcodesListFragment
                 {
                     Folder = folder,
                 };
                 ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
                 ft.Commit();
 
-                CommonConfig.Logger.Info($"Created {nameof(PickerContactsListActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(PickerShortcodesListActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(PickerContactsListActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(PickerShortcodesListActivity)}");
             }
         }
 

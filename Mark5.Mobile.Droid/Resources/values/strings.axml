@@ -113,6 +113,7 @@
 	<string name="loading_mail">Loading email</string>
 	<string name="loading_template">Loading template</string>
 	<string name="loading_templates">Loading templates</string>
+	<string name="loading_shortcode">Loading shortcode</string>
 	<string name="log_in">Log in</string>
 	<string name="log_in_failed_message">Please check your credentials and try again</string>
 	<string name="log_in_failed_title">Log in failed</string>
