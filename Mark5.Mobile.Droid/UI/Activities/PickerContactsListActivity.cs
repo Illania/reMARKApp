@@ -1,15 +1,10 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
@@ -23,6 +18,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string FolderIntentKey = "FromFolderIntent_3a68d401-f581-4094-b526-4478cc43d3f4";
 
         Toolbar toolbar;
+
+        public static Intent Create(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(PickerContactsListActivity));
+            intent.PutExtra(FolderIntentKey, SerializationUtils.Serialize(folder));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -47,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 SupportActionBar.SetTitle(Resource.String.select_folder);
                 var pcflf = new PickerContactsListFragment
                 {
-                    Folder = Folder.RootForModule(ModuleType.Contacts),
+                    Folder = folder,
                 };
                 ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
                 ft.Commit();

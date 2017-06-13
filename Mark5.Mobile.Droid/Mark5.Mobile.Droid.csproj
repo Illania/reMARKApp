@@ -376,12 +376,12 @@
     <Compile Include="Ui\Fragments\RecentAddressesListFragment.cs" />
     <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PhonebookContactsListFragment.cs" />
-    <Compile Include="Ui\Activities\PickContactFolderListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
-    <Compile Include="Ui\Fragments\ContactsList\PickerContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsList\AbstractContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsList\ContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\PickerContactFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\PickerContactsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

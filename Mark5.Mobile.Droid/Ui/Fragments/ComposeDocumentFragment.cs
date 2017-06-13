@@ -137,7 +137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     linearLayout.AddView(new Divider(Context));
             }
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.SetImageResource(Resource.Drawable.action_send);
             fab.SetOnClickListener(new ActionOnClickListener(() => SendDocument()));
             fab.Enabled = false;
@@ -185,16 +185,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int) Result.Ok)
+            if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
                 HandleLocalAttachment(data);
-            if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int) Result.Ok)
+            if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
             }
-            if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int) Result.Ok)
+            if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
+            }
+            if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
+            {
+                var recentAddress = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recentAddress.Name, recentAddress.Address);
             }
         }
@@ -329,7 +334,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DoOpenContacts(RecipientsView v)
         {
-            var i = new Intent(Activity, typeof(PickContactFolderListActivity));
+            var i = new Intent(Activity, typeof(PickerContactFolderListActivity));
             StartActivityForResult(i, RequestCodes.ContactsRequestCode);
         }
 
@@ -346,8 +351,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Subview_Edited(object sender, EventArgs e)
         {
-            ((AppCompatActivity) Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             UpdateSendButtonState();
 
