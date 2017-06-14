@@ -446,6 +446,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Unsubscribe = 40;
             public const int EnableOffline = 50;
             public const int DisableOffline = 60;
+            public const int SaveOffline = 70;
         }
 
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -481,10 +482,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(f)));
 
-                if (foldersAvailableOfflineState.Any(v => v))
-                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
-                if (foldersAvailableOfflineState.Any(v => !v))
-                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
+                if (RemoteFolder.Module == ModuleType.Documents)
+                {
+                    if (foldersAvailableOfflineState.Any(v => v))
+                        menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
+                    if (foldersAvailableOfflineState.Any(v => !v))
+                        menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
+                }
+
+                if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1)
+                    menu.Add(Menu.None, MenuItemActions.SaveOffline, MenuItemActions.SaveOffline, Resource.String.save_offline).SetShowAsAction(ShowAsAction.Never);
 
                 if (RemoteFolder.Module == ModuleType.Documents && !string.IsNullOrEmpty(PlatformConfig.Preferences.PushNotificationToken))
                 {
@@ -496,6 +503,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
                 }
             }
+
             return true;
         }
 
@@ -520,6 +528,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     break;
                 case MenuItemActions.Unsubscribe:
                     SetFoldersSubscriptionToSelection(false);
+                    break;
+                case MenuItemActions.SaveOffline:
+                    SaveFolderOffline();
                     break;
             }
 
@@ -649,6 +660,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         }
                     },
                     TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        void SaveFolderOffline()
+        {
+            var selectedFolder = CurrentAdapter.GetSelectedItems().FirstOrDefault();
+            if (selectedFolder == null)
+                return;
+
+            var i = new Intent(Activity, typeof(DownloadActivity));
+            i.PutExtra(DownloadActivity.FolderIntentKey, SerializationUtils.Serialize(selectedFolder.ShallowCopy()));
+            StartActivity(i);
         }
 
         #endregion

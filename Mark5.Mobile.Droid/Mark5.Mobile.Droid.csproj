@@ -373,6 +373,8 @@
     <Compile Include="Utilities\SystemReportCollector.cs" />
     <Compile Include="Utilities\UI.cs" />
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
+    <Compile Include="Ui\Activities\DownloadActivity.cs" />
+    <Compile Include="Ui\Fragments\DownloadFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -651,6 +653,7 @@
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\xml\network_security_config.xml" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
+    <AndroidResource Include="Resources\layout\download.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

@@ -177,6 +177,7 @@
 	<string name="save">Save</string>
 	<string name="save_draft">Save draft</string>
 	<string name="save_modifications">Save modifications</string>
+	<string name="save_offline">Save offline</string>
 	<string name="saving_draft">Saving draft</string>
 	<string name="search">Search</string>
 	<string name="search_editable_empty">___</string>
