@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Creating {nameof(PickerShortcodesListActivity)}...");
 
-            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+            OverridePendingTransition(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left_half);
 
             SetContentView(Resource.Layout.base_layout);
 
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.Finish();
 
-            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
+            OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
     }
 }
