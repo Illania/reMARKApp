@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -25,6 +26,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        static class RequestCodes
+        {
+            public const int SaveOfflineRequest = 1;
+        }
+
         public Folder Folder { get; set; }
         public Action CloseRequest { get; set; }
 
@@ -131,6 +137,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (requestCode == RequestCodes.SaveOfflineRequest && resultCode == (int)Result.Ok)
+                RefreshData(force: true, skipOfflineCheck: true);
+        }
+
         public override void OnPause()
         {
             base.OnPause();
@@ -226,7 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Refreshing
 
-        void RefreshData(int startRowId = -1, bool force = false)
+        async void RefreshData(int startRowId = -1, bool force = false, bool skipOfflineCheck = false)
         {
             CommonConfig.Logger.Info($"Attempting refresh [startRowId={startRowId}, force={force}]...");
 
@@ -235,6 +247,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             refreshing = true;
             refreshLayout.Refreshing = true;
+
+            if (force && !skipOfflineCheck && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            {
+                var result = await Dialogs.ShowYesNoCancelDialogAsync(Activity,
+                                                                      Resource.String.folder_offline_title,
+                                                                      Resource.String.folder_offline_message,
+                                                                      Resource.String.folder_offline_go_online,
+                                                                      Resource.String.folder_offline_redownload,
+                                                                      Resource.String.cancel);
+
+                if (result == 1)
+                    await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
+                if (result == 0)
+                {
+                    var i = new Intent(Activity, typeof(DownloadActivity));
+                    i.PutExtra(DownloadActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                    StartActivityForResult(i, RequestCodes.SaveOfflineRequest);
+
+                    refreshLayout.Refreshing = false;
+                    refreshing = false;
+
+                    return;
+                }
+                if (result == -1)
+                {
+                    refreshLayout.Refreshing = false;
+                    refreshing = false;
+
+                    return;
+                }
+            }
 
             CommonConfig.Logger.Info($"Refresh running...");
 

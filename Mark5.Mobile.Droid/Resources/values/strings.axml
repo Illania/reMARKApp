@@ -85,6 +85,10 @@
 	<string name="filter">Filter...</string>
 	<string name="folder_favorites">Favorites</string>
 	<string name="folder_local">Local folders</string>
+	<string name="folder_offline_message">This folder is saved offline. You can make the folder online again or redownload its contents.</string>
+	<string name="folder_offline_go_online">Go online</string>
+	<string name="folder_offline_redownload">Redownload</string>
+	<string name="folder_offline_title">Folder is offline</string>
 	<string name="folder_remote">Folders</string>
 	<string name="folders">Folders</string>
 	<string name="forward">Forward</string>

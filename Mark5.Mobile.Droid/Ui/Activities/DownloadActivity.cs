@@ -53,6 +53,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
+        public override void OnBackPressed()
+        {
+            if (df != null)
+                SetResult(Result.Ok);
+
+            base.OnBackPressed();
+        }
+
         public override void Finish()
         {
             base.Finish();
