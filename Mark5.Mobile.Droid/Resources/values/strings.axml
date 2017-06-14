@@ -168,7 +168,7 @@
 	<string name="permissions_snackbar_text">Tap to grant permissions</string>
 	<string name="physical_addresses">Addresses</string>
 	<string name="phonebook">Phonebook</string>
-	<string name="picker_title">Choose source</string>
+	<string name="picker_title">Add address from</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid</string>
