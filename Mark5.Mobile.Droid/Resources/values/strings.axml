@@ -30,12 +30,6 @@
 	<string name="categories">Categories</string>
 	<string name="cc">Cc</string>
 	<string name="choose_application">Choose an application</string>
-	<string name="clear_contacts_cache_title">Clear contacts cache</string>
-	<string name="clear_contacts_cache_summary">Do you want to remove cached contacts?</string>
-	<string name="clear_shortcodes_cache_title">Clear shortcodes cache</string>
-	<string name="clear_shortcodes_cache_summary">Do you want to remove cached shortcodes?</string>
-	<string name="clearing_contacts_cache">Clearing contacts cache</string>
-	<string name="clearing_shortcodes_cache">Clearing shortcodes cache</string>
 	<string name="close_drawer">Close navigation drawer</string>
 	<string name="comments">Comments</string>
 	<string name="confirm">Confirm</string>

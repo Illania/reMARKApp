@@ -11,7 +11,6 @@
 		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_documents_download_as_plaintext" android:title="@string/pref_documents_download_as_plaintext_title" android:summaryOn="@string/pref_documents_download_as_plaintext_summary_on" android:summaryOff="@string/pref_documents_download_as_plaintext_summary_off" android:defaultValue="@bool/pref_documents_download_as_plaintext_default" />
 	</android.support.v7.preference.PreferenceScreen>
 	<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_contacts" android:title="@string/pref_cat_contacts">
-		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_synchronised" android:title="@string/pref_contacts_synchronised_title" android:summaryOn="@string/pref_contacts_synchronised_summary_on" android:summaryOff="@string/pref_contacts_synchronised_summary_off" android:defaultValue="@bool/pref_contacts_synchronised_default" />
 		<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_contacts_view_options" android:title="@string/pref_contacts_view_options_title" android:summary="@string/pref_contacts_view_options_summary">
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_comm_fax" android:title="@string/pref_contacts_sub_comm_fax_title" android:defaultValue="@bool/pref_contacts_sub_comm_fax_default" />
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_comm_telex" android:title="@string/pref_contacts_sub_comm_telex_title" android:defaultValue="@bool/pref_contacts_sub_comm_telex_default" />
@@ -23,9 +22,6 @@
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_account" android:title="@string/pref_contacts_sub_account_title" android:defaultValue="@bool/pref_contacts_sub_account_default" />
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_vat" android:title="@string/pref_contacts_sub_vat_title" android:defaultValue="@bool/pref_contacts_sub_vat_default" />
 		</android.support.v7.preference.PreferenceScreen>
-	</android.support.v7.preference.PreferenceScreen>
-	<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_shortcodes" android:title="@string/pref_cat_shortcodes">
-		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_shortcodes_synchronised" android:title="@string/pref_shortcodes_synchronised_title" android:summaryOn="@string/pref_shortcodes_synchronised_summary_on" android:summaryOff="@string/pref_shortcodes_synchronised_summary_off" android:defaultValue="@bool/pref_shortcodes_synchronised_default" />
 	</android.support.v7.preference.PreferenceScreen>
 	<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_compose" android:title="@string/pref_cat_compose">
 		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_compose_remove_line" android:title="@string/pref_compose_remove_line_title" android:summaryOn="@string/pref_compose_remove_line_summary_on" android:summaryOff="@string/pref_compose_remove_line_summary_off" android:defaultValue="@bool/pref_compose_remove_line_default" />

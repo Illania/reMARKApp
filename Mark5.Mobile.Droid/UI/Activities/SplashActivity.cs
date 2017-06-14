@@ -92,13 +92,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                     Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                    var policies = Managers.DocumentsDownloadManager.DownloadPolicies;
-                    policies[ObjectType.Document] = new DownloadFoldersPolicy();
-                    if (PlatformConfig.Preferences.SynchroniseContacts)
-                        policies[ObjectType.Contact] = new DownloadAllPolicy();
-                    if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                        policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-
                     if (PlatformConfig.Preferences.ClearCache)
                     {
                         CommonConfig.Logger.Info("Clearing cache...");
