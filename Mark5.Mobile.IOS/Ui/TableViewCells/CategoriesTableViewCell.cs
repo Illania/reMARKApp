@@ -47,6 +47,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             CategoryNameLabel.Text = category.Name;
         }
 
+        internal void Initialize(TemplatePreview tp) //TODO for testing!
+        {
+            CategoryNameLabel.Text = tp.Name;
+        }
+
         #endregion
     }
 }

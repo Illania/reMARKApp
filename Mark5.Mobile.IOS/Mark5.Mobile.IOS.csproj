@@ -250,6 +250,11 @@
 		<Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
+		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs">
+		  <DependentUpon>TemplatesTableViewCell.cs</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -358,6 +363,7 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
+		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">
