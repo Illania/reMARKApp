@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 var contact = await Managers.ContactsManager.GetContactAsync(Folder, contactPreview.Id);
                 dismissAction();
 
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
                 var cell = tableView.CellAt(ds.FindItemIndexPath(contactPreview));
 
                 var emailAddresses = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email).Select(ca => ca.Address).ToArray();
@@ -45,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 }
                 else
                 {
-                    await Dialogs.ShowConfirmDialogAsync(this, string.Empty, Localization.GetString("no_email_addresses"));
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
                 }
             }
             catch (Exception ex)
