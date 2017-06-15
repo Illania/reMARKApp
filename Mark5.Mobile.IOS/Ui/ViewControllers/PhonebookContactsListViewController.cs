@@ -87,8 +87,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
+            exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            NavigationItem.SetLeftBarButtonItem(exitEditItem, true);
         }
 
         void InitializeView()

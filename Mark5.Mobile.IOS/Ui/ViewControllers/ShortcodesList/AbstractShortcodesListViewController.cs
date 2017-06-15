@@ -37,8 +37,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         bool refreshing;
 
-        bool disableRowActions;
-
         protected CancellationTokenSource cts;
 
         protected AbstractShortcodesListViewController(bool disableRowActions)
@@ -143,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             tableView = new UITableView();
             tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"), disableRowActions);
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"), DisableRowActions);
             tableView.AllowsSelectionDuringEditing = false;
             tableView.AllowsMultipleSelectionDuringEditing = true;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -173,7 +171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_shortcodes"), disableRowActions);
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_shortcodes"), DisableRowActions);
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)

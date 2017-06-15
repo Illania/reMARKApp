@@ -817,7 +817,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
             sendButtonItem.Enabled = IsFormValid();
 
-            if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+            if (sender is LineView
+                && PlatformConfig.Preferences.RemoveLine
+                && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
+                && PreviousDocumentPreview != null
+                && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
                 {
                     toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
@@ -834,7 +838,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 Localization.GetString("contact_picker_phonebook"),
             };
 
-            var choice = await Dialogs.ShowListDialogAsync(this, string.Empty, strings, sender as UIView);
+            var choice = await Dialogs.ShowListDialogAsync(this, null, strings, sender as UIView);
 
             if (choice < 0)
                 return;
