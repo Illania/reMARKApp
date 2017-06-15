@@ -6,7 +6,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -62,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ShortcodesListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(ShortcodesSearchResultsViewController)} appeared");
 
             var ds = (DataSource) tableView.Source;
             if (ds.Empty)
@@ -615,9 +614,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public NSIndexPath FindItemIndexPath(int id)
             {
                 for (var section = 0; section < shortcodePreviewsInView.Count; section++)
-                for (var row = 0; row < shortcodePreviewsInView[section].Count; row++)
-                    if (shortcodePreviewsInView[section][row].Id == id)
-                        return NSIndexPath.FromRowSection(row, section);
+                    for (var row = 0; row < shortcodePreviewsInView[section].Count; row++)
+                        if (shortcodePreviewsInView[section][row].Id == id)
+                            return NSIndexPath.FromRowSection(row, section);
 
                 return null;
             }

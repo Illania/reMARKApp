@@ -27,6 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder RemoteFolder { get; set; }
+        readonly bool hideSearch;
 
         protected View Container;
         protected FolderListAdapter Adapter;
@@ -46,6 +47,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual bool LoadRemoteFromCache { get; }
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
+
+        public FoldersListFragment(bool hideSearch = false)
+        {
+            this.hideSearch = hideSearch;
+        }
 
         #region Overrides
 
@@ -97,8 +103,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual View InflateView(LayoutInflater inflater, ViewGroup container)
         {
             return inflater.Inflate(Resource.Layout.list, container, false);
-
-            ;
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -122,8 +126,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         break;
                 }
 
-                ((AppCompatActivity) Activity).SupportActionBar.Title = title;
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
             }
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
@@ -135,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            fab = ((View) Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             if (RemoteFolder?.Module == ModuleType.Documents)
             {
                 fab.SetImageResource(Resource.Drawable.action_new);
@@ -170,13 +174,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            SearchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
+            SearchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
 
-            var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
-            searchItem.SetIcon(Resource.Drawable.action_search_server);
-            searchItem.SetShowAsAction(ShowAsAction.Always);
+            if (!hideSearch)
+            {
+                var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+                searchItem.SetIcon(Resource.Drawable.action_search_server);
+                searchItem.SetShowAsAction(ShowAsAction.Always);
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -338,7 +345,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void NavigateToFolder(Folder folder)
         {
-            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var foldersListFragment = GetFolderFragment(folder);
             var tag = foldersListFragment.GenerateTag();
 
@@ -1070,18 +1077,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var sectionsPositionToSection = SectionsPositionToSection();
                 var offset = sectionsInView.Count == 1 ? 0 : 1;
                 foreach (var folder in folders)
-                foreach (var section in sectionsInView)
-                {
-                    var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
-
-                    var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
-                    if (index >= 0)
+                    foreach (var section in sectionsInView)
                     {
-                        var position = sectionPosition + offset + index;
-                        selectedItemPositions.Add(position);
-                        NotifyItemChanged(position);
+                        var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
+
+                        var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
+                        if (index >= 0)
+                        {
+                            var position = sectionPosition + offset + index;
+                            selectedItemPositions.Add(position);
+                            NotifyItemChanged(position);
+                        }
                     }
-                }
             }
 
             #endregion

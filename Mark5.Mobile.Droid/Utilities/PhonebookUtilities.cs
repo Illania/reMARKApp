@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Android;
 using Android.Net;
 using Android.Provider;
@@ -19,12 +18,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region IPhonebookUtilities implementation
 
-        public List<Contact> GetPhonebookContacts()
+        public List<Recipient> GetPhonebookContacts()
         {
             return GetAndroidContacts(null);
         }
 
-        public List<Contact> GetFilteredPhonebookContacts(string phrase)
+        public List<Recipient> GetFilteredPhonebookContacts(string phrase)
         {
             var selection = string.Format("{0} like \"%{2}%\" OR {1} like \"%{2}%\" COLLATE NOCASE", ContactsNameColumn, ContactEmailColumn, phrase);
             return GetAndroidContacts(selection);
@@ -34,55 +33,50 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Helper methods
 
-        List<Contact> GetAndroidContacts(string selection = null)
+        List<Recipient> GetAndroidContacts(string selection = null)
         {
-            var contacts = new List<Contact>();
+            var phonebookContacts = new List<Recipient>();
             var permissionCheck = ContextCompat.CheckSelfPermission(Android.App.Application.Context, Manifest.Permission.ReadContacts);
 
-            if (permissionCheck == Android.Content.PM.Permission.Granted)
+            if (permissionCheck != Android.Content.PM.Permission.Granted)
+                return null;
+
+            string[] projection =
             {
-                string[] projection =
-                {
                     ContactIdColumn,
                     ContactsNameColumn,
                     ContactEmailColumn,
                 };
 
-                var cursor = Android.App.Application.Context.ContentResolver.Query(contactsUri, projection, selection, null, null);
+            var cursor = Android.App.Application.Context.ContentResolver.Query(contactsUri, projection, selection, null, null);
 
-                if (cursor.MoveToFirst())
+            if (cursor.MoveToFirst())
+            {
+                var contactIdIndex = cursor.GetColumnIndex(ContactIdColumn);
+                var contactsNameIndex = cursor.GetColumnIndex(ContactsNameColumn);
+                var contactsEmailIndex = cursor.GetColumnIndex(ContactEmailColumn);
+
+                do
                 {
-                    var contactIdIndex = cursor.GetColumnIndex(ContactIdColumn);
-                    var contactsNameIndex = cursor.GetColumnIndex(ContactsNameColumn);
-                    var contactsEmailIndex = cursor.GetColumnIndex(ContactEmailColumn);
+                    var contactId = cursor.GetLong(contactIdIndex);
+                    var contactName = cursor.GetString(contactsNameIndex);
+                    var contactEmail = cursor.GetString(contactsEmailIndex);
 
-                    do
+                    var phonebookContact = new Recipient
                     {
-                        var contactId = cursor.GetLong(contactIdIndex);
-                        var contactName = cursor.GetString(contactsNameIndex);
-                        var contactEmail = cursor.GetString(contactsEmailIndex);
+                        Type = RecipientType.Phonebook,
+                        Address = contactEmail,
+                        Name = contactName,
+                    };
 
-                        var preExisting = contacts.FirstOrDefault(c => c.Id == contactId);
+                    phonebookContacts.Add(phonebookContact);
 
-                        if (preExisting != null)
-                        {
-                            preExisting.CommunicationAddresses.Add(new CommunicationAddress(contactEmail, CommunicationAddressType.Email));
-                        }
-                        else
-                        {
-                            var newContact = new Contact();
-                            newContact.Id = (int) contactId;
-                            newContact.FirstName = contactName;
-                            newContact.CommunicationAddresses.Add(new CommunicationAddress(contactEmail, CommunicationAddressType.Email));
-                            contacts.Add(newContact);
-                        }
-                    } while (cursor.MoveToNext());
+                } while (cursor.MoveToNext());
 
-                    cursor.Close();
-                }
+                cursor.Close();
             }
 
-            return contacts;
+            return phonebookContacts;
         }
 
         #endregion

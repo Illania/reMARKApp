@@ -107,7 +107,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsTableView.EstimatedRowHeight = 44f;
             suggestionsTableView.TableFooterView = new UIView(CGRect.Empty); //Used to avoid showing empty rows at the bottom
             suggestionsTableView.Source = suggestionsListViewSource = new SuggestionsListViewSource(this, suggestionsTableView);
-            ;
             suggestionsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(suggestionsTableView);
             AddConstraints(new[]
@@ -196,7 +195,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        void HandleSugguestions(List<PrintableSuggestion> newSuggestions, CancellationToken token)
+        void HandleSugguestions(List<Recipient> newSuggestions, CancellationToken token)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -208,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             });
         }
 
-        public void SuggestionSelected(PrintableSuggestion printableSuggestion)
+        public void SuggestionSelected(Recipient printableSuggestion)
         {
             suggestionsTextView.AddSuggestion(printableSuggestion);
             Dismiss();
@@ -317,7 +316,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             tableView.ReloadData();
         }
 
-        public virtual void RefreshData(List<PrintableSuggestion> printableSuggestions, bool clean = false)
+        public virtual void RefreshData(List<Recipient> printableSuggestions, bool clean = false)
         {
             answersReceived += 1;
             Suggestions.AddOrReplaceAllSorted(printableSuggestions);
@@ -332,10 +331,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         #endregion
     }
 
-    public class SuggestionsObservableCollection : SortedObservableCollection<PrintableSuggestion>
+    public class SuggestionsObservableCollection : SortedObservableCollection<Recipient>
     {
         public SuggestionsObservableCollection()
-            : base(PrintableSuggestion.LookupComparison, PrintableSuggestion.SortingComparison)
+            : base(Recipient.LookupComparison, Recipient.SortingComparison)
         {
         }
     }
@@ -347,14 +346,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public event EventHandler ReachedOriginalState = delegate { };
 
         public SuggestionsTextView()
-            : base(DocumentAddressType.None)
+            : base(DocumentAddressType.None, true)
         {
             CollapseExpandAnimationEnabled = false;
         }
 
         #region Public methods
 
-        public void AddSuggestion(PrintableSuggestion printableSuggestion)
+        public void AddSuggestion(Recipient printableSuggestion)
         {
             var text = TextView.Text;
             var splittedRecipients = text.Split(new[]

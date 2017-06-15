@@ -31,7 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null && notificationGuid == default(Guid);
 
-        int? folderId { get; set; } //TODO correct naming after merge
+        int? folderId { get; set; }
         Folder folder { get; set; }
         int? documentId { get; set; }
         DocumentPreview documentPreview { get; set; }
@@ -382,8 +382,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             toolbar.BarTintColor = Theme.Gray;
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
             {
@@ -1078,7 +1078,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem) sender)));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
@@ -1089,7 +1089,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
         }
