@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -13,14 +14,19 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class TemplatesListViewController : AbstractViewController
+    public class TemplatesListViewController : AbstractViewController, IUISearchResultsUpdating
     {
         UIBarButtonItem dismissButtonItem;
 
         UITableView tableView;
         DataSource dataSource;
+        UISearchController searchController;
+        UITableViewController searchResultsController;
+        DataSource searchResultsDataSource;
 
         CancellationTokenSource cts; //TODO used?
+        CancellationTokenSource searchCancellationTokenSource;
+        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         bool refreshing;
 
@@ -36,7 +42,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             InitializeNavigationBar();
-            InitializeCategoriesListView();
+            InitializeListView();
+            InitializeSearchBar();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -74,6 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
+
         #endregion
 
         #region Init methods
@@ -84,7 +92,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetRightBarButtonItem(dismissButtonItem, false);
         }
 
-        void InitializeCategoriesListView()
+        void InitializeListView()
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
@@ -102,6 +110,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
             });
+        }
+
+        void InitializeSearchBar()
+        {
+            DefinesPresentationContext = true;
+
+            searchResultsController = new UITableViewController();
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_templates"));
+            searchResultsController.TableView.Source = searchResultsDataSource;
+
+            searchController = new UISearchController(searchResultsController)
+            {
+                HidesNavigationBarDuringPresentation = true,
+                DimsBackgroundDuringPresentation = true,
+                ObscuresBackgroundDuringPresentation = true,
+                SearchResultsUpdater = this
+            };
+            searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            tableView.TableHeaderView = searchController.SearchBar;
         }
 
         void InitializeHandlers()
@@ -146,6 +174,63 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Dialogs.ShowErrorDialogAsync(this, ex);
                 refreshing = false;
             }
+        }
+
+        #endregion
+
+        #region Search
+
+        public void UpdateSearchResultsForSearchController(UISearchController searchController)
+        {
+            var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+                searchResultsDataSource.Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
+                {
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
+
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                DoSearchTemplate(searchText, searchCancellationTokenSource.Token);
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        async void DoSearchTemplate(string searchText, CancellationToken ct)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            searchResultsDataSource.Reset();
+
+            await Task.Delay(500);
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            var filteredShortcodes = dataSource.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            searchResultsDataSource.SetItems(filteredShortcodes);
+        }
+
+        static bool MatchesQuery(TemplatePreview tp, string query)
+        {
+            if (tp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
         }
 
         #endregion
@@ -251,11 +336,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
+                var empty = Empty;
                 templatesInView.Clear();
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, 1)), UITableViewRowAnimation.Fade);
+                if (!empty)
+                    tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, 1)), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
             }
 
