@@ -16,7 +16,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class TemplatesListViewController : AbstractViewController, IUISearchResultsUpdating
     {
-        UIBarButtonItem dismissButtonItem;
+        public Task<TemplatePreview> ResultTask => tcs.Task;
+
+        UIBarButtonItem cancelButtonItem;
 
         UITableView tableView;
         DataSource dataSource;
@@ -24,11 +26,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITableViewController searchResultsController;
         DataSource searchResultsDataSource;
 
-        CancellationTokenSource cts; //TODO used?
+        CancellationTokenSource cts;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         bool refreshing;
+
+        TaskCompletionSource<TemplatePreview> tcs = new TaskCompletionSource<TemplatePreview>();
 
         public TemplatesListViewController()
         {
@@ -88,8 +92,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            dismissButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            NavigationItem.SetRightBarButtonItem(dismissButtonItem, false);
+            cancelButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
         }
 
         void InitializeListView()
@@ -134,20 +138,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
-            if (dismissButtonItem != null)
-                dismissButtonItem.Clicked += DismissButtonItem_Clicked;
+            if (cancelButtonItem != null)
+                cancelButtonItem.Clicked += DismissButtonItem_Clicked;
         }
 
         void DeInitializeHandlers()
         {
-            if (dismissButtonItem != null)
-                dismissButtonItem.Clicked -= DismissButtonItem_Clicked;
+            if (cancelButtonItem != null)
+                cancelButtonItem.Clicked -= DismissButtonItem_Clicked;
         }
 
         void DismissButtonItem_Clicked(object sender, EventArgs e)
         {
+            tcs.SetResult(null);
             DismissViewController(true, null);
         }
+
+        #endregion
 
         #region Refreshing
 
@@ -170,10 +177,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
+                refreshing = false;
+
                 CommonConfig.Logger.Error("Error while retrieving template previews", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
-                refreshing = false;
+                tcs.SetResult(null);
             }
+        }
+
+        #endregion
+
+        #region Selection
+
+        public void TemplateSelected(TemplatePreview tp)
+        {
+            tcs.SetResult(tp);
         }
 
         #endregion
@@ -235,8 +253,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #endregion
-
         class DataSource : UITableViewSource, IDisposable
         {
             public bool Empty { get { return !templatesInView.SelectMany(v => v).Any(); } }
@@ -276,6 +292,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.Initialize(tp);
 
                 return cell;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var tp = templatesInView[indexPath.Section][indexPath.Row];
+                viewController.TemplateSelected(tp);
             }
 
             public override nint NumberOfSections(UITableView tableView)
