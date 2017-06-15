@@ -169,6 +169,8 @@
 	<string name="priority_low">Low</string>
 	<string name="priority_normal">Normal</string>
 	<string name="priority_urgent">Urgent</string>
+	<string name="public_header">Public</string>
+	<string name="private_header">Private</string>
 	<string name="read_by">Read by:</string>
 	<string name="read_by_prefix">read by</string>
 	<string name="reference">Ref.</string>

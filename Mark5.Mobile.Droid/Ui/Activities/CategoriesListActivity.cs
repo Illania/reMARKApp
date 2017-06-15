@@ -51,7 +51,6 @@ namespace Mark5.Mobile.Droid
             }
             else
             {
-                clf = (CategoriesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CategoriesListActivity)}");
             }
         }

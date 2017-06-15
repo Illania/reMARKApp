@@ -1070,18 +1070,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var sectionsPositionToSection = SectionsPositionToSection();
                 var offset = sectionsInView.Count == 1 ? 0 : 1;
                 foreach (var folder in folders)
-                foreach (var section in sectionsInView)
-                {
-                    var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
-
-                    var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
-                    if (index >= 0)
+                    foreach (var section in sectionsInView)
                     {
-                        var position = sectionPosition + offset + index;
-                        selectedItemPositions.Add(position);
-                        NotifyItemChanged(position);
+                        var sectionPosition = sectionsPositionToSection.FirstOrDefault(c => c.Value == section).Key;
+
+                        var index = foldersInSection[section].FindIndex(f => f.Id == folder.Id);
+                        if (index >= 0)
+                        {
+                            var position = sectionPosition + offset + index;
+                            selectedItemPositions.Add(position);
+                            NotifyItemChanged(position);
+                        }
                     }
-                }
             }
 
             #endregion
@@ -1098,9 +1098,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (sectionsInView.Count <= 1)
                     return new Dictionary<int, Section>();
 
-                var positions = new Dictionary<int, Section>();
-                positions.Add(0, sectionsInView[0]);
-
+                var positions = new Dictionary<int, Section>
+                {
+                    { 0, sectionsInView[0] }
+                };
                 var previousSectionPosition = 0;
                 var previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
                 for (var i = 1; i < sectionsInView.Count; i++)
