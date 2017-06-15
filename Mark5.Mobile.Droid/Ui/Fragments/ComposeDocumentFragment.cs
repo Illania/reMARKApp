@@ -18,6 +18,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
@@ -710,39 +711,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetAllTemplates()
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_templates, Resource.String.please_wait);
-            List<TemplatePreview> templatesPreviews = null;
 
-            try
-            {
-                templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+            var intent = new Intent(Context, typeof(TemplatesListActivity));
+            StartActivity(intent);
+            //var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_templates, Resource.String.please_wait);
+            //List<TemplatePreview> templatesPreviews = null;
 
-                templatesPreviews = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None)
-                                                     .OrderByDescending(tp => tp.Private).ThenBy(tp => tp.Name)
-                                                     .ToList();
+            //try
+            //{
+            //    templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
 
-                dismissAction();
+            //    templatesPreviews = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None)
+            //                                         .OrderByDescending(tp => tp.Private).ThenBy(tp => tp.Name)
+            //                                         .ToList();
 
-                if (templatesPreviews.Any())
-                {
-                    var templateNames = templatesPreviews.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
+            //    dismissAction();
 
-                    var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true);
-                    var selectedPreview = templatesPreviews[result];
-                    await GetTemplate(selectedPreview);
-                }
-                else
-                {
-                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.no_templates_title, Resource.String.no_templates_content);
-                }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+            //    if (templatesPreviews.Any())
+            //    {
+            //        var templateNames = templatesPreviews.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
 
-                dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
+            //        var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true);
+            //        var selectedPreview = templatesPreviews[result];
+            //        await GetTemplate(selectedPreview);
+            //    }
+            //    else
+            //    {
+            //        await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.no_templates_title, Resource.String.no_templates_content);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+
+            //    dismissAction();
+            //    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            //}
         }
 
         async Task GetLocalTemplate()

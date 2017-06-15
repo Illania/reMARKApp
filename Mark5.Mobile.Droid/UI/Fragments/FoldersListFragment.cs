@@ -97,8 +97,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual View InflateView(LayoutInflater inflater, ViewGroup container)
         {
             return inflater.Inflate(Resource.Layout.list, container, false);
-
-            ;
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)

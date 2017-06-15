@@ -2,23 +2,109 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
+using System.Threading.Tasks;
 using Android.OS;
-using Android.Runtime;
+using Android.Support.V4.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Util;
 using Android.Views;
-using Android.Widget;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class TemplatesListFragment : RetainableStateFragment
     {
+        RecyclerView recyclerView;
+        TemplatesListAdapter adapter;
+        TemplatesListAdapter searchAdapter;
+
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
+            CommonConfig.Logger.Info($"Creating {nameof(TemplatesListFragment)}");
+
+            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+
+            var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
+            emptyView.SetText(Resource.String.no_templates);
+
+            var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
+            refreshLayout.Enabled = false;
+
+            recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
+            recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
+            recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
+
+            adapter = new TemplatesListAdapter();
+            adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            {
+                if (recyclerView.GetAdapter() != adapter)
+                    return;
+
+                emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+            }));
+            recyclerView.SetAdapter(adapter);
+
+            searchAdapter = new TemplatesListAdapter();
+
+            HasOptionsMenu = true;
+
+            return rootView;
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.templates);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+
+            CommonConfig.Logger.Info($"Created {nameof(TemplatesListFragment)}");
+        }
+
+        public async override void OnResume()
+        {
+            base.OnResume();
+
+            if (adapter.Empty)
+            {
+                CommonConfig.Logger.Info($"Refreshing {nameof(TemplatesListFragment)}");
+                await RefreshView();
+            }
+        }
+
+        #region Refresh
+
+        async Task RefreshView()
+        {
+            try
+            {
+                CommonConfig.Logger.Info($"Refresh running...");
+
+                var previews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+
+                adapter.RefreshData(previews);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while retrieving template previews", ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                //TODO need to close
+            }
+            finally
+            {
+                CommonConfig.Logger.Info($"Refresh finished");
+            }
+        }
+
+        #endregion
+
         #region Retainable State
 
         public override string GenerateTag() => $"{nameof(TemplatesListFragment)}";
@@ -28,6 +114,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         class TemplatesListAdapter : RecyclerView.Adapter
         {
             public event EventHandler<TemplatePreview> ItemClicked = delegate { };
+
+            readonly int sectionHeight = ConversionUtils.ConvertDpToPixels(56);
 
             public static class ViewType
             {
@@ -47,6 +135,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 new List<TemplatePreview>(),
             };
 
+            public bool Empty => !templatesInView.SelectMany(t => t).Any();
+
             public override int ItemCount => templatesInView.Sum(f => f.Count) + 2;
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
@@ -58,6 +148,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                   : holder.ItemView.Context.GetString(Resource.String.public_header);
 
                     sectionViewHolder.SectionTitle = title;
+
+                    if (templatesInView[section].Any())
+                    {
+                        sectionViewHolder.ItemView.Visibility = ViewStates.Visible;
+                        sectionViewHolder.ItemView.LayoutParameters.Height = sectionHeight;
+                    }
+                    else
+                    {
+                        sectionViewHolder.ItemView.Visibility = ViewStates.Gone;
+                        sectionViewHolder.ItemView.LayoutParameters.Height = 0;
+                    }
                 }
 
                 if (holder is TemplateViewHolder templateViewHolder)
@@ -73,22 +174,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var privateCount = templatesInView[Section.Private].Count;
                 var publicCount = templatesInView[Section.Public].Count;
 
-                if (position < privateCount)
+                if (position < privateCount + 1)
                 {
                     return templatesInView[Section.Private][position - 1];
                 }
 
-                return templatesInView[Section.Public][position - 2];
+                return templatesInView[Section.Public][position - 2 - privateCount];
             }
 
             int GetSectionAtPosition(int position)
             {
-                var privateCount = templatesInView[Section.Private].Count;
-                var publicCount = templatesInView[Section.Public].Count;
-                if (privateCount == 0 || position < privateCount) //We consider that private come before public
-                    return Section.Public;
-                else
+                if (position == 0)
+                {
                     return Section.Private;
+                }
+
+                if (position == templatesInView[0].Count + 1)
+                {
+                    return Section.Public;
+                }
+
+                return 0;
+                //var privateCount = templatesInView[Section.Private].Count;
+                //var publicCount = templatesInView[Section.Public].Count;
+                //if (privateCount == 0 || position < privateCount) //We consider that private come before public
+                //    return Section.Public;
+                //else
+                //return Section.Private;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -105,13 +217,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public override int GetItemViewType(int position)
+            {
+                if (position == 0 || position == templatesInView[0].Count + 1)
+                    return ViewType.SectionView;
+
+                return ViewType.TemplateView;
+            }
+
             public void RefreshData(List<TemplatePreview> previews)
             {
                 NotifyItemRangeRemoved(0, ItemCount);
 
-                templatesInView.Clear();
-                templatesInView[Section.Private].AddRange(previews.Where(p => p.Private));
-                templatesInView[Section.Public].AddRange(previews.Where(p => !p.Private));
+                templatesInView[Section.Private].Clear();
+                templatesInView[Section.Public].Clear();
+
+                templatesInView[Section.Private].AddRange(previews.Where(p => p.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase)); //TODO do with ios too
+                templatesInView[Section.Public].AddRange(previews.Where(p => !p.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase));
 
                 NotifyItemRangeInserted(0, ItemCount);
             }
