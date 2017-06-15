@@ -1,4 +1,5 @@
 ﻿using System;
+using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.App;
 
@@ -37,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             UserVisibleHint = false;
         }
 
-        public override void OnCreate(Android.OS.Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
         }
