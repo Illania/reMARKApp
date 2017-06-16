@@ -235,6 +235,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public const int SectionView = 1;
             }
 
+            //If we decide to change the order of public and private some of the functions need to be modified slightly
             public static class Section
             {
                 public const int Private = 0;
