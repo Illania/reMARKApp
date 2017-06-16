@@ -18,6 +18,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -28,8 +29,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
+        static class RequestCodes
+        {
+            public const int AttachmentRequestCode = 111;
+            public const int RecentAddressesRequestCode = 222;
+            public const int ContactsRequestCode = 333;
+            public const int ShortcodesRequestCode = 444;
+            public const int PhonebookRequestCode = 555;
+        }
+
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        const int AttachmentRequestCode = 111;
 
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
@@ -88,14 +97,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             toView = new ToView(Context);
+            toView.AddButtonClicked += RecipientView_AddButtonClicked;
             toView.Edited += Subview_Edited;
             subViews.Add(toView);
 
             ccView = new CcView(Context);
+            ccView.AddButtonClicked += RecipientView_AddButtonClicked;
             ccView.Edited += Subview_Edited;
             subViews.Add(ccView);
 
             bccView = new BccView(Context);
+            bccView.AddButtonClicked += RecipientView_AddButtonClicked;
             bccView.Edited += Subview_Edited;
             subViews.Add(bccView);
 
@@ -125,7 +137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     linearLayout.AddView(new Divider(Context));
             }
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.SetImageResource(Resource.Drawable.action_send);
             fab.SetOnClickListener(new ActionOnClickListener(() => SendDocument()));
             fab.Enabled = false;
@@ -173,8 +185,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (requestCode == AttachmentRequestCode && resultCode == (int) Result.Ok)
+            if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
                 HandleLocalAttachment(data);
+            if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
+            {
+                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+            }
+            if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
+            {
+                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+            }
+            if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
+            {
+                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
+                focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+            }
+            if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
+            {
+                var shortcode = SerializationUtils.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
+                AddAddressesFromShortcode(shortcode);
+            }
+        }
+
+        void AddAddressesFromShortcode(Shortcode shortcode)
+        {
+            if (shortcode == null || shortcode.Addresses == null || !shortcode.Addresses.Any())
+                return;
+
+            var addresses = shortcode.Addresses;
+            toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+            ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+            bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
         async Task LoadDocument()
@@ -268,10 +311,65 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Subviews event handlers
 
+        RecipientsView focusedRecipientiView;
+
+        async void RecipientView_AddButtonClicked(object sender, EventArgs e)
+        {
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
+
+            if (choice < 0)
+                return;
+
+            focusedRecipientiView = sender as RecipientsView;
+
+            switch (choice)
+            {
+                case 0:
+                    DoOpenRecentAddresses(sender as RecipientsView);
+                    break;
+                case 1:
+                    DoOpenContacts(sender as RecipientsView);
+                    break;
+                case 2:
+                    DoOpenShortcodes();
+                    break;
+                case 3:
+                    DoOpenPhonebook(sender as RecipientsView);
+                    break;
+            }
+
+            if (choice != 2)
+                focusedRecipientiView.RequestEditorFocus();
+        }
+
+        void DoOpenRecentAddresses(RecipientsView v)
+        {
+            var i = new Intent(Activity, typeof(RecentAddressesListActivity));
+            StartActivityForResult(i, RequestCodes.RecentAddressesRequestCode);
+        }
+
+        void DoOpenContacts(RecipientsView v)
+        {
+            var i = new Intent(Activity, typeof(PickerContactFolderListActivity));
+            StartActivityForResult(i, RequestCodes.ContactsRequestCode);
+        }
+
+        void DoOpenShortcodes()
+        {
+            var i = new Intent(Activity, typeof(PickerShortcodesFolderListActivity));
+            StartActivityForResult(i, RequestCodes.ShortcodesRequestCode);
+        }
+
+        void DoOpenPhonebook(RecipientsView v)
+        {
+            var i = new Intent(Activity, typeof(PhonebookContactsListActivity));
+            StartActivityForResult(i, RequestCodes.PhonebookRequestCode);
+        }
+
         void Subview_Edited(object sender, EventArgs e)
         {
-            ((AppCompatActivity) Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             UpdateSendButtonState();
 
@@ -351,8 +449,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (option == 1) //Remove attachment
             {
-                var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
-                if (outgoingAttachment != null)
+                if (attachment is OutgoingDocumentAttachmentDescription outgoingAttachment)
                 {
                     try
                     {
@@ -625,7 +722,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
             var i = Intent.CreateChooser(intent, "File");
-            StartActivityForResult(i, AttachmentRequestCode);
+            StartActivityForResult(i, RequestCodes.AttachmentRequestCode);
         }
 
         void UpdateSendButtonState()

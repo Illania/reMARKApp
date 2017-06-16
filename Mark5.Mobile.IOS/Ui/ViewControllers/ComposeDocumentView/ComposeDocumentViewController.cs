@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
@@ -281,12 +282,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentButtonItem.Clicked += AttachmentButtonItem_Clicked;
 
             //Subviews
+            toView.AddButtonTapped += RecipientView_AddButtonTapped;
             toView.SearchRequested += RecipientView_SearchRequested;
             toView.Edited += Subview_Edited;
 
+            ccView.AddButtonTapped += RecipientView_AddButtonTapped;
             ccView.SearchRequested += RecipientView_SearchRequested;
             ccView.Edited += Subview_Edited;
 
+            bccView.AddButtonTapped += RecipientView_AddButtonTapped;
             bccView.SearchRequested += RecipientView_SearchRequested;
             bccView.Edited += Subview_Edited;
 
@@ -306,12 +310,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentButtonItem.Clicked -= AttachmentButtonItem_Clicked;
 
             //Subviews
+            toView.AddButtonTapped -= RecipientView_AddButtonTapped;
             toView.SearchRequested -= RecipientView_SearchRequested;
             toView.Edited -= Subview_Edited;
 
+            ccView.AddButtonTapped -= RecipientView_AddButtonTapped;
             ccView.SearchRequested -= RecipientView_SearchRequested;
             ccView.Edited -= Subview_Edited;
 
+            bccView.AddButtonTapped -= RecipientView_AddButtonTapped;
             bccView.SearchRequested -= RecipientView_SearchRequested;
             bccView.Edited -= Subview_Edited;
 
@@ -427,9 +434,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return;
 
             var addresses = shortcode.Addresses;
-            toView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
-            ccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
-            bccView.SetEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
+            toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+            ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+            bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
         bool IsFormValid()
@@ -810,13 +817,47 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
             sendButtonItem.Enabled = IsFormValid();
 
-            if (sender is LineView && PlatformConfig.Preferences.RemoveLine && CreationModeFlag == DocumentCreationModeFlag.ReplyAll && PreviousDocumentPreview != null && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
+            if (sender is LineView
+                && PlatformConfig.Preferences.RemoveLine
+                && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
+                && PreviousDocumentPreview != null
+                && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
                 {
                     toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                     ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                     bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
                 }
+        }
+
+        async void RecipientView_AddButtonTapped(object sender, EventArgs e)
+        {
+            var strings = new[] { Localization.GetString("contact_picker_recent_addresses"),
+                Localization.GetString("contact_picker_contacts"),
+                Localization.GetString("contact_picker_shortcodes"),
+                Localization.GetString("contact_picker_phonebook"),
+            };
+
+            var choice = await Dialogs.ShowListDialogAsync(this, null, strings, sender as UIView);
+
+            if (choice < 0)
+                return;
+
+            switch (choice)
+            {
+                case 0:
+                    await DoOpenRecents(sender as RecipientsView);
+                    break;
+                case 1:
+                    await DoOpenContacts(sender as RecipientsView);
+                    break;
+                case 2:
+                    await DoOpenShortcodes();
+                    break;
+                case 3:
+                    await DoOpenPhonebook(sender as RecipientsView);
+                    break;
+            }
         }
 
         void RecipientView_SearchRequested(object sender, string initialSearchString)
@@ -952,6 +993,58 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var remoteAttachment = attachment as AttachmentDescription;
                 attachmentsView.RemoveAttachment(sender, remoteAttachment);
             }
+        }
+
+        #endregion
+
+        #region Picker methods
+
+        async Task DoOpenPhonebook(RecipientsView recipientsView)
+        {
+            var vc = new PhonebookContactsListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.ReturnTask;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+
+            DismissViewController(true, null);
+        }
+
+        async Task DoOpenShortcodes()
+        {
+            var vc = new PickerShortcodesFolderListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var sc = await vc.Task;
+            if (sc != null)
+                AddAddressesFromShortcode(sc);
+
+            DismissViewController(true, null);
+        }
+
+        async Task DoOpenContacts(RecipientsView recipientsView)
+        {
+            var vc = new PickerContactsFolderListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Task;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+
+            DismissViewController(true, null);
+        }
+
+        async Task DoOpenRecents(RecipientsView recipientsView)
+        {
+            var vc = new RecentAddressesListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Task;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+
+            DismissViewController(true, null);
         }
 
         #endregion

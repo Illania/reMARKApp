@@ -1,12 +1,4 @@
-﻿//
-// Project: Mark5.Mobile.Droid
-// File: CopyToNewOptions.cs
-// Author: Ferdinando Papale fp@nordic-it.com
-//
-// Copyright (c) 2017 Nordic IT
-//
-using System;
-namespace Mark5.Mobile.Common.Model.Support
+﻿namespace Mark5.Mobile.Common.Model.Support
 {
     public enum CopyToNewOption
     {

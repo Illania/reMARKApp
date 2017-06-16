@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     public class RecipientsView : ComposeDocumentView
     {
         public event EventHandler Edited = delegate { };
+        public event EventHandler AddButtonClicked = delegate { };
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
@@ -80,8 +81,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             emailEditor = new AppCompatMultiAutoCompleteTextView(context);
             emailEditor.SetPadding(0, 0, 0, 0);
-            var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
-            contentLayoutParameters.Weight = 1;
+            var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            {
+                RightMargin = DistanceNormal,
+                Weight = 1
+            };
             emailEditor.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             emailEditor.SetBackgroundColor(Color.Transparent);
 
@@ -99,6 +103,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.FocusChange += TextView_FocusChange;
 
             AddView(emailEditor, contentLayoutParameters);
+
+            var addButton = new AppCompatImageButton(Context);
+            addButton.Click += AddButton_Click;
+            addButton.SetImageResource(Resource.Drawable.add);
+            addButton.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
+            var addButtonLp = new LinearLayout.LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
+            {
+                Gravity = GravityFlags.CenterVertical,
+            };
+            AddView(addButton, addButtonLp);
         }
 
         #region Public Methods
@@ -213,6 +227,88 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 Clear();
         }
 
+        public void AddEmails(IEnumerable<string> emails)
+        {
+            AddEmails(string.Join(EmailSeparator, emails));
+        }
+
+        public void AddEmails(string emails)
+        {
+            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            {
+                var newEmails = new StringBuilder();
+                newEmails.Append(emailEditor.Text);
+                if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                    newEmails.Append(EmailSeparator);
+                newEmails.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(EmailSeparator);
+
+                emailEditor.Text = newEmails.ToString();
+
+                CorrectMarkup();
+
+                SetCursorAtEnd();
+
+                Edited(this, EventArgs.Empty);
+            }
+            else
+            {
+                CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+            }
+        }
+
+        public void AddRecipent(string name, string address)
+        {
+            var newEmails = new StringBuilder();
+            newEmails.Append(emailEditor.Text);
+            if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                newEmails.Append(EmailSeparator);
+            if (string.IsNullOrWhiteSpace(name))
+                newEmails.Append(address);
+            else
+                newEmails.Append(string.Format(RecipentFormat, name, address));
+            newEmails.Append(EmailSeparator);
+
+            emailEditor.Text = newEmails.ToString();
+
+            CorrectMarkup();
+
+            SetCursorAtEnd();
+
+            Edited(this, EventArgs.Empty);
+        }
+
+        public void RequestEditorFocus()
+        {
+            emailEditor.RequestFocus();
+        }
+
+        #endregion
+
+        #region Utilities
+
+        void SetEmails(string emails)
+        {
+            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            {
+                var sb = new StringBuilder();
+                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+
+                sb.Append(EmailSeparator);
+
+                emailEditor.Text = sb.ToString();
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"No valid emails found in {emails}");
+            }
+        }
+
+        IEnumerable<string> GetEmails()
+        {
+            return Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
+        }
+
         IEnumerable<string> GetRecipents()
         {
             return emailEditor.Text.Split(new[]
@@ -236,35 +332,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #endregion
 
-        #region Utilities
-
-        void SetEmails(string emails)
-        {
-            MatchCollection matches;
-            if (Validator.ContainsValidEmails(emails, out matches))
-            {
-                var sb = new StringBuilder();
-                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-
-                sb.Append(EmailSeparator);
-
-                emailEditor.Text = sb.ToString();
-            }
-            else
-            {
-                CommonConfig.Logger.Info($"No valid emails found in {emails}");
-            }
-        }
-
-        IEnumerable<string> GetEmails()
-        {
-            MatchCollection matches;
-            return Validator.ContainsValidEmails(emailEditor.Text, out matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
-        }
-
-        #endregion
-
         #region Control event handlers
+
+        void AddButton_Click(object sender, EventArgs e)
+        {
+            AddButtonClicked(this, EventArgs.Empty);
+        }
 
         void TextView_FocusChange(object sender, FocusChangeEventArgs e)
         {
@@ -393,6 +466,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var recipientsViewState = State as RecipientsViewState;
             emailEditor.Text = recipientsViewState.Content;
             savedRecipient = recipientsViewState.SavedRecipient;
+            if (recipientsViewState.HasFocus)
+            {
+                emailEditor.RequestFocus();
+            }
         }
 
         public override IComposeDocumentViewState ReturnState()
@@ -401,6 +478,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 Content = emailEditor.Text,
                 SavedRecipient = savedRecipient,
+                HasFocus = emailEditor.IsFocused,
             };
         }
 
@@ -408,13 +486,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             public string Content { get; set; }
             public string SavedRecipient { get; set; }
+            public bool HasFocus { get; set; }
         }
 
         #endregion
 
         #region Support class
 
-        public class SuggestionsAdapter : BaseAdapter<PrintableSuggestion>, IFilterable
+        public class SuggestionsAdapter : BaseAdapter<Recipient>, IFilterable
         {
             readonly SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
 
@@ -496,13 +575,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return suggestions[position].GetHashCode();
             }
 
-            public override PrintableSuggestion this[int position] => suggestions[position];
+            public override Recipient this[int position] => suggestions[position];
 
-            public void AddSuggestions(List<PrintableSuggestion> newSuggestions)
+            public void AddSuggestions(List<Recipient> newSuggestions)
             {
                 new Handler(Looper.MainLooper).Post(() =>
                 {
-                    suggestions.AddOrReplaceAllSorted(newSuggestions);
+                    suggestions.AddOrReplaceAllSorted(newSuggestions ?? new List<Recipient>());
                     NotifyDataSetChanged();
                 });
             }
@@ -573,7 +652,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 #region SuggestionService handlers
 
-                void HandleSugguestions(List<PrintableSuggestion> newSuggestions, CancellationToken token)
+                void HandleSugguestions(List<Recipient> newSuggestions, CancellationToken token)
                 {
                     if (token.IsCancellationRequested)
                         return;
@@ -588,10 +667,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             #endregion
         }
 
-        public class SuggestionsObservableCollection : SortedObservableCollection<PrintableSuggestion>
+        public class SuggestionsObservableCollection : SortedObservableCollection<Recipient>
         {
             public SuggestionsObservableCollection()
-                : base(PrintableSuggestion.LookupComparison, PrintableSuggestion.SortingComparison)
+                : base(Recipient.LookupComparison, Recipient.SortingComparison)
             {
             }
         }

@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public PriorityView(Context context)
             : base(context)
         {
-            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)
             {

@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class TemplatesListActivity : BaseAppCompatActivity
     {
-        public const string TemplatePreviewKey = "TemplatePreview_92796943-fe6c-44d1-a999-1d19286a97f6";
+        public const string TemplatePreviewResultKey = "TemplatePreviewResult_92796943-fe6c-44d1-a999-1d19286a97f6";
 
         Toolbar toolbar;
 

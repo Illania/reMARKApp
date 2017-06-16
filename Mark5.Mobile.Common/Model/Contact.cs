@@ -157,5 +157,10 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[Contact: Id={Id}, FirstName={FirstName}, Patronymic={Patronymic}, LastName={LastName}]";
         }
+
+        public string GetFullName()
+        {
+            return $"{FirstName}{(string.IsNullOrEmpty(Patronymic) ? string.Empty : " " + Patronymic)}" + $"{(string.IsNullOrEmpty(LastName) ? "" : " " + LastName)}";
+        }
     }
 }

@@ -12,8 +12,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly UINib Nib = UINib.FromName("SuggestionsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("SuggestionsTableViewCell");
 
-        public PrintableSuggestion PrintableSuggestion { get; private set; }
-
         public SuggestionsTableViewCell(IntPtr handle)
             : base(handle)
         {
@@ -33,21 +31,29 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         #region Custom methods
 
-        public void Initialize(PrintableSuggestion printableSuggestion)
+        public void Initialize(Recipient recipient)
         {
-            PrintableSuggestion = printableSuggestion;
+            Initialize(recipient.Name, recipient.Address);
+        }
 
-            if (string.IsNullOrEmpty(PrintableSuggestion.Name))
+        public void Initialize(RecentAddress recentAddress)
+        {
+            Initialize(recentAddress.Name, recentAddress.Address);
+        }
+
+        public void Initialize(string name, string address)
+        {
+            if (string.IsNullOrEmpty(name))
             {
-                SuggestionAddressAlternative.Text = PrintableSuggestion.Address;
+                SuggestionAddressAlternative.Text = address;
 
                 SuggestionName.Hidden = true;
                 SuggestionAddress.Hidden = true;
             }
             else
             {
-                SuggestionName.Text = PrintableSuggestion.Name;
-                SuggestionAddress.Text = PrintableSuggestion.Address;
+                SuggestionName.Text = name;
+                SuggestionAddress.Text = address;
 
                 SuggestionAddressAlternative.Hidden = true;
             }

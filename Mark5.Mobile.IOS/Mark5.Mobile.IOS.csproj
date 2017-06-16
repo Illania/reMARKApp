@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -68,7 +68,7 @@
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<MtouchArch>ARMv7, ARMv7s, ARM64</MtouchArch>
+		<MtouchArch>ARMv7, ARM64</MtouchArch>
 		<ConsolePause>false</ConsolePause>
 		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
@@ -161,7 +161,6 @@
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
@@ -179,7 +178,6 @@
 		<Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
@@ -250,6 +248,16 @@
 		<Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+		<Compile Include="Ui\ViewControllers\RecentAddressesListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFolderListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ContactsList\PickerContactsListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFolderListViewController %28copy%29.cs" />
+		<Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
 		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs">
@@ -521,12 +529,18 @@
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd47.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
+		<BundleResource Include="Resources\icons\add%402x.png" />
+		<BundleResource Include="Resources\icons\add%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
 			<Version>2.6.0.0</Version>
 			<Visible>False</Visible>
 		</XamarinComponentReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Ui\ViewControllers\ContactsList\" />
+	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

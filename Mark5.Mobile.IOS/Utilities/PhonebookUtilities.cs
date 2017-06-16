@@ -13,12 +13,12 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         #region IPhonebookUtilities implementation
 
-        public List<Contact> GetPhonebookContacts()
+        public List<Recipient> GetPhonebookContacts()
         {
             return GetiOSContacts();
         }
 
-        public List<Contact> GetFilteredPhonebookContacts(string phrase)
+        public List<Recipient> GetFilteredPhonebookContacts(string phrase)
         {
             return GetiOSContacts(phrase);
         }
@@ -27,11 +27,11 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Helper methods
 
-        List<Contact> GetiOSContacts(string phrase = null)
+        List<Recipient> GetiOSContacts(string phrase = null)
         {
             var authorizationSemaphore = new SemaphoreSlim(0, 1);
 
-            var contacts = new List<Contact>();
+            var contacts = new List<Recipient>();
 
             var status = CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts);
 
@@ -63,7 +63,7 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
 
-        List<Contact> GetContactsFromContactStore(CNContactStore store, string phrase)
+        List<Recipient> GetContactsFromContactStore(CNContactStore store, string phrase)
         {
             var cnContacts = new List<CNContact>();
 
@@ -74,8 +74,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 CNContactKey.EmailAddresses
             };
 
-            NSError error;
-            var containers = store.GetContainers(null, out error);
+            var containers = store.GetContainers(null, out NSError error);
 
             if (error != null)
                 return null;
@@ -91,21 +90,28 @@ namespace Mark5.Mobile.IOS.Utilities
                 cnContacts.AddRange(cnContactsTemp);
             }
 
-            var contacts = cnContacts.Select(ConvertToContact);
+            var contacts = cnContacts.Select(ConvertToContact).SelectMany(i => i);
 
             if (!string.IsNullOrEmpty(phrase))
-                contacts = contacts.Where(c => c.FirstName.ContainsCaseInsensitive(phrase) || c.LastName.ContainsCaseInsensitive(phrase) || c.CommunicationAddresses.Any(ca => ca.Address.ContainsCaseInsensitive(phrase)));
+                contacts = contacts.Where(c => c.Name.ContainsCaseInsensitive(phrase) || c.Address.ContainsCaseInsensitive(phrase));
             return contacts.ToList();
         }
 
-        Contact ConvertToContact(CNContact cnContact)
+        List<Recipient> ConvertToContact(CNContact cnContact)
         {
-            var contact = new Contact();
-            contact.FirstName = cnContact.GivenName;
-            contact.LastName = cnContact.FamilyName;
-            contact.CommunicationAddresses = cnContact.EmailAddresses.Where(el => Validator.IsEmailValid(el.Value)).Select(el => new CommunicationAddress(el.Value, CommunicationAddressType.Email)).ToList();
+            var phonebookContacts = new List<Recipient>();
+            var addresses = cnContact.EmailAddresses.Where(el => Validator.IsEmailValid(el.Value)).Select(el => el.Value).ToList();
+            foreach (var address in addresses)
+            {
+                phonebookContacts.Add(new Recipient()
+                {
+                    Address = address,
+                    Type = RecipientType.Phonebook,
+                    Name = string.Join(" ", new[] { cnContact.GivenName, cnContact.FamilyName }.Where(v => !string.IsNullOrEmpty(v))),
+                });
+            }
 
-            return contact;
+            return phonebookContacts;
         }
 
         #endregion

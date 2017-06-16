@@ -15,27 +15,34 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
-    public class ShortcodesListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public abstract class AbstractShortcodesListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
     {
+        protected readonly bool DisableRowActions;
+
         public Folder Folder { get; set; }
 
-        UIBarButtonItem exitEditItem;
-        UIBarButtonItem editItem;
+        protected UIBarButtonItem exitEditItem;
+        protected UIBarButtonItem editItem;
 
-        UIRefreshControl refreshControl;
-        UITableView tableView;
-        UISearchController searchController;
-        UITableViewController searchResultsController;
-        DataSource searchResultsDataSource;
+        protected UIRefreshControl refreshControl;
+        protected UITableView tableView;
+        protected UISearchController searchController;
+        protected UITableViewController searchResultsController;
+        protected DataSource searchResultsDataSource;
 
-        CancellationTokenSource searchCancellationTokenSource;
+        protected CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         bool refreshing;
 
-        CancellationTokenSource cts;
+        protected CancellationTokenSource cts;
+
+        protected AbstractShortcodesListViewController(bool disableRowActions)
+        {
+            DisableRowActions = disableRowActions;
+        }
 
         #region UIViewController overrides
 
@@ -77,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ShortcodesListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(AbstractShortcodesListViewController)} appeared");
 
             var ds = (DataSource) tableView.Source;
             if (ds.Empty)
@@ -109,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ShortcodesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(AbstractShortcodesListViewController)} received memory warning!");
 
             var ds = tableView?.Source as DataSource;
             ds?.Reset();
@@ -134,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             tableView = new UITableView();
             tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"));
+            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"), DisableRowActions);
             tableView.AllowsSelectionDuringEditing = false;
             tableView.AllowsMultipleSelectionDuringEditing = true;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -164,7 +171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_shortcodes"));
+            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_shortcodes"), DisableRowActions);
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -222,37 +229,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
+        public virtual void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
-            if (tableView == searchResultsController.TableView)
-            {
-                var ds = (DataSource) tableView.Source;
-                var indexPath = ds.FindItemIndexPath(shortcodePreview);
-                if (indexPath != null)
-                    tableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
-            }
 
-            if (SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
-                nc.PopToRootViewController(false);
-
-                var vc = (ShortcodeViewController) nc.ViewControllers[0];
-
-                if (vc.IsShowingShortcodeWithId(shortcodePreview.Id))
-                    return;
-
-                vc.ClearData();
-                vc.SetData(Folder, shortcodePreview);
-                vc.RefreshData();
-            }
-            else
-            {
-                var vc = new ShortcodeViewController();
-                vc.SetData(Folder, shortcodePreview);
-                vc.SetRefreshDataOnAppear();
-                NavigationController.PushViewController(vc, true);
-            }
         }
 
         [Export("longPressed:")]
@@ -691,24 +670,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        protected class DataSource : UITableViewSource, IDisposable
         {
             public bool Empty { get { return !shortcodePreviewsInView.SelectMany(v => v).Any(); } }
 
             public IEnumerable<ShortcodePreview> Items { get { return shortcodePreviewsInView.SelectMany(i => i); } }
 
-            ShortcodesListViewController viewController;
+            AbstractShortcodesListViewController viewController;
             UITableView tableView;
             readonly string emptyText;
 
             bool loading = true;
+            bool disableRowActions;
             List<List<ShortcodePreview>> shortcodePreviewsInView = new List<List<ShortcodePreview>>(25);
 
-            public DataSource(ShortcodesListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(AbstractShortcodesListViewController viewController, UITableView tableView, string emptyText, bool disableRowActions)
             {
                 this.viewController = viewController;
                 this.tableView = tableView;
                 this.emptyText = emptyText;
+                this.disableRowActions = disableRowActions;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -780,7 +761,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return true;
+                return !disableRowActions;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
