@@ -60,9 +60,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Label.TextColor = UIColor.LightGray;
             Label.Opaque = false;
             Label.TranslatesAutoresizingMaskIntoConstraints = false;
-            Label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            Label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            Label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            Label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(Label);
             ContainerView.AddConstraints(new[]
             {
@@ -83,15 +83,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             if (!hideAddButton)
             {
-                var addButtonIcon = UIImage.FromBundle(Path.Combine("Icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                var addButtonIcon = UIImage.FromBundle(Path.Combine("icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                 addButton = new UIButton();
                 addButton.SetImage(addButtonIcon, UIControlState.Normal);
                 addButton.BackgroundColor = UIColor.Clear;
                 addButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 addButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
-                addButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-                addButton.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-                addButton.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                addButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                addButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                addButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 addButton.TouchUpInside += HandleAddButtonTapped;
 
                 ContainerView.AddSubview(addButton);
@@ -243,8 +243,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var tapPosition = TextView.GetClosestPositionToPoint(textViewTapGestureRecognizer.LocationInView(TextView));
             var offset = TextView.GetOffsetFromPosition(TextView.BeginningOfDocument, tapPosition);
 
-            var beforeSubstring = TextView.Text.SafeSubstring(0, (int) offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
-            var afterSubstring = TextView.Text.SafeSubstring((int) offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var beforeSubstring = TextView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = TextView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
@@ -269,8 +269,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             if (TextView.Text.Length > selection.Location)
             {
-                var beforeCursorString = TextView.Text.SafeSubstring(0, (int) selection.Location);
-                var afterCursorString = TextView.Text.SafeSubstring((int) selection.Location, TextView.Text.Length - (int) selection.Location - 1);
+                var beforeCursorString = TextView.Text.SafeSubstring(0, (int)selection.Location);
+                var afterCursorString = TextView.Text.SafeSubstring((int)selection.Location, TextView.Text.Length - (int)selection.Location - 1);
 
                 var indexInSecondPartString = afterCursorString.IndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
                 if (indexInSecondPartString == -1)
@@ -307,7 +307,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (numberOfCharactersDeleted > 1)
                 TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
 
-            var textSubstring = TextView.Text.SafeSubstring(0, (int) (TextView.SelectedRange.Location + TextView.SelectedRange.Length));
+            var textSubstring = TextView.Text.SafeSubstring(0, (int)(TextView.SelectedRange.Location + TextView.SelectedRange.Length));
             if (textSubstring.EndsWith(EmailSeparator.Trim(), StringComparison.CurrentCultureIgnoreCase))
             {
                 var startIndex = TextView.Text.LastIndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);

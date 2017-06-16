@@ -313,12 +313,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return templatesInView[(int) section].Count;
+                return templatesInView[(int)section].Count;
             }
 
             public override nfloat GetHeightForHeader(UITableView tableView, nint section)
             {
-                if (loading || Empty || !templatesInView[(int) section].Any())
+                if (loading || Empty || !templatesInView[(int)section].Any())
                     return 0;
 
                 return UITableView.AutomaticDimension;
@@ -326,7 +326,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                return section == 0 ? Localization.GetString("private") : Localization.GetString("Public");
+                return section == 0 ? Localization.GetString("private") : Localization.GetString("public");
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
@@ -344,8 +344,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 templatesInView.Clear();
 
-                templatesInView.Add(templatePreviews.Where(t => t.Private).ToList());
-                templatesInView.Add(templatePreviews.Where(t => !t.Private).ToList());
+                templatesInView.Add(templatePreviews.Where(t => t.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
+                templatesInView.Add(templatePreviews.Where(t => !t.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
