@@ -299,17 +299,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             int GetSectionAtPosition(int position)
             {
-                if (position == 0)
-                {
-                    return Section.Private;
-                }
-
-                if (position == templatesInView[Section.Private].Count + 1)
-                {
-                    return Section.Public;
-                }
-
-                return 0;
+                return position == 0 ? Section.Private : Section.Public;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
