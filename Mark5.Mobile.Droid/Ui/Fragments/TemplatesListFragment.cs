@@ -195,7 +195,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Retainable State
 
+        public override IRetainableState OnRetainInstanceState()
+        {
+            CommonConfig.Logger.Info($"Retaining state for {nameof(TemplatesListFragment)}");
+            return new TemplateListFragmentState
+            {
+                TemplatePreviews = adapter.Items.ToList()
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            CommonConfig.Logger.Info($"Restoring state for {nameof(TemplatesListFragment)}");
+
+            if (restoredState is TemplateListFragmentState tlfs)
+            {
+                adapter.RefreshData(tlfs.TemplatePreviews);
+            }
+        }
+
         public override string GenerateTag() => $"{nameof(TemplatesListFragment)}";
+
+        class TemplateListFragmentState : IRetainableState
+        {
+            public List<TemplatePreview> TemplatePreviews { get; set; }
+        }
 
         #endregion
 
@@ -343,7 +367,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public TemplateViewHolder(View itemView)
                     : base(itemView)
                 {
-                    // Locate and cache view references
                     nameTextView = itemView as AppCompatTextView;
                 }
             }
@@ -357,7 +380,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 public SectionViewHolder(View itemView)
                     : base(itemView)
                 {
-                    // Locate and cache view references
                     sectionTitleTextView = itemView as AppCompatTextView;
                 }
             }
