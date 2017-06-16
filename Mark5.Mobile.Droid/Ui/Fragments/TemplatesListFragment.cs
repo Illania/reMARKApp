@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.OS;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
@@ -13,6 +14,8 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -68,8 +71,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.templates);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.templates);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(TemplatesListFragment)}");
         }
@@ -91,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -112,8 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error($"Error while retrieving template previews", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
-                //TODO need to close
+                Activity.Finish();
             }
             finally
             {
@@ -125,9 +127,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Actions
 
-        void Adapter_ItemClicked(object sender, TemplatePreview e) //TODO move
+        void Adapter_ItemClicked(object sender, TemplatePreview tp)
         {
-
+            var data = new Intent();
+            data.PutExtra(TemplatesListActivity.TemplatePreviewResultKey, SerializationUtils.Serialize(tp));
+            Activity.SetResult(Android.App.Result.Ok, data);
+            Activity.Finish();
         }
 
         #endregion
