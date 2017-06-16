@@ -341,7 +341,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 templatesInView[Section.Private].Clear();
                 templatesInView[Section.Public].Clear();
 
-                templatesInView[Section.Private].AddRange(previews.Where(p => p.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase)); //TODO do with ios too
+                templatesInView[Section.Private].AddRange(previews.Where(p => p.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase));
                 templatesInView[Section.Public].AddRange(previews.Where(p => !p.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase));
 
                 NotifyItemRangeInserted(0, ItemCount);
