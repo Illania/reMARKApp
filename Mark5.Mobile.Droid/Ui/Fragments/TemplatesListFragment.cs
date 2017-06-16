@@ -108,7 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Refresh running...");
 
                 var previews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
-
+                previews.ForEach(p => p.Private = false);
                 adapter.RefreshData(previews);
             }
             catch (Exception ex)
@@ -303,7 +303,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return Section.Private;
                 }
 
-                if (position == templatesInView[0].Count + 1)
+                if (position == templatesInView[Section.Private].Count + 1)
                 {
                     return Section.Public;
                 }
@@ -327,7 +327,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override int GetItemViewType(int position)
             {
-                if (position == 0 || position == templatesInView[0].Count + 1)
+                if (position == 0 || position == templatesInView[Section.Private].Count + 1)
                     return ViewType.SectionView;
 
                 return ViewType.TemplateView;
