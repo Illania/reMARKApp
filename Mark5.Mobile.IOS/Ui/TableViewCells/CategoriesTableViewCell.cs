@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static CategoriesTableViewCell Create()
         {
-            return (CategoriesTableViewCell) Nib.Instantiate(null, null)[0];
+            return (CategoriesTableViewCell)Nib.Instantiate(null, null)[0];
         }
 
         #region UITableViewCell overrides
@@ -45,11 +45,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             categoryColor = UI.UIColorFromHexString(category.HexColor);
             CategoryColorView.BackgroundColor = categoryColor;
             CategoryNameLabel.Text = category.Name;
-        }
-
-        internal void Initialize(TemplatePreview tp) //TODO for testing!
-        {
-            CategoryNameLabel.Text = tp.Name;
         }
 
         #endregion
