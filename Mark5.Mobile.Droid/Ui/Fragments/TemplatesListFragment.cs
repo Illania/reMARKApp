@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
+using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -16,12 +18,15 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class TemplatesListFragment : RetainableStateFragment
+    public class TemplatesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         RecyclerView recyclerView;
+        SearchView searchView;
+
         TemplatesListAdapter adapter;
         TemplatesListAdapter searchAdapter;
 
+        readonly Handler searchHandler = new Handler();
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -40,6 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             adapter = new TemplatesListAdapter();
+            adapter.ItemClicked += Adapter_ItemClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
                 if (recyclerView.GetAdapter() != adapter)
@@ -51,6 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetAdapter(adapter);
 
             searchAdapter = new TemplatesListAdapter();
+            searchAdapter.ItemClicked += Adapter_ItemClicked;
 
             HasOptionsMenu = true;
 
@@ -78,6 +85,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            inflater.Inflate(Resource.Menu.menu_main, menu);
+
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
+            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
+            searchView.QueryHint = GetString(Resource.String.filter);
+            searchView.SetOnQueryTextListener(this);
+        }
+
         #region Refresh
 
         async Task RefreshView()
@@ -101,6 +119,71 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh finished");
             }
+        }
+
+        #endregion
+
+        #region Actions
+
+        void Adapter_ItemClicked(object sender, TemplatePreview e) //TODO move
+        {
+
+        }
+
+        #endregion
+
+        #region Filtering
+
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_filter)
+            {
+                recyclerView.SwapAdapter(searchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_filter)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchHandler.PostDelayed(() =>
+                {
+                    if (string.IsNullOrWhiteSpace(newText))
+                        searchAdapter.RefreshData(adapter.Items);
+                    else
+                        searchAdapter.RefreshData(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+                },
+                500);
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
+        {
+            return false;
+        }
+
+        static bool MatchesQuery(TemplatePreview sp, string query)
+        {
+            if (sp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
         }
 
         #endregion
@@ -135,7 +218,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 new List<TemplatePreview>(),
             };
 
-            public bool Empty => !templatesInView.SelectMany(t => t).Any();
+            public bool Empty => !Items.Any();
+
+            public IEnumerable<TemplatePreview> Items => templatesInView.SelectMany(t => t);
 
             public override int ItemCount => templatesInView.Sum(f => f.Count) + 2;
 
@@ -195,12 +280,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 return 0;
-                //var privateCount = templatesInView[Section.Private].Count;
-                //var publicCount = templatesInView[Section.Public].Count;
-                //if (privateCount == 0 || position < privateCount) //We consider that private come before public
-                //    return Section.Public;
-                //else
-                //return Section.Private;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -225,7 +304,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return ViewType.TemplateView;
             }
 
-            public void RefreshData(List<TemplatePreview> previews)
+            public void RefreshData(IEnumerable<TemplatePreview> previews)
             {
                 NotifyItemRangeRemoved(0, ItemCount);
 
@@ -236,6 +315,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 templatesInView[Section.Public].AddRange(previews.Where(p => !p.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase));
 
                 NotifyItemRangeInserted(0, ItemCount);
+            }
+
+            public void Clear()
+            {
+                var size = ItemCount;
+
+                templatesInView[Section.Private].Clear();
+                templatesInView[Section.Public].Clear();
+
+                NotifyItemRangeRemoved(2, size - 2);
             }
 
             #region RecyclerView ViewHolders
