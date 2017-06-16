@@ -108,7 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Refresh running...");
 
                 var previews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
-                previews.ForEach(p => p.Private = false);
+
                 adapter.RefreshData(previews);
             }
             catch (Exception ex)
