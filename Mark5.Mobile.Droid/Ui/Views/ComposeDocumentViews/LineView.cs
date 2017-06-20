@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public LineView(Context context)
             : base(context)
         {
-            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)
             {

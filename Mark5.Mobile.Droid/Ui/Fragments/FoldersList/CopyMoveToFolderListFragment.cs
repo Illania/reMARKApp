@@ -189,8 +189,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnRetainedInstanceStateRestored(restoredState as FolderListFragmentState);
 
-            var flfs = restoredState as MoveToFolderListFragmentState;
-            if (flfs != null)
+            if (restoredState is MoveToFolderListFragmentState flfs)
             {
                 BusinessEntities = flfs.BusinessEntities;
                 FromFolder = flfs.FromFolder;

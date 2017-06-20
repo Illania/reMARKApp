@@ -112,11 +112,15 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(selected)));
             var md = builder.Build();
             var selectedIndex = -1;
-            for (var i = 0; i < values.Count; i++)
-                if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
-                    selectedIndex = i;
+            if (!EqualityComparer<T>.Default.Equals(selected, default(T)))
+            {
+                for (var i = 0; i < values.Count; i++)
+                    if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
+                        selectedIndex = i;
 
-            md.SelectedIndex = selectedIndex;
+                md.SelectedIndex = selectedIndex;
+            }
+
             builder.Cancelable(false);
             md.Show();
             return tcs.Task;

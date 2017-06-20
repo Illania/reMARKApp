@@ -410,42 +410,6 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<PrintableSuggestion>> GetSuggestions(string phrase)
-        {
-            try
-            {
-                List<PrintableSuggestion> suggestions = null;
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(PrintableSuggestion.Name)},"
-                        + $" CP.{nameof(ContactPreview.ShortId)} as {nameof(PrintableSuggestion.ShortId)}, "
-                        + $" CP.{nameof(ContactPreview.Description)} as {nameof(PrintableSuggestion.ContactDescription)}, "
-                        + $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(PrintableSuggestion.Address)}, "
-                        + $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(PrintableSuggestion.AddressDescription)} "
-                        + $" from {nameof(ContactPreview)} CP "
-                        + $"inner join {nameof(ContactCommunicationAddress)} CA on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)}"
-                        + $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType)"
-                        + $" AND ((CP.{nameof(ContactPreview.Name)} like @phrase)"
-                        + $" OR (CP.{nameof(ContactPreview.ShortId)} like @phrase)"
-                        + $" OR (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase)) "
-                        + $" limit 250 "
-                        + "COLLATE Nocase";
-                    var cmd = c.CreateCommand(commandString);
-                    cmd.Bind("@phrase", $"%{phrase}%");
-                    cmd.Bind("@addressType", (int) CommunicationAddressType.Email);
-                    var result = cmd.ExecuteQuery<PrintableSuggestion>();
-                    suggestions = result;
-                });
-
-                return suggestions;
-            }
-            catch
-            {
-                return new List<PrintableSuggestion>();
-            }
-        }
-
         public async Task RemoveOrphans()
         {
             try
@@ -470,6 +434,40 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error removing orphan contacts and contact previews.", ex);
+            }
+        }
+
+        public async Task<List<Recipient>> GetSuggestions(string phrase)
+        {
+            try
+            {
+                List<Recipient> suggestions = null;
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(Recipient.Name)},"
+                        + $" CP.{nameof(ContactPreview.ShortId)} as {nameof(Recipient.ShortId)}, "
+                        + $" CP.{nameof(ContactPreview.Description)} as {nameof(Recipient.ContactDescription)}, "
+                        + $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(Recipient.Address)}, "
+                        + $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(Recipient.AddressDescription)} "
+                        + $" from {nameof(ContactPreview)} CP "
+                        + $"  inner join {nameof(ContactCommunicationAddress)} CA on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)} "
+                        + $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) "
+                        + $" and ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase) "
+                        + $" or (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase)) "
+                        + " collate Nocase";
+                    var cmd = c.CreateCommand(commandString);
+                    cmd.Bind("@phrase", $"%{phrase}%");
+                    cmd.Bind("@addressType", (int) CommunicationAddressType.Email);
+                    var result = cmd.ExecuteQuery<Recipient>();
+                    suggestions = result;
+                });
+
+                return suggestions;
+            }
+            catch
+            {
+                return new List<Recipient>();
             }
         }
 

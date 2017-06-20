@@ -27,6 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder RemoteFolder { get; set; }
+        readonly bool hideSearch;
 
         protected View Container;
         protected FolderListAdapter Adapter;
@@ -46,6 +47,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual bool LoadRemoteFromCache { get; }
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
+
+        public FoldersListFragment(bool hideSearch = false)
+        {
+            this.hideSearch = hideSearch;
+        }
 
         #region Overrides
 
@@ -97,8 +103,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual View InflateView(LayoutInflater inflater, ViewGroup container)
         {
             return inflater.Inflate(Resource.Layout.list, container, false);
-
-            ;
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -174,9 +178,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
 
-            var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
-            searchItem.SetIcon(Resource.Drawable.action_search_server);
-            searchItem.SetShowAsAction(ShowAsAction.Always);
+            if (!hideSearch)
+            {
+                var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+                searchItem.SetIcon(Resource.Drawable.action_search_server);
+                searchItem.SetShowAsAction(ShowAsAction.Always);
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

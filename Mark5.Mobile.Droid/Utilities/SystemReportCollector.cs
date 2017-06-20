@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sendIntent.PutExtra(Intent.ExtraEmail,
                 new[]
                 {
-                    "support@nordic-it.com"
+                    "appfeedback@nordic-it.com"
                 });
             sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android System report");
             sendIntent.PutExtra(Intent.ExtraText, report);

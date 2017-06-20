@@ -3,40 +3,40 @@ using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
 {
-    public class PrintableSuggestion
+    public class Recipient
     {
         public string Name { get; set; }
         public string ContactDescription { get; set; }
         public string Address { get; set; }
         public string AddressDescription { get; set; }
         public string ShortId { get; set; }
-        public SuggestionType Type { get; set; }
+        public RecipientType Type { get; set; }
 
-        public PrintableSuggestion(RecentAddress ra)
-            : this(ra.Name, ra.Address, SuggestionType.RecentAddress)
+        public Recipient(RecentAddress ra)
+            : this(ra.Name, ra.Address, RecipientType.RecentAddress)
         {
         }
 
-        public PrintableSuggestion()
+        public Recipient()
         {
         }
 
-        public PrintableSuggestion(string name, string address, SuggestionType type)
+        public Recipient(string name, string address, RecipientType type)
         {
             Name = name;
             Address = address;
             Type = type;
         }
 
-        public static List<PrintableSuggestion> GetPrintableSuggestionsFromContacts(List<Contact> contacts, SuggestionType type)
+        public static List<Recipient> GetPrintableSuggestionsFromContacts(List<Contact> contacts, RecipientType type)
         {
-            var suggestions = new List<PrintableSuggestion>();
+            var suggestions = new List<Recipient>();
             foreach (var contact in contacts)
-            foreach (var address in contact.CommunicationAddresses)
-            {
-                var fullName = $"{contact.FirstName}{(string.IsNullOrEmpty(contact.Patronymic) ? string.Empty : " " + contact.Patronymic)}" + $"{(string.IsNullOrEmpty(contact.LastName) ? "" : " " + contact.LastName)}";
-                suggestions.Add(new PrintableSuggestion(fullName, address.Address, type));
-            }
+                foreach (var address in contact.CommunicationAddresses)
+                {
+                    var fullName = contact.GetFullName();
+                    suggestions.Add(new Recipient(fullName, address.Address, type));
+                }
 
             return suggestions;
         }
@@ -49,10 +49,10 @@ namespace Mark5.Mobile.Common.Model
                 return false;
             if (ReferenceEquals(this, obj))
                 return true;
-            if (obj.GetType() != typeof(PrintableSuggestion))
+            if (obj.GetType() != typeof(Recipient))
                 return false;
 
-            var other = (PrintableSuggestion) obj;
+            var other = (Recipient)obj;
             return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase) && string.Equals(Address, other.Address, StringComparison.CurrentCultureIgnoreCase) && Type == other.Type;
         }
 
@@ -72,11 +72,11 @@ namespace Mark5.Mobile.Common.Model
 
         #endregion
 
-        public static int SortingComparison(PrintableSuggestion x, PrintableSuggestion y)
+        public static int SortingComparison(Recipient x, Recipient y)
         {
-            if (x.Type == SuggestionType.RecentAddress && y.Type != SuggestionType.RecentAddress)
+            if (x.Type == RecipientType.RecentAddress && y.Type != RecipientType.RecentAddress)
                 return -1;
-            if (x.Type != SuggestionType.RecentAddress && y.Type == SuggestionType.RecentAddress)
+            if (x.Type != RecipientType.RecentAddress && y.Type == RecipientType.RecentAddress)
                 return 1;
 
             var nameX = string.IsNullOrEmpty(x.Name) ? x.Address : x.Name;
@@ -85,7 +85,7 @@ namespace Mark5.Mobile.Common.Model
             return string.Compare(nameX, nameY, StringComparison.CurrentCulture);
         }
 
-        public static int LookupComparison(PrintableSuggestion x, PrintableSuggestion y)
+        public static int LookupComparison(Recipient x, Recipient y)
         {
             return x.GetHashCode().CompareTo(y.GetHashCode());
         }

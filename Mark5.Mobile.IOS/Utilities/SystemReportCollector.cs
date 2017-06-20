@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var mc = new MFMailComposeViewController();
             mc.SetToRecipients(new[]
             {
-                "support@nordic-it.com"
+                "appfeedback@nordic-it.com"
             });
             mc.SetSubject("MARK5 for iOS Feedback");
             mc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");

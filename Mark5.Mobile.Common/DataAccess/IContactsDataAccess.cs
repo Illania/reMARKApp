@@ -39,9 +39,9 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteCommentAsync(Contact contact, Comment comment);
 
-        Task<List<PrintableSuggestion>> GetSuggestions(string phrase);
-
         Task RemoveOrphans();
+
+        Task<List<Recipient>> GetSuggestions(string phrase);
 
         Task DeleteAllAsync();
     }

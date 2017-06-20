@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsListActivity)}...");
+            CommonConfig.Logger.Info($"Creating {nameof(CopyMoveToFolderListActivity)}...");
 
             OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 

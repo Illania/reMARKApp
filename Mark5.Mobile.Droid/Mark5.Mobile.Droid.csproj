@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.props')" />
   <PropertyGroup>
@@ -59,7 +59,7 @@
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
-    <AndroidSupportedAbis>armeabi;armeabi-v7a;arm64-v8a;x86;x86_64</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi;armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
     <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
@@ -205,6 +205,22 @@
     <Compile Include="Services\PushNotificationMessagingService.cs" />
     <Compile Include="Services\ReachabilityBroadcastReceiver.cs" />
     <Compile Include="Services\ReachabilityService.cs" />
+    <Compile Include="Utilities\ConversionUtils.cs" />
+    <Compile Include="Utilities\DateTimeUtils.cs" />
+    <Compile Include="Utilities\DeviceInfoProvider.cs" />
+    <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
+    <Compile Include="Utilities\Integration.cs" />
+    <Compile Include="Utilities\LocalNotificationsListener.cs" />
+    <Compile Include="Utilities\MimeTypeMap.cs" />
+    <Compile Include="Utilities\PhonebookUtilities.cs" />
+    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
+    <Compile Include="Utilities\Preferences.cs" />
+    <Compile Include="Utilities\PushNotificationsConverter.cs" />
+    <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
+    <Compile Include="Utilities\SimpleLogger.cs" />
+    <Compile Include="Utilities\SystemReportCollector.cs" />
+    <Compile Include="Utilities\UI.cs" />
+    <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Ui\Activities\CategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\CommentsListActivity.cs" />
     <Compile Include="Ui\Activities\ComposeDocumentActivity.cs" />
@@ -220,7 +236,13 @@
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
     <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
+    <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerShortcodesFolderListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerShortcodesListActivity.cs" />
     <Compile Include="Ui\Activities\PreferenceActivity.cs" />
+    <Compile Include="Ui\Activities\RecentAddressesListActivity.cs" />
     <Compile Include="Ui\Activities\SearchActivity.cs" />
     <Compile Include="Ui\Activities\SearchResultsActivity.cs" />
     <Compile Include="Ui\Activities\ShortcodeActivity.cs" />
@@ -258,32 +280,40 @@
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Fragments\ComposeDocumentFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
-    <Compile Include="Ui\Fragments\ContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchResultsFragment.cs" />
-    <Compile Include="Ui\Fragments\CopyMoveToFolderListFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchResultsFragment.cs" />
     <Compile Include="Ui\Fragments\EditCategoriesListFragment.cs" />
-    <Compile Include="Ui\Fragments\FoldersListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
     <Compile Include="Ui\Fragments\NotificationsListFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
     <Compile Include="Ui\Fragments\OutgoingDocumentsListFragment.cs" />
+    <Compile Include="Ui\Fragments\PhonebookContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\PickCountryFragment.cs" />
     <Compile Include="Ui\Fragments\PickDateRangeFragment.cs" />
     <Compile Include="Ui\Fragments\PickLinesListFragment.cs" />
     <Compile Include="Ui\Fragments\PickPrioritiesListFragment.cs" />
     <Compile Include="Ui\Fragments\PreferenceFragment.cs" />
+    <Compile Include="Ui\Fragments\RecentAddressesListFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodeFragment.cs" />
-    <Compile Include="Ui\Fragments\ShortcodesListFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodesSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ShortcodesSearchResultsFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\AbstractContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\ContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\PickerContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\CopyMoveToFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\FoldersListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\PickerContactFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\PickerShortcodesFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesList\AbstractShortcodesListFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesList\PickerShortcodesListFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesList\ShortcodesListFragment.cs" />
     <Compile Include="Ui\Views\ObjectActionsView.cs" />
     <Compile Include="Ui\Views\ObjectLinksView.cs" />
     <Compile Include="Ui\Views\Common\CustomWebView.cs" />
@@ -357,22 +387,6 @@
     <Compile Include="Ui\Views\ShortcodeViews\AddressesView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\DescriptionView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
-    <Compile Include="Utilities\ConversionUtils.cs" />
-    <Compile Include="Utilities\DateTimeUtils.cs" />
-    <Compile Include="Utilities\DeviceInfoProvider.cs" />
-    <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
-    <Compile Include="Utilities\Integration.cs" />
-    <Compile Include="Utilities\LocalNotificationsListener.cs" />
-    <Compile Include="Utilities\MimeTypeMap.cs" />
-    <Compile Include="Utilities\PhonebookUtilities.cs" />
-    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
-    <Compile Include="Utilities\Preferences.cs" />
-    <Compile Include="Utilities\PushNotificationsConverter.cs" />
-    <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
-    <Compile Include="Utilities\SimpleLogger.cs" />
-    <Compile Include="Utilities\SystemReportCollector.cs" />
-    <Compile Include="Utilities\UI.cs" />
-    <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Ui\Activities\DownloadActivity.cs" />
     <Compile Include="Ui\Fragments\DownloadFragment.cs" />
   </ItemGroup>
@@ -653,6 +667,11 @@
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\xml\network_security_config.xml" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
+    <AndroidResource Include="Resources\layout\list_item_recipients.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
     <AndroidResource Include="Resources\layout\download.axml" />
   </ItemGroup>
   <ItemGroup>

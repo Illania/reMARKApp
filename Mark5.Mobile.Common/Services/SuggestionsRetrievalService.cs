@@ -10,7 +10,7 @@ namespace Mark5.Mobile.Common.Services
 {
     public class SuggestionsRetrievalService
     {
-        public void GetSuggestions(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
+        public void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -20,18 +20,18 @@ namespace Mark5.Mobile.Common.Services
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
-        public void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
+        public void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
 
             Task.Run(async () =>
             {
-                var filtered = new List<PrintableSuggestion>();
+                var filtered = new List<Recipient>();
                 try
                 {
                     var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync();
-                    filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase)).Select(ra => new PrintableSuggestion(ra)).ToList();
+                    filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase)).Select(ra => new Recipient(ra)).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -41,27 +41,26 @@ namespace Mark5.Mobile.Common.Services
             });
         }
 
-        public void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
+        public void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
 
             Task.Run(() =>
             {
-                var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Contact>();
-                var filtered = PrintableSuggestion.GetPrintableSuggestionsFromContacts(phonebookContacts, SuggestionType.Phonebook);
-                handler(filtered, token);
+                var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Recipient>();
+                handler(phonebookContacts, token);
             });
         }
 
-        public void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<PrintableSuggestion>, CancellationToken> handler)
+        public void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
 
             Task.Run(async () =>
             {
-                var filtered = new List<PrintableSuggestion>();
+                var filtered = new List<Recipient>();
                 try
                 {
                     filtered = await Managers.Managers.ContactsManager.GetSuggestions(phrase);
