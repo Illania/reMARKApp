@@ -188,6 +188,8 @@
 "no_templates" = "No templates";
 "no_templates_content" = "There are no templates defined for this creation mode.";
 "no_templates_title" = "No templates";
+"no_public_templates" = "No public templates";
+"no_private_templates" = "No private templates";
 "normal" = "Normal";
 "notifications" = "Notifications";
 "ok" = "OK";

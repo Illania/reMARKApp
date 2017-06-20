@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
@@ -24,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         DataSource dataSource;
         UISearchController searchController;
         UITableViewController searchResultsController;
-        DataSource searchResultsDataSource;
+        FilterDataSource searchResultsDataSource;
 
         CancellationTokenSource cts;
         CancellationTokenSource searchCancellationTokenSource;
@@ -100,7 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            tableView = new UITableView();
+            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
             tableView.Source = dataSource = new DataSource(this, tableView, Localization.GetString("no_templates"));
             tableView.EstimatedRowHeight = 40f;
             tableView.RowHeight = UITableView.AutomaticDimension;
@@ -121,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_templates"));
+            searchResultsDataSource = new FilterDataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_templates"));
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -286,6 +287,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
+                if (templatesInView[indexPath.Section].Count < 1)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+
+                    if (indexPath.Section == 0)
+                        emptyCell.Initialize(Localization.GetString("no_private_templates"));
+                    else
+                        emptyCell.Initialize(Localization.GetString("no_public_templates"));
+
+                    return emptyCell;
+                }
+
                 var tp = templatesInView[indexPath.Section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(TemplatesTableViewCell.Key) as TemplatesTableViewCell ?? TemplatesTableViewCell.Create();
@@ -310,22 +323,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading || Empty)
+                if (loading || templatesInView[(int)section].Count < 1)
                     return 1;
 
                 return templatesInView[(int)section].Count;
             }
 
-            public override nfloat GetHeightForHeader(UITableView tableView, nint section)
-            {
-                if (loading || Empty || !templatesInView[(int)section].Any())
-                    return 0;
-
-                return UITableView.AutomaticDimension;
-            }
-
             public override string TitleForHeader(UITableView tableView, nint section)
             {
+                if (Empty)
+                    return string.Empty;
+
                 return section == 0 ? Localization.GetString("private") : Localization.GetString("public");
             }
 
@@ -349,9 +357,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 tableView.BeginUpdates();
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.InsertSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
+                if (!Empty)
+                    tableView.InsertSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
-
             }
 
             public void Reset()
@@ -366,6 +374,98 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (!empty)
                     tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, 1)), UITableViewRowAnimation.Fade);
                 tableView.EndUpdates();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+
+                viewController = null;
+                tableView = null;
+                templatesInView = null;
+            }
+        }
+
+        class FilterDataSource : UITableViewSource, IDisposable
+        {
+            public bool Empty { get { return !templatesInView.Any(); } }
+
+            List<TemplatePreview> templatesInView = new List<TemplatePreview>(25);
+
+            UITableView tableView;
+            string emptyText;
+            TemplatesListViewController viewController;
+
+            bool loading = true;
+
+            public FilterDataSource(TemplatesListViewController viewController, UITableView tableView, string emptyText)
+            {
+                this.tableView = tableView;
+                this.emptyText = emptyText;
+                this.viewController = viewController;
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+
+                if (Empty)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    emptyCell.Initialize(emptyText);
+                    return emptyCell;
+                }
+
+                var tp = templatesInView[indexPath.Row];
+
+                var cell = tableView.DequeueReusableCell(TemplatesTableViewCell.Key) as TemplatesTableViewCell ?? TemplatesTableViewCell.Create();
+                cell.Initialize(tp);
+
+                return cell;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var tp = templatesInView[indexPath.Row];
+                viewController.TemplateSelected(tp);
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (loading || Empty)
+                    return 1;
+
+                return templatesInView.Count;
+            }
+
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
+            {
+                var v = headerView as UITableViewHeaderFooterView;
+                if (v == null)
+                    return;
+
+                v.TextLabel.TextColor = Theme.DarkerBlue;
+            }
+
+            public void SetItems(List<TemplatePreview> templatePreviews)
+            {
+                loading = false;
+
+                templatesInView.Clear();
+
+                templatesInView.AddRange(templatePreviews.OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+
+                var empty = Empty;
+                templatesInView.Clear();
+
+                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             protected override void Dispose(bool disposing)

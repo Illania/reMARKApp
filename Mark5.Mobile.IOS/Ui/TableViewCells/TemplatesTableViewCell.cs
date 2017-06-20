@@ -18,9 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static TemplatesTableViewCell Create()
         {
-            var cell = (TemplatesTableViewCell) Nib.Instantiate(null, null)[0];
+            var cell = (TemplatesTableViewCell)Nib.Instantiate(null, null)[0];
 
-            cell.BackgroundColor = UIColor.Clear;
             cell.NameLabel.Font = Theme.DefaultFont;
 
             return cell;
