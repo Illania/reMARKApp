@@ -92,8 +92,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         #region IWKScriptMessageHandler
 
-        Stopwatch sw;
-
         [Export("userContentController:didReceiveScriptMessage:")]
         public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
@@ -101,36 +99,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             if (responseDict == null)
                 return;
 
-            var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
-            var resizedNumber = responseDict["resized"] as NSNumber;
+            Action<WKWebView, NSLayoutConstraint> resizeAction = null;
+            resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
+                () =>
+                {
+                    if (wv.IsLoading)
+                    {
+                        resizeAction(wv, nslc);
+                    }
+                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
+                    {
+                        nslc.Constant = wv.ScrollView.ContentSize.Height;
+
+                        SetNeedsLayout();
+                    }
+                });
 
             if (responseDict["domLoaded"] is NSNumber domLoadedNumber && domLoadedNumber.BoolValue)
             {
-                Task.Run(async () =>
-               {
-                   await Task.Delay(3000);
-                   webView.StopLoading();
-               });
+                DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3000)),
+                                                      () =>
+                                                      {
+                                                          webView.StopLoading();
+                                                          resizeAction(webView, webViewHeightConstraint);
+                                                      });
             }
-
-            if (justLoadedNumber != null && justLoadedNumber.BoolValue
-                || resizedNumber != null && resizedNumber.BoolValue)
+            else if (responseDict["justLoaded"] is NSNumber justLoadedNumber && justLoadedNumber.BoolValue
+                || responseDict["resized"] is NSNumber resizedNumber && resizedNumber.BoolValue)
             {
-                Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
-                    () =>
-                    {
-                        if (wv.IsLoading)
-                        {
-                            resizeAction(wv, nslc);
-                        }
-                        else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
-                        {
-                            nslc.Constant = wv.ScrollView.ContentSize.Height;
-
-                            SetNeedsLayout();
-                        }
-                    });
                 resizeAction(webView, webViewHeightConstraint);
             }
         }
