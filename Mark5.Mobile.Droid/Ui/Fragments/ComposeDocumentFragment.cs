@@ -191,21 +191,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+                UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+                UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+                UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
             {
                 var shortcode = SerializationUtils.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
                 AddAddressesFromShortcode(shortcode);
+                UpdateSendButtonState();
             }
         }
 
