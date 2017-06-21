@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -258,6 +258,15 @@
 		<Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
+		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs">
+		  <DependentUpon>TemplatesTableViewCell.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs">
+		  <DependentUpon>TemplatesSearchResultsTableViewCell.cs</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -366,6 +375,8 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
+		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesTableViewCell.xib" />
+		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">

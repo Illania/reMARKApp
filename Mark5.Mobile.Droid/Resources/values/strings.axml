@@ -153,6 +153,7 @@
 	<string name="no_results_contacts">No contacts were found</string>
 	<string name="no_results_documents">No emails were found</string>
 	<string name="no_results_shortcodes">No shortcodes were found</string>
+	<string name="no_templates">There are no templates</string>
 	<string name="no_templates_content">There are no templates defined for this creation mode</string>
 	<string name="no_templates_title">No templates</string>
 	<string name="notification_token_missing_content">The notification token was not set. Please try again later.</string>
@@ -176,6 +177,8 @@
 	<string name="priority_low">Low</string>
 	<string name="priority_normal">Normal</string>
 	<string name="priority_urgent">Urgent</string>
+	<string name="public_header">Public</string>
+	<string name="private_header">Private</string>
 	<string name="phonebook_contacts_no_access_title">Phonebook access refused</string>
 	<string name="phonebook_contacts_no_access_content">You need to grant MARK5 access to the Phonebook in order to use this functionality</string>
 	<string name="read_by">Read by:</string>
@@ -286,6 +289,7 @@
 	<string name="subject">Subject</string>
 	<string name="subscribe_folder">Subscribe</string>
 	<string name="subscribing_folders">Subscribing to folders...</string>
+	<string name="templates">Templates</string>
 	<string name="template_null">You do not have a default template set</string>
 	<string name="template_question">Which template do you want to use?</string>
 	<string-array name="template_question_options">

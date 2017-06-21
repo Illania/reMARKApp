@@ -1113,47 +1113,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task GetAllTemplates()
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_templates___"));
-            List<TemplatePreview> templatesPreviews = null;
+            var tp = new TemplatesListViewController();
+            PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
 
-            try
-            {
-                templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+            var templatePreview = await tp.ResultTask;
 
-                templatesPreviews = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None)
-                                                     .OrderByDescending(tp => tp.Private).ThenBy(tp => tp.Name)
-                                                     .ToList();
+            DismissViewController(true, null);
 
-                dismissAction();
-
-                if (templatesPreviews.Any())
-                {
-                    var templateNames = templatesPreviews.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
-
-                    var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_question"), templateNames, contentView);
-
-                    if (result >= 0)
-                    {
-                        var selectedPreview = templatesPreviews[result];
-                        await GetTemplate(selectedPreview);
-                    }
-                    else
-                    {
-                        await AskIfShouldUseTemplates();
-                    }
-                }
-                else
-                {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("no_templates_title"), Localization.GetString("no_templates_content"));
-                }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
-
-                dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
+            if (templatePreview != null)
+                await GetTemplate(templatePreview);
         }
 
         async Task GetLocalTemplate()
