@@ -263,6 +263,10 @@
 		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs">
 		  <DependentUpon>TemplatesTableViewCell.cs</DependentUpon>
 		</Compile>
+		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs">
+		  <DependentUpon>TemplatesSearchResultsTableViewCell.cs</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -372,6 +376,7 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesTableViewCell.xib" />
+		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">

@@ -124,6 +124,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchResultsController = new UITableViewController();
             searchResultsDataSource = new FilterDataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_templates"));
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
+            searchResultsController.TableView.EstimatedRowHeight = 50f;
 
             searchController = new UISearchController(searchResultsController)
             {
@@ -419,7 +421,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var tp = templatesInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(TemplatesTableViewCell.Key) as TemplatesTableViewCell ?? TemplatesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(TemplatesSearchResultsTableViewCell.Key) as TemplatesSearchResultsTableViewCell ?? TemplatesSearchResultsTableViewCell.Create();
                 cell.Initialize(tp);
 
                 return cell;
@@ -437,15 +439,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return 1;
 
                 return templatesInView.Count;
-            }
-
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
-            {
-                var v = headerView as UITableViewHeaderFooterView;
-                if (v == null)
-                    return;
-
-                v.TextLabel.TextColor = Theme.DarkerBlue;
             }
 
             public void SetItems(List<TemplatePreview> templatePreviews)
