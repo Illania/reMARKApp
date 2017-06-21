@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using CoreFoundation;
 using CoreGraphics;
 using Foundation;
@@ -15,6 +17,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
 
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
+
+        static readonly NSString script3 = new NSString("document.addEventListener(\"DOMContentLoaded\", function () {window.webkit.messageHandlers.sizeNotification.postMessage({domLoaded:true});});");
 
         WKWebView webView;
         NSLayoutConstraint webViewHeightConstraint;
@@ -43,10 +47,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
+            userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
             var configuration = new WKWebViewConfiguration();
@@ -86,6 +92,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         #region IWKScriptMessageHandler
 
+        Stopwatch sw;
+
         [Export("userContentController:didReceiveScriptMessage:")]
         public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
@@ -96,7 +104,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
 
-            if (justLoadedNumber != null && justLoadedNumber.BoolValue || resizedNumber != null && resizedNumber.BoolValue)
+            if (responseDict["domLoaded"] is NSNumber domLoadedNumber && domLoadedNumber.BoolValue)
+            {
+                Task.Run(async () =>
+               {
+                   await Task.Delay(3000);
+                   webView.StopLoading();
+               });
+            }
+
+            if (justLoadedNumber != null && justLoadedNumber.BoolValue
+                || resizedNumber != null && resizedNumber.BoolValue)
             {
                 Action<WKWebView, NSLayoutConstraint> resizeAction = null;
                 resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
