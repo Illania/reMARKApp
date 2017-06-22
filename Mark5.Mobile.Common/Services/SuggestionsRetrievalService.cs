@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Common.Services
                 var filtered = new List<Recipient>();
                 try
                 {
-                    var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync();
+                    var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync(phrase.Length < 2 ? SourceType.Remote : SourceType.Local);
                     filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase)).Select(ra => new Recipient(ra)).ToList();
                 }
                 catch (Exception ex)
