@@ -455,6 +455,7 @@ namespace Mark5.Mobile.Common.DataAccess
                         + $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) "
                         + $" and ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase) "
                         + $" or (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase)) "
+                        + $"limit 100 "
                         + " collate Nocase";
                     var cmd = c.CreateCommand(commandString);
                     cmd.Bind("@phrase", $"%{phrase}%");
