@@ -1,6 +1,5 @@
 using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
+using System.Threading;
 using CoreFoundation;
 using CoreGraphics;
 using Foundation;
@@ -25,6 +24,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
 
+        UIActivityIndicatorView spinner;
+
+        CancellationTokenSource cts;
+
         public ContentView(Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
         {
             this.navigationActionDelegate = navigationActionDelegate;
@@ -32,6 +35,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void CreateWebView()
         {
+            if (spinner != null)
+            {
+                spinner.RemoveFromSuperview();
+            }
+
+            spinner = null;
+
+            spinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
+            spinner.TranslatesAutoresizingMaskIntoConstraints = false;
+            spinner.HidesWhenStopped = true;
+            ContainerView.AddSubview(spinner);
+            ContainerView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.CenterX, 1f, 0f),
+                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+            });
+
+            spinner.StartAnimating();
+
             if (webView != null)
             {
                 webView.RemoveFromSuperview();
@@ -72,8 +94,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             ContainerView.AddSubview(webView);
             ContainerView.AddConstraints(new[]
             {
-                webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
-                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
+                webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 0f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spinner, NSLayoutAttribute.Bottom, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.GreaterThanOrEqual, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
@@ -99,35 +122,65 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             if (responseDict == null)
                 return;
 
-            Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-            resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
+            var domLoadedNumber = responseDict["domLoaded"] as NSNumber;
+            var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
+            var resizedNumber = responseDict["resized"] as NSNumber;
+
+            Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> resizeAction = null;
+            resizeAction = (wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
                 () =>
                 {
+                    if (wv != webView)
+                        return;
+
+                    CommonConfig.Logger.Debug($"{wv.GetHashCode()} - RESIZE ACTION ");
+
                     if (wv.IsLoading)
                     {
-                        resizeAction(wv, nslc);
+                        CommonConfig.Logger.Debug($"{wv.GetHashCode()} - IS LOADING ");
+
+                        resizeAction(wv, sv, nslc);
                     }
-                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
+                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height && wv.ScrollView.ContentSize.Height > 1)
                     {
+                        CommonConfig.Logger.Debug($"{wv.GetHashCode()} - INCREASING HEIGHT FROM {nslc.Constant} TO {wv.ScrollView.ContentSize.Height} ");
+                        sv.RemoveFromSuperview();
+
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
 
                         SetNeedsLayout();
                     }
                 });
 
-            if (responseDict["domLoaded"] is NSNumber domLoadedNumber && domLoadedNumber.BoolValue)
-            {
-                DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3000)),
-                                                      () =>
+            Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> stopLoadingAction = null;
+            stopLoadingAction = (wv, sv, nslc) =>
+            DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)),
+                                                  () =>
+                                                  {
+                                                      if (wv != webView)
+                                                          return;
+
+                                                      CommonConfig.Logger.Debug($"{wv.GetHashCode()} - TIMEOUT ");
+
+                                                      if (wv.IsLoading)
                                                       {
-                                                          webView.StopLoading();
-                                                          resizeAction(webView, webViewHeightConstraint);
-                                                      });
-            }
-            else if (responseDict["justLoaded"] is NSNumber justLoadedNumber && justLoadedNumber.BoolValue
-                || responseDict["resized"] is NSNumber resizedNumber && resizedNumber.BoolValue)
+                                                          CommonConfig.Logger.Debug($"{wv.GetHashCode()} - STOP LOADING ");
+
+                                                          wv.StopLoading();
+                                                          resizeAction(wv, sv, nslc);
+                                                      }
+                                                  });
+
+            if (domLoadedNumber != null && domLoadedNumber.BoolValue)
             {
-                resizeAction(webView, webViewHeightConstraint);
+                CommonConfig.Logger.Debug($"{webView.GetHashCode()} - DOM LOADED ");
+                stopLoadingAction(webView, spinner, webViewHeightConstraint);
+            }
+            else if (justLoadedNumber != null && justLoadedNumber.BoolValue
+                     || resizedNumber != null && resizedNumber.BoolValue)
+            {
+                CommonConfig.Logger.Debug($"{webView.GetHashCode()} - JUST_LOADED={justLoadedNumber} / RESIZED={resizedNumber} ");
+                resizeAction(webView, spinner, webViewHeightConstraint);
             }
         }
 
@@ -137,10 +190,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public override void RefreshView()
         {
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
             if (Document == null)
                 return;
 
             CreateWebView();
+
+            CommonConfig.Logger.Debug($"REFRESHING - SUB = {DocumentPreview.Subject}");
 
             if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 SetContent(ContentType.PlainText, Document.PlainTextBody);
@@ -167,69 +225,79 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void SetContent(ContentType contentType, string content)
         {
-            DispatchQueue.MainQueue.DispatchAsync(() =>
-            {
-                webView.StopLoading();
+            Action<CancellationToken> setContentAction;
 
-                if (content == null)
-                {
-                    webView.LoadData(NSData.FromString("Content could not be loaded."), "text/plain", "UTF-8", new NSUrl("/"));
-                    return;
-                }
+            setContentAction = (ct) => DispatchQueue.MainQueue.DispatchAsync(() =>
+             {
+                 if (ct.IsCancellationRequested)
+                 {
+                     CommonConfig.Logger.Debug("CANCELLATION REQUESTED ");
+                     return;
+                 }
 
-                switch (contentType)
-                {
-                    case ContentType.Html:
-                        try
-                        {
-                            HtmlNode headNode = null;
+                 webView.StopLoading();
 
-                            var htmlDoc = new HtmlDocument();
-                            htmlDoc.LoadHtml(content);
+                 if (content == null)
+                 {
+                     webView.LoadData(NSData.FromString("Content could not be loaded."), "text/plain", "UTF-8", new NSUrl("/"));
+                     return;
+                 }
 
-                            foreach (var childNode1 in htmlDoc.DocumentNode.ChildNodes)
-                            {
-                                if (headNode != null)
-                                    break;
+                 switch (contentType)
+                 {
+                     case ContentType.Html:
+                         try
+                         {
+                             HtmlNode headNode = null;
 
-                                if (childNode1.Name == "head")
-                                {
-                                    headNode = childNode1;
-                                    break;
-                                }
+                             var htmlDoc = new HtmlDocument();
+                             htmlDoc.LoadHtml(content);
 
-                                foreach (var childNode2 in childNode1.ChildNodes)
-                                    if (childNode2.Name == "head")
-                                    {
-                                        headNode = childNode2;
-                                        break;
-                                    }
-                            }
+                             foreach (var childNode1 in htmlDoc.DocumentNode.ChildNodes)
+                             {
+                                 if (headNode != null)
+                                     break;
 
-                            if (htmlDoc != null && headNode != null)
-                            {
-                                var metaElement = htmlDoc.CreateElement("meta");
-                                metaElement.SetAttributeValue("name", "viewport");
-                                metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.5, maximum-scale=2");
-                                headNode.AppendChild(metaElement);
-                                content = htmlDoc.DocumentNode.OuterHtml;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            CommonConfig.Logger.Warning("Could not process and insert viewport tag", ex);
-                        }
+                                 if (childNode1.Name == "head")
+                                 {
+                                     headNode = childNode1;
+                                     break;
+                                 }
 
-                        webView.LoadHtmlString(content, null);
-                        break;
-                    case ContentType.PlainText:
-                        webView.LoadData(NSData.FromString(content), "text/plain", "UTF-8", new NSUrl("/"));
-                        break;
-                    default:
-                        webView.LoadData(NSData.FromString(string.Empty), "text/plain", "UTF-8", new NSUrl("/"));
-                        break;
-                }
-            });
+                                 foreach (var childNode2 in childNode1.ChildNodes)
+                                     if (childNode2.Name == "head")
+                                     {
+                                         headNode = childNode2;
+                                         break;
+                                     }
+                             }
+
+                             if (htmlDoc != null && headNode != null)
+                             {
+                                 var metaElement = htmlDoc.CreateElement("meta");
+                                 metaElement.SetAttributeValue("name", "viewport");
+                                 metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.5, maximum-scale=2");
+                                 headNode.AppendChild(metaElement);
+                                 content = htmlDoc.DocumentNode.OuterHtml;
+                             }
+                         }
+                         catch (Exception ex)
+                         {
+                             CommonConfig.Logger.Warning("Could not process and insert viewport tag", ex);
+                         }
+
+                         webView.LoadHtmlString(content, null);
+                         break;
+                     case ContentType.PlainText:
+                         webView.LoadData(NSData.FromString(content), "text/plain", "UTF-8", new NSUrl("/"));
+                         break;
+                     default:
+                         webView.LoadData(NSData.FromString(string.Empty), "text/plain", "UTF-8", new NSUrl("/"));
+                         break;
+                 }
+             });
+
+            setContentAction(cts.Token);
         }
 
         #endregion
