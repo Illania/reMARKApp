@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static CategoriesTableViewCell Create()
         {
-            return (CategoriesTableViewCell) Nib.Instantiate(null, null)[0];
+            return (CategoriesTableViewCell)Nib.Instantiate(null, null)[0];
         }
 
         #region UITableViewCell overrides

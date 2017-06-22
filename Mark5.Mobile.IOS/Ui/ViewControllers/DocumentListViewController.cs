@@ -9,7 +9,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -1262,10 +1261,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void RemoveItems(List<int> documentIds)
             {
                 var indices = Items.Select((d, i) => new
-                    {
-                        d,
-                        i
-                    })
+                {
+                    d,
+                    i
+                })
                     .Where(x => documentIds.Contains(x.d.Id))
                     .Select(x => x.i)
                     .ToList();

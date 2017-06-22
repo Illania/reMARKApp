@@ -610,7 +610,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         ModalPresentationStyle = UIModalPresentationStyle.PageSheet
                     };
                     if (picker.PopoverPresentationController != null)
-                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
                     PresentViewController(picker, true, null);
                 }));
             sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("existing_photo"),
@@ -629,7 +629,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         ModalPresentationStyle = UIModalPresentationStyle.PageSheet
                     };
                     if (picker.PopoverPresentationController != null)
-                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
                     PresentViewController(picker, true, null);
                 }));
             sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"),
@@ -648,13 +648,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
                     };
                     if (picker.PopoverPresentationController != null)
-                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
                     PresentViewController(picker, true, null);
                 }));
             sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (sourceChooser.PopoverPresentationController != null)
-                sourceChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                sourceChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(sourceChooser, true, null);
         }
@@ -717,7 +717,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             try
             {
-                var sizeInBytes = (long) jpegData.Length;
+                var sizeInBytes = (long)jpegData.Length;
                 stream = jpegData.AsStream();
 
                 if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
@@ -858,6 +858,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await DoOpenPhonebook(sender as RecipientsView);
                     break;
             }
+
+            sendButtonItem.Enabled = IsFormValid();
         }
 
         void RecipientView_SearchRequested(object sender, string initialSearchString)
@@ -882,7 +884,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 View.SendSubviewToBack(suggestionsListView);
             }
 
-            var recipientView = (RecipientsView) sender;
+            var recipientView = (RecipientsView)sender;
             suggestionsListView.Initialize(recipientView, initialSearchString);
 
             View.BringSubviewToFront(suggestionsListView);
@@ -1111,47 +1113,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task GetAllTemplates()
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_templates___"));
-            List<TemplatePreview> templatesPreviews = null;
+            var tp = new TemplatesListViewController();
+            PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
 
-            try
-            {
-                templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+            var templatePreview = await tp.ResultTask;
 
-                templatesPreviews = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None)
-                                                     .OrderByDescending(tp => tp.Private).ThenBy(tp => tp.Name)
-                                                     .ToList();
+            DismissViewController(true, null);
 
-                dismissAction();
-
-                if (templatesPreviews.Any())
-                {
-                    var templateNames = templatesPreviews.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
-
-                    var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_question"), templateNames, contentView);
-
-                    if (result >= 0)
-                    {
-                        var selectedPreview = templatesPreviews[result];
-                        await GetTemplate(selectedPreview);
-                    }
-                    else
-                    {
-                        await AskIfShouldUseTemplates();
-                    }
-                }
-                else
-                {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("no_templates_title"), Localization.GetString("no_templates_content"));
-                }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
-
-                dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
+            if (templatePreview != null)
+                await GetTemplate(templatePreview);
         }
 
         async Task GetLocalTemplate()
@@ -1281,12 +1251,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 try
                 {
                     NSData jpegImage;
-                    using (var image = (UIImage) info[UIImagePickerController.OriginalImage])
+                    using (var image = (UIImage)info[UIImagePickerController.OriginalImage])
                     {
                         jpegImage = image.AsJPEG();
                     }
 
-                    var referenceUrl = (NSUrl) info[UIImagePickerController.ReferenceUrl];
+                    var referenceUrl = (NSUrl)info[UIImagePickerController.ReferenceUrl];
 
                     string filename;
                     if (referenceUrl != null)
@@ -1296,7 +1266,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                                 referenceUrl
                             },
                             null);
-                        var asset = (PHAsset) results.firstObject;
+                        var asset = (PHAsset)results.firstObject;
 
                         var assetResources = PHAssetResource.GetAssetResources(asset);
                         filename = assetResources[0].OriginalFilename;

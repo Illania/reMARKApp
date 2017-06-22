@@ -174,6 +174,7 @@
 "no_matching_categories" = "There are no matching categories";
 "no_matching_contacts" = "There are no matching contacts";
 "no_matching_documents" = "There are no matching emails";
+"no_matching_templates" = "There are no matching templates";
 "no_matching_shortcodes" = "There are no matching shortcodes";
 "no_matching_users" = "There are no matching users";
 "no_notifications" = "There are no new notifications";
@@ -182,8 +183,11 @@
 "no_object_links" = "There are no links";
 "no_subject" = "No subject";
 "no_suggestions_available" = "No suggestions available";
+"no_templates" = "No templates";
 "no_templates_content" = "There are no templates defined for this creation mode.";
 "no_templates_title" = "No templates";
+"no_public_templates" = "No public templates";
+"no_private_templates" = "No private templates";
 "normal" = "Normal";
 "notifications" = "Notifications";
 "ok" = "OK";
@@ -207,6 +211,8 @@
 "priority_low" = "Low";
 "priority_normal" = "Normal";
 "priority_urgent" = "High";
+"private" = "Private";
+"public" = "Public";
 "read_by" = "Read by";
 "reference_number" = "Reference number";
 "remove_from_favorites" = "Remove from\nfavorites";
@@ -288,6 +294,7 @@
 "take_photo" = "Capture new photo";
 "tap_select_line" = "Tap to select a mailbox";
 "telex" = "Telex";
+"templates" = "Templates";
 "template_null" = "You do not have a default template set.";
 "template_question" = "Which template do you want to use?";
 "template_selection_another" = "Another template";

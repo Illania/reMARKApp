@@ -36,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int ContactsRequestCode = 333;
             public const int ShortcodesRequestCode = 444;
             public const int PhonebookRequestCode = 555;
+            public const int TemplatePreviewRequestCode = 666;
         }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
@@ -183,7 +184,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Paused {nameof(ComposeDocumentFragment)}");
         }
 
-        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
                 HandleLocalAttachment(data);
@@ -191,21 +192,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+                UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+                UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
+                UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
             {
                 var shortcode = SerializationUtils.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
                 AddAddressesFromShortcode(shortcode);
+                UpdateSendButtonState();
+            }
+            if (requestCode == RequestCodes.TemplatePreviewRequestCode && resultCode == (int)Result.Ok)
+            {
+                var template = SerializationUtils.Deserialize<TemplatePreview>(data.GetStringExtra(TemplatesListActivity.TemplatePreviewResultKey));
+                await GetTemplate(template);
             }
         }
 
@@ -325,16 +335,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             switch (choice)
             {
                 case 0:
-                    DoOpenRecentAddresses(sender as RecipientsView);
+                    DoOpenRecentAddresses();
                     break;
                 case 1:
-                    DoOpenContacts(sender as RecipientsView);
+                    DoOpenContacts();
                     break;
                 case 2:
                     DoOpenShortcodes();
                     break;
                 case 3:
-                    DoOpenPhonebook(sender as RecipientsView);
+                    DoOpenPhonebook();
                     break;
             }
 
@@ -342,13 +352,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 focusedRecipientiView.RequestEditorFocus();
         }
 
-        void DoOpenRecentAddresses(RecipientsView v)
+        void DoOpenRecentAddresses()
         {
             var i = new Intent(Activity, typeof(RecentAddressesListActivity));
             StartActivityForResult(i, RequestCodes.RecentAddressesRequestCode);
         }
 
-        void DoOpenContacts(RecipientsView v)
+        void DoOpenContacts()
         {
             var i = new Intent(Activity, typeof(PickerContactFolderListActivity));
             StartActivityForResult(i, RequestCodes.ContactsRequestCode);
@@ -360,7 +370,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             StartActivityForResult(i, RequestCodes.ShortcodesRequestCode);
         }
 
-        void DoOpenPhonebook(RecipientsView v)
+        void DoOpenPhonebook()
         {
             var i = new Intent(Activity, typeof(PhonebookContactsListActivity));
             StartActivityForResult(i, RequestCodes.PhonebookRequestCode);
@@ -798,7 +808,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         await GetLocalTemplate();
                         break;
                     case 2:
-                        await GetAllTemplates();
+                        GetAllTemplates();
                         break;
                 }
             }
@@ -806,41 +816,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             templateLoaded = true;
         }
 
-        async Task GetAllTemplates()
+        void GetAllTemplates()
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_templates, Resource.String.please_wait);
-            List<TemplatePreview> templatesPreviews = null;
-
-            try
-            {
-                templatesPreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
-
-                templatesPreviews = templatesPreviews.Where(t => t.CreationMode.HasFlag(CreationModeFlag) || t.CreationMode == DocumentCreationModeFlag.None)
-                                                     .OrderByDescending(tp => tp.Private).ThenBy(tp => tp.Name)
-                                                     .ToList();
-
-                dismissAction();
-
-                if (templatesPreviews.Any())
-                {
-                    var templateNames = templatesPreviews.Select(t => (t.Private ? "[Private] " : "[Public] ") + t.Name).ToArray();
-
-                    var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, templateNames, true);
-                    var selectedPreview = templatesPreviews[result];
-                    await GetTemplate(selectedPreview);
-                }
-                else
-                {
-                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.no_templates_title, Resource.String.no_templates_content);
-                }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
-
-                dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
+            var i = new Intent(Context, typeof(TemplatesListActivity));
+            StartActivityForResult(i, RequestCodes.TemplatePreviewRequestCode);
         }
 
         async Task GetLocalTemplate()

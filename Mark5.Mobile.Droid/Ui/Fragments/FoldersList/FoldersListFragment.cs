@@ -1127,9 +1127,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (sectionsInView.Count <= 1)
                     return new Dictionary<int, Section>();
 
-                var positions = new Dictionary<int, Section>();
-                positions.Add(0, sectionsInView[0]);
-
+                var positions = new Dictionary<int, Section>
+                {
+                    { 0, sectionsInView[0] }
+                };
                 var previousSectionPosition = 0;
                 var previousSectionItemsCount = foldersInSection[sectionsInView[0]].Count;
                 for (var i = 1; i < sectionsInView.Count; i++)

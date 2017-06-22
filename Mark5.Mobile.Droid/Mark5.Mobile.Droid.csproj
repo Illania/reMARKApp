@@ -667,6 +667,7 @@
     <AndroidResource Include="Resources\xml\filepaths.xml" />
     <AndroidResource Include="Resources\xml\network_security_config.xml" />
     <AndroidResource Include="Resources\xml\preferences.axml" />
+    <AndroidResource Include="Resources\layout\list_item_templates.axml" />
     <AndroidResource Include="Resources\layout\list_item_recipients.axml" />
     <AndroidResource Include="Resources\drawable-hdpi\add.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\add.png" />
