@@ -68,7 +68,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
 
-            ReachabilityBar.Attach(View, commentsTableView, (float) (NavigationController.BottomLayoutGuide.Length + commentEditView.Frame.Height));
+            ReachabilityBar.Attach(View, commentsTableView, (float)(NavigationController.BottomLayoutGuide.Length + commentEditView.Frame.Height));
         }
 
         public override void ViewDidAppear(bool animated)
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(CommentsListViewController)} appeared");
 
-            var ds = (DataSource) commentsTableView.Source;
+            var ds = (DataSource)commentsTableView.Source;
             if (ds.Empty)
                 RefreshView();
         }
@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentEditView = new UIView();
             commentEditView.BackgroundColor = UIColor.FromRGB(248f / 255f, 248f / 255f, 248f / 255f);
             commentEditView.TranslatesAutoresizingMaskIntoConstraints = false;
-            commentEditView.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            commentEditView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             commentEditViewBottomConstraint = NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
             View.AddSubview(commentEditView);
             View.AddConstraints(new[]
@@ -145,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var borderView = new UIView();
             borderView.BackgroundColor = UIColor.LightGray;
             borderView.TranslatesAutoresizingMaskIntoConstraints = false;
-            borderView.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            borderView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             commentEditView.AddSubview(borderView);
             commentEditView.AddConstraints(new[]
             {
@@ -161,10 +161,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             addComment.Enabled = false;
             addComment.Opaque = false;
             addComment.TranslatesAutoresizingMaskIntoConstraints = false;
-            addComment.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            addComment.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            addComment.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            addComment.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            addComment.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            addComment.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            addComment.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            addComment.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             commentEditView.AddSubview(addComment);
             commentEditView.AddConstraints(new[]
             {
@@ -260,7 +260,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             commentContent.EndEditing(true);
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("add_comment___"));
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("adding_comment___"));
             var newCommentContent = commentContent.Text;
 
             try
@@ -483,7 +483,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 targetHeight = Math.Min(targetHeight, commentEditView.Frame.Bottom - NavigationController.NavigationBar.Frame.Bottom - 2 * CommentEditViewInnerMargin);
                 if (targetHeight >= 0f)
                 {
-                    commentContentMaximumHeightConstraint.Constant = (nfloat) targetHeight;
+                    commentContentMaximumHeightConstraint.Constant = (nfloat)targetHeight;
                     commentContent.ScrollEnabled = heightThatFits > targetHeight;
                 }
             }
