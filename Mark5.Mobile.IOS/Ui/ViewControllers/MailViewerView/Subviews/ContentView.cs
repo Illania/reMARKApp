@@ -15,10 +15,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
 
+        static readonly NSString script3 = new NSString("document.addEventListener(\"DOMContentLoaded\", function () {window.webkit.messageHandlers.sizeNotification.postMessage({domLoaded:true});});");
+
         WKWebView webView;
         NSLayoutConstraint webViewHeightConstraint;
 
         Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
+
+        UIActivityIndicatorView spinner;
 
         public ContentView(Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
         {
@@ -27,6 +31,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         void CreateWebView()
         {
+            if (spinner != null)
+            {
+                spinner.RemoveFromSuperview();
+            }
+
+            spinner = null;
+
+            spinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
+            spinner.TranslatesAutoresizingMaskIntoConstraints = false;
+            spinner.HidesWhenStopped = true;
+            ContainerView.AddSubview(spinner);
+            ContainerView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.CenterX, 1f, 0f),
+                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+            });
+
+            spinner.StartAnimating();
+
             if (webView != null)
             {
                 webView.RemoveFromSuperview();
@@ -42,10 +65,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
+            userContentController.AddUserScript(wkscript3);
+
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
             var configuration = new WKWebViewConfiguration();
@@ -65,7 +91,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             ContainerView.AddConstraints(new[]
             {
                 webViewHeightConstraint = NSLayoutConstraint.Create(webView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
-                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spinner, NSLayoutAttribute.Bottom, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(webView, NSLayoutAttribute.Top, NSLayoutRelation.GreaterThanOrEqual, ContainerView, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(webView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(webView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(webView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
@@ -91,27 +118,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             if (responseDict == null)
                 return;
 
+            var domLoadedNumber = responseDict["domLoaded"] as NSNumber;
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
 
-            if (justLoadedNumber != null && justLoadedNumber.BoolValue || resizedNumber != null && resizedNumber.BoolValue)
-            {
-                Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
-                    () =>
-                    {
-                        if (wv.IsLoading)
-                        {
-                            resizeAction(wv, nslc);
-                        }
-                        else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
-                        {
-                            nslc.Constant = wv.ScrollView.ContentSize.Height;
+            var justLoaded = justLoadedNumber != null && justLoadedNumber.BoolValue;
+            var resized = resizedNumber != null && resizedNumber.BoolValue;
+            var domLoaded = domLoadedNumber != null && domLoadedNumber.BoolValue;
 
-                            SetNeedsLayout();
-                        }
-                    });
-                resizeAction(webView, webViewHeightConstraint);
+            Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> resizeAction = null;
+            resizeAction = (wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
+                () =>
+                {
+                    if (wv.IsLoading)
+                    {
+                        resizeAction(wv, sv, nslc);
+                    }
+                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
+                    {
+                        nslc.Constant = wv.ScrollView.ContentSize.Height;
+
+                        SetNeedsLayout();
+                    }
+                });
+
+            Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> stopLoadingAction = null;
+            stopLoadingAction = (wv, sv, nslc) =>
+            DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)),
+                                                  () =>
+                                                  {
+                                                      if (wv.IsLoading)
+                                                      {
+                                                          wv.StopLoading();
+                                                          resizeAction(wv, sv, nslc);
+                                                      }
+                                                  });
+
+            if (domLoaded)
+            {
+                stopLoadingAction(webView, spinner, webViewHeightConstraint);
+            }
+            else if (justLoaded || resized)
+            {
+                resizeAction(webView, spinner, webViewHeightConstraint);
             }
         }
 
