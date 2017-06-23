@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Utilities
             Managers.OutgoingDocumentsManager.DocumentSendingFailed += OutgoingDocumentsManager_DocumentSendingFailed;
         }
 
-        static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer e)
+        static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, DocumentToUploadContainer e)
         {
             try
             {

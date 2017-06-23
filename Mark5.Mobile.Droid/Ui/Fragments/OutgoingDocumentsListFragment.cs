@@ -146,7 +146,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void Adapter_ItemClicked(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void Adapter_ItemClicked(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             if (outgoingDocumentContainer.Info.State == OutgoingDocumentState.Sending)
                 return;
@@ -177,7 +177,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void Adapter_ItemLongClicked(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void Adapter_ItemLongClicked(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             if (outgoingDocumentContainer.Info.State == OutgoingDocumentState.Sending)
                 return;
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             actionMode = null;
         }
 
-        void DeleteOutgoingDocuments(List<OutgoingDocumentContainer> selectedOutgoingDocumentContainers)
+        void DeleteOutgoingDocuments(List<DocumentToUploadContainer> selectedOutgoingDocumentContainers)
         {
             Task.Run(async () =>
                 {
@@ -245,7 +245,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region OutgoingDocumentManager event handlers
 
-        void OutgoingDocumentsManager_DocumentBeingSent(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void OutgoingDocumentsManager_DocumentBeingSent(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             var position = adapter.GetPosition(outgoingDocumentContainer.Info.Identifier);
             if (position >= 0)
@@ -256,7 +256,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void OutgoingDocumentsManager_DocumentSendingFailed(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             var position = adapter.GetPosition(outgoingDocumentContainer.Info.Identifier);
             if (position >= 0)
@@ -267,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             var position = adapter.GetPosition(outgoingDocumentContainer.Info.Identifier);
             if (position >= 0)
@@ -323,31 +323,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public Folder Folder { get; set; }
 
-            public List<OutgoingDocumentContainer> OutgoingDocumentPreviews { get; set; }
+            public List<DocumentToUploadContainer> OutgoingDocumentPreviews { get; set; }
 
-            public List<OutgoingDocumentContainer> OutgoingSelectedDocumentPreviews { get; set; }
+            public List<DocumentToUploadContainer> OutgoingSelectedDocumentPreviews { get; set; }
         }
 
         #endregion
 
         protected class OutgoingDocumentsListAdapter : RecyclerView.Adapter
         {
-            public List<OutgoingDocumentContainer> Items => ougoingDocumentPreviewsInView.ToList();
+            public List<DocumentToUploadContainer> Items => ougoingDocumentPreviewsInView.ToList();
 
-            public List<OutgoingDocumentContainer> SelectedItems => selectedOutgoingDocumentsInView.Values.ToList();
+            public List<DocumentToUploadContainer> SelectedItems => selectedOutgoingDocumentsInView.Values.ToList();
 
             public override int ItemCount => ougoingDocumentPreviewsInView.Count;
 
             public int SelectedItemCount => selectedOutgoingDocumentsInView.Count;
 
-            readonly List<OutgoingDocumentContainer> ougoingDocumentPreviewsInView = new List<OutgoingDocumentContainer>();
+            readonly List<DocumentToUploadContainer> ougoingDocumentPreviewsInView = new List<DocumentToUploadContainer>();
 
-            readonly Dictionary<Guid, OutgoingDocumentContainer> selectedOutgoingDocumentsInView = new Dictionary<Guid, OutgoingDocumentContainer>();
+            readonly Dictionary<Guid, DocumentToUploadContainer> selectedOutgoingDocumentsInView = new Dictionary<Guid, DocumentToUploadContainer>();
 
             readonly Context context;
 
-            public event EventHandler<OutgoingDocumentContainer> ItemClicked = delegate { };
-            public event EventHandler<OutgoingDocumentContainer> ItemLongClicked = delegate { };
+            public event EventHandler<DocumentToUploadContainer> ItemClicked = delegate { };
+            public event EventHandler<DocumentToUploadContainer> ItemLongClicked = delegate { };
 
             public OutgoingDocumentsListAdapter(Context context)
             {
@@ -383,7 +383,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return new OutgoingDocumentPreviewViewHolder(itemView);
             }
 
-            public void AppendItems(List<OutgoingDocumentContainer> items)
+            public void AppendItems(List<DocumentToUploadContainer> items)
             {
                 var count = ougoingDocumentPreviewsInView.Count;
                 ougoingDocumentPreviewsInView.AddRange(items);
@@ -395,7 +395,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ougoingDocumentPreviewsInView.RemoveAt(index);
             }
 
-            public void ReplaceItems(List<OutgoingDocumentContainer> items)
+            public void ReplaceItems(List<DocumentToUploadContainer> items)
             {
                 Clear();
                 AppendItems(items.OrderByDescending(i => i.Info.DateLastSavedTimestamp).ToList());
@@ -409,13 +409,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeRemoved(0, size);
             }
 
-            public void SetSelected(List<OutgoingDocumentContainer> outgoingDocumentPrevivews, bool selected)
+            public void SetSelected(List<DocumentToUploadContainer> outgoingDocumentPrevivews, bool selected)
             {
                 foreach (var outgoingDocumentPreview in outgoingDocumentPrevivews)
                     SetSelected(outgoingDocumentPreview, selected);
             }
 
-            public void SetSelected(OutgoingDocumentContainer outgoingDocumentPreview, bool selected)
+            public void SetSelected(DocumentToUploadContainer outgoingDocumentPreview, bool selected)
             {
                 var position = GetPosition(outgoingDocumentPreview);
                 if (position < 0)
@@ -437,7 +437,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         NotifyItemChanged(GetPosition(document));
             }
 
-            public bool IsSelected(OutgoingDocumentContainer outgoingDocumentPreview)
+            public bool IsSelected(DocumentToUploadContainer outgoingDocumentPreview)
             {
                 return selectedOutgoingDocumentsInView.ContainsKey(outgoingDocumentPreview.Info.Identifier);
             }
@@ -455,7 +455,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return position;
             }
 
-            public int GetPosition(OutgoingDocumentContainer outgoingDocumentPreview)
+            public int GetPosition(DocumentToUploadContainer outgoingDocumentPreview)
             {
                 return GetPosition(outgoingDocumentPreview.Info.Identifier);
             }

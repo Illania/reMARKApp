@@ -1,6 +1,6 @@
 ﻿using TinyMessenger;
 
-namespace Mark5.Mobile.Droid.Ui.Common.HubMessages
+namespace Mark5.Mobile.Droid.Model.HubMessages
 {
     public class DocumentPreviewCommentCountChangedMessage : TinyMessageBase
     {

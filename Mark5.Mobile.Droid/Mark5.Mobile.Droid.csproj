@@ -267,15 +267,6 @@
     <Compile Include="Ui\Common\RetainedFragment.cs" />
     <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
-    <Compile Include="Ui\Common\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityRemovedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Fragments\ComposeDocumentFragment.cs" />
@@ -389,6 +380,15 @@
     <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
     <Compile Include="Ui\Activities\DownloadActivity.cs" />
     <Compile Include="Ui\Fragments\DownloadFragment.cs" />
+    <Compile Include="Model\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityRemovedMessage.cs" />
+    <Compile Include="Model\HubMessages\NewNotificationsReceived.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -398,6 +398,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
+    <Folder Include="Model\HubMessages\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />

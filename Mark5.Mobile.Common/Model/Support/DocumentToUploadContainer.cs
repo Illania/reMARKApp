@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
 {
-    public class OutgoingDocumentContainer
+    public class DocumentToUploadContainer
     {
         Document document;
 

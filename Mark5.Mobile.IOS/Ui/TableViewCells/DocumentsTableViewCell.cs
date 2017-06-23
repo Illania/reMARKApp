@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             IndicatorImageView4.Image = documentPreview.CommentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "message-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
         }
 
-        public void Initialize(OutgoingDocumentContainer container)
+        public void Initialize(DocumentToUploadContainer container)
         {
             var documentPreview = container.DocumentPreview;
 

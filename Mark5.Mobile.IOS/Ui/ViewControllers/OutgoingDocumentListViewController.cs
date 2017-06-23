@@ -195,7 +195,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void DocumentSelected(OutgoingDocumentContainer container)
+        public void DocumentSelected(DocumentToUploadContainer container)
         {
             if (tableView.Editing || container.Info.State == OutgoingDocumentState.Sending)
                 return;
@@ -292,15 +292,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Delete(selectedDocuments);
         }
 
-        async void Delete(OutgoingDocumentContainer container)
+        async void Delete(DocumentToUploadContainer container)
         {
-            await Delete(new List<OutgoingDocumentContainer>
+            await Delete(new List<DocumentToUploadContainer>
             {
                 container
             });
         }
 
-        async Task Delete(List<OutgoingDocumentContainer> containers)
+        async Task Delete(List<DocumentToUploadContainer> containers)
         {
             foreach (var container in containers)
                 await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(container.Info.Identifier);
@@ -354,7 +354,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region OutgoingDocumentManager event handlers
 
-        void OutgoingDocumentsManager_DocumentBeingSent(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void OutgoingDocumentsManager_DocumentBeingSent(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             BeginInvokeOnMainThread(() =>
             {
@@ -369,7 +369,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-        void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void OutgoingDocumentsManager_DocumentSendingFailed(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             BeginInvokeOnMainThread(() =>
             {
@@ -384,7 +384,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer outgoingDocumentContainer)
+        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, DocumentToUploadContainer outgoingDocumentContainer)
         {
             BeginInvokeOnMainThread(() =>
             {
@@ -406,7 +406,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public bool Empty => Items.Count < 1;
 
-            public List<OutgoingDocumentContainer> Items { get; private set; } = new List<OutgoingDocumentContainer>(1000);
+            public List<DocumentToUploadContainer> Items { get; private set; } = new List<DocumentToUploadContainer>(1000);
 
             OutgoingDocumentListViewController viewController;
             UITableView documentsTableView;
@@ -491,7 +491,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Items.FindIndex(o => o.Info.Identifier == identifier);
             }
 
-            public void ReplaceItems(List<OutgoingDocumentContainer> containers)
+            public void ReplaceItems(List<DocumentToUploadContainer> containers)
             {
                 loading = false;
 

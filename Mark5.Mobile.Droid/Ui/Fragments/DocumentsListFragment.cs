@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -24,9 +24,9 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -370,7 +370,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region OutgoingDocumentsManager callbacks
 
-        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, OutgoingDocumentContainer e)
+        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, DocumentToUploadContainer e)
         {
             if (e.DocumentPreview.Id >= 0)
                 Activity.RunOnUiThread(async () => await RefreshData(forceClear: true));

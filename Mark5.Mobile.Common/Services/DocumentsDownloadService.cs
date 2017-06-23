@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.PortableCollections;
-using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Extensions;
 
-namespace Mark5.Mobile.Common
+namespace Mark5.Mobile.Common.Services
 {
-    class DocumentsDownloadManager : IDocumentsDownloadManager
+    class DocumentsDownloadService : IDocumentsDownloadService
     {
         CancellationTokenSource cts;
         Task downloadTask;
@@ -24,7 +23,7 @@ namespace Mark5.Mobile.Common
         readonly SemaphoreSlim semaphore;
         readonly IPortableConcurrentQueue<int> queue;
 
-        public DocumentsDownloadManager(IDocumentsDataAccess documentsDataAccess)
+        public DocumentsDownloadService(IDocumentsDataAccess documentsDataAccess)
         {
             this.documentsDataAccess = documentsDataAccess;
 

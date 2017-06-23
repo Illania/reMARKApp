@@ -113,7 +113,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         CommonConfig.Logger.Info("Cleaned up cache");
                     }
 
-                    CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+                    CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
 
                     await Managers.DocumentsDownloadManager.Start();
                     await Managers.OutgoingDocumentsManager.Start();

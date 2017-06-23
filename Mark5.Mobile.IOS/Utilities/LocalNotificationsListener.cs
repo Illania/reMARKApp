@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Utilities
             Managers.OutgoingDocumentsManager.DocumentSendingFailed += OutgoingDocumentsManager_DocumentSendingFailed;
         }
 
-        static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer e)
+        static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, DocumentToUploadContainer e)
         {
             var notificatioContent = new UNMutableNotificationContent();
 

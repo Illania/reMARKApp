@@ -8,7 +8,7 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Services
 {
-    public class SuggestionsRetrievalService
+    public class SuggestionsRetrievalService : ISuggestionsRetrievalService
     {
         public void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.Services
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
-        public void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Common.Services
             });
         }
 
-        public void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Common.Services
             });
         }
 
-        public void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;

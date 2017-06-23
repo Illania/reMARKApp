@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Common.Managers
             return await documentsDataAccess.GetNeighbourDocumentsIdAsync(folder, documentId, getPrevious, getNext, maxItems);
         }
 
-        public async Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersPreviewAsync()
+        public async Task<List<DocumentToUploadContainer>> GetOutgoingDocumentContainersPreviewAsync()
         {
             return await FileSystemStorage.GetOutgoingDocumentContainersAsync();
         }
@@ -179,69 +179,6 @@ namespace Mark5.Mobile.Common.Managers
             throw new ArgumentException("Invalid sourceType provided");
         }
 
-        public async Task SaveOutgoingDocumentAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery)
-        {
-            var outgoingDocumentInfo = new OutgoingDocumentInfo
-            {
-                Flag = flag,
-                PreviousDocumentId = precedingDocumentId,
-                PreviousDocumentdFolderId = precedingDocumentFolderId,
-                SendOnTimestamp = sendOnTimestamp,
-                ConfirmRead = confirmRead,
-                ConfirmDelivery = confirmDelivery,
-                Identifier = id
-            };
-
-            await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview, false);
-        }
-
-        public async Task InsertDocumentInOutgoingAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery)
-        {
-            var outgoingDocumentInfo = new OutgoingDocumentInfo
-            {
-                Flag = flag,
-                PreviousDocumentId = precedingDocumentId,
-                PreviousDocumentdFolderId = precedingDocumentFolderId,
-                SendOnTimestamp = sendOnTimestamp,
-                ConfirmRead = confirmRead,
-                ConfirmDelivery = confirmDelivery,
-                Identifier = id
-            };
-
-            await FileSystemStorage.SaveOutgoingDocumentAsync(outgoingDocumentInfo, document, documentPreview, true);
-            Managers.OutgoingDocumentsManager.Notify(id);
-        }
-
-        public async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument = false)
-        {
-            return await FileSystemStorage.GetOutgoingDocumentContainerAsync(id, lockDocument, LoadMode.Complete);
-        }
-
-        public async Task<string> SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream)
-        {
-            return await FileSystemStorage.SaveOutgoingDocumentAttachmentAsync(id, filename, attachmentStream);
-        }
-
-        public async Task RemoveOutgoingAttachmentAsync(Guid id, string filename)
-        {
-            await FileSystemStorage.RemoveOutgoingDocumentAttachmentAsync(id, filename);
-        }
-
-        public async Task DeleteOutgoingDocumentFolder(Guid id)
-        {
-            await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(id);
-        }
-
-        public async Task LockOutgoingDocumentAsync(Guid id)
-        {
-            await FileSystemStorage.LockOutgoingDocumentAsync(id);
-        }
-
-        public async Task UnlockOutgoingDocumentAsync(Guid id)
-        {
-            await FileSystemStorage.UnlockOutgoingDocumentAsync(id);
-        }
-
         public async Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
@@ -298,32 +235,6 @@ namespace Mark5.Mobile.Common.Managers
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
 
             throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task AutoSaveDocumentAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery)
-        {
-            var outgoingDocumentInfo = new OutgoingDocumentInfo
-            {
-                Flag = flag,
-                PreviousDocumentId = precedingDocumentId,
-                PreviousDocumentdFolderId = precedingDocumentFolderId,
-                SendOnTimestamp = sendOnTimestamp,
-                ConfirmRead = confirmRead,
-                ConfirmDelivery = confirmDelivery,
-                Identifier = id
-            };
-
-            await FileSystemStorage.AutoSaveDocumentAsync(outgoingDocumentInfo, document, documentPreview);
-        }
-
-        public async Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync()
-        {
-            return await FileSystemStorage.GetAutoSavedDocumentAsync();
-        }
-
-        public async Task DeleteAutoSavedDocumentAsync()
-        {
-            await FileSystemStorage.DeleteAutoSavedDocumentAsync();
         }
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
@@ -708,6 +619,32 @@ namespace Mark5.Mobile.Common.Managers
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task AutoSaveDocumentAsync(Guid id, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery)
+        {
+            var outgoingDocumentInfo = new OutgoingDocumentInfo
+            {
+                Flag = flag,
+                PreviousDocumentId = precedingDocumentId,
+                PreviousDocumentdFolderId = precedingDocumentFolderId,
+                SendOnTimestamp = sendOnTimestamp,
+                ConfirmRead = confirmRead,
+                ConfirmDelivery = confirmDelivery,
+                Identifier = id
+            };
+
+            await FileSystemStorage.AutoSaveDocumentAsync(outgoingDocumentInfo, document, documentPreview);
+        }
+
+        public async Task<DocumentToUploadContainer> GetAutoSavedDocumentAsync()
+        {
+            return await FileSystemStorage.GetAutoSavedDocumentAsync();
+        }
+
+        public async Task DeleteAutoSavedDocumentAsync()
+        {
+            await FileSystemStorage.DeleteAutoSavedDocumentAsync();
         }
     }
 }

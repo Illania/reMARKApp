@@ -245,7 +245,7 @@ namespace Mark5.Mobile.Common.Storage
             await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
         }
 
-        public static async Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument, LoadMode loadMode)
+        public static async Task<DocumentToUploadContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument, LoadMode loadMode)
         {
             if (!await OutgoingFolderExistsAsync(id))
                 return null;
@@ -309,7 +309,7 @@ namespace Mark5.Mobile.Common.Storage
                     }
                 }
 
-                return new OutgoingDocumentContainer
+                return new DocumentToUploadContainer
                 {
                     Document = document,
                     DocumentPreview = documentPreview,
@@ -326,10 +326,10 @@ namespace Mark5.Mobile.Common.Storage
             }
         }
 
-        public static async Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersAsync()
+        public static async Task<List<DocumentToUploadContainer>> GetOutgoingDocumentContainersAsync()
         {
             var identifiers = await GetOutgoingDocumentIdentifiersAsync();
-            var outgoingDocumentContainers = new List<OutgoingDocumentContainer>();
+            var outgoingDocumentContainers = new List<DocumentToUploadContainer>();
 
             foreach (var id in identifiers)
             {
@@ -464,7 +464,7 @@ namespace Mark5.Mobile.Common.Storage
             await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingAutoSave, CreationCollisionOption.ReplaceExisting);
         }
 
-        public static async Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync()
+        public static async Task<DocumentToUploadContainer> GetAutoSavedDocumentAsync()
         {
             var autoSavedGuid = await GetAutoSavedIdAsync();
             return autoSavedGuid == Guid.Empty ? null : await GetOutgoingDocumentContainerAsync(autoSavedGuid, false, LoadMode.Complete);

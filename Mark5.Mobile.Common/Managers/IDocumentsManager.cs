@@ -26,30 +26,6 @@ namespace Mark5.Mobile.Common.Managers
 
         Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 
-        Task SaveOutgoingDocumentAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
-
-        Task InsertDocumentInOutgoingAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
-
-        Task<string> SaveOutgoingAttachmentAsync(Guid id, string filename, Stream attachmentStream);
-
-        Task<OutgoingDocumentContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument = false);
-
-        Task<List<OutgoingDocumentContainer>> GetOutgoingDocumentContainersPreviewAsync();
-
-        Task RemoveOutgoingAttachmentAsync(Guid id, string filename);
-
-        Task DeleteOutgoingDocumentFolder(Guid id);
-
-        Task LockOutgoingDocumentAsync(Guid identifier);
-
-        Task UnlockOutgoingDocumentAsync(Guid identifier);
-
-        Task AutoSaveDocumentAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
-
-        Task<OutgoingDocumentContainer> GetAutoSavedDocumentAsync();
-
-        Task DeleteAutoSavedDocumentAsync();
-
         Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto);
@@ -79,5 +55,11 @@ namespace Mark5.Mobile.Common.Managers
         Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
 
         Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
+
+        Task AutoSaveDocumentAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
+
+        Task<DocumentToUploadContainer> GetAutoSavedDocumentAsync();
+
+        Task DeleteAutoSavedDocumentAsync();
     }
 }

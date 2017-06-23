@@ -10,16 +10,13 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Utilities.Services
 {
     [Service]
-    [IntentFilter(new[]
-    {
-        "com.google.firebase.MESSAGING_EVENT"
-    })]
+    [IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
     public class PushNotificationMessagingService : FirebaseMessagingService
     {
         public string GroupName = "mark5";
@@ -52,7 +49,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                     i.PutExtra(DocumentActivity.NotificationGuidIntentKey, SerializationUtils.Serialize(n.Guid));
                     var pi = PendingIntent.GetActivity(this, 0, i, PendingIntentFlags.OneShot);
 
-                    var nb = new NotificationCompat.Builder(this).SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon).SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue)).SetContentTitle(n.Title).SetContentText(n.Message).SetContentIntent(pi).SetCategory(Android.Support.V4.App.NotificationCompat.CategoryMessage).SetAutoCancel(true).SetGroup(GroupName).SetPriority((int) NotificationPriority.High).SetStyle(new Android.Support.V4.App.NotificationCompat.BigTextStyle().BigText(n.Message));
+                    var nb = new NotificationCompat.Builder(this).SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon).SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue)).SetContentTitle(n.Title).SetContentText(n.Message).SetContentIntent(pi).SetCategory(Android.Support.V4.App.NotificationCompat.CategoryMessage).SetAutoCancel(true).SetGroup(GroupName).SetPriority((int)NotificationPriority.High).SetStyle(new Android.Support.V4.App.NotificationCompat.BigTextStyle().BigText(n.Message));
 
                     if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
                         nb.SetSound(Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));
@@ -66,7 +63,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                         });
 
                     var nm = Android.Support.V4.App.NotificationManagerCompat.From(this);
-                    nm.Notify((int) (Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
+                    nm.Notify((int)(Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
 
                     PlatformConfig.MessengerHub.Publish(new NewNotificationsReceived(this));
                 }
@@ -84,7 +81,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 return;
 
-            var nm = (NotificationManager) GetSystemService(NotificationService);
+            var nm = (NotificationManager)GetSystemService(NotificationService);
 
             var activeNotifications = nm.GetActiveNotifications().Where(sbn => sbn.Id != StackNotification).ToArray();
 
@@ -111,7 +108,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
             builder.SetAutoCancel(true);
             builder.SetGroup(GroupName);
             builder.SetGroupSummary(true);
-            builder.SetPriority((int) NotificationPriority.High);
+            builder.SetPriority((int)NotificationPriority.High);
 
             var n = builder.Build();
             n.Defaults = 0;

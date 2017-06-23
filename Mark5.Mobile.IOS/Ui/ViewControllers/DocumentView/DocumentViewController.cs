@@ -37,7 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         DocumentPreview documentPreview { get; set; }
         Document document { get; set; }
         Guid outgoingDocumentIdentifier { get; set; }
-        OutgoingDocumentContainer container { get; set; }
+        DocumentToUploadContainer container { get; set; }
         Guid notificationGuid { get; set; }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB

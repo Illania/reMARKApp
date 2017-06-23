@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Mark5.Mobile.Common
+namespace Mark5.Mobile.Common.Services
 {
-    public interface IDocumentsDownloadManager
+    public interface IDocumentsDownloadService
     {
         Task Notify(int folderId);
         Task<bool> IsRunning();

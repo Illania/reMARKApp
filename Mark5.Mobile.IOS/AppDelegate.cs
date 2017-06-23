@@ -319,7 +319,7 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                         CommonConfig.Logger.Info("Cleaned up cache");
                     }
 
-                    CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+                    CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadManager)}...");
                     await Managers.DocumentsDownloadManager.Start();
                     await Managers.OutgoingDocumentsManager.Start();
 

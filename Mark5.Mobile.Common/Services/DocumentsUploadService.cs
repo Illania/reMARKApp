@@ -1,15 +1,15 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.PortableCollections;
-using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Storage;
 
-namespace Mark5.Mobile.Common.Managers
+namespace Mark5.Mobile.Common.Services
 {
-    class OutgoingDocumentsManager : IOutgoingDocumentsManager
+    class DocumentsUploadService : IDocumentsUploadService
     {
         CancellationTokenSource cts;
         Task sendTask;
@@ -19,19 +19,11 @@ namespace Mark5.Mobile.Common.Managers
 
         SemaphoreSlim semaphore;
 
-        public event EventHandler<Guid> DocumentAddedToQueue = delegate { };
-        public event EventHandler<OutgoingDocumentContainer> DocumentBeingSent = delegate { };
-        public event EventHandler<OutgoingDocumentContainer> DocumentSendingSuccessful = delegate { };
-        public event EventHandler<OutgoingDocumentContainer> DocumentSendingFailed = delegate { };
-
         readonly IPortableConcurrentQueue<Guid> queue;
 
-        public OutgoingDocumentsManager()
+        public DocumentsUploadService()
         {
-            queue = (IPortableConcurrentQueue<Guid>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[]
-            {
-                typeof(Guid)
-            }));
+            queue = (IPortableConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(Guid) }));
             semaphore = new SemaphoreSlim(1);
             UnlockAllDocuments(); //Used to unlock all the documents that were not unlocked because the app closed/crashed on compose view
         }
@@ -51,10 +43,10 @@ namespace Mark5.Mobile.Common.Managers
             }
         }
 
-        public void Notify(Guid identifier)
+        public void Notify(Guid guid)
         {
-            DocumentAddedToQueue(this, identifier);
-            AddToQueue(identifier);
+            AddToQueue(guid);
+            CommonConfig.MessengerHub.PublishAsync(new DocumentInUploadChangedMessage(this, DocumentInUploadChangedMessage.ChangeType.DocumentAdded, guid));
         }
 
         public async Task Start()
@@ -127,11 +119,9 @@ namespace Mark5.Mobile.Common.Managers
             {
                 await semaphore.WaitAsync();
 
-                if (cts != null)
-                {
-                    cts.Cancel();
-                    cts = null;
-                }
+                cts?.Cancel();
+                cts = null;
+
                 if (sendTask != null)
                 {
                     await sendTask;
@@ -171,17 +161,17 @@ namespace Mark5.Mobile.Common.Managers
                     var sendSuccessful = false;
                     try
                     {
-                        DocumentBeingSent(this, container);
+                        //TODO DocumentBeingSent(this, container);
 
                         var attachmentGuids = new List<Guid>();
 
                         foreach (var attachment in await FileSystemStorage.GetOutgoingDocumentAttachmentsAsync(identifier))
                         {
-                            var attachmentGuid = await Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
+                            var attachmentGuid = await Managers.Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
                             attachmentGuids.Add(attachmentGuid);
                         }
 
-                        await Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PreviousDocumentId, info.PreviousDocumentdFolderId, info.SendOnTimestamp, info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
+                        await Managers.Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PreviousDocumentId, info.PreviousDocumentdFolderId, info.SendOnTimestamp, info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
                         sendSuccessful = true;
                     }
                     catch (Exception ex)
@@ -190,13 +180,13 @@ namespace Mark5.Mobile.Common.Managers
 
                         await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier);
 
-                        DocumentSendingFailed(this, container);
+                        // TODO DocumentSendingFailed(this, container);
                     }
 
                     if (sendSuccessful)
                     {
                         await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
-                        DocumentSendingSuccessful(this, container);
+                        // TODO DocumentSendingSuccessful(this, container);
                     }
                 }
             }

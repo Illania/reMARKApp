@@ -13,7 +13,5 @@ namespace Mark5.Mobile.Droid
         public static ReachabilityBroadcastReceiver ReachabilityBroadcastReceiver { get; set; }
 
         public static Preferences Preferences { get; set; }
-
-        public static ITinyMessengerHub MessengerHub { get; set; }
     }
 }

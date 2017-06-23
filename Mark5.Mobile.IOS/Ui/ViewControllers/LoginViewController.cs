@@ -619,7 +619,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
-                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
+                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
 
                 await Managers.DocumentsDownloadManager.Start();
                 await Managers.OutgoingDocumentsManager.Start();
