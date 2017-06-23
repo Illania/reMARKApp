@@ -126,6 +126,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
 
+            var justLoaded = justLoadedNumber != null && justLoadedNumber.BoolValue;
+            var resized = resizedNumber != null && resizedNumber.BoolValue;
+            var domLoaded = domLoadedNumber != null && domLoadedNumber.BoolValue;
+
             Action<CancellationToken, WKWebView, UIActivityIndicatorView, NSLayoutConstraint> resizeAction = null;
             resizeAction = (ct, wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
                 () =>
@@ -142,7 +146,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                         sv.RemoveFromSuperview();
 
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
-
                         SetNeedsLayout();
                     }
                 });
@@ -162,12 +165,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                                                       }
                                                   });
 
-            if (domLoadedNumber != null && domLoadedNumber.BoolValue)
+            if (domLoaded)
             {
                 stopLoadingAction(cts.Token, webView, spinner, webViewHeightConstraint);
             }
-            else if (justLoadedNumber != null && justLoadedNumber.BoolValue
-                     || resizedNumber != null && resizedNumber.BoolValue)
+            else if (justLoaded || resized)
             {
                 resizeAction(cts.Token, webView, spinner, webViewHeightConstraint);
             }
