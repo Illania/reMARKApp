@@ -131,22 +131,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 () =>
                 {
                     if (ct.IsCancellationRequested)
-                    {
-                        CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CANCELLATION REQUESTED IN RESIZE ACTION ");
                         return;
-                    }
-
-                    CommonConfig.Logger.Debug($"{wv.GetHashCode()} - RESIZE ACTION ");
 
                     if (wv.IsLoading)
                     {
-                        CommonConfig.Logger.Debug($"{wv.GetHashCode()} - IS LOADING ");
-
                         resizeAction(ct, wv, sv, nslc);
                     }
                     else if (nslc.Constant != wv.ScrollView.ContentSize.Height && wv.ScrollView.ContentSize.Height > 1)
                     {
-                        CommonConfig.Logger.Debug($"{wv.GetHashCode()} - INCREASING HEIGHT FROM {nslc.Constant} TO {wv.ScrollView.ContentSize.Height} ");
                         sv.RemoveFromSuperview();
 
                         nslc.Constant = wv.ScrollView.ContentSize.Height;
@@ -161,17 +153,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                                                   () =>
                                                   {
                                                       if (ct.IsCancellationRequested)
-                                                      {
-                                                          CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CANCELLATION REQUESTED IN SET STOP LOADING ACTION ");
                                                           return;
-                                                      }
-
-                                                      CommonConfig.Logger.Debug($"{wv.GetHashCode()} - TIMEOUT ");
 
                                                       if (wv.IsLoading)
                                                       {
-                                                          CommonConfig.Logger.Debug($"{wv.GetHashCode()} - STOP LOADING ");
-
                                                           wv.StopLoading();
                                                           resizeAction(ct, wv, sv, nslc);
                                                       }
@@ -179,13 +164,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             if (domLoadedNumber != null && domLoadedNumber.BoolValue)
             {
-                CommonConfig.Logger.Debug($"{webView.GetHashCode()} - DOM LOADED ");
                 stopLoadingAction(cts.Token, webView, spinner, webViewHeightConstraint);
             }
             else if (justLoadedNumber != null && justLoadedNumber.BoolValue
                      || resizedNumber != null && resizedNumber.BoolValue)
             {
-                CommonConfig.Logger.Debug($"{webView.GetHashCode()} - JUST_LOADED={justLoadedNumber} / RESIZED={resizedNumber} ");
                 resizeAction(cts.Token, webView, spinner, webViewHeightConstraint);
             }
         }
@@ -203,8 +186,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
 
             CreateWebView();
-
-            CommonConfig.Logger.Debug($"{webView.GetHashCode()} -REFRESHING - SUB = {DocumentPreview.Subject}");
 
             if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 SetContent(ContentType.PlainText, Document.PlainTextBody);
@@ -235,13 +216,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             setContentAction = (ct, wv) => DispatchQueue.MainQueue.DispatchAsync(async () =>
              {
-                 CommonConfig.Logger.Debug($"{wv.GetHashCode()} - SET CONTENT ACTION ");
-
                  if (ct.IsCancellationRequested)
-                 {
-                     CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CANCELLATION REQUESTED IN SET CONTENT ");
                      return;
-                 }
 
                  wv.StopLoading();
 
@@ -305,8 +281,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                          wv.LoadData(NSData.FromString(string.Empty), "text/plain", "UTF-8", new NSUrl("/"));
                          break;
                  }
-                 CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CONTENT SET");
-
              });
 
             setContentAction(cts.Token, webView);
