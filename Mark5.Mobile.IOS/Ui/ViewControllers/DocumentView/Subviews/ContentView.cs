@@ -126,12 +126,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
 
-            Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> resizeAction = null;
-            resizeAction = (wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
+            Action<CancellationToken, WKWebView, UIActivityIndicatorView, NSLayoutConstraint> resizeAction = null;
+            resizeAction = (ct, wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
                 () =>
                 {
-                    if (wv != webView)
+                    if (ct.IsCancellationRequested)
+                    {
+                        CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CANCELLATION REQUESTED IN RESIZE ACTION ");
                         return;
+                    }
 
                     CommonConfig.Logger.Debug($"{wv.GetHashCode()} - RESIZE ACTION ");
 
@@ -139,7 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                     {
                         CommonConfig.Logger.Debug($"{wv.GetHashCode()} - IS LOADING ");
 
-                        resizeAction(wv, sv, nslc);
+                        resizeAction(ct, wv, sv, nslc);
                     }
                     else if (nslc.Constant != wv.ScrollView.ContentSize.Height && wv.ScrollView.ContentSize.Height > 1)
                     {
@@ -152,13 +155,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                     }
                 });
 
-            Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> stopLoadingAction = null;
-            stopLoadingAction = (wv, sv, nslc) =>
+            Action<CancellationToken, WKWebView, UIActivityIndicatorView, NSLayoutConstraint> stopLoadingAction = null;
+            stopLoadingAction = (ct, wv, sv, nslc) =>
             DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)),
                                                   () =>
                                                   {
-                                                      if (wv != webView)
+                                                      if (ct.IsCancellationRequested)
+                                                      {
+                                                          CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CANCELLATION REQUESTED IN SET STOP LOADING ACTION ");
                                                           return;
+                                                      }
 
                                                       CommonConfig.Logger.Debug($"{wv.GetHashCode()} - TIMEOUT ");
 
@@ -167,20 +173,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                                                           CommonConfig.Logger.Debug($"{wv.GetHashCode()} - STOP LOADING ");
 
                                                           wv.StopLoading();
-                                                          resizeAction(wv, sv, nslc);
+                                                          resizeAction(ct, wv, sv, nslc);
                                                       }
                                                   });
 
             if (domLoadedNumber != null && domLoadedNumber.BoolValue)
             {
                 CommonConfig.Logger.Debug($"{webView.GetHashCode()} - DOM LOADED ");
-                stopLoadingAction(webView, spinner, webViewHeightConstraint);
+                stopLoadingAction(cts.Token, webView, spinner, webViewHeightConstraint);
             }
             else if (justLoadedNumber != null && justLoadedNumber.BoolValue
                      || resizedNumber != null && resizedNumber.BoolValue)
             {
                 CommonConfig.Logger.Debug($"{webView.GetHashCode()} - JUST_LOADED={justLoadedNumber} / RESIZED={resizedNumber} ");
-                resizeAction(webView, spinner, webViewHeightConstraint);
+                resizeAction(cts.Token, webView, spinner, webViewHeightConstraint);
             }
         }
 
@@ -198,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             CreateWebView();
 
-            CommonConfig.Logger.Debug($"REFRESHING - SUB = {DocumentPreview.Subject}");
+            CommonConfig.Logger.Debug($"{webView.GetHashCode()} -REFRESHING - SUB = {DocumentPreview.Subject}");
 
             if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 SetContent(ContentType.PlainText, Document.PlainTextBody);
@@ -225,21 +231,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void SetContent(ContentType contentType, string content)
         {
-            Action<CancellationToken> setContentAction;
+            Action<CancellationToken, WKWebView> setContentAction;
 
-            setContentAction = (ct) => DispatchQueue.MainQueue.DispatchAsync(() =>
+            setContentAction = (ct, wv) => DispatchQueue.MainQueue.DispatchAsync(async () =>
              {
+                 CommonConfig.Logger.Debug($"{wv.GetHashCode()} - SET CONTENT ACTION ");
+
                  if (ct.IsCancellationRequested)
                  {
-                     CommonConfig.Logger.Debug("CANCELLATION REQUESTED ");
+                     CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CANCELLATION REQUESTED IN SET CONTENT ");
                      return;
                  }
 
-                 webView.StopLoading();
+                 wv.StopLoading();
+
+                 await wv.EvaluateJavaScriptAsync("");
 
                  if (content == null)
                  {
-                     webView.LoadData(NSData.FromString("Content could not be loaded."), "text/plain", "UTF-8", new NSUrl("/"));
+                     wv.LoadData(NSData.FromString("Content could not be loaded."), "text/plain", "UTF-8", new NSUrl("/"));
                      return;
                  }
 
@@ -286,18 +296,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                              CommonConfig.Logger.Warning("Could not process and insert viewport tag", ex);
                          }
 
-                         webView.LoadHtmlString(content, null);
+                         wv.LoadHtmlString(content, null);
                          break;
                      case ContentType.PlainText:
-                         webView.LoadData(NSData.FromString(content), "text/plain", "UTF-8", new NSUrl("/"));
+                         wv.LoadData(NSData.FromString(content), "text/plain", "UTF-8", new NSUrl("/"));
                          break;
                      default:
-                         webView.LoadData(NSData.FromString(string.Empty), "text/plain", "UTF-8", new NSUrl("/"));
+                         wv.LoadData(NSData.FromString(string.Empty), "text/plain", "UTF-8", new NSUrl("/"));
                          break;
                  }
+                 CommonConfig.Logger.Debug($"{wv.GetHashCode()} - CONTENT SET");
+
              });
 
-            setContentAction(cts.Token);
+            setContentAction(cts.Token, webView);
         }
 
         #endregion
