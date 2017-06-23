@@ -1,4 +1,4 @@
-﻿namespace Mark5.Mobile.Common.Model.Support
+﻿namespace Mark5.Mobile.Common.Model
 {
     public enum CopyToNewOption
     {

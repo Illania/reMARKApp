@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
+using System.IO;
 
 namespace Mark5.Mobile.Common.Managers
 {
@@ -23,8 +23,6 @@ namespace Mark5.Mobile.Common.Managers
         Task<DocumentContainer> GetDocumentWithPreviewAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto);
 
         Task<DocumentContainer> GetDocumentWithPreviewAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto);
-
-        Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto);
 
         Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto);
 
@@ -54,12 +52,12 @@ namespace Mark5.Mobile.Common.Managers
 
         Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
 
-        Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto);
+        Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy info);
 
-        Task AutoSaveDocumentAsync(Guid identifier, Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery);
+        Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream);
 
-        Task<DocumentToUploadContainer> GetAutoSavedDocumentAsync();
+        Task<DocumentWorkingCopy> GetDocumentWorkingCopyAsync();
 
-        Task DeleteAutoSavedDocumentAsync();
+        Task DeleteDocumentWorkingCopyAsync();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -21,18 +22,11 @@ namespace Mark5.Mobile.Common.Storage
             public const string SavedOfflineFolderInfos = "savedOfflineFolderInfos.json";
             public const string NotificationSettings = "notificationSettings.json";
             public const string LastCacheCleanUp = "lastCacheCleanUp.json";
-
             public const string LastSearchDocumentCriteria = "lastSearchDocumentCriteria.json";
             public const string LastSearchContactsCriteria = "lastSearchContactsCriteria.json";
             public const string LastSearchShortcodesCriteria = "lastSearchShortcodesCriteria.json";
 
-            public const string OutgoingDocument = "document.json";
-            public const string OutgoingDocumentPreview = "documentPreview.json";
-            public const string OutgoingInfo = "info.json";
-            public const string OutgoingLock = ".lock";
-            public const string OutgoingFailed = ".failed";
-            public const string OutgoingAutoSave = ".autosave";
-            public const string OutgoingAttachmentFolder = "attachment";
+            public const string DocumentWorkingCopy = "documentWorkingCopy.json";
         }
 
         static readonly IDictionary<string, SemaphoreSlim> semaphores = new Dictionary<string, SemaphoreSlim>
@@ -189,7 +183,7 @@ namespace Mark5.Mobile.Common.Storage
 
         #endregion
 
-        #region LastCacheCleanUp
+        #region Last cache clean up
 
         public static async Task<DateTime> GetLastCacheCleanUpAsync(CancellationToken ct = default(CancellationToken))
         {
@@ -207,288 +201,74 @@ namespace Mark5.Mobile.Common.Storage
 
         #endregion
 
-        #region OutgoingDocuments
+        #region Documents upload / Document working copy interop
 
-        public static async Task SaveOutgoingDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview, bool cleanFailedState = false)
+        public static async Task MoveDocumentWorkingCopyToUpload()
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(outgoingDocumentInfo.Identifier);
+            var documentWorkingCopy = await GetDocumentWorkingCopyAsync();
+            var documentWorkingCopyAttachments = await GetDocumentWorkingCopyAttachments();
 
-            if (cleanFailedState)
-            {
-                var wasFailed = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed) == ExistenceCheckResult.FileExists;
-                if (wasFailed)
-                {
-                    var isFailedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingFailed);
-                    await isFailedFile.DeleteAsync();
-                }
-            }
-            var wasLocked = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock) == ExistenceCheckResult.FileExists;
-            if (wasLocked)
-            {
-                var isLockedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingLock);
-                await isLockedFile.DeleteAsync();
-            }
-            var wasSaved = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists;
-            if (wasSaved)
-            {
-                var isSavedFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingAutoSave);
-                await isSavedFile.DeleteAsync();
-            }
-            var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
-            await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
-
-            var documentPreviewFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocumentPreview, CreationCollisionOption.ReplaceExisting);
-            await documentPreviewFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(documentPreview));
-
-            outgoingDocumentInfo.DateLastSavedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
-            var infoFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingInfo, CreationCollisionOption.ReplaceExisting);
-            await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
-        }
-
-        public static async Task<DocumentToUploadContainer> GetOutgoingDocumentContainerAsync(Guid id, bool lockDocument, LoadMode loadMode)
-        {
-            if (!await OutgoingFolderExistsAsync(id))
-                return null;
-
-            try
-            {
-                var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-
-                //Can happen when an attachment is added, but the application is closed before sending it
-                if (await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingDocumentPreview) == ExistenceCheckResult.NotFound)
-                {
-                    await outgoingDocumentFolder.DeleteAsync();
-                    return null;
-                }
-
-                var documentPreviewFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocumentPreview);
-                var documentPreview = await SerializationUtils.DeserializeAsync<DocumentPreview>(await documentPreviewFile.ReadAllTextAsync());
-
-                var infoFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingInfo);
-                var info = await SerializationUtils.DeserializeAsync<OutgoingDocumentInfo>(await infoFile.ReadAllTextAsync());
-                var isFailed = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingFailed) == ExistenceCheckResult.FileExists;
-                var isAutoSave = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists;
-
-                if (isFailed)
-                    info.State = OutgoingDocumentState.Failed;
-                else if (isAutoSave)
-                    info.State = OutgoingDocumentState.AutoSaved;
-                else
-                    info.State = OutgoingDocumentState.Waiting;
-                if (lockDocument)
-                {
-                    await LockOutgoingDocumentAsync(id);
-                    info.Locked = true;
-                }
-                else
-                {
-                    var isLocked = await outgoingDocumentFolder.CheckExistsAsync(Filenames.OutgoingLock) == ExistenceCheckResult.FileExists;
-
-                    if (isLocked)
-                        info.Locked = true;
-                }
-                Document document = null;
-                List<OutgoingDocumentAttachmentDescription> attachments = null;
-
-                if (loadMode == LoadMode.Complete)
-                {
-                    var documentFile = await outgoingDocumentFolder.GetFileAsync(Filenames.OutgoingDocument);
-                    document = await SerializationUtils.DeserializeAsync<Document>(await documentFile.ReadAllTextAsync());
-
-                    var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
-                    attachments = new List<OutgoingDocumentAttachmentDescription>();
-                    foreach (var item in await attachmentsFolder.GetFilesAsync())
-                    {
-                        var attachment = new OutgoingDocumentAttachmentDescription();
-                        var stream = await item.OpenAsync(PCLStorage.FileAccess.Read);
-                        attachment.SizeInBytes = (int) stream.Length;
-                        stream.Dispose();
-                        attachment.Path = item.Path;
-                        attachment.Name = item.Name;
-                        attachments.Add(attachment);
-                    }
-                }
-
-                return new DocumentToUploadContainer
-                {
-                    Document = document,
-                    DocumentPreview = documentPreview,
-                    Info = info,
-                    LocalAttachments = attachments,
-                    LoadMode = loadMode
-                };
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to retrieve outgoing document container", ex);
-
-                return null;
-            }
-        }
-
-        public static async Task<List<DocumentToUploadContainer>> GetOutgoingDocumentContainersAsync()
-        {
-            var identifiers = await GetOutgoingDocumentIdentifiersAsync();
-            var outgoingDocumentContainers = new List<DocumentToUploadContainer>();
-
-            foreach (var id in identifiers)
-            {
-                var container = await GetOutgoingDocumentContainerAsync(id, false, LoadMode.Preview);
-                if (container != null && container.Info.State != OutgoingDocumentState.AutoSaved)
-                    outgoingDocumentContainers.Add(container);
-            }
-
-            return outgoingDocumentContainers;
-        }
-
-        public static async Task<IEnumerable<Guid>> GetOutgoingDocumentIdentifiersAsync()
-        {
-            var identifiers = new List<Guid>();
-            foreach (var folder in await CommonConfig.OutgoingFolder.GetFoldersAsync())
-                identifiers.Add(new Guid(folder.Name));
-
-            return identifiers;
-        }
-
-        public static async Task DeleteOutgoingDocumentFolderAsync(Guid id)
-        {
-            var folderExists = await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
-            if (folderExists)
-            {
-                var outgoingDocumentFolder = await CommonConfig.OutgoingFolder.GetFolderAsync(id.ToString());
-                await outgoingDocumentFolder.DeleteAsync();
-            }
-        }
-
-        public static async Task<IEnumerable<Attachment>> GetOutgoingDocumentAttachmentsAsync(Guid id)
-        {
-            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
-            var attachments = new List<Attachment>();
-            foreach (var item in await attachmentsFolder.GetFilesAsync())
-            {
-                var attachment = new Attachment
-                {
-                    Filename = Path.GetFileNameWithoutExtension(item.Name),
-                    Extension = Path.GetExtension(item.Name),
-                    Stream = await item.OpenAsync(PCLStorage.FileAccess.Read)
-                };
-                attachment.Size = (int) attachment.Stream.Length;
-                attachments.Add(attachment);
-            }
-
-            return attachments;
-        }
-
-        public static async Task<string> SaveOutgoingDocumentAttachmentAsync(Guid id, string filename, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
-        {
-            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
-            var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
-            if (fileExists == ExistenceCheckResult.FileExists)
-                return Path.Combine(attachmentsFolder.Path, filename);
-
-            var file = await attachmentsFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
-            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
-            {
-                await attachmentStream.CopyToAsync(fileStream);
-            }
-            return file.Path;
-        }
-
-        public static async Task RemoveOutgoingDocumentAttachmentAsync(Guid id, string filename, CancellationToken ct = default(CancellationToken))
-        {
-            var attachmentsFolder = await GetOutgoingAttachmentsFolderAsync(id);
-
-            var fileExists = await attachmentsFolder.CheckExistsAsync(filename, ct);
-            if (fileExists != ExistenceCheckResult.FileExists)
-                return;
-
-            var file = await attachmentsFolder.GetFileAsync(filename, ct);
-            await file.DeleteAsync(ct);
-
-            return;
-        }
-
-        public static async Task SetOutgoingDocumentToFailedAsync(Guid id)
-        {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingFailed, CreationCollisionOption.ReplaceExisting);
-        }
-
-        public static async Task LockOutgoingDocumentAsync(Guid id)
-        {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingLock, CreationCollisionOption.ReplaceExisting);
-        }
-
-        public static async Task UnlockOutgoingDocumentAsync(Guid id)
-        {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(id);
-            var lockFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingLock, CreationCollisionOption.OpenIfExists);
-            await lockFile?.DeleteAsync();
-        }
-
-        static async Task<IFolder> GetOutgoingAttachmentsFolderAsync(Guid id)
-        {
-            return await (await GetOutgoingFolderAsync(id)).CreateFolderAsync(Filenames.OutgoingAttachmentFolder, CreationCollisionOption.OpenIfExists);
-        }
-
-        static async Task<bool> OutgoingFolderExistsAsync(Guid id)
-        {
-            return await CommonConfig.OutgoingFolder.CheckExistsAsync(id.ToString()) == ExistenceCheckResult.FolderExists;
-        }
-
-        static async Task<IFolder> GetOutgoingFolderAsync(Guid id)
-        {
-            return await CommonConfig.OutgoingFolder.CreateFolderAsync(id.ToString(), CreationCollisionOption.OpenIfExists);
+            await DeleteDocumentWorkingCopyAsync();
         }
 
         #endregion
 
-        #region Saved documents
+        #region Documents upload
 
-        public static async Task AutoSaveDocumentAsync(OutgoingDocumentInfo outgoingDocumentInfo, Document document, DocumentPreview documentPreview)
+        public static async Task<Guid> GetDocumentToUploadGuid()
         {
-            var outgoingDocumentFolder = await GetOutgoingFolderAsync(outgoingDocumentInfo.Identifier);
+            var folderName = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault()?.Name;
 
-            var documentFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocument, CreationCollisionOption.ReplaceExisting);
-            await documentFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(document));
+            if (folderName == null)
+                return Guid.Empty;
 
-            var documentPreviewFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingDocumentPreview, CreationCollisionOption.ReplaceExisting);
-            await documentPreviewFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(documentPreview));
-
-            outgoingDocumentInfo.DateLastSavedTimestamp = DateTime.Now.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds();
-            outgoingDocumentInfo.State = OutgoingDocumentState.AutoSaved;
-            var infoFile = await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingInfo, CreationCollisionOption.ReplaceExisting);
-            await infoFile.WriteAllTextAsync(await SerializationUtils.SerializeAsync(outgoingDocumentInfo));
-
-            await outgoingDocumentFolder.CreateFileAsync(Filenames.OutgoingAutoSave, CreationCollisionOption.ReplaceExisting);
+            return new Guid(folderName);
         }
 
-        public static async Task<DocumentToUploadContainer> GetAutoSavedDocumentAsync()
+        #endregion
+
+        #region Document working copy
+
+        public static async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy documentWorkingCopy)
         {
-            var autoSavedGuid = await GetAutoSavedIdAsync();
-            return autoSavedGuid == Guid.Empty ? null : await GetOutgoingDocumentContainerAsync(autoSavedGuid, false, LoadMode.Complete);
+            var documentWorkingCopyFile = await CommonConfig.DocumentWorkingCopyFolder.CreateFileAsync(Filenames.DocumentWorkingCopy, CreationCollisionOption.ReplaceExisting);
+            await documentWorkingCopyFile.WriteAllTextAsync(SerializationUtils.Serialize(documentWorkingCopy));
         }
 
-        public static async Task DeleteAutoSavedDocumentAsync()
+        public static async Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream)
         {
-            var autoSavedGuid = await GetAutoSavedIdAsync();
-            if (autoSavedGuid != Guid.Empty) //If not found, it means that in the meanwhile the document was inserted in outgoing list, for instance
-                await DeleteOutgoingDocumentFolderAsync(autoSavedGuid);
+            var file = await CommonConfig.DocumentWorkingCopyFolder.CreateFileAsync(filename, CreationCollisionOption.GenerateUniqueName);
+            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
+                try
+                {
+                    await stream.CopyToAsync(fileStream);
+                }
+                finally
+                {
+                    stream.Dispose();
+                }
         }
 
-        static async Task<Guid> GetAutoSavedIdAsync()
+        public static async Task<DocumentWorkingCopy> GetDocumentWorkingCopyAsync()
         {
-            var identifiers = await GetOutgoingDocumentIdentifiersAsync();
-            foreach (var id in identifiers)
-            {
-                var folder = await GetOutgoingFolderAsync(id);
-                if (await folder.CheckExistsAsync(Filenames.OutgoingAutoSave) == ExistenceCheckResult.FileExists)
-                    return id;
-            }
+            if (await CommonConfig.DocumentWorkingCopyFolder.CheckExistsAsync(Filenames.DocumentWorkingCopy) != ExistenceCheckResult.FileExists)
+                return null;
 
-            return Guid.Empty;
+            var documentWorkingCopyFile = await CommonConfig.DocumentWorkingCopyFolder.GetFileAsync(Filenames.DocumentWorkingCopy);
+            return SerializationUtils.Deserialize<DocumentWorkingCopy>(await documentWorkingCopyFile.ReadAllTextAsync());
         }
+
+        public static async Task DeleteDocumentWorkingCopyAsync()
+        {
+            var files = await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync();
+            foreach (var file in files)
+                await file.DeleteAsync();
+        }
+
+        static async Task<string[]> GetDocumentWorkingCopyAttachments() => (await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync())
+            .Where(f => f.Name != Filenames.DocumentWorkingCopy)
+            .Select(f => f.Name)
+            .ToArray();
 
         #endregion
 
@@ -541,7 +321,7 @@ namespace Mark5.Mobile.Common.Storage
                 await semaphores[filename].WaitAsync();
 
                 if (objectCache.ContainsKey(filename))
-                    return (T) objectCache[filename];
+                    return (T)objectCache[filename];
 
                 var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
                 if (fileExists == ExistenceCheckResult.FileExists)
