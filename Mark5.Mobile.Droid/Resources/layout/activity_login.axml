@@ -8,116 +8,108 @@
     android:fitsSystemWindows="true">
     <include
         layout="@layout/appbar" />
-    <RelativeLayout
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/login_form"
+        android:minWidth="25px"
+        android:minHeight="25px"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/login_button"
-            android:text="@string/log_in"
+        <android.support.v7.widget.LinearLayoutCompat
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="true"
-            android:background="?attr/selectableItemBackground" />
-        <View
-            android:id="@+id/button_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/darkblue"
-            android:layout_above="@id/login_button" />
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/login_form"
-            android:minWidth="25px"
-            android:minHeight="25px"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <android.support.v7.widget.LinearLayoutCompat
-                android:orientation="vertical"
+            android:layout_height="match_parent"
+            app:showDividers="middle"
+            app:divider="@drawable/login_page_divider"
+            android:paddingTop="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp">
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/username_text_input_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:showDividers="middle"
-                app:divider="@drawable/login_page_divider"
-                android:paddingTop="16dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingBottom="16dp">
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/username_text_input_layout"
+                android:layout_height="wrap_content"
+                android:background="@color/darkblue"
+                android:paddingTop="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="4dp">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/username_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/darkblue"
-                    android:paddingTop="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="8dp">
-                    <android.support.design.widget.TextInputEditText
-                        android:id="@+id/username_edit_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/username"
-                        android:singleLine="true"
-                        android:inputType="textNoSuggestions" />
-                </android.support.design.widget.TextInputLayout>
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/password_text_input_layout"
-                    app:passwordToggleEnabled="true"
-                    app:passwordToggleTint="@color/white"
+                    android:hint="@string/username"
+                    android:singleLine="true"
+                    android:inputType="textNoSuggestions" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/password_text_input_layout"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/darkblue"
+                android:paddingTop="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="4dp">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/password_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/darkblue"
-                    android:paddingTop="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="8dp">
-                    <android.support.design.widget.TextInputEditText
-                        android:id="@+id/password_edit_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/password"
-                        android:singleLine="true"
-                        android:inputType="textPassword" />
-                </android.support.design.widget.TextInputLayout>
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/hostname_text_input_layout"
+                    android:hint="@string/password"
+                    android:singleLine="true"
+                    android:inputType="textPassword" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/hostname_text_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/darkblue"
+                android:paddingTop="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="4dp">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/hostname_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/darkblue"
-                    android:paddingTop="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="8dp">
-                    <android.support.design.widget.TextInputEditText
-                        android:id="@+id/hostname_edit_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/hostname"
-                        android:singleLine="true"
-                        android:inputType="textNoSuggestions" />
-                </android.support.design.widget.TextInputLayout>
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/port_text_input_layout"
+                    android:hint="@string/hostname"
+                    android:singleLine="true"
+                    android:inputType="textNoSuggestions" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/port_text_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/darkblue"
+                android:paddingTop="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="4dp">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/port_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/darkblue"
-                    android:paddingTop="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="8dp">
-                    <android.support.design.widget.TextInputEditText
-                        android:id="@+id/port_edit_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/port"
-                        android:singleLine="true"
-                        android:inputType="numberDecimal" />
-                </android.support.design.widget.TextInputLayout>
-                <android.support.v7.widget.AppCompatSpinner
-                    android:id="@+id/ssl_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="8dp" />
-            </android.support.v7.widget.LinearLayoutCompat>
-        </android.support.v4.widget.NestedScrollView>
-    </RelativeLayout>
+                    android:hint="@string/port"
+                    android:singleLine="true"
+                    android:inputType="numberDecimal" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/ssl_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="8dp" />
+        </android.support.v7.widget.LinearLayoutCompat>
+    </android.support.v4.widget.NestedScrollView>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="visible"
+        app:backgroundTint="@color/darkblue"
+        app:layout_anchorGravity="bottom|right|end" />
 </android.support.design.widget.CoordinatorLayout>
