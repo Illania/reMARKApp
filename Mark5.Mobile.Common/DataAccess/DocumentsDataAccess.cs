@@ -664,73 +664,29 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<IEnumerable<int>> GetPendingFolders()
+        public async Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds)
         {
             try
             {
-                var fIds = new List<int>();
+                var ids = new int[0];
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderDocumentLink.FolderId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderDocumentLink)}" + $"   where {nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
+                    var query = $"select distinct DP.{nameof(DocumentPreview.Id)} " +
+                                $"from {nameof(DocumentPreview)} as DP " +
+                                $"where DP.{nameof(DocumentPreview.Id)} not in (select {nameof(Document.Id)} from {nameof(Document)}) " +
+                                $" and DP.{nameof(DocumentPreview.Id)} in (select distinct {nameof(FolderDocumentLink.DocumentId)} from {nameof(FolderDocumentLink)} where {nameof(FolderDocumentLink.FolderId)} in ({string.Join(",", folderIds)})) " +
+                                $"order by DP.{nameof(DocumentPreview.Id)} desc " +
+                                "limit 50";
 
-                    var result = c.Query<IdValue>(queryString);
-
-                    fIds = result.Select(v => v.Id).ToList();
+                    var result = c.Query<IdValue>(query);
+                    ids = result.Select(v => v.Id).ToArray();
                 });
-
-                return fIds;
+                return ids;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error while getting pending folder ids for documents.", ex);
-            }
-        }
-
-        public async Task<bool> IsDocumentCached(int documentId)
-        {
-            try
-            {
-                var found = false;
-
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    var result = c.Table<Document>().Count(d => d.Id == documentId);
-                    found = result >= 1;
-                });
-
-                return found;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while checking document existence.", ex);
-            }
-        }
-
-        public async Task<IEnumerable<int>> GetPendingDocumentsId(int folderId)
-        {
-            try
-            {
-                var documentIds = new List<int>();
-
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    var folderCondition = $"{nameof(FolderDocumentLink.FolderId)} = ?";
-                    var inCondition = $"{nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
-                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}'"
-                        + $" from {nameof(FolderDocumentLink)}"
-                        + $" where {folderCondition} and {inCondition}"
-                        + $" order by {nameof(FolderDocumentLink.DocumentId)} desc";
-
-                    var result = c.Query<IdValue>(queryString, folderId);
-                    documentIds = result.Select(v => v.Id).ToList();
-                });
-
-                return documentIds;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while getting pending document ids.", ex);
+                throw new DataAccessException("Error getting document preview IDs of non-cached documents.", ex);
             }
         }
 

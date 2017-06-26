@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Services;
-using Mark5.Mobile.Common.Tester;
+using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Services
@@ -123,7 +122,7 @@ namespace Mark5.Mobile.IOS.Services
         {
             try
             {
-                var tester = TesterFactory.Create();
+                var tester = ConnectionTesterFactory.Create();
                 if (!await tester.CanTest())
                 {
                     CommonConfig.Logger.Info("Cannot test service availability");

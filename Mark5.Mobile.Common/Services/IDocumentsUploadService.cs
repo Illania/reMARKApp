@@ -1,10 +1,6 @@
 ﻿namespace Mark5.Mobile.Common.Services
 {
-    public interface IDocumentsUploadService
+    public interface IDocumentsUploadService : IAbstractService
     {
-        void Notify();
-        bool IsRunning();
-        void Start();
-        void Stop();
     }
 }

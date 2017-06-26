@@ -1,12 +1,6 @@
-﻿using System.Threading.Tasks;
-
-namespace Mark5.Mobile.Common.Services
+﻿namespace Mark5.Mobile.Common.Services
 {
-    public interface IDocumentsDownloadService
+    public interface IDocumentsDownloadService : IAbstractService
     {
-        Task Notify(int folderId);
-        Task<bool> IsRunning();
-        Task Start();
-        Task Stop();
     }
 }

@@ -5,75 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Storage;
-using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Services
 {
-    class DocumentsUploadService : IDocumentsUploadService
+    class DocumentsUploadService : AbstractService, IDocumentsUploadService
     {
-        static readonly object lockObj = new object();
-
-        Task sendTask;
-        CancellationTokenSource sendTaskCts;
-
-        SemaphoreSlim ss = new SemaphoreSlim(1);
-
-        #region Public methods
-
-        public bool IsRunning()
+        protected override async Task Work(CancellationToken ct)
         {
-            lock (lockObj)
-                return sendTask != null;
-        }
-
-        public void Start()
-        {
-            lock (lockObj)
-            {
-                CommonConfig.Logger.Info("Starting...");
-
-                if (sendTask != null)
-                    return;
-
-                if (!CommonConfig.Reachability.IsReachable)
-                    return;
-
-                sendTaskCts?.Cancel();
-                sendTaskCts = new CancellationTokenSource();
-
-                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
-                CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
-
-                sendTask = Task.Run(async () => await SendAction(sendTaskCts.Token));
-
-                CommonConfig.Logger.Info("Started");
-            }
-        }
-
-        public void Stop()
-        {
-            lock (lockObj)
-            {
-                CommonConfig.Logger.Info("Stopping...");
-
-                sendTask = null;
-                sendTaskCts?.Cancel();
-
-                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
-
-                CommonConfig.Logger.Info("Stopped");
-            }
-        }
-
-        public void Notify() => ss.Release();
-
-        #endregion
-
-        #region Send Action
-
-        async Task SendAction(CancellationToken ct)
-        {
-            CommonConfig.Logger.Info("Starting send action...");
+            CommonConfig.Logger.Info("Starting upload task...");
 
             try
             {
@@ -86,7 +25,7 @@ namespace Mark5.Mobile.Common.Services
                     {
                         CommonConfig.Logger.Info("No documents to upload found. Waiting...");
 
-                        await ss.WaitAsync(ct);
+                        await MainSemaphore.WaitAsync(ct);
                         continue;
                     }
 
@@ -131,7 +70,7 @@ namespace Mark5.Mobile.Common.Services
                                 uploadedAttachmentsGuids.Add(uploadedAttachmentGuid);
 
                                 if (ct.IsCancellationRequested)
-                                    continue;
+                                    break;
                             }
                         }
 
@@ -163,25 +102,7 @@ namespace Mark5.Mobile.Common.Services
                 CommonConfig.Logger.Error("Unexpected error in send action!", ex);
             }
 
-            CommonConfig.Logger.Info("Stopped send action");
+            CommonConfig.Logger.Info("Stopped upload task");
         }
-
-        #endregion
-
-        #region Reachability Changes
-
-        void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
-        {
-            if (!e.Changed)
-                return;
-
-            if (e.IsReachable)
-                Start();
-            else
-                Stop();
-        }
-
-        #endregion
-
     }
 }

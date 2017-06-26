@@ -322,9 +322,9 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     CommonConfig.Logger.Info("Cleaned up cache");
                 }
 
-                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadManager)}...");
-                await Managers.DocumentsDownloadManager.Start();
-                await Managers.OutgoingDocumentsManager.Start();
+                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
+                Common.Services.Services.DocumentsDownloadService.Start();
+                Common.Services.Services.DocumentsUploadService.Start();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.Reachability.Refresh();
