@@ -172,7 +172,7 @@
 		<Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ObjectActionsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ObjectLinksListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\OutgoingDocumentListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentsToUploadListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SettingsViewController.cs" />

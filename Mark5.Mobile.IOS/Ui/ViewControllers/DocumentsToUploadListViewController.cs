@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -9,21 +7,15 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class OutgoingDocumentListViewController : AbstractViewController, IPrimaryViewController, IUIGestureRecognizerDelegate
+    public class DocumentsToUploadListViewController : AbstractViewController, IPrimaryViewController
     {
         readonly Folder outgoingFolder = Folder.DocumentsOutgoingFolder;
 
-        UIBarButtonItem composeDocumentItem;
-        UIBarButtonItem exitEditItem;
-        UIBarButtonItem editItem;
-
-        UIRefreshControl refreshControl;
         UITableView tableView;
 
         bool refreshing;
@@ -34,7 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            InitializeNavigationBar();
             InitializeView();
         }
 
@@ -50,7 +41,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeNavigationBarTitle();
-            InitializeHandlers();
 
             if (tableView?.IndexPathForSelectedRow != null)
                 tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
@@ -59,7 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
                     tableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -68,19 +58,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(OutgoingDocumentListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(DocumentsToUploadListViewController)} appeared");
 
             await RefreshData();
 
             if (IsBeingDismissed)
                 return;
-        }
-
-        public override void ViewWillDisappear(bool animated)
-        {
-            base.ViewWillDisappear(animated);
-
-            DeinitializeHandlers();
         }
 
         public override void DidReceiveMemoryWarning()
@@ -97,16 +80,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Initialization
-
-        void InitializeNavigationBar()
-        {
-            composeDocumentItem = new UIBarButtonItem();
-            composeDocumentItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
-
-            exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
-        }
 
         void InitializeView()
         {
@@ -139,10 +112,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Delegate = this
             };
             tableView.AddGestureRecognizer(longPressRecognizer);
-
-            refreshControl = new UIRefreshControl();
-            refreshControl.BackgroundColor = UIColor.White;
-            tableView.AddSubview(refreshControl);
         }
 
         void InitializeNavigationBarTitle()
@@ -151,44 +120,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.Title = outgoingFolder.Name;
             NavigationItem.Prompt = null;
             UIView.AnimationsEnabled = true;
-        }
-
-        void InitializeHandlers()
-        {
-            if (composeDocumentItem != null)
-                composeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
-
-            if (exitEditItem != null)
-                exitEditItem.Clicked += ExitEditItem_Clicked;
-
-            if (editItem != null)
-                editItem.Clicked += EditItem_Clicked;
-
-            if (refreshControl != null)
-                refreshControl.ValueChanged += RefreshControl_ValueChanged;
-
-            Managers.OutgoingDocumentsManager.DocumentBeingSent += OutgoingDocumentsManager_DocumentBeingSent;
-            Managers.OutgoingDocumentsManager.DocumentSendingFailed += OutgoingDocumentsManager_DocumentSendingFailed;
-            Managers.OutgoingDocumentsManager.DocumentSendingSuccessful += OutgoingDocumentsManager_DocumentSendingSuccessful;
-        }
-
-        void DeinitializeHandlers()
-        {
-            if (composeDocumentItem != null)
-                composeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
-
-            if (exitEditItem != null)
-                exitEditItem.Clicked -= ExitEditItem_Clicked;
-
-            if (editItem != null)
-                editItem.Clicked -= EditItem_Clicked;
-
-            if (refreshControl != null)
-                refreshControl.ValueChanged -= RefreshControl_ValueChanged;
-
-            Managers.OutgoingDocumentsManager.DocumentBeingSent -= OutgoingDocumentsManager_DocumentBeingSent;
-            Managers.OutgoingDocumentsManager.DocumentSendingFailed -= OutgoingDocumentsManager_DocumentSendingFailed;
-            Managers.OutgoingDocumentsManager.DocumentSendingSuccessful -= OutgoingDocumentsManager_DocumentSendingSuccessful;
         }
 
         #endregion
@@ -202,12 +133,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
 
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
-                var vc = (DocumentViewController) nc.ViewControllers[0];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
 
                 if (vc.IsShowingOutgoingDocumentWithGuid(container.Info.Identifier))
                     return;
@@ -228,76 +159,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        [Export("longPressed:")]
-        public void LongPressed(UILongPressGestureRecognizer recognizer)
-        {
-            if (tableView.Editing)
-                return;
-
-            StartEditing();
-
-            var point = recognizer.LocationInView(tableView);
-            var indexPath = tableView.IndexPathForRowAtPoint(point);
-
-            tableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
-        }
-
-        void StartEditing()
-        {
-            tableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
-            NavigationItem.SetLeftBarButtonItem(editItem, true);
-        }
-
-        void ComposeDocumentItem_Clicked(object sender, EventArgs e)
-        {
-            var vc = new ComposeDocumentViewController
-            {
-                CreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentDirection = DocumentDirection.None
-            };
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void ExitEditItem_Clicked(object sender, EventArgs e)
-        {
-            EndEditing();
-        }
-
         void EndEditing()
         {
             tableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
-        }
-
-        async void EditItem_Clicked(object sender, EventArgs e)
-        {
-            if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
-                return;
-
-            var rows = tableView.IndexPathsForSelectedRows.ToArray();
-            var selectedDocuments = rows.Select(ip => ((DataSource) tableView.Source).Items[ip.Row]).ToList();
-
-            var result = await Dialogs.ShowListDialogAsync(this,
-                null,
-                new string[]
-                {
-                    Localization.GetString("delete")
-                },
-                editItem);
-
-            if (result == 0)
-                await Delete(selectedDocuments);
         }
 
         async void Delete(DocumentToUploadContainer container)
         {
-            await Delete(new List<DocumentToUploadContainer>
-            {
-                container
-            });
+            await Delete(new List<DocumentToUploadContainer> { container });
         }
 
         async Task Delete(List<DocumentToUploadContainer> containers)
@@ -323,13 +193,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             refreshing = true;
-            refreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
             CommonConfig.Logger.Info($"Refreshing outgoing documents list");
 
             try
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
 
                 if (forceClear)
                     ds.Reset();
@@ -344,9 +213,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
 
-            refreshControl.EndRefreshing();
-            refreshControl.ValueChanged += RefreshControl_ValueChanged;
-
             refreshing = false;
         }
 
@@ -358,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
                 var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
                 if (row >= 0)
                 {
@@ -373,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
                 var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
                 if (row >= 0)
                 {
@@ -388,7 +254,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
                 var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
                 if (row >= 0)
                 {
@@ -408,13 +274,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public List<DocumentToUploadContainer> Items { get; private set; } = new List<DocumentToUploadContainer>(1000);
 
-            OutgoingDocumentListViewController viewController;
+            DocumentsToUploadListViewController viewController;
             UITableView documentsTableView;
             readonly string emptyText;
 
             bool loading = true;
 
-            public DataSource(OutgoingDocumentListViewController viewController, UITableView documentsTableView, string emptyText)
+            public DataSource(DocumentsToUploadListViewController viewController, UITableView documentsTableView, string emptyText)
             {
                 this.viewController = viewController;
                 this.documentsTableView = documentsTableView;
@@ -519,11 +385,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public void UpdateRow(int row)
             {
-                documentsTableView.ReloadRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(row, 0)
-                    },
-                    UITableViewRowAnimation.Fade);
+                documentsTableView.ReloadRows(new[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Fade);
             }
 
             public void RemoveRow(int row)
@@ -531,11 +393,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (Items.Count < 1 && row == 0)
                     UpdateRow(0); //We always keep a row for the empty table cell
                 else
-                    documentsTableView.DeleteRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(row, 0)
-                        },
-                        UITableViewRowAnimation.Fade);
+                    documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Fade);
             }
         }
     }

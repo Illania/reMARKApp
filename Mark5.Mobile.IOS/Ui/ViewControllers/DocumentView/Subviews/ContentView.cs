@@ -13,7 +13,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     public class ContentView : DocumentSubView, IWKNavigationDelegate, IWKScriptMessageHandler
     {
         static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
-
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
 
         WKWebView webView;
@@ -36,11 +35,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             webView = null;
 
-            var preferences = new WKPreferences();
-            preferences.MinimumFontSize = 12f;
-            preferences.JavaScriptCanOpenWindowsAutomatically = false;
-            preferences.JavaScriptEnabled = true;
-
+            var preferences = new WKPreferences
+            {
+                MinimumFontSize = 12f,
+                JavaScriptCanOpenWindowsAutomatically = false,
+                JavaScriptEnabled = true
+            };
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
@@ -49,17 +49,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             userContentController.AddUserScript(wkscript2);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
-            var configuration = new WKWebViewConfiguration();
-            configuration.SuppressesIncrementalRendering = true;
-            configuration.AllowsInlineMediaPlayback = false;
-            configuration.UserContentController = userContentController;
-            configuration.Preferences = preferences;
-            configuration.DataDetectorTypes = WKDataDetectorTypes.PhoneNumber | WKDataDetectorTypes.Link;
-
-            webView = new WKWebView(CGRect.Empty, configuration);
-            webView.NavigationDelegate = this;
-            webView.Opaque = false;
-            webView.BackgroundColor = UIColor.White;
+            var configuration = new WKWebViewConfiguration
+            {
+                SuppressesIncrementalRendering = true,
+                AllowsInlineMediaPlayback = false,
+                UserContentController = userContentController,
+                Preferences = preferences,
+                DataDetectorTypes = WKDataDetectorTypes.PhoneNumber | WKDataDetectorTypes.Link
+            };
+            webView = new WKWebView(CGRect.Empty, configuration)
+            {
+                NavigationDelegate = this,
+                Opaque = false,
+                BackgroundColor = UIColor.White
+            };
             webView.ScrollView.Bounces = false;
             webView.ScrollView.BouncesZoom = false;
             webView.TranslatesAutoresizingMaskIntoConstraints = false;

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.Common.Storage
 {
@@ -326,11 +327,24 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task DeleteDocumentToUpload(Guid guid)
         {
-            var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
+            var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name != "failed" && f.Name == guid.ToString());
             if (folder == null)
                 return;
 
             await folder.DeleteAsync();
+        }
+
+        public static async Task MoveDocumentToUploadToFailed(Guid guid)
+        {
+            var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
+            if (folder == null)
+                return;
+
+            var failedFolder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists);
+            if (failedFolder == null)
+                return;
+
+            await folder.MoveRecursivelyAsync(failedFolder, CreationCollisionOption.FailIfExists);
         }
 
         #endregion

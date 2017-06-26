@@ -93,39 +93,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             IndicatorImageView4.Image = documentPreview.CommentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "message-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
         }
 
-        public void Initialize(DocumentToUploadContainer container)
-        {
-            var documentPreview = container.DocumentPreview;
-
-            var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
-            SenderNameLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
-
-            SubjectLabel.Text = string.IsNullOrWhiteSpace(documentPreview.Subject) ? Localization.GetString("no_subject") : documentPreview.Subject;
-            MessagePreviewLabel.Text = !string.IsNullOrWhiteSpace(documentPreview.Preview) ? Regex.Replace(documentPreview.Preview, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline) : Localization.GetString("no_content");
-            DateReceivedLabel.Text = container.Info.DateLastSavedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
-
-            UIImage stateIcon;
-            switch (container.Info.State)
-            {
-                case OutgoingDocumentState.Failed:
-                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "failed.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case OutgoingDocumentState.Sending:
-                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "sending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case OutgoingDocumentState.Waiting:
-                    stateIcon = UIImage.FromBundle(Path.Combine("icons", "pending.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                default:
-                    stateIcon = null;
-                    break;
-            }
-
-            IndicatorImageView1.Image = stateIcon;
-            IndicatorImageView2.Image = null;
-            IndicatorImageView3.Image = documentPreview.AttachmentsCount > 0 ? UIImage.FromBundle(Path.Combine("icons", "attachment-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : null;
-        }
-
         #endregion
 
         #region UITableViewCell overrides
@@ -181,9 +148,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 UIView previousView = null;
                 foreach (var color in categoriesColors)
                 {
-                    var categoryView = new UIView();
-                    categoryView.BackgroundColor = color;
-                    categoryView.TranslatesAutoresizingMaskIntoConstraints = false;
+                    var categoryView = new UIView
+                    {
+                        BackgroundColor = color,
+                        TranslatesAutoresizingMaskIntoConstraints = false
+                    };
                     CategoriesView.AddSubview(categoryView);
 
                     if (previousView == null)

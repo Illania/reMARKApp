@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -895,7 +895,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachmentDescription)
+        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
@@ -970,7 +970,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void AttachmentsView_DeleteAttachmentClicked(object sender, IAttachmentDescription attachment)
+        async void AttachmentsView_DeleteAttachmentClicked(object sender, AttachmentDescription attachment)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;

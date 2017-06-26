@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -136,13 +136,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
     class AttachmentsSubView : UIView
     {
-        public IAttachmentDescription Attachment { get; }
+        public AttachmentDescription Attachment { get; }
 
         readonly AttachmentsView view;
 
         UIButton attachmentButton;
 
-        public AttachmentsSubView(AttachmentsView view, IAttachmentDescription attachmentDescription)
+        public AttachmentsSubView(AttachmentsView view, AttachmentDescription attachmentDescription)
         {
             this.view = view;
             Attachment = attachmentDescription;
@@ -175,9 +175,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
     public class AttachmentButtonTappedEventArgs : EventArgs
     {
-        public IAttachmentDescription Attachment { get; }
+        public AttachmentDescription Attachment { get; }
 
-        public AttachmentButtonTappedEventArgs(IAttachmentDescription attachment)
+        public AttachmentButtonTappedEventArgs(AttachmentDescription attachment)
         {
             Attachment = attachment;
         }

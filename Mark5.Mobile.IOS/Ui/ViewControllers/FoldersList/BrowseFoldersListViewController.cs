@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 UIViewController vc;
                 if (folder.Local)
-                    vc = new OutgoingDocumentListViewController();
+                    vc = new DocumentsToUploadListViewController();
                 else
                     vc = new DocumentsListViewController
                     {

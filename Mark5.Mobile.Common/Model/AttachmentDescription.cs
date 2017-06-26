@@ -3,28 +3,17 @@ using Newtonsoft.Json;
 
 namespace Mark5.Mobile.Common.Model
 {
-    public class AttachmentDescription : IAttachmentDescription
+    public class AttachmentDescription
     {
-        [JsonIgnore] static readonly char[] invalidChars =
-        {
-            '\\',
-            '/',
-            ':',
-            '?',
-            '|',
-            '*',
-            '"',
-            '<',
-            '>',
-            '\0',
-            '\b',
-            '\t'
-        };
+        [JsonIgnore]
+        static readonly char[] invalidChars = { '\\', '/', ':', '?', '|', '*', '"', '<', '>', '\0', '\b', '\t' };
 
         public int Id { get; set; } = -1;
 
         public string Name { get; set; }
-        [JsonIgnore] string safeName;
+
+        [JsonIgnore]
+        string safeName;
 
         [JsonIgnore]
         public string SafeName

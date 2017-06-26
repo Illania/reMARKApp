@@ -26,8 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         NSLayoutConstraint spaceHeightConstraint;
 
-        RecipentSuggestions suggestionService;
-
         CancellationTokenSource searchCancellationTokenSource;
         List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
 
@@ -45,7 +43,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public SuggestionsListView(ComposeDocumentViewController composeDocumentViewController)
         {
             viewController = composeDocumentViewController;
-            suggestionService = new RecipentSuggestions();
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
@@ -58,10 +55,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             BackgroundColor = UIColor.White;
 
-            spaceView = new UIView();
-            spaceView.Opaque = false;
-            spaceView.BackgroundColor = UIColor.Clear;
-            spaceView.TranslatesAutoresizingMaskIntoConstraints = false;
+            spaceView = new UIView
+            {
+                Opaque = false,
+                BackgroundColor = UIColor.Clear,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
             AddSubview(spaceView);
             AddConstraints(new[]
@@ -72,8 +71,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 spaceHeightConstraint
             });
 
-            suggestionsTextView = new SuggestionsTextView();
-            suggestionsTextView.TranslatesAutoresizingMaskIntoConstraints = false;
+            suggestionsTextView = new SuggestionsTextView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             AddSubview(suggestionsTextView);
             AddConstraints(new[]
             {
@@ -87,8 +88,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsTextView.CommaOrEnterPressed += (sender, e) => Dismiss();
             suggestionsTextView.ReachedOriginalState += (sender, e) => Dismiss();
 
-            separator = new SeparatorSubView();
-            separator.TranslatesAutoresizingMaskIntoConstraints = false;
+            separator = new SeparatorSubView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             AddSubview(separator);
             AddConstraints(new[]
             {
@@ -101,13 +104,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitializeListView()
         {
-            suggestionsTableView = new UITableView();
-            suggestionsTableView.BackgroundColor = Theme.Gray;
-            suggestionsTableView.RowHeight = UITableView.AutomaticDimension;
-            suggestionsTableView.EstimatedRowHeight = 44f;
-            suggestionsTableView.TableFooterView = new UIView(CGRect.Empty); //Used to avoid showing empty rows at the bottom
+            suggestionsTableView = new UITableView
+            {
+                BackgroundColor = Theme.Gray,
+                RowHeight = UITableView.AutomaticDimension,
+                EstimatedRowHeight = 44f,
+                TableFooterView = new UIView(CGRect.Empty),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             suggestionsTableView.Source = suggestionsListViewSource = new SuggestionsListViewSource(this, suggestionsTableView);
-            suggestionsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(suggestionsTableView);
             AddConstraints(new[]
             {
@@ -186,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 suggestionsListViewSource.Searching = true;
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                suggestionService.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
+                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
             }
             else
             {

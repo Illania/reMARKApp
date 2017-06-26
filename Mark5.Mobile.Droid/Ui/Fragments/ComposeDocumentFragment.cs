@@ -393,7 +393,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void AttachmentsView_AttachmentClicked(object sender, IAttachmentDescription attachment)
+        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachment)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var option = await Dialogs.ShowListDialog(Context, attachment.Name, Resource.Array.attachment_clicked_options, true);

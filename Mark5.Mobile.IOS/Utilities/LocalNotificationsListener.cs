@@ -27,12 +27,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
             var request = UNNotificationRequest.FromIdentifier(FailedSendingIdentifier, notificatioContent, null);
 
-            UNUserNotificationCenter.Current.AddNotificationRequest(request,
-                err =>
-                {
-                    if (err != null)
-                        CommonConfig.Logger.Error($"Error while sending notification for failed send document: {err}");
-                });
+            UNUserNotificationCenter.Current.AddNotificationRequest(request, null);
         }
     }
 }

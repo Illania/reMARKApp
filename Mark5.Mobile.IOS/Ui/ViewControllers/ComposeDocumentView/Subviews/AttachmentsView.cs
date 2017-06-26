@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,10 +16,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         UILabel titleLabel;
         UIStackView stackView;
 
-        List<IAttachmentDescription> attachmentsDescription = new List<IAttachmentDescription>();
+        List<AttachmentDescription> attachmentsDescription = new List<AttachmentDescription>();
 
-        public event EventHandler<IAttachmentDescription> AttachmentClicked = delegate { };
-        public event EventHandler<IAttachmentDescription> DeleteAttachmentClicked = delegate { };
+        public event EventHandler<AttachmentDescription> AttachmentClicked = delegate { };
+        public event EventHandler<AttachmentDescription> DeleteAttachmentClicked = delegate { };
 
         public AttachmentsView()
         {
@@ -95,7 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             return Task.CompletedTask;
         }
 
-        public void AddAttachment(IAttachmentDescription attachment)
+        public void AddAttachment(AttachmentDescription attachment)
         {
             attachmentsDescription.Add(attachment);
 
@@ -105,7 +105,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             UpdateVisibility();
         }
 
-        public void RemoveAttachment(object view, IAttachmentDescription attachmentDescrption)
+        public void RemoveAttachment(object view, AttachmentDescription attachmentDescrption)
         {
             attachmentsDescription.Remove(attachmentDescrption);
             (view as UIView).RemoveFromSuperview();
@@ -127,12 +127,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Hidden = attachmentsDescription.Count < 1;
         }
 
-        void HandleAttachmentClicked(AttachmentsSubView view, IAttachmentDescription attachmentDescrption)
+        void HandleAttachmentClicked(AttachmentsSubView view, AttachmentDescription attachmentDescrption)
         {
             AttachmentClicked(view, attachmentDescrption);
         }
 
-        void HandleDeleteAttachmentClicked(AttachmentsSubView view, IAttachmentDescription attachmentDescrption)
+        void HandleDeleteAttachmentClicked(AttachmentsSubView view, AttachmentDescription attachmentDescrption)
         {
             DeleteAttachmentClicked(view, attachmentDescrption);
         }
@@ -141,14 +141,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         class AttachmentsSubView : UIStackView
         {
-            readonly IAttachmentDescription attachmentDescription;
-            readonly Action<AttachmentsSubView, IAttachmentDescription> attachmentClickedAction;
-            readonly Action<AttachmentsSubView, IAttachmentDescription> deleteAttachmentClickedAction;
+            readonly AttachmentDescription attachmentDescription;
+            readonly Action<AttachmentsSubView, AttachmentDescription> attachmentClickedAction;
+            readonly Action<AttachmentsSubView, AttachmentDescription> deleteAttachmentClickedAction;
 
             UIButton filenameButton;
             UIButton deleteButton;
 
-            public AttachmentsSubView(IAttachmentDescription attachmentDescription, Action<AttachmentsSubView, IAttachmentDescription> attachmentClickedAction, Action<AttachmentsSubView, IAttachmentDescription> deleteAttachmentClickedAction)
+            public AttachmentsSubView(AttachmentDescription attachmentDescription, Action<AttachmentsSubView, AttachmentDescription> attachmentClickedAction, Action<AttachmentsSubView, AttachmentDescription> deleteAttachmentClickedAction)
             {
                 this.attachmentDescription = attachmentDescription;
                 this.attachmentClickedAction = attachmentClickedAction;
