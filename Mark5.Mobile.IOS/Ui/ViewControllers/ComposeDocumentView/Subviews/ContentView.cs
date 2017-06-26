@@ -30,7 +30,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
 
-        static readonly NSString script3 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
+        static readonly NSString script3 = new NSString("document.addEventListener(\"DOMContentLoaded\", function () {window.webkit.messageHandlers.sizeNotification.postMessage({domLoaded:true});});");
+
+        static readonly NSString script4 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
 
         UIButton expandButton;
 
@@ -96,12 +98,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
-            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
+            var wkscript4 = new WKUserScript(script4, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
             userContentController.AddUserScript(wkscript3);
+            userContentController.AddUserScript(wkscript4);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
             userContentController.AddScriptMessageHandler(this, "mutation");
 
@@ -188,10 +192,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
+            userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
             var configuration = new WKWebViewConfiguration();
@@ -316,6 +322,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && CreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
             {
+                await oldContentWebView.EvaluateJavaScriptAsync("");
+
                 string oldContent = null;
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
                 {
@@ -645,28 +653,53 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var justLoadedNumber = responseDict["justLoaded"] as NSNumber;
             var resizedNumber = responseDict["resized"] as NSNumber;
             var mutatedNumber = responseDict["mutated"] as NSNumber;
+            var domLoadedNumber = responseDict["domLoaded"] as NSNumber;
 
             var justLoaded = justLoadedNumber != null && justLoadedNumber.BoolValue;
             var resized = resizedNumber != null && resizedNumber.BoolValue;
             var mutated = mutatedNumber != null && mutatedNumber.BoolValue;
+            var domLoaded = domLoadedNumber != null && domLoadedNumber.BoolValue;
 
+            Action<WKWebView, NSLayoutConstraint> resizeAction = null;
+            resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)),
+                () =>
+                {
+                    if (wv.IsLoading)
+                    {
+                        resizeAction(wv, nslc);
+                    }
+                    else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
+                    {
+                        nslc.Constant = wv.ScrollView.ContentSize.Height;
+                        SetNeedsLayout();
+                    }
+                });
+
+            Action<WKWebView, NSLayoutConstraint> stopLoadingAction = null;
+            stopLoadingAction = (wv, nslc) =>
+            DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)),
+                                                  () =>
+                                                  {
+                                                      if (wv.IsLoading)
+                                                      {
+                                                          wv.StopLoading();
+                                                          resizeAction(wv, nslc);
+                                                      }
+                                                  });
+
+            if (domLoaded)
+            {
+                if (userContentController == newContentWebView.Configuration.UserContentController)
+                {
+                    stopLoadingAction(newContentWebView, newContentHeightConstraint);
+                }
+                else if (userContentController == oldContentWebView.Configuration.UserContentController)
+                {
+                    stopLoadingAction(oldContentWebView, oldContentHeightConstraint);
+                }
+            }
             if (justLoaded || resized || mutated)
             {
-                Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-                resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)),
-                    () =>
-                    {
-                        if (wv.IsLoading)
-                        {
-                            resizeAction(wv, nslc);
-                        }
-                        else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
-                        {
-                            nslc.Constant = wv.ScrollView.ContentSize.Height;
-                            SetNeedsLayout();
-                        }
-                    });
-
                 if (userContentController == newContentWebView.Configuration.UserContentController)
                 {
                     if (resized && newContentResized)
