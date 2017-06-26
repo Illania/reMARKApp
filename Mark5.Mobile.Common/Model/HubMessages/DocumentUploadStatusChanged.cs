@@ -3,22 +3,21 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Common.Model.HubMessages
 {
-    public class DocumentInUploadChangedMessage : TinyMessageBase
+    public class DocumentUploadStatusChanged : TinyMessageBase
     {
 
-        public enum ChangeType
+        public enum Status
         {
             None,
-            DocumentAdded,
             DocumentSending,
             DocumentSent,
             DocumentSentFailed
         }
 
-        public ChangeType Change { get; set; }
+        public Status Change { get; }
         public Guid DocumentGuid { get; }
 
-        public DocumentInUploadChangedMessage(object sender, ChangeType change, Guid documentGuid)
+        public DocumentUploadStatusChanged(object sender, Status change, Guid documentGuid)
             : base(sender)
         {
             Change = change;

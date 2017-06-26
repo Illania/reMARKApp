@@ -159,7 +159,7 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
 
                 if (n.ObjectType == ObjectType.Document)
                 {
-                    if (notification.Request.Identifier != LocalNotificationsListener.FailedSendingIdentifier)
+                    if (notification.Request.Identifier != LocalNotificationsListener.DocumentFailedToSendIdentifier)
                         PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
 
                     options(UNNotificationPresentationOptions.Alert);

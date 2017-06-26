@@ -209,6 +209,8 @@ namespace Mark5.Mobile.Common.Storage
             var documentWorkingCopy = await GetDocumentWorkingCopyAsync();
             var documentWorkingCopyAttachments = await GetDocumentWorkingCopyAttachments();
 
+
+
             await DeleteDocumentWorkingCopyAsync();
         }
 
@@ -218,8 +220,7 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task<Guid> GetDocumentToUploadGuid()
         {
-            var folderName = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault()?.Name;
-
+            var folderName = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name != "failed")?.Name;
             if (folderName == null)
                 return Guid.Empty;
 
@@ -327,7 +328,7 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task DeleteDocumentToUpload(Guid guid)
         {
-            var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name != "failed" && f.Name == guid.ToString());
+            var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
             if (folder == null)
                 return;
 
@@ -345,6 +346,19 @@ namespace Mark5.Mobile.Common.Storage
                 return;
 
             await folder.MoveRecursivelyAsync(failedFolder, CreationCollisionOption.FailIfExists);
+        }
+
+        public static async Task MoveFailedToDocumentToUpload(Guid guid)
+        {
+            var failedFolder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists);
+            if (failedFolder == null)
+                return;
+
+            var failedFolderGuid = (await failedFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
+            if (failedFolderGuid == null)
+                return;
+
+            await failedFolderGuid.MoveRecursivelyAsync(CommonConfig.DocumentsToUploadFolder, CreationCollisionOption.FailIfExists);
         }
 
         #endregion

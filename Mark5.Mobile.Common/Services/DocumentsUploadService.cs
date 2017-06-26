@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Storage;
+using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Common.Services
 {
@@ -28,6 +29,8 @@ namespace Mark5.Mobile.Common.Services
                         await MainSemaphore.WaitAsync(ct);
                         continue;
                     }
+
+                    CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSending, documentToUploadGuid));
 
                     try
                     {
@@ -97,12 +100,16 @@ namespace Mark5.Mobile.Common.Services
                         await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
 
                         CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
+
+                        CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSent, documentToUploadGuid));
                     }
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error($"Document failed sent [documentToUploadGuid={documentToUploadGuid}]", ex);
 
                         await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid);
+
+                        CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSentFailed, documentToUploadGuid));
                     }
                 }
             }
