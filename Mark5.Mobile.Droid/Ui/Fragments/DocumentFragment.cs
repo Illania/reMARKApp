@@ -196,12 +196,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (resultCode == (int) Result.Ok)
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
-                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    var comments = Serializer.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
                     UpdateComments(comments);
                 }
                 else if (requestCode == RequestCodes.CategoriesRequest)
                 {
-                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    var categories = Serializer.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
                 }
         }
@@ -326,9 +326,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    Serializer.Serialize(new List<IBusinessEntity>
                     {
                         DocumentPreview
                     }));
@@ -341,13 +341,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    Serializer.Serialize(new List<IBusinessEntity>
                     {
                         DocumentPreview
                     }));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
                 StartActivity(i);
 
                 return true;
@@ -362,7 +362,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(DocumentPreview));
                 StartActivityForResult(i, RequestCodes.CategoriesRequest);
 
                 return true;
@@ -371,7 +371,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Comments)
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
-                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, Serializer.Serialize(Document));
                 StartActivityForResult(i, RequestCodes.CommentsRequest);
 
                 return true;
@@ -380,7 +380,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview as IBusinessEntity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
                 StartActivity(i);
 
                 return true;
@@ -389,7 +389,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview as IBusinessEntity));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
                 StartActivity(i);
 
                 return true;

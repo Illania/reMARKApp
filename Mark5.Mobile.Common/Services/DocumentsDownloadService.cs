@@ -1,17 +1,19 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
+using Mark5.Mobile.Common.Database;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.PortableCollections;
 using Mark5.Mobile.Common.Storage;
-using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Services
 {
-    class DocumentsDownloadService : IDocumentsDownloadService
+    public class DocumentsDownloadService : IDocumentsDownloadService
     {
         CancellationTokenSource cts;
         Task downloadTask;
@@ -19,14 +21,11 @@ namespace Mark5.Mobile.Common.Services
         bool active;
         bool subscribed;
 
-        readonly IDocumentsDataAccess documentsDataAccess;
         readonly SemaphoreSlim semaphore;
         readonly IPortableConcurrentQueue<int> queue;
 
-        public DocumentsDownloadService(IDocumentsDataAccess documentsDataAccess)
+        public DocumentsDownloadService()
         {
-            this.documentsDataAccess = documentsDataAccess;
-
             semaphore = new SemaphoreSlim(1);
             queue = (IPortableConcurrentQueue<int>) Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new[] { typeof(int) }));
         }
@@ -75,7 +74,7 @@ namespace Mark5.Mobile.Common.Services
 
                 if (!subscribed)
                 {
-                    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
+                    CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
                     subscribed = true;
                 }
 
@@ -102,7 +101,7 @@ namespace Mark5.Mobile.Common.Services
 
                 if (subscribed)
                 {
-                    CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityRefreshed;
+                    CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
                     subscribed = false;
                 }
 
@@ -125,7 +124,7 @@ namespace Mark5.Mobile.Common.Services
         {
             if (downloadTask != null)
                 return;
-            if (!CommonConfig.ReachabilityService.IsReachable)
+            if (!CommonConfig.Reachability.IsReachable)
                 return;
 
             cts = new CancellationTokenSource();

@@ -7,7 +7,7 @@ using UserNotifications;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public static class NotificationsUtilities
+    public static class NotificationConverter
     {
         public static Notification Convert(UNNotification notification)
         {

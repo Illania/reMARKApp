@@ -31,7 +31,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var userInfoData = NSJsonSerialization.Serialize(userInfoDict, NSJsonWritingOptions.PrettyPrinted, out _error);
             var userInfoJson = new NSString(userInfoData, NSStringEncoding.UTF8);
 
-            return SerializationUtils.Deserialize<PushNotification>(userInfoJson);
+            return Serializer.Deserialize<PushNotification>(userInfoJson);
         }
 
         public static Notification ConvertToNotification(this PushNotification pn)

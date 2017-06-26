@@ -190,31 +190,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 HandleLocalAttachment(data);
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
-                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
+                var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
-                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
+                var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
-                var recipient = SerializationUtils.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
+                var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
                 focusedRecipientiView.AddRecipent(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
             {
-                var shortcode = SerializationUtils.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
+                var shortcode = Serializer.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
                 AddAddressesFromShortcode(shortcode);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.TemplatePreviewRequestCode && resultCode == (int)Result.Ok)
             {
-                var template = SerializationUtils.Deserialize<TemplatePreview>(data.GetStringExtra(TemplatesListActivity.TemplatePreviewResultKey));
+                var template = Serializer.Deserialize<TemplatePreview>(data.GetStringExtra(TemplatesListActivity.TemplatePreviewResultKey));
                 await GetTemplate(template);
             }
         }

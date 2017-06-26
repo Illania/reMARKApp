@@ -86,13 +86,13 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("CategoryString")]
-        public string CategoryString { get => SerializationUtils.Serialize(Category); set => Category = SerializationUtils.Deserialize<CalendarCategory>(value); }
+        public string CategoryString { get => Serializer.Serialize(Category); set => Category = Serializer.Deserialize<CalendarCategory>(value); }
 
         [Column("ResourcesString")]
-        public string ResourcesString { get => SerializationUtils.Serialize(Resources); set => Resources = SerializationUtils.Deserialize<List<CalendarResource>>(value); }
+        public string ResourcesString { get => Serializer.Serialize(Resources); set => Resources = Serializer.Deserialize<List<CalendarResource>>(value); }
 
         [Column("ParticipantsString")]
-        public string ParticipantsString { get => SerializationUtils.Serialize(Participants); set => Participants = SerializationUtils.Deserialize<List<Participant>>(value); }
+        public string ParticipantsString { get => Serializer.Serialize(Participants); set => Participants = Serializer.Deserialize<List<Participant>>(value); }
 
         #endregion
 

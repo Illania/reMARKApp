@@ -211,7 +211,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == 10)
             {
                 var i = new Intent(Activity, typeof(SearchActivity));
-                i.PutExtra(SearchActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(SearchActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 StartActivity(i);
 
                 return true;
@@ -397,8 +397,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else
                 {
                     var i = new Intent(Activity, typeof(SwipeDocumentActivity));
-                    i.PutExtra(SwipeDocumentActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
-                    i.PutExtra(SwipeDocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+                    i.PutExtra(SwipeDocumentActivity.FolderIntentKey, Serializer.Serialize(Folder));
+                    i.PutExtra(SwipeDocumentActivity.DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
                     StartActivity(i);
                 }
             }
@@ -508,8 +508,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 StartActivity(i);
 
                 actionMode?.Finish();
@@ -520,9 +520,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
                 StartActivity(i);
 
                 actionMode?.Finish();
@@ -665,7 +665,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void ShowCategories(DocumentPreview documentPreview)
         {
             var i = new Intent(Activity, typeof(CategoriesListActivity));
-            i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+            i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(documentPreview));
             StartActivity(i);
         }
 

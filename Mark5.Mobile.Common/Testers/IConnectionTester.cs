@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mark5.Mobile.Common.Tester
+namespace Mark5.Mobile.Common.Testers
 {
-    public interface ITester
+    public interface IConnectionTester
     {
         Task<bool> CanTest(CancellationToken ct = default(CancellationToken));
 

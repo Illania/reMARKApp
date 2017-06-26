@@ -15,8 +15,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (ActionMode == null)
             {
                 var i = new Intent(Activity, typeof(ContactActivity));
-                i.PutExtra(ContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(contactPreview));
-                i.PutExtra(ContactActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(ContactActivity.ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
+                i.PutExtra(ContactActivity.FolderIntentKey, Serializer.Serialize(Folder));
                 StartActivity(i);
             }
             else

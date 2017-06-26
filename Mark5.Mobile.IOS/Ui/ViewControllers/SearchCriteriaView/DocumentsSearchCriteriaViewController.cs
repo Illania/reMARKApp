@@ -57,7 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             criteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
             criteria.MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch;
 
-            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
+            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new DocumentsSearchResultsViewController
                 {
@@ -841,7 +841,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         };
 
                         var fromNSDate = NSCalendar.CurrentCalendar.DateFromComponents(fromComponents);
-                        fromValue.Text = Utilities.DateTimeUtils.DateFormatter.StringFor(fromNSDate);
+                        fromValue.Text = Utilities.DateTimeFormatter.ShortDateFormatter.StringFor(fromNSDate);
 
                         toDatePicker.MinimumDate = fromNSDate;
                         fromDatePicker.SetDate(fromNSDate, false);
@@ -866,7 +866,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         };
 
                         var toNSDate = NSCalendar.CurrentCalendar.DateFromComponents(toComponents);
-                        toValue.Text = Utilities.DateTimeUtils.DateFormatter.StringFor(toNSDate);
+                        toValue.Text = Utilities.DateTimeFormatter.ShortDateFormatter.StringFor(toNSDate);
 
                         fromDatePicker.MaximumDate = toNSDate;
                         toDatePicker.SetDate(toNSDate, false);

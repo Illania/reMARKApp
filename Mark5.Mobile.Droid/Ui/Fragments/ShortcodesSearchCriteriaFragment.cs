@@ -193,8 +193,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             GetCriteria();
 
             var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
+            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
+            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
             StartActivity(i);
         }
 
@@ -204,7 +204,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
 
-            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(searchCriteria)}]");
+            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
 
             return searchCriteria;
         }

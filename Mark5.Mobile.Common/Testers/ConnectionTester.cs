@@ -6,9 +6,9 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference;
 using DataContract = Mark5.ServiceReference.DataContract;
 
-namespace Mark5.Mobile.Common.Tester
+namespace Mark5.Mobile.Common.Testers
 {
-    public class Tester : ITester
+    public class ConnectionTester : IConnectionTester
     {
         public async Task<bool> CanTest(CancellationToken ct = default(CancellationToken))
         {

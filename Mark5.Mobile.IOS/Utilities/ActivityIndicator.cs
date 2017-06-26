@@ -3,7 +3,7 @@ using Foundation;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public static class ActivityIndicatorUtils
+    public static class ActivityIndicator
     {
         static readonly object lockObject = new object();
         static readonly NSObject nsobject = new NSObject();

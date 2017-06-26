@@ -9,7 +9,7 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public class PhonebookUtilities : IPhonebookUtils
+    public class Phonebook : IPhonebook
     {
         #region IPhonebookUtilities implementation
 

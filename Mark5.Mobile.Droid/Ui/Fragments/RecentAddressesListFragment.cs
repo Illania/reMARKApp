@@ -95,7 +95,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, RecentAddress ra)
         {
             var intent = new Intent();
-            intent.PutExtra(RecentAddressesListActivity.RecipientResultKey, SerializationUtils.Serialize(new Recipient(ra)));
+            intent.PutExtra(RecentAddressesListActivity.RecipientResultKey, Serializer.Serialize(new Recipient(ra)));
             Activity.SetResult(Result.Ok, intent);
             Activity.Finish();
         }

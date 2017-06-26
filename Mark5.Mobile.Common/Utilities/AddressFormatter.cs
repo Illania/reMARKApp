@@ -3,7 +3,7 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
 {
-    public static class AddressUtils
+    public static class AddressFormatter
     {
         public static string FormatCommunicationAddress(CommunicationAddress ca)
         {

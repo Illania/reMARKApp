@@ -6,11 +6,11 @@ using Newtonsoft.Json.Converters;
 
 namespace Mark5.Mobile.Common.Utilities
 {
-    public static class SerializationUtils
+    public static class Serializer
     {
         static readonly JsonSerializer jsonSerializer;
 
-        static SerializationUtils()
+        static Serializer()
         {
             var jsSettings = new JsonSerializerSettings
             {

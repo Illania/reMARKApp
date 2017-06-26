@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sb = new StringBuilder();
             sb.AppendLine("===== Server information =====");
-            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine(Serializer.Serialize(ServerConfig.SystemSettings));
             return sb.ToString();
         }
 

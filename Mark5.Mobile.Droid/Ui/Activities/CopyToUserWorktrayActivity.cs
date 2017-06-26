@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public static Intent CreateIntent(Context context, List<IBusinessEntity> businessEntities)
         {
             var i = new Intent(context, typeof(CopyToUserWorktrayActivity));
-            i.PutExtra(BusinessEntitiesIntentKey, SerializationUtils.Serialize(businessEntities));
+            i.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(businessEntities));
             return i;
         }
 
@@ -43,7 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var be = SerializationUtils.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey));
+                var be = Serializer.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
                 var dlf = new CopyToUserWorktrayFragment
                 {

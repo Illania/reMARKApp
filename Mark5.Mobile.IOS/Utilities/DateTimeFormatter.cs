@@ -5,55 +5,47 @@ using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public static class DateTimeUtils
+    public static class DateTimeFormatter
     {
-        public static bool UseServerTimezone = true;
-
-        static readonly int LocalUtcOffset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Hours;
-
-        public static NSDateFormatter TimeFormatter;
-        public static NSDateFormatter DateFormatter;
+        public static NSDateFormatter ShortTimeFormatter;
+        public static NSDateFormatter ShortDateFormatter;
+        public static NSDateFormatter ShortDateTimeFormatter;
         public static NSDateFormatter LongDateFormatter;
-        public static NSDateFormatter DateTimeFormatter;
 
-        static DateTimeUtils()
+        static DateTimeFormatter()
         {
-            TimeFormatter = new NSDateFormatter();
-            TimeFormatter.DateStyle = NSDateFormatterStyle.None;
-            TimeFormatter.TimeStyle = NSDateFormatterStyle.Short;
-            TimeFormatter.TimeZone = new NSTimeZone("GMT");
+            ShortTimeFormatter = new NSDateFormatter()
+            {
+                DateStyle = NSDateFormatterStyle.None,
+                TimeStyle = NSDateFormatterStyle.Short,
+                TimeZone = new NSTimeZone("GMT")
+            };
 
-            DateFormatter = new NSDateFormatter();
-            DateFormatter.DateStyle = NSDateFormatterStyle.Short;
-            DateFormatter.TimeStyle = NSDateFormatterStyle.None;
-            DateFormatter.TimeZone = new NSTimeZone("GMT");
+            ShortDateFormatter = new NSDateFormatter()
+            {
+                DateStyle = NSDateFormatterStyle.Short,
+                TimeStyle = NSDateFormatterStyle.None,
+                TimeZone = new NSTimeZone("GMT")
+            };
 
-            LongDateFormatter = new NSDateFormatter();
-            LongDateFormatter.DateStyle = NSDateFormatterStyle.Medium;
-            LongDateFormatter.TimeStyle = NSDateFormatterStyle.None;
-            LongDateFormatter.TimeZone = new NSTimeZone("GMT");
+            ShortDateTimeFormatter = new NSDateFormatter()
+            {
+                DateStyle = NSDateFormatterStyle.Short,
+                TimeStyle = NSDateFormatterStyle.Short,
+                TimeZone = new NSTimeZone("GMT")
+            };
 
-            DateTimeFormatter = new NSDateFormatter();
-            DateTimeFormatter.DateStyle = NSDateFormatterStyle.Short;
-            DateTimeFormatter.TimeStyle = NSDateFormatterStyle.Short;
-            DateTimeFormatter.TimeZone = new NSTimeZone("GMT");
-        }
-
-        public static DateTime ConvertUtcToUserTime(this DateTime dateTime)
-        {
-            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
-            return dt.AddHours(UseServerTimezone ? ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : LocalUtcOffset);
-        }
-
-        public static DateTime ConvertUserTimeToUtc(this DateTime dateTime)
-        {
-            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
-            return dt.AddHours(UseServerTimezone ? -ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : -LocalUtcOffset);
+            LongDateFormatter = new NSDateFormatter()
+            {
+                DateStyle = NSDateFormatterStyle.Medium,
+                TimeStyle = NSDateFormatterStyle.None,
+                TimeZone = new NSTimeZone("GMT")
+            };
         }
 
         public static string FormatUserTimestampAsTimeString(this long timestamp)
         {
-            return TimeFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
+            return ShortTimeFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
         }
 
         /// <summary>
@@ -62,7 +54,7 @@ namespace Mark5.Mobile.IOS.Utilities
         /// </summary>
         public static string FormatUserTimestampAsDateString(this long timestamp)
         {
-            return DateFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
+            return ShortDateFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
         }
 
         /// <summary>
@@ -80,7 +72,7 @@ namespace Mark5.Mobile.IOS.Utilities
         /// </summary>
         public static string FormatUserTimestampAsTimeAndDateString(this long timestamp)
         {
-            return DateTimeFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
+            return ShortDateTimeFormatter.StringFor(NSDate.FromTimeIntervalSince1970(timestamp / 1000));
         }
 
         /// <summary>

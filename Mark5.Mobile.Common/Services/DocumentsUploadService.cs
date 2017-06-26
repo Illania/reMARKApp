@@ -1,254 +1,187 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
-using Mark5.Mobile.Common.PortableCollections;
+using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Storage;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Services
 {
     class DocumentsUploadService : IDocumentsUploadService
     {
-        CancellationTokenSource cts;
+        static readonly object lockObj = new object();
+
         Task sendTask;
+        CancellationTokenSource sendTaskCts;
 
-        bool active;
-        bool subscribed;
-
-        SemaphoreSlim semaphore;
-
-        readonly IPortableConcurrentQueue<Guid> queue;
-
-        public DocumentsUploadService()
-        {
-            queue = (IPortableConcurrentQueue<Guid>)Activator.CreateInstance(CommonConfig.ConcurrentQueueType.MakeGenericType(new Type[] { typeof(Guid) }));
-            semaphore = new SemaphoreSlim(1);
-            UnlockAllDocuments(); //Used to unlock all the documents that were not unlocked because the app closed/crashed on compose view
-        }
+        SemaphoreSlim ss = new SemaphoreSlim(1);
 
         #region Public methods
 
-        public async Task<bool> IsRunning()
+        public bool IsRunning()
         {
-            try
-            {
-                await semaphore.WaitAsync();
+            lock (lockObj)
                 return sendTask != null;
-            }
-            finally
-            {
-                semaphore.Release();
-            }
         }
 
-        public void Notify(Guid guid)
+        public void Start()
         {
-            AddToQueue(guid);
-            CommonConfig.MessengerHub.PublishAsync(new DocumentInUploadChangedMessage(this, DocumentInUploadChangedMessage.ChangeType.DocumentAdded, guid));
-        }
-
-        public async Task Start()
-        {
-            try
+            lock (lockObj)
             {
-                await semaphore.WaitAsync();
-
-                active = true;
-
-                if (!subscribed)
-                {
-                    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityRefreshed;
-                    subscribed = true;
-                }
-                StartSendTask();
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        }
-
-        public async Task Stop()
-        {
-            try
-            {
-                await semaphore.WaitAsync();
-                await StopSendTask();
-
-                if (subscribed)
-                {
-                    CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityRefreshed;
-                    subscribed = false;
-                }
-                active = false;
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        }
-
-        #endregion
-
-        #region Private methods
-
-        void StartSendTask()
-        {
-            if (sendTask != null)
-                return;
-            if (!CommonConfig.ReachabilityService.IsReachable)
-                return;
-
-            cts = new CancellationTokenSource();
-
-            sendTask = Task.Run(async () => await SendAction())
-                .ContinueWith(async (t) =>
-                {
-                    sendTask = null;
-
-                    if (t.IsFaulted)
-                        await Start();
-                });
-        }
-
-        async Task StopSendTask()
-        {
-            try
-            {
-                await semaphore.WaitAsync();
-
-                cts?.Cancel();
-                cts = null;
+                CommonConfig.Logger.Info("Starting...");
 
                 if (sendTask != null)
-                {
-                    await sendTask;
-                    sendTask = null;
-                }
-            }
-            finally
-            {
-                semaphore.Release();
+                    return;
+
+                if (!CommonConfig.Reachability.IsReachable)
+                    return;
+
+                sendTaskCts?.Cancel();
+                sendTaskCts = new CancellationTokenSource();
+
+                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
+                CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
+
+                sendTask = Task.Run(async () => await SendAction(sendTaskCts.Token));
+
+                CommonConfig.Logger.Info("Started");
             }
         }
+
+        public void Stop()
+        {
+            lock (lockObj)
+            {
+                CommonConfig.Logger.Info("Stopping...");
+
+                sendTask = null;
+                sendTaskCts?.Cancel();
+
+                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
+
+                CommonConfig.Logger.Info("Stopped");
+            }
+        }
+
+        public void Notify() => ss.Release();
 
         #endregion
 
         #region Send Action
 
-        async Task SendAction()
+        async Task SendAction(CancellationToken ct)
         {
+            CommonConfig.Logger.Info("Starting send action...");
+
             try
             {
-                queue.Clear();
-                await RetrieveOutgoingFromStorage();
+                var documentManager = (DocumentsManager)Managers.Managers.DocumentsManager;
 
-                while (!cts.IsCancellationRequested)
+                while (!ct.IsCancellationRequested)
                 {
-                    queue.TryTake(out Guid identifier, -1, cts.Token);
-
-                    var container = await FileSystemStorage.GetOutgoingDocumentContainerAsync(identifier, false, LoadMode.Complete);
-
-                    if (container == null || container.Info.State == OutgoingDocumentState.Failed || container.Info.State == OutgoingDocumentState.AutoSaved || container.Info.Locked)
-                        continue;
-
-                    var document = container.Document;
-                    var documentPreview = container.DocumentPreview;
-                    var info = container.Info;
-
-                    var sendSuccessful = false;
-                    try
+                    var documentToUploadGuid = await FileSystemStorage.GetDocumentToUploadGuid();
+                    if (documentToUploadGuid == Guid.Empty)
                     {
-                        //TODO DocumentBeingSent(this, container);
+                        CommonConfig.Logger.Info("No documents to upload found. Waiting...");
 
-                        var attachmentGuids = new List<Guid>();
+                        await ss.WaitAsync(ct);
+                        continue;
+                    }
 
-                        foreach (var attachment in await FileSystemStorage.GetOutgoingDocumentAttachmentsAsync(identifier))
+                    CommonConfig.Logger.Info($"Found document to upload [documentToUploadGuid={documentToUploadGuid}]");
+
+                    var info = await FileSystemStorage.GetDocumentToUploadInfo(documentToUploadGuid);
+                    var documentPreview = await FileSystemStorage.GetDocumentToUploadDocumentPreview(documentToUploadGuid);
+                    var document = await FileSystemStorage.GetDocumentToUploadDocument(documentToUploadGuid);
+
+                    if (info == null || documentPreview == null || document == null)
+                    {
+                        CommonConfig.Logger.Error($"Document to upload is corrupt [info={info != null}, documentPreview={documentPreview != null}, document={document != null}]");
+                        continue;
+                    }
+
+                    var uploadedAttachmentsGuids = new List<Guid>();
+                    var attachmentNames = await FileSystemStorage.GetDocumentToUploadAttachmentNames(documentToUploadGuid);
+                    if (attachmentNames != null && attachmentNames.Length > 0)
+                    {
+                        CommonConfig.Logger.Info($"Found attachments to upload [documentToUploadGuid={documentToUploadGuid}, attachmentNames.Length={attachmentNames.Length}]");
+
+                        foreach (var attachmentName in attachmentNames)
                         {
-                            var attachmentGuid = await Managers.Managers.DocumentsManager.UploadTemporaryAttachmentAsync(attachment);
-                            attachmentGuids.Add(attachmentGuid);
+                            var stream = await FileSystemStorage.GetDocumentToUploadAttachmentStream(documentToUploadGuid, attachmentName);
+                            if (stream == null)
+                                continue;
+
+                            CommonConfig.Logger.Info($"Uploading attachment to upload [documentToUploadGuid={documentToUploadGuid}, attachmentName={attachmentName}]");
+
+                            using (stream)
+                            {
+                                var lengthInBytes = stream.Length;
+                                stream.Position = 0;
+
+                                var uploadedAttachmentGuid = await documentManager.UploadTemporaryAttachmentAsync(new Attachment
+                                {
+                                    Filename = Path.GetFileNameWithoutExtension(attachmentName),
+                                    Extension = Path.GetExtension(attachmentName),
+                                    Size = (int)lengthInBytes,
+                                    Stream = stream
+                                });
+                                uploadedAttachmentsGuids.Add(uploadedAttachmentGuid);
+
+                                if (ct.IsCancellationRequested)
+                                    continue;
+                            }
                         }
 
-                        await Managers.Managers.DocumentsManager.SendDocumentAsync(document, documentPreview, info.Flag, info.PreviousDocumentId, info.PreviousDocumentdFolderId, info.SendOnTimestamp, info.ConfirmRead, info.ConfirmDelivery, attachmentGuids);
-                        sendSuccessful = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        CommonConfig.Logger.Error("Could not send document", ex);
-
-                        await FileSystemStorage.SetOutgoingDocumentToFailedAsync(info.Identifier);
-
-                        // TODO DocumentSendingFailed(this, container);
+                        CommonConfig.Logger.Info($"Done uploading attachments [documentToUploadGuid={documentToUploadGuid}]");
                     }
 
-                    if (sendSuccessful)
-                    {
-                        await FileSystemStorage.DeleteOutgoingDocumentFolderAsync(info.Identifier);
-                        // TODO DocumentSendingSuccessful(this, container);
-                    }
+                    if (ct.IsCancellationRequested)
+                        continue;
+
+                    CommonConfig.Logger.Info($"Sending document... [documentToUploadGuid={documentToUploadGuid}]");
+
+                    await documentManager.SendDocumentAsync(document,
+                                                            documentPreview,
+                                                            info.CreationModeFlag,
+                                                            info.PreviousDocumentId,
+                                                            info.PreviousDocumentdFolderId,
+                                                            info.SendOnTimestamp,
+                                                            info.ConfirmRead,
+                                                            info.ConfirmDelivery,
+                                                            uploadedAttachmentsGuids);
+
+                    await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
+
+                    CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
                 }
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error in send action ", ex);
-
-                throw ex;
+                CommonConfig.Logger.Error("Unexpected error in send action!", ex);
             }
+
+            CommonConfig.Logger.Info("Stopped send action");
         }
 
         #endregion
 
         #region Reachability Changes
 
-        async void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
+        void ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
-            if (!active || !e.Changed)
+            if (!e.Changed)
                 return;
 
             if (e.IsReachable)
-                StartSendTask();
+                Start();
             else
-                await StopSendTask();
+                Stop();
         }
 
         #endregion
 
-        #region Utilities
-
-        async Task RetrieveOutgoingFromStorage()
-        {
-            var ids = await FileSystemStorage.GetOutgoingDocumentIdentifiersAsync();
-            AddToQueue(ids);
-        }
-
-        void UnlockAllDocuments()
-        {
-            Task.Run(async () =>
-                {
-                    var ids = await FileSystemStorage.GetOutgoingDocumentIdentifiersAsync();
-                    foreach (var id in ids)
-                        await FileSystemStorage.UnlockOutgoingDocumentAsync(id);
-                })
-                .ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                        CommonConfig.Logger.Error("Error while unlocking documents at startup", t.Exception.InnerException);
-                });
-        }
-
-        void AddToQueue(IEnumerable<Guid> identifiers)
-        {
-            foreach (var identifier in identifiers)
-                AddToQueue(identifier);
-        }
-
-        void AddToQueue(Guid identifier)
-        {
-            queue.TryAdd(identifier);
-        }
-
-        #endregion
     }
 }

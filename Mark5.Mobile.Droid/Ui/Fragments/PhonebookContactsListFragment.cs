@@ -114,7 +114,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, Recipient r)
         {
             var intent = new Intent();
-            intent.PutExtra(PhonebookContactsListActivity.RecipientResultKey, SerializationUtils.Serialize(r));
+            intent.PutExtra(PhonebookContactsListActivity.RecipientResultKey, Serializer.Serialize(r));
             Activity.SetResult(Result.Ok, intent);
             Activity.Finish();
         }

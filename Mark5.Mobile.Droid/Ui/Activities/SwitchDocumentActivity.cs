@@ -57,16 +57,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    df.Folder = folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    df.Folder = folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(DocumentIdIntentKey))
                     df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    df.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    df.DocumentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    df.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 df.CloseRequest = OnBackPressed;
 
@@ -88,10 +88,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                documentIds = SerializationUtils.Deserialize<List<int>>(savedInstanceState.GetString(NeighbourDocumentIdsKey));
+                documentIds = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(NeighbourDocumentIdsKey));
 
                 var serializedFolder = savedInstanceState.GetString(FolderKey);
-                folder = !string.IsNullOrEmpty(serializedFolder) ? SerializationUtils.Deserialize<Folder>(serializedFolder) : null;
+                folder = !string.IsNullOrEmpty(serializedFolder) ? Serializer.Deserialize<Folder>(serializedFolder) : null;
 
                 CommonConfig.Logger.Info($"Restored {nameof(SwitchDocumentActivity)}");
             }
@@ -99,8 +99,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-            outState.PutString(NeighbourDocumentIdsKey, SerializationUtils.Serialize(documentIds));
-            outState.PutString(FolderKey, folder != null ? SerializationUtils.Serialize(folder) : null);
+            outState.PutString(NeighbourDocumentIdsKey, Serializer.Serialize(documentIds));
+            outState.PutString(FolderKey, folder != null ? Serializer.Serialize(folder) : null);
 
             base.OnSaveInstanceState(outState);
         }

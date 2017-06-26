@@ -17,8 +17,8 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return new PushNotification
             {
-                Data = SerializationUtils.Deserialize<PushNotificationData>(m.Data["data"]),
-                Notification = SerializationUtils.Deserialize<PushNotificationNotification>(m.Data["notification"])
+                Data = Serializer.Deserialize<PushNotificationData>(m.Data["data"]),
+                Notification = Serializer.Deserialize<PushNotificationNotification>(m.Data["notification"])
             };
         }
 

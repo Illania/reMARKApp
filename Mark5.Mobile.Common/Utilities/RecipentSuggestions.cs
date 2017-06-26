@@ -8,9 +8,9 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Services
 {
-    public class SuggestionsRetrievalService : ISuggestionsRetrievalService
+    public static class RecipentSuggestions
     {
-        public void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.Services
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
-        void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        static void GetSuggestionFromRecentAddresses(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -41,19 +41,19 @@ namespace Mark5.Mobile.Common.Services
             });
         }
 
-        void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        static void GetSuggestionFromPhonebook(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
 
             Task.Run(() =>
             {
-                var phonebookContacts = CommonConfig.PhonebookUtilities.GetFilteredPhonebookContacts(phrase) ?? new List<Recipient>();
+                var phonebookContacts = CommonConfig.Phonebook.GetFilteredPhonebookContacts(phrase) ?? new List<Recipient>();
                 handler(phonebookContacts, token);
             });
         }
 
-        void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        static void GetSuggestionFromContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;

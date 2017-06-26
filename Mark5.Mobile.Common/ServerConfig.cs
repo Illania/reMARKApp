@@ -1,6 +1,6 @@
 ﻿using Mark5.Mobile.Common.Model;
 
-namespace Mark5.Mobile.IOS
+namespace Mark5.Mobile.Common
 {
     public static class ServerConfig
     {

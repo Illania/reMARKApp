@@ -44,16 +44,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    cf.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    cf.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(ContactIdIntentKey))
                     cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
-                    cf.ContactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
+                    cf.ContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    cf.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    cf.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 cf.CloseRequest = OnBackPressed;
 

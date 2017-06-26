@@ -13,7 +13,7 @@ using Mark5.Mobile.Common.Tester;
 
 namespace Mark5.Mobile.Droid.Services
 {
-    public class ReachabilityService : IReachabilityService
+    public class ReachabilityService : IReachability
     {
         const string GoogleRequestUrl = "http://clients3.google.com/generate_204";
 

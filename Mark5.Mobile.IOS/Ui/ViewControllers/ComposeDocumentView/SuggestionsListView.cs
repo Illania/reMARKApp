@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         NSLayoutConstraint spaceHeightConstraint;
 
-        SuggestionsRetrievalService suggestionService;
+        RecipentSuggestions suggestionService;
 
         CancellationTokenSource searchCancellationTokenSource;
         List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
@@ -45,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public SuggestionsListView(ComposeDocumentViewController composeDocumentViewController)
         {
             viewController = composeDocumentViewController;
-            suggestionService = new SuggestionsRetrievalService();
+            suggestionService = new RecipentSuggestions();
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 

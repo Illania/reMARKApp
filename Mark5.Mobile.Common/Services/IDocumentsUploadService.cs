@@ -1,13 +1,10 @@
-﻿﻿using System;
-using System.Threading.Tasks;
-
-namespace Mark5.Mobile.Common.Services
+﻿namespace Mark5.Mobile.Common.Services
 {
     public interface IDocumentsUploadService
     {
-        void Notify(Guid identifier);
-        Task<bool> IsRunning();
-        Task Start();
-        Task Stop();
+        void Notify();
+        bool IsRunning();
+        void Start();
+        void Stop();
     }
 }

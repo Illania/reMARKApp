@@ -228,7 +228,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 await Managers.OutgoingDocumentsManager.Start();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
-                await CommonConfig.ReachabilityService.Refresh();
+                await CommonConfig.Reachability.Refresh();
 
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();

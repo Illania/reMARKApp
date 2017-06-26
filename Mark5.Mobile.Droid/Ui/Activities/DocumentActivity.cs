@@ -45,16 +45,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    df.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    df.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(DocumentIdIntentKey))
                     df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    df.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    df.DocumentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    df.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 df.CloseRequest = OnBackPressed;
 

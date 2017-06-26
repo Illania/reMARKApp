@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Utilities
             try
             {
                 var i = new Intent(Application.Context, typeof(DocumentsListActivity));
-                i.PutExtra(DocumentsListActivity.FolderIntentKey, SerializationUtils.Serialize(Folder.DocumentsOutgoingFolder));
+                i.PutExtra(DocumentsListActivity.FolderIntentKey, Serializer.Serialize(Folder.DocumentsOutgoingFolder));
                 var pi = PendingIntent.GetActivity(Application.Context, 0, i, PendingIntentFlags.UpdateCurrent);
 
                 var title = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_title);

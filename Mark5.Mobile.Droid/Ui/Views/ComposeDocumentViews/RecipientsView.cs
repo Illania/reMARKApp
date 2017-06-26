@@ -600,7 +600,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 public bool Loading => answersReceived < 3;
 
                 readonly SuggestionsAdapter suggestionsAdapter;
-                SuggestionsRetrievalService suggestionService;
+                RecipentSuggestions suggestionService;
 
                 CancellationTokenSource searchCancellationTokenSource;
                 List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
@@ -610,7 +610,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 public SuggestionsFilter(SuggestionsAdapter suggestionsAdapter)
                 {
                     this.suggestionsAdapter = suggestionsAdapter;
-                    suggestionService = new SuggestionsRetrievalService();
+                    suggestionService = new RecipentSuggestions();
                 }
 
                 #region Overrides

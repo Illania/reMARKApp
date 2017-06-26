@@ -83,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                 AddView(innerLayout);
 
                 var titleTextView = new AppCompatTextView(context);
-                titleTextView.Text = AddressUtils.FormatCommunicationAddress(communicationAddress);
+                titleTextView.Text = AddressFormatter.FormatCommunicationAddress(communicationAddress);
                 titleTextView.SetTextAppearanceCompat(context, communicationAddress.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
                 innerLayout.AddView(titleTextView, new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 

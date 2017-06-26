@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public static Intent Create(Context context, Folder folder)
         {
             var intent = new Intent(context, typeof(PickerShortcodesListActivity));
-            intent.PutExtra(FolderIntentKey, SerializationUtils.Serialize(folder));
+            intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
 
             return intent;
         }
@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var folder = Intent.HasExtra(FolderIntentKey) ? SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey)) : null;
+                var folder = Intent.HasExtra(FolderIntentKey) ? Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey)) : null;
 
                 var ft = SupportFragmentManager.BeginTransaction();
 

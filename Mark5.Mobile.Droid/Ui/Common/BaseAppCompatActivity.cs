@@ -21,8 +21,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 connectionBar.Click += ConnectionBar_Click;
                 connectionBar.LongClickable = true;
                 connectionBar.LongClick += ConnectionBar_LongClick;
-                connectionBar.Visibility = CommonConfig.ReachabilityService.IsReachable ? ViewStates.Gone : ViewStates.Visible;
-                CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
+                connectionBar.Visibility = CommonConfig.Reachability.IsReachable ? ViewStates.Gone : ViewStates.Visible;
+                CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
             }
 
             var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 if (lp != null)
                 {
                     lp.BottomMargin = (int) Resources.GetDimension(Resource.Dimension.fab_margin);
-                    if (!CommonConfig.ReachabilityService.IsReachable)
+                    if (!CommonConfig.Reachability.IsReachable)
                         lp.BottomMargin += (int) Resources.GetDimension(Resource.Dimension.connection_bar_height);
                     fab.RequestLayout();
                 }
@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 connectionBar.Click -= ConnectionBar_Click;
                 connectionBar.LongClick -= ConnectionBar_LongClick;
-                CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
+                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
             }
         }
 
@@ -83,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
 
-            await CommonConfig.ReachabilityService.Refresh();
+            await CommonConfig.Reachability.Refresh();
 
             dismissAction();
         }
@@ -94,10 +94,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             try
             {
-                var network = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.NetworkAvailability, true);
-                var google = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Google, true);
-                var serviceConnection = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.ServiceConnection, true);
-                var service = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Service, true);
+                var network = await CommonConfig.Reachability.Refresh(ReachabilityMode.NetworkAvailability, true);
+                var google = await CommonConfig.Reachability.Refresh(ReachabilityMode.Google, true);
+                var serviceConnection = await CommonConfig.Reachability.Refresh(ReachabilityMode.ServiceConnection, true);
+                var service = await CommonConfig.Reachability.Refresh(ReachabilityMode.Service, true);
 
                 var title = GetString(Resource.String.connection_status);
 

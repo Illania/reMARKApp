@@ -48,7 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             criteria.MaxToFetch = PlatformConfig.Preferences.ContactsToSearch;
 
-            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
+            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new ContactsSearchResultsViewController
                 {

@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.Logger = new SimpleLogger();
-                    CommonConfig.ReachabilityService = new ReachabilityService();
+                    CommonConfig.Reachability = new ReachabilityService();
                     CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };

@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid
                     CloseRequest = categories =>
                     {
                         var intent = new Intent();
-                        intent.PutExtra(CategoriesResultKey, SerializationUtils.Serialize(categories));
+                        intent.PutExtra(CategoriesResultKey, Serializer.Serialize(categories));
                         SetResult(Result.Ok, intent);
                         OnBackPressed();
                     }

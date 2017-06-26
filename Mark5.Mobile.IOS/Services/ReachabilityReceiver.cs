@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Services
 
         void Reachability_ReachabilityChanged(object sender, EventArgs e)
         {
-            CommonConfig.ReachabilityService.Refresh();
+            CommonConfig.Reachability.Refresh();
         }
     }
 }

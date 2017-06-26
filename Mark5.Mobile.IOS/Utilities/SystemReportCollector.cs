@@ -102,7 +102,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");
-            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine(Serializer.Serialize(ServerConfig.SystemSettings));
             sb.AppendLine();
 
             sb.AppendLine("===== Memory information =====");

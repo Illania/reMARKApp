@@ -397,7 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
-            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressUtils.FormatCommunicationAddress(ca)).ToArray();
+            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
                 return;
 
@@ -420,7 +420,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (communicationAddresses == null)
                 return;
 
-            Integration.Text(this, (UIButton) sender, AddressUtils.FormatCommunicationAddress(communicationAddresses));
+            Integration.Text(this, (UIButton) sender, AddressFormatter.FormatCommunicationAddress(communicationAddresses));
         }
 
         async void Button4_TouchUpInside(object sender, EventArgs e)

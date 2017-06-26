@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("OptionalParametersString")]
-        public string OptionalParametersString { get => SerializationUtils.Serialize(OptionalParameters); set => OptionalParameters = SerializationUtils.Deserialize<OptionalParameters>(value); }
+        public string OptionalParametersString { get => Serializer.Serialize(OptionalParameters); set => OptionalParameters = Serializer.Deserialize<OptionalParameters>(value); }
 
         #endregion
 

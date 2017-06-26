@@ -7,10 +7,11 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Tester;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Services
 {
-    public class ReachabilityService : IReachabilityService
+    public class Reachability : IReachability
     {
         const string GoogleRequestUrl = "http://clients3.google.com/generate_204";
 
@@ -22,7 +23,7 @@ namespace Mark5.Mobile.IOS.Services
 
         public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
 
-        public ReachabilityService()
+        public Reachability()
         {
             IsReachable = CheckNetworkAvailability();
         }

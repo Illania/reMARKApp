@@ -8,10 +8,7 @@ namespace Mark5.Mobile.Common.Managers
 {
     public static class Managers
     {
-        static void HandleFunc()
-        {
-
-        }
+        public static ConnectionInfo ActiveConnectionInfo { get; private set; }
 
         public static IFoldersManager FoldersManager { get; private set; }
         public static IDocumentsManager DocumentsManager { get; private set; }
@@ -23,7 +20,6 @@ namespace Mark5.Mobile.Common.Managers
         public static ISystemManager SystemManager { get; private set; }
         public static ICommonActionsManager CommonActionsManager { get; private set; }
         public static ICleanUpManager CleanUpManager { get; private set; }
-        public static ConnectionInfo ActiveConnectionInfo { get; private set; }
 
         public static void Initialize(ConnectionInfo connectionInfo)
         {

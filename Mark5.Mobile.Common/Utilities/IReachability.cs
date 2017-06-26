@@ -1,9 +1,9 @@
-﻿using System;
+﻿﻿using System;
 using System.Threading.Tasks;
 
-namespace Mark5.Mobile.Common.Services
+namespace Mark5.Mobile.Common.Utilities
 {
-    public interface IReachabilityService
+    public interface IReachability
     {
         bool IsReachable { get; }
         bool IsCheckingReachability { get; }

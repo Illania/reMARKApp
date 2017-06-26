@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
 
                 var data = new Intent();
-                data.PutExtra(PickerShortcodesListActivity.ShortcodeResultKey, SerializationUtils.Serialize(shortcode));
+                data.PutExtra(PickerShortcodesListActivity.ShortcodeResultKey, Serializer.Serialize(shortcode));
                 Activity.SetResult(Android.App.Result.Ok, data);
                 Activity.Finish();
             }

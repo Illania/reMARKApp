@@ -46,7 +46,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                     var i = new Intent(this, typeof(DocumentActivity));
                     i.PutExtra(DocumentActivity.FolderIdIntentKey, n.FolderId);
                     i.PutExtra(DocumentActivity.DocumentIdIntentKey, n.ObjectId);
-                    i.PutExtra(DocumentActivity.NotificationGuidIntentKey, SerializationUtils.Serialize(n.Guid));
+                    i.PutExtra(DocumentActivity.NotificationGuidIntentKey, Serializer.Serialize(n.Guid));
                     var pi = PendingIntent.GetActivity(this, 0, i, PendingIntentFlags.OneShot);
 
                     var nb = new NotificationCompat.Builder(this).SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon).SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue)).SetContentTitle(n.Title).SetContentText(n.Message).SetContentIntent(pi).SetCategory(Android.Support.V4.App.NotificationCompat.CategoryMessage).SetAutoCancel(true).SetGroup(GroupName).SetPriority((int)NotificationPriority.High).SetStyle(new Android.Support.V4.App.NotificationCompat.BigTextStyle().BigText(n.Message));

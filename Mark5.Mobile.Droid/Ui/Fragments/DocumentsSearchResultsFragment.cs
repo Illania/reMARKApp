@@ -168,7 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
             var i = new Intent(Activity, typeof(DocumentActivity));
-            i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, SerializationUtils.Serialize(documentPreview));
+            i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
             StartActivity(i);
         }
 

@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
 
                     var data = new Intent();
-                    data.PutExtra(PickerContactsListActivity.RecipientResultKey, SerializationUtils.Serialize(new Recipient(contactPreview.Name, emailAddress, RecipientType.Contact)));
+                    data.PutExtra(PickerContactsListActivity.RecipientResultKey, Serializer.Serialize(new Recipient(contactPreview.Name, emailAddress, RecipientType.Contact)));
                     Activity.SetResult(Android.App.Result.Ok, data);
                     Activity.Finish();
                 }
