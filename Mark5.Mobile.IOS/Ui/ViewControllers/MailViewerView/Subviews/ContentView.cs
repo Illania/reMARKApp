@@ -136,8 +136,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                     }
                     else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
                     {
-                        nslc.Constant = wv.ScrollView.ContentSize.Height;
+                        sv.RemoveFromSuperview();
 
+                        nslc.Constant = wv.ScrollView.ContentSize.Height;
                         SetNeedsLayout();
                     }
                 });
