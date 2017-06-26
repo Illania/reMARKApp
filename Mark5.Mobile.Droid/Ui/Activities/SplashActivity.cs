@@ -5,7 +5,6 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Views;
-using HockeyApp.Android;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
@@ -14,11 +13,14 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
+#if !DEBUG
+using HockeyApp.Android;
 using Mark5.Mobile.Droid.Utilities.Hockey;
+#endif
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(Label = "MARK5", MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait, NoHistory = true)]
+    [Activity(Label = "MARK5", MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait, NoHistory = true, ResizeableActivity = true)]
     public class SplashActivity : AppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
