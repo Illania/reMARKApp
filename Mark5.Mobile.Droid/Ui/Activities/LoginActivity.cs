@@ -40,7 +40,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
 
             SetTitle(Resource.String.app_name);
-            SetTheme(Resource.Style.mark5Login);
             SetContentView(Resource.Layout.activity_login);
 
             var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -55,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             portEditText = FindViewById<TextInputEditText>(Resource.Id.port_edit_text);
             portEditText.TextChanged += (sender, e) => portEditText.Error = null;
             sslSpinner = FindViewById<AppCompatSpinner>(Resource.Id.ssl_spinner);
-            sslSpinner.Adapter = CustomArrayAdapter.CreateWithLeftPaddingMatchingEditText(this, Resource.Array.ssl_modes, Android.Resource.Layout.SimpleSpinnerItem, Resource.Layout.support_simple_spinner_dropdown_item);
+            sslSpinner.Adapter = CustomArrayAdapter.CreateWithLeftPaddingMatchingEditText(this, Resource.Array.ssl_modes, Resource.Layout.login_spinner, Resource.Layout.support_simple_spinner_dropdown_item);
             loginButton = FindViewById<FloatingActionButton>(Resource.Id.login_button);
             loginButton.Click += LoginButton_Click;
 
