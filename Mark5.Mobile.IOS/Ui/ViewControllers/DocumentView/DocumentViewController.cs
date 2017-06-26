@@ -678,7 +678,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MarkAsReadIfNecessary()
         {
-            if (outgoingDocumentIdentifier != default(Guid) || folder == null || document == null || documentPreview == null)
+            if (outgoingDocumentIdentifier != default(Guid) || document == null || documentPreview == null)
                 return;
 
             readStatusCts?.Cancel();
