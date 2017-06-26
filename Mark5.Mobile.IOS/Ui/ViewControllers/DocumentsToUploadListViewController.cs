@@ -7,15 +7,12 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class DocumentsToUploadListViewController : AbstractViewController, IPrimaryViewController
     {
-        readonly Folder outgoingFolder = Folder.DocumentsOutgoingFolder;
-
         UITableView tableView;
 
         bool refreshing;
@@ -85,18 +82,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            tableView = new UITableView();
-            tableView.ClipsToBounds = false;
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+            tableView = new UITableView
+            {
+                ClipsToBounds = false,
+                RowHeight = UITableView.AutomaticDimension,
+                EstimatedRowHeight = 75f,
+                AllowsSelectionDuringEditing = false,
+                AllowsMultipleSelectionDuringEditing = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            tableView.EstimatedRowHeight = 75f;
-            tableView.AllowsSelectionDuringEditing = false;
-            tableView.AllowsMultipleSelectionDuringEditing = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
             {
@@ -105,19 +100,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
             });
-
-            var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))
-            {
-                MinimumPressDuration = 1f,
-                Delegate = this
-            };
-            tableView.AddGestureRecognizer(longPressRecognizer);
         }
 
         void InitializeNavigationBarTitle()
         {
             UIView.AnimationsEnabled = false;
-            NavigationItem.Title = outgoingFolder.Name;
+            NavigationItem.Title = Localization.GetString("outgoing");
             NavigationItem.Prompt = null;
             UIView.AnimationsEnabled = true;
         }
