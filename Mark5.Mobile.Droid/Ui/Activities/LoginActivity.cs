@@ -40,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
 
             SetTitle(Resource.String.app_name);
+            SetTheme(Resource.Style.mark5Login);
             SetContentView(Resource.Layout.activity_login);
 
             var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
@@ -146,7 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var password = passwordEditText.Text;
                 var hostname = hostnameEditText.Text;
                 var port = portEditText.Text;
-                var sslMode = (SslMode) sslSpinner.SelectedItemPosition;
+                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))
