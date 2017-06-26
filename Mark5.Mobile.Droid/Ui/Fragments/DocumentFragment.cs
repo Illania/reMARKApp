@@ -162,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!IsAdded || IsDetached || IsRemoving)
                 return;
-            if (!UserVisibleHint)
+            if ((Activity is SwipeDocumentActivity) && !UserVisibleHint)
                 return;
 
             MarkAsReadIfNecessary();
@@ -171,6 +171,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnUserVisibilityHintChanged()
         {
             base.OnUserVisibilityHintChanged();
+
+            if (!(Activity is SwipeDocumentActivity))
+                return;
 
             if (UserVisibleHint)
             {
