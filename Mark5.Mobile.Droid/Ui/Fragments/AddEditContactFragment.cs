@@ -11,6 +11,7 @@ using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -19,13 +20,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class AddEditContactFragment : RetainableStateFragment
     {
         public Contact Contact { get; set; }
+        public ContactType ContactType { get; set; }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            // Use this to return your custom view for this Fragment
-            // return inflater.Inflate(Resource.Layout.YourFragment, container, false);
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contactId={Contact?.Id}, type={ContactType}]...");
 
-            return base.OnCreateView(inflater, container, savedInstanceState);
+            var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
+
+
+
+
+
+            return rootView;
         }
 
         #region Init
