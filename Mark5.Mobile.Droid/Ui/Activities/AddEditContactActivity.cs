@@ -16,13 +16,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class AddEditContactActivity : AppCompatActivity
     {
         const string ContactIntentKey = "Contact_16fd7751-f195-4a43-87fa-097115921e6d";
+        const string ContactTypeIntentKey = "ContactType_8d9839f0-c47b-481e-ac20-e9a88376a3ec";
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Contact contact)
+        public static Intent CreateIntent(Contact contact = null, ContactType type = ContactType.None)
         {
             var intent = new Intent();
-            intent.PutExtra(ContactIntentKey, SerializationUtils.Serialize(contact));
+
+            if (contact != null)
+                intent.PutExtra(ContactIntentKey, SerializationUtils.Serialize(contact));
+
+            if (type != ContactType.None)
+                intent.PutExtra(ContactIntentKey, (int)type);
+
             return intent;
         }
 
@@ -57,6 +64,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(AddEditContactActivity)}");
             }
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }
 }

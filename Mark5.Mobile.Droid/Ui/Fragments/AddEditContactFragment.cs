@@ -20,18 +20,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Contact Contact { get; set; }
 
-        public override string GenerateTag()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-
-            // Create your fragment here
-        }
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             // Use this to return your custom view for this Fragment
@@ -39,5 +27,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return base.OnCreateView(inflater, container, savedInstanceState);
         }
+
+        #region Init
+
+        #endregion
+
+        #region RetainableState 
+
+        //TODO all this region
+
+        public override string GenerateTag()
+        {
+            return $"{nameof(AddEditContactFragment)}";
+        }
+
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return base.OnRetainInstanceState();
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            base.OnRetainedInstanceStateRestored(restoredState);
+        }
+
+        class AddEditContactFragmentState : IRetainableState
+        {
+
+        }
+
+        #endregion
     }
 }
