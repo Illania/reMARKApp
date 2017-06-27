@@ -6,7 +6,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -17,6 +19,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string CriteriaIntentKey = "Criteria_6f536c40-9c1b-4996-a60a-bf94df1613a7";
 
         Toolbar toolbar;
+
+        DocumentsSearchResultsFragment dlf;
+
+        TinyMessageSubscriptionToken readStatusToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -42,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = SerializationUtils.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new DocumentsSearchResultsFragment
+                    dlf = new DocumentsSearchResultsFragment
                     {
                         Criteria = criteria,
                         CloseRequest = OnBackPressed
@@ -56,12 +62,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = SerializationUtils.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new ContactsSearchResultsFragment
+                    var csrf = new ContactsSearchResultsFragment
                     {
                         Criteria = criteria,
                         CloseRequest = OnBackPressed
                     };
-                    ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                    ft.Replace(Resource.Id.fragment_container, csrf, csrf.GenerateTag());
                     ft.Commit();
                 }
 
@@ -70,12 +76,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = SerializationUtils.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var dlf = new ShortcodesSearchResultsFragment
+                    var ssrf = new ShortcodesSearchResultsFragment
                     {
                         Criteria = criteria,
                         CloseRequest = OnBackPressed
                     };
-                    ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                    ft.Replace(Resource.Id.fragment_container, ssrf, ssrf.GenerateTag());
                     ft.Commit();
                 }
 
@@ -85,6 +91,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(SearchResultsActivity)}");
             }
+
+            if (dlf != null)
+            {
+                readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
+            }
         }
 
         public override void Finish()
@@ -92,6 +103,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.Finish();
 
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            readStatusToken?.Dispose();
         }
     }
 }

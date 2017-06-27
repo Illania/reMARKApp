@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -30,6 +31,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentSearchResultsAdapter adapter;
+
+        bool shouldNotifyAdapter;
 
         #region Fragment overrides
 
@@ -58,8 +61,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]");
         }
@@ -75,6 +78,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"No elements - will refresh...");
 
                 await RefreshData();
+            }
+
+            if (shouldNotifyAdapter)
+            {
+                shouldNotifyAdapter = false;
+                adapter.NotifyDataSetChanged();
             }
         }
 
@@ -158,6 +167,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Refreshing = false;
 
                 CommonConfig.Logger.Info($"Refresh finished");
+            }
+        }
+
+        #endregion
+
+        #region Messenger hub related
+
+        public void UpdateReadStatus(DocumentPreviewReadStatusChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.DocumentPreviewId);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                var dp = adapter.Items[position];
+                dp.IsReadByCurrent = m.IsReadByCurrent;
+                dp.IsReadByAnyone = m.IsReadByAnyone;
             }
         }
 
@@ -288,15 +313,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var vh = recyclerView.FindViewHolderForAdapterPosition(position);
 
-                var dpvh = vh as DocumentPreviewViewHolder;
-                if (dpvh != null)
+                if (vh is DocumentPreviewViewHolder dpvh)
                     return dpvh.BubbleDate;
 
-                var edpvh = vh as ExternalDocumentPreviewViewHolder;
-                if (edpvh != null)
+                if (vh is ExternalDocumentPreviewViewHolder edpvh)
                     return edpvh.BubbleDate;
 
                 return string.Empty;
+            }
+
+            public int GetPosition(int documentPreviewId)
+            {
+                var position = -1;
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == documentPreviewId)
+                    {
+                        position = i;
+                        break;
+                    }
+
+                return position;
             }
         }
 
