@@ -717,8 +717,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         readByView.RefreshView();
                         readByView.UpdateVisibility();
 
-                        if (ReadStatusUpdated != null)
-                            ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(dp));
+                        ReadStatusUpdated?.Invoke(this, new ReadStatusUpdatedEventArgs(dp));
                     });
                 }
                 catch (Exception ex)
