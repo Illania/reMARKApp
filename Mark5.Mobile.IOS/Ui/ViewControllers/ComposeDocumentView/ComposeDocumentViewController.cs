@@ -71,11 +71,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         Worker autoSaveWorkingCopyWorker;
         int autoSaveWorkingCopyInterval = 5 * 1000;
 
-        public ComposeDocumentViewController()
-        {
-            Title = DefaultTitle;
-        }
-
         #region UIViewController overrides
 
         public override void LoadView()
@@ -117,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             await LoadDocument();
 
             autoSaveWorkingCopyWorker?.Stop();
-            autoSaveWorkingCopyWorker = new Worker(AutoSaveAction, autoSaveWorkingCopyInterval);
+            autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, autoSaveWorkingCopyInterval);
             autoSaveWorkingCopyWorker.Start();
         }
 
@@ -141,6 +136,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitNavigationBar()
         {
+            Title = DefaultTitle;
+
             cancelButtonItem = new UIBarButtonItem
             {
                 Title = Localization.GetString("cancel")
@@ -504,7 +501,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
+                CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
             }
@@ -545,7 +542,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save image [FileName={filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
+                CommonConfig.Logger.Error($"Failed to save image [FileName={filename}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
             }
@@ -571,10 +568,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task SaveAndCloseComposeViewController()
         {
-            //if (!LocalDocument)
-            //await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
-            //else
-
+            await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
             PopOrDismissViewController();
         }
 
@@ -599,6 +593,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             try
             {
+                var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
                 foreach (var subView in subViews)
                     await subView.UpdateDocument();
 
@@ -626,15 +621,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 NavigationController.PopViewController(true);
         }
 
-        async Task AutoSaveAction()
+        async Task SaveWorkingCopy()
         {
             InvokeOnMainThread(async () =>
             {
+                var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
                 foreach (var subView in subViews)
                     await subView.UpdateDocument();
             });
 
-            //await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
+            await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+            {
+                DocumentCreationModeFlag = DocumentCreationModeFlag,
+                PreviousDocumentFolderId = PreviousDocumentFolderId,
+                PreviousDocumentId = PreviousDocumentId,
+                DocumentPreview = documentPreview,
+                Document = document
+            });
         }
 
         #endregion
