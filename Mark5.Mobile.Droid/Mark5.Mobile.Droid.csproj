@@ -389,6 +389,8 @@
     <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Ui\Activities\TemplatesListActivity.cs" />
     <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
+    <Compile Include="Ui\Activities\AddEditContactActivity.cs" />
+    <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
