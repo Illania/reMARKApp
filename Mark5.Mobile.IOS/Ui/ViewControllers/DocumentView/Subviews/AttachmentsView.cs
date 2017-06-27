@@ -90,12 +90,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 }
             }
 
-            if (Container != null)
-                foreach (var ad in Container.LocalAttachments)
-                {
-                    var alssv = new AttachmentsSubView(this, ad);
-                    stackView.AddArrangedSubview(alssv);
-                }
+            //if (Container != null)
+                //foreach (var ad in Container.LocalAttachments)
+                //{
+                //    var alssv = new AttachmentsSubView(this, ad);
+                //    stackView.AddArrangedSubview(alssv);
+                //}
         }
 
         public override void UpdateVisibility()
@@ -107,9 +107,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             }
 
             var noRemoteAttachments = Document.Attachments.Count < 1;
-            var noLocalAttachments = Container == null || Container.LocalAttachments?.Count < 1;
+            //var noLocalAttachments = Container == null || Container.LocalAttachments?.Count < 1;
 
-            Hidden = noRemoteAttachments && noLocalAttachments;
+            Hidden = noRemoteAttachments;// && noLocalAttachments;
         }
 
         #region Event handlers

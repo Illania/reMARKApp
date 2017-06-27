@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Common.Services
         Task workerTask;
         CancellationTokenSource workerTaskCts;
 
-        protected SemaphoreSlim MainSemaphore = new SemaphoreSlim(1);
+        protected SemaphoreSlim MainSemaphore = new SemaphoreSlim(0);
 
         public bool IsRunning()
         {
@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Common.Services
             }
         }
 
-        public void Stop()
+        public void Stop(bool allowRestart = false)
         {
             lock (lockObj)
             {
@@ -54,7 +54,8 @@ namespace Mark5.Mobile.Common.Services
                 workerTask = null;
                 workerTaskCts?.Cancel();
 
-                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
+                if (!allowRestart)
+                    CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
 
                 CommonConfig.Logger.Info("Stopped");
             }
@@ -70,7 +71,7 @@ namespace Mark5.Mobile.Common.Services
             if (e.IsReachable)
                 Start();
             else
-                Stop();
+                Stop(true);
         }
     }
 }

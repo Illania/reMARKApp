@@ -5,6 +5,6 @@
         void Notify();
         bool IsRunning();
         void Start();
-        void Stop();
+        void Stop(bool allowRestart = false);
     }
 }

@@ -7,6 +7,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Services;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -620,9 +621,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
                 CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
-
-                await Managers.DocumentsDownloadManager.Start();
-                await Managers.OutgoingDocumentsManager.Start();
+                Mark5.Mobile.Common.Services.Services.DocumentsDownloadService.Start();
+                Mark5.Mobile.Common.Services.Services.DocumentsUploadService.Start();
 
                 LocalNotificationsListener.Initialize();
 

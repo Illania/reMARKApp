@@ -26,7 +26,14 @@ namespace Mark5.Mobile.Common.Services
                     {
                         CommonConfig.Logger.Info("No documents to upload found. Waiting...");
 
-                        await MainSemaphore.WaitAsync(ct);
+                        try
+                        {
+                            await MainSemaphore.WaitAsync(ct);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // Nothing to do here
+                        }
                         continue;
                     }
 

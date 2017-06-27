@@ -26,11 +26,18 @@ namespace Mark5.Mobile.Common.Services
                                                     .ToArray();
 
                     var documentsToDownloadIds = await documentManager.GetNonCachedDocumentIdsAsync(offlineDocumentFolderIds);
-                    if (documentsToDownloadIds == null || documentsToDownloadIds.Length < 0)
+                    if (documentsToDownloadIds == null || documentsToDownloadIds.Length < 1)
                     {
                         CommonConfig.Logger.Info("No documents to download found. Waiting...");
 
-                        await MainSemaphore.WaitAsync(ct);
+                        try
+                        {
+                            await MainSemaphore.WaitAsync(ct);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // Nothing to do here
+                        }
                         continue;
                     }
 

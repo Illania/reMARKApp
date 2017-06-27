@@ -189,9 +189,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "arrow-up.png"));
                 previousDocumentButtonItem.Enabled = false;
 
-                editDocumentButtonItem = new UIBarButtonItem();
-                editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "pencil.png"));
-                editDocumentButtonItem.Enabled = true;
+                //editDocumentButtonItem = new UIBarButtonItem();
+                //editDocumentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "pencil.png"));
+                //editDocumentButtonItem.Enabled = true;
 
                 var rightButtons = new UIBarButtonItem[2];
                 rightButtons[0] = nextDocumentButtonItem;
@@ -425,7 +425,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 nextDocumentButtonItem.Clicked += NextDocumentButton_Clicked;
                 previousDocumentButtonItem.Clicked += PreviousDocumentButton_Clicked;
-                editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
+                //editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
             }
         }
 
@@ -776,8 +776,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
-                    path = outgoingAttachment.Path;
+                    //var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
+                    //path = outgoingAttachment.Path;
                 }
 
                 if (string.IsNullOrWhiteSpace(path))

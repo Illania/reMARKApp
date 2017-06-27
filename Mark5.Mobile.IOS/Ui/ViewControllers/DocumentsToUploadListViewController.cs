@@ -114,66 +114,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        public void DocumentSelected(DocumentToUploadContainer container)
-        {
-            if (tableView.Editing || container.Info.State == OutgoingDocumentState.Sending)
-                return;
-
-            if (SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                var ds = (DataSource)tableView.Source;
-
-                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                nc.PopToViewController(nc.ViewControllers[0], false);
-
-                var vc = (DocumentViewController)nc.ViewControllers[0];
-
-                if (vc.IsShowingOutgoingDocumentWithGuid(container.Info.Identifier))
-                    return;
-
-                vc.HidesBottomBarWhenPushed = false;
-
-                vc.ClearData();
-                vc.SetData(container.Info.Identifier);
-                vc.RefreshData();
-            }
-            else
-            {
-                var vc = new DocumentViewController();
-                vc.SetData(container.Info.Identifier);
-                vc.SetRefreshDataOnAppear();
-
-                NavigationController.PushViewController(vc, true);
-            }
-        }
-
-        void EndEditing()
-        {
-            tableView.SetEditing(false, true);
-            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
-        }
-
-        async void Delete(DocumentToUploadContainer container)
-        {
-            await Delete(new List<DocumentToUploadContainer> { container });
-        }
-
-        async Task Delete(List<DocumentToUploadContainer> containers)
-        {
-            foreach (var container in containers)
-                await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(container.Info.Identifier);
-
-            await RefreshData();
-        }
-
         #endregion
 
         #region Refreshing
-
-        async void RefreshControl_ValueChanged(object sender, EventArgs e)
-        {
-            await RefreshData(true);
-        }
 
         async Task RefreshData(bool forceClear = false)
         {
@@ -191,8 +134,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (forceClear)
                     ds.Reset();
 
-                var outgoingDocumentContainers = await Managers.DocumentsManager.GetOutgoingDocumentContainersPreviewAsync();
-                ds.ReplaceItems(outgoingDocumentContainers);
+                //var outgoingDocumentContainers = await Managers.DocumentsManager.GetOutgoingDocumentContainersPreviewAsync();
+                //ds.ReplaceItems(outgoingDocumentContainers);
             }
             catch (Exception ex)
             {
@@ -206,61 +149,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region OutgoingDocumentManager event handlers
-
-        void OutgoingDocumentsManager_DocumentBeingSent(object sender, DocumentToUploadContainer outgoingDocumentContainer)
-        {
-            BeginInvokeOnMainThread(() =>
-            {
-                var ds = (DataSource)tableView.Source;
-                var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
-                if (row >= 0)
-                {
-                    var container = ds.Items[row];
-                    container.Info.State = OutgoingDocumentState.Sending;
-                    ds.UpdateRow(row);
-                }
-            });
-        }
-
-        void OutgoingDocumentsManager_DocumentSendingFailed(object sender, DocumentToUploadContainer outgoingDocumentContainer)
-        {
-            BeginInvokeOnMainThread(() =>
-            {
-                var ds = (DataSource)tableView.Source;
-                var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
-                if (row >= 0)
-                {
-                    var container = ds.Items[row];
-                    container.Info.State = OutgoingDocumentState.Failed;
-                    ds.UpdateRow(row);
-                }
-            });
-        }
-
-        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, DocumentToUploadContainer outgoingDocumentContainer)
-        {
-            BeginInvokeOnMainThread(() =>
-            {
-                var ds = (DataSource)tableView.Source;
-                var row = ds.GetPosition(outgoingDocumentContainer.Info.Identifier);
-                if (row >= 0)
-                {
-                    ds.Items.RemoveAt(row);
-                    ds.RemoveRow(row);
-                }
-            });
-        }
-
-        #endregion
-
         class DataSource : UITableViewSource, IDisposable
         {
             static readonly nfloat Height = 100f;
 
             public bool Empty => Items.Count < 1;
 
-            public List<DocumentToUploadContainer> Items { get; private set; } = new List<DocumentToUploadContainer>(1000);
+            public List<DocumentPreview> Items { get; private set; } = new List<DocumentPreview>(1000);
 
             DocumentsToUploadListViewController viewController;
             UITableView documentsTableView;
@@ -325,8 +220,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Localization.GetString("delete"),
                     (a, ip) =>
                     {
-                        viewController.Delete(documentPreview);
-                        viewController.EndEditing();
+                        //viewController.Delete(documentPreview);
+                        //viewController.EndEditing();
                     });
                 deleteAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(deleteAction);
@@ -337,20 +232,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var dp = Items[indexPath.Row];
-                viewController.DocumentSelected(dp);
+                //viewController.DocumentSelected(dp);
             }
 
-            public int GetPosition(Guid identifier)
-            {
-                return Items.FindIndex(o => o.Info.Identifier == identifier);
-            }
+            //public int GetPosition(Guid identifier)
+            //{
+            //    return Items.FindIndex(o => o.Info.Identifier == identifier);
+            //}
 
-            public void ReplaceItems(List<DocumentToUploadContainer> containers)
+            public void ReplaceItems(List<DocumentPreview> documentPreviews)
             {
                 loading = false;
 
                 Items.Clear();
-                Items.AddRange(containers);
+                Items.AddRange(documentPreviews);
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
@@ -379,7 +274,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void RemoveRow(int row)
             {
                 if (Items.Count < 1 && row == 0)
-                    UpdateRow(0); //We always keep a row for the empty table cell
+                    UpdateRow(0);
                 else
                     documentsTableView.DeleteRows(new NSIndexPath[] { NSIndexPath.FromRowSection(row, 0) }, UITableViewRowAnimation.Fade);
             }

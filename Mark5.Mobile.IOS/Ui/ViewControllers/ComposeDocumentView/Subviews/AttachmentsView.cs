@@ -113,10 +113,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             UpdateVisibility();
         }
 
-        public List<OutgoingDocumentAttachmentDescription> GetOutgoingAttachments()
-        {
-            return attachmentsDescription.OfType<OutgoingDocumentAttachmentDescription>().ToList();
-        }
+        //public List<OutgoingDocumentAttachmentDescription> GetOutgoingAttachments()
+        //{
+        //    return attachmentsDescription.OfType<OutgoingDocumentAttachmentDescription>().ToList();
+        //}
 
         #endregion
 

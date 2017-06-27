@@ -168,7 +168,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             Task.Run(() =>
               {
-                  contacts = CommonConfig.PhonebookUtilities.GetPhonebookContacts();
+                  contacts = CommonConfig.Phonebook.GetPhonebookContacts();
               }).ContinueWith(t =>
            {
                InvokeOnMainThread(async () =>

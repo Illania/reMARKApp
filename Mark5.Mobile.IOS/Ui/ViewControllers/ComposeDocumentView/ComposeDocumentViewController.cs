@@ -29,9 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
         public Guid OutgoingDocumentGuid { get; set; }
-        public OutgoingDocumentState OutgoingDocumentState { get; set; }
+        //public OutgoingDocumentState OutgoingDocumentState { get; set; }
 
-        public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; } = new List<OutgoingDocumentAttachmentDescription>();
+        //public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; } = new List<OutgoingDocumentAttachmentDescription>();
 
         public bool LocalDocument { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
@@ -129,12 +129,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             await LoadDocument();
 
-            if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved)
-            {
-                autoSaveWorker?.Stop();
-                autoSaveWorker = new AutoSaveWorker(AutoSaveAction, autoSaveInterval);
-                autoSaveWorker.Start();
-            }
+            //if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved)
+            //{
+            //    autoSaveWorker?.Stop();
+            //    autoSaveWorker = new AutoSaveWorker(AutoSaveAction, autoSaveInterval);
+            //    autoSaveWorker.Start();
+            //}
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -348,33 +348,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 if (LocalDocument)
                 {
-                    var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid, true);
-                    PreviousDocument = outgoingContainer.Document;
-                    PreviousDocumentPreview = outgoingContainer.DocumentPreview;
-                    PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
-                    PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
-                    OutgoingDocumentState = outgoingContainer.Info.State;
+                    //var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid, true);
+                    //PreviousDocument = outgoingContainer.Document;
+                    //PreviousDocumentPreview = outgoingContainer.DocumentPreview;
+                    //PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
+                    //PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
+                    //OutgoingDocumentState = outgoingContainer.Info.State;
 
-                    OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
-                    if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
-                    {
-                        await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
-                        NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                            {
-                                sendButtonItem,
-                                attachmentButtonItem
-                            },
-                            false);
-                    }
-                    if (outgoingContainer.Info.State == OutgoingDocumentState.AutoSaved)
-                        NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                            {
-                                sendButtonItem,
-                                attachmentButtonItem
-                            },
-                            false);
-                    if (outgoingContainer.LocalAttachments != null)
-                        OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
+                    //OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
+                    //if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
+                    //{
+                    //    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
+                    //    NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
+                    //        {
+                    //            sendButtonItem,
+                    //            attachmentButtonItem
+                    //        },
+                    //        false);
+                    //}
+                    //if (outgoingContainer.Info.State == OutgoingDocumentState.AutoSaved)
+                    //    NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
+                    //        {
+                    //            sendButtonItem,
+                    //            attachmentButtonItem
+                    //        },
+                    //        false);
+                    //if (outgoingContainer.LocalAttachments != null)
+                        //OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
                 }
                 else
                 {
@@ -410,7 +410,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 await subView.RefreshView();
             }
 
-            OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
+            //OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
 
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
@@ -516,7 +516,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (LocalDocument)
                     await SynchOutgoingAttachments(false);
 
-                await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
+                //await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
                 dismissAction();
 
                 PopOrDismissViewController();
@@ -542,12 +542,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         public void DeleteAutoSavedDocument()
         {
-            Task.Run(async () => { await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync(); })
-                .ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                        CommonConfig.Logger.Error("Error while deleting autosaved document", t.Exception);
-                });
+            //Task.Run(async () => { await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync(); })
+                //.ContinueWith(t =>
+                //{
+                //    if (t.IsFaulted)
+                //        CommonConfig.Logger.Error("Error while deleting autosaved document", t.Exception);
+                //});
         }
 
         async Task AutoSaveAction()
@@ -561,31 +561,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             await SynchOutgoingAttachments(false);
 
             DocumentPreview.Direction = DocumentDirection.Outgoing;
-            await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
+            //await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
         }
 
         public async Task SynchOutgoingAttachments(bool restoreState)
         {
-            if (restoreState) //We need to remove all the newly added attachments - Restoring state before modifications
-            {
-                var currentAttachments = attachmentsView.GetOutgoingAttachments();
-                var initialAttachmentsNames = OutgoingDocumentInitialAttachments.Select(a => a.Name).ToList();
+            //if (restoreState) //We need to remove all the newly added attachments - Restoring state before modifications
+            //{
+            //    var currentAttachments = attachmentsView.GetOutgoingAttachments();
+            //    var initialAttachmentsNames = OutgoingDocumentInitialAttachments.Select(a => a.Name).ToList();
 
-                var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
+            //    var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
 
-                foreach (var attachment in attachmentsToRemove)
-                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-            }
-            else //We need to remove all the attachments that are not there already
-            {
-                var currentAttachmentsNames = attachmentsView.GetOutgoingAttachments().Select(a => a.Name).ToList();
-                var initialAttachments = OutgoingDocumentInitialAttachments;
+            //    foreach (var attachment in attachmentsToRemove)
+            //        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+            //}
+            //else //We need to remove all the attachments that are not there already
+            //{
+            //    var currentAttachmentsNames = attachmentsView.GetOutgoingAttachments().Select(a => a.Name).ToList();
+            //    var initialAttachments = OutgoingDocumentInitialAttachments;
 
-                var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
+            //    var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
 
-                foreach (var attachment in attachmentsToRemove)
-                    await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-            }
+            //    foreach (var attachment in attachmentsToRemove)
+            //        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
+            //}
         }
 
         #endregion
@@ -684,16 +684,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
                 }
 
-                var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+                //var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
 
-                var attachment = new OutgoingDocumentAttachmentDescription
-                {
-                    Name = filename,
-                    SizeInBytes = sizeInBytes,
-                    Path = path
-                };
+                //var attachment = new OutgoingDocumentAttachmentDescription
+                //{
+                //    Name = filename,
+                //    SizeInBytes = sizeInBytes,
+                //    Path = path
+                //};
 
-                attachmentsView.AddAttachment(attachment);
+                //attachmentsView.AddAttachment(attachment);
             }
             catch (Exception ex)
             {
@@ -725,16 +725,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
                 }
 
-                var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+                //var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
 
-                var attachment = new OutgoingDocumentAttachmentDescription
-                {
-                    Name = filename,
-                    SizeInBytes = sizeInBytes,
-                    Path = path
-                };
+                //var attachment = new OutgoingDocumentAttachmentDescription
+                //{
+                //    Name = filename,
+                //    SizeInBytes = sizeInBytes,
+                //    Path = path
+                //};
 
-                attachmentsView.AddAttachment(attachment);
+                //attachmentsView.AddAttachment(attachment);
             }
             catch (Exception ex)
             {
@@ -755,29 +755,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void CancelButtonItem_Clicked(object sender, EventArgs e)
         {
-            if (LocalDocument && OutgoingDocumentState != OutgoingDocumentState.AutoSaved)
-            {
-                var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
-                if (confirm)
-                    await SaveModifiedOutgoingDocument();
-                else
-                    await SaveAndCloseComposeViewController();
-            }
-            else
-            {
+            //if (LocalDocument && OutgoingDocumentState != OutgoingDocumentState.AutoSaved)
+            //{
+            //    var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
+            //    if (confirm)
+            //        await SaveModifiedOutgoingDocument();
+            //    else
+            //        await SaveAndCloseComposeViewController();
+            //}
+            //else
+            //{
                 var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
                 if (confirm)
                     await SendDocument(true);
                 else
                     await SaveAndCloseComposeViewController();
-            }
+            //}
         }
 
         async Task SaveAndCloseComposeViewController()
         {
-            if (!LocalDocument)
-                await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
-            else
+            //if (!LocalDocument)
+                //await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+            //else
                 await SynchOutgoingAttachments(true);
 
             PopOrDismissViewController();
@@ -796,7 +796,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 DocumentPreview.Direction = PreviousDocumentPreview.Direction;
 
                 await SynchOutgoingAttachments(false);
-                await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
+                //await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
 
                 PopOrDismissViewController();
             }
@@ -922,8 +922,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
                 else
                 {
-                    var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
-                    path = outgoingAttachment.Path;
+                    //var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
+                    //path = outgoingAttachment.Path;
                 }
 
                 if (string.IsNullOrWhiteSpace(path))
@@ -973,27 +973,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async void AttachmentsView_DeleteAttachmentClicked(object sender, AttachmentDescription attachment)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
-            if (outgoingAttachment != null)
-            {
-                try
-                {
-                    if (!LocalDocument)
-                        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
+            //var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
+            //if (outgoingAttachment != null)
+            //{
+            //    try
+            //    {
+            //        if (!LocalDocument)
+            //            await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
 
-                    attachmentsView.RemoveAttachment(sender, outgoingAttachment);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}," + $" PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
-                    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_removing_local_attachment")));
-                }
-            }
-            else
-            {
-                var remoteAttachment = attachment as AttachmentDescription;
-                attachmentsView.RemoveAttachment(sender, remoteAttachment);
-            }
+            //        attachmentsView.RemoveAttachment(sender, outgoingAttachment);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}," + $" PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+            //        await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_removing_local_attachment")));
+            //    }
+            //}
+            //else
+            //{
+            //    var remoteAttachment = attachment as AttachmentDescription;
+            //    attachmentsView.RemoveAttachment(sender, remoteAttachment);
+            //}
         }
 
         #endregion
