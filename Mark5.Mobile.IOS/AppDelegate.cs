@@ -11,13 +11,14 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
-using Mark5.Mobile.IOS.Services;
+using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
@@ -26,7 +27,6 @@ using PCLStorage;
 using TinyMessenger;
 using UIKit;
 using UserNotifications;
-using Mark5.Mobile.Common.Services;
 
 namespace Mark5.Mobile.IOS
 {
@@ -53,7 +53,7 @@ namespace Mark5.Mobile.IOS
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
 #else
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus =
-PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BITCrashManagerStatus.Disabled;
+                PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BITCrashManagerStatus.Disabled;
 #endif
                 BITHockeyManager.SharedHockeyManager.StartManager();
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
@@ -323,8 +323,8 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                 }
 
                 CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
-                Common.Services.Services.DocumentsDownloadService.Start();
-                Common.Services.Services.DocumentsUploadService.Start();
+                Services.DocumentsDownloadService.Start();
+                Services.DocumentsUploadService.Start();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.Reachability.Refresh();

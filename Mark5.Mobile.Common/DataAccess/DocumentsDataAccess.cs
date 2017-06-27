@@ -664,7 +664,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds)
+        public async Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds, int limit = -1)
         {
             try
             {
@@ -676,8 +676,10 @@ namespace Mark5.Mobile.Common.DataAccess
                                 $"from {nameof(DocumentPreview)} as DP " +
                                 $"where DP.{nameof(DocumentPreview.Id)} not in (select {nameof(Document.Id)} from {nameof(Document)}) " +
                                 $" and DP.{nameof(DocumentPreview.Id)} in (select distinct {nameof(FolderDocumentLink.DocumentId)} from {nameof(FolderDocumentLink)} where {nameof(FolderDocumentLink.FolderId)} in ({string.Join(",", folderIds)})) " +
-                                $"order by DP.{nameof(DocumentPreview.Id)} desc " +
-                                "limit 50";
+                                $"order by DP.{nameof(DocumentPreview.Id)} desc ";
+
+                    if (limit > 0)
+                        query += $"limit {limit}";
 
                     var result = c.Query<IdValue>(query);
                     ids = result.Select(v => v.Id).ToArray();

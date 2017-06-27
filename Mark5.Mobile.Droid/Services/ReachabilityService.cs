@@ -6,9 +6,9 @@ using Android.App;
 using Android.Content;
 using Android.Net;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Tester;
 
 namespace Mark5.Mobile.Droid.Services

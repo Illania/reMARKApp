@@ -7,7 +7,7 @@ using Android.Content;
 using Android.OS;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Android.Support.V7.Widget;

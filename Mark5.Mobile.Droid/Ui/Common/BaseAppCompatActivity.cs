@@ -1,7 +1,7 @@
 ﻿using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Service;
 using System.Text;
 using System;
 using Android.Support.Design.Widget;

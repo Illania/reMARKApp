@@ -5,11 +5,11 @@ using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Services;
+using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -621,8 +621,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
                 CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
-                Mark5.Mobile.Common.Services.Services.DocumentsDownloadService.Start();
-                Mark5.Mobile.Common.Services.Services.DocumentsUploadService.Start();
+                Services.DocumentsDownloadService.Start();
+                Services.DocumentsUploadService.Start();
 
                 LocalNotificationsListener.Initialize();
 

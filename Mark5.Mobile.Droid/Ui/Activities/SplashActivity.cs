@@ -8,7 +8,7 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Droid.Services;

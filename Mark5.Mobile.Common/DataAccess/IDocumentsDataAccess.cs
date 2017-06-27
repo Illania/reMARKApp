@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteCommentAsync(Document document, Comment comment);
 
-        Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds);
+        Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds, int limit = -1);
 
         Task RemoveOrphans();
     }

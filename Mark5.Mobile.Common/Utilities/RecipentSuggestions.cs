@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 
-namespace Mark5.Mobile.Common.Services
+namespace Mark5.Mobile.Common.Utilities
 {
     public static class RecipentSuggestions
     {
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Common.Services
                 var filtered = new List<Recipient>();
                 try
                 {
-                    var recentAddresses = await Managers.Managers.DocumentsManager.GetRecentAddressesAsync(phrase.Length < 2 ? SourceType.Remote : SourceType.Local);
+                    var recentAddresses = await Manager.Managers.DocumentsManager.GetRecentAddressesAsync(phrase.Length < 2 ? SourceType.Remote : SourceType.Local);
                     filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase)).Select(ra => new Recipient(ra)).ToList();
                 }
                 catch (Exception ex)
@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Common.Services
                 var filtered = new List<Recipient>();
                 try
                 {
-                    filtered = await Managers.Managers.ContactsManager.GetSuggestions(phrase);
+                    filtered = await Manager.Managers.ContactsManager.GetSuggestions(phrase);
                 }
                 catch (Exception ex)
                 {

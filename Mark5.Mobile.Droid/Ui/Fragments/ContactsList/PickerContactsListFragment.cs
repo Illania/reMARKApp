@@ -2,7 +2,7 @@
 using System.Linq;
 using Android.Content;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;

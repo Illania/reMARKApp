@@ -18,7 +18,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Support;
-using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.Droid.Ui.Common;

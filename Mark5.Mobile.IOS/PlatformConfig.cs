@@ -1,5 +1,5 @@
 ﻿using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.IOS.Services;
+using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 

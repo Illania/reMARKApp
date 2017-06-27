@@ -90,9 +90,9 @@
 		<Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
 		<Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
 		<Compile Include="Model\HubMessages\NewNotificationsMessage.cs" />
-		<Compile Include="Services\ReachabilityProvider.cs" />
-		<Compile Include="Services\ReachabilityReceiver.cs" />
-		<Compile Include="Services\Reachability.cs" />
+		<Compile Include="Service\ReachabilityProvider.cs" />
+		<Compile Include="Service\ReachabilityReceiver.cs" />
+		<Compile Include="Service\Reachability.cs" />
 		<Compile Include="Ui\Common\AbstractSplitViewController.cs" />
 		<Compile Include="Ui\Common\AbstractViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
