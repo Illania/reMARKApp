@@ -350,7 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                CreationModeFlag = DocumentCreationModeFlag.New,
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                 PreviousDocumentDirection = DocumentDirection.None
             };
 
@@ -599,7 +599,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new ComposeDocumentViewController
             {
                 PreviousDocumentId = documentPreview.Id,
-                CreationModeFlag = creationModeFlag,
+                DocumentCreationModeFlag = creationModeFlag,
                 PreviousDocumentFolderId = Folder.Id,
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocumentPreview = documentPreview

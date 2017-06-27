@@ -2,9 +2,9 @@
 {
     public enum CopyToNewOption
     {
-        None = 0,
-        KeepOnlyAddresses = 1,
-        KeepTextAndAttachments = 2,
-        KeepOnlyAttachments = 3,
+        None,
+        KeepOnlyAddresses,
+        KeepTextAndAttachments,
+        KeepOnlyAttachments
     }
 }

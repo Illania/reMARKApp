@@ -350,7 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         {
             var vc = new ComposeDocumentViewController
             {
-                CreationModeFlag = DocumentCreationModeFlag.New,
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                 PreviousDocumentDirection = DocumentDirection.None,
                 PreconfiguredEmailAddresses = preconfiguredEmailAddresses
             };

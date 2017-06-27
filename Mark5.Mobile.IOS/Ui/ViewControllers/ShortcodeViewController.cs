@@ -230,7 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     documentAddress.FullAddress
                 },
-                CreationModeFlag = DocumentCreationModeFlag.New
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -299,7 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                CreationModeFlag = DocumentCreationModeFlag.New,
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                 PreConfiguredShortcode = shortcode
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

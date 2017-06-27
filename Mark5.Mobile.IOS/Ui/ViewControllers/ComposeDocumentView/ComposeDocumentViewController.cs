@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -25,26 +25,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         string DefaultTitle = Localization.GetString("new_document");
 
-        public DocumentDirection PreviousDocumentDirection { get; set; }
-        public DocumentCreationModeFlag CreationModeFlag { get; set; }
-        public DocumentCreationModeFlag OutgoingDocumentOriginalCreationModeFlag { get; set; }
-        public Guid OutgoingDocumentGuid { get; set; }
-        //public OutgoingDocumentState OutgoingDocumentState { get; set; }
-
-        //public List<OutgoingDocumentAttachmentDescription> OutgoingDocumentInitialAttachments { get; set; } = new List<OutgoingDocumentAttachmentDescription>();
-
-        public bool LocalDocument { get; set; }
-        public int? PreviousDocumentFolderId { get; set; }
-        public int? PreviousDocumentId { get; set; }
-        public string[] PreconfiguredEmailAddresses { get; set; }
-        public Shortcode PreConfiguredShortcode;
-        public Document PreviousDocument { get; set; }
+        public DocumentCreationModeFlag DocumentCreationModeFlag { get; set; } = DocumentCreationModeFlag.New;
         public CopyToNewOption CopyToNewOption { get; set; }
 
-        public DocumentPreview PreviousDocumentPreview { get; set; }
+        public DocumentDirection PreviousDocumentDirection { get; set; }
+        public int? PreviousDocumentFolderId { get; set; }
+        public int? PreviousDocumentId { get; set; }
+        public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
 
-        Document Document { get; } = new Document();
-        DocumentPreview DocumentPreview { get; } = new DocumentPreview();
+        DocumentPreview documentPreview = new DocumentPreview();
+        Document document = new Document();
+
+        DocumentPreview previousDocumentPreview;
+        Document previousDocument;
+
+        bool documentLoaded;
+        bool templateLoaded;
+
+        UIBarButtonItem cancelButtonItem;
+        UIBarButtonItem sendButtonItem;
+        UIBarButtonItem attachmentButtonItem;
 
         UIScrollView scrollView;
         UIStackView stackView;
@@ -57,24 +57,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         SubjectView subjectView;
         AttachmentsView attachmentsView;
         ContentView contentView;
-        readonly List<ComposeDocumentSubView> subViews = new List<ComposeDocumentSubView>();
 
         SuggestionsListView suggestionsListView;
 
-        bool templateLoaded;
-        bool documentShown;
-
-        UIBarButtonItem cancelButtonItem;
-        UIBarButtonItem sendButtonItem;
-        UIBarButtonItem attachmentButtonItem;
-
         UIDocumentInteractionController attachmentInteractionController;
 
-        // This value will be later updated from notification.
+        NSObject observeDidShowNotification;
+        NSObject observeWillChangeNotification;
+        NSObject observeWillHideNotification;
+        NSObject observeWillShowNotification;
         float keyboardHeight = 216f;
 
-        AutoSaveWorker autoSaveWorker;
-        int autoSaveInterval = 5 * 1000; //5 seconds
+        Worker autoSaveWorkingCopyWorker;
+        int autoSaveWorkingCopyInterval = 5 * 1000;
 
         public ComposeDocumentViewController()
         {
@@ -87,9 +82,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             base.LoadView();
 
-            Initialize();
             InitNavigationBar();
-            InitSubViews();
+            InitializeView();
+            InitializeSubViews();
         }
 
         public override void ViewDidLoad()
@@ -98,11 +93,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             ExtendedLayoutIncludesOpaqueBars = true;
         }
-
-        NSObject observeDidShowNotification;
-        NSObject observeWillChangeNotification;
-        NSObject observeWillHideNotification;
-        NSObject observeWillShowNotification;
 
         public override void ViewWillAppear(bool animated)
         {
@@ -124,39 +114,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             CommonConfig.Logger.Info($"{typeof(ComposeDocumentViewController)} appeared");
 
-            if (OutgoingDocumentGuid == Guid.Empty)
-                OutgoingDocumentGuid = Guid.NewGuid();
-
             await LoadDocument();
 
-            //if (!LocalDocument || LocalDocument && OutgoingDocumentState == OutgoingDocumentState.AutoSaved)
-            //{
-            //    autoSaveWorker?.Stop();
-            //    autoSaveWorker = new AutoSaveWorker(AutoSaveAction, autoSaveInterval);
-            //    autoSaveWorker.Start();
-            //}
+            autoSaveWorkingCopyWorker?.Stop();
+            autoSaveWorkingCopyWorker = new Worker(AutoSaveAction, autoSaveWorkingCopyInterval);
+            autoSaveWorkingCopyWorker.Start();
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
-            DeInitializeHandlers();
 
-            NavigationController.HidesBarsOnSwipe = false;
+            DeInitializeHandlers();
 
             observeDidShowNotification?.Dispose();
             observeWillHideNotification?.Dispose();
             observeWillChangeNotification?.Dispose();
             observeWillShowNotification?.Dispose();
 
-            autoSaveWorker?.Stop();
+            autoSaveWorkingCopyWorker?.Stop();
         }
 
         #endregion
 
         #region Init methods
 
-        void Initialize()
+        void InitNavigationBar()
+        {
+            cancelButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("cancel")
+            };
+            sendButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("send"),
+                Enabled = false
+            };
+            attachmentButtonItem = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+            };
+
+            NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
+            NavigationItem.SetRightBarButtonItems(new[] { sendButtonItem, attachmentButtonItem }, false);
+        }
+
+        void InitializeView()
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
@@ -212,75 +215,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             });
         }
 
-        void InitNavigationBar()
+        void InitializeSubViews()
         {
-            cancelButtonItem = new UIBarButtonItem();
-            cancelButtonItem.Title = Localization.GetString("cancel");
-            NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
+            stackView.AddArrangedSubview(toView = new ToView());
+            stackView.AddArrangedSubview(ccView = new CcView());
+            stackView.AddArrangedSubview(bccView = new BccView());
+            stackView.AddArrangedSubview(lineView = new LineView(this));
 
-            sendButtonItem = new UIBarButtonItem();
-            sendButtonItem.Title = Localization.GetString("send");
-            sendButtonItem.Enabled = false;
-
-            attachmentButtonItem = new UIBarButtonItem();
-            attachmentButtonItem.Image = UIImage.FromBundle(Path.Combine("icons", "attachment.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            attachmentButtonItem.Enabled = true;
-
-            if (LocalDocument)
-                NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                    {
-                        attachmentButtonItem
-                    },
-                    false);
-            else
-                NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                    {
-                        sendButtonItem,
-                        attachmentButtonItem
-                    },
-                    false);
-        }
-
-        void InitSubViews()
-        {
-            var subviewsInStackView = new List<ComposeDocumentSubView>();
-
-            toView = new ToView();
-            subviewsInStackView.Add(toView);
-
-            ccView = new CcView();
-            subviewsInStackView.Add(ccView);
-
-            bccView = new BccView();
-            subviewsInStackView.Add(bccView);
-
-            lineView = new LineView(this);
-            subviewsInStackView.Add(lineView);
-
-            priorityView = new PriorityView(this);
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
-                subviewsInStackView.Add(priorityView);
+                stackView.AddArrangedSubview(priorityView = new PriorityView(this));
 
-            subjectView = new SubjectView();
-            subviewsInStackView.Add(subjectView);
-
-            attachmentsView = new AttachmentsView();
-            subviewsInStackView.Add(attachmentsView);
-
-            subviewsInStackView.ForEach(stackView.AddArrangedSubview);
-
-            subViews.AddRange(subviewsInStackView);
-            subViews.Add(contentView);
+            stackView.AddArrangedSubview(subjectView = new SubjectView());
+            stackView.AddArrangedSubview(attachmentsView = new AttachmentsView());
         }
 
         void InitializeHandlers()
         {
-            //Navigation Bar
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
             sendButtonItem.Clicked += SendButtonItem_Clicked;
             attachmentButtonItem.Clicked += AttachmentButtonItem_Clicked;
 
-            //Subviews
             toView.AddButtonTapped += RecipientView_AddButtonTapped;
             toView.SearchRequested += RecipientView_SearchRequested;
             toView.Edited += Subview_Edited;
@@ -303,12 +257,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void DeInitializeHandlers()
         {
-            //Navigation Bar
             cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
             sendButtonItem.Clicked -= SendButtonItem_Clicked;
             attachmentButtonItem.Clicked -= AttachmentButtonItem_Clicked;
 
-            //Subviews
             toView.AddButtonTapped -= RecipientView_AddButtonTapped;
             toView.SearchRequested -= RecipientView_SearchRequested;
             toView.Edited -= Subview_Edited;
@@ -327,135 +279,96 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             attachmentsView.AttachmentClicked -= AttachmentsView_AttachmentClicked;
             attachmentsView.DeleteAttachmentClicked -= AttachmentsView_DeleteAttachmentClicked;
-
-            if (suggestionsListView != null)
-                suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
         }
 
         #endregion
 
         async Task LoadDocument()
         {
-            if (PreviousDocument != null || CreationModeFlag == DocumentCreationModeFlag.New)
-            {
-                await ShowDocument();
+            if (documentLoaded)
                 return;
-            }
+
+            documentLoaded = true;
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_document___"));
 
             try
             {
-                if (LocalDocument)
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAttachments ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
                 {
-                    //var outgoingContainer = await Managers.DocumentsManager.GetOutgoingDocumentContainerAsync(OutgoingDocumentGuid, true);
-                    //PreviousDocument = outgoingContainer.Document;
-                    //PreviousDocumentPreview = outgoingContainer.DocumentPreview;
-                    //PreviousDocumentId = outgoingContainer.Info.PreviousDocumentId;
-                    //PreviousDocumentFolderId = outgoingContainer.Info.PreviousDocumentdFolderId;
-                    //OutgoingDocumentState = outgoingContainer.Info.State;
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value);
+                    previousDocumentPreview = result.DocumentPreview;
+                    previousDocument = result.Document;
 
-                    //OutgoingDocumentOriginalCreationModeFlag = outgoingContainer.Info.Flag;
-                    //if (outgoingContainer.Info.State == OutgoingDocumentState.Failed)
-                    //{
-                    //    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_while_sending_document")));
-                    //    NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                    //        {
-                    //            sendButtonItem,
-                    //            attachmentButtonItem
-                    //        },
-                    //        false);
-                    //}
-                    //if (outgoingContainer.Info.State == OutgoingDocumentState.AutoSaved)
-                    //    NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[]
-                    //        {
-                    //            sendButtonItem,
-                    //            attachmentButtonItem
-                    //        },
-                    //        false);
-                    //if (outgoingContainer.LocalAttachments != null)
-                        //OutgoingDocumentInitialAttachments.AddRange(outgoingContainer.LocalAttachments);
-                }
-                else
-                {
-                    var sourceType = SourceType.Auto;
-                    PreviousDocument = await Managers.DocumentsManager.GetDocumentAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value, sourceType);
-                    if (CreationModeFlag == DocumentCreationModeFlag.Edit && PreviousDocumentPreview.Direction == DocumentDirection.Draft)
-                        Document.Id = DocumentPreview.Id = PreviousDocument.Id;
+                    await ShowDocument();
+                    dismissAction();
+
+                    return;
                 }
 
-                dismissAction();
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit &&
+                    PreviousDocumentDirection == DocumentDirection.Draft &&
+                    CopyToNewOption == CopyToNewOption.None)
+                {
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value);
+                    previousDocumentPreview = result.DocumentPreview;
+                    previousDocument = result.Document;
+
+                    document.Id = PreviousDocumentId.Value;
+                    documentPreview.Id = PreviousDocumentId.Value;
+
+                    await ShowDocument();
+                    dismissAction();
+
+                    return;
+                }
+
+                // Just the default case
                 await ShowDocument();
+                dismissAction();
             }
             catch (Exception ex)
             {
                 dismissAction();
+
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
         async Task ShowDocument()
         {
-            if (documentShown)
-                return;
-
+            var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
             foreach (var subView in subViews)
             {
-                subView.Document = Document;
-                subView.DocumentPreview = DocumentPreview;
-                subView.PreviousDocument = PreviousDocument;
-                subView.PreviousDocumentPreview = PreviousDocumentPreview;
-                subView.CreationModeFlag = CreationModeFlag;
+                subView.CreationModeFlag = DocumentCreationModeFlag;
                 subView.CopyToNewOptions = CopyToNewOption;
+                subView.Document = document;
+                subView.DocumentPreview = documentPreview;
+                subView.PreviousDocumentDirection = PreviousDocumentDirection;
+                subView.PreviousDocument = previousDocument;
+                subView.PreviousDocumentPreview = previousDocumentPreview;
+                subView.PreconfiguredEmailAddresses = PreconfiguredEmailAddresses;
+
                 await subView.RefreshView();
-            }
-
-            //OutgoingDocumentInitialAttachments.ForEach(attachmentsView.AddAttachment);
-
-            if (CreationModeFlag == DocumentCreationModeFlag.New)
-            {
-                if (PreconfiguredEmailAddresses != null)
-                    toView.SetEmails(PreconfiguredEmailAddresses);
-
-                AddAddressesFromShortcode(PreConfiguredShortcode);
             }
 
             sendButtonItem.Enabled = IsFormValid();
 
             await AskIfShouldUseTemplates();
-
-            documentShown = true;
-        }
-
-        void AddAddressesFromShortcode(Shortcode shortcode)
-        {
-            if (shortcode == null || shortcode.Addresses == null || !shortcode.Addresses.Any())
-                return;
-
-            var addresses = shortcode.Addresses;
-            toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
-            ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
-            bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
         bool IsFormValid()
         {
-            if (subjectView.Empty)
-                return false;
-
             var recipientAdded = false;
-            foreach (var recipientView in new List<RecipientsView>
-            {
-                toView,
-                ccView,
-                bccView
-            })
+            foreach (var recipientView in new RecipientsView[] { toView, ccView, bccView })
                 recipientAdded |= !recipientView.Empty;
 
-            if (!recipientAdded)
-                return false;
-
-            return !lineView.LineSelectedIsAmbiguous;
+            return !recipientAdded || !lineView.LineSelectedIsAmbiguous;
         }
 
         #region Keyboard Notifications
@@ -484,113 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #endregion
 
-        #region Actions
-
-        async Task SendDocument(bool draft)
-        {
-            var containtsIncompleteEmail = false;
-            foreach (var recipientView in new List<RecipientsView>
-            {
-                toView,
-                ccView,
-                bccView
-            })
-                containtsIncompleteEmail |= recipientView.ContainsInvalidEmail();
-
-            if (containtsIncompleteEmail)
-            {
-                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warining"), Localization.GetString("incorrect_email_addresses"));
-                if (!result)
-                    return;
-            }
-
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(draft ? Localization.GetString("saving_draft___") : Localization.GetString("sending_document___"));
-
-            try
-            {
-                foreach (var subView in subViews)
-                    await subView.UpdateDocument();
-
-                DocumentPreview.Direction = draft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
-
-                if (LocalDocument)
-                    await SynchOutgoingAttachments(false);
-
-                //await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
-                dismissAction();
-
-                PopOrDismissViewController();
-            }
-            catch (Exception ex)
-            {
-                dismissAction();
-
-                CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={draft}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
-        }
-
-        void PopOrDismissViewController()
-        {
-            if (PresentingViewController != null)
-                DismissViewController(true, null);
-            else
-                NavigationController.PopViewController(true);
-
-            DeleteAutoSavedDocument();
-        }
-
-        public void DeleteAutoSavedDocument()
-        {
-            //Task.Run(async () => { await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync(); })
-                //.ContinueWith(t =>
-                //{
-                //    if (t.IsFaulted)
-                //        CommonConfig.Logger.Error("Error while deleting autosaved document", t.Exception);
-                //});
-        }
-
-        async Task AutoSaveAction()
-        {
-            InvokeOnMainThread(async () =>
-            {
-                foreach (var subView in subViews)
-                    await subView.UpdateDocument();
-            });
-
-            await SynchOutgoingAttachments(false);
-
-            DocumentPreview.Direction = DocumentDirection.Outgoing;
-            //await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
-        }
-
-        public async Task SynchOutgoingAttachments(bool restoreState)
-        {
-            //if (restoreState) //We need to remove all the newly added attachments - Restoring state before modifications
-            //{
-            //    var currentAttachments = attachmentsView.GetOutgoingAttachments();
-            //    var initialAttachmentsNames = OutgoingDocumentInitialAttachments.Select(a => a.Name).ToList();
-
-            //    var attachmentsToRemove = currentAttachments.Where(a => !initialAttachmentsNames.Contains(a.Name));
-
-            //    foreach (var attachment in attachmentsToRemove)
-            //        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-            //}
-            //else //We need to remove all the attachments that are not there already
-            //{
-            //    var currentAttachmentsNames = attachmentsView.GetOutgoingAttachments().Select(a => a.Name).ToList();
-            //    var initialAttachments = OutgoingDocumentInitialAttachments;
-
-            //    var attachmentsToRemove = initialAttachments.Where(a => !currentAttachmentsNames.Contains(a.Name));
-
-            //    foreach (var attachment in attachmentsToRemove)
-            //        await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, attachment.Name);
-            //}
-        }
-
-        #endregion
-
-        #region Navigation Bar Event Handlers
+        #region NavigationBar Event Handlers
 
         void AttachmentButtonItem_Clicked(object sender, EventArgs e)
         {
@@ -697,7 +504,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
             }
@@ -738,7 +545,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save image [FileName={filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
+                CommonConfig.Logger.Error($"Failed to save image [FileName={filename}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
             }
@@ -755,56 +562,79 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void CancelButtonItem_Clicked(object sender, EventArgs e)
         {
-            //if (LocalDocument && OutgoingDocumentState != OutgoingDocumentState.AutoSaved)
-            //{
-            //    var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_modifications"), Localization.GetString("confirm_save_modified_document"));
-            //    if (confirm)
-            //        await SaveModifiedOutgoingDocument();
-            //    else
-            //        await SaveAndCloseComposeViewController();
-            //}
-            //else
-            //{
-                var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
-                if (confirm)
-                    await SendDocument(true);
-                else
-                    await SaveAndCloseComposeViewController();
-            //}
+            var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
+            if (confirm)
+                await SendDocument(true);
+            else
+                await SaveAndCloseComposeViewController();
         }
 
         async Task SaveAndCloseComposeViewController()
         {
             //if (!LocalDocument)
-                //await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
+            //await Managers.DocumentsManager.DeleteOutgoingDocumentFolder(OutgoingDocumentGuid);
             //else
-                await SynchOutgoingAttachments(true);
 
             PopOrDismissViewController();
         }
 
-        async Task SaveModifiedOutgoingDocument()
+        #endregion
+
+        #region Actions
+
+        async Task SendDocument(bool saveDraft)
         {
-            if (!LocalDocument)
-                return;
+            var containsInvalidEmails = false;
+            foreach (var recipientView in new RecipientsView[] { toView, ccView, bccView })
+                containsInvalidEmails |= recipientView.ContainsInvalidEmail();
+
+            if (containsInvalidEmails)
+            {
+                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses"));
+                if (!result)
+                    return;
+            }
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(saveDraft ? Localization.GetString("saving_draft___") : Localization.GetString("sending_document___"));
 
             try
             {
                 foreach (var subView in subViews)
                     await subView.UpdateDocument();
 
-                DocumentPreview.Direction = PreviousDocumentPreview.Direction;
+                documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
 
-                await SynchOutgoingAttachments(false);
-                //await Managers.DocumentsManager.SaveOutgoingDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
+                //await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
+                dismissAction();
 
                 PopOrDismissViewController();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save modified outgoing document [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={saveDraft}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
+        }
+
+        void PopOrDismissViewController()
+        {
+            if (PresentingViewController != null)
+                DismissViewController(true, null);
+            else
+                NavigationController.PopViewController(true);
+        }
+
+        async Task AutoSaveAction()
+        {
+            InvokeOnMainThread(async () =>
+            {
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
+            });
+
+            //await Managers.DocumentsManager.AutoSaveDocumentAsync(OutgoingDocumentGuid, Document, DocumentPreview, CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
         }
 
         #endregion
@@ -818,15 +648,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (sender is LineView
                 && PlatformConfig.Preferences.RemoveLine
-                && CreationModeFlag == DocumentCreationModeFlag.ReplyAll
-                && PreviousDocumentPreview != null
-                && PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
-                if (!lineView.LineSelectedIsAmbiguous && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
-                {
-                    toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
-                    ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
-                    bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
-                }
+                && DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll
+                && previousDocumentPreview != null
+                && previousDocumentPreview.Direction == DocumentDirection.Incoming
+                && !lineView.LineSelectedIsAmbiguous
+                && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
+            {
+                toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+            }
         }
 
         async void RecipientView_AddButtonTapped(object sender, EventArgs e)
@@ -838,9 +669,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             };
 
             var choice = await Dialogs.ShowListDialogAsync(this, null, strings, sender as UIView);
-
-            if (choice < 0)
-                return;
 
             switch (choice)
             {
@@ -856,6 +684,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 case 3:
                     await DoOpenPhonebook(sender as RecipientsView);
                     break;
+                default:
+                    return;
             }
 
             sendButtonItem.Enabled = IsFormValid();
@@ -869,7 +699,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (suggestionsListView == null)
             {
                 suggestionsListView = new SuggestionsListView(this);
-                suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
 
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
@@ -883,8 +712,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 View.SendSubviewToBack(suggestionsListView);
             }
 
-            var recipientView = (RecipientsView)sender;
-            suggestionsListView.Initialize(recipientView, initialSearchString);
+            suggestionsListView.Initialize((RecipientsView)sender, initialSearchString);
+            suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
+            suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
 
             View.BringSubviewToFront(suggestionsListView);
         }
@@ -892,6 +722,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
         {
             View.SendSubviewToBack(suggestionsListView);
+            ((SuggestionsListView)sender).ShouldDisappear -= SuggestionsListView_ShouldDisappear;
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -907,7 +738,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var remoteAttachment = attachmentDescription as AttachmentDescription;
                 if (remoteAttachment != null)
                 {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Local);
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, document, false, SourceType.Local);
 
                     if (string.IsNullOrWhiteSpace(path))
                     {
@@ -917,7 +748,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                             return;
                         }
 
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, Document, false, SourceType.Remote);
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, document, false, SourceType.Remote);
                     }
                 }
                 else
@@ -945,12 +776,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     if (!previewSuccessful)
                     {
-                        CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                        CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
 
                         var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
                         if (!openInSuccessful)
                         {
-                            CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed [documentId={0}, attachment={1}]", Document.Id, attachmentDescription));
+                            CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
                             await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
                     }
@@ -958,7 +789,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={Document.Id}, attachment.Name={attachmentDescription?.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -1018,8 +849,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             PresentViewController(new NavigationController(vc), true, null);
 
             var sc = await vc.Task;
-            if (sc != null)
-                AddAddressesFromShortcode(sc);
+            if (sc != null && sc.Addresses != null && sc.Addresses.Any())
+            {
+                var addresses = sc.Addresses;
+                toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+                bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
+            }
 
             DismissViewController(true, null);
         }
@@ -1057,7 +893,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (templateLoaded)
                 return;
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 CommonConfig.Logger.Info("Document opened in edit mode, no need to add template");
                 return;
@@ -1135,7 +971,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             try
             {
-                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(CreationModeFlag);
+                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(DocumentCreationModeFlag);
                 if (template != null)
                     await ApplyTemplate(template);
                 else if (errorMessageIfNull)
@@ -1143,7 +979,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                CommonConfig.Logger.Error($"Error while getting default template [PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -1166,7 +1002,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, PreviousDocument.Id={PreviousDocument?.Id}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}] ", ex);
+                CommonConfig.Logger.Error($"Error while getting template [templatePreview.Id={templatePreview?.Id}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -1198,24 +1034,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var timeString = currentTime.ToString("HH:mm");
 
             var fromNameString = string.Empty;
-            if (PreviousDocumentPreview != null && PreviousDocumentPreview.Addresses != null)
-                fromNameString = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
+            if (previousDocumentPreview != null && previousDocumentPreview.Addresses != null)
+                fromNameString = previousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 
             if (template.ContentType == ContentType.Html)
             {
                 templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
                 templateContent = templateContent.Replace("&lt;DATE&gt;", dateString);
                 templateContent = templateContent.Replace("&lt;TIME&gt;", timeString);
-            }
-            else
-            {
-                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
-                templateContent = templateContent.Replace("<DATE>", dateString);
-                templateContent = templateContent.Replace("<TIME>", timeString);
-            }
 
-            if (template.ContentType == ContentType.Html)
-            {
                 templateContent = templateContent.Replace("&lt;CUR&gt;", string.Empty);
                 templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
                 templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
@@ -1223,6 +1050,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             else
             {
+                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
+                templateContent = templateContent.Replace("<DATE>", dateString);
+                templateContent = templateContent.Replace("<TIME>", timeString);
+
                 templateContent = templateContent.Replace("<CUR>", string.Empty);
                 templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
                 templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
@@ -1313,51 +1144,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 documentPicker.Delegate = this;
                 documentPicker.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
 
-                ComposeDocumentViewController vc;
-                if (vcWeak.TryGetTarget(out vc))
+                if (vcWeak.TryGetTarget(out ComposeDocumentViewController vc))
                     vc.PresentViewController(documentPicker, true, null);
             }
 
             public override void WasCancelled(UIDocumentMenuViewController documentMenu)
             {
                 // Nothing to do
-            }
-        }
-
-        public class AutoSaveWorker
-        {
-            CancellationTokenSource cts;
-            Func<Task> autoSaveAction;
-            int delay;
-
-            public AutoSaveWorker(Func<Task> autoSaveAction, int delay)
-            {
-                this.autoSaveAction = autoSaveAction;
-                this.delay = delay;
-            }
-
-            public void Start()
-            {
-                cts?.Cancel();
-                cts = new CancellationTokenSource();
-
-                Task.Run(async () =>
-                {
-                    while (true)
-                    {
-                        await Task.Delay(delay);
-                        if (cts.IsCancellationRequested)
-                            return;
-
-                        await autoSaveAction();
-                    }
-                });
-            }
-
-            public void Stop()
-            {
-                cts?.Cancel();
-                cts = null;
             }
         }
     }

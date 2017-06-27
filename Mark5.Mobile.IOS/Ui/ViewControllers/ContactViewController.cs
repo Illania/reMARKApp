@@ -390,7 +390,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     communicationAddress.Address
                 },
-                CreationModeFlag = DocumentCreationModeFlag.New
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -550,7 +550,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         ca.Address
                     },
-                    CreationModeFlag = DocumentCreationModeFlag.New
+                    DocumentCreationModeFlag = DocumentCreationModeFlag.New
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }

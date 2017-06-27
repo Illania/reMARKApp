@@ -859,7 +859,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                CreationModeFlag = DocumentCreationModeFlag.New,
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                 PreviousDocumentDirection = DocumentDirection.None,
                 PreconfiguredEmailAddresses = preconfiguredEmailAddresses
             };
@@ -1083,7 +1083,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 PreviousDocumentPreview = documentPreview,
                 PreviousDocument = document,
-                CreationModeFlag = DocumentCreationModeFlag.Edit,
+                DocumentCreationModeFlag = DocumentCreationModeFlag.Edit,
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocumentFolderId = folder.Id
             };
@@ -1176,7 +1176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new ComposeDocumentViewController
             {
                 PreviousDocumentId = documentPreview.Id,
-                CreationModeFlag = creationModeFlag,
+                DocumentCreationModeFlag = creationModeFlag,
                 PreviousDocumentFolderId = folderId ?? folder?.Id,
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocument = document,
@@ -1228,7 +1228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new ComposeDocumentViewController
             {
                 PreviousDocumentId = documentPreview.Id,
-                CreationModeFlag = DocumentCreationModeFlag.New,
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                 PreviousDocumentFolderId = folderId ?? folder?.Id,
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocument = document,

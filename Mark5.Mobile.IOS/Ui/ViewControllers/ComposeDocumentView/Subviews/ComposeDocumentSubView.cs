@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -10,12 +11,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
     {
         protected UIView ContainerView;
 
-        public DocumentPreview DocumentPreview { get; set; }
-        public Document Document { get; set; }
-        public DocumentPreview PreviousDocumentPreview { get; set; }
-        public Document PreviousDocument { get; set; }
         public DocumentCreationModeFlag CreationModeFlag { get; set; }
         public CopyToNewOption CopyToNewOptions { get; set; }
+        public DocumentPreview DocumentPreview { get; set; }
+        public Document Document { get; set; }
+        public DocumentDirection PreviousDocumentDirection { get; set; }
+        public Document PreviousDocument { get; set; }
+        public DocumentPreview PreviousDocumentPreview { get; set; }
+        public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
 
         protected float MinimumHeight = 21f;
         protected float HorizontalMargin = 15f;
