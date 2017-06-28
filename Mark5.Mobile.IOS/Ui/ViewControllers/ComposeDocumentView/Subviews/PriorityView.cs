@@ -79,19 +79,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
             {
-                var possiblePriorities = new[]
-                {
-                    Priority.Urgent,
-                    Priority.Normal,
-                    Priority.Low
-                };
                 var previousDocumentPriority = PreviousDocumentPreview.Priority;
 
-                if (!possiblePriorities.Contains(previousDocumentPriority))
+                if (previousDocumentPriority != Priority.Low && previousDocumentPriority != Priority.Normal && previousDocumentPriority != Priority.Urgent)
                     previousDocumentPriority = Priority.Normal;
-
+                
                 SelectPriority(previousDocumentPriority);
             }
 

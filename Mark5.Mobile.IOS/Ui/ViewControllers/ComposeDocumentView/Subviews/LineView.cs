@@ -92,39 +92,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.New)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+                SetLine(defaultOutgoingLine);
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                SetLine(PreviousDocument.Lines.FirstOrDefault());
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
             {
-                if (defaultOutgoingLine != null)
+                if (availableOutgoingLines.Count == 1)
+                {
+                    SetLine(availableOutgoingLines.FirstOrDefault());
+                    return Task.CompletedTask;
+                }
+
+                if (PreviousDocument.Lines.FirstOrDefault(l => l.Guid == defaultOutgoingLine.Guid) != null)
                     SetLine(defaultOutgoingLine);
                 else
-                    SetLine(null);
-                return Task.CompletedTask;
-            }
-
-            if (CreationModeFlag == DocumentCreationModeFlag.None)
-                return Task.CompletedTask;
-
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
-                SetLine(PreviousDocument.Lines.First());
-
-            if (availableOutgoingLines.Count == 1)
-            {
-                SetLine(availableOutgoingLines.First());
-                return Task.CompletedTask;
-            }
-
-            var previousDocumentLines = PreviousDocument.Lines;
-            if (previousDocumentLines.FirstOrDefault(l => l.Guid == defaultOutgoingLine.Guid) != null)
-            {
-                SetLine(defaultOutgoingLine);
-            }
-            else
-            {
-                var intersection = previousDocumentLines.Intersect(availableOutgoingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToList();
-                if (intersection.Count() == 1)
-                    SetLine(intersection.First());
-                else
-                    SetLine(null);
+                {
+                    var intersection = PreviousDocument.Lines.Intersect(availableOutgoingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToArray();
+                    if (intersection.Length == 1)
+                        SetLine(intersection.FirstOrDefault());
+                    else
+                        SetLine(null);
+                }
             }
 
             return Task.CompletedTask;

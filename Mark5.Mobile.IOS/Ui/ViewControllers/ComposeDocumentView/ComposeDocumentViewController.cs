@@ -346,8 +346,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             foreach (var subView in subViews)
             {
                 subView.RestoreWorkingCopy = RestoreWorkingCopy;
-                subView.CreationModeFlag = DocumentCreationModeFlag;
-                subView.CopyToNewOptions = CopyToNewOption;
+                subView.DocumentCreationModeFlag = DocumentCreationModeFlag;
+                subView.CopyToNewOption = CopyToNewOption;
                 subView.Document = document;
                 subView.DocumentPreview = documentPreview;
                 subView.PreviousDocumentDirection = PreviousDocumentDirection;

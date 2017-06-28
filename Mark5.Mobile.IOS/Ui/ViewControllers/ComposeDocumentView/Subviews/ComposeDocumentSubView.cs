@@ -12,8 +12,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         protected UIView ContainerView;
 
         public bool RestoreWorkingCopy { get; set; }
-        public DocumentCreationModeFlag CreationModeFlag { get; set; }
-        public CopyToNewOption CopyToNewOptions { get; set; }
+        public DocumentCreationModeFlag DocumentCreationModeFlag { get; set; }
+        public CopyToNewOption CopyToNewOption { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
         public DocumentDirection PreviousDocumentDirection { get; set; }

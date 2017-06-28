@@ -72,16 +72,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 foreach (var attachmentDescription in Document.Attachments)
                     AddAttachment(attachmentDescription);
-                
+
                 return Task.CompletedTask;
             }
 
             attachmentsDescription.Clear();
             stackView.Subviews.OfType<AttachmentsSubView>().ForEach(v => v.RemoveFromSuperview());
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.Edit
-                || CreationModeFlag == DocumentCreationModeFlag.New
-                && (CopyToNewOptions == CopyToNewOption.KeepOnlyAttachments || CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments))
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.New && (CopyToNewOption == CopyToNewOption.KeepOnlyAttachments || CopyToNewOption == CopyToNewOption.KeepTextAndAttachments))
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);
@@ -92,10 +92,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
-            var remoteAttachments = attachmentsDescription.OfType<AttachmentDescription>().ToList();
+            var remoteAttachments = attachmentsDescription.OfType<AttachmentDescription>().ToArray();
+            DocumentPreview.AttachmentsCount = remoteAttachments.Length;
             Document.Attachments.Clear();
             Document.Attachments.AddRange(remoteAttachments);
-            DocumentPreview.AttachmentsCount = attachmentsDescription.Count;
 
             return Task.CompletedTask;
         }

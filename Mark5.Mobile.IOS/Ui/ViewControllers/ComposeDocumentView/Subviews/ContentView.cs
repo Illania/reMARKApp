@@ -285,8 +285,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit
-                || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
+                (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments))
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                     await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
@@ -295,7 +295,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             else
             {
-                expandButton.Hidden = PreviousDocument == null || CreationModeFlag == DocumentCreationModeFlag.New;
+                expandButton.Hidden = PreviousDocument == null || DocumentCreationModeFlag == DocumentCreationModeFlag.New;
                 separatorBeforeExpand.Hidden = expandButton.Hidden;
 
                 await LoadOldContent();
@@ -324,7 +324,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         async Task LoadOldContent()
         {
-            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && CreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
+            if (!oldContentLoaded && DocumentCreationModeFlag != DocumentCreationModeFlag.Edit && DocumentCreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
             {
                 await oldContentWebView.EvaluateJavaScriptAsync("");
 

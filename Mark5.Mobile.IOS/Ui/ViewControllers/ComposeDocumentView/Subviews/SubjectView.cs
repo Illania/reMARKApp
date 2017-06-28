@@ -79,22 +79,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return Task.CompletedTask;
             }
 
-            switch (CreationModeFlag)
-            {
-                case DocumentCreationModeFlag.New:
-                    textView.Text = CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments ? PreviousDocumentPreview.Subject : string.Empty;
-                    break;
-                case DocumentCreationModeFlag.Edit:
-                    textView.Text = PreviousDocumentPreview.Subject;
-                    break;
-                case DocumentCreationModeFlag.Reply:
-                case DocumentCreationModeFlag.ReplyAll:
-                    textView.Text = $"Re: {PreviousDocumentPreview.Subject}";
-                    break;
-                case DocumentCreationModeFlag.Forward:
-                    textView.Text = $"Fw: {PreviousDocumentPreview.Subject}";
-                    break;
-            }
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments)
+                textView.Text = PreviousDocumentPreview.Subject;
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                textView.Text = PreviousDocumentPreview.Subject;
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply || DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+                textView.Text = "Re: " + PreviousDocumentPreview.Subject;
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                textView.Text = "Fw: " + PreviousDocumentPreview.Subject;
 
             return Task.CompletedTask;
         }

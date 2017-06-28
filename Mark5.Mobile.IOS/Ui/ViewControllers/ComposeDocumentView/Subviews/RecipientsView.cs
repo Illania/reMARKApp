@@ -166,17 +166,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.None
-                || CreationModeFlag == DocumentCreationModeFlag.Forward)
-                return Task.CompletedTask;
-
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses)
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
 
-            if (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepOnlyAddresses)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Reply)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
             {
                 if (AddressType != DocumentAddressType.To)
                     return Task.CompletedTask;
@@ -195,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 }
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
             {
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
