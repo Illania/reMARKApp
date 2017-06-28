@@ -108,16 +108,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         #region Utilities
 
-        AppCompatImageButton GetButton(bool addButton = true)
+        AppCompatImageButton GetButton(bool plus = true)
         {
             var button = new AppCompatImageButton(Context);
 
-            var drawable = ContextCompat.GetDrawable(Context, Resource.Drawable.circle).GetConstantState().NewDrawable();
-            drawable.SetColorFilter(addButton ? new Color(ContextCompat.GetColor(Context, Resource.Color.blue)) : Color.Red, PorterDuff.Mode.SrcAtop);
+            button.SetImageResource(Resource.Drawable.add);
+            button.SetColorFilter(plus ? new Color(ContextCompat.GetColor(Context, Resource.Color.blue)) : Color.Red);
 
-            button.SetImageDrawable(drawable);
-
-            var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(20), ConversionUtils.ConvertDpToPixels(20))
+            var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
                 LeftMargin = DistanceNormal,
                 Gravity = (int)GravityFlags.CenterVertical,

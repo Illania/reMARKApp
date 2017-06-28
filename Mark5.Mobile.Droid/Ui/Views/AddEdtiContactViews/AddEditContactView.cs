@@ -1,4 +1,5 @@
 ﻿using System;
+using Android.Animation;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -25,14 +26,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             Orientation = Vertical;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            LayoutTransition = new Android.Animation.LayoutTransition();
+            LayoutTransition = new LayoutTransition();
 
             TopLayout = new LinearLayoutCompat(context);
             TopLayout.Orientation = Horizontal;
+            TopLayout.LayoutTransition = new LayoutTransition();
             AddView(TopLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             ContentLayout = new LinearLayoutCompat(context);
             ContentLayout.Orientation = Vertical;
+            ContentLayout.LayoutTransition = new LayoutTransition();
             AddView(ContentLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
