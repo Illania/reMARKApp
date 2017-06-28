@@ -110,10 +110,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             CommonConfig.Logger.Info($"{typeof(ComposeDocumentViewController)} appeared");
 
             await LoadDocument();
-
-            autoSaveWorkingCopyWorker?.Stop();
-            autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, autoSaveWorkingCopyInterval);
-            autoSaveWorkingCopyWorker.Start();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -298,36 +294,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value);
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value);
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
-
-                    await ShowDocument();
-                    dismissAction();
-
-                    return;
                 }
-
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit &&
-                    PreviousDocumentDirection == DocumentDirection.Draft &&
-                    CopyToNewOption == CopyToNewOption.None)
+                else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit &&
+                         PreviousDocumentDirection == DocumentDirection.Draft &&
+                         CopyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId.Value, PreviousDocumentId.Value);
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value);
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
 
                     document.Id = PreviousDocumentId.Value;
                     documentPreview.Id = PreviousDocumentId.Value;
-
-                    await ShowDocument();
-                    dismissAction();
-
-                    return;
                 }
 
-                // Just the default case
                 await ShowDocument();
                 dismissAction();
+
+                autoSaveWorkingCopyWorker?.Stop();
+                autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, autoSaveWorkingCopyInterval);
+                autoSaveWorkingCopyWorker.Start();
             }
             catch (Exception ex)
             {
@@ -582,8 +570,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
 
-                autoSaveWorkingCopyWorker.Stop();
-                await autoSaveWorkingCopyWorker.Finished();
+                if (autoSaveWorkingCopyWorker != null)
+                {
+                    autoSaveWorkingCopyWorker.Stop();
+                    await autoSaveWorkingCopyWorker.Finished();
+                }
+
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag,
@@ -618,21 +610,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task SaveWorkingCopy()
         {
-            InvokeOnMainThread(async () =>
+            try
             {
-                var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
-                foreach (var subView in subViews)
-                    await subView.UpdateDocument();
-            });
+                InvokeOnMainThread(async () =>
+                {
+                    var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
+                    foreach (var subView in subViews)
+                        await subView.UpdateDocument();
+                });
 
-            await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag,
+                    PreviousDocumentFolderId = PreviousDocumentFolderId,
+                    PreviousDocumentId = PreviousDocumentId,
+                    DocumentPreview = documentPreview,
+                    Document = document
+                });
+            }
+            catch (Exception ex)
             {
-                DocumentCreationModeFlag = DocumentCreationModeFlag,
-                PreviousDocumentFolderId = PreviousDocumentFolderId,
-                PreviousDocumentId = PreviousDocumentId,
-                DocumentPreview = documentPreview,
-                Document = document
-            });
+                CommonConfig.Logger.Error("Failed to save working copy!", ex);
+            }
         }
 
         #endregion

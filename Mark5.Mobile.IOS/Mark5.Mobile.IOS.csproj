@@ -25,7 +25,7 @@
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<CodesignKey>iPhone Developer</CodesignKey>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -41,7 +41,7 @@
 		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
 		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
@@ -58,7 +58,7 @@
 		<CodesignKey>iPhone Developer</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -74,7 +74,7 @@
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
 		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<ItemGroup>
@@ -292,12 +292,6 @@
 		<Reference Include="InAppSettingsKit">
 			<HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
 		</Reference>
-		<Reference Include="HockeySDK">
-			<HintPath>..\packages\HockeySDK.Xamarin.4.1.4\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
-		</Reference>
-		<Reference Include="HockeySDK.iOSBindings">
-			<HintPath>..\packages\HockeySDK.Xamarin.4.1.4\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
-		</Reference>
 		<Reference Include="AngleSharp">
 			<HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
 		</Reference>
@@ -324,6 +318,12 @@
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="HockeySDK">
+		  <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+		</Reference>
+		<Reference Include="HockeySDK.iOSBindings">
+		  <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

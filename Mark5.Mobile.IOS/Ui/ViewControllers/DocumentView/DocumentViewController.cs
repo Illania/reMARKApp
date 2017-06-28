@@ -915,13 +915,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             switch (result)
             {
                 case 0:
-                    DoReply(DocumentCreationModeFlag.Reply);
+                    DoRespond(DocumentCreationModeFlag.Reply);
                     break;
                 case 1:
-                    DoReply(DocumentCreationModeFlag.ReplyAll);
+                    DoRespond(DocumentCreationModeFlag.ReplyAll);
                     break;
                 case 2:
-                    DoReply(DocumentCreationModeFlag.Forward);
+                    DoRespond(DocumentCreationModeFlag.Forward);
                     break;
                 case 3:
                     CopyToNew();
@@ -1172,7 +1172,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void DoReply(DocumentCreationModeFlag creationModeFlag)
+        void DoRespond(DocumentCreationModeFlag creationModeFlag)
         {
             var vc = new ComposeDocumentViewController
             {

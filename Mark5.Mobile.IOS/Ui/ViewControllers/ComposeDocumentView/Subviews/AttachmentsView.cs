@@ -57,7 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerMargin),
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin - InnerMargin),
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
             });
 
@@ -90,8 +90,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Document.Attachments.AddRange(remoteAttachments);
             DocumentPreview.AttachmentsCount = attachmentsDescription.Count;
 
-            //Nothing to do for local attachments, they're saved on disk
-
             return Task.CompletedTask;
         }
 
@@ -113,29 +111,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             UpdateVisibility();
         }
 
-        //public List<OutgoingDocumentAttachmentDescription> GetOutgoingAttachments()
-        //{
-        //    return attachmentsDescription.OfType<OutgoingDocumentAttachmentDescription>().ToList();
-        //}
-
         #endregion
 
         #region Utilities
 
-        void UpdateVisibility()
-        {
-            Hidden = attachmentsDescription.Count < 1;
-        }
+        void UpdateVisibility() => Hidden = attachmentsDescription.Count < 1;
 
-        void HandleAttachmentClicked(AttachmentsSubView view, AttachmentDescription attachmentDescrption)
-        {
-            AttachmentClicked(view, attachmentDescrption);
-        }
+        void HandleAttachmentClicked(AttachmentsSubView view, AttachmentDescription attachmentDescrption) => AttachmentClicked(view, attachmentDescrption);
 
-        void HandleDeleteAttachmentClicked(AttachmentsSubView view, AttachmentDescription attachmentDescrption)
-        {
-            DeleteAttachmentClicked(view, attachmentDescrption);
-        }
+        void HandleDeleteAttachmentClicked(AttachmentsSubView view, AttachmentDescription attachmentDescrption) => DeleteAttachmentClicked(view, attachmentDescrption);
 
         #endregion
 
@@ -176,9 +160,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 deleteButton = new UIButton();
                 deleteButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "remove.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                deleteButton.BackgroundColor = UIColor.Clear;
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
+                deleteButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
+                deleteButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                deleteButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                deleteButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 deleteButton.TouchUpInside += (sender, e) => deleteAttachmentClickedAction(this, attachmentDescription);
-                deleteButton.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 AddArrangedSubview(deleteButton);
             }
         }
