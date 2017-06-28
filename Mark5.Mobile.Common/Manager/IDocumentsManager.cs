@@ -53,6 +53,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task QueueWorkingCopyToUpload();
 
+        Task<bool> IsDocumentWorkingCopyAvailableAsync();
+
         Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy info);
 
         Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream);

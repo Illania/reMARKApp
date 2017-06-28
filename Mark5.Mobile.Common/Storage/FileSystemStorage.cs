@@ -490,6 +490,11 @@ namespace Mark5.Mobile.Common.Storage
 
         #region Document working copy
 
+        public static async Task<bool> IsDocumentWorkingCopyAvailableAsync()
+        {
+            return await CommonConfig.DocumentWorkingCopyFolder.CheckExistsAsync("documentWorkingCopy.json") == ExistenceCheckResult.FileExists;
+        }
+
         public static async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy documentWorkingCopy)
         {
             var documentWorkingCopyFile = await CommonConfig.DocumentWorkingCopyFolder.CreateFileAsync("documentWorkingCopy.json", CreationCollisionOption.ReplaceExisting);

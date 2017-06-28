@@ -563,6 +563,8 @@ namespace Mark5.Mobile.Common.Manager
             Services.DocumentsUploadService.Notify();
         }
 
+        public async Task<bool> IsDocumentWorkingCopyAvailableAsync() => await FileSystemStorage.IsDocumentWorkingCopyAvailableAsync();
+
         public async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy workingCopy) => await FileSystemStorage.SaveDocumentWorkingCopyAsync(workingCopy);
 
         public async Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream) => await FileSystemStorage.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);

@@ -25,6 +25,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         string DefaultTitle = Localization.GetString("new_document");
 
+        public bool RestoreWorkingCopy { get; set; }
+
         public DocumentCreationModeFlag DocumentCreationModeFlag { get; set; } = DocumentCreationModeFlag.New;
         public CopyToNewOption CopyToNewOption { get; set; }
 
@@ -287,7 +289,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             try
             {
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
+                if (RestoreWorkingCopy)
+                {
+                    var wc = await Managers.DocumentsManager.GetDocumentWorkingCopyAsync();
+
+                    DocumentCreationModeFlag = wc.DocumentCreationModeFlag;
+                    PreviousDocumentFolderId = wc.PreviousDocumentFolderId;
+                    PreviousDocumentId = wc.PreviousDocumentId;
+                    PreviousDocumentDirection = wc.PreviousDocumentDirection;
+                    documentPreview = wc.DocumentPreview;
+                    document = wc.Document;
+
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value);
+                    previousDocumentPreview = result.DocumentPreview;
+                    previousDocument = result.Document;
+                }
+                else if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAttachments ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
@@ -581,6 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DocumentCreationModeFlag = DocumentCreationModeFlag,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document
                 });
@@ -612,6 +630,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             try
             {
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug("Saving working copy...");
+
                 InvokeOnMainThread(async () =>
                 {
                     var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
@@ -624,9 +645,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DocumentCreationModeFlag = DocumentCreationModeFlag,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document
                 });
+
+                CommonConfig.Logger.Info("Saved working copy");
             }
             catch (Exception ex)
             {

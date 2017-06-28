@@ -60,7 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            //CheckAutoSavedDocument();
+            CheckAutoSavedDocument();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -79,40 +79,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(nc, true, null);
         }
 
-        //async void CheckAutoSavedDocument()
-        //{
-        //    try
-        //    {
-        //        var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
+        async void CheckAutoSavedDocument()
+        {
+            try
+            {
+                var isAvailable = await Managers.DocumentsManager.IsDocumentWorkingCopyAvailableAsync();
+                if (!isAvailable)
+                    return;
 
-        //        if (container == null)
-        //            return;
-
-        //        var title = Localization.GetString("autosave_recover_title");
-        //        var content = Localization.GetString("autosave_recover_content");
-
-        //        var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, title, content);
-        //        if (shouldRecover)
-        //        {
-        //            var vc = new ComposeDocumentViewController
-        //            {
-        //                LocalDocument = true,
-        //                CreationModeFlag = DocumentCreationModeFlag.Edit,
-        //                PreviousDocumentDirection = container.DocumentPreview.Direction,
-        //                OutgoingDocumentGuid = container.Info.Identifier
-        //            };
-
-        //            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        //        }
-        //        else
-        //        {
-        //            await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        CommonConfig.Logger.Error("Error while checking if autosaved document is present", ex);
-        //    }
-        //}
+                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("autosave_recover_title"), Localization.GetString("autosave_recover_content"));
+                if (shouldRecover)
+                {
+                    var vc = new ComposeDocumentViewController { RestoreWorkingCopy = true };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }
+                else
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while checking if document working copy is available!", ex);
+            }
+        }
     }
 }
