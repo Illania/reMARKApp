@@ -119,6 +119,18 @@ namespace Mark5.Mobile.IOS
             return true;
         }
 
+        public override void OnActivated(UIApplication application)
+        {
+            Services.DocumentsDownloadService?.Start();
+            Services.DocumentsUploadService?.Start();
+        }
+
+        public override void DidEnterBackground(UIApplication application)
+        {
+            Services.DocumentsDownloadService?.Stop();
+            Services.DocumentsUploadService?.Stop();
+        }
+
         public override void ReceiveMemoryWarning(UIApplication application)
         {
             CommonConfig.Logger.Warning("Received memory warning!");
@@ -321,10 +333,6 @@ namespace Mark5.Mobile.IOS
                     await Managers.CleanUpManager.CleanUp();
                     CommonConfig.Logger.Info("Cleaned up cache");
                 }
-
-                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
-                Services.DocumentsDownloadService.Start();
-                Services.DocumentsUploadService.Start();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.Reachability.Refresh();

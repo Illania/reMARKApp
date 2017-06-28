@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Manager;
 
 namespace Mark5.Mobile.Common.Service
 {
@@ -12,6 +14,13 @@ namespace Mark5.Mobile.Common.Service
         CancellationTokenSource workerTaskCts;
 
         SemaphoreSlim mainSemaphore = new SemaphoreSlim(0);
+
+        private readonly int autoRunPeriod;
+
+        protected AbstractService(int autoRunPeriod)
+        {
+            this.autoRunPeriod = autoRunPeriod;
+        }
 
         public bool IsRunning()
         {
@@ -25,9 +34,10 @@ namespace Mark5.Mobile.Common.Service
         {
             lock (lockObj)
             {
-                CommonConfig.Logger.Info("Starting...");
-
                 if (workerTask != null)
+                    return;
+
+                if (Managers.ActiveConnectionInfo == null)
                     return;
 
                 if (!CommonConfig.Reachability.IsReachable)
@@ -40,8 +50,6 @@ namespace Mark5.Mobile.Common.Service
                 CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
 
                 workerTask = Task.Run(async () => await Work(workerTaskCts.Token));
-
-                CommonConfig.Logger.Info("Started");
             }
         }
 
@@ -49,19 +57,15 @@ namespace Mark5.Mobile.Common.Service
         {
             lock (lockObj)
             {
-                CommonConfig.Logger.Info("Stopping...");
-
                 workerTask = null;
                 workerTaskCts?.Cancel();
 
                 if (!allowRestart)
                     CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
-
-                CommonConfig.Logger.Info("Stopped");
             }
         }
 
-        protected async Task Wait(CancellationToken ct) => await mainSemaphore.WaitAsync(5 * 1000, ct);
+        protected async Task Wait(CancellationToken ct) => await mainSemaphore.WaitAsync(autoRunPeriod, ct);
 
         protected abstract Task Work(CancellationToken ct);
 

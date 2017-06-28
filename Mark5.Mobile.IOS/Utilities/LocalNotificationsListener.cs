@@ -29,6 +29,9 @@ namespace Mark5.Mobile.IOS.Utilities
                     var request = UNNotificationRequest.FromIdentifier(DocumentFailedToSendIdentifier, notificatioContent, null);
                     UNUserNotificationCenter.Current.AddNotificationRequest(request, null);
                 });
+            }, m =>
+            {
+                return m.Change == DocumentUploadStatusChanged.Status.DocumentSentFailed;
             });
         }
     }

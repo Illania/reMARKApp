@@ -17,29 +17,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public event EventHandler Edited = delegate { };
         public event EventHandler ActionSheetWillAppear = delegate { };
 
-        UIViewController viewController;
+        readonly WeakReference<UIViewController> weakViewController;
 
         UILabel label;
         UILabel selectedPriorityLabel;
 
         public PriorityView(UIViewController viewController)
         {
-            this.viewController = viewController;
+            weakViewController = new WeakReference<UIViewController>(viewController);
             Initialize();
         }
 
         void Initialize()
         {
-            label = new UILabel();
-            label.Text = Localization.GetString("priority") + ": ";
-            label.Font = Theme.DefaultFont;
-            label.TextColor = UIColor.LightGray;
-            label.Opaque = false;
-            label.Lines = 0;
-            label.TranslatesAutoresizingMaskIntoConstraints = false;
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label = new UILabel
+            {
+                Text = Localization.GetString("priority") + ": ",
+                Font = Theme.DefaultFont,
+                TextColor = UIColor.LightGray,
+                Opaque = false,
+                Lines = 0,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
             {
@@ -47,14 +49,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
             });
 
-            selectedPriorityLabel = new UILabel();
-            selectedPriorityLabel.Text = UI.PriorityString(selectedPriority);
-            selectedPriorityLabel.Font = Theme.DefaultFont;
-            selectedPriorityLabel.Opaque = false;
-            selectedPriorityLabel.Lines = 1;
-            selectedPriorityLabel.UserInteractionEnabled = true;
+            selectedPriorityLabel = new UILabel
+            {
+                Text = UI.PriorityString(selectedPriority),
+                Font = Theme.DefaultFont,
+                Opaque = false,
+                Lines = 1,
+                UserInteractionEnabled = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             selectedPriorityLabel.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("PriorityLabelTapped")));
-            selectedPriorityLabel.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(selectedPriorityLabel);
             ContainerView.AddConstraints(new[]
             {
@@ -114,6 +118,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 UI.PriorityString(Priority.Normal),
                 UI.PriorityString(Priority.Low)
             };
+
+            if (!weakViewController.TryGetTarget(out UIViewController viewController))
+                return;
 
             var result = await Dialogs.ShowListDialogAsync(viewController, null, priorityStrings, selectedPriorityLabel);
             switch (result)

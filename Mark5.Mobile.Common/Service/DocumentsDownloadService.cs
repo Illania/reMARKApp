@@ -10,6 +10,11 @@ namespace Mark5.Mobile.Common.Service
 {
     public class DocumentsDownloadService : AbstractService, IDocumentsDownloadService
     {
+        public DocumentsDownloadService()
+            : base(15 * 1000)
+        {
+        }
+
         protected override async Task Work(CancellationToken ct)
         {
             CommonConfig.Logger.Info("Starting download task...");
@@ -34,21 +39,26 @@ namespace Mark5.Mobile.Common.Service
                         {
                             await Wait(ct);
 
-                            CommonConfig.Logger.Info("Looking for documents to download...");
+                            if (CommonConfig.Logger.IsDebugEnabled())
+                                CommonConfig.Logger.Debug("Looking for documents to download...");
                         }
                         catch (OperationCanceledException) { }
                         continue;
                     }
 
-                    CommonConfig.Logger.Info($"Found documents to download (possibly more) [documentsToDownloadIds.length={documentsToDownloadIds.Length}]");
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"Found documents to download (possibly more) [documentsToDownloadIds.length={documentsToDownloadIds.Length}]");
 
                     foreach (var documentId in documentsToDownloadIds)
                     {
-                        CommonConfig.Logger.Info($"Downloading document [documentId={documentId}]");
+                        if (CommonConfig.Logger.IsDebugEnabled())
+                            CommonConfig.Logger.Debug($"Downloading document [documentId={documentId}]");
 
                         try
                         {
                             await documentManager.GetDocumentAsync(-1, documentId, SourceType.Remote);
+
+                            CommonConfig.Logger.Info($"Downloaded document [documentId={documentId}]");
                         }
                         catch (Exception ex)
                         {

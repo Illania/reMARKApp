@@ -53,12 +53,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize(bool hideAddButton)
         {
-            Label = new UILabel();
-            Label.Text = GetTitleFromAddressType();
-            Label.Font = Theme.DefaultFont;
-            Label.TextColor = UIColor.LightGray;
-            Label.Opaque = false;
-            Label.TranslatesAutoresizingMaskIntoConstraints = false;
+            Label = new UILabel
+            {
+                Text = GetTitleFromAddressType(),
+                Font = Theme.DefaultFont,
+                TextColor = UIColor.LightGray,
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             Label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -101,25 +103,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     });
             }
 
-            TextView = new CustomUITextView(CGRect.Empty, textContainer);
-            TextView.AutocapitalizationType = UITextAutocapitalizationType.None;
-            TextView.AutocorrectionType = UITextAutocorrectionType.No;
-            TextView.Font = Theme.DefaultFont;
-            TextView.Opaque = false;
-            TextView.TextContainer.LineFragmentPadding = 0f;
-            TextView.TextContainerInset = UIEdgeInsets.Zero;
-            TextView.ClipsToBounds = false;
-            TextView.ScrollEnabled = false;
-            TextView.KeyboardType = UIKeyboardType.EmailAddress;
-            TextView.TranslatesAutoresizingMaskIntoConstraints = false;
+            TextView = new CustomUITextView(CGRect.Empty, textContainer)
+            {
+                AutocapitalizationType = UITextAutocapitalizationType.None,
+                AutocorrectionType = UITextAutocorrectionType.No,
+                Font = Theme.DefaultFont,
+                Opaque = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                KeyboardType = UIKeyboardType.EmailAddress,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             TextView.TextContainer.MaximumNumberOfLines = 1;
+            TextView.TextContainer.LineFragmentPadding = 0f;
             TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
             TextView.Started += HandleEditingStarted;
             TextView.Changed += HandleTextViewChanged;
             TextView.SelectionChanged += HandleTextViewSelectionChanged;
             TextView.DeletedBackward += HandleTextViewDeletedBackward;
             TextView.Ended += HandleEditingEnded;
-            TextView.ShouldChangeText += HandleShouldTextViewChange;
+            TextView.ShouldChangeText = HandleShouldTextViewChange;
             ContainerView.AddSubview(TextView);
 
             var rightConstraint = NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right,
@@ -159,14 +163,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (CreationModeFlag == DocumentCreationModeFlag.None
                 || CreationModeFlag == DocumentCreationModeFlag.Forward)
-            {
                 return Task.CompletedTask;
-            }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepOnlyAddresses))
-            {
+            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
-            }
+
+            if (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepOnlyAddresses)
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
 
             if (CreationModeFlag == DocumentCreationModeFlag.Reply)
             {
@@ -247,8 +250,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
-            if (CommonConfig.Logger.IsTraceEnabled())
-                CommonConfig.Logger.Trace($"Tapped recipent. [recipent={tappedRecipent}]");
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug($"Tapped recipent. [recipent={tappedRecipent}]");
 
             RecipentTapped(this, new RecipentTappedEventArgs(tappedRecipent));
         }
@@ -321,17 +324,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         bool HandleShouldTextViewChange(UITextView textViewToChange, NSRange range, string text)
         {
-            if (textViewToChange.Text.Length > range.Location && text.Length == 1) //The second condition is needed to avoid problems when deleting
+            if (textViewToChange.Text.Length > range.Location && text.Length == 1)
             {
                 textViewToChange.SelectedRange = new NSRange(textViewToChange.Text.Length, 0);
             }
             else if (textViewToChange == TextView && (text == Environment.NewLine || text == "," || text == "\t"))
             {
-                var splittedField = textViewToChange.Text.Split(new[]
-                    {
-                        EmailSeparator
-                    },
-                    StringSplitOptions.None);
+                var splittedField = textViewToChange.Text.Split(new[] { EmailSeparator }, StringSplitOptions.None);
                 if (splittedField.Last().Equals(string.Empty))
                 {
                     CommaOrEnterPressed(this, EventArgs.Empty);
@@ -372,10 +371,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             CollapseView();
         }
 
-        void HandleAddButtonTapped(object sender, EventArgs e)
-        {
-            AddButtonTapped(this, EventArgs.Empty);
-        }
+        void HandleAddButtonTapped(object sender, EventArgs e) => AddButtonTapped(this, EventArgs.Empty);
 
         string GetStringToSearch()
         {
@@ -468,31 +464,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Public methods
 
-        public bool ContainsInvalidEmail()
-        {
-            return TextView.Text.Split(new[]
-                    {
-                        EmailSeparator
-                    },
-                    StringSplitOptions.RemoveEmptyEntries)
-                .Any(a => !Validator.ContainsValidEmails(a));
-        }
+        public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
+                                                      .Any(a => !Validator.ContainsValidEmails(a));
 
-        public IEnumerable<string> GetEmails()
-        {
-            MatchCollection matches;
-            return Validator.ContainsValidEmails(TextView.Text, out matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
-        }
+        public IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out MatchCollection matches)
+                                                           ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToArray()
+                                                           : new string[0];
 
         public IEnumerable<string> GetRecipents()
         {
-            return TextView.Text.Split(new[]
-                    {
-                        EmailSeparator
-                    },
-                    StringSplitOptions.RemoveEmptyEntries)
+            return TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(Validator.ContainsValidEmails)
-                .Select(s => s.Trim());
+                .Select(s => s.Trim())
+                .ToArray();
         }
 
         public void SetEmails(IEnumerable<string> emails)
@@ -502,8 +486,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void SetEmails(string emails)
         {
-            MatchCollection matches;
-            if (Validator.ContainsValidEmails(emails, out matches))
+            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
                 sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
@@ -521,7 +504,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             else
             {
-                CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug(string.Format("No valid emails found in {0}.", emails));
             }
         }
 
@@ -549,8 +533,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void AddEmails(string emails)
         {
-            MatchCollection matches;
-            if (Validator.ContainsValidEmails(emails, out matches))
+            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
             {
                 var newEmails = new StringBuilder();
                 newEmails.Append(TextView.Text);
@@ -570,7 +553,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             else
             {
-                CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug(string.Format("No valid emails found in {0}.", emails));
             }
         }
 

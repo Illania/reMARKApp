@@ -24,7 +24,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         UILabel label;
         UILabel selectedLineLabel;
 
-        readonly UIViewController viewController;
+        readonly WeakReference<UIViewController> weakViewController;
+
         readonly Line defaultOutgoingLine;
         readonly List<Line> availableOutgoingLines;
 
@@ -32,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public LineView(UIViewController viewController)
         {
-            this.viewController = viewController;
+            weakViewController = new WeakReference<UIViewController>(viewController);
 
             defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
             availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
@@ -42,16 +43,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
-            label = new UILabel();
-            label.Text = Localization.GetString("line") + ": ";
-            label.Font = Theme.DefaultFont;
-            label.TextColor = UIColor.LightGray;
-            label.Opaque = false;
-            label.Lines = 0;
-            label.TranslatesAutoresizingMaskIntoConstraints = false;
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label = new UILabel
+            {
+                Text = Localization.GetString("line") + ": ",
+                Font = Theme.DefaultFont,
+                TextColor = UIColor.LightGray,
+                Opaque = false,
+                Lines = 0,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
             {
@@ -60,14 +63,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(label, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
             });
 
-            selectedLineLabel = new UILabel();
-            selectedLineLabel.Text = selectedLine == null ? defaultMessage : selectedLine.Name;
-            selectedLineLabel.Font = Theme.DefaultFont;
-            selectedLineLabel.Opaque = false;
-            selectedLineLabel.Lines = 1;
-            selectedLineLabel.UserInteractionEnabled = true;
+            selectedLineLabel = new UILabel()
+            {
+                Text = selectedLine == null ? defaultMessage : selectedLine.Name,
+                Font = Theme.DefaultFont,
+                Opaque = false,
+                Lines = 1,
+                UserInteractionEnabled = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             selectedLineLabel.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("LineLabelTapped")));
-            selectedLineLabel.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(selectedLineLabel);
             ContainerView.AddConstraints(new[]
             {
@@ -105,13 +110,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var previousDocumentLines = PreviousDocument.Lines;
             if (previousDocumentLines.Contains(defaultOutgoingLine))
-            {
                 SetLine(defaultOutgoingLine);
-            }
             else
             {
                 var intersection = previousDocumentLines.Intersect(availableOutgoingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToList();
-                if (intersection.Count() == 1)
+                if (intersection.Count == 1)
                     SetLine(intersection.First());
                 else
                     SetLine(null);
@@ -134,10 +137,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 SetLine(line);
         }
 
-        public Line GetLine()
-        {
-            return selectedLine;
-        }
+        public Line GetLine() => selectedLine;
 
         #endregion
 
@@ -172,6 +172,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             HandleScrollToView(this, EventArgs.Empty);
             ActionSheetWillAppear(this, EventArgs.Empty);
+
+            if (!weakViewController.TryGetTarget(out UIViewController viewController))
+                return;
 
             var lineNames = availableOutgoingLines.Select(l => l.Name).ToArray();
             var result = await Dialogs.ShowListDialogAsync(viewController, null, lineNames, selectedLineLabel);

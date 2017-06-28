@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
@@ -24,12 +25,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
-            label = new UILabel();
-            label.Text = Localization.GetString("subject");
-            label.Font = Theme.DefaultFont;
-            label.TextColor = UIColor.LightGray;
-            label.Opaque = false;
-            label.TranslatesAutoresizingMaskIntoConstraints = false;
+            label = new UILabel
+            {
+                Text = Localization.GetString("subject"),
+                Font = Theme.DefaultFont,
+                TextColor = UIColor.LightGray,
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -40,18 +43,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
             });
 
-            textView = new UITextView();
-            textView.Font = Theme.DefaultFont;
-            textView.Opaque = false;
-            textView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            textView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            textView.SpellCheckingType = UITextSpellCheckingType.Yes;
+            textView = new UITextView
+            {
+                Font = Theme.DefaultFont,
+                Opaque = false,
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                SpellCheckingType = UITextSpellCheckingType.Yes,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                KeyboardType = UIKeyboardType.Default,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             textView.TextContainer.LineFragmentPadding = 0f;
-            textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.ClipsToBounds = false;
-            textView.ScrollEnabled = false;
-            textView.KeyboardType = UIKeyboardType.Default;
-            textView.TranslatesAutoresizingMaskIntoConstraints = false;
             textView.Started += HandleScrollToView;
             textView.Changed += (sender, e) => Edited(this, EventArgs.Empty);
             ContainerView.AddSubview(textView);

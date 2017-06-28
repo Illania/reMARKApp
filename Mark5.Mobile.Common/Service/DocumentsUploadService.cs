@@ -12,6 +12,11 @@ namespace Mark5.Mobile.Common.Service
 {
     class DocumentsUploadService : AbstractService, IDocumentsUploadService
     {
+        public DocumentsUploadService()
+            : base(5 * 1000)
+        {
+        }
+
         protected override async Task Work(CancellationToken ct)
         {
             CommonConfig.Logger.Info("Starting upload task...");
@@ -32,13 +37,15 @@ namespace Mark5.Mobile.Common.Service
                         {
                             await Wait(ct);
 
-                            CommonConfig.Logger.Info("Looking for documents to upload...");
+                            if (CommonConfig.Logger.IsDebugEnabled())
+                                CommonConfig.Logger.Debug("Looking for documents to upload...");
                         }
                         catch (OperationCanceledException) { }
                         continue;
                     }
 
-                    CommonConfig.Logger.Info($"Found documents to upload [documentToUploadGuid.Length={documentToUploadGuids.Length}]");
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"Found documents to upload [documentToUploadGuid.Length={documentToUploadGuids.Length}]");
 
                     foreach (var documentToUploadGuid in documentToUploadGuids)
                     {
@@ -46,7 +53,8 @@ namespace Mark5.Mobile.Common.Service
 
                         try
                         {
-                            CommonConfig.Logger.Info($"Found document to upload [documentToUploadGuid={documentToUploadGuid}]");
+                            if (CommonConfig.Logger.IsDebugEnabled())
+                                CommonConfig.Logger.Debug($"Found document to upload [documentToUploadGuid={documentToUploadGuid}]");
 
                             var info = await FileSystemStorage.GetDocumentToUploadInfo(documentToUploadGuid);
                             var documentPreview = await FileSystemStorage.GetDocumentToUploadDocumentPreview(documentToUploadGuid);
@@ -62,7 +70,8 @@ namespace Mark5.Mobile.Common.Service
                             var attachmentNames = await FileSystemStorage.GetDocumentToUploadAttachmentNames(documentToUploadGuid);
                             if (attachmentNames != null && attachmentNames.Length > 0)
                             {
-                                CommonConfig.Logger.Info($"Found attachments to upload [documentToUploadGuid={documentToUploadGuid}, attachmentNames.Length={attachmentNames.Length}]");
+                                if (CommonConfig.Logger.IsDebugEnabled())
+                                    CommonConfig.Logger.Debug($"Found attachments to upload [documentToUploadGuid={documentToUploadGuid}, attachmentNames.Length={attachmentNames.Length}]");
 
                                 foreach (var attachmentName in attachmentNames)
                                 {
@@ -97,7 +106,8 @@ namespace Mark5.Mobile.Common.Service
                             if (ct.IsCancellationRequested)
                                 continue;
 
-                            CommonConfig.Logger.Info($"Sending document... [documentToUploadGuid={documentToUploadGuid}]");
+                            if (CommonConfig.Logger.IsDebugEnabled())
+                                CommonConfig.Logger.Debug($"Sending document... [documentToUploadGuid={documentToUploadGuid}]");
 
                             await documentManager.SendDocumentAsync(document,
                                                                     documentPreview,
@@ -129,7 +139,7 @@ namespace Mark5.Mobile.Common.Service
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Unexpected error in send action!", ex);
+                CommonConfig.Logger.Error("Unexpected error in upload task!", ex);
             }
 
             CommonConfig.Logger.Info("Stopped upload task");
