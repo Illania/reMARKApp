@@ -28,9 +28,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             LayoutTransition = new Android.Animation.LayoutTransition();
 
             TopLayout = new LinearLayoutCompat(context);
+            TopLayout.Orientation = Horizontal;
             AddView(TopLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             ContentLayout = new LinearLayoutCompat(context);
+            ContentLayout.Orientation = Vertical;
             AddView(ContentLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 

@@ -15,9 +15,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         AppCompatTextView titleTextView;
         AppCompatImageButton addButton;
 
-        public ExpandableView(Context context) : base(context)
+        bool singleAdd;
+
+        public ExpandableView(Context context, bool singleAdd = false) : base(context)
         {
-            SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
+            this.singleAdd = singleAdd;
+
+            SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
 
             titleEditText = new AppCompatEditText(context)
             {
@@ -50,15 +54,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             titleTextView.SetPadding(titleEditText.PaddingLeft, titleEditText.PaddingTop, titleEditText.PaddingRight, titleEditText.PaddingBottom);
             TopLayout.AddView(titleTextView, titleTextViewLp);
 
-            addButton = new AppCompatImageButton(Context);
-            addButton.SetImageResource(Resource.Drawable.add);
-            addButton.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
-
-            var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
-            {
-                Gravity = (int)GravityFlags.CenterVertical,
-            };
-            TopLayout.AddView(addButton, addButtonLp);
+            addButton = GetButton(true);
+            addButton.Click += AddButton_Click;
+            TopLayout.AddView(addButton);
         }
 
         public override void RefreshView()
@@ -71,20 +69,75 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             throw new NotImplementedException();
         }
 
+        void AddButton_Click(object sender, EventArgs e)
+        {
+            AddRow();
+        }
+
         void HintEditText_Click(object sender, EventArgs e)
         {
+            AddRow();
+        }
+
+        void AddRow()
+        {
+            if (singleAdd)
+                addButton.Visibility = ViewStates.Gone;
+
             titleEditText.Visibility = ViewStates.Gone;
             titleTextView.Visibility = ViewStates.Visible;
 
+            var layout = new LinearLayoutCompat(Context);
+            layout.Orientation = Horizontal;
+            ContentLayout.AddView(layout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
             var editText = new AppCompatEditText(Context);
 
-            var hintEditTextLp = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f)
+            var editTextLp = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f)
             {
                 Gravity = (int)GravityFlags.CenterVertical,
             };
 
             editText.RequestFocus();
-            ContentLayout.AddView(editText, hintEditTextLp);
+            layout.AddView(editText, editTextLp);
+
+            var button = GetButton(false);
+            button.Click += (s, e) => RemoveRow(layout);
+            layout.AddView(button);
+        }
+
+        #region Utilities
+
+        AppCompatImageButton GetButton(bool addButton = true)
+        {
+            var button = new AppCompatImageButton(Context);
+
+            var drawable = ContextCompat.GetDrawable(Context, Resource.Drawable.circle).GetConstantState().NewDrawable();
+            drawable.SetColorFilter(addButton ? new Color(ContextCompat.GetColor(Context, Resource.Color.blue)) : Color.Red, PorterDuff.Mode.SrcAtop);
+
+            button.SetImageDrawable(drawable);
+
+            var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(20), ConversionUtils.ConvertDpToPixels(20))
+            {
+                LeftMargin = DistanceNormal,
+                Gravity = (int)GravityFlags.CenterVertical,
+            };
+            button.LayoutParameters = addButtonLp;
+            return button;
+        }
+
+        #endregion
+
+        void RemoveRow(LinearLayoutCompat layout)
+        {
+            ContentLayout.RemoveView(layout);
+
+            if (ContentLayout.ChildCount == 0)
+            {
+                titleEditText.Visibility = ViewStates.Visible;
+                titleTextView.Visibility = ViewStates.Gone;
+                addButton.Visibility = ViewStates.Visible;
+            }
         }
     }
 }
