@@ -51,6 +51,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto);
 
+        Task QueueWorkingCopyToUpload();
+
         Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy info);
 
         Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream);

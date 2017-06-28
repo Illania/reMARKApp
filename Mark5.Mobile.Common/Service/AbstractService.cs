@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Common.Service
         Task workerTask;
         CancellationTokenSource workerTaskCts;
 
-        protected SemaphoreSlim MainSemaphore = new SemaphoreSlim(0);
+        SemaphoreSlim mainSemaphore = new SemaphoreSlim(0);
 
         public bool IsRunning()
         {
@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Common.Service
                 return workerTask != null;
         }
 
-        public void Notify() => MainSemaphore.Release();
+        public void Notify() => mainSemaphore.Release();
 
         public void Start()
         {
@@ -60,6 +60,8 @@ namespace Mark5.Mobile.Common.Service
                 CommonConfig.Logger.Info("Stopped");
             }
         }
+
+        protected async Task Wait(CancellationToken ct) => await mainSemaphore.WaitAsync(5 * 1000, ct);
 
         protected abstract Task Work(CancellationToken ct);
 

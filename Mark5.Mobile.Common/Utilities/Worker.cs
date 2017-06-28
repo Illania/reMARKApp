@@ -10,6 +10,7 @@ namespace Mark5.Mobile.Common.Utilities
 
         Func<Task> autoSaveAction;
         int delay;
+        Task task;
 
         public Worker(Func<Task> autoSaveAction, int delay)
         {
@@ -24,11 +25,16 @@ namespace Mark5.Mobile.Common.Utilities
 
             var ct = cts.Token;
 
-            Task.Run(async () =>
+            task = Task.Run(async () =>
             {
                 while (true)
                 {
-                    await Task.Delay(delay);
+                    try
+                    {
+                        await Task.Delay(delay, ct);
+                    }
+                    catch (OperationCanceledException) { }
+
                     if (ct.IsCancellationRequested)
                         return;
 
@@ -41,6 +47,14 @@ namespace Mark5.Mobile.Common.Utilities
         {
             cts?.Cancel();
             cts = null;
+        }
+
+        public async Task Finished()
+        {
+            if (task == null)
+                return;
+
+            await Task.WhenAny(task);
         }
     }
 }

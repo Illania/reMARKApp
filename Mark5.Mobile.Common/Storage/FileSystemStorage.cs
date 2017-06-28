@@ -26,8 +26,6 @@ namespace Mark5.Mobile.Common.Storage
             public const string LastSearchDocumentCriteria = "lastSearchDocumentCriteria.json";
             public const string LastSearchContactsCriteria = "lastSearchContactsCriteria.json";
             public const string LastSearchShortcodesCriteria = "lastSearchShortcodesCriteria.json";
-
-            public const string DocumentWorkingCopy = "documentWorkingCopy.json";
         }
 
         static readonly IDictionary<string, SemaphoreSlim> semaphores = new Dictionary<string, SemaphoreSlim>
@@ -202,6 +200,98 @@ namespace Mark5.Mobile.Common.Storage
 
         #endregion
 
+        #region Attachments
+
+        public static async Task<string> SaveAttachmentAsync(AttachmentDescription attachmentDescription, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
+        {
+            var path = await CheckAttachmentsExistsAsync(attachmentDescription);
+            if (!string.IsNullOrEmpty(path))
+                return path;
+
+            var folderExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(attachmentDescription.Id.ToString());
+            if (folderExists != ExistenceCheckResult.FolderExists)
+                await CommonConfig.AttachmentsFolder.CreateFolderAsync(attachmentDescription.Id.ToString(), CreationCollisionOption.OpenIfExists);
+
+            var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
+
+            var file = await folder.CreateFileAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName), CreationCollisionOption.ReplaceExisting, ct);
+            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
+            {
+                await attachmentStream.CopyToAsync(fileStream);
+            }
+
+            return file.Path;
+        }
+
+        public static async Task<string> CheckAttachmentsExistsAsync(AttachmentDescription attachmentDescription)
+        {
+            var folderExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(attachmentDescription.Id.ToString());
+            if (folderExists != ExistenceCheckResult.FolderExists)
+                return string.Empty;
+
+            var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
+
+            var fileExists = await folder.CheckExistsAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName));
+            if (fileExists != ExistenceCheckResult.FileExists)
+                return string.Empty;
+
+            return CommonConfig.AttachmentsFolder.Path + CommonConfig.PathSeparator + attachmentDescription.Id + CommonConfig.PathSeparator + CommonConfig.Utf8Normalizer(attachmentDescription.SafeName);
+        }
+
+        #endregion
+
+        #region Private methods
+
+        static async Task<T> GetAsync<T>(string filename, CancellationToken ct = default(CancellationToken)) where T : class
+        {
+            try
+            {
+                await semaphores[filename].WaitAsync();
+
+                if (objectCache.ContainsKey(filename))
+                    return (T)objectCache[filename];
+
+                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
+                if (fileExists == ExistenceCheckResult.FileExists)
+                {
+                    var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
+                    return await Serializer.DeserializeAsync<T>(await file.ReadAllTextAsync());
+                }
+
+                return null;
+            }
+            finally
+            {
+                semaphores[filename].Release();
+            }
+        }
+
+        static async Task SaveAsync<T>(T obj, string filename, CancellationToken ct = default(CancellationToken)) where T : class
+        {
+            try
+            {
+                await semaphores[filename].WaitAsync();
+
+                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
+                if (fileExists != ExistenceCheckResult.FileExists)
+                    await CommonConfig.DataFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
+                var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
+                await file.WriteAllTextAsync(await Serializer.SerializeAsync(obj));
+
+                objectCache[filename] = obj;
+            }
+            finally
+            {
+                semaphores[filename].Release();
+            }
+        }
+
+        #endregion
+
+        /*
+         * Methods below do not use locking!
+         */
+
         #region Documents upload / Document working copy interop
 
         public static async Task MoveDocumentWorkingCopyToUpload()
@@ -209,7 +299,34 @@ namespace Mark5.Mobile.Common.Storage
             var documentWorkingCopy = await GetDocumentWorkingCopyAsync();
             var documentWorkingCopyAttachments = await GetDocumentWorkingCopyAttachments();
 
+            var folder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync(Guid.NewGuid().ToString(), CreationCollisionOption.FailIfExists);
 
+            var lockFile = await folder.CreateFileAsync(".lock", CreationCollisionOption.FailIfExists);
+
+            var documentToUploadInfoFile = await folder.CreateFileAsync("documentToUploadInfo.json", CreationCollisionOption.FailIfExists);
+            await documentToUploadInfoFile.WriteAllTextAsync(Serializer.Serialize(new DocumentToUploadInfo
+            {
+                DocumentCreationModeFlag = documentWorkingCopy.DocumentCreationModeFlag,
+                PreviousDocumentFolderId = documentWorkingCopy.PreviousDocumentFolderId,
+                PreviousDocumentId = documentWorkingCopy.PreviousDocumentId,
+                ConfirmDelivery = documentWorkingCopy.ConfirmDelivery,
+                ConfirmRead = documentWorkingCopy.ConfirmRead,
+                SendOnTimestamp = documentWorkingCopy.SendOnTimestamp
+            }));
+            var documentPreviewFile = await folder.CreateFileAsync("documentPreview.json", CreationCollisionOption.FailIfExists);
+            await documentPreviewFile.WriteAllTextAsync(Serializer.Serialize(documentWorkingCopy.DocumentPreview));
+            var documentFile = await folder.CreateFileAsync("document.json", CreationCollisionOption.FailIfExists);
+            await documentFile.WriteAllTextAsync(Serializer.Serialize(documentWorkingCopy.Document));
+
+            if (documentWorkingCopyAttachments.Length > 0)
+            {
+                var attFolder = await folder.CreateFolderAsync("att", CreationCollisionOption.FailIfExists);
+
+                foreach (var attachment in documentWorkingCopyAttachments)
+                    await attachment.MoveAsync(Path.Combine(attFolder.Name, attachment.Name));
+            }
+
+            await lockFile.DeleteAsync();
 
             await DeleteDocumentWorkingCopyAsync();
         }
@@ -218,13 +335,21 @@ namespace Mark5.Mobile.Common.Storage
 
         #region Documents upload
 
-        public static async Task<Guid> GetDocumentToUploadGuid()
+        public static async Task<Guid[]> GetDocumentsToUploadGuids()
         {
-            var folderName = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name != "failed")?.Name;
-            if (folderName == null)
-                return Guid.Empty;
+            var guids = new List<Guid>();
+            var folders = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync());
 
-            return new Guid(folderName);
+            foreach (var folder in folders)
+            {
+                if (folder.Name == "failed")
+                    continue;
+
+                if (await folder.CheckExistsAsync(".lock") == ExistenceCheckResult.NotFound)
+                    guids.Add(new Guid(folder.Name));
+            }
+
+            return guids.ToArray();
         }
 
         public static async Task<DocumentToUploadInfo> GetDocumentToUploadInfo(Guid guid)
@@ -367,7 +492,7 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy documentWorkingCopy)
         {
-            var documentWorkingCopyFile = await CommonConfig.DocumentWorkingCopyFolder.CreateFileAsync(Filenames.DocumentWorkingCopy, CreationCollisionOption.ReplaceExisting);
+            var documentWorkingCopyFile = await CommonConfig.DocumentWorkingCopyFolder.CreateFileAsync("documentWorkingCopy.json", CreationCollisionOption.ReplaceExisting);
             await documentWorkingCopyFile.WriteAllTextAsync(Serializer.Serialize(documentWorkingCopy));
         }
 
@@ -387,10 +512,10 @@ namespace Mark5.Mobile.Common.Storage
 
         public static async Task<DocumentWorkingCopy> GetDocumentWorkingCopyAsync()
         {
-            if (await CommonConfig.DocumentWorkingCopyFolder.CheckExistsAsync(Filenames.DocumentWorkingCopy) != ExistenceCheckResult.FileExists)
+            if (await CommonConfig.DocumentWorkingCopyFolder.CheckExistsAsync("documentWorkingCopy.json") != ExistenceCheckResult.FileExists)
                 return null;
 
-            var documentWorkingCopyFile = await CommonConfig.DocumentWorkingCopyFolder.GetFileAsync(Filenames.DocumentWorkingCopy);
+            var documentWorkingCopyFile = await CommonConfig.DocumentWorkingCopyFolder.GetFileAsync("documentWorkingCopy.json");
             return Serializer.Deserialize<DocumentWorkingCopy>(await documentWorkingCopyFile.ReadAllTextAsync());
         }
 
@@ -401,98 +526,9 @@ namespace Mark5.Mobile.Common.Storage
                 await file.DeleteAsync();
         }
 
-        static async Task<string[]> GetDocumentWorkingCopyAttachments() => (await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync())
-            .Where(f => f.Name != Filenames.DocumentWorkingCopy)
-            .Select(f => f.Name)
+        static async Task<IFile[]> GetDocumentWorkingCopyAttachments() => (await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync())
+            .Where(f => f.Name != "documentWorkingCopy.json")
             .ToArray();
-
-        #endregion
-
-        #region Attachments
-
-        public static async Task<string> SaveAttachmentAsync(AttachmentDescription attachmentDescription, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
-        {
-            var path = await CheckAttachmentsExistsAsync(attachmentDescription);
-            if (!string.IsNullOrEmpty(path))
-                return path;
-
-            var folderExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(attachmentDescription.Id.ToString());
-            if (folderExists != ExistenceCheckResult.FolderExists)
-                await CommonConfig.AttachmentsFolder.CreateFolderAsync(attachmentDescription.Id.ToString(), CreationCollisionOption.OpenIfExists);
-
-            var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
-
-            var file = await folder.CreateFileAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName), CreationCollisionOption.ReplaceExisting, ct);
-            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
-            {
-                await attachmentStream.CopyToAsync(fileStream);
-            }
-
-            return file.Path;
-        }
-
-        public static async Task<string> CheckAttachmentsExistsAsync(AttachmentDescription attachmentDescription)
-        {
-            var folderExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(attachmentDescription.Id.ToString());
-            if (folderExists != ExistenceCheckResult.FolderExists)
-                return string.Empty;
-
-            var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
-
-            var fileExists = await folder.CheckExistsAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName));
-            if (fileExists != ExistenceCheckResult.FileExists)
-                return string.Empty;
-
-            return CommonConfig.AttachmentsFolder.Path + CommonConfig.PathSeparator + attachmentDescription.Id + CommonConfig.PathSeparator + CommonConfig.Utf8Normalizer(attachmentDescription.SafeName);
-        }
-
-        #endregion
-
-        #region Private methods
-
-        static async Task<T> GetAsync<T>(string filename, CancellationToken ct = default(CancellationToken)) where T : class
-        {
-            try
-            {
-                await semaphores[filename].WaitAsync();
-
-                if (objectCache.ContainsKey(filename))
-                    return (T)objectCache[filename];
-
-                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
-                if (fileExists == ExistenceCheckResult.FileExists)
-                {
-                    var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
-                    return await Serializer.DeserializeAsync<T>(await file.ReadAllTextAsync());
-                }
-
-                return null;
-            }
-            finally
-            {
-                semaphores[filename].Release();
-            }
-        }
-
-        static async Task SaveAsync<T>(T obj, string filename, CancellationToken ct = default(CancellationToken)) where T : class
-        {
-            try
-            {
-                await semaphores[filename].WaitAsync();
-
-                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
-                if (fileExists != ExistenceCheckResult.FileExists)
-                    await CommonConfig.DataFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
-                var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
-                await file.WriteAllTextAsync(await Serializer.SerializeAsync(obj));
-
-                objectCache[filename] = obj;
-            }
-            finally
-            {
-                semaphores[filename].Release();
-            }
-        }
 
         #endregion
     }

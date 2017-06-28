@@ -22,100 +22,108 @@ namespace Mark5.Mobile.Common.Service
 
                 while (!ct.IsCancellationRequested)
                 {
-                    var documentToUploadGuid = await FileSystemStorage.GetDocumentToUploadGuid();
-                    if (documentToUploadGuid == Guid.Empty)
+                    var documentToUploadGuids = await FileSystemStorage.GetDocumentsToUploadGuids();
+
+                    if (documentToUploadGuids.Length < 1)
                     {
                         CommonConfig.Logger.Info("No documents to upload found. Waiting...");
 
                         try
                         {
-                            await MainSemaphore.WaitAsync(ct);
+                            await Wait(ct);
+
+                            CommonConfig.Logger.Info("Looking for documents to upload...");
                         }
                         catch (OperationCanceledException) { }
                         continue;
                     }
 
-                    CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSending, documentToUploadGuid));
+                    CommonConfig.Logger.Info($"Found documents to upload [documentToUploadGuid.Length={documentToUploadGuids.Length}]");
 
-                    try
+                    foreach (var documentToUploadGuid in documentToUploadGuids)
                     {
-                        CommonConfig.Logger.Info($"Found document to upload [documentToUploadGuid={documentToUploadGuid}]");
+                        CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSending, documentToUploadGuid));
 
-                        var info = await FileSystemStorage.GetDocumentToUploadInfo(documentToUploadGuid);
-                        var documentPreview = await FileSystemStorage.GetDocumentToUploadDocumentPreview(documentToUploadGuid);
-                        var document = await FileSystemStorage.GetDocumentToUploadDocument(documentToUploadGuid);
-
-                        if (info == null || documentPreview == null || document == null)
+                        try
                         {
-                            CommonConfig.Logger.Error($"Document to upload is corrupt [info={info != null}, documentPreview={documentPreview != null}, document={document != null}]");
-                            continue;
-                        }
+                            CommonConfig.Logger.Info($"Found document to upload [documentToUploadGuid={documentToUploadGuid}]");
 
-                        var uploadedAttachmentsGuids = new List<Guid>();
-                        var attachmentNames = await FileSystemStorage.GetDocumentToUploadAttachmentNames(documentToUploadGuid);
-                        if (attachmentNames != null && attachmentNames.Length > 0)
-                        {
-                            CommonConfig.Logger.Info($"Found attachments to upload [documentToUploadGuid={documentToUploadGuid}, attachmentNames.Length={attachmentNames.Length}]");
+                            var info = await FileSystemStorage.GetDocumentToUploadInfo(documentToUploadGuid);
+                            var documentPreview = await FileSystemStorage.GetDocumentToUploadDocumentPreview(documentToUploadGuid);
+                            var document = await FileSystemStorage.GetDocumentToUploadDocument(documentToUploadGuid);
 
-                            foreach (var attachmentName in attachmentNames)
+                            if (info == null || documentPreview == null || document == null)
                             {
-                                var stream = await FileSystemStorage.GetDocumentToUploadAttachmentStream(documentToUploadGuid, attachmentName);
-                                if (stream == null)
-                                    continue;
-
-                                CommonConfig.Logger.Info($"Uploading attachment to upload [documentToUploadGuid={documentToUploadGuid}, attachmentName={attachmentName}]");
-
-                                using (stream)
-                                {
-                                    var lengthInBytes = stream.Length;
-                                    stream.Position = 0;
-
-                                    var uploadedAttachmentGuid = await documentManager.UploadTemporaryAttachmentAsync(new Attachment
-                                    {
-                                        Filename = Path.GetFileNameWithoutExtension(attachmentName),
-                                        Extension = Path.GetExtension(attachmentName),
-                                        Size = (int)lengthInBytes,
-                                        Stream = stream
-                                    }, SourceType.Remote);
-                                    uploadedAttachmentsGuids.Add(uploadedAttachmentGuid);
-
-                                    if (ct.IsCancellationRequested)
-                                        break;
-                                }
+                                CommonConfig.Logger.Error($"Document to upload is corrupt [info={info != null}, documentPreview={documentPreview != null}, document={document != null}]");
+                                continue;
                             }
 
-                            CommonConfig.Logger.Info($"Done uploading attachments [documentToUploadGuid={documentToUploadGuid}]");
+                            var uploadedAttachmentsGuids = new List<Guid>();
+                            var attachmentNames = await FileSystemStorage.GetDocumentToUploadAttachmentNames(documentToUploadGuid);
+                            if (attachmentNames != null && attachmentNames.Length > 0)
+                            {
+                                CommonConfig.Logger.Info($"Found attachments to upload [documentToUploadGuid={documentToUploadGuid}, attachmentNames.Length={attachmentNames.Length}]");
+
+                                foreach (var attachmentName in attachmentNames)
+                                {
+                                    var stream = await FileSystemStorage.GetDocumentToUploadAttachmentStream(documentToUploadGuid, attachmentName);
+                                    if (stream == null)
+                                        continue;
+
+                                    CommonConfig.Logger.Info($"Uploading attachment to upload [documentToUploadGuid={documentToUploadGuid}, attachmentName={attachmentName}]");
+
+                                    using (stream)
+                                    {
+                                        var lengthInBytes = stream.Length;
+                                        stream.Position = 0;
+
+                                        var uploadedAttachmentGuid = await documentManager.UploadTemporaryAttachmentAsync(new Attachment
+                                        {
+                                            Filename = Path.GetFileNameWithoutExtension(attachmentName),
+                                            Extension = Path.GetExtension(attachmentName),
+                                            Size = (int)lengthInBytes,
+                                            Stream = stream
+                                        }, SourceType.Remote);
+                                        uploadedAttachmentsGuids.Add(uploadedAttachmentGuid);
+
+                                        if (ct.IsCancellationRequested)
+                                            break;
+                                    }
+                                }
+
+                                CommonConfig.Logger.Info($"Done uploading attachments [documentToUploadGuid={documentToUploadGuid}]");
+                            }
+
+                            if (ct.IsCancellationRequested)
+                                continue;
+
+                            CommonConfig.Logger.Info($"Sending document... [documentToUploadGuid={documentToUploadGuid}]");
+
+                            await documentManager.SendDocumentAsync(document,
+                                                                    documentPreview,
+                                                                    info.DocumentCreationModeFlag,
+                                                                    info.PreviousDocumentId ?? -1,
+                                                                    info.PreviousDocumentFolderId ?? -1,
+                                                                    info.SendOnTimestamp,
+                                                                    info.ConfirmRead,
+                                                                    info.ConfirmDelivery,
+                                                                    uploadedAttachmentsGuids,
+                                                                    SourceType.Remote);
+
+                            await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
+
+                            CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
+
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSent, documentToUploadGuid));
                         }
+                        catch (Exception ex)
+                        {
+                            CommonConfig.Logger.Error($"Document failed sent [documentToUploadGuid={documentToUploadGuid}]", ex);
 
-                        if (ct.IsCancellationRequested)
-                            continue;
+                            await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid);
 
-                        CommonConfig.Logger.Info($"Sending document... [documentToUploadGuid={documentToUploadGuid}]");
-
-                        await documentManager.SendDocumentAsync(document,
-                                                                documentPreview,
-                                                                info.CreationModeFlag,
-                                                                info.PreviousDocumentId,
-                                                                info.PreviousDocumentdFolderId,
-                                                                info.SendOnTimestamp,
-                                                                info.ConfirmRead,
-                                                                info.ConfirmDelivery,
-                                                                uploadedAttachmentsGuids,
-                                                                SourceType.Remote);
-
-                        await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
-
-                        CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
-
-                        CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSent, documentToUploadGuid));
-                    }
-                    catch (Exception ex)
-                    {
-                        CommonConfig.Logger.Error($"Document failed sent [documentToUploadGuid={documentToUploadGuid}]", ex);
-
-                        await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid);
-
-                        CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSentFailed, documentToUploadGuid));
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSentFailed, documentToUploadGuid));
+                        }
                     }
                 }
             }

@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
@@ -554,6 +555,12 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task QueueWorkingCopyToUpload()
+        {
+            await FileSystemStorage.MoveDocumentWorkingCopyToUpload();
+            Services.DocumentsUploadService.Notify();
         }
 
         public async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy workingCopy) => await FileSystemStorage.SaveDocumentWorkingCopyAsync(workingCopy);

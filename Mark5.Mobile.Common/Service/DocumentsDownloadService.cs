@@ -32,7 +32,9 @@ namespace Mark5.Mobile.Common.Service
 
                         try
                         {
-                            await MainSemaphore.WaitAsync(ct);
+                            await Wait(ct);
+
+                            CommonConfig.Logger.Info("Looking for documents to download...");
                         }
                         catch (OperationCanceledException) { }
                         continue;

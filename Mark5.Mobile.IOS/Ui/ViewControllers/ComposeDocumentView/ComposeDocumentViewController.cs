@@ -470,12 +470,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             try
             {
-                //The url points to a temporary file in the app's sandbox
                 var filename = url.LastPathComponent;
                 stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
-                NSError _error;
-                NSObject sizeObject;
-                var result = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
+                var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
 
                 if (!result)
                     throw new Exception(_error.ToString());
@@ -488,16 +485,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
                 }
 
-                //var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
 
-                //var attachment = new OutgoingDocumentAttachmentDescription
-                //{
-                //    Name = filename,
-                //    SizeInBytes = sizeInBytes,
-                //    Path = path
-                //};
-
-                //attachmentsView.AddAttachment(attachment);
+                // TODO refresh view
             }
             catch (Exception ex)
             {
@@ -529,16 +519,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
                 }
 
-                //var path = await Managers.DocumentsManager.SaveOutgoingAttachmentAsync(OutgoingDocumentGuid, filename, stream);
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
 
-                //var attachment = new OutgoingDocumentAttachmentDescription
-                //{
-                //    Name = filename,
-                //    SizeInBytes = sizeInBytes,
-                //    Path = path
-                //};
-
-                //attachmentsView.AddAttachment(attachment);
+                // TODO refresh view
             }
             catch (Exception ex)
             {
@@ -599,7 +582,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
 
-                //await Managers.DocumentsManager.InsertDocumentInOutgoingAsync(OutgoingDocumentGuid, Document, DocumentPreview, LocalDocument ? OutgoingDocumentOriginalCreationModeFlag : CreationModeFlag, PreviousDocumentId ?? -1, PreviousDocumentFolderId ?? -1, 0, false, false);
+                autoSaveWorkingCopyWorker.Stop();
+                await autoSaveWorkingCopyWorker.Finished();
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag,
+                    PreviousDocumentFolderId = PreviousDocumentFolderId,
+                    PreviousDocumentId = PreviousDocumentId,
+                    DocumentPreview = documentPreview,
+                    Document = document
+                });
+                await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+
                 dismissAction();
 
                 PopOrDismissViewController();
@@ -608,7 +602,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Failed to insert document in outgoing [isDraft={saveDraft}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
+                CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
+
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
@@ -738,8 +733,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 string path = null;
 
-                var remoteAttachment = attachmentDescription as AttachmentDescription;
-                if (remoteAttachment != null)
+                if (attachmentDescription is AttachmentDescription remoteAttachment)
                 {
                     path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, document, false, SourceType.Local);
 
@@ -1117,8 +1111,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     CommonConfig.Logger.Error("Could not pick media", ex);
 
-                    ComposeDocumentViewController vc;
-                    if (vcWeak.TryGetTarget(out vc))
+                    if (vcWeak.TryGetTarget(out ComposeDocumentViewController vc))
                         Dialogs.ShowErrorDialog(vc, ex);
 
                     picker.DismissViewController(true, null);
