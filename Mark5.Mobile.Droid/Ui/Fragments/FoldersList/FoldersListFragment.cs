@@ -213,7 +213,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
+            StartActivity(AddEditContactActivity.CreateIntent(Context));
         }
 
         #endregion

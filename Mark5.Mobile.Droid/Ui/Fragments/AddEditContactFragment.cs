@@ -1,19 +1,10 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Util;
+﻿using Android.OS;
+using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -22,15 +13,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Contact Contact { get; set; }
         public ContactType ContactType { get; set; }
 
+        LinearLayoutCompat linearLayout;
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contactId={Contact?.Id}, type={ContactType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
+            linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
+            var ev = new ExpandableView(Context);
+            linearLayout.AddView(ev);
 
+            ev = new ExpandableView(Context);
+            linearLayout.AddView(ev);
 
+            ev = new ExpandableView(Context);
+            linearLayout.AddView(ev);
 
             return rootView;
         }

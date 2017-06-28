@@ -391,6 +391,8 @@
     <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
     <Compile Include="Ui\Activities\AddEditContactActivity.cs" />
     <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\ExpandableView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -400,6 +402,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
+    <Folder Include="Ui\Views\AddEdtiContactViews\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />

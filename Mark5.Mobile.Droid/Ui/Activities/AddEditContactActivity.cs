@@ -20,9 +20,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Contact contact = null, ContactType type = ContactType.None)
+        public static Intent CreateIntent(Context context, Contact contact = null, ContactType type = ContactType.None)
         {
-            var intent = new Intent();
+            var intent = new Intent(context, typeof(AddEditContactActivity));
 
             if (contact != null)
                 intent.PutExtra(ContactIntentKey, SerializationUtils.Serialize(contact));

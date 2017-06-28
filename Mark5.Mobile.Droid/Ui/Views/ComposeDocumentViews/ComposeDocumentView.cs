@@ -19,7 +19,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public CopyToNewOption CopyToNewOptions { get; set; }
         public IComposeDocumentViewState State { get; set; }
 
-        protected int DistanceNone;
         protected int DistanceVeryLarge;
         protected int DistanceLarge;
         protected int DistanceNormal;
