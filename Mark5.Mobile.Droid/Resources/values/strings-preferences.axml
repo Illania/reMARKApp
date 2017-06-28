@@ -82,9 +82,9 @@
 	<string name="pref_documents_use_server_timezone_title">Use timezone of MARK5 Server</string>
 	<string name="pref_documents_use_server_timezone_summary_off">Dates will be shown according to this device\'s timezone.</string>
 	<string name="pref_documents_use_server_timezone_summary_on">Dates will be shown according to server\'s timezone.</string>
-	<string name="pref_documents_show_creator_outgoing_title">Show creator on outgoing documents</string>
-	<string name="pref_documents_show_creator_outgoing_summary_off">The recipients\'s addresses will be shown in the preview of outgoing documents.</string>
-	<string name="pref_documents_show_creator_outgoing_summary_on">The creator will be shown in preview of outgoing documents.</string>
+	<string name="pref_documents_show_creator_outgoing_title">Show creator on outgoing emails</string>
+	<string name="pref_documents_show_creator_outgoing_summary_off">The recipients\'s addresses will be shown in the preview of outgoing emails.</string>
+	<string name="pref_documents_show_creator_outgoing_summary_on">The creator will be shown in preview of outgoing emails.</string>
 	<string name="pref_key_about_privacy_policy">pref_key_about_privacy_policy</string>
 	<string name="pref_key_about_send_feedback">pref_key_advanced_send_feedback</string>
 	<string name="pref_key_about_version">pref_key_about_version</string>

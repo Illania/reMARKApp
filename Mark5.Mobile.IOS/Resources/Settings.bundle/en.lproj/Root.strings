@@ -47,7 +47,7 @@
 "send_feedback" = "Send feedback";
 "server" = "Server";
 "shortcodes_to_search" = "Shortcodes search results";
-"show_creator_outgoing" = "Show creator for outgoing documents";
+"show_creator_outgoing" = "Show creator for outgoing emails";
 "ssl" = "SSL";
 "unread_indicator_me" = "Unread indicator";
 "update_config" = "Update system configuration";

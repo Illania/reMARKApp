@@ -14,7 +14,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.Exceptions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -181,7 +180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 },
                 null);
             if (avc.PopoverPresentationController != null)
-                avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
             PresentViewController(avc, true, null);
         }
 
@@ -431,7 +430,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 MailBee.Mime.Attachment matchingAtt = null;
                 foreach (var obj in atts)
                 {
-                    var att = (MailBee.Mime.Attachment) obj;
+                    var att = (MailBee.Mime.Attachment)obj;
                     if (att.ContentID == cid)
                     {
                         matchingAtt = att;
