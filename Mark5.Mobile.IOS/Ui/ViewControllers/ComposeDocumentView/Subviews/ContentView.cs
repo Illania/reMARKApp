@@ -277,8 +277,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Public methods
 
-        public override async Task RefreshView()
+        public override async Task InitializeView()
         {
+            if (RestoreWorkingCopy)
+            {
+                await SetWebContentPart(NewEditableContentClass, ContentType.Html, Document.HtmlBody);
+                return;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.Edit
                 || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments)
             {

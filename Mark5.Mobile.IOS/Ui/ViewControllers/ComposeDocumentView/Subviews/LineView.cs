@@ -84,8 +84,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Public methods
 
-        public override Task RefreshView()
+        public override Task InitializeView()
         {
+            if (RestoreWorkingCopy)
+            {
+                SetLine(Document.Lines.FirstOrDefault());
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.New)
             {
                 if (defaultOutgoingLine != null)

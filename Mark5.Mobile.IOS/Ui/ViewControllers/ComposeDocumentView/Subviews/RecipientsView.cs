@@ -158,8 +158,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Overrides
 
-        public override Task RefreshView()
+        public override Task InitializeView()
         {
+            if (RestoreWorkingCopy)
+            {
+                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.None
                 || CreationModeFlag == DocumentCreationModeFlag.Forward)
                 return Task.CompletedTask;

@@ -66,8 +66,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Public methods
 
-        public override Task RefreshView()
+        public override Task InitializeView()
         {
+            if (RestoreWorkingCopy)
+            {
+                foreach (var attachmentDescription in Document.Attachments)
+                    AddAttachment(attachmentDescription);
+                
+                return Task.CompletedTask;
+            }
+
             attachmentsDescription.Clear();
             stackView.Subviews.OfType<AttachmentsSubView>().ForEach(v => v.RemoveFromSuperview());
 
@@ -76,9 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 && (CopyToNewOptions == CopyToNewOption.KeepOnlyAttachments || CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments))
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
-                {
                     AddAttachment(attachmentDescription);
-                }
             }
 
             return Task.CompletedTask;
@@ -87,6 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public override Task UpdateDocument()
         {
             var remoteAttachments = attachmentsDescription.OfType<AttachmentDescription>().ToList();
+            Document.Attachments.Clear();
             Document.Attachments.AddRange(remoteAttachments);
             DocumentPreview.AttachmentsCount = attachmentsDescription.Count;
 

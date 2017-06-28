@@ -22,6 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
     public class ComposeDocumentViewController : AbstractViewController
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
+        const int AutoSaveWorkingCopyInterval = 5 * 1000; // 5 seconds
 
         string DefaultTitle = Localization.GetString("new_document");
 
@@ -71,7 +72,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         float keyboardHeight = 216f;
 
         Worker autoSaveWorkingCopyWorker;
-        int autoSaveWorkingCopyInterval = 5 * 1000;
 
         #region UIViewController overrides
 
@@ -294,17 +294,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     var wc = await Managers.DocumentsManager.GetDocumentWorkingCopyAsync();
 
                     DocumentCreationModeFlag = wc.DocumentCreationModeFlag;
+                    CopyToNewOption = wc.CopyToNewOption;
                     PreviousDocumentFolderId = wc.PreviousDocumentFolderId;
                     PreviousDocumentId = wc.PreviousDocumentId;
                     PreviousDocumentDirection = wc.PreviousDocumentDirection;
                     documentPreview = wc.DocumentPreview;
                     document = wc.Document;
-
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value);
-                    previousDocumentPreview = result.DocumentPreview;
-                    previousDocument = result.Document;
                 }
-                else if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
+
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAttachments ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
@@ -331,7 +329,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 dismissAction();
 
                 autoSaveWorkingCopyWorker?.Stop();
-                autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, autoSaveWorkingCopyInterval);
+                autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
                 autoSaveWorkingCopyWorker.Start();
             }
             catch (Exception ex)
@@ -347,6 +345,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
             foreach (var subView in subViews)
             {
+                subView.RestoreWorkingCopy = RestoreWorkingCopy;
                 subView.CreationModeFlag = DocumentCreationModeFlag;
                 subView.CopyToNewOptions = CopyToNewOption;
                 subView.Document = document;
@@ -356,15 +355,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 subView.PreviousDocumentPreview = previousDocumentPreview;
                 subView.PreconfiguredEmailAddresses = PreconfiguredEmailAddresses;
 
-                await subView.RefreshView();
+                await subView.InitializeView();
             }
 
-            sendButtonItem.Enabled = IsFormValid();
+            sendButtonItem.Enabled = ValidateForm();
+
+            if (RestoreWorkingCopy)
+                return;
 
             await AskIfShouldUseTemplates();
         }
 
-        bool IsFormValid()
+        bool ValidateForm()
         {
             var recipientAdded = false;
             foreach (var recipientView in new RecipientsView[] { toView, ccView, bccView })
@@ -596,6 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag,
+                    CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
                     PreviousDocumentDirection = PreviousDocumentDirection,
@@ -643,6 +646,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag,
+                    CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
                     PreviousDocumentDirection = PreviousDocumentDirection,
@@ -665,7 +669,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void Subview_Edited(object sender, EventArgs e)
         {
             Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
-            sendButtonItem.Enabled = IsFormValid();
+            sendButtonItem.Enabled = ValidateForm();
 
             if (sender is LineView
                 && PlatformConfig.Preferences.RemoveLine
@@ -709,7 +713,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
             }
 
-            sendButtonItem.Enabled = IsFormValid();
+            sendButtonItem.Enabled = ValidateForm();
         }
 
         void RecipientView_SearchRequested(object sender, string initialSearchString)

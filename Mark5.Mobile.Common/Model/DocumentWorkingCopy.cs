@@ -3,6 +3,7 @@
     public class DocumentWorkingCopy
     {
         public DocumentCreationModeFlag DocumentCreationModeFlag { get; set; }
+        public CopyToNewOption CopyToNewOption { get; set; }
         public int? PreviousDocumentId { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public DocumentDirection PreviousDocumentDirection { get; set; }

@@ -71,8 +71,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Overrides
 
-        public override Task RefreshView()
+        public override Task InitializeView()
         {
+            if (RestoreWorkingCopy)
+            {
+                SelectPriority(DocumentPreview.Priority);
+                return Task.CompletedTask;
+            }
+
             if (CreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 var possiblePriorities = new[]

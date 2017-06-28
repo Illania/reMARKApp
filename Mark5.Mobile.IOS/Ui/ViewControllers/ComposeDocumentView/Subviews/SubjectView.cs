@@ -71,10 +71,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Public methods
 
-        public override Task RefreshView()
+        public override Task InitializeView()
         {
-            if (CreationModeFlag == DocumentCreationModeFlag.None)
+            if (RestoreWorkingCopy)
+            {
+                textView.Text = DocumentPreview.Subject;
                 return Task.CompletedTask;
+            }
 
             switch (CreationModeFlag)
             {

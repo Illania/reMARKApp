@@ -323,7 +323,7 @@ namespace Mark5.Mobile.Common.Storage
                 var attFolder = await folder.CreateFolderAsync("att", CreationCollisionOption.FailIfExists);
 
                 foreach (var attachment in documentWorkingCopyAttachments)
-                    await attachment.MoveAsync(Path.Combine(attFolder.Name, attachment.Name));
+                    await attachment.MoveAsync(Path.Combine(attFolder.Path, attachment.Name), NameCollisionOption.FailIfExists);
             }
 
             await lockFile.DeleteAsync();
