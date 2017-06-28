@@ -289,8 +289,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             toolbar.BarTintColor = Theme.Gray;
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
             {
@@ -380,17 +380,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
-            var communicationAddress = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
-            if (communicationAddress == null)
+            var primaryEmail = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
+            if (primaryEmail == null)
                 return;
 
             var vc = new ComposeDocumentViewController
             {
-                PreconfiguredEmailAddresses = new string[]
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
                 {
-                    communicationAddress.Address
-                },
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New
+                    { DocumentAddressType.To, new [] { primaryEmail.Address } }
+                }
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -403,15 +403,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (formattedNumbers.Length == 1)
             {
-                Integration.Call(this, (UIButton) sender, formattedNumbers[0]);
+                Integration.Call(this, (UIButton)sender, formattedNumbers[0]);
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("call"), formattedNumbers, (UIButton) sender);
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("call"), formattedNumbers, (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
-            Integration.Call(this, (UIButton) sender, formattedNumbers[selectedItem]);
+            Integration.Call(this, (UIButton)sender, formattedNumbers[selectedItem]);
         }
 
         void Button3_TouchUpInside(object sender, EventArgs e)
@@ -420,7 +420,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (communicationAddresses == null)
                 return;
 
-            Integration.Text(this, (UIButton) sender, AddressFormatter.FormatCommunicationAddress(communicationAddresses));
+            Integration.Text(this, (UIButton)sender, AddressFormatter.FormatCommunicationAddress(communicationAddresses));
         }
 
         async void Button4_TouchUpInside(object sender, EventArgs e)
@@ -431,15 +431,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (physicalAddress.Length == 1)
             {
-                Integration.ShowOnMap(this, (UIButton) sender, physicalAddress[0]);
+                Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[0]);
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("show_on_map"), physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton) sender);
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("show_on_map"), physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
-            Integration.ShowOnMap(this, (UIButton) sender, physicalAddress[selectedItem]);
+            Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
         }
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
@@ -502,7 +502,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
         }
@@ -546,11 +546,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = new ComposeDocumentViewController
                 {
-                    PreconfiguredEmailAddresses = new string[]
-                    {
-                        ca.Address
-                    },
-                    DocumentCreationModeFlag = DocumentCreationModeFlag.New
+                    DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+	                {
+	                    { DocumentAddressType.To, new [] { ca.Address } }
+	                }
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }
@@ -646,7 +646,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info("Loading contact...");
 
-            var ds = (DataSource) tableView?.Source;
+            var ds = (DataSource)tableView?.Source;
 
             try
             {
@@ -895,7 +895,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                return sections[(int) section].Rows.Count;
+                return sections[(int)section].Rows.Count;
             }
 
             public override nint NumberOfSections(UITableView tableView)
@@ -1228,7 +1228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("description").ToUpper(), ContactPreview.Description, true);
                 }
 
@@ -1280,12 +1280,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (string.IsNullOrWhiteSpace(ca.Description))
                     {
-                        var cactcv = (CommunicationAddressCompactTableViewCell) cell;
+                        var cactcv = (CommunicationAddressCompactTableViewCell)cell;
                         cactcv.Initialize(ca);
                     }
                     else
                     {
-                        var catcv = (CommunicationAddressTableViewCell) cell;
+                        var catcv = (CommunicationAddressTableViewCell)cell;
                         catcv.Initialize(ca);
                     }
                 }
@@ -1327,7 +1327,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PhysicalAddress pa;
                     weakPhysicalAddress.TryGetTarget(out pa);
 
-                    var patvc = (PhysicalAddressTableViewCell) cell;
+                    var patvc = (PhysicalAddressTableViewCell)cell;
                     patvc.Initialize(pa);
                 }
 
@@ -1381,7 +1381,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                         type = Localization.GetString("company");
 
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(type.ToUpper(), cp.Name);
                 }
 
@@ -1413,7 +1413,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("webpage").ToUpper(), new NSAttributedString(Contact.WebPageAddress, foregroundColor: Theme.DarkBlue, underlineStyle: NSUnderlineStyle.Single));
                 }
 
@@ -1437,7 +1437,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("birthdate").ToUpper(), Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsLongDateString());
                 }
             }
@@ -1451,7 +1451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("account").ToUpper(), Contact.Account);
                 }
 
@@ -1470,7 +1470,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("ledger").ToUpper(), Contact.Ledger);
                 }
 
@@ -1489,7 +1489,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("vat").ToUpper(), Contact.Vat);
                 }
 
@@ -1508,7 +1508,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("responsible_users").ToUpper(), string.Join(", ", Contact.ResponsibleUsers.Values.OrderBy(s => s)));
                 }
             }
@@ -1522,7 +1522,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell) cell;
+                    var cic = (ContactInfoTableViewCell)cell;
                     cic.Initialize(Localization.GetString("short_id").ToUpper(), ContactPreview.ShortId);
                 }
             }

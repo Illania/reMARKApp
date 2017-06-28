@@ -286,8 +286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             var vc = new ComposeDocumentViewController
             {
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentDirection = DocumentDirection.None
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

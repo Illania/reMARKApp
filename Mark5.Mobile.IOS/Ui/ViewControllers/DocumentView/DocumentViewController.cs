@@ -860,8 +860,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentDirection = DocumentDirection.None,
-                PreconfiguredEmailAddresses = preconfiguredEmailAddresses
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, preconfiguredEmailAddresses }
+                }
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -1081,11 +1083,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                PreviousDocumentPreview = documentPreview,
-                PreviousDocument = document,
                 DocumentCreationModeFlag = DocumentCreationModeFlag.Edit,
                 PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocumentFolderId = folder.Id
+                PreviousDocumentFolderId = folder.Id,
+                PreviousDocumentId = documentPreview.Id
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -1175,12 +1176,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                PreviousDocumentId = documentPreview.Id,
                 DocumentCreationModeFlag = creationModeFlag,
-                PreviousDocumentFolderId = folderId ?? folder?.Id,
                 PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocument = document,
-                PreviousDocumentPreview = documentPreview
+                PreviousDocumentFolderId = folderId ?? folder?.Id,
+                PreviousDocumentId = documentPreview.Id
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -1227,13 +1226,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var vc = new ComposeDocumentViewController
             {
-                PreviousDocumentId = documentPreview.Id,
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentFolderId = folderId ?? folder?.Id,
-                PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocument = document,
-                PreviousDocumentPreview = documentPreview,
                 CopyToNewOption = option,
+                PreviousDocumentDirection = documentPreview.Direction,
+                PreviousDocumentFolderId = folderId ?? folder?.Id,
+                PreviousDocumentId = documentPreview.Id
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

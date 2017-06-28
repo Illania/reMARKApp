@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -351,8 +352,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentDirection = DocumentDirection.None,
-                PreconfiguredEmailAddresses = preconfiguredEmailAddresses
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, preconfiguredEmailAddresses }
+                }
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

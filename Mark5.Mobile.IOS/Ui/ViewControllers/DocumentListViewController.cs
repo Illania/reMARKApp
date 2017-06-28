@@ -350,8 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentDirection = DocumentDirection.None
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -594,15 +593,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void Reply(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
+        void Respond(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
         {
             var vc = new ComposeDocumentViewController
             {
-                PreviousDocumentId = documentPreview.Id,
                 DocumentCreationModeFlag = creationModeFlag,
-                PreviousDocumentFolderId = Folder.Id,
                 PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocumentPreview = documentPreview
+                PreviousDocumentFolderId = Folder.Id,
+                PreviousDocumentId = documentPreview.Id
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -742,21 +740,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    Reply(selectedDocument, DocumentCreationModeFlag.Reply);
+                    Respond(selectedDocument, DocumentCreationModeFlag.Reply);
                     EndEditing();
                 }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    Reply(selectedDocument, DocumentCreationModeFlag.ReplyAll);
+                    Respond(selectedDocument, DocumentCreationModeFlag.ReplyAll);
                     EndEditing();
                 }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    Reply(selectedDocument, DocumentCreationModeFlag.Forward);
+                    Respond(selectedDocument, DocumentCreationModeFlag.Forward);
                     EndEditing();
                 }));
 

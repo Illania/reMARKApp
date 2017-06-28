@@ -226,11 +226,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                PreconfiguredEmailAddresses = new string[]
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
                 {
-                    documentAddress.FullAddress
-                },
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New
+                    { DocumentAddressType.To, new [] { documentAddress.FullAddress } }
+                }
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -300,7 +300,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreConfiguredShortcode = shortcode
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.FullAddress).ToArray() },
+                    { DocumentAddressType.Cc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.FullAddress).ToArray() },
+                    { DocumentAddressType.Bcc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.FullAddress).ToArray() }
+                }
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
