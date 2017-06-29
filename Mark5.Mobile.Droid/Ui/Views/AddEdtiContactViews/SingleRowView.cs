@@ -5,7 +5,7 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class SingleRowView<T> : ExpandableView<T>
+    public abstract class SingleRowView<T> : ExpandableView<T> where T : class
     {
         protected SingleRowView(Context context, int titleResourceId)
             : base(context, titleResourceId, true)
@@ -25,10 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 };
 
                 editText.RequestFocus();
-                Layout.AddView(editText, editTextLp);
-
-                var button = GetButton(context, false);
-                Layout.AddView(button);
+                Layout.AddView(editText, 0, editTextLp);
             }
         }
 

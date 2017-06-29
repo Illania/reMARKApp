@@ -23,13 +23,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            var ev = new ExpandableView(Context);
+            var ev = new MultipleRowsView(Context);
             linearLayout.AddView(ev);
 
-            ev = new ExpandableView(Context);
+            ev = new MultipleRowsView(Context);
             linearLayout.AddView(ev);
 
-            ev = new ExpandableView(Context);
+            ev = new MultipleRowsView(Context);
             linearLayout.AddView(ev);
 
             return rootView;

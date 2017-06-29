@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class ExpandableView<T> : AddEditContactView where T : class  //TODO rename, eventually merge with base class
+    public abstract class MultipleRowsView<T> : AddEditContactView where T : class  //TODO rename
     {
         AppCompatEditText titleEditText;
         AppCompatTextView titleTextView;
@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         List<Row> rows = new List<Row>();
 
-        protected ExpandableView(Context context, int titleResourceId, bool singleRow) : base(context)
+        protected MultipleRowsView(Context context, int titleResourceId, bool singleRow) : base(context)
         {
             this.singleRow = singleRow;
 
@@ -80,6 +80,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             titleTextView.Visibility = ViewStates.Visible;
 
             var row = GetNewRow(content);
+            row.DeleteButton.Click += (sender, e) => RemoveRow(sender as Row);
+
             rows.Add(row);
             ContentLayout.AddView(row.Layout);
         }
@@ -121,19 +123,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         abstract protected class Row
         {
-            public LinearLayoutCompat Layout { get => containerLayout; }
+            public LinearLayoutCompat Layout { get => layout; }
+            public AppCompatImageButton DeleteButton { get => deleteButton; }
 
-            LinearLayoutCompat containerLayout;
-            T content;
+            protected LinearLayoutCompat layout;
+            protected AppCompatImageButton deleteButton;
+            protected T content;
 
             protected Row(Context context, T content)
             {
                 this.content = content;
 
-                containerLayout = new LinearLayoutCompat(context)
+                layout = new LinearLayoutCompat(context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 };
+
+                deleteButton = GetButton(context, false);
+                Layout.AddView(deleteButton);
             }
 
             public abstract T GetContent();
