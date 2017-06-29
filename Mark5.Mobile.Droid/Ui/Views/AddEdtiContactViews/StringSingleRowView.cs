@@ -5,9 +5,9 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class StringSingleRow : MultipleRowsView<string>
+    public abstract class StringSingleRowView : MultipleRowsView<string>
     {
-        protected StringSingleRow(Context context, int titleResourceId)
+        protected StringSingleRowView(Context context, int titleResourceId)
             : base(context, titleResourceId, true)
         {
         }
@@ -32,6 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 };
 
                 editText.RequestFocus();
+                editText.Text = content;
                 Layout.AddView(editText, 0, editTextLp);
             }
 

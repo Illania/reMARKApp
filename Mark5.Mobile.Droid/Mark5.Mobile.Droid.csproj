@@ -393,8 +393,14 @@
     <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\MultipleRowsView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\NameView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\StringSingleRow.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\FirstNameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\StringSingleRowView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\MiddleNameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\LastNameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\ShortIdView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\PositionView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\WebpageView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

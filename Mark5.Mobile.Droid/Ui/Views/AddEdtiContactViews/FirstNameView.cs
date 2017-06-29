@@ -4,7 +4,7 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class FirstNameView : StringSingleRow
+    public class FirstNameView : StringSingleRowView
     {
         public FirstNameView(Context context)
             : base(context, Resource.String.edit_contact_first_name)

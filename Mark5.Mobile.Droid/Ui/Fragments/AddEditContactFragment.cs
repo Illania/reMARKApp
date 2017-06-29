@@ -1,4 +1,5 @@
-﻿using Android.OS;
+﻿using System.Collections.Generic;
+using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -15,6 +16,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         LinearLayoutCompat linearLayout;
 
+        List<AddEditContactView> subviews = new List<AddEditContactView>();
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contactId={Contact?.Id}, type={ContactType}]...");
@@ -23,14 +26,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            var ev = new FirstNameView(Context);
-            linearLayout.AddView(ev);
+            var c = new Contact();
+            c.FirstName = "Primo";
+            c.LastName = "Ultimo";
 
-            ev = new FirstNameView(Context);
-            linearLayout.AddView(ev);
+            subviews.Add(new FirstNameView(Context));
+            subviews.Add(new MiddleNameView(Context));
+            subviews.Add(new LastNameView(Context));
 
-            ev = new FirstNameView(Context);
-            linearLayout.AddView(ev);
+            foreach (var subview in subviews)
+            {
+                linearLayout.AddView(subview);
+                subview.Contact = c;
+                subview.RefreshView();
+            }
 
             return rootView;
         }
