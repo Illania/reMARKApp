@@ -11,31 +11,39 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         public static Notification ConvertToNotification(this NSDictionary dict)
         {
-            return dict.ConvertToPushNotification().ConvertToNotification();
+            return dict.ConvertNSDictionaryToPushNotification().ConvertPushNotificationToNotification();
         }
 
         public static Notification ConvertToNotification(this UNNotification n)
         {
-            return n.ConvertToPushNotification().ConvertToNotification();
+            return n?.ConvertToPushNotification()?.ConvertPushNotificationToNotification();
         }
 
-        public static PushNotification ConvertToPushNotification(this UNNotification n)
+        static PushNotification ConvertToPushNotification(this UNNotification n)
         {
+            if (n == null)
+                return null;
+            
             var userInfoDict = n.Request.Content.UserInfo;
-            return ConvertToPushNotification(userInfoDict);
+            return ConvertNSDictionaryToPushNotification(userInfoDict);
         }
 
-        public static PushNotification ConvertToPushNotification(this NSDictionary userInfoDict)
+        static PushNotification ConvertNSDictionaryToPushNotification(this NSDictionary userInfoDict)
         {
-            NSError _error;
-            var userInfoData = NSJsonSerialization.Serialize(userInfoDict, NSJsonWritingOptions.PrettyPrinted, out _error);
+            if (userInfoDict == null)
+                return null;
+            
+            var userInfoData = NSJsonSerialization.Serialize(userInfoDict, NSJsonWritingOptions.PrettyPrinted, out NSError _error);
             var userInfoJson = new NSString(userInfoData, NSStringEncoding.UTF8);
 
             return Serializer.Deserialize<PushNotification>(userInfoJson);
         }
 
-        public static Notification ConvertToNotification(this PushNotification pn)
+        static Notification ConvertPushNotificationToNotification(this PushNotification pn)
         {
+            if (pn == null)
+                return null;
+            
             return new Notification
             {
                 Guid = pn.Custom.Guid,

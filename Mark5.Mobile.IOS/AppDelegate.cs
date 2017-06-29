@@ -100,10 +100,9 @@ namespace Mark5.Mobile.IOS
                 {
                     var n = userInfo.ConvertToNotification();
 
-                    if (n.ObjectType == ObjectType.Document)
+                    if (n != null && n.ObjectType == ObjectType.Document)
                     {
-                        var vc = new DocumentViewController();
-                        vc.Modal = true;
+                        var vc = new DocumentViewController { Modal = true };
                         vc.SetRefreshDataOnAppear();
                         vc.SetData(n.ObjectId);
 
@@ -167,6 +166,12 @@ namespace Mark5.Mobile.IOS
         {
             try
             {
+                if (notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                {
+                    options(UNNotificationPresentationOptions.Alert);
+                    return;
+                }
+
                 var n = notification.ConvertToNotification();
 
                 if (n.ObjectType == ObjectType.Document)
@@ -194,12 +199,17 @@ namespace Mark5.Mobile.IOS
         {
             try
             {
+                if (response?.Notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                {
+                    completionHandler();
+                    return;
+                }
+
                 var n = response.Notification.ConvertToNotification();
 
                 if (n.ObjectType == ObjectType.Document)
                 {
-                    var vc = new DocumentViewController();
-                    vc.Modal = true;
+                    var vc = new DocumentViewController { Modal = true };
                     vc.SetRefreshDataOnAppear();
                     vc.SetData(n.ObjectId);
 
