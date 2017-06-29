@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using PCLStorage;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -567,11 +568,15 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy workingCopy) => await FileSystemStorage.SaveDocumentWorkingCopyAsync(workingCopy);
 
-        public async Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream) => await FileSystemStorage.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+        public async Task<IFile> SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream) => await FileSystemStorage.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
 
         public async Task<DocumentWorkingCopy> GetDocumentWorkingCopyAsync() => await FileSystemStorage.GetDocumentWorkingCopyAsync();
 
+        public async Task<IFile[]> GetDocumentWorkingCopyAttachmentsAsync() => await FileSystemStorage.GetDocumentWorkingCopyAttachmentsAsync();
+
         public async Task DeleteDocumentWorkingCopyAsync() => await FileSystemStorage.DeleteDocumentWorkingCopyAsync();
+
+        public async Task DeleteDocumentWorkingCopyAttachmentAsync(string filename) => await FileSystemStorage.DeleteDocumentWorkingCopyAttachmentAsync(filename);
 
         #region DocumentsUploadService specific
 

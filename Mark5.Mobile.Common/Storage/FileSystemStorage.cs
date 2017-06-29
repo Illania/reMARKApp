@@ -297,7 +297,7 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task MoveDocumentWorkingCopyToUpload()
         {
             var documentWorkingCopy = await GetDocumentWorkingCopyAsync();
-            var documentWorkingCopyAttachments = await GetDocumentWorkingCopyAttachments();
+            var documentWorkingCopyAttachments = await GetDocumentWorkingCopyAttachmentsAsync();
 
             var folder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync(Guid.NewGuid().ToString(), CreationCollisionOption.FailIfExists);
 
@@ -490,10 +490,7 @@ namespace Mark5.Mobile.Common.Storage
 
         #region Document working copy
 
-        public static async Task<bool> IsDocumentWorkingCopyAvailableAsync()
-        {
-            return await CommonConfig.DocumentWorkingCopyFolder.CheckExistsAsync("documentWorkingCopy.json") == ExistenceCheckResult.FileExists;
-        }
+        public static async Task<bool> IsDocumentWorkingCopyAvailableAsync() => (await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync()).Any();
 
         public static async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy documentWorkingCopy)
         {
@@ -501,7 +498,7 @@ namespace Mark5.Mobile.Common.Storage
             await documentWorkingCopyFile.WriteAllTextAsync(Serializer.Serialize(documentWorkingCopy));
         }
 
-        public static async Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream)
+        public static async Task<IFile> SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream)
         {
             var file = await CommonConfig.DocumentWorkingCopyFolder.CreateFileAsync(filename, CreationCollisionOption.GenerateUniqueName);
             using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
@@ -513,6 +510,7 @@ namespace Mark5.Mobile.Common.Storage
                 {
                     stream.Dispose();
                 }
+            return file;
         }
 
         public static async Task<DocumentWorkingCopy> GetDocumentWorkingCopyAsync()
@@ -524,6 +522,10 @@ namespace Mark5.Mobile.Common.Storage
             return Serializer.Deserialize<DocumentWorkingCopy>(await documentWorkingCopyFile.ReadAllTextAsync());
         }
 
+        public static async Task<IFile[]> GetDocumentWorkingCopyAttachmentsAsync() => (await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync())
+            .Where(f => f.Name != "documentWorkingCopy.json")
+            .ToArray();
+
         public static async Task DeleteDocumentWorkingCopyAsync()
         {
             var files = await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync();
@@ -531,9 +533,12 @@ namespace Mark5.Mobile.Common.Storage
                 await file.DeleteAsync();
         }
 
-        static async Task<IFile[]> GetDocumentWorkingCopyAttachments() => (await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync())
-            .Where(f => f.Name != "documentWorkingCopy.json")
-            .ToArray();
+        public static async Task DeleteDocumentWorkingCopyAttachmentAsync(string filename)
+        {
+            var file = (await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync()).FirstOrDefault(f => f.Name == filename);
+            if (file != null)
+                await file.DeleteAsync();
+        }
 
         #endregion
     }

@@ -8,6 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -22,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
     public class ComposeDocumentViewController : AbstractViewController
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        const int AutoSaveWorkingCopyInterval = 5 * 1000; // 5 seconds
+        const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
 
         string DefaultTitle = Localization.GetString("new_document");
 
@@ -244,8 +245,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             subjectView.Edited += Subview_Edited;
 
-            attachmentsView.AttachmentClicked += AttachmentsView_AttachmentClicked;
-            attachmentsView.DeleteAttachmentClicked += AttachmentsView_DeleteAttachmentClicked;
+            attachmentsView.Tapped += AttachmentsView_Tapped;
+            attachmentsView.DeleteTapped += AttachmentsView_DeleteTapped;
         }
 
         void DeInitializeHandlers()
@@ -270,8 +271,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             subjectView.Edited -= Subview_Edited;
 
-            attachmentsView.AttachmentClicked -= AttachmentsView_AttachmentClicked;
-            attachmentsView.DeleteAttachmentClicked -= AttachmentsView_DeleteAttachmentClicked;
+            attachmentsView.Tapped -= AttachmentsView_Tapped;
+            attachmentsView.DeleteTapped -= AttachmentsView_DeleteTapped;
         }
 
         #endregion
@@ -355,6 +356,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 await subView.InitializeView();
             }
+
+            var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
+            attachmentsView.InitializeFilesDescriptions(files.Select(f => new FileDescription(f)).ToArray());
 
             sendButtonItem.Enabled = ValidateForm();
 
@@ -490,9 +494,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
                 }
 
-                await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
-
-                // TODO refresh view
+                var file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+                attachmentsView.AddFileDescription(new FileDescription(file));
             }
             catch (Exception ex)
             {
@@ -524,9 +527,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
                 }
 
-                await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
-
-                // TODO refresh view
+                var file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+                attachmentsView.AddFileDescription(new FileDescription(file));
             }
             catch (Exception ex)
             {
@@ -750,9 +752,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             ((SuggestionsListView)sender).ShouldDisappear -= SuggestionsListView_ShouldDisappear;
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
@@ -760,32 +760,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 string path = null;
 
-                if (attachmentDescription is AttachmentDescription remoteAttachment)
+                if (e.AttachmentDescription != null)
                 {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, document, false, SourceType.Local);
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Local);
 
                     if (string.IsNullOrWhiteSpace(path))
                     {
-                        if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes && PlatformConfig.Preferences.LargeAttachmentWarning && !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(remoteAttachment.SizeInBytes))))
+                        if (PlatformConfig.Preferences.LargeAttachmentWarning &&
+                            e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
+                            !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
                         {
                             dismissAction();
                             return;
                         }
 
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(remoteAttachment, document, false, SourceType.Remote);
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Remote);
                     }
                 }
-                else
-                {
-                    //var outgoingAttachment = attachmentDescription as OutgoingDocumentAttachmentDescription;
-                    //path = outgoingAttachment.Path;
-                }
+
+                if (e.FileDescription != null)
+                    path = e.FileDescription.Path;
 
                 if (string.IsNullOrWhiteSpace(path))
-                    throw new Exception("Unable to get attachment path.");
+                    throw new Exception("Unable to open attachment");
 
                 var url = NSUrl.FromFilename(path);
-
 
                 if (MailViewerViewController.CanOpen(url))
                 {
@@ -794,18 +793,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 else
                 {
                     attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
-                    attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
+                    attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
 
                     var previewSuccessful = attachmentInteractionController.PresentPreview(true);
 
                     if (!previewSuccessful)
                     {
-                        CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
+                        CommonConfig.Logger.Info($"Failed to present preview for attachment. Presenting open with instead [documentId={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
 
                         var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
                         if (!openInSuccessful)
                         {
-                            CommonConfig.Logger.Warning(string.Format("Failed to present open in view - there is no app that can open this type of attachment installed [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
+                            CommonConfig.Logger.Warning($"Failed to present open in view - there is no app that can open this type of attachment installed [documentId={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
+
                             await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
                     }
@@ -813,7 +813,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, attachment.Name={attachmentDescription?.Name}", ex);
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
@@ -824,31 +824,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void AttachmentsView_DeleteAttachmentClicked(object sender, AttachmentDescription attachment)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        async void AttachmentsView_DeleteTapped(object sender, AttachmentsView.DeleteTappedEventArgs e)
         {
-            //var outgoingAttachment = attachment as OutgoingDocumentAttachmentDescription;
-            //if (outgoingAttachment != null)
-            //{
-            //    try
-            //    {
-            //        if (!LocalDocument)
-            //            await Managers.DocumentsManager.RemoveOutgoingAttachmentAsync(OutgoingDocumentGuid, outgoingAttachment.Name);
+            try
+            {
+                if (e.AttachmentDescription != null)
+                    attachmentsView.RemoveAttachment(e.AttachmentDescription);
 
-            //        attachmentsView.RemoveAttachment(sender, outgoingAttachment);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        CommonConfig.Logger.Error($"Error while removing attachment [AttachmentName={outgoingAttachment?.Name}, PreviousDocument.Id={PreviousDocument?.Id}," + $" PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={CreationModeFlag}]", ex);
-            //        await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_removing_local_attachment")));
-            //    }
-            //}
-            //else
-            //{
-            //    var remoteAttachment = attachment as AttachmentDescription;
-            //    attachmentsView.RemoveAttachment(sender, remoteAttachment);
-            //}
+                if (e.FileDescription != null)
+                {
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(e.FileDescription.Name);
+                    attachmentsView.RemoveFileDescription(e.FileDescription);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to remove attachment [document.Id={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
         }
 
         #endregion

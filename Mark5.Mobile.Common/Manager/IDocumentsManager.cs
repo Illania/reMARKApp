@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
+using PCLStorage;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -57,10 +58,14 @@ namespace Mark5.Mobile.Common.Manager
 
         Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy info);
 
-        Task SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream);
+        Task<IFile> SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream);
 
         Task<DocumentWorkingCopy> GetDocumentWorkingCopyAsync();
 
+        Task<IFile[]> GetDocumentWorkingCopyAttachmentsAsync();
+
         Task DeleteDocumentWorkingCopyAsync();
+
+        Task DeleteDocumentWorkingCopyAttachmentAsync(string filename);
     }
 }

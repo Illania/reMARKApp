@@ -671,8 +671,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         readByView.RefreshView();
                         readByView.UpdateVisibility();
 
-                        if (ReadStatusUpdated != null)
-                            ReadStatusUpdated(this, new ReadStatusUpdatedEventArgs(dp));
+                        ReadStatusUpdated?.Invoke(this, new ReadStatusUpdatedEventArgs(dp));
                     });
                 }
                 catch (Exception ex)
@@ -792,13 +791,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                 {
                     attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
-                    attachmentInteractionController.Delegate = new AttachmentInteractionControllerDelegate(this, attachmentDescription);
+                    attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
 
                     var previewSuccessful = attachmentInteractionController.PresentPreview(true);
 
                     if (!previewSuccessful)
                     {
-                        CommonConfig.Logger.Info(string.Format("Failed to present preview for attachment. Presenting open with instead. [documentId={0}, attachment={1}]", document.Id, attachmentDescription));
+                        CommonConfig.Logger.Info($"Failed to present preview for attachment. Presenting open with instead. [documentId={document.Id}, attachment={attachmentDescription}]");
                         var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
                         if (!openInSuccessful)
                         {
@@ -1334,47 +1333,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Error while deleting document [documentId={document.Id}]", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
-        }
-
-        #endregion
-    }
-
-    class AttachmentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
-    {
-        readonly UIViewController parentController;
-        readonly AttachmentDescription attachmentDescription;
-
-        public AttachmentInteractionControllerDelegate(UIViewController parentController, AttachmentDescription attachmentDescription)
-        {
-            this.attachmentDescription = attachmentDescription;
-            this.parentController = parentController;
-        }
-
-        #region UIDocumentInteractionControllerDelegate overrides
-
-        public override UIViewController ViewControllerForPreview(UIDocumentInteractionController controller)
-        {
-            return parentController;
-        }
-
-        public override UIView ViewForPreview(UIDocumentInteractionController controller)
-        {
-            return parentController.View;
-        }
-
-        public override CGRect RectangleForPreview(UIDocumentInteractionController controller)
-        {
-            return parentController.View.Frame;
-        }
-
-        public override void WillBeginSendingToApplication(UIDocumentInteractionController controller, string application)
-        {
-            CommonConfig.Logger.Info($"Sending atttachment to {attachmentDescription} app [attachment={application}");
-        }
-
-        public override void DidEndSendingToApplication(UIDocumentInteractionController controller, string application)
-        {
-            CommonConfig.Logger.Info($"Sent atttachment to {attachmentDescription} app [attachment={application}");
         }
 
         #endregion

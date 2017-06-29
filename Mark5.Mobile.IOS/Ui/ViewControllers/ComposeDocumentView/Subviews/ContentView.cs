@@ -25,11 +25,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
     public class ContentView : ComposeDocumentSubView, IWKNavigationDelegate, IUIGestureRecognizerDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
         static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
-
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
-
         static readonly NSString script3 = new NSString("document.addEventListener(\"DOMContentLoaded\", function () {window.webkit.messageHandlers.sizeNotification.postMessage({domLoaded:true});});");
-
         static readonly NSString script4 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
 
         UIButton expandButton;
@@ -50,13 +47,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         CGPoint tapLocationOldContent;
         CGPoint tapLocationNewContent;
 
-        Dictionary<UIView, NSLayoutConstraint[]> constraintsStash;
+        Dictionary<UIView, NSLayoutConstraint[]> constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
 
         NSLayoutConstraint newContentHeightConstraint;
         NSLayoutConstraint oldContentZeroHeightConstraint;
         NSLayoutConstraint oldContentHeightConstraint;
 
-        SemaphoreSlim newContentLoadingSemaphore;
+        SemaphoreSlim newContentLoadingSemaphore = new SemaphoreSlim(0);
         const string NewEditableContentClass = "new_content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
         const string OldEditableContentClass = "old_content_cc4ee2cb-e18c-423a-adb2-d106a29dcbc3";
 
@@ -66,9 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"">
                                                 </head>
                                                 <body>
-                                                    <div id=""editable-one"" class=""" +
-                                          NewEditableContentClass +
-                                          @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
+                                                    <div id=""editable-one"" class=""" + NewEditableContentClass + @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%""><br></div>
                                                 </body >
                                             </html>";
 
@@ -80,20 +75,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             this.externalScrollView = externalScrollView;
 
-            constraintsStash = new Dictionary<UIView, NSLayoutConstraint[]>();
-            newContentLoadingSemaphore = new SemaphoreSlim(0);
-
             InitializeNewContentControls();
             InitializeOldContentControls();
         }
 
         void InitializeNewContentControls()
         {
-            var preferences = new WKPreferences();
-            preferences.MinimumFontSize = 12f;
-            preferences.JavaScriptCanOpenWindowsAutomatically = false;
-            preferences.JavaScriptEnabled = true;
-
+            var preferences = new WKPreferences
+            {
+                MinimumFontSize = 12f,
+                JavaScriptCanOpenWindowsAutomatically = false,
+                JavaScriptEnabled = true
+            };
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
@@ -107,15 +100,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
             userContentController.AddScriptMessageHandler(this, "mutation");
 
-            var configuration = new WKWebViewConfiguration();
-            configuration.SuppressesIncrementalRendering = true;
-            configuration.AllowsInlineMediaPlayback = false;
-            configuration.UserContentController = userContentController;
-            configuration.Preferences = preferences;
+            var configuration = new WKWebViewConfiguration
+            {
+                SuppressesIncrementalRendering = true,
+                AllowsInlineMediaPlayback = false,
+                UserContentController = userContentController,
+                Preferences = preferences
+            };
 
-            newContentWebView = new WKWebView(CGRect.Empty, configuration);
-            newContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
-            newContentWebView.Opaque = false;
+            newContentWebView = new WKWebView(CGRect.Empty, configuration)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Opaque = false
+            };
             newContentWebView.ScrollView.Bounces = false;
             newContentWebView.ScrollView.BouncesZoom = false;
 
@@ -124,11 +121,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             tapRecognizer.Delegate = this;
 
             newContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
+            newContentWebView.NavigationDelegate = new WebViewNavigationDelegate { DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); } };
 
-            newContentWebView.NavigationDelegate = new WebViewNavigationDelegate
-            {
-                DidFinishNavigationAction = () => { newContentLoadingSemaphore.Release(); }
-            };
             ContainerView.AddSubview(newContentWebView);
             AddConstraints(new[]
             {
@@ -143,9 +137,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void InitializeOldContentControls()
         {
-            separatorBeforeExpand = new SeparatorSubView();
-            separatorBeforeExpand.TranslatesAutoresizingMaskIntoConstraints = false;
-            separatorBeforeExpand.Hidden = true;
+            separatorBeforeExpand = new SeparatorSubView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Hidden = true
+            };
             ContainerView.AddSubview(separatorBeforeExpand);
             AddConstraints(new[]
             {
@@ -171,9 +167,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(expandButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
             });
 
-            separatorAfterExpand = new SeparatorSubView();
-            separatorAfterExpand.Hidden = true;
-            separatorAfterExpand.TranslatesAutoresizingMaskIntoConstraints = false;
+            separatorAfterExpand = new SeparatorSubView
+            {
+                Hidden = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             ContainerView.AddSubview(separatorAfterExpand);
 
             AddConstraints(new[]
@@ -183,11 +181,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(separatorAfterExpand, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
             });
 
-            var preferences = new WKPreferences();
-            preferences.MinimumFontSize = 12f;
-            preferences.JavaScriptCanOpenWindowsAutomatically = false;
-            preferences.JavaScriptEnabled = true;
-
+            var preferences = new WKPreferences
+            {
+                MinimumFontSize = 12f,
+                JavaScriptCanOpenWindowsAutomatically = false,
+                JavaScriptEnabled = true
+            };
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
@@ -198,16 +197,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
-            var configuration = new WKWebViewConfiguration();
-            configuration.SuppressesIncrementalRendering = true;
-            configuration.AllowsInlineMediaPlayback = false;
-            configuration.UserContentController = userContentController;
-            configuration.Preferences = preferences;
-
-            oldContentWebView = new WKWebView(CGRect.Empty, configuration);
-            oldContentWebView.TranslatesAutoresizingMaskIntoConstraints = false;
-            oldContentWebView.Hidden = true;
-            oldContentWebView.Opaque = false;
+            var configuration = new WKWebViewConfiguration
+            {
+                SuppressesIncrementalRendering = true,
+                AllowsInlineMediaPlayback = false,
+                UserContentController = userContentController,
+                Preferences = preferences
+            };
+            oldContentWebView = new WKWebView(CGRect.Empty, configuration)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Hidden = true,
+                Opaque = false
+            };
             oldContentWebView.ScrollView.Bounces = false;
             oldContentWebView.ScrollView.BouncesZoom = false;
             oldContentWebView.ScrollView.Delegate = this;
@@ -217,9 +219,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             tapRecognizer.Delegate = this;
 
             oldContentWebView.ScrollView.AddGestureRecognizer(tapRecognizer);
-
             oldContentWebView.NavigationDelegate = new WebViewNavigationDelegate();
-
             oldContentHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
             oldContentZeroHeightConstraint = NSLayoutConstraint.Create(oldContentWebView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
 
@@ -261,12 +261,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             if (oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20 > 0)
             {
-                var rect = new CGRect();
-                rect.Height = 40;
-                rect.Width = 1;
-                rect.X = ConvertPointToView(tapLocation, externalScrollView).X;
-                rect.Y = ConvertPointToView(tapLocation, externalScrollView).Y;
-
+                var rect = new CGRect
+                {
+                    Height = 40,
+                    Width = 1,
+                    X = ConvertPointToView(tapLocation, externalScrollView).X,
+                    Y = ConvertPointToView(tapLocation, externalScrollView).Y
+                };
                 externalScrollView.ScrollRectToVisible(rect, true);
             }
 
