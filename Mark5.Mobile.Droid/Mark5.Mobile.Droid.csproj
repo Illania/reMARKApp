@@ -393,6 +393,8 @@
     <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\ExpandableView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\SingleRowView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

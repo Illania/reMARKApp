@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -9,25 +11,27 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class ExpandableView : AddEditContactView
+    public abstract class ExpandableView<T> : AddEditContactView where T : class  //TODO rename, eventually merge with base class
     {
         AppCompatEditText titleEditText;
         AppCompatTextView titleTextView;
         AppCompatImageButton addButton;
 
-        bool singleAdd;
+        bool singleRow;
 
-        public ExpandableView(Context context, bool singleAdd = false) : base(context)
+        List<Row> rows = new List<Row>();
+
+        protected ExpandableView(Context context, int titleResourceId, bool singleRow) : base(context)
         {
-            this.singleAdd = singleAdd;
+            this.singleRow = singleRow;
 
             SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
 
             titleEditText = new AppCompatEditText(context)
             {
                 KeyListener = null,
-                Hint = "Test"
             };
+            titleEditText.SetHint(titleResourceId);
 
             titleEditText.Focusable = false;
             titleEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
@@ -40,10 +44,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             TopLayout.AddView(titleEditText, hintEditTextLp);
 
-            titleTextView = new AppCompatTextView(context)
-            {
-                Text = "Test"
-            };
+            titleTextView = new AppCompatTextView(context);
+            titleTextView.SetText(titleResourceId);
             var titleTextViewLp = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
             {
                 Gravity = (int)GravityFlags.CenterVertical,
@@ -54,19 +56,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             titleTextView.SetPadding(titleEditText.PaddingLeft, titleEditText.PaddingTop, titleEditText.PaddingRight, titleEditText.PaddingBottom);
             TopLayout.AddView(titleTextView, titleTextViewLp);
 
-            addButton = GetButton(true);
+            addButton = GetButton(context, true);
             addButton.Click += AddButton_Click;
             TopLayout.AddView(addButton);
-        }
-
-        public override void RefreshView()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void UpdateContact()
-        {
-            throw new NotImplementedException();
         }
 
         void AddButton_Click(object sender, EventArgs e)
@@ -79,41 +71,42 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             AddRow();
         }
 
-        void AddRow()
+        virtual protected void AddRow(T content = null)
         {
-            if (singleAdd)
+            if (singleRow)
                 addButton.Visibility = ViewStates.Gone;
 
             titleEditText.Visibility = ViewStates.Gone;
             titleTextView.Visibility = ViewStates.Visible;
 
-            var layout = new LinearLayoutCompat(Context);
-            layout.Orientation = Horizontal;
-            ContentLayout.AddView(layout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-            var editText = new AppCompatEditText(Context);
-
-            var editTextLp = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f)
-            {
-                Gravity = (int)GravityFlags.CenterVertical,
-            };
-
-            editText.RequestFocus();
-            layout.AddView(editText, editTextLp);
-
-            var button = GetButton(false);
-            button.Click += (s, e) => RemoveRow(layout);
-            layout.AddView(button);
+            var row = GetNewRow(content);
+            rows.Add(row);
+            ContentLayout.AddView(row.Layout);
         }
+
+        void RemoveRow(Row row)
+        {
+            ContentLayout.RemoveView(row.Layout);
+            rows.Remove(row);
+
+            if (!rows.Any())
+            {
+                titleEditText.Visibility = ViewStates.Visible;
+                titleTextView.Visibility = ViewStates.Gone;
+                addButton.Visibility = ViewStates.Visible;
+            }
+        }
+
+        abstract protected Row GetNewRow(T content = null);
 
         #region Utilities
 
-        AppCompatImageButton GetButton(bool plus = true)
+        static public AppCompatImageButton GetButton(Context context, bool plus = true)
         {
-            var button = new AppCompatImageButton(Context);
+            var button = new AppCompatImageButton(context);
 
             button.SetImageResource(Resource.Drawable.add);
-            button.SetColorFilter(plus ? new Color(ContextCompat.GetColor(Context, Resource.Color.blue)) : Color.Red);
+            button.SetColorFilter(plus ? new Color(ContextCompat.GetColor(context, Resource.Color.blue)) : Color.Red);
 
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
@@ -126,16 +119,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         #endregion
 
-        void RemoveRow(LinearLayoutCompat layout)
+        abstract protected class Row
         {
-            ContentLayout.RemoveView(layout);
+            public LinearLayoutCompat Layout { get => containerLayout; }
 
-            if (ContentLayout.ChildCount == 0)
+            LinearLayoutCompat containerLayout;
+            T content;
+
+            protected Row(Context context, T content)
             {
-                titleEditText.Visibility = ViewStates.Visible;
-                titleTextView.Visibility = ViewStates.Gone;
-                addButton.Visibility = ViewStates.Visible;
+                this.content = content;
+
+                containerLayout = new LinearLayoutCompat(context)
+                {
+                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                };
             }
+
+            public abstract T GetContent();
         }
     }
 }
