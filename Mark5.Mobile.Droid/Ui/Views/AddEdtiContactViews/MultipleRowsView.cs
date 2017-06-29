@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         bool singleRow;
 
-        List<Row> rows = new List<Row>();
+        protected List<Row> Rows = new List<Row>();
 
         protected MultipleRowsView(Context context, int titleResourceId, bool singleRow) : base(context)
         {
@@ -80,18 +80,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             titleTextView.Visibility = ViewStates.Visible;
 
             var row = GetNewRow(content);
-            row.DeleteButton.Click += (sender, e) => RemoveRow(sender as Row);
+            row.DeleteClicked += (sender, e) => RemoveRow(sender as Row);
 
-            rows.Add(row);
+            Rows.Add(row);
             ContentLayout.AddView(row.Layout);
         }
 
         void RemoveRow(Row row)
         {
             ContentLayout.RemoveView(row.Layout);
-            rows.Remove(row);
+            Rows.Remove(row);
 
-            if (!rows.Any())
+            if (!Rows.Any())
             {
                 titleEditText.Visibility = ViewStates.Visible;
                 titleTextView.Visibility = ViewStates.Gone;
@@ -123,12 +123,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         abstract protected class Row
         {
-            public LinearLayoutCompat Layout { get => layout; }
-            public AppCompatImageButton DeleteButton { get => deleteButton; }
+            public event EventHandler DeleteClicked = delegate { };
 
-            protected LinearLayoutCompat layout;
-            protected AppCompatImageButton deleteButton;
-            protected T content;
+            public LinearLayoutCompat Layout { get => layout; }
+
+            protected readonly LinearLayoutCompat layout;
+            protected readonly AppCompatImageButton deleteButton;
+            protected readonly T content;
 
             protected Row(Context context, T content)
             {
@@ -140,7 +141,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 };
 
                 deleteButton = GetButton(context, false);
-                Layout.AddView(deleteButton);
+                deleteButton.Click += (sender, e) => DeleteClicked(this, EventArgs.Empty);
+                layout.AddView(deleteButton);
             }
 
             public abstract T GetContent();

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class FirstNameView : SingleRowView
+    public class FirstNameView : StringSingleRow
     {
         public FirstNameView(Context context)
             : base(context, Resource.String.edit_contact_first_name)
@@ -12,13 +13,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         public override void RefreshView()
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(Contact.FirstName))
+                AddRow(Contact.FirstName);
         }
 
         public override void UpdateContact()
         {
-            throw new NotImplementedException();
+            string name;
+            if (Rows.Any() && !string.IsNullOrEmpty(name = Rows[0].GetContent()))
+                Contact.FirstName = name;
         }
-
     }
 }

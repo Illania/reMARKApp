@@ -5,19 +5,26 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class SingleRowView<T> : ExpandableView<T> where T : class
+    public abstract class StringSingleRow : MultipleRowsView<string>
     {
-        protected SingleRowView(Context context, int titleResourceId)
+        protected StringSingleRow(Context context, int titleResourceId)
             : base(context, titleResourceId, true)
         {
         }
 
-        protected abstract class SimpleRow : Row
+        protected override Row GetNewRow(string content = null)
         {
-            protected SimpleRow(Context context, T content)
+            return new SimpleRow(Context, content);
+        }
+
+        protected class SimpleRow : Row
+        {
+            readonly AppCompatEditText editText;
+
+            public SimpleRow(Context context, string content)
                 : base(context, content)
             {
-                var editText = new AppCompatEditText(context);
+                editText = new AppCompatEditText(context);
 
                 var editTextLp = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f)
                 {
@@ -26,6 +33,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
                 editText.RequestFocus();
                 Layout.AddView(editText, 0, editTextLp);
+            }
+
+            public override string GetContent()
+            {
+                return editText.Text;
             }
         }
 
