@@ -295,7 +295,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             else
             {
-                expandButton.Hidden = PreviousDocument == null || DocumentCreationModeFlag == DocumentCreationModeFlag.New;
+                expandButton.Hidden = DocumentCreationModeFlag == DocumentCreationModeFlag.New ||
+                                      DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
+                                      PreviousDocument == null;
                 separatorBeforeExpand.Hidden = expandButton.Hidden;
 
                 await LoadOldContent();
