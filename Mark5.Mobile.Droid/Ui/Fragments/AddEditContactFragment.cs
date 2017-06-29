@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            var c = new Contact()
+            var c = new Contact
             {
                 FirstName = "Primo",
                 LastName = "Ultimo",
@@ -36,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(new MiddleNameView(Context));
             subviews.Add(new LastNameView(Context));
             subviews.Add(new BirthdateView(Context));
+            subviews.Add(new EmailsView(Context));
 
             foreach (var subview in subviews)
             {

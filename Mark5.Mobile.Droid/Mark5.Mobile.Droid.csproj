@@ -402,6 +402,7 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\PositionView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\WebpageView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\BirthdateView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\EmailsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
