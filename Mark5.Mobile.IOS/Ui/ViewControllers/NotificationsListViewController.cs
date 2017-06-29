@@ -64,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
                     tableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -80,7 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             newNotificationsMessageToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource)tableView.Source;
             await RefreshData();
         }
 
@@ -198,7 +198,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
                 ds.SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
@@ -219,52 +219,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public async void NotificationSelected(Notification notification, NSIndexPath row)
         {
             await Managers.NotificationsManager.MarkAsRead(notification);
-            tableView.ReloadRows(new[]
-                {
-                    row
-                },
-                UITableViewRowAnimation.Fade);
+            tableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
 
             switch (notification.ObjectType)
             {
                 case ObjectType.Document:
-                    PresentDocumentViewController(notification.ObjectId);
-                    break;
-                case ObjectType.Contact:
-                    PresentContactViewController(notification.ObjectId);
-                    break;
-                case ObjectType.Shortcode:
-                    PresentShortcodeViewController(notification.ObjectId);
+                    PresentDocumentViewController(notification.ObjectId,notification.Guid);
                     break;
             }
         }
 
-        public void PresentDocumentViewController(int documentId)
+        void PresentDocumentViewController(int documentId, Guid notificationGuid)
         {
             var vc = new DocumentViewController();
             vc.Modal = true;
             vc.SetRefreshDataOnAppear();
-            vc.SetData(documentId);
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        public void PresentContactViewController(int contactId)
-        {
-            var vc = new ContactViewController();
-            vc.Modal = true;
-            vc.SetRefreshDataOnAppear();
-            vc.SetData(contactId);
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        public void PresentShortcodeViewController(int shortcodeId)
-        {
-            var vc = new ShortcodeViewController();
-            vc.Modal = true;
-            vc.SetRefreshDataOnAppear();
-            vc.SetData(shortcodeId);
+            vc.SetData(documentId, notificationGuid);
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }

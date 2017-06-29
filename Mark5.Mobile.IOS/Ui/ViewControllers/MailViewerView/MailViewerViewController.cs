@@ -325,10 +325,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 if (navigationAction.Request.Url.Scheme == "mailto")
                 {
                     var address = navigationAction.Request.Url.ResourceSpecifier;
-                    PresentComposeViewWithPreconfiguredAddresses(new string[]
-                    {
-                        address
-                    });
+                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
                 }
                 else
                 {
