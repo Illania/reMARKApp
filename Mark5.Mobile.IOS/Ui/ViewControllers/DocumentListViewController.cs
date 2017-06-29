@@ -80,9 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
@@ -160,11 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             tableView = new UITableView();
             tableView.ClipsToBounds = false;
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
             tableView.Source = new DataSource(this, tableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = DocumentsTableViewCell.Height;
             tableView.AllowsSelectionDuringEditing = false;
@@ -437,9 +431,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void ShowPriorityActionSheet(List<DocumentPreview> selectedDocuments, UIBarButtonItem barButtonItem)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var priorities = new List<Priority>
             {
@@ -458,9 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             await SetPriority(selectedDocuments, priority);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, UITableViewCell cell)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var priorities = new List<Priority>
             {
@@ -516,9 +506,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<DocumentPreview> selectedDocuments)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_documents"));
 
@@ -558,9 +546,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<DocumentPreview> selectedDocuments)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_documents"));
 
@@ -674,9 +660,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
 
@@ -705,9 +689,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreviews={documentPreviews.Count}]...");
 
@@ -1025,9 +1007,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void DoSearchDocuments(string searchText, CancellationToken ct)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             searchResultsDataSource.Reset();
 
@@ -1422,9 +1402,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
                                 InvokeOnMainThread(async () => await work(first.Id));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                         }
                     });
                 }

@@ -67,9 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
@@ -80,9 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
                 newNotificationsMessageToken = null;
             }
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
             newNotificationsMessageToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
 
             var ds = (DataSource) tableView.Source;
             await RefreshData();

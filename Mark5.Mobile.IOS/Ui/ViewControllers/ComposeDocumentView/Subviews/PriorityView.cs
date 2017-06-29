@@ -103,9 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         #region Event handlers
 
         [Export("PriorityLabelTapped")]
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void PriorityLabelTapped()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             selectedPriorityLabel.TextColor = Theme.TintColor;
 

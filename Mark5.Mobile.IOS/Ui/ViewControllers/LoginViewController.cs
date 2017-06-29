@@ -495,9 +495,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void LoginButton_TouchUpInside(object sender, EventArgs e)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             loginButton.TouchUpInside -= LoginButton_TouchUpInside;
 

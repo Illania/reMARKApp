@@ -193,10 +193,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         [Export("settingsViewController:buttonTappedForSpecifier:")]
         public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (specifier.Key == LogoutKey)
             {
@@ -311,9 +309,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void SettingsChanged(NSNotification n)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var key = n.Object.ToString();
 

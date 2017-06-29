@@ -104,9 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             observeWillHideNotification = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
@@ -471,9 +469,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             PresentViewController(sourceChooser, true, null);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void HandleAttachmentUrl(NSUrl url)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             Stream stream = null;
 
@@ -509,10 +505,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void HandleAttachmentImage(string filename, NSData jpegData)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             Stream stream = null;
 

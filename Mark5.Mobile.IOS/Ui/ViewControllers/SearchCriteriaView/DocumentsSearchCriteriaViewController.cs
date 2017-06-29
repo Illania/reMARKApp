@@ -66,9 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 true);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         protected override async void SaveCriteria()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -80,9 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         protected override async void RestoreCriteria()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -1116,9 +1112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
 
             [Export("tapped:")]
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
             async void Tapped(UITapGestureRecognizer recognizer)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             {
                 if (recognizer.View == lineView)
                 {

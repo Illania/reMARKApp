@@ -631,9 +631,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return contactPreview?.Id == contactId || this.contactId == contactId;
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RefreshData()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             cts?.Cancel();
             cts = new CancellationTokenSource();
@@ -767,9 +765,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contact"));
 
@@ -812,9 +808,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contact"));
 

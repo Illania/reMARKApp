@@ -126,9 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DismissViewController(true, null);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void CopyBusinessEntityToFolder(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             string key;
             switch (businessEntities.First().ObjectType)
@@ -171,9 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MoveBusinessEntityToFolder(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             string key;
             switch (businessEntities.First().ObjectType)

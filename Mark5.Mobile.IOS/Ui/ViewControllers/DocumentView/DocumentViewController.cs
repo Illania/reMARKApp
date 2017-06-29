@@ -130,9 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewWillDisappear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void 
         {
             base.ViewWillDisappear(animated);
 
@@ -550,9 +548,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refresh methods
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RefreshData()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             loadCts?.Cancel();
             loadCts = new CancellationTokenSource();
@@ -746,9 +742,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Subviews event handlers
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
@@ -928,9 +922,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void ShowPriorityActionSheet(UIBarButtonItem barButtonItem)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var priorities = new List<Priority>
             {
@@ -1247,9 +1239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_document"));
 
@@ -1292,9 +1282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_document"));
 

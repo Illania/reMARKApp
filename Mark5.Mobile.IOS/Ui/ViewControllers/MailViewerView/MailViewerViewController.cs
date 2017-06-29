@@ -332,9 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 }
                 else
                 {
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
                     Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                 }
 
                 return WKNavigationActionPolicy.Cancel;
@@ -360,11 +358,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-#pragma warning disable RECS0154 // Parameter is never used
         async void AttachmentsView_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
-#pragma warning restore RECS0154 // Parameter is never used
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var att = e.Attachment;
 

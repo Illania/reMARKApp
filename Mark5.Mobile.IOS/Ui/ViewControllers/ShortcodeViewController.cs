@@ -14,7 +14,6 @@ using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
-using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -360,9 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RefreshData()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             cts?.Cancel();
             cts = new CancellationTokenSource();
@@ -471,9 +468,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcode"));
 
@@ -516,9 +511,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcode"));
 

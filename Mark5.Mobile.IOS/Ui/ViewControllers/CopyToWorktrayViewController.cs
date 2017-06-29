@@ -47,9 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 

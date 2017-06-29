@@ -294,9 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ShortcodePreview> selectedShortcodes)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcodes"));
 
@@ -392,9 +390,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refreshing
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RefreshData()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {

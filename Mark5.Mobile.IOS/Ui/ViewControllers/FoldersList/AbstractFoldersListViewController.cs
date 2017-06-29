@@ -292,9 +292,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void EditModeItem_Clicked(object sender, EventArgs e)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             EditModeItem.Clicked -= EditModeItem_Clicked;
 
@@ -339,9 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshData(true);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RefreshData(bool forceRefresh = false)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
@@ -412,9 +408,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void QuickRefreshData()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -442,9 +436,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RefreshFoldersInfo()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (IsRootOfFoldersList)
             {
@@ -515,9 +507,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #region Row actions handlers
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void AddToFavorites(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -555,9 +545,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RemoveFromFavorites(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -595,9 +583,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void EnableNotifications(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -636,9 +622,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void DisableNotifications(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -677,9 +661,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void EnableCaching(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -711,9 +693,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void DisableCaching(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {
@@ -780,9 +760,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void DoSearchFolders(string searchText, CancellationToken cancellationToken)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             try
             {

@@ -117,9 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         [Export("longPressed:")]
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void LongPressed(UILongPressGestureRecognizer recognizer)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             UserInteractionEnabled = false;
 
