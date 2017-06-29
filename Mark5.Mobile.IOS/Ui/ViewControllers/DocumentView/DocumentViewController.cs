@@ -24,7 +24,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class DocumentViewController : AbstractViewController, ISecondaryViewController
     {
-
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public bool Modal { get; set; }
@@ -41,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem previousDocumentButtonItem;
         UIBarButtonItem nextDocumentButtonItem;
+        UIBarButtonItem editDocumentButtonItem;
 
         UIScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
@@ -191,6 +191,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "arrow-up.png")),
                     Enabled = false
+                };
+
+                editDocumentButtonItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "pencil.png"))
                 };
 
                 var rightButtons = new UIBarButtonItem[2];
@@ -434,6 +439,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 nextDocumentButtonItem.Clicked += NextDocumentButton_Clicked;
                 previousDocumentButtonItem.Clicked += PreviousDocumentButton_Clicked;
+                editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
             }
         }
 
@@ -457,6 +463,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 nextDocumentButtonItem.Clicked -= NextDocumentButton_Clicked;
                 previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
+                editDocumentButtonItem.Clicked -= EditDocumentButtonItem_Clicked;
             }
         }
 
@@ -754,9 +761,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                var rightButtons = new UIBarButtonItem[2];
+                var rightButtons = new UIBarButtonItem[3];
                 rightButtons[0] = nextDocumentButtonItem;
                 rightButtons[1] = previousDocumentButtonItem;
+                rightButtons[2] = editDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, true);
             }
         }
