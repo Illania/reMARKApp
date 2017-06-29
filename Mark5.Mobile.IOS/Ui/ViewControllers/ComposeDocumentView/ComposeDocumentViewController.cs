@@ -124,8 +124,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             observeWillHideNotification?.Dispose();
             observeWillChangeNotification?.Dispose();
             observeWillShowNotification?.Dispose();
-
-            autoSaveWorkingCopyWorker?.Stop();
         }
 
         #endregion
@@ -558,6 +556,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task SaveAndCloseComposeViewController()
         {
+            autoSaveWorkingCopyWorker.Stop();
+            await autoSaveWorkingCopyWorker.Finished();
             await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
             PopOrDismissViewController();
         }
