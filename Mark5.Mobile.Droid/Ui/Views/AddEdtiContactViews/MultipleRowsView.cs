@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class MultipleRowsView<T> : AddEditContactView where T : class  //TODO rename
+    public abstract class MultipleRowsView<T> : AddEditContactView
     {
         AppCompatEditText titleEditText;
         AppCompatTextView titleTextView;
@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             AddRow();
         }
 
-        virtual protected void AddRow(T content = null)
+        virtual protected void AddRow(T content = default(T))
         {
             if (singleRow)
                 addButton.Visibility = ViewStates.Gone;
@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
         }
 
-        abstract protected Row GetNewRow(T content = null);
+        abstract protected Row GetNewRow(T content);
 
         #region Utilities
 
