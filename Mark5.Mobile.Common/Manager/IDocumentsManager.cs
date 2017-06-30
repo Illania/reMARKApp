@@ -54,6 +54,10 @@ namespace Mark5.Mobile.Common.Manager
 
         Task QueueWorkingCopyToUpload();
 
+        Task<List<DocumentPreview>> GetDocumentsToUploadDocumentPreviews();
+
+        Task<List<DocumentPreview>> GetFailedDocumentsToUploadDocumentPreviews();
+
         Task<bool> IsDocumentWorkingCopyAvailableAsync();
 
         Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy info);

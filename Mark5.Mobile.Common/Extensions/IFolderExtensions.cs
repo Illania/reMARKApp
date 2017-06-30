@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using PCLStorage;
 
 namespace Mark5.Mobile.Common.Extensions
@@ -10,7 +11,7 @@ namespace Mark5.Mobile.Common.Extensions
             var target = await destinationFolder.CreateFolderAsync(folderToMove.Name, collisionOptions);
 
             foreach (var file in await folderToMove.GetFilesAsync())
-                await file.MoveAsync(target.Path);
+                await file.MoveAsync(Path.Combine(target.Path, file.Name));
 
             foreach (var folder in await folderToMove.GetFoldersAsync())
             {

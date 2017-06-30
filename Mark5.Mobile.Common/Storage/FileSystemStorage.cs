@@ -352,6 +352,22 @@ namespace Mark5.Mobile.Common.Storage
             return guids.ToArray();
         }
 
+        public static async Task<Guid[]> GetFailedDocumentsToUploadGuids()
+        {
+            var guids = new List<Guid>();
+
+            var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
+            if (failedFolder == null)
+                return null;
+
+            var folders = await failedFolder.GetFoldersAsync();
+
+            foreach (var folder in folders)
+                guids.Add(new Guid(folder.Name));
+
+            return guids.ToArray();
+        }
+
         public static async Task<DocumentToUploadInfo> GetDocumentToUploadInfo(Guid guid)
         {
             var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
@@ -374,6 +390,29 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task<DocumentPreview> GetDocumentToUploadDocumentPreview(Guid guid)
         {
             var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
+            if (folder == null)
+                return null;
+
+            var fileExists = await folder.CheckExistsAsync("documentPreview.json") == ExistenceCheckResult.FileExists;
+            if (!fileExists)
+                return null;
+
+            var file = await folder.GetFileAsync("documentPreview.json");
+            if (file == null)
+                return null;
+
+            var fileContent = await file.ReadAllTextAsync();
+
+            return Serializer.Deserialize<DocumentPreview>(fileContent);
+        }
+
+        public static async Task<DocumentPreview> GetFailedDocumentToUploadDocumentPreview(Guid guid)
+        {
+            var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
+            if (failedFolder == null)
+                return null;
+
+            var folder = await failedFolder.GetFolderAsync(guid.ToString());
             if (folder == null)
                 return null;
 
@@ -471,6 +510,7 @@ namespace Mark5.Mobile.Common.Storage
                 return;
 
             await folder.MoveRecursivelyAsync(failedFolder, CreationCollisionOption.FailIfExists);
+            await folder.DeleteAsync();
         }
 
         public static async Task MoveFailedToDocumentToUpload(Guid guid)
@@ -484,6 +524,7 @@ namespace Mark5.Mobile.Common.Storage
                 return;
 
             await failedFolderGuid.MoveRecursivelyAsync(CommonConfig.DocumentsToUploadFolder, CreationCollisionOption.FailIfExists);
+            await failedFolder.DeleteAsync();
         }
 
         #endregion

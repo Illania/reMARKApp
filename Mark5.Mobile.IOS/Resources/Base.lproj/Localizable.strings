@@ -109,6 +109,7 @@
 "error_saving_local_attachment" = "Error while saving local attachment";
 "error_while_sending_document" = "Error while sending email";
 "existing_photo" = "Add existing photo";
+"failed" = "Failed";
 "failed_send_document_notification_content" = "One or more emails could not be sent. Please check Outgoing folder for details.";
 "failed_send_document_notification_title" = "Failed to send messages";
 "favorites" = "Favorites";
@@ -165,7 +166,9 @@
 "no_contacts_found" = "No contacts were found";
 "no_content" = "This email has no content";
 "no_description" = "No description";
+"no_documents_failed" = "No documents failed to send";
 "no_documents_found" = "No emails were found";
+"no_documents_pending" = "No documents are pending send";
 "no_email_addresses_content" = "The contact does not have email addresses";
 "no_email_addresses_title" = "No email addresses";
 "no_folders_found" = "No folders found";
@@ -198,6 +201,7 @@
 "own_worktray" = "My worktray";
 "outgoing" = "Outgoing";
 "password" = "Password";
+"pending" = "Pending";
 "person" = "Person";
 "phone" = "Phone";
 "phonebook_contacts_empty" = "No Phonebook contacts";

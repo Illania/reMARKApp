@@ -564,6 +564,32 @@ namespace Mark5.Mobile.Common.Manager
             Services.DocumentsUploadService.Notify();
         }
 
+        public async Task<List<DocumentPreview>> GetDocumentsToUploadDocumentPreviews()
+        {
+            var docs = new List<DocumentPreview>();
+            var guids = await FileSystemStorage.GetDocumentsToUploadGuids();
+            foreach (var guid in guids)
+            {
+                var doc = await FileSystemStorage.GetDocumentToUploadDocumentPreview(guid);
+                if (doc != null)
+                    docs.Add(doc);
+            }
+            return docs;
+        }
+
+        public async Task<List<DocumentPreview>> GetFailedDocumentsToUploadDocumentPreviews()
+        {
+            var docs = new List<DocumentPreview>();
+            var guids = await FileSystemStorage.GetFailedDocumentsToUploadGuids();
+            foreach (var guid in guids)
+            {
+                var doc = await FileSystemStorage.GetFailedDocumentToUploadDocumentPreview(guid);
+                if (doc != null)
+                    docs.Add(doc);
+            }
+            return docs;
+        }
+
         public async Task<bool> IsDocumentWorkingCopyAvailableAsync() => await FileSystemStorage.IsDocumentWorkingCopyAvailableAsync();
 
         public async Task SaveDocumentWorkingCopyAsync(DocumentWorkingCopy workingCopy) => await FileSystemStorage.SaveDocumentWorkingCopyAsync(workingCopy);

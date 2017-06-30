@@ -261,15 +261,13 @@
 		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
 		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs">
-		  <DependentUpon>TemplatesTableViewCell.cs</DependentUpon>
-		</Compile>
+		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs"/>
 		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs">
-		  <DependentUpon>TemplatesSearchResultsTableViewCell.cs</DependentUpon>
-		</Compile>
+		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs"/>
 		<Compile Include="Model\FileDescription.cs" />
 		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
+		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.designer.cs"/>
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -380,6 +378,7 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.xib" />
+		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">
