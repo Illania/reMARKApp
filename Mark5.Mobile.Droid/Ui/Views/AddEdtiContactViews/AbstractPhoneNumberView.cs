@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var addresses = Contact.CommunicationAddresses.Where(a => a.Type == type);
             foreach (var address in addresses)
             {
-                AddRow(address);
+                AddRow(address, type);
             }
         }
 
@@ -65,12 +65,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             CountryInfo selectedCountry;
 
             CommunicationAddress address;
+            CommunicationAddressType type;
 
-            public PhoneNumberRow(Context context, CommunicationAddress address)
+            public PhoneNumberRow(Context context, CommunicationAddress address, CommunicationAddressType type)
                 : base(context, address)
             {
                 this.context = context;
                 this.address = address;
+                this.type = type;
 
                 var container = new LinearLayoutCompat(context)
                 {
@@ -94,7 +96,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 };
-                phoneEditText.SetHint(Resource.String.edit_contact_phone);
+                phoneEditText.SetHint(GetResourceIdForType(type));
                 container.AddView(phoneEditText);
 
                 descriptionEditText = new AppCompatEditText(context)

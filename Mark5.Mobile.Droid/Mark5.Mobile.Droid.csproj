@@ -405,6 +405,9 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\EmailsView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AbstractPhoneNumberView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\PhoneView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\MobileView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\FaxView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\TelexView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
