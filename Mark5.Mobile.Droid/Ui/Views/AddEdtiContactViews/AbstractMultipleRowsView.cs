@@ -17,13 +17,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         AppCompatTextView titleTextView;
         AppCompatImageButton addButton;
 
-        bool singleRow;
+        bool isSingleRow;
 
         protected List<Row> Rows = new List<Row>();
 
-        protected AbstractMultipleRowsView(Context context, int titleResourceId, bool singleRow) : base(context)
+        protected AbstractMultipleRowsView(Context context, int titleResourceId, bool isSingleRow) : base(context)
         {
-            this.singleRow = singleRow;
+            this.isSingleRow = isSingleRow;
 
             SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
 
@@ -73,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         virtual protected void AddRow(T content = default(T))
         {
-            if (singleRow)
+            if (isSingleRow)
                 addButton.Visibility = ViewStates.Gone;
 
             titleEditText.Visibility = ViewStates.Gone;
