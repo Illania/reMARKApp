@@ -125,24 +125,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
             public event EventHandler DeleteClicked = delegate { };
 
-            public LinearLayoutCompat Layout { get => layout; }
+            public LinearLayoutCompat Layout { get => LinearLayout; }
 
-            protected readonly LinearLayoutCompat layout;
-            protected readonly AppCompatImageButton deleteButton;
-            protected readonly T content;
+            readonly AppCompatImageButton deleteButton;
+
+            protected readonly LinearLayoutCompat LinearLayout;
+            protected readonly T Content;
+            protected readonly Context Context;
 
             protected Row(Context context, T content)
             {
-                this.content = content;
+                Context = context;
+                Content = content;
 
-                layout = new LinearLayoutCompat(context)
+                LinearLayout = new LinearLayoutCompat(context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 };
 
                 deleteButton = GetButton(context, false);
                 deleteButton.Click += (sender, e) => DeleteClicked(this, EventArgs.Empty);
-                layout.AddView(deleteButton);
+                LinearLayout.AddView(deleteButton);
             }
 
             public abstract T GetContent();

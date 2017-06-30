@@ -410,6 +410,7 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\TelexView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\VatView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\LedgerView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\ResponsibleUsersView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

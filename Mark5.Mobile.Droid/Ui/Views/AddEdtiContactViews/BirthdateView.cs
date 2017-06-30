@@ -35,13 +35,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
             readonly AppCompatEditText dateEditText;
             long currentTimestamp;
-            Context context;
 
             public DateRow(Context context, long timestamp)
                 : base(context, timestamp)
             {
-                this.context = context;
-
                 currentTimestamp = timestamp == -1 || timestamp == 0 ? -1 : timestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
 
                 dateEditText = new AppCompatEditText(context);
@@ -65,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 if (currentTimestamp != -1)
                 {
-                    dateEditText.Text = currentTimestamp.FormatUserTimestampAsLongDateString(context);
+                    dateEditText.Text = currentTimestamp.FormatUserTimestampAsLongDateString(Context);
                 }
                 else
                 {
@@ -75,7 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             async void EditText_Click(object sender, EventArgs e)
             {
-                currentTimestamp = await Dialogs.ShowDatePicker(context, currentTimestamp);
+                currentTimestamp = await Dialogs.ShowDatePicker(Context, currentTimestamp);
 
                 UpdateText();
             }

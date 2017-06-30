@@ -60,18 +60,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             readonly AppCompatEditText phoneEditText;
             readonly AppCompatEditText descriptionEditText;
 
-            Context context;
-
             CountryInfo selectedCountry;
 
-            CommunicationAddress address;
             CommunicationAddressType type;
 
             public PhoneNumberRow(Context context, CommunicationAddress address, CommunicationAddressType type)
                 : base(context, address)
             {
-                this.context = context;
-                this.address = address;
                 this.type = type;
 
                 var container = new LinearLayoutCompat(context)
@@ -82,6 +77,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
                 Layout.AddView(container, 0);
 
+
+                var firstLine = new LinearLayoutCompat(context)
+                {
+                    Orientation = Horizontal,
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                };
+                container.AddView(firstLine);
+
+
                 countryEditText = new AppCompatEditText(context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
@@ -90,14 +94,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 countryEditText.KeyListener = null;
                 countryEditText.Focusable = false;
                 countryEditText.Click += CountryEditText_Click;
-                container.AddView(countryEditText);
+                firstLine.AddView(countryEditText);
 
                 phoneEditText = new AppCompatEditText(context)
                 {
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
                 };
                 phoneEditText.SetHint(GetResourceIdForType(type));
-                container.AddView(phoneEditText);
+                firstLine.AddView(phoneEditText);
 
                 descriptionEditText = new AppCompatEditText(context)
                 {
@@ -112,7 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             async void CountryEditText_Click(object sender, EventArgs e)
             {
                 var countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries;
-                var index = await Dialogs.ShowListDialog(context, Resource.String.edit_contact_country, countries.Select(c => c.Name).ToArray(), true);
+                var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_country, countries.Select(c => c.Name).ToArray(), true);
                 if (index >= 0)
                 {
                     selectedCountry = countries[index];
@@ -122,10 +126,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void UpdateText()
             {
-                if (address != null)
+                if (Content != null)
                 {
                     //TODO to complete
-                    descriptionEditText.Text = address.Description;
+                    descriptionEditText.Text = Content.Description;
                 }
             }
 

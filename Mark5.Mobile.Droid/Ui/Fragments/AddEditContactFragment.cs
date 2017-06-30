@@ -32,12 +32,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 LastName = "Ultimo",
                 BirthDateTimestamp = -1,
             };
+
+
+            var su1 = new SystemUser
+            {
+                Id = 1,
+                Username = "sa",
+            };
+            var su2 = new SystemUser
+            {
+                Id = 2,
+                Username = "fp",
+            };
+            var users = new List<SystemUser> { su1, su2 };
+
             subviews.Add(new FirstNameView(Context));
             subviews.Add(new MiddleNameView(Context));
             subviews.Add(new LastNameView(Context));
             subviews.Add(new BirthdateView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
+            subviews.Add(new ResponsibleUsersView(Context, users));
 
             foreach (var subview in subviews)
             {
