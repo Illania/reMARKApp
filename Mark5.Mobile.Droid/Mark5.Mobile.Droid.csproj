@@ -403,6 +403,8 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\WebpageView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\BirthdateView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\EmailsView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractPhoneNumberView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\PhoneView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

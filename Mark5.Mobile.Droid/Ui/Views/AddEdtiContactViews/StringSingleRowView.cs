@@ -36,10 +36,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 Layout.AddView(editText, 0, editTextLp);
             }
 
-            public override string GetContent()
-            {
-                return editText.Text;
-            }
+            public override string GetContent() => editText.Text;
+
+            public override bool ContainsValidContent() => true;
         }
 
     }

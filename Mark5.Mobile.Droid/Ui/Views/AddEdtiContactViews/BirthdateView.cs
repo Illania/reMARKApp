@@ -84,6 +84,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 return 0; //TODO correct
             }
+
+            public override bool ContainsValidContent()
+            {
+                throw new NotImplementedException();
+            }
         }
 
     }

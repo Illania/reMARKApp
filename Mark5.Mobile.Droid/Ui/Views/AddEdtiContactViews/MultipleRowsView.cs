@@ -146,6 +146,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             public abstract T GetContent();
+
+            public abstract bool ContainsValidContent();
         }
     }
 }
