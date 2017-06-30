@@ -4,7 +4,7 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class LastNameView : StringSingleRowView
+    public class LastNameView : AbstractStringSingleRowView
     {
         public LastNameView(Context context)
             : base(context, Resource.String.edit_contact_last_name)

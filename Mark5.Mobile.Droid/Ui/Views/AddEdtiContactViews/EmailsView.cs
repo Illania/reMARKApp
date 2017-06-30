@@ -7,7 +7,7 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class EmailsView : MultipleRowsView<CommunicationAddress>
+    public class EmailsView : AbstractMultipleRowsView<CommunicationAddress>
     {
         public EmailsView(Context context)
             : base(context, Resource.String.edit_contact_email, false)

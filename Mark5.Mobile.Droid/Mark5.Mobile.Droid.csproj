@@ -392,9 +392,9 @@
     <Compile Include="Ui\Activities\AddEditContactActivity.cs" />
     <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\MultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractMultipleRowsView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\FirstNameView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\StringSingleRowView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractStringSingleRowView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\MiddleNameView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\LastNameView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\ShortIdView.cs" />
@@ -408,6 +408,8 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\MobileView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\FaxView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\TelexView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\VatView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\LedgerView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

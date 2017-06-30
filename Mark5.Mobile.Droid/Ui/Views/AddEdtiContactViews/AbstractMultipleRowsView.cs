@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class MultipleRowsView<T> : AddEditContactView
+    public abstract class AbstractMultipleRowsView<T> : AddEditContactView
     {
         AppCompatEditText titleEditText;
         AppCompatTextView titleTextView;
@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected List<Row> Rows = new List<Row>();
 
-        protected MultipleRowsView(Context context, int titleResourceId, bool singleRow) : base(context)
+        protected AbstractMultipleRowsView(Context context, int titleResourceId, bool singleRow) : base(context)
         {
             this.singleRow = singleRow;
 

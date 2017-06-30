@@ -3,24 +3,24 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class WebpageView : AbstractStringSingleRowView
+    public class LedgerView : AbstractStringSingleRowView
     {
-        public WebpageView(Context context)
-            : base(context, Resource.String.edit_contact_webpage)
+        public LedgerView(Context context)
+            : base(context, Resource.String.edit_contact_ledger)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact.WebPageAddress))
-                AddRow(Contact.WebPageAddress);
+            if (!string.IsNullOrEmpty(Contact.Ledger))
+                AddRow(Contact.Ledger);
         }
 
         public override void UpdateContact()
         {
             string position;
             if (Rows.Any() && !string.IsNullOrEmpty(position = Rows[0].GetContent()))
-                Contact.WebPageAddress = position;
+                Contact.Ledger = position;
         }
     }
 }

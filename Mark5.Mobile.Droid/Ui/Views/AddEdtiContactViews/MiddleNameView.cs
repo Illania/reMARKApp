@@ -3,7 +3,7 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class MiddleNameView : StringSingleRowView
+    public class MiddleNameView : AbstractStringSingleRowView
     {
         public MiddleNameView(Context context)
             : base(context, Resource.String.edit_contact_middle_name)

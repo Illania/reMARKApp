@@ -8,7 +8,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class AbstractPhoneNumberView : MultipleRowsView<CommunicationAddress>
+    public abstract class AbstractPhoneNumberView : AbstractMultipleRowsView<CommunicationAddress>
     {
         CommunicationAddressType type;
 

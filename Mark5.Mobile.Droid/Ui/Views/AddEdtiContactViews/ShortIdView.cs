@@ -3,7 +3,7 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class ShortIdView : StringSingleRowView
+    public class ShortIdView : AbstractStringSingleRowView
     {
         public ShortIdView(Context context)
             : base(context, Resource.String.edit_contact_short_id)

@@ -8,7 +8,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class BirthdateView : MultipleRowsView<long>
+    public class BirthdateView : AbstractMultipleRowsView<long>
     {
         public BirthdateView(Context context)
             : base(context, Resource.String.edit_contact_birthdate, true)
