@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var addresses = Contact.CommunicationAddresses.Where(a => a.Type == type);
             foreach (var address in addresses)
             {
-                AddRow(address, type);
+                AddRow(address);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected override Row GetNewRow(CommunicationAddress content)
         {
-            return new PhoneNumberRow(Context, content);
+            return new PhoneNumberRow(Context, content, type);
         }
 
         protected class PhoneNumberRow : Row
