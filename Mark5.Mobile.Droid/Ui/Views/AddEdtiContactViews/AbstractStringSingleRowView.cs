@@ -5,7 +5,7 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class AbstractStringSingleRowView : MultipleRowsView<string>
+    public abstract class AbstractStringSingleRowView : AbstractMultipleRowsView<string>
     {
         protected AbstractStringSingleRowView(Context context, int titleResourceId)
             : base(context, titleResourceId, true)
