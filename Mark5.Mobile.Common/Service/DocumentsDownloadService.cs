@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,9 @@ namespace Mark5.Mobile.Common.Service
 {
     public class DocumentsDownloadService : AbstractService, IDocumentsDownloadService
     {
+
+        readonly HashSet<int> documentIdSkipList = new HashSet<int>();
+
         public DocumentsDownloadService()
             : base(15 * 1000)
         {
@@ -31,6 +35,7 @@ namespace Mark5.Mobile.Common.Service
                                                     .ToArray();
 
                     var documentsToDownloadIds = await documentManager.GetNonCachedDocumentIdsAsync(offlineDocumentFolderIds, 25);
+                    documentsToDownloadIds = documentsToDownloadIds.Except(documentIdSkipList).ToArray();
                     if (documentsToDownloadIds == null || documentsToDownloadIds.Length < 1)
                     {
                         CommonConfig.Logger.Info("No documents to download found. Waiting...");
@@ -62,6 +67,8 @@ namespace Mark5.Mobile.Common.Service
                         }
                         catch (Exception ex)
                         {
+                            documentIdSkipList.Add(documentId);
+
                             CommonConfig.Logger.Error($"Failed to download document [documentId={documentId}]", ex);
                         }
 

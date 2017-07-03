@@ -261,13 +261,13 @@
 		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
 		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs"/>
+		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs"/>
+		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs" />
 		<Compile Include="Model\FileDescription.cs" />
 		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.designer.cs"/>
+		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.designer.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -295,9 +295,6 @@
 		<Reference Include="AngleSharp">
 			<HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
 		</Reference>
-		<Reference Include="HtmlAgilityPack">
-			<HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\portable-net45+netcore45+wp8+MonoAndroid+MonoTouch\HtmlAgilityPack.dll</HintPath>
-		</Reference>
 		<Reference Include="PreMailer.Net">
 			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
 		</Reference>
@@ -324,6 +321,9 @@
 		</Reference>
 		<Reference Include="SQLitePCLRaw.batteries_v2">
 		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+		</Reference>
+		<Reference Include="HtmlAgilityPack">
+		  <HintPath>..\packages\HtmlAgilityPack.1.5.0\lib\netstandard1.6\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
