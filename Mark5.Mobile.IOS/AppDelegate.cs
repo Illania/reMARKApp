@@ -120,14 +120,16 @@ namespace Mark5.Mobile.IOS
 
         public override void OnActivated(UIApplication application)
         {
-            Services.DocumentsDownloadService?.Start();
             Services.DocumentsUploadService?.Start();
+            Services.DocumentPreviewsDownloadService?.Start();
+            Services.DocumentsDownloadService?.Start();
         }
 
         public override void DidEnterBackground(UIApplication application)
         {
-            Services.DocumentsDownloadService?.Stop();
             Services.DocumentsUploadService?.Stop();
+            Services.DocumentPreviewsDownloadService?.Stop();
+            Services.DocumentsDownloadService?.Stop();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)

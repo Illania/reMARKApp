@@ -619,8 +619,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
                 CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
-                Services.DocumentsDownloadService.Start();
                 Services.DocumentsUploadService.Start();
+                Services.DocumentPreviewsDownloadService.Start();
+                Services.DocumentsDownloadService.Start();
 
                 LocalNotificationsListener.Initialize();
 

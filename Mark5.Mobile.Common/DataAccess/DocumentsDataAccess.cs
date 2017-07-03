@@ -19,17 +19,17 @@ namespace Mark5.Mobile.Common.DataAccess
             this.documentsDatabase = documentsDatabase;
         }
 
-        public async Task SaveDocumentPreviewsAsync(Folder folder, List<DocumentPreview> documentPreviews, bool clean)
+        public async Task SaveDocumentPreviewsAsync(int folderId, List<DocumentPreview> documentPreviews, bool clean)
         {
             try
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
-                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.FolderId == folder.Id);
+                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.FolderId == folderId);
                     c.InsertOrReplaceAll(documentPreviews.Select(dp => new FolderDocumentLink
                     {
-                        FolderId = folder.Id,
+                        FolderId = folderId,
                         DocumentId = dp.Id
                     }));
                     c.InsertOrReplaceAll(documentPreviews);
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500)
+        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(int folderId, int startId = -1, int endId = -1, int maxItems = 500)
         {
             try
             {
@@ -49,7 +49,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select * " + $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " + $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
+                    var query = $"select * " + $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folderId} " +
+                        $" and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
 
                     if (startId > 0)
                         query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} < \"{startId}\" ";
@@ -75,7 +76,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<int>> GetNeighbourDocumentsIdAsync(Folder folder, int documentId, bool getPrevious, bool getNext, int maxItems)
+        public async Task<List<int>> GetNeighbourDocumentsIdAsync(int folderId, int documentId, bool getPrevious, bool getNext, int maxItems)
         {
             try
             {
@@ -85,7 +86,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " + $"from {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} ";
+                    var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " + $"from {nameof(FolderDocumentLink)} " +
+                        $"where {nameof(FolderDocumentLink.FolderId)} = {folderId} ";
 
                     string getPreviousQuery;
                     string getNextQuery;

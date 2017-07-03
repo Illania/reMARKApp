@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Common.Service
 
         protected override async Task Work(CancellationToken ct)
         {
-            CommonConfig.Logger.Info("Starting download task...");
+            CommonConfig.Logger.Info("Starting download documents task...");
 
             try
             {
@@ -36,6 +36,7 @@ namespace Mark5.Mobile.Common.Service
 
                     var documentsToDownloadIds = await documentManager.GetNonCachedDocumentIdsAsync(offlineDocumentFolderIds, 25);
                     documentsToDownloadIds = documentsToDownloadIds.Except(documentIdSkipList).ToArray();
+
                     if (documentsToDownloadIds == null || documentsToDownloadIds.Length < 1)
                     {
                         CommonConfig.Logger.Info("No documents to download found. Waiting...");
@@ -79,10 +80,10 @@ namespace Mark5.Mobile.Common.Service
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Unexpected error in download task!", ex);
+                CommonConfig.Logger.Error("Unexpected error in download documents task!", ex);
             }
 
-            CommonConfig.Logger.Info("Stopped download task");
+            CommonConfig.Logger.Info("Stopped download documents task");
         }
     }
 }

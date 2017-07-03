@@ -36,6 +36,11 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
+            return await GetDocumentPreviewsAsync(folder.Id, startId, endId, sourceType);
+        }
+
+        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(int folderId, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
+        {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -44,7 +49,7 @@ namespace Mark5.Mobile.Common.Manager
                 var result = await AppServiceProxy.GetDocumentPreviewsAsync(new DataContract.GetDocumentPreviewsParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    FolderId = folderId,
                     StartId = startId,
                     EndId = endId,
                     MaxToFetch = MaxToFetch,
@@ -53,20 +58,20 @@ namespace Mark5.Mobile.Common.Manager
 
                 var documentPreviews = result.DocumentPreviews.WhereNotNull().OrderByDescending(dp => dp.Id).Select(dp => dp.Convert()).ToList();
 
-                await documentsDataAccess.SaveDocumentPreviewsAsync(folder, documentPreviews, startId == -1 && endId == -1);
+                await documentsDataAccess.SaveDocumentPreviewsAsync(folderId, documentPreviews, startId == -1 && endId == -1);
 
                 return documentPreviews;
             }
 
             if (sourceType == SourceType.Local)
-                return await documentsDataAccess.GetDocumentPreviewsAsync(folder, startId, endId, MaxToFetch);
+                return await documentsDataAccess.GetDocumentPreviewsAsync(folderId, startId, endId, MaxToFetch);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<int>> GetNeighbourDocumentsIdAsync(Folder folder, int documentId, bool getPrevious, bool getNext, int maxItems = 30)
         {
-            return await documentsDataAccess.GetNeighbourDocumentsIdAsync(folder, documentId, getPrevious, getNext, maxItems);
+            return await documentsDataAccess.GetNeighbourDocumentsIdAsync(folder.Id, documentId, getPrevious, getNext, maxItems);
         }
 
         public async Task<Document> GetDocumentAsync(Folder folder, int documentId, SourceType sourceType = SourceType.Auto)

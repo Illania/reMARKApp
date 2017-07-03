@@ -9,6 +9,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -838,8 +839,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {ds.LoadMoreEnabled}");
 
-                Mark5.Mobile.Common.Service.Services.DocumentsDownloadService.Notify();
-                //.DocumentsDownloadManager.Notify(Folder.Id).FireAndForget();
+                Services.DocumentsDownloadService.Notify();
 
                 ds.AppendItems(documentPreviews);
 
@@ -885,7 +885,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
 
-                    Mark5.Mobile.Common.Service.Services.DocumentsDownloadService.Notify();
+                    Services.DocumentsDownloadService.Notify();
 
                     var ds = tableView.Source as DataSource;
                     ds?.PrependItems(documents);

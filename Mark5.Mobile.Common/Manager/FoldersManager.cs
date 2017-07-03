@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Service;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -135,7 +136,7 @@ namespace Mark5.Mobile.Common.Manager
             if ((existingInfo = infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module)) != null)
             {
                 existingInfo.FolderName = folder.Name;
-                existingInfo.LastDownloaded = DateTime.Now.ConvertDateTimeToTimestampMilliseconds();
+                existingInfo.LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds();
             }
             else
             {
@@ -144,11 +145,14 @@ namespace Mark5.Mobile.Common.Manager
                     FolderId = folder.Id,
                     FolderName = folder.Name,
                     Module = folder.Module,
-                    LastDownloaded = DateTime.Now.ConvertDateTimeToTimestampMilliseconds()
+                    LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds()
                 });
             }
 
             await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
+
+            if (folder.Module == ModuleType.Documents)
+                Services.DocumentPreviewsDownloadService.Notify();
         }
 
         public async Task RemoveSavedFolderInfo(Folder folder)
