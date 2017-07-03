@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
@@ -28,60 +29,97 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             throw new NotImplementedException();
         }
 
-        protected override Row GetNewRow(CommunicationAddress content)
+        protected override Row GetNewRow()
         {
-            return new EmailRow(Context, content);
+            return new EmailRow(Context, this);
+        }
+
+        protected override void AddButton_Click(object sender, EventArgs e)
+        {
+            CreateDialog();
+        }
+
+        async void CreateDialog(CommunicationAddress ca = null, EmailRow row = null) //TODO we could also pass only the row
+        {
+            var container = new LinearLayoutCompat(Context)
+            {
+                Orientation = Vertical,
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            };
+
+            var emailEditText = new AppCompatEditText(Context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            emailEditText.SetHint(Resource.String.edit_contact_address);
+            container.AddView(emailEditText);
+
+            var descriptionEditText = new AppCompatEditText(Context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            descriptionEditText.SetHint(Resource.String.edit_contact_description);
+
+            if (ca != null)
+            {
+                emailEditText.Text = ca.Address;
+                descriptionEditText.Text = ca.Description;
+            }
+
+            container.AddView(descriptionEditText);
+
+            if (await Dialogs.ShowCustomViewDialogAsync(Context, Resource.String.edit_contact_email, container) == true)
+            {
+                ca = ca ?? new CommunicationAddress();
+                ca.Address = emailEditText.Text;
+                ca.Description = descriptionEditText.Text;
+
+                if (row == null)
+                {
+                    AddRow(ca);
+                }
+                else
+                {
+                    row.SetContent(ca);
+                }
+            }
+
         }
 
         protected class EmailRow : Row
         {
             readonly AppCompatEditText emailEditText;
-            readonly AppCompatEditText descriptionEditText;
 
-            CommunicationAddress address;
-
-            public EmailRow(Context context, CommunicationAddress address)
-                : base(context, address)
+            public EmailRow(Context context, EmailsView emailsView)
+                : base(context, emailsView)
             {
-                this.address = address;
-
-                var container = new LinearLayoutCompat(context)
-                {
-                    Orientation = Vertical,
-                    LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
-                };
-
-                Layout.AddView(container, 0);
-
                 emailEditText = new AppCompatEditText(context)
                 {
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f),
+                    KeyListener = null,
+                    Focusable = false,
                 };
                 emailEditText.SetHint(Resource.String.edit_contact_address);
-                container.AddView(emailEditText);
-
-                descriptionEditText = new AppCompatEditText(context)
-                {
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                };
-                descriptionEditText.SetHint(Resource.String.edit_contact_description);
-                container.AddView(descriptionEditText);
-
-                UpdateText();
+                emailEditText.Click += EmailEditText_Click;
+                Layout.AddView(emailEditText, 0);
             }
 
-            void UpdateText()
+            void EmailEditText_Click(object sender, EventArgs e)
             {
-                if (address != null)
+                (ParentView as EmailsView).CreateDialog(Content, this);
+            }
+
+            override protected void UpdateRow()
+            {
+                if (Content != null)
                 {
-                    emailEditText.Text = address.Address;
-                    descriptionEditText.Text = address.Description;
+                    emailEditText.Text = Content.Address;
                 }
             }
 
             public override CommunicationAddress GetContent()
             {
-                return null; //TODO correct
+                return Content;
             }
 
             public override bool ContainsValidContent()

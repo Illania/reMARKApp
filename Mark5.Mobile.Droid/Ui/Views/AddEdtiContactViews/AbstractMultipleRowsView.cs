@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             titleEditText.Focusable = false;
             titleEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            titleEditText.Click += HintEditText_Click;
+            titleEditText.Click += AddButton_Click;
             var hintEditTextLp = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
             {
                 Gravity = (int)GravityFlags.CenterVertical,
@@ -61,15 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             TopLayout.AddView(addButton);
         }
 
-        void AddButton_Click(object sender, EventArgs e)
-        {
-            AddRow();
-        }
-
-        void HintEditText_Click(object sender, EventArgs e)
-        {
-            AddRow();
-        }
+        abstract protected void AddButton_Click(object sender, EventArgs e); //TODO change name
 
         virtual protected void AddRow(T content = default(T))
         {
@@ -79,7 +71,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             titleEditText.Visibility = ViewStates.Gone;
             titleTextView.Visibility = ViewStates.Visible;
 
-            var row = GetNewRow(content);
+            var row = GetNewRow();
+            row.SetContent(content);
             row.DeleteClicked += (sender, e) => RemoveRow(sender as Row);
 
             Rows.Add(row);
@@ -99,7 +92,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
         }
 
-        abstract protected Row GetNewRow(T content);
+        abstract protected Row GetNewRow();
 
         #region Utilities
 
@@ -130,14 +123,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             readonly AppCompatImageButton deleteButton;
 
             protected readonly LinearLayoutCompat LinearLayout;
-            protected readonly T Content;
             protected readonly Context Context;
+            protected readonly AddEditContactView ParentView;
 
-            protected Row(Context context, T content)
+            protected T Content;
+
+            protected Row(Context context, AddEditContactView parentView)
             {
+                ParentView = parentView;
                 Context = context;
-                Content = content;
-
                 LinearLayout = new LinearLayoutCompat(context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
@@ -147,6 +141,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 deleteButton.Click += (sender, e) => DeleteClicked(this, EventArgs.Empty);
                 LinearLayout.AddView(deleteButton);
             }
+
+            public void SetContent(T content)
+            {
+                Content = content;
+                UpdateRow();
+            }
+
+            protected abstract void UpdateRow();
 
             public abstract T GetContent();
 

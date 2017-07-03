@@ -18,17 +18,42 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         public override void RefreshView()
         {
             if (Contact.BirthDateTimestamp != -6847804800000 && Contact.BirthDateTimestamp != -1)
-                AddRow(Contact.BirthDateTimestamp);
+                AddRow(Contact.BirthDateTimestamp); //TODO need a conversion!
         }
+
+        //var currentTimestamp = timestamp == -1 || timestamp == 0 ? -1 : timestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
+
 
         public override void UpdateContact()
         {
             throw new NotImplementedException();
         }
 
-        protected override Row GetNewRow(long content)
+        protected override Row GetNewRow()
         {
-            return new DateRow(Context, content);
+            return new DateRow(Context, this);
+        }
+
+        protected override void AddButton_Click(object sender, EventArgs e)
+        {
+            CreateDialog();
+        }
+
+        async void CreateDialog(long timestamp = -1, DateRow row = null)
+        {
+            var newTimestamp = await Dialogs.ShowDatePicker(Context, timestamp);
+
+            if (newTimestamp != -1)
+            {
+                if (row == null)
+                {
+                    AddRow(newTimestamp);
+                }
+                else
+                {
+                    row.SetContent(newTimestamp);
+                }
+            }
         }
 
         protected class DateRow : Row
@@ -36,11 +61,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             readonly AppCompatEditText dateEditText;
             long currentTimestamp;
 
-            public DateRow(Context context, long timestamp)
-                : base(context, timestamp)
+            public DateRow(Context context, BirthdateView birthdateView)
+                : base(context, birthdateView)
             {
-                currentTimestamp = timestamp == -1 || timestamp == 0 ? -1 : timestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
-
                 dateEditText = new AppCompatEditText(context);
 
                 var editTextLp = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, 1.0f)
@@ -53,12 +76,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 dateEditText.KeyListener = null;
                 dateEditText.Click += EditText_Click;
                 Layout.AddView(dateEditText, 0, editTextLp);
-
-                UpdateText();
-
             }
 
-            void UpdateText()
+            protected override void UpdateRow()
             {
                 if (currentTimestamp != -1)
                 {
@@ -70,11 +90,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 }
             }
 
-            async void EditText_Click(object sender, EventArgs e)
+            void EditText_Click(object sender, EventArgs e)
             {
-                currentTimestamp = await Dialogs.ShowDatePicker(Context, currentTimestamp);
-
-                UpdateText();
+                (ParentView as BirthdateView).CreateDialog(currentTimestamp, this);
             }
 
             public override long GetContent()

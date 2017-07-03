@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
@@ -8,7 +9,8 @@ namespace Mark5.Mobile.Common.Utilities
         public static string FormatCommunicationAddress(CommunicationAddress ca)
         {
             if (ca.Address.Contains("|"))
-                if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
+                if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone
+                    || ca.Type == CommunicationAddressType.Fax || ca.Type == CommunicationAddressType.Telex)
                 {
                     var addressParts = ca.Address.Split('|');
                     if (addressParts[0].Length > 0)
@@ -17,6 +19,18 @@ namespace Mark5.Mobile.Common.Utilities
                 }
 
             return ca.Address;
+        }
+
+        public static (string, string) CommunicationAddressParts(CommunicationAddress ca)
+        {
+            if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone
+                || ca.Type == CommunicationAddressType.Fax || ca.Type == CommunicationAddressType.Telex)
+            {
+                var addressParts = ca.Address.Split('|');
+                return (addressParts[0], string.Join(" ", addressParts.Skip(1).Where(s => !string.IsNullOrWhiteSpace(s))));
+            }
+
+            throw new ArgumentException("This method can be used only with phone numbers!");
         }
 
         public static string FormatPhysicalAddress(PhysicalAddress pe)

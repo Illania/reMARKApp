@@ -22,6 +22,21 @@ namespace Mark5.Mobile.Droid.Ui.Common
     {
         #region Awaitable dialogs
 
+        public static Task<bool> ShowCustomViewDialogAsync(Context context, int titleId, View customView)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.CustomView(customView, true);
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var tcs = new TaskCompletionSource<bool>();

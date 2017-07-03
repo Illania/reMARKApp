@@ -12,17 +12,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
         }
 
-        protected override Row GetNewRow(string content = null)
+        protected override Row GetNewRow()
         {
-            return new SimpleRow(Context, content);
+            return new SimpleRow(Context, this);
+        }
+
+        protected override void AddButton_Click(object sender, EventArgs e)
+        {
+            AddRow();
         }
 
         protected class SimpleRow : Row
         {
             readonly AppCompatEditText editText;
 
-            public SimpleRow(Context context, string content)
-                : base(context, content)
+            public SimpleRow(Context context, AbstractStringSingleRowView stringSingleRowView)
+                : base(context, stringSingleRowView)
             {
                 editText = new AppCompatEditText(context);
 
@@ -32,13 +37,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 };
 
                 editText.RequestFocus();
-                editText.Text = content;
                 Layout.AddView(editText, 0, editTextLp);
+            }
+
+            protected override void UpdateRow()
+            {
+                editText.Text = Content;
             }
 
             public override string GetContent() => editText.Text;
 
             public override bool ContainsValidContent() => true;
+
         }
 
     }

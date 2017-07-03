@@ -698,6 +698,7 @@
     <AndroidResource Include="Resources\drawable-xhdpi\add.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\add.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
+    <AndroidResource Include="Resources\layout\countries_dropdown.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
