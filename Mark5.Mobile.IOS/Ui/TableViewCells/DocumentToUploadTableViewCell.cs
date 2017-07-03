@@ -4,6 +4,7 @@ using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -25,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             return cell;
         }
 
-        public void Initialize(DocumentPreview documentPreview, int section)
+        public void Initialize((Guid Guid, DocumentPreview DocumentPreview) data, int section)
         {
             if (section == 0)
             {
@@ -46,10 +47,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 IndicatorImageView1.Image = null;
             }
 
-            var address = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+            var address = data.DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
             SenderLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
-            SubjectLabel.Text = string.IsNullOrWhiteSpace(documentPreview.Subject) ? Localization.GetString("no_subject") : documentPreview.Subject;
+            SubjectLabel.Text = string.IsNullOrWhiteSpace(data.DocumentPreview.Subject) ? Localization.GetString("no_subject") : data.DocumentPreview.Subject;
+        }
 
+        public override void LayoutSubviews()
+        {
+            base.LayoutSubviews();
+
+            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
         }
     }
 }

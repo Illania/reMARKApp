@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
@@ -54,9 +55,13 @@ namespace Mark5.Mobile.Common.Manager
 
         Task QueueWorkingCopyToUpload();
 
-        Task<List<DocumentPreview>> GetDocumentsToUploadDocumentPreviews();
+        Task RequeueFailedToUpload(Guid guid);
 
-        Task<List<DocumentPreview>> GetFailedDocumentsToUploadDocumentPreviews();
+        Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetDocumentsToUploadDocumentPreviews();
+
+        Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetFailedDocumentsToUploadDocumentPreviews();
+
+        Task DeleteFailedDocumentToUpload(Guid guid);
 
         Task<bool> IsDocumentWorkingCopyAvailableAsync();
 

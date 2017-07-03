@@ -499,6 +499,19 @@ namespace Mark5.Mobile.Common.Storage
             await folder.DeleteAsync();
         }
 
+        public static async Task DeleteFailedDocumentToUpload(Guid guid)
+        {
+            var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
+            if (failedFolder == null)
+                return;
+
+            var folder = (await failedFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
+            if (folder == null)
+                return;
+
+            await folder.DeleteAsync();
+        }
+
         public static async Task MoveDocumentToUploadToFailed(Guid guid)
         {
             var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());

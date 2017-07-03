@@ -564,31 +564,39 @@ namespace Mark5.Mobile.Common.Manager
             Services.DocumentsUploadService.Notify();
         }
 
-        public async Task<List<DocumentPreview>> GetDocumentsToUploadDocumentPreviews()
+        public async Task RequeueFailedToUpload(Guid guid)
         {
-            var docs = new List<DocumentPreview>();
+            await FileSystemStorage.MoveFailedToDocumentToUpload(guid);
+            Services.DocumentsUploadService.Notify();
+        }
+
+        public async Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetDocumentsToUploadDocumentPreviews()
+        {
+            var docs = new List<(Guid, DocumentPreview)>();
             var guids = await FileSystemStorage.GetDocumentsToUploadGuids();
             foreach (var guid in guids)
             {
                 var doc = await FileSystemStorage.GetDocumentToUploadDocumentPreview(guid);
                 if (doc != null)
-                    docs.Add(doc);
+                    docs.Add((guid, doc));
             }
             return docs;
         }
 
-        public async Task<List<DocumentPreview>> GetFailedDocumentsToUploadDocumentPreviews()
+        public async Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetFailedDocumentsToUploadDocumentPreviews()
         {
-            var docs = new List<DocumentPreview>();
+            var docs = new List<(Guid, DocumentPreview)>();
             var guids = await FileSystemStorage.GetFailedDocumentsToUploadGuids();
             foreach (var guid in guids)
             {
                 var doc = await FileSystemStorage.GetFailedDocumentToUploadDocumentPreview(guid);
                 if (doc != null)
-                    docs.Add(doc);
+                    docs.Add((guid, doc));
             }
             return docs;
         }
+
+        public async Task DeleteFailedDocumentToUpload(Guid guid) => await FileSystemStorage.DeleteFailedDocumentToUpload(guid);
 
         public async Task<bool> IsDocumentWorkingCopyAvailableAsync() => await FileSystemStorage.IsDocumentWorkingCopyAvailableAsync();
 

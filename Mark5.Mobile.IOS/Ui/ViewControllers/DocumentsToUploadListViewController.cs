@@ -60,7 +60,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(DocumentsToUploadListViewController)} appeared");
-            Mark5.Mobile.Common.Service.Services.DocumentsUploadService?.Start();
             await RefreshData();
 
             if (IsBeingDismissed)
@@ -132,6 +131,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+        #region Actions
+
+        async void ResendFailedDocumentToUpload((Guid Guid, DocumentPreview DocumentPreview) data)
+        {
+            await Managers.DocumentsManager.RequeueFailedToUpload(data.Guid);
+            await RefreshData();
+        }
+
+        async void DeleteFailedDocumentToUpload((Guid Guid, DocumentPreview DocumentPreview) data)
+        {
+            await Managers.DocumentsManager.DeleteFailedDocumentToUpload(data.Guid);
+            await RefreshData();
+        }
+
+        #endregion
+
         #region Refreshing
 
         async Task RefreshData()
@@ -175,10 +190,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public bool Empty => !Items.SelectMany(kv => kv.Value).Any();
 
-            public Dictionary<nint, List<DocumentPreview>> Items { get; } = new Dictionary<nint, List<DocumentPreview>>
+            public Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>> Items { get; } = new Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>>
             {
-                { Section.Pending, new List<DocumentPreview>(25) },
-                { Section.Failed, new List<DocumentPreview>(25) }
+                { Section.Pending, new List<(Guid, DocumentPreview)>(25) },
+                { Section.Failed, new List<(Guid, DocumentPreview)>(25) }
             };
 
             DocumentsToUploadListViewController viewController;
@@ -244,7 +259,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => Height;
 
-            public void ReplaceItems(List<DocumentPreview> queue, List<DocumentPreview> failed)
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return indexPath.Section == Section.Failed;
+            }
+
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (indexPath.Section == Section.Pending)
+                    return new UITableViewRowAction[0];
+
+                var actions = new UITableViewRowAction[2];
+                actions[0] = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, "Delete", (a, nsip) => { viewController.DeleteFailedDocumentToUpload(Items[indexPath.Section][indexPath.Row]); });
+                actions[0].BackgroundColor = Theme.Brown;
+                actions[1] = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, "Resend", (a, nsip) => { viewController.ResendFailedDocumentToUpload(Items[indexPath.Section][indexPath.Row]); });
+                actions[1].BackgroundColor = Theme.DarkBlue;
+                return actions;
+            }
+
+            public void ReplaceItems(List<(Guid, DocumentPreview)> queue, List<(Guid, DocumentPreview)> failed)
             {
                 loading = false;
 
