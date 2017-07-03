@@ -411,6 +411,8 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\VatView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\LedgerView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\ResponsibleUsersView.cs" />
+    <Compile Include="Ui\Fragments\AbstractUserSelectionFragment.cs" />
+    <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
