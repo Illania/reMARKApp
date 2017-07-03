@@ -81,7 +81,7 @@
 "deleting_from_folder___" = "Deleting from folder...";
 "department" = "Department";
 "description" = "Description";
-"disable_caching" = "Disable\ncaching";
+"disable_sync" = "Disable\nsync";
 "disable_notifications" = "Don't\nnotify";
 "disabled" = "Disabled";
 "disconnected" = "Disconnected";
@@ -93,8 +93,8 @@
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "editing_comment___" = "Editing comment...";
 "email" = "Email";
-"enable_caching" = "Enable\ncaching";
 "enable_notifications" = "Notify";
+"enable_sync" = "Enable\nsync";
 "enabled" = "Enabled";
 "error" = "Error";
 "error_appserviceexception_title" = "Error";

@@ -444,18 +444,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var ids = gds.FoldersInViewIds;
 
                 var favoritesStatus = new SortedDictionary<int, bool>();
-                var cachingStatus = new SortedDictionary<int, bool>();
+                var syncStatus = new SortedDictionary<int, bool>();
 
                 foreach (var id in ids)
                 {
                     favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
-                    cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
+                    syncStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
                 }
 
-                if (!gds.FavoriteStatus.SequenceEqual(favoritesStatus) || !gds.CachingStatus.SequenceEqual(cachingStatus))
+                if (!gds.FavoriteStatus.SequenceEqual(favoritesStatus) || !gds.SyncStatus.SequenceEqual(syncStatus))
                 {
                     gds.FavoriteStatus = favoritesStatus;
-                    gds.CachingStatus = cachingStatus;
+                    gds.SyncStatus = syncStatus;
                     gds.Reload();
                 }
             }
@@ -465,18 +465,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var ids = ds.FoldersInViewIds;
 
                 var favoritesStatus = new SortedDictionary<int, bool>();
-                var cachingStatus = new SortedDictionary<int, bool>();
+                var syncStatus = new SortedDictionary<int, bool>();
 
                 foreach (var id in ids)
                 {
                     favoritesStatus[id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, id);
-                    cachingStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
+                    syncStatus[id] = await Managers.FoldersManager.IsSavedFolderOfflineInfo(ParentFolder.Module, id);
                 }
 
-                if (!ds.FavoriteStatus.SequenceEqual(favoritesStatus) || !ds.CachingStatus.SequenceEqual(cachingStatus))
+                if (!ds.FavoriteStatus.SequenceEqual(favoritesStatus) || !ds.SyncStatus.SequenceEqual(syncStatus))
                 {
                     ds.FavoriteStatus = favoritesStatus;
-                    ds.CachingStatus = cachingStatus;
+                    ds.SyncStatus = syncStatus;
                     ds.Reload();
                 }
             }
@@ -661,7 +661,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        public async void EnableCaching(Folder folder)
+        public async void EnableSync(Folder folder)
         {
             try
             {
@@ -670,7 +670,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
-                    gds.CachingStatus[folder.Id] = true;
+                    gds.SyncStatus[folder.Id] = true;
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
                     TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
@@ -679,7 +679,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
-                    ds.CachingStatus[folder.Id] = true;
+                    ds.SyncStatus[folder.Id] = true;
 
                     var indexPaths = ds.GetIndexPaths(folder.Id);
                     TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
@@ -687,13 +687,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Could not enabled caching for folder", ex);
+                CommonConfig.Logger.Error("Could not enabled sync for folder", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
-        public async void DisableCaching(Folder folder)
+        public async void DisableSync(Folder folder)
         {
             try
             {
@@ -702,7 +702,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var gds = TableView.Source as GrouppedDataSource;
                 if (gds != null)
                 {
-                    gds.CachingStatus[folder.Id] = false;
+                    gds.SyncStatus[folder.Id] = false;
 
                     var indexPaths = gds.GetIndexPaths(folder.Id);
                     TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
@@ -711,7 +711,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var ds = TableView.Source as DataSource;
                 if (ds != null)
                 {
-                    ds.CachingStatus[folder.Id] = false;
+                    ds.SyncStatus[folder.Id] = false;
 
                     var indexPaths = ds.GetIndexPaths(folder.Id);
                     TableView.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
@@ -719,7 +719,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Could not disable caching for folder", ex);
+                CommonConfig.Logger.Error("Could not disable sync for folder", ex);
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
@@ -812,7 +812,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public int[] FoldersInViewIds => foldersInView.Select(f => f.Id).Distinct().ToArray();
 
             public SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
-            public SortedDictionary<int, bool> CachingStatus { get; set; } = new SortedDictionary<int, bool>();
+            public SortedDictionary<int, bool> SyncStatus { get; set; } = new SortedDictionary<int, bool>();
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
@@ -854,7 +854,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var f = foldersInView[indexPath.Row];
                 var folderIsCached = false;
-                CachingStatus.TryGetValue(f.Id, out folderIsCached);
+                SyncStatus.TryGetValue(f.Id, out folderIsCached);
 
                 cell.Initialize(f, folderIsCached);
                 if (viewController.ShouldDisableFolder(f))
@@ -936,14 +936,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (module == ModuleType.Documents)
                 {
-                    if (CachingStatus.ContainsKey(f.Id))
-                        if (CachingStatus[f.Id])
+                    if (SyncStatus.ContainsKey(f.Id))
+                        if (SyncStatus[f.Id])
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("disable_caching"),
+                                Localization.GetString("disable_sync"),
                                 (a, ip) =>
                                 {
-                                    viewController.DisableCaching(foldersInView[ip.Row]);
+                                    viewController.DisableSync(foldersInView[ip.Row]);
                                     tableView.SetEditing(false, true);
                                 });
                             action.BackgroundColor = Theme.DarkBlue;
@@ -952,10 +952,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         else
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("enable_caching"),
+                                Localization.GetString("enable_sync"),
                                 (a, ip) =>
                                 {
-                                    viewController.EnableCaching(foldersInView[ip.Row]);
+                                    viewController.EnableSync(foldersInView[ip.Row]);
                                     tableView.SetEditing(false, true);
                                 });
                             action.BackgroundColor = Theme.DarkBlue;
@@ -1012,7 +1012,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 loading = true;
                 foldersInView = null;
                 FavoriteStatus = null;
-                CachingStatus = null;
+                SyncStatus = null;
             }
 
             public void SetFolders(List<Folder> folders)
@@ -1077,7 +1077,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public int[] FoldersInViewIds => foldersInView.SelectMany(kv => kv.Value).Select(f => f.Id).Distinct().ToArray();
 
             public SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
-            public SortedDictionary<int, bool> CachingStatus { get; set; } = new SortedDictionary<int, bool>();
+            public SortedDictionary<int, bool> SyncStatus { get; set; } = new SortedDictionary<int, bool>();
 
             AbstractFoldersListViewController viewController;
             UITableView tableView;
@@ -1151,7 +1151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var f = foldersInView[indexPath.LongSection][indexPath.Row];
                 var folderIsCached = false;
-                CachingStatus.TryGetValue(f.Id, out folderIsCached);
+                SyncStatus.TryGetValue(f.Id, out folderIsCached);
 
                 cell.Initialize(f, folderIsCached);
                 if (viewController.ShouldDisableFolder(f))
@@ -1274,14 +1274,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (module == ModuleType.Documents)
                 {
-                    if (CachingStatus.ContainsKey(f.Id))
-                        if (CachingStatus[f.Id])
+                    if (SyncStatus.ContainsKey(f.Id))
+                        if (SyncStatus[f.Id])
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("disable_caching"),
+                                Localization.GetString("disable_sync"),
                                 (a, ip) =>
                                 {
-                                    viewController.DisableCaching(foldersInView[ip.LongSection][ip.Row]);
+                                    viewController.DisableSync(foldersInView[ip.LongSection][ip.Row]);
                                     tableView.SetEditing(false, true);
                                 });
                             action.BackgroundColor = Theme.DarkBlue;
@@ -1290,10 +1290,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         else
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("enable_caching"),
+                                Localization.GetString("enable_sync"),
                                 (a, ip) =>
                                 {
-                                    viewController.EnableCaching(foldersInView[ip.LongSection][ip.Row]);
+                                    viewController.EnableSync(foldersInView[ip.LongSection][ip.Row]);
                                     tableView.SetEditing(false, true);
                                 });
                             action.BackgroundColor = Theme.DarkBlue;
@@ -1375,7 +1375,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 loading = null;
                 foldersInView = null;
                 FavoriteStatus = null;
-                CachingStatus = null;
+                SyncStatus = null;
             }
 
             public void SetFolders(nint section, List<Folder> folders)
