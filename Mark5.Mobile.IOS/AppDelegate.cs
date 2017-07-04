@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -179,7 +179,7 @@ namespace Mark5.Mobile.IOS
                 if (n.ObjectType == ObjectType.Document)
                 {
                     if (notification.Request.Identifier != LocalNotificationsListener.DocumentFailedToSendIdentifier)
-                        PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
+                        CommonConfig.MessengerHub.Publish(new NewNotificationsMessage(this));
 
                     options(UNNotificationPresentationOptions.Alert);
                 }
@@ -285,7 +285,6 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                 PlatformConfig.Preferences = preferences;
                 PlatformConfig.ReachabilityReceiver = new ReachabilityReceiver();
-                PlatformConfig.MessengerHub = new TinyMessengerHub();
 
                 UNUserNotificationCenter.Current.Delegate = this;
             })

@@ -1269,7 +1269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { document }, folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
                     ObjectType.Document,
                     folder.Id,
                     new List<int> { document.Id }));
@@ -1308,7 +1308,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     document
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
                     ObjectType.Document,
                     new List<int>
                     {

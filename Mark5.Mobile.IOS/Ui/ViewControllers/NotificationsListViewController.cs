@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -75,10 +75,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (newNotificationsMessageToken != null)
             {
-                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
+                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
                 newNotificationsMessageToken = null;
             }
-            newNotificationsMessageToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
+            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
 
             var ds = (DataSource)tableView.Source;
             await RefreshData();
@@ -90,7 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (newNotificationsMessageToken != null)
             {
-                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
+                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
                 newNotificationsMessageToken = null;
             }
 

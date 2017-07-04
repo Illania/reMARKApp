@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -282,12 +282,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         case ObjectType.Document:
                             var documentPreview = BusinessEntityPreview as DocumentPreview;
                             await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, categoriesToAssign);
-                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, categoriesToAssign));
+                            CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, categoriesToAssign));
                             break;
                         case ObjectType.Contact:
                             var contactPreview = BusinessEntityPreview as ContactPreview;
                             await Managers.ContactsManager.SetCategoriesAsync(contactPreview, categoriesToAssign);
-                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, categoriesToAssign));
+                            CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, categoriesToAssign));
                             break;
                         default:
                             throw new ArgumentException("Invalid BusinessEntityPreview!");

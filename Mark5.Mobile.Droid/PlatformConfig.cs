@@ -1,6 +1,5 @@
 ﻿using Mark5.Mobile.Droid.Services;
 using Mark5.Mobile.Droid.Utilities;
-using TinyMessenger;
 
 namespace Mark5.Mobile.Droid
 {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -784,7 +784,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     },
                     folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
                     ObjectType.Contact,
                     folder.Id,
                     new List<int>
@@ -826,7 +826,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     contact
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
                     ObjectType.Contact,
                     new List<int>
                     {
