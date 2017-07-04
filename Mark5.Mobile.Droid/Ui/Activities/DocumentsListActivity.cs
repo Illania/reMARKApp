@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
 
         DocumentsListFragment dlf;
-        OutgoingDocumentsListFragment odlf;
+        DocumentsToUploadListFragment odlf;
 
         TinyMessageSubscriptionToken readStatusToken;
         TinyMessageSubscriptionToken priorityToken;
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 if (folder.Local)
                 {
-                    odlf = new OutgoingDocumentsListFragment();
+                    odlf = new DocumentsToUploadListFragment();
                     odlf.CloseRequest = OnBackPressed;
                     odlfFragmentTag = odlf.GenerateTag();
                     ft.Replace(Resource.Id.fragment_container, odlf, odlfFragmentTag);
@@ -87,8 +87,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 odlfFragmentTag = savedInstanceState.GetString(odlfFragmentTagKey);
                 if (!string.IsNullOrEmpty(odlfFragmentTag))
                 {
-                    odlf = SupportFragmentManager.FindFragmentByTag(odlfFragmentTag) as OutgoingDocumentsListFragment;
-                    CommonConfig.Logger.Info($"Reassigned {nameof(OutgoingDocumentsListFragment)}");
+                    odlf = SupportFragmentManager.FindFragmentByTag(odlfFragmentTag) as DocumentsToUploadListFragment;
+                    CommonConfig.Logger.Info($"Reassigned {nameof(DocumentsToUploadListFragment)}");
                 }
 
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");

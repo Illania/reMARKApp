@@ -78,8 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            if (DocumentUploadStatusChangedToken != null)
-                CommonConfig.MessengerHub.Unsubscribe<DocumentUploadStatusChanged>(DocumentUploadStatusChangedToken);
+            DocumentUploadStatusChangedToken?.Dispose();
         }
 
         public override void DidReceiveMemoryWarning()

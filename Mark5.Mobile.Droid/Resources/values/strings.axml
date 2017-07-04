@@ -161,6 +161,7 @@
 	<string name="on">on</string>
 	<string name="open_drawer">Open navigation drawer</string>
 	<string name="opening_attachment">Opening attachment</string>
+	<string name="outgoing">Outgoing</string>
 	<string name="password">Password</string>
 	<string name="password_invalid">Password is not valid</string>
 	<string name="permissions_snackbar_action">Ok</string>
@@ -190,6 +191,7 @@
 	<string name="reply">Reply</string>
 	<string name="reply_all">Reply all</string>
 	<string name="reply_to">Reply to:</string>
+	<string name="resend">Resend</string>
 	<string name="responsible_users">Responsible users</string>
 	<string name="save">Save</string>
 	<string name="save_draft">Save draft</string>
