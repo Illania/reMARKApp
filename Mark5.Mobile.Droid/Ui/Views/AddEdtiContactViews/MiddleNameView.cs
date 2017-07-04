@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System;
 using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
@@ -16,11 +16,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 AddRow(Contact.Patronymic);
         }
 
-        public override void UpdateContact()
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
         {
-            string name;
-            if (Rows.Any() && !string.IsNullOrEmpty(name = Rows[0].GetContent()))
-                Contact.Patronymic = name;
+            Contact.Patronymic = string.Empty;
+            RemoveRow(sender as Row);
         }
+
+        protected override void TextChanged(string newText)
+        {
+            Contact.Patronymic = newText;
+        }
+
     }
 }

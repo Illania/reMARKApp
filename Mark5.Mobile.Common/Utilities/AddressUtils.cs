@@ -21,13 +21,14 @@ namespace Mark5.Mobile.Common.Utilities
             return ca.Address;
         }
 
-        public static (string, string) CommunicationAddressParts(CommunicationAddress ca)
+        public static (int, string) CommunicationAddressParts(CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone
                 || ca.Type == CommunicationAddressType.Fax || ca.Type == CommunicationAddressType.Telex)
             {
                 var addressParts = ca.Address.Split('|');
-                return (addressParts[0], string.Join(" ", addressParts.Skip(1).Where(s => !string.IsNullOrWhiteSpace(s))));
+                var success = int.TryParse(addressParts[0], out int prefix);
+                return (success ? prefix : -1, string.Join(" ", addressParts.Skip(1).Where(s => !string.IsNullOrWhiteSpace(s))));
             }
 
             throw new ArgumentException("This method can be used only with phone numbers!");

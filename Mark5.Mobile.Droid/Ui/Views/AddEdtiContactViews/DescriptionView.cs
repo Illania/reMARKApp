@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
@@ -16,11 +17,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 AddRow(ContactPreview.Description);
         }
 
-        public override void UpdateContact()
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
         {
-            string shortId;
-            if (Rows.Any() && !string.IsNullOrEmpty(shortId = Rows[0].GetContent()))
-                ContactPreview.Description = shortId;
+            ContactPreview.Description = string.Empty;
+            RemoveRow(sender as Row);
         }
+
+        protected override void TextChanged(string newText)
+        {
+            ContactPreview.Description = newText;
+        }
+
     }
 }

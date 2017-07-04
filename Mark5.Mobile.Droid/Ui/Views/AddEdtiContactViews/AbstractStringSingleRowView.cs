@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             AddRow();
         }
 
+        abstract protected void TextChanged(string newText);
+
         protected class SimpleRow : Row
         {
             readonly AppCompatEditText editText;
@@ -37,15 +39,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 };
 
                 editText.RequestFocus();
+                editText.TextChanged += EditText_TextChanged;
                 Layout.AddView(editText, 0, editTextLp);
+            }
+
+            void EditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            {
+                (ParentView as AbstractStringSingleRowView).TextChanged(editText.Text);
             }
 
             protected override void UpdateRow()
             {
                 editText.Text = Content;
             }
-
-            public override string GetContent() => editText.Text;
 
             public override bool ContainsValidContent() => true;
 

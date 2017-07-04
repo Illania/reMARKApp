@@ -61,7 +61,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             TopLayout.AddView(addButton);
         }
 
-        abstract protected void AddButton_Click(object sender, EventArgs e); //TODO change name
+        abstract protected void AddButton_Click(object sender, EventArgs e);
+
+        abstract protected void Row_DeleteClicked(object sender, EventArgs e);
+
+        //TODO change name
 
         virtual protected void AddRow(T content = default(T))
         {
@@ -73,15 +77,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             var row = GetNewRow();
             row.SetContent(content);
-            row.DeleteClicked += (sender, e) => RemoveRow(sender as Row);
+            row.DeleteClicked += Row_DeleteClicked;
 
             Rows.Add(row);
             ContentLayout.AddView(row.Layout);
         }
 
-        void RemoveRow(Row row)
+        virtual protected void RemoveRow(Row row)
         {
             ContentLayout.RemoveView(row.Layout);
+            row.DeleteClicked -= Row_DeleteClicked;
             Rows.Remove(row);
 
             if (!Rows.Any())
@@ -148,9 +153,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 UpdateRow();
             }
 
-            protected abstract void UpdateRow();
+            public T GetContent() => Content;
 
-            public abstract T GetContent();
+            protected abstract void UpdateRow();
 
             public abstract bool ContainsValidContent();
         }

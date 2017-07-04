@@ -1,9 +1,9 @@
-﻿using System.Linq;
+﻿using System;
 using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class PositionView : AbstractStringSingleRowView
+    public abstract class PositionView : AbstractStringSingleRowView
     {
         public PositionView(Context context)
             : base(context, Resource.String.edit_contact_position)
@@ -16,11 +16,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 AddRow(Contact.Position);
         }
 
-        public override void UpdateContact()
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
         {
-            string position;
-            if (Rows.Any() && !string.IsNullOrEmpty(position = Rows[0].GetContent()))
-                Contact.Position = position;
+            Contact.Position = string.Empty;
+            RemoveRow(sender as Row);
         }
+
+        protected override void TextChanged(string newText)
+        {
+            Contact.Position = newText;
+        }
+
     }
 }

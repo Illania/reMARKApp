@@ -8,7 +8,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class EmailsView : AbstractMultipleRowsView<CommunicationAddress>
+    public abstract class EmailsView : AbstractMultipleRowsView<CommunicationAddress>
     {
         public EmailsView(Context context)
             : base(context, Resource.String.edit_contact_email, false)
@@ -22,11 +22,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 AddRow(address);
             }
-        }
-
-        public override void UpdateContact()
-        {
-            throw new NotImplementedException();
         }
 
         protected override Row GetNewRow()
@@ -115,11 +110,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 {
                     emailEditText.Text = Content.Address;
                 }
-            }
-
-            public override CommunicationAddress GetContent()
-            {
-                return Content;
             }
 
             public override bool ContainsValidContent()

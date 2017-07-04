@@ -14,6 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public abstract class AbstractPhoneNumberView : AbstractMultipleRowsView<CommunicationAddress>
     {
         CommunicationAddressType type;
+        List<CountryInfo> countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries;
 
         protected AbstractPhoneNumberView(Context context, CommunicationAddressType type)
             : base(context, GetResourceIdForType(type), false)
@@ -47,27 +48,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
         }
 
-        public override void UpdateContact()
-        {
-            throw new NotImplementedException();
-        }
-
         protected override Row GetNewRow()
         {
             return new PhoneNumberRow(Context, this, type);
         }
-
 
         protected override void AddButton_Click(object sender, EventArgs e)
         {
             CreateDialog();
         }
 
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        {
+            var row = sender as PhoneNumberRow;
+            var ca = row.GetContent();
+            Contact.CommunicationAddresses.Remove(ca);
+            RemoveRow(row);
+        }
+
         async void CreateDialog(CommunicationAddress ca = null, PhoneNumberRow row = null)
         {
             var container = new LinearLayoutCompat(Context)
             {
-                Orientation = Horizontal,
+                Orientation = Vertical,
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
             };
 
@@ -78,12 +81,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             };
             container.AddView(firstLine);
 
-            var countryEditText = new Spinner(Context)
+            var countrySpinner = new Spinner(Context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent),
             };
-            countryEditText.Adapter = new CountryAdapter(Context); // TODO SELECT NONE
-            firstLine.AddView(countryEditText);
+            countrySpinner.Adapter = new CountryAdapter(Context, countries); // TODO SELECT NONE
+            firstLine.AddView(countrySpinner);
 
             var phoneEditText = new AppCompatEditText(Context)
             {
@@ -102,19 +105,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             if (ca != null)
             {
                 var parts = AddressUtils.CommunicationAddressParts(ca);
-                //countryEditText.Text = $"+{parts.Item1}";
+                if (parts.Item1 >= 0)
+                {
+                    countrySpinner.SetSelection(countries.FindIndex(c => c.FaxPrefix == parts.Item1));
+                }
                 phoneEditText.Text = parts.Item2;
+                descriptionEditText.Text = ca.Description;
             }
 
             if (await Dialogs.ShowCustomViewDialogAsync(Context, Resource.String.edit_contact_email, container) == true)
             {
                 ca = ca ?? new CommunicationAddress(); //TODO check if correct
-                //ca.Address = string.Join("|", countryEditText.Text.Skip(1), phoneEditText);
+                ca.Type = type;
+                ca.Address = string.Join("|", countries[countrySpinner.SelectedItemPosition].FaxPrefix.ToString(), phoneEditText.Text);
                 ca.Description = descriptionEditText.Text;
 
                 if (row == null)
                 {
                     AddRow(ca);
+                    Contact.CommunicationAddresses.Add(ca);
                 }
                 else
                 {
@@ -125,14 +134,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         class CountryAdapter : ArrayAdapter
         {
-            List<CountryInfo> countries;
+            readonly List<CountryInfo> countries;
             Context context;
 
-            public CountryAdapter(Context context)
+            public CountryAdapter(Context context, List<CountryInfo> countries)
                 : base(context, Android.Resource.Layout.SimpleSpinnerItem)
             {
                 this.context = context;
-                countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries;
+                this.countries = countries;
             }
 
             public override int Count => countries.Count;
@@ -142,29 +151,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 var view = convertView ?? new AppCompatTextView(Context);
 
                 (view as AppCompatTextView).Text = $"+{countries[position].FaxPrefix}";
-                return convertView;
+                return view;
             }
 
             public override View GetDropDownView(int position, View convertView, ViewGroup parent)
             {
-
-                var view = convertView ?? new AppCompatTextView(Context);
-
-                (view as AppCompatTextView).Text = $"+{countries[position].FaxPrefix}";
-                return convertView;
-
-                //var view = convertView ?? LayoutInflater.From(parent.Context).Inflate(Resource.Layout.countries_dropdown, parent, false);
-                //var countryTextView = view.FindViewById<AppCompatTextView>(Resource.Id.countryText);
-                //countryTextView.Text = $"{countries[position].Name} (+{countries[position].FaxPrefix})";
-                //return view;
+                var view = convertView ?? LayoutInflater.From(parent.Context).Inflate(Resource.Layout.countries_dropdown, parent, false);
+                var countryTextView = view.FindViewById<AppCompatTextView>(Resource.Id.countryText);
+                countryTextView.Text = $"{countries[position].Name} (+{countries[position].FaxPrefix})";
+                return view;
             }
         }
 
         protected class PhoneNumberRow : Row
         {
             readonly AppCompatEditText phoneEditText;
-
-            CountryInfo selectedCountry;
 
             CommunicationAddressType type;
 
@@ -179,32 +180,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     KeyListener = null,
                     Focusable = false,
                 };
+                phoneEditText.Click += PhoneEditText_Click;
                 phoneEditText.SetHint(GetResourceIdForType(type));
                 Layout.AddView(phoneEditText, 0);
             }
 
-            //async void CountryEditText_Click(object sender, EventArgs e)
-            //{
-            //    var countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries;
-            //    var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_country, countries.Select(c => c.Name).ToArray(), true);
-            //    if (index >= 0)
-            //    {
-            //        selectedCountry = countries[index];
-            //        countryEditText.Text = selectedCountry.Name;
-            //    }
-            //}
+            void PhoneEditText_Click(object sender, EventArgs e)
+            {
+                (ParentView as AbstractPhoneNumberView).CreateDialog(Content, this);
+            }
 
             protected override void UpdateRow()
             {
                 if (Content != null)
                 {
-                    //TODO to complete
+                    var parts = AddressUtils.CommunicationAddressParts(Content);
+                    var country = parts.Item1 >= 0 ? $"+{parts.Item1}" : string.Empty;
+                    phoneEditText.Text = string.Join(" ", country, parts.Item2);
                 }
-            }
-
-            public override CommunicationAddress GetContent()
-            {
-                return null; //TODO correct
             }
 
             public override bool ContainsValidContent()

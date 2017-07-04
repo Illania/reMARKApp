@@ -40,6 +40,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         }
 
         abstract public void RefreshView();
-        abstract public void UpdateContact();
     }
 }
