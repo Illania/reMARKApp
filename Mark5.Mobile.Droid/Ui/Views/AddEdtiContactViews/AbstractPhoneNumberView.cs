@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
+using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -66,8 +67,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             RemoveRow(row);
         }
 
-        async void CreateDialog(CommunicationAddress ca = null, PhoneNumberRow row = null)
+        async void CreateDialog(PhoneNumberRow row = null)
         {
+            CommunicationAddress ca = null;
+
             var container = new LinearLayoutCompat(Context)
             {
                 Orientation = Vertical,
@@ -102,8 +105,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             descriptionEditText.SetHint(Resource.String.edit_contact_description);
             container.AddView(descriptionEditText);
 
-            if (ca != null)
+            var preferableCheckBox = new AppCompatCheckBox(Context)
             {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            preferableCheckBox.SetText(Resource.String.edit_contact_mark_as_preferable);
+            container.AddView(preferableCheckBox);
+
+            if (row != null)
+            {
+                ca = row.GetContent();
                 var parts = AddressUtils.CommunicationAddressParts(ca);
                 if (parts.Item1 >= 0)
                 {
@@ -111,14 +122,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 }
                 phoneEditText.Text = parts.Item2;
                 descriptionEditText.Text = ca.Description;
+                preferableCheckBox.Checked = ca.IsPrimary;
             }
 
             if (await Dialogs.ShowCustomViewDialogAsync(Context, Resource.String.edit_contact_email, container) == true)
             {
-                ca = ca ?? new CommunicationAddress(); //TODO check if correct
+                ca = ca ?? new CommunicationAddress();
                 ca.Type = type;
-                ca.Address = string.Join("|", countries[countrySpinner.SelectedItemPosition].FaxPrefix.ToString(), phoneEditText.Text);
+                ca.Address = string.Join("|", countries[countrySpinner.SelectedItemPosition].FaxPrefix.ToString(), phoneEditText.Text); //TODO is it correct?
                 ca.Description = descriptionEditText.Text;
+                ca.IsPrimary = preferableCheckBox.Checked;
+
+                if (ca.IsPrimary)
+                {
+                    SetIsPrimaryOnOtherRows(row);
+                }
 
                 if (row == null)
                 {
@@ -127,7 +145,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 }
                 else
                 {
-                    row.SetContent(ca); //TODO this could be also an updateview command
+                    row.UpdateRow();
+                }
+            }
+        }
+
+        void SetIsPrimaryOnOtherRows(PhoneNumberRow primaryAddressRow) //TODO need a better name
+        {
+            foreach (var row in Rows)
+            {
+                if (row != primaryAddressRow)
+                {
+                    var emailRow = row as PhoneNumberRow;
+                    emailRow.GetContent().IsPrimary = false;
+                    emailRow.UpdateRow();
                 }
             }
         }
@@ -187,16 +218,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void PhoneEditText_Click(object sender, EventArgs e)
             {
-                (ParentView as AbstractPhoneNumberView).CreateDialog(Content, this);
+                (ParentView as AbstractPhoneNumberView).CreateDialog(this);
             }
 
-            protected override void UpdateRow()
+            public override void UpdateRow()
             {
                 if (Content != null)
                 {
                     var parts = AddressUtils.CommunicationAddressParts(Content);
                     var country = parts.Item1 >= 0 ? $"+{parts.Item1}" : string.Empty;
                     phoneEditText.Text = string.Join(" ", country, parts.Item2);
+                    Layout.SetBackgroundColor(Content.IsPrimary ? Color.BlanchedAlmond : Color.White);
                 }
             }
 

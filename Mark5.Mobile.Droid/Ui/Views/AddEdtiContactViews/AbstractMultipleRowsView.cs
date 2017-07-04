@@ -155,7 +155,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             public T GetContent() => Content;
 
-            protected abstract void UpdateRow();
+            public abstract void UpdateRow();
 
             public abstract bool ContainsValidContent();
         }

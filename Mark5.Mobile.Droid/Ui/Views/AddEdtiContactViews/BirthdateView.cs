@@ -37,8 +37,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             RemoveRow(sender as DateRow);
         }
 
-        async void CreateDialog(long timestamp = -1, DateRow row = null)
+        async void CreateDialog(DateRow row = null)
         {
+            long timestamp = -1;
+
+            if (row != null)
+            {
+                timestamp = row.GetContent();
+            }
+
             var newTimestamp = await Dialogs.ShowDatePicker(Context, timestamp);
 
             if (newTimestamp != -1)
@@ -78,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 Layout.AddView(dateEditText, 0, editTextLp);
             }
 
-            protected override void UpdateRow()
+            public override void UpdateRow()
             {
                 if (Content != -1)
                 {
@@ -93,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void EditText_Click(object sender, EventArgs e)
             {
-                (ParentView as BirthdateView).CreateDialog(Content, this);
+                (ParentView as BirthdateView).CreateDialog(this);
             }
 
             public override bool ContainsValidContent()

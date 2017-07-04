@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 (ParentView as AbstractStringSingleRowView).TextChanged(editText.Text);
             }
 
-            protected override void UpdateRow()
+            public override void UpdateRow()
             {
                 editText.Text = Content;
             }

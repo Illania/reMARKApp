@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Android.Content;
+using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
@@ -42,8 +43,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             RemoveRow(row);
         }
 
-        async void CreateDialog(CommunicationAddress ca = null, EmailRow row = null) //TODO we could also pass only the row
+        async void CreateDialog(EmailRow row = null)
         {
+            CommunicationAddress ca = null;
+
             var container = new LinearLayoutCompat(Context)
             {
                 Orientation = Vertical,
@@ -62,20 +65,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             descriptionEditText.SetHint(Resource.String.edit_contact_description);
+            container.AddView(descriptionEditText);
 
-            if (ca != null)
+            var preferableCheckBox = new AppCompatCheckBox(Context)
             {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            preferableCheckBox.SetText(Resource.String.edit_contact_mark_as_preferable);
+            container.AddView(preferableCheckBox);
+
+            if (row != null)
+            {
+                ca = row.GetContent();
                 emailEditText.Text = ca.Address;
                 descriptionEditText.Text = ca.Description;
+                preferableCheckBox.Checked = ca.IsPrimary;
             }
-
-            container.AddView(descriptionEditText);
 
             if (await Dialogs.ShowCustomViewDialogAsync(Context, Resource.String.edit_contact_email, container) == true)
             {
                 ca = ca ?? new CommunicationAddress();
                 ca.Address = emailEditText.Text;
                 ca.Description = descriptionEditText.Text;
+                ca.IsPrimary = preferableCheckBox.Checked;
+
+                if (ca.IsPrimary)
+                {
+                    SetIsPrimaryOnOtherRows(row);
+                }
 
                 if (row == null)
                 {
@@ -87,7 +104,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     row.SetContent(ca);
                 }
             }
+        }
 
+        void SetIsPrimaryOnOtherRows(EmailRow primaryAddressRow)
+        {
+            foreach (var row in Rows)
+            {
+                if (row != primaryAddressRow)
+                {
+                    var emailRow = row as EmailRow;
+                    emailRow.GetContent().IsPrimary = false;
+                    emailRow.UpdateRow();
+                }
+            }
         }
 
         protected class EmailRow : Row
@@ -110,14 +139,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void EmailEditText_Click(object sender, EventArgs e)
             {
-                (ParentView as EmailsView).CreateDialog(Content, this);
+                (ParentView as EmailsView).CreateDialog(this);
             }
 
-            override protected void UpdateRow()
+            override public void UpdateRow()
             {
                 if (Content != null)
                 {
                     emailEditText.Text = Content.Address;
+                    Layout.SetBackgroundColor(Content.IsPrimary ? Color.BlanchedAlmond : Color.White);
                 }
             }
 
