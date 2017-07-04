@@ -8,12 +8,12 @@ using Android.Net;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Service;
-using Mark5.Mobile.Common.Tester;
+using Mark5.Mobile.Common.Testers;
+using Mark5.Mobile.Common.Utilities;
 
-namespace Mark5.Mobile.Droid.Services
+namespace Mark5.Mobile.Droid.Service
 {
-    public class ReachabilityService : IReachability
+    public class Reachability : IReachability
     {
         const string GoogleRequestUrl = "http://clients3.google.com/generate_204";
 
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Services
 
         public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
 
-        public ReachabilityService()
+        public Reachability()
         {
             IsReachable = CheckNetworkAvailability();
         }
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Droid.Services
         {
             try
             {
-                var tester = TesterFactory.Create();
+                var tester = ConnectionTesterFactory.Create();
                 if (!await tester.CanTest())
                 {
                     CommonConfig.Logger.Info("Cannot test service availability");

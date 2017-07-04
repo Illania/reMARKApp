@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             linearLayout.SetClipToPadding(false);
-            var padding = ConversionUtils.ConvertDpToPixels(10f);
+            var padding = Conversion.ConvertDpToPixels(10f);
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             linearLayout.AddView(new DescriptionView(Context));
@@ -291,7 +291,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     },
                     Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
                     ObjectType.Shortcode,
                     Folder.Id,
                     new List<int>
@@ -328,7 +328,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     ShortcodePreview
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
                     ObjectType.Shortcode,
                     new List<int>
                     {

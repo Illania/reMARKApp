@@ -1,10 +1,8 @@
-using System;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
@@ -30,10 +28,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(64f);
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
+            DistanceVeryLarge = Conversion.ConvertDpToPixels(64f);
+            DistanceLarge = Conversion.ConvertDpToPixels(16f);
+            DistanceNormal = Conversion.ConvertDpToPixels(8f);
+            DistanceSmall = Conversion.ConvertDpToPixels(4f);
         }
 
         public abstract Task RefreshView();

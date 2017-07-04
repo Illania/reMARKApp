@@ -79,8 +79,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
             public AttachmentView(Context context, Attachment att, int distanceLarge, int distanceNormal)
                 : base(context)
             {
-                var maximumWidth = ConversionUtils.ConvertDpToPixels(250f);
-                var innerMargin = ConversionUtils.ConvertDpToPixels(4f);
+                var maximumWidth = Conversion.ConvertDpToPixels(250f);
+                var innerMargin = Conversion.ConvertDpToPixels(4f);
 
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
@@ -89,13 +89,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                     RightMargin = distanceLarge,
                     BottomMargin = distanceNormal
                 };
-                Elevation = ConversionUtils.ConvertDpToPixels(2f);
+                Elevation = Conversion.ConvertDpToPixels(2f);
 
                 SetBackgroundResource(Resource.Drawable.rounded_background);
 
                 Clickable = true;
 
-                var imageSize = ConversionUtils.ConvertDpToPixels(16f);
+                var imageSize = Conversion.ConvertDpToPixels(16f);
                 var image = new AppCompatImageView(Context)
                 {
                     LayoutParameters = new LayoutParams(imageSize, imageSize)

@@ -10,8 +10,9 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
-using Mark5.Mobile.Droid.Services;
+using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
 #if !DEBUG
 using HockeyApp.Android;
@@ -29,10 +30,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             SetContentView(Resource.Layout.activity_splash);
 
-            var uiOptions = (int) Window.DecorView.SystemUiVisibility;
-            uiOptions |= (int) SystemUiFlags.Immersive;
-            uiOptions |= (int) SystemUiFlags.HideNavigation;
-            Window.DecorView.SystemUiVisibility = (StatusBarVisibility) uiOptions;
+            var uiOptions = (int)Window.DecorView.SystemUiVisibility;
+            uiOptions |= (int)SystemUiFlags.Immersive;
+            uiOptions |= (int)SystemUiFlags.HideNavigation;
+            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
 
             if (CommonConfig.Logger.IsInfoEnabled())
                 CommonConfig.Logger.Info($"Created {nameof(SplashActivity)}");
@@ -113,11 +114,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         CommonConfig.Logger.Info("Cleaned up cache");
                     }
 
-                    CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
-
-                    await Managers.DocumentsDownloadManager.Start();
-                    await Managers.OutgoingDocumentsManager.Start();
-
                     CommonConfig.Logger.Info($"Refreshing reachability status...");
                     await CommonConfig.Reachability.Refresh();
 
@@ -130,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     LocalNotificationsListener.Initialize();
 
-                    DateTimeUtils.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+                    DateTimeFormatter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
                     CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
@@ -138,6 +134,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 })
                 .ContinueWith(t =>
                     {
+                        Services.DocumentsUploadService?.Start();
+                        Services.DocumentPreviewsDownloadService?.Start();
+                        Services.DocumentsDownloadService?.Start();
+
                         if (t.Result)
                             StartActivity(new Intent(this, typeof(MainActivity)));
                         else

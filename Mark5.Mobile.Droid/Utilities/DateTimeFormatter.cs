@@ -5,24 +5,8 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public static class DateTimeUtils
+    public static class DateTimeFormatter
     {
-        public static bool UseServerTimezone = true;
-
-        static readonly int LocalUtcOffset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Hours;
-
-        public static DateTime ConvertUtcToUserTime(this DateTime dateTime)
-        {
-            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
-            return dt.AddHours(UseServerTimezone ? ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : LocalUtcOffset);
-        }
-
-        public static DateTime ConvertUserTimeToUtc(this DateTime dateTime)
-        {
-            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
-            return dt.AddHours(UseServerTimezone ? -ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : -LocalUtcOffset);
-        }
-
         public static string FormatUserTimestampAsTimeString(this long timestamp, Context context)
         {
             var date = new Java.Util.Date(timestamp);

@@ -50,8 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.Focusable = true;
             containerLinearLayout.FocusableInTouchMode = true;
 
-            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
-            var bottomPadding = ConversionUtils.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
+            var paddingLinearLayout = Conversion.ConvertDpToPixels(12);
+            var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
             containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
 
             fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);

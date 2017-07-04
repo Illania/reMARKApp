@@ -13,7 +13,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 
-namespace Mark5.Mobile.Droid.Utilities.Services
+namespace Mark5.Mobile.Droid.Utilities.Service
 {
     [Service]
     [IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Droid.Utilities.Services
                     var nm = Android.Support.V4.App.NotificationManagerCompat.From(this);
                     nm.Notify((int)(Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
 
-                    PlatformConfig.MessengerHub.Publish(new NewNotificationsReceived(this));
+                    CommonConfig.MessengerHub.Publish(new NewNotificationsReceived(this));
                 }
 
                 StackIfNeeded();

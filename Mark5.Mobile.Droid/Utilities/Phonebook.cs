@@ -8,7 +8,7 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public class PhonebookUtilities : Java.Lang.Object, IPhonebook
+    public class Phonebook : Java.Lang.Object, IPhonebook
     {
         readonly Uri contactsUri = ContactsContract.CommonDataKinds.Email.ContentUri;
 

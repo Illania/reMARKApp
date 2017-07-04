@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(BusinessEntities, FromFolder, toFolder);
-                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, BusinessEntities.First().ObjectType, FromFolder.Id, BusinessEntities.Select(b => b.Id).ToList()));
+                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, BusinessEntities.First().ObjectType, FromFolder.Id, BusinessEntities.Select(b => b.Id).ToList()));
             }
             catch (Exception ex)
             {

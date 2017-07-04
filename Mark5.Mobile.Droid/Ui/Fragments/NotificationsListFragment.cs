@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             await RefreshData();
 
-            newNotificationsToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsReceived>(m => Activity.RunOnUiThread(async () => await RefreshData()));
+            newNotificationsToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsReceived>(m => Activity.RunOnUiThread(async () => await RefreshData()));
         }
 
         public override void OnPause()
@@ -100,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(NotificationsListFragment)}...");
 
             if (newNotificationsToken != null)
-                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsReceived>(newNotificationsToken);
+                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsReceived>(newNotificationsToken);
         }
 
         #endregion

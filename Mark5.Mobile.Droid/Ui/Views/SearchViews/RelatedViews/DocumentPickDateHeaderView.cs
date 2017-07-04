@@ -42,8 +42,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             LayoutTransition = new LayoutTransition();
 
-            var bigPaddingValue = ConversionUtils.ConvertDpToPixels(16f);
-            var mediumPaddingValue = ConversionUtils.ConvertDpToPixels(8f);
+            var bigPaddingValue = Conversion.ConvertDpToPixels(16f);
+            var mediumPaddingValue = Conversion.ConvertDpToPixels(8f);
             SetPadding(bigPaddingValue, bigPaddingValue, bigPaddingValue, 0);
 
             fromLayout = new LinearLayoutCompat(context)
@@ -74,7 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             };
             fromLayout.AddView(dateRangeFromTextView);
 
-            var marginValue = ConversionUtils.ConvertDpToPixels(16);
+            var marginValue = Conversion.ConvertDpToPixels(16);
             var separator = new AppCompatTextView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)

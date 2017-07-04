@@ -73,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button4Layout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.button4_layout);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(10);
+            var paddingLinearLayout = Conversion.ConvertDpToPixels(10);
             linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout);
             linearLayout.SetClipToPadding(false);
 
@@ -95,8 +95,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = null;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}...");
         }
@@ -110,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int) Result.Ok)
+            if (resultCode == (int)Result.Ok)
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
                     var comments = Serializer.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
@@ -180,7 +180,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
                     Serializer.Serialize(new List<IBusinessEntity>
@@ -195,7 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
                     Serializer.Serialize(new List<IBusinessEntity>
@@ -308,19 +308,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                    {
-                        ContactPreview
-                    },
-                    Folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { ContactPreview }, Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
                     ObjectType.Contact,
                     Folder.Id,
-                    new List<int>
-                    {
-                        ContactPreview.Id
-                    }));
+                    new List<int> { ContactPreview.Id }));
 
                 dismissAction();
             }
@@ -351,7 +344,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     ContactPreview
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
                     ObjectType.Contact,
                     new List<int>
                     {
@@ -359,8 +352,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
             catch (Exception ex)
             {
@@ -384,7 +376,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             addressesCardView.Radius = CardRadius;
             addressesCardView.UseCompatPadding = true;
 
-            var paddingTopBottom = ConversionUtils.ConvertDpToPixels(16f);
+            var paddingTopBottom = Conversion.ConvertDpToPixels(16f);
             var internalLayout = new LinearLayoutCompat(Context)
             {
                 Orientation = LinearLayoutCompat.Vertical,
@@ -427,9 +419,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             relatedCardView.Radius = CardRadius;
             relatedCardView.UseCompatPadding = true;
 
-            var veryLargeDistance = ConversionUtils.ConvertDpToPixels(24f);
-            var largeDistance = ConversionUtils.ConvertDpToPixels(16f);
-            var normalDistance = ConversionUtils.ConvertDpToPixels(8f);
+            var veryLargeDistance = Conversion.ConvertDpToPixels(24f);
+            var largeDistance = Conversion.ConvertDpToPixels(16f);
+            var normalDistance = Conversion.ConvertDpToPixels(8f);
 
             var relatedCardInternalLayout = new LinearLayoutCompat(Context)
             {
@@ -466,9 +458,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionCardView.Radius = CardRadius;
             descriptionCardView.UseCompatPadding = true;
 
-            var veryLargeDistance = ConversionUtils.ConvertDpToPixels(24f);
-            var largeDistance = ConversionUtils.ConvertDpToPixels(16f);
-            var normalDistance = ConversionUtils.ConvertDpToPixels(8f);
+            var veryLargeDistance = Conversion.ConvertDpToPixels(24f);
+            var largeDistance = Conversion.ConvertDpToPixels(16f);
+            var normalDistance = Conversion.ConvertDpToPixels(8f);
 
             var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context)
             {
@@ -555,8 +547,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshTitle()
         {
-            ((AppCompatActivity) Activity).SupportActionBar.Title = ContactPreview?.Name;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = ContactPreview?.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = ContactPreview?.CompanyName;
 
             descriptionCardTitle.Text = $"About {ContactPreview?.Name}";
         }
@@ -741,7 +733,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ContactClicked(object sender, ContactPreview cp)
         {
-            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
 
             var cf = new ContactFragment

@@ -17,8 +17,6 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
-using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -96,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.TextSize = 15;
             emailEditor.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
             emailEditor.Ellipsize = TextUtils.TruncateAt.End;
-            emailEditor.DropDownVerticalOffset = ConversionUtils.ConvertDpToPixels(4);
+            emailEditor.DropDownVerticalOffset = Conversion.ConvertDpToPixels(4);
 
             emailEditor.BeforeTextChanged += TextView_BeforeTextChanged;
             emailEditor.AfterTextChanged += TextView_AfterTextChanged;
@@ -108,7 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             addButton.Click += AddButton_Click;
             addButton.SetImageResource(Resource.Drawable.add);
             addButton.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
-            var addButtonLp = new LinearLayout.LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
+            var addButtonLp = new LinearLayout.LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
             {
                 Gravity = GravityFlags.CenterVertical,
             };
@@ -600,7 +598,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 public bool Loading => answersReceived < 3;
 
                 readonly SuggestionsAdapter suggestionsAdapter;
-                RecipentSuggestions suggestionService;
 
                 CancellationTokenSource searchCancellationTokenSource;
                 List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
@@ -610,7 +607,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 public SuggestionsFilter(SuggestionsAdapter suggestionsAdapter)
                 {
                     this.suggestionsAdapter = suggestionsAdapter;
-                    suggestionService = new RecipentSuggestions();
                 }
 
                 #region Overrides
@@ -632,7 +628,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         suggestionsAdapter.ActualConstraint = constraint.ToString();
                         searchCancellationTokenSource = new CancellationTokenSource();
                         searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                        suggestionService.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSugguestions);
+                        RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSugguestions);
                     }
                     else
                     {

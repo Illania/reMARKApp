@@ -9,7 +9,6 @@ using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -145,8 +144,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 AttachmentDescription = attachmentDescription;
 
-                var maximumWidth = ConversionUtils.ConvertDpToPixels(250f);
-                var innerMargin = ConversionUtils.ConvertDpToPixels(4f);
+                var maximumWidth = Conversion.ConvertDpToPixels(250f);
+                var innerMargin = Conversion.ConvertDpToPixels(4f);
 
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
@@ -155,13 +154,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     RightMargin = distanceLarge,
                     BottomMargin = distanceNormal
                 };
-                Elevation = ConversionUtils.ConvertDpToPixels(2f);
+                Elevation = Conversion.ConvertDpToPixels(2f);
 
                 SetBackgroundResource(Resource.Drawable.rounded_background);
 
                 Clickable = true;
 
-                var imageSize = ConversionUtils.ConvertDpToPixels(16f);
+                var imageSize = Conversion.ConvertDpToPixels(16f);
                 var image = new AppCompatImageView(Context)
                 {
                     LayoutParameters = new LayoutParams(imageSize, imageSize)

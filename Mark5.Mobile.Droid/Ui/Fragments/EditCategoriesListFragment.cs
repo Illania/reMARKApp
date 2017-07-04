@@ -120,12 +120,12 @@ namespace Mark5.Mobile.Droid
                     case ObjectType.Document:
                         var documentPreview = BusinessEntityPreview as DocumentPreview;
                         await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories.Values.ToList());
-                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCategoriesChangedMessage(this, documentPreview.Id, documentPreview.Categories));
+                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCategoriesChangedMessage(this, documentPreview.Id, documentPreview.Categories));
                         break;
                     case ObjectType.Contact:
                         var contactPreview = BusinessEntityPreview as ContactPreview;
                         await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories.Values.ToList());
-                        PlatformConfig.MessengerHub.Publish(new ContactPreviewCategoriesChangedMessage(this, contactPreview.Id, contactPreview.Categories));
+                        CommonConfig.MessengerHub.Publish(new ContactPreviewCategoriesChangedMessage(this, contactPreview.Id, contactPreview.Categories));
                         break;
                     default:
                         throw new ArgumentException("Invalid BusinessEntityPreview!");
@@ -434,7 +434,7 @@ namespace Mark5.Mobile.Droid
                 {
                     var gd = new GradientDrawable();
                     gd.SetShape(ShapeType.Oval);
-                    gd.SetStroke(ConversionUtils.ConvertDpToPixels(1), Color.Black);
+                    gd.SetStroke(Conversion.ConvertDpToPixels(1), Color.Black);
                     gd.SetColor(Color.ParseColor(value));
 
                     colorImageView.Background = gd;

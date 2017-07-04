@@ -28,6 +28,7 @@ using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Common.Service;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -167,9 +168,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return adapter?.Items?.FirstOrDefault(); }, AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
 
-            if (Folder.Type == FolderType.Draft)
-                Managers.OutgoingDocumentsManager.DocumentSendingSuccessful += OutgoingDocumentsManager_DocumentSendingSuccessful;
-
             CommonConfig.Logger.Info($"Started automatic refresh");
         }
 
@@ -184,9 +182,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             autoRefreshWorker?.Stop();
 
             CommonConfig.Logger.Info($"Stopped automatic refresh");
-
-            if (Folder.Type == FolderType.Draft)
-                Managers.OutgoingDocumentsManager.DocumentSendingSuccessful -= OutgoingDocumentsManager_DocumentSendingSuccessful;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -307,9 +302,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkerblue)));
                     snackbar.Show();
 
-                    Managers.DocumentsDownloadManager.Notify(Folder.Id).FireAndForget();
-
                     Activity?.RunOnUiThread(() => { adapter?.PrependItems(documents); });
+
+                    Services.DocumentsDownloadService.Notify();
                 }
             }
             catch (Exception ex)
@@ -345,8 +340,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (forceClear)
                     adapter.Clear();
 
-                Managers.DocumentsDownloadManager.Notify(Folder.Id).FireAndForget();
                 adapter.AppendItems(documentPreviews);
+
+                Services.DocumentsDownloadService.Notify();
             }
             catch (Exception ex)
             {
@@ -364,16 +360,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Info($"Refresh finished");
             }
-        }
-
-        #endregion
-
-        #region OutgoingDocumentsManager callbacks
-
-        void OutgoingDocumentsManager_DocumentSendingSuccessful(object sender, DocumentToUploadContainer e)
-        {
-            if (e.DocumentPreview.Id >= 0)
-                Activity.RunOnUiThread(async () => await RefreshData(forceClear: true));
         }
 
         #endregion
@@ -1379,7 +1365,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 paint.TextAlign = Paint.Align.Left;
                 paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Normal));
 
-                var iconMargin = ConversionUtils.ConvertDpToPixels(30);
+                var iconMargin = Conversion.ConvertDpToPixels(30);
 
                 var baseline = -paint.Ascent();
                 var textHeight = (int) (baseline + paint.Descent() + 0.5f);

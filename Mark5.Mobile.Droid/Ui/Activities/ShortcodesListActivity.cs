@@ -59,9 +59,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodesListActivity)}");
             }
 
-            entityMovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(slf.UpdateMovedEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
-            entityRemovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(slf.UpdateRemovedFromFolderEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
-            entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(slf.UpdateRemovedEntities, m => slf != null && m.Sender != slf && m.ObjectType == ObjectType.Shortcode);
+            entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(slf.UpdateMovedEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
+            entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(slf.UpdateRemovedFromFolderEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
+            entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(slf.UpdateRemovedEntities, m => slf != null && m.Sender != slf && m.ObjectType == ObjectType.Shortcode);
         }
 
         public override void Finish()

@@ -42,8 +42,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 AddOnLayoutChangeListener(this);
                 Gravity = GravityFlags.Center;
 
-                var horizontalPaddingValue = ConversionUtils.ConvertDpToPixels(10);
-                var verticalPaddingValue = ConversionUtils.ConvertDpToPixels(16);
+                var horizontalPaddingValue = Conversion.ConvertDpToPixels(10);
+                var verticalPaddingValue = Conversion.ConvertDpToPixels(16);
 
                 SetPadding(horizontalPaddingValue, verticalPaddingValue, horizontalPaddingValue, verticalPaddingValue);
 

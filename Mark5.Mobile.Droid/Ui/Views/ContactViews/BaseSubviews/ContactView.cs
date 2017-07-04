@@ -18,10 +18,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
         protected ContactView(Context context)
             : base(context)
         {
-            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24);
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4);
+            DistanceVeryLarge = Conversion.ConvertDpToPixels(24);
+            DistanceLarge = Conversion.ConvertDpToPixels(16);
+            DistanceNormal = Conversion.ConvertDpToPixels(8);
+            DistanceSmall = Conversion.ConvertDpToPixels(4);
         }
 
         public abstract void RefreshView();

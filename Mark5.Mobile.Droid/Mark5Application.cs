@@ -7,7 +7,7 @@ using Android.Runtime;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Services;
+using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
 using TinyMessenger;
@@ -35,19 +35,21 @@ namespace Mark5.Mobile.Droid
 
                     CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
                     CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "out"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "documents_upload"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "document_work"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.Logger = new SimpleLogger();
-                    CommonConfig.Reachability = new ReachabilityService();
                     CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
-                    CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
-                    CommonConfig.PhonebookUtilities = new PhonebookUtilities();
+                    CommonConfig.MessengerHub = new TinyMessengerHub();
+                    CommonConfig.Phonebook = new Phonebook();
+                    CommonConfig.Reachability = new Reachability();
+                    CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
 
 #if !DEBUG
-                CommonConfig.Logger.Level = LogLevel.INFO;
+                    CommonConfig.Logger.Level = LogLevel.INFO;
 #else
                     CommonConfig.Logger.Level = LogLevel.DEBUG;
 #endif
@@ -57,7 +59,6 @@ namespace Mark5.Mobile.Droid
                     PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                     PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
                     PlatformConfig.Preferences = new Preferences();
-                    PlatformConfig.MessengerHub = new TinyMessengerHub();
                 })
                 .Wait();
 

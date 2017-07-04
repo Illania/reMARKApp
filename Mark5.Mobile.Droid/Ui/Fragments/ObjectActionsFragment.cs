@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-            var padding = ConversionUtils.ConvertDpToPixels(10f);
+            var padding = Conversion.ConvertDpToPixels(10f);
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             return rootView;

@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
@@ -210,7 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         case ObjectType.Document:
                             var document = Entity as Document;
                             await Managers.DocumentsManager.DeleteComment(document, comment);
-                            PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
                             var contact = Entity as Contact;
@@ -250,7 +250,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         case ObjectType.Document:
                             var document = Entity as Document;
                             await Managers.DocumentsManager.EditComment(document, newComment);
-                            PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
                             var contact = Entity as Contact;
@@ -299,8 +299,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var cfs = restoredState as CommentsFragmentState;
-            if (cfs != null)
+            if (restoredState is CommentsFragmentState cfs)
             {
                 Entity = cfs.Entity;
                 addCommentEditText.Text = cfs.AddCommentText;

@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         public Divider(Context context)
             : base(context)
         {
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ConversionUtils.ConvertDpToPixels(0.5f));
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(0.5f));
             SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
         }
 
@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
 
             var inner = new View(Context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ConversionUtils.ConvertDpToPixels(0.5f))
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(0.5f))
                 {
                     LeftMargin = leftMargin,
                     TopMargin = topMargin,

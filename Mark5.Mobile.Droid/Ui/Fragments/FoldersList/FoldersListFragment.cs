@@ -837,7 +837,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public FolderListAdapter(Context context, RecyclerView parentRecyclerView)
             {
                 parentView = parentRecyclerView;
-                sectionHeight = ConversionUtils.ConvertDpToPixels(56);
+                sectionHeight = Conversion.ConvertDpToPixels(56);
                 this.context = context;
             }
 

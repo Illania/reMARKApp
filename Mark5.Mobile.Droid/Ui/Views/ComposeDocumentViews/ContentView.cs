@@ -11,14 +11,12 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Webkit;
-using AngleSharp.Dom;
 using AngleSharp.Html;
 using AngleSharp.Parser.Html;
 using Java.Interop;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -63,9 +61,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             this.context = context;
             Orientation = Vertical;
-            var layoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0);
-            layoutParams.Weight = 1;
-            LayoutParameters = layoutParams;
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0)
+            {
+                Weight = 1
+            };
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
 
             newContentWebView = new CustomWebView(context)

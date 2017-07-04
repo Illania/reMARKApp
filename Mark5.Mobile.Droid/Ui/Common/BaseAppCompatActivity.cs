@@ -1,10 +1,10 @@
-﻿using Android.Support.V7.App;
+﻿using System;
+using System.Text;
+using Android.Support.Design.Widget;
+using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Service;
-using System.Text;
-using System;
-using Android.Support.Design.Widget;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -28,12 +28,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
             if (fab != null)
             {
-                var lp = fab.LayoutParameters as CoordinatorLayout.LayoutParams;
-                if (lp != null)
+                if (fab.LayoutParameters is CoordinatorLayout.LayoutParams lp)
                 {
-                    lp.BottomMargin = (int) Resources.GetDimension(Resource.Dimension.fab_margin);
+                    lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
                     if (!CommonConfig.Reachability.IsReachable)
-                        lp.BottomMargin += (int) Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                        lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
                     fab.RequestLayout();
                 }
             }
@@ -69,12 +68,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
             connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
 
             var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
-            var lp = fab?.LayoutParameters as CoordinatorLayout.LayoutParams;
-            if (lp != null)
+            if (fab?.LayoutParameters is CoordinatorLayout.LayoutParams lp)
             {
-                lp.BottomMargin = (int) Resources.GetDimension(Resource.Dimension.fab_margin);
+                lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
                 if (!e.IsReachable)
-                    lp.BottomMargin += (int) Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                    lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
                 fab.RequestLayout();
             }
         }

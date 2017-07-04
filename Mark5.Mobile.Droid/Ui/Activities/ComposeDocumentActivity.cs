@@ -8,7 +8,6 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -21,17 +20,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         const string CreationModeFlagIntentKey = "CreationModeFlagIntent_290d1383-175d-4e2d-8f5e-ca899baff3f7";
         const string PreviousDocumentIdIntentKey = "PreviousDocumentIdIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
-
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
-
         const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirectionIntent_edefdcd2-764f-439d-891b-178b8de29333";
-
         const string OutgoingDocumentGuidIntentKey = "OutgoingDocumentGuidIntent_7901fa2b-f096-4e9e-82b9-5aeae9f39d05";
-
         const string PreconfiguredEmailToAddressesIntentKey = "PreconfiguredEmailToAddressesIntent_25ff402c-268e-477c-890c-80d68e60ab01";
-
         const string PreconfiguredEmailCcAddressesIntentKey = "PreconfiguredEmailCcAddressesIntent_051636c4-f032-4736-9d05-b9c0427bba5b";
-
         const string PreconfiguredEmailBccAddressesIntentKey = "PreconfiguredEmailBccAddressesIntent_c7d5b5ce-497c-460d-bcbd-331b3e01b656";
         const string CopyToNewOptionsIntentKey = "CopyToNewOptionsIntent_f298d024-4df0-431d-ad3d-1834eb0dede0";
 

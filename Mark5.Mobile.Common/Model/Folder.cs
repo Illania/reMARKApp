@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Common.Model
         public string Path { get; set; }
 
         [Ignore]
-        public bool Local { get { return documentsLocalRootFolder.SubFolders.Any(f => f.Id == Id); } }
+        public bool Local { get { return DocumentsLocalRootFolder.SubFolders.Any(f => f.Id == Id); } }
 
         List<Folder> subFolders;
 
@@ -106,13 +106,13 @@ namespace Mark5.Mobile.Common.Model
         [Ignore]
         public bool Root => new[]
         {
-            documentsRootFolder,
-            contactsRootFolder,
-            shortcodesRootFolder,
-            calendarRootFolder
+            DocumentsRootFolder,
+            ContactsRootFolder,
+            ShortcodesRootFolder,
+            CalendarRootFolder
         }.Contains(this);
 
-        static readonly Folder documentsRootFolder = new Folder
+        static readonly Folder DocumentsRootFolder = new Folder
         {
             Id = -100,
             Guid = new Guid("{00000000-0000-0000-0000-000000000100}"),
@@ -122,7 +122,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        static readonly Folder documentsFavoriteRootFolder = new Folder
+        static readonly Folder DocumentsFavoriteRootFolder = new Folder
         {
             Id = -110,
             Guid = new Guid("{00000000-0000-0000-0000-000000000110}"),
@@ -132,7 +132,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        static readonly Folder documentsOutgoingFolder = new Folder
+        static readonly Folder DocumentsOutgoingFolder = new Folder
         {
             Id = -121,
             Guid = new Guid("{00000000-0000-0000-0000-000000000121}"),
@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = false
         };
 
-        static readonly Folder documentsLocalRootFolder = new Folder
+        static readonly Folder DocumentsLocalRootFolder = new Folder
         {
             Id = -120,
             Guid = new Guid("{00000000-0000-0000-0000-000000000120}"),
@@ -152,11 +152,11 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true,
             SubFolders =
             {
-                documentsOutgoingFolder
+                DocumentsOutgoingFolder
             }
         };
 
-        static readonly Folder contactsRootFolder = new Folder
+        static readonly Folder ContactsRootFolder = new Folder
         {
             Id = -200,
             Guid = new Guid("{00000000-0000-0000-0000-000000000200}"),
@@ -166,7 +166,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        static readonly Folder contactsFavoriteRootFolder = new Folder
+        static readonly Folder ContactsFavoriteRootFolder = new Folder
         {
             Id = -210,
             Guid = new Guid("{00000000-0000-0000-0000-000000000210}"),
@@ -176,7 +176,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        static readonly Folder shortcodesRootFolder = new Folder
+        static readonly Folder ShortcodesRootFolder = new Folder
         {
             Id = -300,
             Guid = new Guid("{00000000-0000-0000-0000-000000000300}"),
@@ -186,7 +186,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        static readonly Folder shortcodesFavoriteRootFolder = new Folder
+        static readonly Folder ShortcodesFavoriteRootFolder = new Folder
         {
             Id = -310,
             Guid = new Guid("{00000000-0000-0000-0000-000000000310}"),
@@ -196,7 +196,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        static readonly Folder calendarRootFolder = new Folder
+        static readonly Folder CalendarRootFolder = new Folder
         {
             Id = -400,
             Guid = new Guid("{00000000-0000-0000-0000-000000000400}"),
@@ -206,7 +206,7 @@ namespace Mark5.Mobile.Common.Model
             HasSubFolders = true
         };
 
-        static readonly Folder calendarFavoriteRootFolder = new Folder
+        static readonly Folder CalendarFavoriteRootFolder = new Folder
         {
             Id = -410,
             Guid = new Guid("{00000000-0000-0000-0000-000000000410}"),
@@ -221,13 +221,13 @@ namespace Mark5.Mobile.Common.Model
             switch (module)
             {
                 case ModuleType.Documents:
-                    return documentsRootFolder;
+                    return DocumentsRootFolder;
                 case ModuleType.Contacts:
-                    return contactsRootFolder;
+                    return ContactsRootFolder;
                 case ModuleType.Shortcodes:
-                    return shortcodesRootFolder;
+                    return ShortcodesRootFolder;
                 case ModuleType.Calendar:
-                    return calendarRootFolder;
+                    return CalendarRootFolder;
                 default:
                     throw new ArgumentException(nameof(module));
             }
@@ -238,13 +238,13 @@ namespace Mark5.Mobile.Common.Model
             switch (module)
             {
                 case ModuleType.Documents:
-                    return documentsFavoriteRootFolder;
+                    return DocumentsFavoriteRootFolder;
                 case ModuleType.Contacts:
-                    return contactsFavoriteRootFolder;
+                    return ContactsFavoriteRootFolder;
                 case ModuleType.Shortcodes:
-                    return shortcodesFavoriteRootFolder;
+                    return ShortcodesFavoriteRootFolder;
                 case ModuleType.Calendar:
-                    return calendarFavoriteRootFolder;
+                    return CalendarFavoriteRootFolder;
                 default:
                     throw new ArgumentException(nameof(module));
             }
@@ -255,7 +255,7 @@ namespace Mark5.Mobile.Common.Model
             switch (module)
             {
                 case ModuleType.Documents:
-                    return documentsLocalRootFolder;
+                    return DocumentsLocalRootFolder;
                 default:
                     throw new ArgumentException("Input module not valid");
             }
