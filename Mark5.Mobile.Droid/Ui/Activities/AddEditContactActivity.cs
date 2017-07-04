@@ -50,6 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var aecf = new AddEditContactFragment();
+                aecf.CreationModeFlag = ContactCreationModeFlag.New;
+                aecf.ContactType = ContactType.Person;
 
                 if (Intent.HasExtra(ContactIntentKey))
                     aecf.Contact = SerializationUtils.Deserialize<Contact>(Intent.Extras.GetString(ContactIntentKey));

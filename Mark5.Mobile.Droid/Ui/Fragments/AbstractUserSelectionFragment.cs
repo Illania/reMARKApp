@@ -36,7 +36,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         int actionButtonTextResId;
         bool includeCurrentUser;
-        List<int> preselectedUserIds;
 
         protected AbstractUserSelectionFragment(int actionButtonTextResId, bool includeCurrentUser)
         {

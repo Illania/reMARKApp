@@ -1,104 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Android.App;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    //public class ResponsibleUsersView : AbstractMultipleRowsView<int>
-    //{
-    //List<SystemUser> users;
+    public class ResponsibleUsersView : AbstractMultipleRowsView<Dictionary<int, string>>
+    {
+        AddEditContactFragment parentFragment;
 
-    //public ResponsibleUsersView(Context context, List<SystemUser> users)
-    //    : base(context, Resource.String.edit_contact_responsible, false)
-    //{
-    //    this.users = users;
-    //}
+        public ResponsibleUsersView(Context context, AddEditContactFragment parentFragment)
+            : base(context, Resource.String.edit_contact_responsible, true)
+        {
+            this.parentFragment = parentFragment;
+        }
 
-    //public override void RefreshView()
-    //{
-    //    foreach (var id in Contact.ResponsibleUserIds)
-    //    {
-    //        AddRow(id);
-    //    }
-    //}
+        public override void RefreshView()
+        {
+            if (Contact.ResponsibleUsers.Any())
+            {
+                AddRow(Contact.ResponsibleUsers);
+            }
+        }
 
-    //protected override void AddButton_Click(object sender, EventArgs e)
-    //{
-    //    AddRow(); //TODO to change
-    //}
+        protected override void AddButton_Click(object sender, EventArgs e)
+        {
+            var pllf = new ResponsibleSelectionFragment
+            {
+                CloseRequest = HandleAction,
+            };
 
-    //public override void UpdateContact()
-    //{
-    //    throw new NotImplementedException();
-    //}
+            parentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
+        }
 
+        void HandleAction(Dictionary<int, string> obj)
+        {
+            AddRow(obj);
+        }
 
-    //protected override Row GetNewRow()
-    //{
-    //    return new ResponsibleRow(Context, content, users);
-    //}
+        protected override Row GetNewRow()
+        {
+            return new ResponsibleRow(Context, this);
+        }
 
-    //protected class ResponsibleRow : Row
-    //{
-    //    readonly AppCompatEditText responsibleEditText;
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        {
+            Contact.ResponsibleUsers.Clear();
+            Contact.ResponsibleUserIds.Clear();
+            RemoveRow(sender as ResponsibleRow);
+        }
 
-    //    List<SystemUser> users;
-    //    SystemUser selectedUser;
+        protected class ResponsibleRow : Row
+        {
+            readonly AppCompatEditText responsibleEditText;
 
-    //    public ResponsibleRow(Context context, int responsibleId, List<SystemUser> users)
-    //        : base(context, responsibleId)
-    //    {
-    //        this.users = users;
-    //        responsibleEditText = new AppCompatEditText(context);
+            public ResponsibleRow(Context context, ResponsibleUsersView responsibleUsersView)
+                : base(context, responsibleUsersView)
+            {
+                responsibleEditText = new AppCompatEditText(context);
 
-    //        var editTextLp = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f)
-    //        {
-    //            Gravity = (int)GravityFlags.CenterVertical,
-    //        };
+                var editTextLp = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1.0f)
+                {
+                    Gravity = (int)GravityFlags.CenterVertical,
+                };
 
-    //        responsibleEditText.Focusable = false;
-    //        responsibleEditText.KeyListener = null;
-    //        responsibleEditText.SetHint(Resource.String.edit_contact_responsible);
-    //        responsibleEditText.Click += ResponsibleEditText_Click;
-    //        Layout.AddView(responsibleEditText, 0, editTextLp);
+                responsibleEditText.Focusable = false;
+                responsibleEditText.KeyListener = null;
+                responsibleEditText.SetHint(Resource.String.edit_contact_responsible);
+                responsibleEditText.Click += ResponsibleEditText_Click;
+                Layout.AddView(responsibleEditText, 0, editTextLp);
+            }
 
-    //        if (Content > 0)
-    //        {
-    //            selectedUser = users.FirstOrDefault(s => s.Id == Content);
-    //        }
+            void ResponsibleEditText_Click(object sender, EventArgs e)
+            {
 
-    //        UpdateText();
-    //    }
+            }
 
-    //    async void ResponsibleEditText_Click(object sender, EventArgs e)
-    //    {
-    //        var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_responsible, users.Select(u => u.Username).ToArray(), true);
-    //        if (index >= 0)
-    //        {
-    //            selectedUser = users[index];
-    //            UpdateText();
-    //        }
-    //    }
+            public override void UpdateRow() //TODO need to remove content null check on others
+            {
+                responsibleEditText.Text = string.Join(", ", Content.Values);
+            }
 
-    //    void UpdateText()
-    //    {
-    //        if (selectedUser != null)
-    //        {
-    //            responsibleEditText.Text = selectedUser.Username;
-    //        }
-    //    }
+            public override bool ContainsValidContent() => true;
 
-    //    public override int GetContent()
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public override bool ContainsValidContent() => true;
-    //}
-    //}
+        }
+    }
 }

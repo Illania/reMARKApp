@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
+using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -55,6 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             };
 
             secondaryLinearLayout = new LinearLayoutCompat(Context);
+            secondaryLinearLayout.Visibility = ViewStates.Gone;
             secondaryLinearLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             switch (ContactType)
@@ -72,6 +75,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     throw new ArgumentException("Contact type needs to be defined");
             }
 
+            linearLayout.AddView(viewMoreButton);
+            linearLayout.AddView(secondaryLinearLayout);
+
             return rootView;
         }
 
@@ -86,6 +92,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             secondarySubviews.Add(new BirthdateView(Context));
             secondarySubviews.Add(new DescriptionView(Context));
+            secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
@@ -114,6 +121,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             await RefreshData();
+        }
+
+        public void ReplaceFragment(Fragment f, string tag)
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+
+            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
 
         #region Refresh methods
@@ -161,9 +175,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progressBar.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
-            foreach (var subview in subviews)
+            foreach (var subview in subviews.Union(secondarySubviews))
             {
-                linearLayout.AddView(subview);
                 subview.Contact = Contact;
                 subview.ContactPreview = ContactPreview;
                 subview.RefreshView();
@@ -180,7 +193,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RetainableState 
 
-        //TODO need to add parent 
+        //TODO need to add parent and check all
 
         public override string GenerateTag()
         {
