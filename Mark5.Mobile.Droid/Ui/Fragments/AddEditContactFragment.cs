@@ -16,8 +16,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class AddEditContactFragment : RetainableStateFragment
     {
-        public Contact Contact { get; set; } = new Contact();
-        public ContactPreview ContactPreview { get; set; } = new ContactPreview();
+        public Contact Contact { get; set; }
+        public ContactPreview ContactPreview { get; set; }
         public Folder Folder { get; set; }
         public int? FolderId { get; set; }
         public int? ContactId { get; set; }
@@ -26,10 +26,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Action CloseRequest { get; set; }
 
         LinearLayoutCompat linearLayout;
+        LinearLayoutCompat secondaryLinearLayout;
         ProgressBar progressBar;
         ScrollView scrollView;
 
         List<AddEditContactView> subviews = new List<AddEditContactView>();
+        List<AddEditContactView> secondarySubviews = new List<AddEditContactView>();
+
+        AppCompatButton viewMoreButton;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -40,6 +44,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
+
+            viewMoreButton = new AppCompatButton(Context);
+            viewMoreButton.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            viewMoreButton.Text = "View more";
+            viewMoreButton.Click += (sender, e) =>
+            {
+                viewMoreButton.Visibility = ViewStates.Gone;
+                secondaryLinearLayout.Visibility = ViewStates.Visible;
+            };
+
+            secondaryLinearLayout = new LinearLayoutCompat(Context);
+            secondaryLinearLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
             switch (ContactType)
             {
@@ -59,15 +75,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        void PrepareViewsForPerson()
+        protected void PrepareViewsForPerson()
         {
             subviews.Add(new FirstNameView(Context));
             subviews.Add(new MiddleNameView(Context));
             subviews.Add(new LastNameView(Context));
-            subviews.Add(new BirthdateView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
-            //subviews.Add(new ResponsibleUsersView(Context, users))
+            subviews.ForEach(linearLayout.AddView);
+
+            secondarySubviews.Add(new BirthdateView(Context));
+            secondarySubviews.Add(new DescriptionView(Context));
+            secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
         void PrepareViewsForDeparment()
@@ -103,10 +122,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (CreationModeFlag == ContactCreationModeFlag.New)
             {
+                Contact = new Contact();
+                ContactPreview = new ContactPreview();
                 RefreshView();
                 return;
             }
-            else if (CreationModeFlag == ContactCreationModeFlag.Edit)
+            if (CreationModeFlag == ContactCreationModeFlag.Edit)
             {
                 try
                 {
