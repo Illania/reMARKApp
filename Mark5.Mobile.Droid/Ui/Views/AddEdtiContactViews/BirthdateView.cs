@@ -44,6 +44,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             if (newTimestamp != -1)
             {
                 var utcTimestamp = newTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+                Contact.BirthDateTimestamp = utcTimestamp;
+
                 if (row == null)
                 {
                     AddRow(utcTimestamp);
