@@ -127,7 +127,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 }
                 else
                 {
-                    row.SetContent(ca);
+                    row.SetContent(ca); //TODO this could be also an updateview command
                 }
             }
         }

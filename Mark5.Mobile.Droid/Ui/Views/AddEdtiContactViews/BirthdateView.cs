@@ -8,7 +8,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class BirthdateView : AbstractMultipleRowsView<long>
+    public class BirthdateView : AbstractMultipleRowsView<long>
     {
         public BirthdateView(Context context)
             : base(context, Resource.String.edit_contact_birthdate, true)
@@ -18,10 +18,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         public override void RefreshView()
         {
             if (Contact.BirthDateTimestamp != -6847804800000 && Contact.BirthDateTimestamp != -1)
-                AddRow(Contact.BirthDateTimestamp); //TODO need a conversion!
+                AddRow(Contact.BirthDateTimestamp);
         }
-
-        //var currentTimestamp = timestamp == -1 || timestamp == 0 ? -1 : timestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
 
         protected override Row GetNewRow()
         {
@@ -33,19 +31,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             CreateDialog();
         }
 
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        {
+            Contact.BirthDateTimestamp = -1;
+            RemoveRow(sender as DateRow);
+        }
+
         async void CreateDialog(long timestamp = -1, DateRow row = null)
         {
             var newTimestamp = await Dialogs.ShowDatePicker(Context, timestamp);
 
             if (newTimestamp != -1)
             {
+                var utcTimestamp = newTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                 if (row == null)
                 {
-                    AddRow(newTimestamp);
+                    AddRow(utcTimestamp);
                 }
                 else
                 {
-                    row.SetContent(newTimestamp);
+                    row.SetContent(utcTimestamp);
                 }
             }
         }
@@ -53,7 +58,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         protected class DateRow : Row
         {
             readonly AppCompatEditText dateEditText;
-            long currentTimestamp;
 
             public DateRow(Context context, BirthdateView birthdateView)
                 : base(context, birthdateView)
@@ -74,9 +78,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             protected override void UpdateRow()
             {
-                if (currentTimestamp != -1)
+                if (Content != -1)
                 {
-                    dateEditText.Text = currentTimestamp.FormatUserTimestampAsLongDateString(Context);
+                    dateEditText.Text = Content.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds()
+                        .FormatUserTimestampAsLongDateString(Context);
                 }
                 else
                 {
@@ -86,7 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void EditText_Click(object sender, EventArgs e)
             {
-                (ParentView as BirthdateView).CreateDialog(currentTimestamp, this);
+                (ParentView as BirthdateView).CreateDialog(Content, this);
             }
 
             public override bool ContainsValidContent()

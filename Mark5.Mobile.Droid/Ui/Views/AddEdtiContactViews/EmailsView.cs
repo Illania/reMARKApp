@@ -8,7 +8,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class EmailsView : AbstractMultipleRowsView<CommunicationAddress>
+    public class EmailsView : AbstractMultipleRowsView<CommunicationAddress>
     {
         public EmailsView(Context context)
             : base(context, Resource.String.edit_contact_email, false)
@@ -32,6 +32,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         protected override void AddButton_Click(object sender, EventArgs e)
         {
             CreateDialog();
+        }
+
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        {
+            var row = sender as EmailRow;
+            var ca = row.GetContent();
+            Contact.CommunicationAddresses.Remove(ca);
+            RemoveRow(row);
         }
 
         async void CreateDialog(CommunicationAddress ca = null, EmailRow row = null) //TODO we could also pass only the row
@@ -72,6 +80,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 if (row == null)
                 {
                     AddRow(ca);
+                    Contact.CommunicationAddresses.Add(ca);
                 }
                 else
                 {

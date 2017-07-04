@@ -49,8 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(new FirstNameView(Context));
             //subviews.Add(new MiddleNameView(Context));
             //subviews.Add(new LastNameView(Context));
-            //subviews.Add(new BirthdateView(Context));
-            //subviews.Add(new EmailsView(Context));
+            subviews.Add(new BirthdateView(Context));
+            subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
             //subviews.Add(new ResponsibleUsersView(Context, users));
 
