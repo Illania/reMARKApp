@@ -5,6 +5,7 @@ using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
@@ -58,6 +59,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             emailEditText.SetHint(Resource.String.edit_contact_address);
+            emailEditText.TextChanged += (sender, e) =>
+            {
+                if (!Validator.IsEmailValid(emailEditText.Text))
+                {
+                    emailEditText.Error = Context.GetString(Resource.String.email_not_valid);
+                }
+            };
             container.AddView(emailEditText);
 
             var descriptionEditText = new AppCompatEditText(Context)
@@ -144,16 +152,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             override public void UpdateRow()
             {
-                if (Content != null)
+                emailEditText.Text = Content.Address;
+                if (!Validator.IsEmailValid(Content.Address))
                 {
-                    emailEditText.Text = Content.Address;
-                    Layout.SetBackgroundColor(Content.IsPrimary ? Color.BlanchedAlmond : Color.White);
+                    emailEditText.Error = Context.GetString(Resource.String.email_not_valid);
                 }
+                Layout.SetBackgroundColor(Content.IsPrimary ? Color.BlanchedAlmond : Color.White);
             }
 
             public override bool ContainsValidContent()
             {
-                throw new NotImplementedException();
+                return Validator.IsEmailValid(Content.Address);
             }
         }
     }

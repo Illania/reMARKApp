@@ -129,13 +129,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 ca = ca ?? new CommunicationAddress();
                 ca.Type = type;
-                ca.Address = string.Join("|", countries[countrySpinner.SelectedItemPosition].FaxPrefix.ToString(), phoneEditText.Text); //TODO is it correct?
+                ca.Address = string.Join("|", countries[countrySpinner.SelectedItemPosition].FaxPrefix.ToString(), "", phoneEditText.Text);
                 ca.Description = descriptionEditText.Text;
                 ca.IsPrimary = preferableCheckBox.Checked;
 
                 if (ca.IsPrimary)
                 {
-                    SetIsPrimaryOnOtherRows(row);
+                    DisablePrimaryOnOtherRows(row);
                 }
 
                 if (row == null)
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
         }
 
-        void SetIsPrimaryOnOtherRows(PhoneNumberRow primaryAddressRow) //TODO need a better name
+        void DisablePrimaryOnOtherRows(PhoneNumberRow primaryAddressRow)
         {
             foreach (var row in Rows)
             {
