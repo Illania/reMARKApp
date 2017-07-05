@@ -23,23 +23,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             this.type = type;
         }
 
-        static int GetResourceIdForType(CommunicationAddressType type)
-        {
-            switch (type)
-            {
-                case CommunicationAddressType.Mobile:
-                    return Resource.String.edit_contact_mobile;
-                case CommunicationAddressType.Phone:
-                    return Resource.String.edit_contact_phone;
-                case CommunicationAddressType.Fax:
-                    return Resource.String.edit_contact_fax;
-                case CommunicationAddressType.Telex:
-                    return Resource.String.edit_contact_telex;
-                default:
-                    throw new ArgumentException("This view does not support the input communication address type");
-            }
-        }
-
         public override void RefreshView()
         {
             var addresses = Contact.CommunicationAddresses.Where(a => a.Type == type);
@@ -138,7 +121,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 preferableCheckBox.Checked = ca.IsPrimary;
             }
 
-            if (await Dialogs.ShowCustomViewDialogAsync(Context, Resource.String.edit_contact_email, container) == true)
+            var titleResource = GetResourceIdForDialogForType(type, row != null);
+            if (await Dialogs.ShowCustomViewDialogAsync(Context, titleResource, container) == true)
             {
                 ca = ca ?? new CommunicationAddress();
                 ca.Type = type;
@@ -173,6 +157,40 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     emailRow.GetContent().IsPrimary = false;
                     emailRow.UpdateRow();
                 }
+            }
+        }
+
+        static int GetResourceIdForType(CommunicationAddressType type)
+        {
+            switch (type)
+            {
+                case CommunicationAddressType.Mobile:
+                    return Resource.String.edit_contact_mobile;
+                case CommunicationAddressType.Phone:
+                    return Resource.String.edit_contact_phone;
+                case CommunicationAddressType.Fax:
+                    return Resource.String.edit_contact_fax;
+                case CommunicationAddressType.Telex:
+                    return Resource.String.edit_contact_telex;
+                default:
+                    throw new ArgumentException("This view does not support the input communication address type");
+            }
+        }
+
+        static int GetResourceIdForDialogForType(CommunicationAddressType type, bool edit)
+        {
+            switch (type)
+            {
+                case CommunicationAddressType.Mobile:
+                    return edit ? Resource.String.edit_contact_edit_mobile : Resource.String.edit_contact_add_mobile;
+                case CommunicationAddressType.Phone:
+                    return edit ? Resource.String.edit_contact_edit_phone : Resource.String.edit_contact_add_phone;
+                case CommunicationAddressType.Fax:
+                    return edit ? Resource.String.edit_contact_edit_fax : Resource.String.edit_contact_add_fax;
+                case CommunicationAddressType.Telex:
+                    return edit ? Resource.String.edit_contact_edit_telex : Resource.String.edit_contact_add_telex;
+                default:
+                    throw new ArgumentException("This view does not support the input communication address type");
             }
         }
 
