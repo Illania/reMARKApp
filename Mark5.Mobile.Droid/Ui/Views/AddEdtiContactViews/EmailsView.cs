@@ -139,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void EmailEditText_Click(object sender, EventArgs e)
             {
-                (ParentView as EmailsView).CreateDialog(this);
+                ((EmailsView)ParentView).CreateDialog(this);
             }
 
             override public void UpdateRow()

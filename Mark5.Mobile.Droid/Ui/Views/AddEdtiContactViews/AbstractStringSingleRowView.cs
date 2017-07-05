@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void EditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
             {
-                (ParentView as AbstractStringSingleRowView).TextChanged(editText.Text);
+                ((AbstractStringSingleRowView)ParentView).TextChanged(editText.Text);
             }
 
             public override void UpdateRow()

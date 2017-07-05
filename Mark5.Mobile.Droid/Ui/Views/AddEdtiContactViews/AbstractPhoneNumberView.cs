@@ -218,7 +218,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void PhoneEditText_Click(object sender, EventArgs e)
             {
-                (ParentView as AbstractPhoneNumberView).CreateDialog(this);
+                ((AbstractPhoneNumberView)ParentView).CreateDialog(this);
             }
 
             public override void UpdateRow()

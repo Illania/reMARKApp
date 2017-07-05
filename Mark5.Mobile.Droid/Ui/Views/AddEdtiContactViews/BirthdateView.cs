@@ -100,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void EditText_Click(object sender, EventArgs e)
             {
-                (ParentView as BirthdateView).CreateDialog(this);
+                ((BirthdateView)ParentView).CreateDialog(this);
             }
 
             public override bool ContainsValidContent()
