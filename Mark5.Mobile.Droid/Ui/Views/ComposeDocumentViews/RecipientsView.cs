@@ -15,7 +15,6 @@ using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
@@ -119,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             if (State != null)
             {
-                RestoreState();
+                SetState();
                 State = null;
                 return Task.CompletedTask;
             }
@@ -462,7 +461,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region State related
 
-        void RestoreState()
+        void SetState()
         {
             var recipientsViewState = (RecipientsViewState)State;
             emailEditor.Text = recipientsViewState.Content;
@@ -473,7 +472,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        public override IComposeDocumentViewState UpdateState()
+        public override IComposeDocumentViewState GetState()
         {
             return new RecipientsViewState
             {

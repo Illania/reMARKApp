@@ -111,7 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finally
             {
                 dismissAction();
-                Activity.Finish();
+                Activity?.Finish();
             }
         }
 
@@ -158,7 +158,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finally
             {
                 dismissAction();
-                Activity.Finish();
+                Activity?.Finish();
             }
         }
 

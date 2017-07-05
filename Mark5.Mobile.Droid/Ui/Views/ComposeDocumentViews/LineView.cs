@@ -153,7 +153,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             SetLine(lineViewState.SelectedLine);
         }
 
-        public override IComposeDocumentViewState UpdateState()
+        public override IComposeDocumentViewState GetState()
         {
             return new LineViewState { SelectedLine = GetLine() };
         }

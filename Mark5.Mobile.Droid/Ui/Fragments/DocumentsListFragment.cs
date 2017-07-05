@@ -270,7 +270,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None));
         }
 
         #endregion
@@ -378,7 +378,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-                    StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Edit, documentPreview.Direction, documentPreview.Id, Folder.Id));
+	                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                       DocumentCreationModeFlag.Edit,
+	                                                                   CopyToNewOption.None,
+	                                                                   previousDocumentDirection: documentPreview.Direction,
+	                                                                   previousDocumentFolderId: Folder.Id,
+	                                                                   previousDocumentId: documentPreview.Id));
                 }
                 else
                 {

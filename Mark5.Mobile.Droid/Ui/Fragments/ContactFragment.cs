@@ -623,12 +623,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                DocumentCreationModeFlag.New,
-                DocumentDirection.None,
-                preconfiguredEmailToAddresses: new List<string>
-                {
-                    communicationAddress.Address
-                }));
+                                                               DocumentCreationModeFlag.New,
+                                                               CopyToNewOption.None,
+                                                               preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
+            {
+                { DocumentAddressType.To, new [] {communicationAddress.Address} }
+            }));
         }
 
         async void Button2Layout_Click(object sender, EventArgs e)
@@ -697,13 +697,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                    DocumentCreationModeFlag.New,
-                    DocumentDirection.None,
-                    preconfiguredEmailToAddresses: new List<string>
-                    {
-                        e.Address
-                    }));
+                                                                   DocumentCreationModeFlag.New,
+                                                                   CopyToNewOption.None,
+                                                                   preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, new [] {e.Address} }
+                }));
                 return;
             }
 

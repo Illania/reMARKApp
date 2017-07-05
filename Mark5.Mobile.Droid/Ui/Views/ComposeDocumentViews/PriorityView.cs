@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             SetPriority(priorityViewState.SelectedPriority);
         }
 
-        public override IComposeDocumentViewState UpdateState()
+        public override IComposeDocumentViewState GetState()
         {
             return new PriorityViewState { SelectedPriority = GetPriority() };
         }

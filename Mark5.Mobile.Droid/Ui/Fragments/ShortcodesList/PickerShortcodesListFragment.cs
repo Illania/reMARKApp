@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var data = new Intent();
                 data.PutExtra(PickerShortcodesListActivity.ShortcodeResultKey, Serializer.Serialize(shortcode));
                 Activity.SetResult(Android.App.Result.Ok, data);
-                Activity.Finish();
+                Activity?.Finish();
             }
             catch (Exception ex)
             {

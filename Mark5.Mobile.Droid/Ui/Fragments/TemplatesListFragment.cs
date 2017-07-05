@@ -114,7 +114,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error($"Error while retrieving template previews", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                Activity.Finish();
+                Activity?.Finish();
             }
             finally
             {
@@ -131,7 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var data = new Intent();
             data.PutExtra(TemplatesListActivity.TemplatePreviewResultKey, Serializer.Serialize(tp));
             Activity.SetResult(Android.App.Result.Ok, data);
-            Activity.Finish();
+            Activity?.Finish();
         }
 
         #endregion

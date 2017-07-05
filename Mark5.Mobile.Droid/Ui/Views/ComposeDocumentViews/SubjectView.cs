@@ -84,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             subjectTextView.Text = subjectViewState.Content;
         }
 
-        public override IComposeDocumentViewState UpdateState()
+        public override IComposeDocumentViewState GetState()
         {
             return new SubjectViewState { Content = subjectTextView.Text };
         }

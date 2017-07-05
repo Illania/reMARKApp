@@ -163,7 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             attachmentsViewState.AttachmentDescriptions.ForEach(AddAttachment);
         }
 
-        public override IComposeDocumentViewState UpdateState()
+        public override IComposeDocumentViewState GetState()
         {
             return new AttachmentsViewState { AttachmentDescriptions = attachmentDescriptions };
         }

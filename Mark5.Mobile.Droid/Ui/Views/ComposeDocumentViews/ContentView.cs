@@ -476,7 +476,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 await SetOldHtmlContentAsync(contentViewState.OldContent);
         }
 
-        public override IComposeDocumentViewState UpdateState()
+        public override IComposeDocumentViewState GetState()
         {
             var newContentString = AsyncHelpers.RunSync(() => { return GetNewHtmlContentAsync(false); });
             var oldContentString = AsyncHelpers.RunSync(() => { return GetOldHtmlContentAsync(false); });

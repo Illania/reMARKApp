@@ -81,7 +81,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.Reply,
+                                                                   CopyToNewOption.None,
+                                                                   previousDocumentDirection: DocumentPreview.Direction,
+                                                                   previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                                   previousDocumentId: DocumentPreview.Id));
             };
             button1.LongClickable = true;
             button1.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply, ToastLength.Short).Show();
@@ -100,8 +105,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
                     return;
                 }
-
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.ReplyAll,
+                                                                   CopyToNewOption.None,
+                                                                   previousDocumentDirection: DocumentPreview.Direction,
+                                                                   previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                                   previousDocumentId: DocumentPreview.Id));
             };
             button2.LongClickable = true;
             button2.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply_all, ToastLength.Short).Show();
@@ -121,7 +130,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.Forward,
+                                                                   CopyToNewOption.None,
+                                                                   previousDocumentDirection: DocumentPreview.Direction,
+                                                                   previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                                   previousDocumentId: DocumentPreview.Id));
             };
             button3.LongClickable = true;
             button3.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.forward, ToastLength.Short).Show();
@@ -652,9 +666,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     break;
             }
 
-            var intent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentPreview.Direction, Document.Id,
-                                                         FolderId ?? Folder?.Id, copyToNewOptions: option);
-            StartActivity(intent);
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                               DocumentCreationModeFlag.New,
+                                                               option,
+                                                               previousDocumentDirection: DocumentPreview.Direction,
+                                                               previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                               previousDocumentId: DocumentPreview.Id));
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)

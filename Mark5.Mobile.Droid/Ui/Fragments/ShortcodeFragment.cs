@@ -131,8 +131,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
                     return true;
                 }
-
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None, preconfiguredEmailToAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.To).Select(a => a.Address).ToList(), preconfiguredEmailCcAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.Cc).Select(a => a.Address).ToList(), preconfiguredEmailBccAddresses: Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.Bcc).Select(a => a.Address).ToList()));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.New,
+                                                                   CopyToNewOption.None,
+                                                                   preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.To).Select(a => a.Address).ToArray() },
+                    { DocumentAddressType.Cc, Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.Cc).Select(a => a.Address).ToArray() },
+                    { DocumentAddressType.Bcc, Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.Bcc).Select(a => a.Address).ToArray() },
+                }));
             }
 
             if (item.ItemId == MenuItemActions.CopyToWorktray)
@@ -362,12 +369,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                    DocumentCreationModeFlag.New,
-                    DocumentDirection.None,
-                    preconfiguredEmailToAddresses: new List<string>
-                    {
-                        e.Address
-                    }));
+                                                                   DocumentCreationModeFlag.New,
+                                                                   CopyToNewOption.None,
+                                                                   preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, new [] {e.Address} }
+                }));
             }
         }
 

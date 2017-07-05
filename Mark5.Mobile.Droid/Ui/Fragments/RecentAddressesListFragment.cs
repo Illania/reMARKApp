@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var intent = new Intent();
             intent.PutExtra(RecentAddressesListActivity.RecipientResultKey, Serializer.Serialize(new Recipient(ra)));
             Activity.SetResult(Result.Ok, intent);
-            Activity.Finish();
+            Activity?.Finish();
         }
 
         #region Retainable State
