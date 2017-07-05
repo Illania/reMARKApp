@@ -826,7 +826,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!string.IsNullOrEmpty(template.Subject))
                 subjectView.SetSubject(template.Subject);
 
-            lineView.SetLineFromGuid(template.LineGuid);
+            lineView.SetLine(template.LineGuid);
         }
 
         void ProcessTemplate(Template template)

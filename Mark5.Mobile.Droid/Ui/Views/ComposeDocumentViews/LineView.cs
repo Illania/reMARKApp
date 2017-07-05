@@ -23,10 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly Line defaultOutgoingLine;
         readonly List<Line> availableOutgoingLines;
 
-        readonly Line ambiguousFakeLine;
-        readonly Guid ambiguousFakeLineGuid;
-
-        public bool LineSelectedIsAmbiguous => GetLine().Guid == ambiguousFakeLineGuid;
+        public bool LineSelectedIsAmbiguous => GetLine().Guid == Guid.Empty;
 
         public LineView(Context context)
             : base(context)
@@ -44,11 +41,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             titleTextView.SetText(Resource.String.line);
             AddView(titleTextView);
 
-            ambiguousFakeLine = new Line
+            availableOutgoingLines.Add(new Line
             {
                 Name = Resources.GetString(Resource.String.select_a_line),
-                Guid = ambiguousFakeLineGuid,
-            };
+                Guid = Guid.Empty,
+            });
 
             lineSpinner = new AppCompatSpinner(context);
             var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent) { Weight = 1 };
@@ -117,31 +114,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return Task.CompletedTask;
         }
 
-        public void SetLineFromGuid(Guid lineGuid)
+        public void SetLine(Line line)
+        {
+            if (line == null)
+                SetLine(Guid.Empty);
+            else
+                SetLine(line.Guid);
+        }
+
+        public void SetLine(Guid lineGuid)
         {
             var index = availableOutgoingLines.FindIndex(l => l.Guid == lineGuid);
             if (index > 0)
                 lineSpinner.SetSelection(index);
         }
 
-        public Line GetLine()
-        {
-            return availableOutgoingLines[lineSpinner.SelectedItemPosition];
-        }
-
-        #endregion
-
-        #region Utilities
-
-        void SetLine(Line line)
-        {
-            SetLineFromGuid(line.Guid);
-        }
-
-        void SetSelectLine()
-        {
-            SetLineFromGuid(ambiguousFakeLineGuid);
-        }
+        public Line GetLine() => availableOutgoingLines[lineSpinner.SelectedItemPosition];
 
         #endregion
 
@@ -169,12 +157,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public class CustomAdapter : ArrayAdapter
         {
-            readonly int hiddenItemIndex;
+            readonly int hiddenItemPosition;
+            readonly public List<Line> lines;
 
-            public CustomAdapter(Context context, int textViewResourceId, IList objects, int hiddenItemIndex)
-                : base(context, textViewResourceId, objects)
+            public CustomAdapter(Context context, int textViewResourceId, List<Line> lines, int hiddenItemPosition)
+                : base(context, textViewResourceId, lines)
             {
-                this.hiddenItemIndex = hiddenItemIndex;
+                this.lines = lines;
+                this.hiddenItemPosition = hiddenItemPosition;
             }
 
             public override View GetView(int position, View convertView, ViewGroup parent)
@@ -182,10 +172,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var v = base.GetView(position, convertView, parent);
 
                 if (v is TextView textView)
-                    if (position == hiddenItemIndex)
+                {
+                    textView.Text = lines[position]?.Name;
+
+                    if (position == hiddenItemPosition)
                         textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
                     else
                         textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
+                }
 
                 return v;
             }
@@ -193,17 +187,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             public override View GetDropDownView(int position, View convertView, ViewGroup parent)
             {
                 View v = null;
-                if (position == hiddenItemIndex)
+
+                if (position == hiddenItemPosition)
                 {
                     var tv = new TextView(Context);
                     tv.SetHeight(0);
                     v = tv;
                 }
                 else
+                {
                     v = base.GetDropDownView(position, null, parent);
 
-                parent.VerticalScrollBarEnabled = false;
+                    if (v is TextView textView)
+                        textView.Text = lines[position]?.Name;
+                }
 
+                parent.VerticalScrollBarEnabled = false;
                 return v;
             }
         }

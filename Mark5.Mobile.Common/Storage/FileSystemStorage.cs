@@ -537,7 +537,7 @@ namespace Mark5.Mobile.Common.Storage
                 return;
 
             await failedFolderGuid.MoveRecursivelyAsync(CommonConfig.DocumentsToUploadFolder, CreationCollisionOption.FailIfExists);
-            await failedFolder.DeleteAsync();
+            await failedFolderGuid.DeleteAsync();
         }
 
         #endregion

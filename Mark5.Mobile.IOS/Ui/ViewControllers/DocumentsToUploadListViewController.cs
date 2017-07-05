@@ -21,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshing;
 
-        TinyMessageSubscriptionToken DocumentUploadStatusChangedToken;
+        TinyMessageSubscriptionToken documentUploadStatusChangedToken;
 
         #region UIViewController overrides
 
@@ -65,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (IsBeingDismissed)
                 return;
 
-            DocumentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
             {
                 BeginInvokeOnMainThread(async () =>
                 {
@@ -78,7 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            DocumentUploadStatusChangedToken?.Dispose();
+            documentUploadStatusChangedToken?.Dispose();
         }
 
         public override void DidReceiveMemoryWarning()

@@ -6,14 +6,15 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
-using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -23,22 +24,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Action CloseRequest { get; set; }
 
-        SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         DocumentsToUploadListAdapter adapter;
         ActionMode actionMode;
+
+        TinyMessageSubscriptionToken documentUploadStatusChangedToken;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsToUploadListFragment)} ...");
 
-            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.list_no_refresh, container, false);
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.empty_folder);
-
-            refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            refreshLayout.Enabled = false;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
@@ -81,11 +80,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!IsAdded || IsDetached || IsRemoving)
                 return;
+
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            {
+                Activity.RunOnUiThread(async () => { await RefreshData(); });
+            });
         }
 
         public override void OnPause()
         {
             base.OnPause();
+
+            documentUploadStatusChangedToken?.Dispose();
 
             CommonConfig.Logger.Info($"Resuming {nameof(DocumentsToUploadListFragment)} ...");
         }
@@ -100,7 +106,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 refreshing = true;
-                refreshLayout.Refreshing = true;
 
                 CommonConfig.Logger.Info($"Refresh running...");
 
@@ -118,7 +123,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             finally
             {
-                refreshLayout.Refreshing = false;
                 refreshing = false;
 
                 CommonConfig.Logger.Info($"Refresh finished");
@@ -127,7 +131,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, (Guid Guid, DocumentPreview DocumentPreview) data)
         {
-            if (actionMode != null)
+            if (actionMode != null &&
+                adapter.FailedGuids.Contains(data.Guid))
             {
                 adapter.SetSelected(data, !adapter.IsSelected(data));
 
@@ -158,8 +163,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
         {
-            menu.Add(Menu.None, 10, 10, Resource.String.resend);
-            menu.Add(Menu.None, 20, 20, Resource.String.delete);
             return true;
         }
 
@@ -168,14 +171,52 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
             Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
 
+            menu.Clear();
+
+            if (adapter.SelectedItems.All(d => adapter.FailedGuids.Contains(d.Guid)))
+            {
+                menu.Add(Menu.None, 10, 10, Resource.String.resend);
+                menu.Add(Menu.None, 20, 20, Resource.String.delete);
+            }
+
             return false;
         }
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
-            var selectedOutgoingDocuments = adapter.SelectedItems;
+            var selectedItems = adapter.SelectedItems;
 
-            // TODO
+            if (item.ItemId == 10)
+            {
+                Task.Run(async () =>
+                {
+                    foreach (var selectedItem in selectedItems)
+                    {
+                        await Managers.DocumentsManager.RequeueFailedToUpload(selectedItem.Guid);
+                    }
+                }).ContinueWith(async t =>
+                {
+                    actionMode?.Finish();
+                    await RefreshData();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+                return true;
+            }
+
+            if (item.ItemId == 20)
+            {
+                Task.Run(async () =>
+                {
+                    foreach (var selectedItem in selectedItems)
+                    {
+                        await Managers.DocumentsManager.DeleteFailedDocumentToUpload(selectedItem.Guid);
+                    }
+                }).ContinueWith(async t =>
+                {
+                    actionMode?.Finish();
+                    await RefreshData();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+                return true;
+            }
 
             return OnOptionsItemSelected(item);
         }
@@ -307,7 +348,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool IsSelected(Guid guid) => selectedItemsInView.Any(d => d.Guid == guid);
             public bool IsSelected((Guid Guid, DocumentPreview DocumentPreview) data) => IsSelected(data.Guid);
 
-            public int GetPosition(Guid guid) => selectedItemsInView.FindIndex(d => d.Guid == guid);
+            public int GetPosition(Guid guid) => itemsInView.FindIndex(d => d.Guid == guid);
             public int GetPosition((Guid Guid, DocumentPreview DocumentPreview) data) => GetPosition(data.Guid);
         }
 

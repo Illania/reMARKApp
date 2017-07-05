@@ -681,6 +681,7 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\add.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
     <AndroidResource Include="Resources\layout\download.axml" />
+    <AndroidResource Include="Resources\layout\list_no_refresh.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
