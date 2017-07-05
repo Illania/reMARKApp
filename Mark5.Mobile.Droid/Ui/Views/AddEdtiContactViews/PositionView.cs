@@ -3,7 +3,7 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public abstract class PositionView : AbstractStringSingleRowView
+    public class PositionView : AbstractStringSingleRowView
     {
         public PositionView(Context context)
             : base(context, Resource.String.edit_contact_position)

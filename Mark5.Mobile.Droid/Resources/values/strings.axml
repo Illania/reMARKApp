@@ -103,6 +103,11 @@
 	<string name="edit_contact_mark_as_preferable">Mark as preferable</string>
 	<string name="edit_contact_add">Add</string>
 	<string name="edit_contact_edit">Edit</string>
+	<string name="edit_contact_physical">Addresses</string>
+	<string name="edit_contact_physical_address">Address</string>
+	<string name="edit_contact_city">City</string>
+	<string name="edit_contact_zip">ZIP</string>
+	<string name="edit_contact_area">Area</string>
 	<string name="email">Email</string>
 	<string name="email_not_valid">Email not valid</string>
 	<string name="empty_folder">This folder is empty</string>

@@ -88,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent),
             };
-            countrySpinner.Adapter = new CountryAdapter(Context, countries); // TODO SELECT NONE
+            countrySpinner.Adapter = new CountryAdapter(Context, countries);
             firstLine.AddView(countrySpinner);
 
             var phoneEditText = new AppCompatEditText(Context)

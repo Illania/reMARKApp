@@ -92,16 +92,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected void PrepareViewsForPerson()
         {
+            //Company
             subviews.Add(new FirstNameView(Context));
             subviews.Add(new MiddleNameView(Context));
             subviews.Add(new LastNameView(Context));
+            subviews.Add(new ShortIdView(Context));
+            subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
+            subviews.Add(new MobileView(Context));
             subviews.ForEach(linearLayout.AddView);
 
+            secondarySubviews.Add(new PhysicalAddressesView(Context));
+            secondarySubviews.Add(new DescriptionView(Context));
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.Add(new BirthdateView(Context));
-            secondarySubviews.Add(new DescriptionView(Context));
+            secondarySubviews.Add(new FaxView(Context));
+            secondarySubviews.Add(new TelexView(Context));
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
