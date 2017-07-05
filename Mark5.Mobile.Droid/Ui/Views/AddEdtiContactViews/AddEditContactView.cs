@@ -1,5 +1,4 @@
-﻿using System;
-using Android.Animation;
+﻿using Android.Animation;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -17,9 +16,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         protected static int DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
         protected static int DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
 
-        protected LinearLayoutCompat TopLayout;
-        protected LinearLayoutCompat ContentLayout;
-
         protected AddEditContactView(Context context)
             : base(context)
         {
@@ -28,16 +24,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             SetPadding(DistanceSmall, DistanceNormal, DistanceSmall, DistanceNormal);
 
             LayoutTransition = new LayoutTransition();
-
-            TopLayout = new LinearLayoutCompat(context);
-            TopLayout.Orientation = Horizontal;
-            TopLayout.LayoutTransition = new LayoutTransition();
-            AddView(TopLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-            ContentLayout = new LinearLayoutCompat(context);
-            ContentLayout.Orientation = Vertical;
-            ContentLayout.LayoutTransition = new LayoutTransition();
-            AddView(ContentLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
         abstract public void RefreshView();

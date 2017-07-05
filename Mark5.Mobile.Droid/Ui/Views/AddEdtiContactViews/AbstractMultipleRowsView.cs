@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Android.Animation;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -13,6 +14,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
     public abstract class AbstractMultipleRowsView<T> : AddEditContactView
     {
+        LinearLayoutCompat topLayout;
+        LinearLayoutCompat contentLayout;
+
         AppCompatEditText titleEditText;
         AppCompatTextView titleTextView;
         AppCompatImageButton addButton;
@@ -23,6 +27,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected AbstractMultipleRowsView(Context context, int titleResourceId, bool isSingleRow) : base(context)
         {
+            topLayout = new LinearLayoutCompat(context);
+            topLayout.Orientation = Horizontal;
+            topLayout.LayoutTransition = new LayoutTransition();
+            AddView(topLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            contentLayout = new LinearLayoutCompat(context);
+            contentLayout.Orientation = Vertical;
+            contentLayout.LayoutTransition = new LayoutTransition();
+            AddView(contentLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
             this.isSingleRow = isSingleRow;
 
             SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
@@ -42,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 RightMargin = DistanceNormal,
             };
 
-            TopLayout.AddView(titleEditText, hintEditTextLp);
+            topLayout.AddView(titleEditText, hintEditTextLp);
 
             titleTextView = new AppCompatTextView(context);
             titleTextView.SetText(titleResourceId);
@@ -54,11 +68,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             titleTextView.Visibility = ViewStates.Gone;
             titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             titleTextView.SetPadding(titleEditText.PaddingLeft, titleEditText.PaddingTop, titleEditText.PaddingRight, titleEditText.PaddingBottom);
-            TopLayout.AddView(titleTextView, titleTextViewLp);
+            topLayout.AddView(titleTextView, titleTextViewLp);
 
             addButton = GetButton(context, true);
             addButton.Click += AddButton_Click;
-            TopLayout.AddView(addButton);
+            topLayout.AddView(addButton);
         }
 
         abstract protected void AddButton_Click(object sender, EventArgs e);
@@ -80,12 +94,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             row.DeleteClicked += Row_DeleteClicked;
 
             Rows.Add(row);
-            ContentLayout.AddView(row.Layout);
+            contentLayout.AddView(row.Layout);
         }
 
         virtual protected void RemoveRow(Row row)
         {
-            ContentLayout.RemoveView(row.Layout);
+            contentLayout.RemoveView(row.Layout);
             row.DeleteClicked -= Row_DeleteClicked;
             Rows.Remove(row);
 

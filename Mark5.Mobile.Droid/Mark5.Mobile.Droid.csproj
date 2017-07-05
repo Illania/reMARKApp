@@ -416,6 +416,7 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\PhysicalAddressesView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\NameView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AccountView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractSimpleFieldView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

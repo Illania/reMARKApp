@@ -105,6 +105,7 @@
 	<string name="edit_contact_mark_as_preferable">Preferable</string>
 	<string name="edit_contact_add">Add</string>
 	<string name="edit_contact_edit">Edit</string>
+	<string name="edit_contact_new_contact">New Contact</string>
 	<string name="edit_contact_add_email">Add email</string>
 	<string name="edit_contact_edit_email">Edit email</string>
 	<string name="edit_contact_add_address">Add address</string>

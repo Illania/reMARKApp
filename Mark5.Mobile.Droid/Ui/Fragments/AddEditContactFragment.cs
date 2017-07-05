@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -31,6 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         LinearLayoutCompat secondaryLinearLayout;
         ProgressBar progressBar;
         ScrollView scrollView;
+        FloatingActionButton fab;
 
         List<AddEditContactView> subviews = new List<AddEditContactView>();
         List<AddEditContactView> secondarySubviews = new List<AddEditContactView>();
@@ -49,11 +51,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab.SetImageResource(Resource.Drawable.action_send);
+            fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
+            fab.Enabled = false;
+            fab.Alpha = 0.6f;
+            fab.Visibility = ViewStates.Visible;
+
             subviews.Clear();
             secondarySubviews.Clear();
 
             showMoreButton = new AppCompatButton(Context);
             showMoreButton.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            var typedArray = Context.ObtainStyledAttributes(new int[]
+            {
+                Resource.Attribute.selectableItemBackground,
+            });
+            showMoreButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
+
             showMoreButton.Text = "View more";
             showMoreButton.Click += (sender, e) =>
             {
@@ -84,8 +99,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.AddView(showMoreButton);
             linearLayout.AddView(secondaryLinearLayout);
-
-            HasOptionsMenu = true;
 
             return rootView;
         }
@@ -123,9 +136,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-
-            ((AppCompatActivity)Activity).SupportActionBar.Title = null;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, type={ContactType}]...");
         }
@@ -219,28 +229,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region Options menu
-
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        void HandleSend()
         {
-            menu.Clear();
-            var actionResourceId = CreationModeFlag == ContactCreationModeFlag.New ? Resource.String.edit_contact_add : Resource.String.edit_contact_edit;
-            var item = menu.Add(Menu.None, 10, 10, actionResourceId);
-            item.SetShowAsAction(ShowAsAction.Always);
+            throw new NotImplementedException();
         }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                //TODO action
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-        #endregion
 
         #region RetainableState 
 
