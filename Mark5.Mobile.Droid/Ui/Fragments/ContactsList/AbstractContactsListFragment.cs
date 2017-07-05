@@ -471,7 +471,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+            {
+                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
+                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(i);
+            }
         }
 
         async void DeleteFromFolderAction()

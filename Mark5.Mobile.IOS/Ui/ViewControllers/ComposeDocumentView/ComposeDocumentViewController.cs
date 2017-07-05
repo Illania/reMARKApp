@@ -356,7 +356,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
-            attachmentsView.InitializeFilesDescriptions(files.Select(f => new FileDescription(f)).ToArray());
+            attachmentsView.InitializeFileDescriptions(files.Select(f => new FileDescription(f)).ToArray());
 
             sendButtonItem.Enabled = ValidateForm();
 

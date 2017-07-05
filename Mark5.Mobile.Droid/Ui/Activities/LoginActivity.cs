@@ -12,6 +12,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -222,10 +223,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
-                CommonConfig.Logger.Info($"Starting {nameof(IDocumentsDownloadService)} and {nameof(IDocumentsUploadService)}...");
-
-                await Managers.DocumentsDownloadManager.Start();
-                await Managers.OutgoingDocumentsManager.Start();
+                CommonConfig.Logger.Info($"Starting services...");
+                Services.DocumentsUploadService.Start();
+                Services.DocumentPreviewsDownloadService.Start();
+                Services.DocumentsDownloadService.Start();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
                 await CommonConfig.Reachability.Refresh();

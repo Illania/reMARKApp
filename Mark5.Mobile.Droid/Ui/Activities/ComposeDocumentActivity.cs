@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 cdf = new ComposeDocumentFragment();
 
                 if (Intent.HasExtra(CreationModeFlagIntentKey))
-                    cdf.CreationModeFlag = (DocumentCreationModeFlag) Intent.Extras.GetInt(CreationModeFlagIntentKey);
+                    cdf.DocumentCreationModeFlag = (DocumentCreationModeFlag) Intent.Extras.GetInt(CreationModeFlagIntentKey);
 
                 if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
                     cdf.PreviousDocumentDirection = (DocumentDirection) Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);

@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Folder Folder { get; set; }
         public Action CloseRequest { get; set; }
 
-        DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter) recyclerView.GetAdapter();
+        DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
 
         bool refreshing;
 
@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
-            coordinatorLayout = (CoordinatorLayout) container.Parent.Parent;
+            coordinatorLayout = (CoordinatorLayout)container.Parent.Parent;
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.empty_folder);
@@ -112,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.SetImageResource(Resource.Drawable.action_new);
             fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
             fab.Visibility = ViewStates.Visible;
@@ -126,8 +126,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.documents);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = Folder?.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
         }
@@ -192,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
 
@@ -493,7 +493,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 StartActivity(i);
@@ -505,7 +505,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
@@ -614,7 +614,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await CopyToOwnWorktray(CurrentAdapter.SelectedItems);
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+            {
+                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
+                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(i);
+            }
         }
 
         async void CopyToOwnWorktray(DocumentPreview documentPreview)
@@ -1360,7 +1364,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var itemViewHeight = itemView.Bottom - itemView.Top;
 
                 var paint = new TextPaint();
-                paint.TextSize = (int) TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics);
+                paint.TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics);
                 paint.Color = Color.White;
                 paint.TextAlign = Paint.Align.Left;
                 paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Normal));
@@ -1368,13 +1372,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var iconMargin = Conversion.ConvertDpToPixels(30);
 
                 var baseline = -paint.Ascent();
-                var textHeight = (int) (baseline + paint.Descent() + 0.5f);
+                var textHeight = (int)(baseline + paint.Descent() + 0.5f);
 
                 if (dX > 0) //Swiping to right
                 {
                     var text = context.Resources.GetString(Resource.String.categories);
 
-                    leftBackground.SetBounds(itemView.Left, itemView.Top, (int) dX, itemView.Bottom);
+                    leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
                     leftBackground.Draw(c);
 
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
@@ -1391,7 +1395,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var text = context.Resources.GetString(Resource.String.copy_to_worktray_multiline);
 
-                    rightBackground.SetBounds(itemView.Right + (int) dX, itemView.Top, itemView.Right, itemView.Bottom);
+                    rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
                     rightBackground.Draw(c);
 
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
@@ -1401,7 +1405,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 "\n"
                             },
                             StringSplitOptions.None)
-                        .Select(s => (int) (paint.MeasureText(s) + 0.5f))
+                        .Select(s => (int)(paint.MeasureText(s) + 0.5f))
                         .Max();
 
                     var textRight = itemView.Right - iconMargin;

@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -147,8 +147,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = string.Empty;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
         }
@@ -195,7 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int) Result.Ok)
+            if (resultCode == (int)Result.Ok)
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
                     var comments = Serializer.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
@@ -290,21 +290,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
                 if (goToPreviousItem != null)
-                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity) Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
 
                 var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
                 if (goToNextItem != null)
-                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity) Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
             }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToPrevious)
-                ((SwitchDocumentActivity) Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
+                ((SwitchDocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
 
             if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToNext)
-                ((SwitchDocumentActivity) Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
+                ((SwitchDocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
 
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
@@ -327,7 +327,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
                     Serializer.Serialize(new List<IBusinessEntity>
@@ -342,7 +342,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
                 i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
                     Serializer.Serialize(new List<IBusinessEntity>
@@ -498,11 +498,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
-                    new List<IBusinessEntity>
-                    {
-                        DocumentPreview
-                    }));
+            {
+                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
+                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(new List<IBusinessEntity> { DocumentPreview }));
+                StartActivity(i);
+            }
         }
 
         async void SetPriority()

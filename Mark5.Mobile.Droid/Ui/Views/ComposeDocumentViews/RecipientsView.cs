@@ -26,15 +26,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class RecipientsView : ComposeDocumentView
     {
+        const string EmailSeparator = ", ";
+        const string RecipentRegex = @".*<.*@.*>";
+        const string RecipentFormat = "{0} <{1}>";
+
         public event EventHandler Edited = delegate { };
         public event EventHandler AddButtonClicked = delegate { };
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
-
-        const string EmailSeparator = ", ";
-        const string RecipentRegex = @".*<.*@.*>";
-        const string RecipentFormat = "{0} <{1}>";
 
         string savedRecipient;
 
@@ -124,18 +124,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.None
-                || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            if (RestoreWorkingCopy)
             {
+                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepOnlyAddresses))
-            {
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses)
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
-            }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Reply)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
             {
                 if (AddressType != DocumentAddressType.To)
                     return Task.CompletedTask;
@@ -154,7 +155,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
             {
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
@@ -183,13 +184,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public override Task UpdateDocument()
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
-            GetEmails()
-                .ForEach(s => DocumentPreview.Addresses.Add(new DocumentAddress
+            foreach (var email in GetEmails())
+            {
+                DocumentPreview.Addresses.Add(new DocumentAddress
                 {
-                    Address = s,
+                    Address = email,
                     AddressType = AddressType,
                     Type = CommunicationAddressType.Email
-                }));
+                });
+            }
             return Task.CompletedTask;
         }
 
@@ -461,7 +464,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void RestoreState()
         {
-            var recipientsViewState = State as RecipientsViewState;
+            var recipientsViewState = (RecipientsViewState)State;
             emailEditor.Text = recipientsViewState.Content;
             savedRecipient = recipientsViewState.SavedRecipient;
             if (recipientsViewState.HasFocus)
@@ -470,7 +473,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        public override IComposeDocumentViewState ReturnState()
+        public override IComposeDocumentViewState UpdateState()
         {
             return new RecipientsViewState
             {

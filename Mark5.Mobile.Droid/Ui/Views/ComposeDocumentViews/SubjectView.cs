@@ -45,25 +45,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.None)
-                return Task.CompletedTask;
-
-            switch (CreationModeFlag)
+            if (RestoreWorkingCopy)
             {
-                case DocumentCreationModeFlag.New:
-                    subjectTextView.Text = CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments ? PreviousDocumentPreview.Subject : string.Empty;
-                    break;
-                case DocumentCreationModeFlag.Edit:
-                    subjectTextView.Text = PreviousDocumentPreview.Subject;
-                    break;
-                case DocumentCreationModeFlag.Reply:
-                case DocumentCreationModeFlag.ReplyAll:
-                    subjectTextView.Text = $"Re: {PreviousDocumentPreview.Subject}";
-                    break;
-                case DocumentCreationModeFlag.Forward:
-                    subjectTextView.Text = $"Fw: {PreviousDocumentPreview.Subject}";
-                    break;
+                subjectTextView.Text = DocumentPreview.Subject;
+                return Task.CompletedTask;
             }
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments)
+                subjectTextView.Text = PreviousDocumentPreview.Subject;
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                subjectTextView.Text = PreviousDocumentPreview.Subject;
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply || DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+                subjectTextView.Text = "Re: " + PreviousDocumentPreview.Subject;
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                subjectTextView.Text = "Fw: " + PreviousDocumentPreview.Subject;
 
             return Task.CompletedTask;
         }
@@ -83,16 +80,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void RestoreState()
         {
-            var subjectViewState = State as SubjectViewState;
+            var subjectViewState = (SubjectViewState)State;
             subjectTextView.Text = subjectViewState.Content;
         }
 
-        public override IComposeDocumentViewState ReturnState()
+        public override IComposeDocumentViewState UpdateState()
         {
-            return new SubjectViewState
-            {
-                Content = subjectTextView.Text,
-            };
+            return new SubjectViewState { Content = subjectTextView.Text };
         }
 
         class SubjectViewState : IComposeDocumentViewState

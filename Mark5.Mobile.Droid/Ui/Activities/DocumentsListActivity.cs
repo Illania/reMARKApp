@@ -31,10 +31,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityRemovedToken;
 
         const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
-        string dlfFragmentTag = string.Empty;
+        const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
 
-        const string odlfFragmentTagKey = "OutgoingDocumentsListFragmentTagKey";
-        string odlfFragmentTag = string.Empty;
+        string dlfFragmentTag;
+        string dtuFragmentTag;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -55,23 +55,26 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                if (folder.Local)
+                if (folder.Local && folder.Id == Folder.LocalRootForModule(ModuleType.Documents).SubFolders[0].Id)
                 {
-                    odlf = new DocumentsToUploadListFragment();
-                    odlf.CloseRequest = OnBackPressed;
-                    odlfFragmentTag = odlf.GenerateTag();
-                    ft.Replace(Resource.Id.fragment_container, odlf, odlfFragmentTag);
-                    ft.Commit();
+                    odlf = new DocumentsToUploadListFragment
+                    {
+                        CloseRequest = OnBackPressed
+                    };
+                    dtuFragmentTag = odlf.GenerateTag();
+                    ft.Replace(Resource.Id.fragment_container, odlf, dtuFragmentTag);
                 }
                 else
                 {
-                    dlf = new DocumentsListFragment();
-                    dlf.Folder = folder;
-                    dlf.CloseRequest = OnBackPressed;
+                    dlf = new DocumentsListFragment
+                    {
+                        Folder = folder,
+                        CloseRequest = OnBackPressed
+                    };
                     dlfFragmentTag = dlf.GenerateTag();
                     ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
-                    ft.Commit();
                 }
+                ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentsListActivity)}");
             }
@@ -84,10 +87,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Info($"Reassigned {nameof(DocumentsListFragment)}");
                 }
 
-                odlfFragmentTag = savedInstanceState.GetString(odlfFragmentTagKey);
-                if (!string.IsNullOrEmpty(odlfFragmentTag))
+                dtuFragmentTag = savedInstanceState.GetString(dtulfFragmentTagKey);
+                if (!string.IsNullOrEmpty(dtuFragmentTag))
                 {
-                    odlf = SupportFragmentManager.FindFragmentByTag(odlfFragmentTag) as DocumentsToUploadListFragment;
+                    odlf = SupportFragmentManager.FindFragmentByTag(dtuFragmentTag) as DocumentsToUploadListFragment;
                     CommonConfig.Logger.Info($"Reassigned {nameof(DocumentsToUploadListFragment)}");
                 }
 
@@ -116,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnSaveInstanceState(Bundle outState)
         {
             outState.PutString(dlfFragmentTagKey, dlfFragmentTag);
-            outState.PutString(odlfFragmentTagKey, odlfFragmentTag);
+            outState.PutString(dtulfFragmentTagKey, dtuFragmentTag);
 
             base.OnSaveInstanceState(outState);
         }

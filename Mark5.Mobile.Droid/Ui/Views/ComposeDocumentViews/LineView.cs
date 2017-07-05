@@ -12,7 +12,6 @@ using Android.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -21,16 +20,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler Edited = delegate { };
 
         readonly AppCompatSpinner lineSpinner;
-        readonly List<LineInView> availableOutgoingLinesInView;
         readonly Line defaultOutgoingLine;
+        readonly List<Line> availableOutgoingLines;
+
         readonly Line ambiguousFakeLine;
-        readonly Guid ambiguousFakeLineGuid = Guid.Parse("175012b3-abee-48ff-9973-2bd84f67e5fd");
+        readonly Guid ambiguousFakeLineGuid;
 
         public bool LineSelectedIsAmbiguous => GetLine().Guid == ambiguousFakeLineGuid;
 
         public LineView(Context context)
             : base(context)
         {
+            defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
+            availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+
             SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceSmall, DistanceNormal + DistanceSmall);
 
             var titleTextView = new AppCompatTextView(context)
@@ -41,33 +44,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             titleTextView.SetText(Resource.String.line);
             AddView(titleTextView);
 
-            defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
-            availableOutgoingLinesInView = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(l => new LineInView(l)).ToList();
-
             ambiguousFakeLine = new Line
             {
                 Name = Resources.GetString(Resource.String.select_a_line),
                 Guid = ambiguousFakeLineGuid,
             };
 
-            availableOutgoingLinesInView.Add(new LineInView(ambiguousFakeLine));
-
             lineSpinner = new AppCompatSpinner(context);
-            var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
-            spinnerLayoutParams.Weight = 1;
+            var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent) { Weight = 1 };
             lineSpinner.LayoutParameters = spinnerLayoutParams;
 
-            var adapter = new CustomAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, availableOutgoingLinesInView, availableOutgoingLinesInView.Count - 1);
+            var adapter = new CustomAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, availableOutgoingLines, availableOutgoingLines.Count - 1);
             adapter.SetDropDownViewResource(Resource.Layout.support_simple_spinner_dropdown_item);
             lineSpinner.Adapter = adapter;
             lineSpinner.ItemSelected += LineSpinner_ItemSelected;
             AddView(lineSpinner);
         }
 
-        void LineSpinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
-        {
-            Edited(this, EventArgs.Empty);
-        }
+        void LineSpinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e) => Edited(this, EventArgs.Empty);
 
         #region Public methods
 
@@ -79,40 +73,38 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 State = null;
                 return Task.CompletedTask;
             }
-
-            if (CreationModeFlag == DocumentCreationModeFlag.New)
+            if (RestoreWorkingCopy)
             {
-                if (defaultOutgoingLine != null)
+                SetLine(Document.Lines.FirstOrDefault());
+                return Task.CompletedTask;
+            }
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+                SetLine(defaultOutgoingLine);
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                SetLine(PreviousDocument.Lines.FirstOrDefault());
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+            {
+                if (availableOutgoingLines.Count == 1)
+                {
+                    SetLine(availableOutgoingLines.FirstOrDefault());
+                    return Task.CompletedTask;
+                }
+
+                if (PreviousDocument.Lines.FirstOrDefault(l => l.Guid == defaultOutgoingLine.Guid) != null)
                     SetLine(defaultOutgoingLine);
                 else
-                    SetSelectLine();
-                return Task.CompletedTask;
-            }
-
-            if (CreationModeFlag == DocumentCreationModeFlag.None)
-                return Task.CompletedTask;
-
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
-                SetLine(PreviousDocument.Lines.First());
-
-            if (availableOutgoingLinesInView.Count == 1)
-            {
-                SetLine(availableOutgoingLinesInView.First().Line);
-                return Task.CompletedTask;
-            }
-
-            var previousDocumentLines = PreviousDocument.Lines;
-            if (previousDocumentLines.FirstOrDefault(l => l.Guid == defaultOutgoingLine.Guid) != null)
-            {
-                SetLine(defaultOutgoingLine);
-            }
-            else
-            {
-                var intersection = previousDocumentLines.Intersect(availableOutgoingLinesInView.Select(l => l.Line), LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToList();
-                if (intersection.Count() == 1)
-                    SetLine(intersection.First());
-                else
-                    SetSelectLine();
+                {
+                    var intersection = PreviousDocument.Lines.Intersect(availableOutgoingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToArray();
+                    if (intersection.Length == 1)
+                        SetLine(intersection.FirstOrDefault());
+                    else
+                        SetLine(null);
+                }
             }
 
             return Task.CompletedTask;
@@ -127,14 +119,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void SetLineFromGuid(Guid lineGuid)
         {
-            var index = availableOutgoingLinesInView.FindIndex(l => l.Line.Guid == lineGuid);
+            var index = availableOutgoingLines.FindIndex(l => l.Guid == lineGuid);
             if (index > 0)
                 lineSpinner.SetSelection(index);
         }
 
         public Line GetLine()
         {
-            return availableOutgoingLinesInView[lineSpinner.SelectedItemPosition].Line;
+            return availableOutgoingLines[lineSpinner.SelectedItemPosition];
         }
 
         #endregion
@@ -151,19 +143,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             SetLineFromGuid(ambiguousFakeLineGuid);
         }
 
-        class LineInView
+        #endregion
+
+        #region State related
+
+        void RestoreState()
         {
-            public Line Line { get; }
+            var lineViewState = (LineViewState)State;
+            SetLine(lineViewState.SelectedLine);
+        }
 
-            public LineInView(Line line)
-            {
-                Line = line;
-            }
+        public override IComposeDocumentViewState UpdateState()
+        {
+            return new LineViewState { SelectedLine = GetLine() };
+        }
 
-            public override string ToString()
-            {
-                return Line.Name;
-            }
+        class LineViewState : IComposeDocumentViewState
+        {
+            public Line SelectedLine { get; set; }
         }
 
         #endregion
@@ -184,8 +181,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 var v = base.GetView(position, convertView, parent);
 
-                var textView = v as TextView;
-                if (textView != null)
+                if (v is TextView textView)
                     if (position == hiddenItemIndex)
                         textView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
                     else
@@ -204,37 +200,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     v = tv;
                 }
                 else
-                {
                     v = base.GetDropDownView(position, null, parent);
-                }
 
                 parent.VerticalScrollBarEnabled = false;
 
                 return v;
             }
-        }
-
-        #endregion
-
-        #region State related
-
-        void RestoreState()
-        {
-            var lineViewState = State as LineViewState;
-            SetLine(lineViewState.SelectedLine);
-        }
-
-        public override IComposeDocumentViewState ReturnState()
-        {
-            return new LineViewState
-            {
-                SelectedLine = GetLine(),
-            };
-        }
-
-        class LineViewState : IComposeDocumentViewState
-        {
-            public Line SelectedLine { get; set; }
         }
 
         #endregion

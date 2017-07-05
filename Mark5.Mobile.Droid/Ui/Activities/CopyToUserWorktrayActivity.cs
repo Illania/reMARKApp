@@ -15,14 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CopyToUserWorktrayActivity : BaseAppCompatActivity
     {
-        const string BusinessEntitiesIntentKey = "BusinessEntities_79eb003f-6e04-4835-8820-fdd4e53a013b";
-
-        public static Intent CreateIntent(Context context, List<IBusinessEntity> businessEntities)
-        {
-            var i = new Intent(context, typeof(CopyToUserWorktrayActivity));
-            i.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(businessEntities));
-            return i;
-        }
+        public const string BusinessEntitiesIntentKey = "BusinessEntities_79eb003f-6e04-4835-8820-fdd4e53a013b";
 
         Toolbar toolbar;
 

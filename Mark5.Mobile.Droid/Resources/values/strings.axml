@@ -39,7 +39,6 @@
 	<string name="confirm_copy_to_folder">Copy</string>
 	<string name="confirm_move_to_folder">Move</string>
 	<string name="confirm_save_as_draft">Do you want to save the email as draft?</string>
-	<string name="confirm_save_modified_document">Do you want to save the modified email?</string>
 	<string name="connection_status">Connection status</string>
 	<string name="contact">Contact</string>
 	<string name="contacts">Contacts</string>
@@ -195,7 +194,6 @@
 	<string name="responsible_users">Responsible users</string>
 	<string name="save">Save</string>
 	<string name="save_draft">Save draft</string>
-	<string name="save_modifications">Save modifications</string>
 	<string name="save_offline">Save offline</string>
 	<string name="saving_draft">Saving draft</string>
 	<string name="search">Search</string>

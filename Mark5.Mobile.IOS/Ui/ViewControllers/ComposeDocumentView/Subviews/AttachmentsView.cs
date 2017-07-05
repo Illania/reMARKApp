@@ -94,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
-            var remoteAttachments = attachmentDescriptionsInView.OfType<AttachmentDescription>().ToArray();
+            var remoteAttachments = attachmentDescriptionsInView.ToArray();
             DocumentPreview.AttachmentsCount = remoteAttachments.Length;
             Document.Attachments.Clear();
             Document.Attachments.AddRange(remoteAttachments);

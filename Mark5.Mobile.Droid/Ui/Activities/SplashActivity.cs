@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
 #if !DEBUG
@@ -126,7 +127,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     LocalNotificationsListener.Initialize();
 
-                    DateTimeFormatter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+                    DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
                     CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 

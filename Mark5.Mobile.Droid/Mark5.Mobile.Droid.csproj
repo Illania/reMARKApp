@@ -389,6 +389,10 @@
     <Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
     <Compile Include="Model\HubMessages\EntityRemovedMessage.cs" />
     <Compile Include="Model\HubMessages\NewNotificationsReceived.cs" />
+    <Compile Include="Ui\Activities\TemplatesListActivity.cs" />
+    <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
+    <Compile Include="Model\FileDescription.cs" />
+    <Compile Include="Utilities\Extensions\ViewGroupExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -399,6 +403,8 @@
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
     <Folder Include="Model\HubMessages\" />
+    <Folder Include="Ui\Activities\Activities\" />
+    <Folder Include="Utilities\Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />

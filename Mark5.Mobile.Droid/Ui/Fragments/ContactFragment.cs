@@ -289,11 +289,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
-                    new List<IBusinessEntity>
-                    {
-                        ContactPreview
-                    }));
+            {
+                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
+                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                StartActivity(i);
+            }
         }
 
         async void DeleteFromFolderAction()
