@@ -105,12 +105,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             descriptionEditText.SetHint(Resource.String.edit_contact_description);
             container.AddView(descriptionEditText);
 
-            var preferableCheckBox = new AppCompatCheckBox(Context)
+            var thirdLine = new LinearLayoutCompat(Context)
             {
+                Orientation = Horizontal,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
-            preferableCheckBox.SetText(Resource.String.edit_contact_mark_as_preferable);
-            container.AddView(preferableCheckBox);
+            container.AddView(thirdLine);
+
+            var preferableTextView = new AppCompatTextView(Context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            };
+            preferableTextView.SetText(Resource.String.edit_contact_mark_as_preferable);
+            thirdLine.AddView(preferableTextView);
+
+            var preferableCheckBox = new AppCompatCheckBox(Context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            };
+            thirdLine.AddView(preferableCheckBox);
 
             if (row != null)
             {
@@ -232,10 +245,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 }
             }
 
-            public override bool ContainsValidContent()
-            {
-                throw new NotImplementedException();
-            }
+            public override bool ContainsValidContent() => true;
         }
     }
 }

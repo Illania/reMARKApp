@@ -102,7 +102,7 @@
 	<string name="edit_contact_country">Country</string>
 	<string name="edit_contact_vat">VAT</string>
 	<string name="edit_contact_ledger">Ledger</string>
-	<string name="edit_contact_mark_as_preferable">Mark as preferable</string>
+	<string name="edit_contact_mark_as_preferable">Preferable</string>
 	<string name="edit_contact_add">Add</string>
 	<string name="edit_contact_edit">Edit</string>
 	<string name="edit_contact_physical">Addresses</string>
