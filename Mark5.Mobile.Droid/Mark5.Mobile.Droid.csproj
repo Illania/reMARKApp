@@ -414,6 +414,8 @@
     <Compile Include="Ui\Fragments\AbstractUserSelectionFragment.cs" />
     <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\PhysicalAddressesView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AccountView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

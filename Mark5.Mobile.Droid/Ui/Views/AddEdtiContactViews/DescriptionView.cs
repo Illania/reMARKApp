@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
@@ -27,6 +26,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
             ContactPreview.Description = newText;
         }
-
     }
 }
