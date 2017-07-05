@@ -126,7 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             UpdateVisibility();
         }
 
-        public void InitializeFilesDescriptions(FileDescription[] fileDescriptions)
+        public void InitializeFileDescriptions(FileDescription[] fileDescriptions)
         {
             fileDescriptionsInView.Clear();
             foreach (var fdsv in stackView.Subviews.OfType<FileDescriptionSubView>().ToArray())
