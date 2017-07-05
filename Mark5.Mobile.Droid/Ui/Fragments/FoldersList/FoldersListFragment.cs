@@ -862,7 +862,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
 
-                    fh.ExpandButton.Visibility = folder.HasSubFolders && sectionForPosition != Section.None ? ViewStates.Visible : ViewStates.Gone;
+                    fh.ExpandButton.Visibility = folder.HasSubFolders && sectionForPosition != Section.None ? ViewStates.Visible : ViewStates.Invisible;
 
                     if (folder.InternalType == FolderInternalType.Worktray)
                         fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
