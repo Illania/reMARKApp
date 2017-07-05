@@ -48,9 +48,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             label.Opaque = false;
             label.Lines = 0;
             label.TranslatesAutoresizingMaskIntoConstraints = false;
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
             {
@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
 
             var previousDocumentLines = PreviousDocument.Lines;
-            if (previousDocumentLines.Contains(defaultOutgoingLine))
+            if (previousDocumentLines.FirstOrDefault(l => l.Guid == defaultOutgoingLine.Guid) != null)
             {
                 SetLine(defaultOutgoingLine);
             }

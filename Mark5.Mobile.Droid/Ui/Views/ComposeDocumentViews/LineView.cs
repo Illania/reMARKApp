@@ -102,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             var previousDocumentLines = PreviousDocument.Lines;
-            if (previousDocumentLines.Contains(defaultOutgoingLine))
+            if (previousDocumentLines.FirstOrDefault(l => l.Guid == defaultOutgoingLine.Guid) != null)
             {
                 SetLine(defaultOutgoingLine);
             }
