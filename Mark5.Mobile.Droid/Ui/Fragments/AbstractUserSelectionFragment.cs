@@ -36,11 +36,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         int actionButtonTextResId;
         bool includeCurrentUser;
+        bool allowNoUserSelected;
 
-        protected AbstractUserSelectionFragment(int actionButtonTextResId, bool includeCurrentUser)
+        protected AbstractUserSelectionFragment(int actionButtonTextResId, bool includeCurrentUser, bool allowNoUserSelected = false)
         {
             this.actionButtonTextResId = actionButtonTextResId;
             this.includeCurrentUser = includeCurrentUser;
+            this.allowNoUserSelected = allowNoUserSelected;
         }
 
         #region Fragment overrides
@@ -193,7 +195,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
                 ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-                actionButton.Enabled = false;
+                if (!allowNoUserSelected)
+                {
+                    actionButton.Enabled = false;
+                }
             }
             else
             {
@@ -278,7 +283,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new AbstractUserSelectionFragmentState
             {
                 SystemUsers = Adapter.Items,
-                SelectedSystemUsers = SelectedSystemUsers
+                SelectedSystemUsers = SelectedSystemUsers,
+                AllowNoUserSelected = allowNoUserSelected,
+                IncludeCurrentUser = includeCurrentUser,
             };
         }
 
@@ -287,6 +294,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (restoredState is AbstractUserSelectionFragmentState dlfs)
             {
                 CommonConfig.Logger.Info($"Restoring state {GetInfo()}[dlfs.systemUsers.Count={dlfs.SystemUsers?.Count}, dlfs.selectedSystemUsers.Cound={dlfs.SelectedSystemUsers?.Count}]...");
+
+                allowNoUserSelected = dlfs.AllowNoUserSelected;
+                includeCurrentUser = dlfs.IncludeCurrentUser;
 
                 Adapter.SetItems(dlfs.SystemUsers);
 
@@ -305,8 +315,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected class AbstractUserSelectionFragmentState : IRetainableState
         {
             public List<SystemUser> SystemUsers { get; set; }
-
             public Dictionary<int, SystemUser> SelectedSystemUsers { get; set; }
+            public bool IncludeCurrentUser { get; set; }
+            public bool AllowNoUserSelected { get; set; }
         }
 
         #endregion

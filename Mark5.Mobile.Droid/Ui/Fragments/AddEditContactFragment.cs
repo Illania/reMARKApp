@@ -35,7 +35,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         List<AddEditContactView> subviews = new List<AddEditContactView>();
         List<AddEditContactView> secondarySubviews = new List<AddEditContactView>();
 
-        AppCompatButton viewMoreButton;
+        AppCompatButton showMoreButton;
+
+        bool secondaryLayoutShown;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -47,16 +49,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
-            viewMoreButton = new AppCompatButton(Context);
-            viewMoreButton.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            viewMoreButton.Text = "View more";
-            viewMoreButton.Click += (sender, e) =>
+            subviews.Clear();
+            secondarySubviews.Clear();
+
+            showMoreButton = new AppCompatButton(Context);
+            showMoreButton.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            showMoreButton.Text = "View more";
+            showMoreButton.Click += (sender, e) =>
             {
-                viewMoreButton.Visibility = ViewStates.Gone;
+                secondaryLayoutShown = true;
+                showMoreButton.Visibility = ViewStates.Gone;
                 secondaryLinearLayout.Visibility = ViewStates.Visible;
             };
 
             secondaryLinearLayout = new LinearLayoutCompat(Context);
+            secondaryLinearLayout.Orientation = LinearLayoutCompat.Vertical;
             secondaryLinearLayout.Visibility = ViewStates.Gone;
             secondaryLinearLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
@@ -75,8 +82,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     throw new ArgumentException("Contact type needs to be defined");
             }
 
-            linearLayout.AddView(viewMoreButton);
+            linearLayout.AddView(showMoreButton);
             linearLayout.AddView(secondaryLinearLayout);
+
+            HasOptionsMenu = true;
 
             return rootView;
         }
@@ -90,9 +99,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(new PhoneView(Context));
             subviews.ForEach(linearLayout.AddView);
 
+            secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.Add(new BirthdateView(Context));
             secondarySubviews.Add(new DescriptionView(Context));
-            secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
@@ -127,13 +136,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
-            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
+            fragmentManager.BeginTransaction()
+                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                           .Replace(Resource.Id.fragment_container, f, tag)
+                           .AddToBackStack(tag).Commit();
         }
 
         #region Refresh methods
 
         async Task RefreshData()
         {
+            if (Contact != null && ContactPreview != null)
+            {
+                RefreshView();
+                return;
+            }
             if (CreationModeFlag == ContactCreationModeFlag.New)
             {
                 Contact = new Contact();
@@ -181,12 +198,41 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subview.ContactPreview = ContactPreview;
                 subview.RefreshView();
             }
+
+            if (secondaryLayoutShown)
+            {
+                showMoreButton.Visibility = ViewStates.Gone;
+                secondaryLinearLayout.Visibility = ViewStates.Visible;
+            }
         }
 
         void RefreshTitle() //TODO should be updated as the information are inserted
         {
             var name = ContactType == ContactType.Person ? string.Join(" ", Contact.FirstName, Contact.Patronymic, Contact.LastName) : ContactPreview.CompanyName; //TODO check if works also for deparments
             ((AppCompatActivity)Activity).SupportActionBar.Title = name;
+        }
+
+        #endregion
+
+        #region Options menu
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+            var actionResourceId = CreationModeFlag == ContactCreationModeFlag.New ? Resource.String.edit_contact_add : Resource.String.edit_contact_edit;
+            var item = menu.Add(Menu.None, 10, 10, actionResourceId);
+            item.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                //TODO action
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         #endregion
@@ -210,6 +256,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 FolderId = FolderId,
                 ContactId = ContactId,
                 ContactType = ContactType,
+                SecondaryLayoutShown = secondaryLayoutShown,
             };
         }
 
@@ -223,6 +270,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 FolderId = state.FolderId;
                 ContactId = state.ContactId;
                 ContactType = state.ContactType;
+                secondaryLayoutShown = state.SecondaryLayoutShown;
             }
         }
 
@@ -234,6 +282,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? FolderId { get; set; }
             public int? ContactId { get; set; }
             public ContactType ContactType { get; set; }
+            public bool SecondaryLayoutShown { get; set; }
         }
 
         #endregion

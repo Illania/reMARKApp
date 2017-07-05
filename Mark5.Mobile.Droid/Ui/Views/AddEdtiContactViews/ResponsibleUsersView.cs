@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Android.App;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
@@ -30,29 +30,52 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected override void AddButton_Click(object sender, EventArgs e)
         {
+            PresentResponsibleSelectionFragement(null);
+        }
+
+        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        {
+            Clear();
+        }
+
+        void PresentResponsibleSelectionFragement(List<int> currentResponsibleUsersId)
+        {
             var pllf = new ResponsibleSelectionFragment
             {
-                CloseRequest = HandleAction,
+                CloseRequest = HandleResponsibleUsersSelection,
+                PreselectedUserIds = currentResponsibleUsersId,
             };
 
             parentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
         }
 
-        void HandleAction(Dictionary<int, string> obj)
+        void HandleResponsibleUsersSelection(Dictionary<int, string> selectedUsers)
         {
-            AddRow(obj);
+            if (!selectedUsers.Any())
+            {
+                Clear();
+                return;
+            }
+
+            Contact.ResponsibleUsers.Clear();
+            selectedUsers.ForEach(kvp =>
+            {
+                Contact.ResponsibleUsers.Add(kvp.Key, kvp.Value);
+                Contact.ResponsibleUserIds.Add(kvp.Key);
+            });
+            AddRow(selectedUsers);
+        }
+
+        void Clear()
+        {
+            Contact.ResponsibleUsers.Clear();
+            Contact.ResponsibleUserIds.Clear();
+            RemoveRow(Rows[0]);
         }
 
         protected override Row GetNewRow()
         {
             return new ResponsibleRow(Context, this);
-        }
-
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
-        {
-            Contact.ResponsibleUsers.Clear();
-            Contact.ResponsibleUserIds.Clear();
-            RemoveRow(sender as ResponsibleRow);
         }
 
         protected class ResponsibleRow : Row
@@ -78,7 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             void ResponsibleEditText_Click(object sender, EventArgs e)
             {
-
+                (ParentView as ResponsibleUsersView).PresentResponsibleSelectionFragement(Content.Keys.ToList());
             }
 
             public override void UpdateRow() //TODO need to remove content null check on others

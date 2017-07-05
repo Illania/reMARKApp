@@ -9,7 +9,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Action<Dictionary<int, string>> CloseRequest { get; set; }
 
         public ResponsibleSelectionFragment()
-            : base(Resource.String.confirm, true)
+            : base(Resource.String.confirm, true, true)
         {
         }
 

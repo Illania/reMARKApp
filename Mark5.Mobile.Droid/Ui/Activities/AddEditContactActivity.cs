@@ -8,12 +8,13 @@ using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class AddEditContactActivity : AppCompatActivity
+    public class AddEditContactActivity : BaseAppCompatActivity
     {
         const string ContactIntentKey = "Contact_16fd7751-f195-4a43-87fa-097115921e6d";
         const string ContactTypeIntentKey = "ContactType_8d9839f0-c47b-481e-ac20-e9a88376a3ec";
