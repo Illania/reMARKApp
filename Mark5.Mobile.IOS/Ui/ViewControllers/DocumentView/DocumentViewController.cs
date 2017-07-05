@@ -25,6 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class DocumentViewController : AbstractViewController, ISecondaryViewController
     {
         public bool Modal { get; set; }
+        public Action OnComplete { get; set; }
 
         GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview { get; set; }
         GetNextDocumentPreviewDelegate getNextDocumentPreview { get; set; }
@@ -144,10 +145,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readStatusCts?.Cancel();
             readStatusCts = null;
 
-            if ((IsMovingFromParentViewController || IsBeingDismissed) && outgoingDocumentIdentifier != default(Guid))
+            if (IsMovingFromParentViewController || IsBeingDismissed)
             {
-                await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(outgoingDocumentIdentifier);
-                Managers.OutgoingDocumentsManager.Notify(outgoingDocumentIdentifier);
+                OnComplete?.Invoke();
+
+                if (outgoingDocumentIdentifier != default(Guid))
+                {
+                    await Managers.DocumentsManager.UnlockOutgoingDocumentAsync(outgoingDocumentIdentifier);
+                    Managers.OutgoingDocumentsManager.Notify(outgoingDocumentIdentifier);
+                }
             }
 
             DeInitializeHandlers();

@@ -161,40 +161,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (tableView.Editing)
                 return;
 
-            if (SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                var ds = (DataSource)tableView.Source;
+            var ds = (DataSource)tableView.Source;
 
-                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                nc.PopToViewController(nc.ViewControllers[0], false);
+            var vc = new DocumentViewController();
+            vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
+            vc.OnComplete = () => { vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated; };
 
-                var vc = (DocumentViewController)nc.ViewControllers[0];
+            vc.SetData(documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
+            vc.SetRefreshDataOnAppear();
 
-                if (vc.IsShowingDocumentWithId(documentPreview.Id))
-                    return;
-
-                vc.HidesBottomBarWhenPushed = false;
-
-                vc.ClearData();
-
-                vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-
-                vc.SetData(documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
-                vc.RefreshData();
-            }
-            else
-            {
-                var ds = (DataSource)tableView.Source;
-
-                var vc = new DocumentViewController();
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-
-                vc.SetData(documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
-                vc.SetRefreshDataOnAppear();
-
-                NavigationController.PushViewController(vc, true);
-            }
+            NavigationController.PushViewController(vc, true);
         }
 
         [Export("longPressed:")]

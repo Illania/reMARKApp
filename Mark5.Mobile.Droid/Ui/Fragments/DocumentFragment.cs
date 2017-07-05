@@ -172,9 +172,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnUserVisibilityHintChanged();
 
-            if (!(Activity is SwipeDocumentActivity))
-                return;
-
             if (UserVisibleHint)
             {
                 MarkAsReadIfNecessary();

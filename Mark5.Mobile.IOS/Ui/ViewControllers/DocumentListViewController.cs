@@ -301,10 +301,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
 
                 var vc = new DocumentViewController();
                 vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
+                vc.OnComplete = () => { vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated; };
                 if (!searchController.Active)
                     vc.SetData(Folder, documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
                 else
