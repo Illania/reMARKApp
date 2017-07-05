@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Common.Service
     class DocumentsUploadService : AbstractService, IDocumentsUploadService
     {
         public DocumentsUploadService()
-            : base(5 * 1000)
+            : base(10 * 1000)
         {
         }
 
