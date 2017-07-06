@@ -7,9 +7,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class PickerShortcodesFolderListFragment : FoldersListFragment
     {
         public PickerShortcodesFolderListFragment()
-            : base(true)
         {
             RemoteFolder = Folder.RootForModule(ModuleType.Shortcodes);
+            HideSearch = true;
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)

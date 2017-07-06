@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder RemoteFolder { get; set; }
-        readonly bool hideSearch;
+        protected bool HideSearch;
 
         protected View Container;
         protected FolderListAdapter Adapter;
@@ -47,11 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual bool LoadRemoteFromCache { get; }
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
-
-        public FoldersListFragment(bool hideSearch = false)
-        {
-            this.hideSearch = hideSearch;
-        }
 
         #region Overrides
 
@@ -178,7 +173,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
 
-            if (!hideSearch)
+            if (!HideSearch)
             {
                 var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
                 searchItem.SetIcon(Resource.Drawable.action_search_server);
@@ -357,6 +352,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new FoldersListFragment
             {
                 RemoteFolder = folder,
+                HideSearch = HideSearch
             };
         }
 
@@ -787,6 +783,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new FolderListFragmentState
             {
                 Folder = RemoteFolder,
+                HideSearch = HideSearch,
                 SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions)
             };
         }
@@ -797,6 +794,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (flfs != null)
             {
                 RemoteFolder = flfs.Folder;
+                HideSearch = flfs.HideSearch;
                 recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
 
                 CommonConfig.Logger.Info($"Restored state state: [folderName={RemoteFolder.Name}, folderId={RemoteFolder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
@@ -806,7 +804,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected class FolderListFragmentState : IRetainableState
         {
             public Folder Folder { get; set; }
-            public Folder FavouriteRootFolder { get; set; }
+            public bool HideSearch { get; set; }
             public List<int> SelectedItemPositions { get; set; }
         }
 
