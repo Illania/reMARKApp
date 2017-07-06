@@ -200,7 +200,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1, bool addResetDate = false)
+        public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1, bool addRemoveDateChoice = false)
         {
             var tcs = new TaskCompletionSource<long>();
             var datePicker = new DatePicker(context);
@@ -216,9 +216,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds()); }));
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(initialTimestamp)));
-            if (addResetDate)
+            if (addRemoveDateChoice)
             {
-                builder.NeutralText(Resource.String.reset);
+                builder.NeutralText(Resource.String.remove);
                 builder.OnNeutral(new SingleButtonCallback(() => tcs.SetResult(0)));
             }
             builder.Cancelable(false);

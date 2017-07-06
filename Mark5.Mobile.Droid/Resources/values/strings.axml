@@ -232,6 +232,7 @@
 	<string name="reference">Ref.</string>
 	<string name="reset">Reset</string>
 	<string name="related_contacts">Related</string>
+	<string name="remove">Remove</string>
 	<string name="remove_favorites">Remove from favourites</string>
 	<string name="remove_offline">Disable offline mode</string>
 	<string name="reply">Reply</string>
