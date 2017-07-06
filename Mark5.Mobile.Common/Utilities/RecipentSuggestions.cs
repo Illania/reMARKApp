@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
@@ -30,7 +31,7 @@ namespace Mark5.Mobile.Common.Utilities
                 var filtered = new List<Recipient>();
                 try
                 {
-                    var recentAddresses = await Manager.Managers.DocumentsManager.GetRecentAddressesAsync(phrase.Length < 2 ? SourceType.Remote : SourceType.Local);
+                    var recentAddresses = await Managers.DocumentsManager.GetRecentAddressesAsync(phrase.Length < 3 ? SourceType.Remote : SourceType.Local);
                     filtered = recentAddresses.Where(r => r.Address.ContainsCaseInsensitive(phrase) || r.Name.ContainsCaseInsensitive(phrase)).Select(ra => new Recipient(ra)).ToList();
                 }
                 catch (Exception ex)

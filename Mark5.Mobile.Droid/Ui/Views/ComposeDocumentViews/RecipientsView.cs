@@ -200,33 +200,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             SetEmails(string.Join(EmailSeparator, emails));
         }
 
-        public void RemoveAddressFromLine(string lineAddress)
-        {
-            if (lineAddress == savedRecipient)
-                return;
-
-            var currentRecipients = GetRecipents().ToList();
-
-            if (!string.IsNullOrEmpty(savedRecipient))
-                currentRecipients.Add(savedRecipient);
-
-            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress));
-            if (lineRelatedRecipient != null)
-            {
-                savedRecipient = lineRelatedRecipient;
-                currentRecipients.Remove(lineRelatedRecipient);
-            }
-            else
-            {
-                savedRecipient = null;
-            }
-
-            if (currentRecipients.Any())
-                SetRecipients(currentRecipients);
-            else
-                Clear();
-        }
-
         public void AddEmails(IEnumerable<string> emails)
         {
             AddEmails(string.Join(EmailSeparator, emails));
@@ -278,10 +251,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             Edited(this, EventArgs.Empty);
         }
 
-        public void RequestEditorFocus()
+        public void RemoveAddressFromLine(string lineAddress)
         {
-            emailEditor.RequestFocus();
+            if (lineAddress == savedRecipient)
+                return;
+
+            var currentRecipients = GetRecipents().ToList();
+
+            if (!string.IsNullOrEmpty(savedRecipient))
+                currentRecipients.Add(savedRecipient);
+
+            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress));
+            if (lineRelatedRecipient != null)
+            {
+                savedRecipient = lineRelatedRecipient;
+                currentRecipients.Remove(lineRelatedRecipient);
+            }
+            else
+            {
+                savedRecipient = null;
+            }
+
+            if (currentRecipients.Any())
+                SetRecipients(currentRecipients);
+            else
+                Clear();
         }
+
+        public void RequestEditorFocus() => emailEditor.RequestFocus();
 
         #endregion
 
@@ -304,21 +301,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetEmails()
-        {
-            return Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
-        }
+        IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ?
+                                                    matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
+                                                    new List<string>();
 
-        IEnumerable<string> GetRecipents()
-        {
-            return emailEditor.Text.Split(new[]
-                    {
-                        EmailSeparator
-                    },
-                    StringSplitOptions.RemoveEmptyEntries)
+        IEnumerable<string> GetRecipents() => emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => Validator.ContainsValidEmail(s))
                 .Select(s => s.Trim());
-        }
 
         void SetRecipients(IEnumerable<string> recipients)
         {
@@ -334,10 +323,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Control event handlers
 
-        void AddButton_Click(object sender, EventArgs e)
-        {
-            AddButtonClicked(this, EventArgs.Empty);
-        }
+        void AddButton_Click(object sender, EventArgs e) => AddButtonClicked(this, EventArgs.Empty);
 
         void TextView_FocusChange(object sender, FocusChangeEventArgs e)
         {
@@ -517,7 +503,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var progressBar = view.FindViewById<ProgressBar>(Resource.Id.suggestionProgressBar);
                 var separator = view.FindViewById<View>(Resource.Id.suggestionSeparator);
 
-                var isLoading = (Filter as SuggestionsFilter).Loading;
+                var isLoading = ((SuggestionsFilter)Filter).Loading;
                 var suggestion = suggestions[position];
 
                 separator.Visibility = position == Count - 1 && !isLoading ? ViewStates.Invisible : ViewStates.Visible;

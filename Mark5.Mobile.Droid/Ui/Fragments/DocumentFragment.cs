@@ -249,10 +249,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Activity is SwitchDocumentActivity && Folder != null)
             {
                 var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.document_previous);
-                goToPreviousItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
+                goToPreviousItem.SetShowAsAction(ShowAsAction.Always);
 
                 var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.document_next);
-                goToNextItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
+                goToNextItem.SetShowAsAction(ShowAsAction.Always);
             }
 
             if (!DocumentPreview.IsReadByCurrent)
@@ -304,11 +304,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
                 if (goToPreviousItem != null)
-                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id));
 
                 var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
                 if (goToNextItem != null)
-                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id));
             }
         }
 
@@ -626,8 +626,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
             catch (Exception ex)
             {
@@ -788,8 +787,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
         }
 
@@ -804,15 +802,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as DocumentView;
-                if (dv != null)
+                if (linearLayout.GetChildAt(i) is DocumentView dv)
                 {
                     dv.DocumentPreview = DocumentPreview;
                     dv.Document = Document;
                     dv.RefreshView();
 
-                    var d = linearLayout.GetChildAt(i + 1) as Divider;
-                    if (d != null)
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {
                         d.Visibility = dv.Visibility;
                         i++;
@@ -833,15 +829,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as T;
-                if (dv != null)
+                if (linearLayout.GetChildAt(i) is T dv)
                 {
                     dv.DocumentPreview = DocumentPreview;
                     dv.Document = Document;
                     dv.RefreshView();
 
-                    var d = linearLayout.GetChildAt(i + 1) as Divider;
-                    if (d != null)
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {
                         d.Visibility = dv.Visibility;
                         i++;
@@ -938,8 +932,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var dfs = restoredState as DocumentFragmentState;
-            if (dfs != null)
+            if (restoredState is DocumentFragmentState dfs)
             {
                 FolderId = dfs.FolderId;
                 Folder = dfs.Folder;
