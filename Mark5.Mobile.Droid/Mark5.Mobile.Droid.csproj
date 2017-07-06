@@ -394,8 +394,6 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AbstractMultipleRowsView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AbstractStringSingleRowView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\MiddleNameView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\LastNameView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\ShortIdView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\DescriptionView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\PositionView.cs" />
