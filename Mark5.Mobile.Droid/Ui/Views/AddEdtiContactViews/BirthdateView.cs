@@ -9,7 +9,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class BirthdateView : AbstractSimpleFieldView
     {
         public BirthdateView(Context context)
-            : base(context, Resource.String.edit_contact_birthdate, true)
+            : base(context, Resource.String.edit_contact_birthdate, true, false)
         {
         }
 
