@@ -42,6 +42,13 @@
 		<item name="windowNoTitle">true</item>
 		<item name="windowActionBar">false</item>
 	</style>
+	<style name="mark5Login" parent="mark5">
+		<item name="colorControlNormal">@color/lightgray</item>
+		<item name="colorControlActivated">@color/lightgray</item>
+		<item name="android:textColorPrimary">@color/lightgray</item>
+		<item name="android:textColorSecondary">@color/lightgray</item>
+		<item name="android:textColorHint">@color/lightgray</item>
+	</style>
 	<style name="mark5appbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
 		<item name="android:textColorPrimary">@color/lightgray</item>
 		<item name="android:textColorSecondary">@color/lightgray</item>

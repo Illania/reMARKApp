@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -185,9 +185,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnUserVisibilityHintChanged()
         {
             base.OnUserVisibilityHintChanged();
-
-            if (!(Activity is SwipeDocumentActivity))
-                return;
 
             if (UserVisibleHint)
             {

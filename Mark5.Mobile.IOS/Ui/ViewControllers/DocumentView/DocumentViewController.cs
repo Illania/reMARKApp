@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,6 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public bool Modal { get; set; }
+        public Action OnComplete { get; set; }
 
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null;
 
@@ -140,7 +141,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readStatusCts?.Cancel();
             readStatusCts = null;
 
-            DeinitializeHandlers();
+            if (IsMovingFromParentViewController || IsBeingDismissed)
+                OnComplete?.Invoke();
+
+            DeInitializeHandlers();
         }
 
         public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)

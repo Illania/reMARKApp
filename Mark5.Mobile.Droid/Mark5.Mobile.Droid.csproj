@@ -682,6 +682,12 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
     <AndroidResource Include="Resources\layout\download.axml" />
     <AndroidResource Include="Resources\layout\list_no_refresh.axml" />
+    <AndroidResource Include="Resources\drawable\login_page_divider.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\login.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\login.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\login.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\login.png" />
+    <AndroidResource Include="Resources\layout\login_spinner.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
