@@ -25,7 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
                 contentEditText = new TextInputEditText(Context)
                 {
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    LayoutParameters = new Android.Widget.LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
                 };
                 contentEditText.SetHint(hintResourceId);
                 layout.AddView(contentEditText);
@@ -35,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 contentEditText = new AppCompatEditText(Context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
                 };
                 contentEditText.SetHint(hintResourceId);
                 AddView(contentEditText);

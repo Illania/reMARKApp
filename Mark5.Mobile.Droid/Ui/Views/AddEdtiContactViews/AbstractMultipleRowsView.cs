@@ -125,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
                 LeftMargin = DistanceNormal,
-                Gravity = (int)GravityFlags.Top,
+                Gravity = (int)GravityFlags.CenterVertical,
             };
             button.LayoutParameters = addButtonLp;
             return button;

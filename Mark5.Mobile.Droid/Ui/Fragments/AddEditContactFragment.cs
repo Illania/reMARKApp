@@ -113,8 +113,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(new MobileView(Context));
             subviews.ForEach(linearLayout.AddView);
 
-            secondarySubviews.Add(new ShortIdView(Context));
             secondarySubviews.Add(new PhysicalAddressesView(Context));
+            secondarySubviews.Add(new ShortIdView(Context));
             secondarySubviews.Add(new DescriptionView(Context));
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.Add(new BirthdateView(Context));

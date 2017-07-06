@@ -3,28 +3,22 @@ using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class LedgerView : AbstractStringSingleRowView
+    public class LedgerView : AbstractSimpleFieldView
     {
         public LedgerView(Context context)
-            : base(context, Resource.String.edit_contact_ledger)
+            : base(context, Resource.String.edit_contact_ledger, true)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact.Ledger))
-                AddRow(Contact.Ledger);
+            Content = Contact.Ledger;
         }
 
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        protected override void ContentChanged(object sender, Android.Text.TextChangedEventArgs e)
         {
-            Contact.Ledger = string.Empty;
-            RemoveRow(sender as Row);
+            Contact.Ledger = Content;
         }
 
-        protected override void TextChanged(string newText)
-        {
-            Contact.Ledger = newText;
-        }
     }
 }

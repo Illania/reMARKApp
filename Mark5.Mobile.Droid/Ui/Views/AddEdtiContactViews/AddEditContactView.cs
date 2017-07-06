@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
             Orientation = Vertical;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            SetPadding(DistanceSmall, DistanceNormal, DistanceSmall, DistanceNormal);
+            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
 
             LayoutTransition = new LayoutTransition();
         }
