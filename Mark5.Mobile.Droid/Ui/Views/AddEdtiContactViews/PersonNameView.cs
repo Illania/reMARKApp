@@ -21,10 +21,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         readonly LinearLayoutCompat namesLayout;
 
         readonly AppCompatImageButton expandButton;
+        readonly Action<string> onPersonNameChanged;
 
-        public PersonNameView(Context context)
+        public PersonNameView(Context context, Action<string> onPersonNameChanged)
             : base(context)
         {
+            this.onPersonNameChanged = onPersonNameChanged;
+
             Orientation = Horizontal;
 
             namesLayout = new LinearLayoutCompat(context)
@@ -125,6 +128,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             UpdateSingleNames();
+            onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
         void FirstNameEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -146,6 +150,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
             UpdateSingleNames();
             UpdateCompositeName();
+            onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
         void UpdateSingleNames()
@@ -165,6 +170,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             if (!string.IsNullOrWhiteSpace(Contact.LastName))
                 sb.Append(" " + Contact.LastName);
             compositeNameEditText.Text = sb.ToString();
+            onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
     }
 }

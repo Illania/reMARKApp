@@ -414,6 +414,9 @@
     <Compile Include="Ui\Views\AddEdtiContactViews\AccountView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\AbstractSimpleFieldView.cs" />
     <Compile Include="Ui\Views\AddEdtiContactViews\PersonNameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\ParentContactView.cs" />
+    <Compile Include="Ui\Activities\ParentContactSelectorActivity.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

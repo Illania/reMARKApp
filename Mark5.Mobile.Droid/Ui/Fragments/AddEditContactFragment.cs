@@ -27,6 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public ContactType ContactType { get; set; }
         public ContactCreationModeFlag CreationModeFlag { get; set; }
         public Action CloseRequest { get; set; }
+        public ContactPreview ParentContactPreview { get; set; }
 
         LinearLayoutCompat linearLayout;
         LinearLayoutCompat secondaryLinearLayout;
@@ -106,7 +107,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected void PrepareViewsForPerson()
         {
             //Company
-            subviews.Add(new PersonNameView(Context));
+            subviews.Add(new PersonNameView(Context, OnPersonNameChanged);
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
@@ -200,8 +201,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshView()
         {
-            RefreshTitle();
-
             progressBar.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
@@ -209,6 +208,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 subview.Contact = Contact;
                 subview.ContactPreview = ContactPreview;
+                subview.ParentContactPreview = ParentContactPreview;
                 subview.RefreshView();
             }
 
@@ -219,9 +219,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void RefreshTitle() //TODO should be updated as the information are inserted
+        void OnPersonNameChanged(string name)
         {
-            var name = ContactType == ContactType.Person ? string.Join(" ", Contact.FirstName, Contact.Patronymic, Contact.LastName) : ContactPreview.CompanyName; //TODO check if works also for deparments
             ((AppCompatActivity)Activity).SupportActionBar.Title = name;
         }
 
