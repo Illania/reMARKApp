@@ -601,6 +601,13 @@ namespace Mark5.Mobile.Common.Manager
             return docs;
         }
 
+        public async Task<(DocumentPreview DocumentPreview, Document Document)> GetFailedDocumentToUpload(Guid guid)
+        {
+            var document = await FileSystemStorage.GetFailedDocumentToUploadDocument(guid);
+            var documentPreview = await FileSystemStorage.GetFailedDocumentToUploadDocumentPreview(guid);
+            return (documentPreview, document);
+        }
+
         public async Task DeleteFailedDocumentToUpload(Guid guid) => await FileSystemStorage.DeleteFailedDocumentToUpload(guid);
 
         public async Task<bool> IsDocumentWorkingCopyAvailableAsync() => await FileSystemStorage.IsDocumentWorkingCopyAvailableAsync();

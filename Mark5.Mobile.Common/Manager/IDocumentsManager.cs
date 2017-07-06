@@ -63,6 +63,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetFailedDocumentsToUploadDocumentPreviews();
 
+        Task<(DocumentPreview DocumentPreview, Document Document)> GetFailedDocumentToUpload(Guid guid);
+
         Task DeleteFailedDocumentToUpload(Guid guid);
 
         Task<bool> IsDocumentWorkingCopyAvailableAsync();

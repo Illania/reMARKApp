@@ -132,6 +132,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
+        void FailedDocumentSelected(Guid guid)
+        {
+            var vc = new DocumentViewController { Modal = true };
+            vc.SetData(guid);
+            vc.SetRefreshDataOnAppear();
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         async void ResendFailedDocumentToUpload((Guid Guid, DocumentPreview DocumentPreview) data)
         {
             await Managers.DocumentsManager.RequeueFailedToUpload(data.Guid);
@@ -257,6 +265,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => Height;
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (indexPath.Section == Section.Failed)
+                    viewController.FailedDocumentSelected(Items[Section.Failed][indexPath.Row].Guid);
+            }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {

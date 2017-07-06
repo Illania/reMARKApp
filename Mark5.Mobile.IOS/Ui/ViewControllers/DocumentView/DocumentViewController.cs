@@ -30,6 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null;
 
+        Guid failedDocumentToUploadGuid;
         int? folderId;
         Folder folder;
         int? documentId;
@@ -280,41 +281,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var viewsBeforeContent = new List<DocumentSubView>();
             var viewsAfterContent = new List<DocumentSubView>();
 
-            subjectView = new SubjectView();
-            viewsBeforeContent.Add(subjectView);
-
-            fromView = new FromView();
-            viewsBeforeContent.Add(fromView);
-
-            toView = new ToView();
-            viewsBeforeContent.Add(toView);
-
-            ccView = new CcView();
-            viewsBeforeContent.Add(ccView);
-
-            bccView = new BccView();
-            viewsBeforeContent.Add(bccView);
-
-            dateReceivedView = new DateReceivedView();
-            viewsBeforeContent.Add(dateReceivedView);
-
-            priorityView = new PriorityView();
-            viewsBeforeContent.Add(priorityView);
-
-            attachmentsListView = new AttachmentsView();
-            viewsBeforeContent.Add(attachmentsListView);
-
-            referenceNumberView = new ReferenceNumberView();
-            viewsAfterContent.Add(referenceNumberView);
-
-            readByView = new ReadByView();
-            viewsAfterContent.Add(readByView);
-
-            creatorView = new CreatorView();
-            viewsAfterContent.Add(creatorView);
-
-            originatorView = new OriginatorView();
-            viewsAfterContent.Add(originatorView);
+            viewsBeforeContent.Add(subjectView = new SubjectView());
+            viewsBeforeContent.Add(fromView = new FromView());
+            viewsBeforeContent.Add(toView = new ToView());
+            viewsBeforeContent.Add(ccView = new CcView());
+            viewsBeforeContent.Add(bccView = new BccView());
+            viewsBeforeContent.Add(dateReceivedView = new DateReceivedView());
+            viewsBeforeContent.Add(priorityView = new PriorityView());
+            viewsBeforeContent.Add(attachmentsListView = new AttachmentsView());
+            viewsAfterContent.Add(referenceNumberView = new ReferenceNumberView());
+            viewsAfterContent.Add(readByView = new ReadByView());
+            viewsAfterContent.Add(creatorView = new CreatorView());
+            viewsAfterContent.Add(originatorView = new OriginatorView());
 
             viewsBeforeContent.ForEach(stackViewBeforeContent.AddArrangedSubview);
             viewsAfterContent.ForEach(stackViewAfterContent.AddArrangedSubview);
@@ -469,6 +447,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            failedDocumentToUploadGuid = Guid.Empty;
             documentId = null;
             document = null;
             folderId = null;
@@ -482,6 +461,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId)
         {
+            failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
             folderId = null;
@@ -495,6 +475,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId, Guid notificationGuid)
         {
+            failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
             folderId = null;
@@ -508,6 +489,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
             folderId = null;
@@ -521,6 +503,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview)
         {
+            failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
             folderId = null;
@@ -530,10 +513,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.folder = folder;
         }
 
+        public void SetData(Guid failedDocumentToUploadGuid)
+        {
+            document = null;
+            documentPreview = null;
+            folder = null;
+            documentId = null;
+            GetPreviousDocumentPreview = null;
+            GetNextDocumentPreview = null;
+            notificationGuid = default(Guid);
+
+            this.failedDocumentToUploadGuid = failedDocumentToUploadGuid;
+        }
+
         public void ClearData()
         {
             loadCts?.Cancel();
 
+            failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentPreview = null;
             folder = null;
@@ -590,6 +587,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (notificationGuid != default(Guid))
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
+
+                if (failedDocumentToUploadGuid != Guid.Empty)
+                {
+                    (documentPreview, document) = await Managers.DocumentsManager.GetFailedDocumentToUpload(failedDocumentToUploadGuid);
+                    documentId = document.Id;
+                }
 
                 if (documentId.HasValue && documentPreview == null && document == null)
                 {
@@ -720,13 +723,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RefreshNavigationBar();
 
-            flag.Enabled = document != null;
-            fileTo.Enabled = document != null;
-            replyActions.Enabled = document != null;
-            comments.BadgeValue = document?.Comments?.Count.ToString();
-            comments.Enabled = document != null;
-            commentsButton.Enabled = document != null;
-            userActions.Enabled = document != null;
+            var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
+            if (enableBottomActions)
+            {
+                flag.Enabled = document != null;
+                fileTo.Enabled = document != null;
+                replyActions.Enabled = document != null;
+                comments.BadgeValue = document?.Comments?.Count.ToString();
+                comments.Enabled = document != null;
+                commentsButton.Enabled = document != null;
+                userActions.Enabled = document != null;
+            }
 
             UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
             UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1f);
