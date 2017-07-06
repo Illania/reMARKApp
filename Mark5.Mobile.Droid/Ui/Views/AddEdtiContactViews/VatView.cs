@@ -1,31 +1,24 @@
 ﻿using System;
 using Android.Content;
+using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class VatView : AbstractStringSingleRowView
+    public class VatView : AbstractSimpleFieldView
     {
         public VatView(Context context)
-            : base(context, Resource.String.edit_contact_vat)
+            : base(context, Resource.String.edit_contact_vat, true)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact.Vat))
-                AddRow(Contact.Vat);
+            Content = Contact.Vat;
         }
 
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
-            Contact.Vat = string.Empty;
-            RemoveRow(sender as Row);
+            Contact.Vat = Content;
         }
-
-        protected override void TextChanged(string newText)
-        {
-            Contact.Vat = newText;
-        }
-
     }
 }

@@ -1,30 +1,24 @@
 ﻿using System;
 using Android.Content;
+using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class DescriptionView : AbstractStringSingleRowView
+    public class DescriptionView : AbstractSimpleFieldView
     {
         public DescriptionView(Context context)
-            : base(context, Resource.String.edit_contact_description)
+            : base(context, Resource.String.edit_contact_description, true)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(ContactPreview.Description))
-                AddRow(ContactPreview.Description);
+            Content = ContactPreview.Description;
         }
 
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
-            ContactPreview.Description = string.Empty;
-            RemoveRow(sender as Row);
-        }
-
-        protected override void TextChanged(string newText)
-        {
-            ContactPreview.Description = newText;
+            ContactPreview.Description = Content;
         }
     }
 }

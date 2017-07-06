@@ -6,11 +6,13 @@ using Android.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class AbstractSimpleFieldView : AddEditContactView
+    public abstract class AbstractSimpleFieldView : AddEditContactView
     {
         AppCompatEditText contentEditText;
 
-        public AbstractSimpleFieldView(Context context, int hintResourceId, bool floatingHint = false)
+        protected string Content { get => contentEditText.Text; set => contentEditText.Text = value; }
+
+        protected AbstractSimpleFieldView(Context context, int hintResourceId, bool floatingHint, bool editable = true)
             : base(context)
         {
             if (floatingHint)
@@ -38,17 +40,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 AddView(contentEditText);
             }
 
-            contentEditText.TextChanged += ContentEditText_TextChanged;
+            contentEditText.TextChanged += ContentChanged;
+            contentEditText.Click += ContentClicked;
+
+            if (!editable)
+            {
+                contentEditText.Focusable = false;
+                contentEditText.KeyListener = null;
+            }
         }
 
-        void ContentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
-        {
+        protected virtual void ContentClicked(object sender, EventArgs e) { }
 
-        }
-
-        public override void RefreshView()
-        {
-            throw new NotImplementedException();
-        }
+        protected virtual void ContentChanged(object sender, Android.Text.TextChangedEventArgs e) { }
     }
 }

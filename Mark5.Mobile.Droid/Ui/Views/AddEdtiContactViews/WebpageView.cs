@@ -1,30 +1,24 @@
 ﻿using System;
 using Android.Content;
+using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class WebpageView : AbstractStringSingleRowView
+    public class WebpageView : AbstractSimpleFieldView
     {
         public WebpageView(Context context)
-            : base(context, Resource.String.edit_contact_webpage)
+            : base(context, Resource.String.edit_contact_webpage, true)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact.WebPageAddress))
-                AddRow(Contact.WebPageAddress);
+            Content = Contact.WebPageAddress;
         }
 
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
-            Contact.WebPageAddress = string.Empty;
-            RemoveRow(sender as Row);
-        }
-
-        protected override void TextChanged(string newText)
-        {
-            Contact.WebPageAddress = newText;
+            Contact.WebPageAddress = Content;
         }
 
     }

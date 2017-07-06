@@ -1,32 +1,25 @@
 ﻿using System;
 using Android.Content;
+using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
     //To be used with deparment and companies
-    public class NameView : AbstractStringSingleRowView
+    public class NameView : AbstractSimpleFieldView
     {
         public NameView(Context context)
-            : base(context, Resource.String.edit_contact_name)
+            : base(context, Resource.String.edit_contact_name, false)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(ContactPreview.Name))
-                AddRow(ContactPreview.Name);
+            ContactPreview.Name = Content;
         }
 
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
-            ContactPreview.Name = string.Empty;
-            RemoveRow(sender as Row);
+            ContactPreview.Name = Content;
         }
-
-        protected override void TextChanged(string newText)
-        {
-            ContactPreview.Name = newText;
-        }
-
     }
 }

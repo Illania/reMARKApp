@@ -1,31 +1,24 @@
 ﻿using System;
 using Android.Content;
+using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class PositionView : AbstractStringSingleRowView
+    public class PositionView : AbstractSimpleFieldView
     {
         public PositionView(Context context)
-            : base(context, Resource.String.edit_contact_position)
+            : base(context, Resource.String.edit_contact_position, false)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(Contact.Position))
-                AddRow(Contact.Position);
+            Content = Contact.Position;
         }
 
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
-            Contact.Position = string.Empty;
-            RemoveRow(sender as Row);
+            Contact.Position = Content;
         }
-
-        protected override void TextChanged(string newText)
-        {
-            Contact.Position = newText;
-        }
-
     }
 }

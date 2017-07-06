@@ -1,31 +1,24 @@
 ﻿using System;
 using Android.Content;
+using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
-    public class ShortIdView : AbstractStringSingleRowView
+    public class ShortIdView : AbstractSimpleFieldView
     {
         public ShortIdView(Context context)
-            : base(context, Resource.String.edit_contact_short_id)
+            : base(context, Resource.String.edit_contact_short_id, true)
         {
         }
 
         public override void RefreshView()
         {
-            if (!string.IsNullOrEmpty(ContactPreview.ShortId))
-                AddRow(ContactPreview.ShortId);
+            Content = ContactPreview.ShortId;
         }
 
-        protected override void Row_DeleteClicked(object sender, EventArgs e)
+        protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
-            ContactPreview.ShortId = string.Empty;
-            RemoveRow(sender as Row);
+            ContactPreview.ShortId = Content;
         }
-
-        protected override void TextChanged(string newText)
-        {
-            ContactPreview.ShortId = newText;
-        }
-
     }
 }
