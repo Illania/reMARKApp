@@ -700,6 +700,10 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\add.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
     <AndroidResource Include="Resources\layout\countries_dropdown.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\expand_down.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

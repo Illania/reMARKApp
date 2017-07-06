@@ -39,8 +39,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             this.isSingleRow = isSingleRow;
 
-            SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
-
             titleEditText = new AppCompatEditText(context)
             {
                 KeyListener = null,

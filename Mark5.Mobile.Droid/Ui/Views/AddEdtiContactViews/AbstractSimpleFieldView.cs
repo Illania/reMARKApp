@@ -1,8 +1,10 @@
 ﻿using System;
 using Android.Content;
+using Android.Graphics;
 using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
@@ -44,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             contentEditText.TextChanged += ContentChanged;
             contentEditText.Click += ContentClicked;
+            contentEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
 
             if (!editable)
             {

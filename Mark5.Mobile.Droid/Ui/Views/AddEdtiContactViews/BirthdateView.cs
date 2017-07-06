@@ -33,6 +33,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 var utcTimestamp = newTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                 Contact.BirthDateTimestamp = utcTimestamp;
             }
+
+            RefreshView();
         }
 
     }

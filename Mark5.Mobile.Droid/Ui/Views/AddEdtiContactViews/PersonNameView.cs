@@ -5,21 +5,23 @@ using Android.Content;
 using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Views.Animations;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
     public class PersonNameView : AddEditContactView
     {
-        AppCompatEditText compositeNameEditText;
-        AppCompatEditText firstNameEditText;
-        AppCompatEditText middleNameEditText;
-        AppCompatEditText lastNameEditText;
+        readonly AppCompatEditText compositeNameEditText;
+        readonly AppCompatEditText firstNameEditText;
+        readonly AppCompatEditText middleNameEditText;
+        readonly AppCompatEditText lastNameEditText;
 
-        LinearLayoutCompat expandedLayout;
-        LinearLayoutCompat namesLayout;
+        readonly LinearLayoutCompat expandedLayout;
+        readonly LinearLayoutCompat namesLayout;
 
-        AppCompatImageButton expandButton;
+        readonly AppCompatImageButton expandButton;
 
         public PersonNameView(Context context)
             : base(context)
@@ -35,13 +37,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             expandButton = new AppCompatImageButton(context);
 
-            expandButton.SetImageResource(Resource.Drawable.add);
-            expandButton.SetColorFilter(Color.Blue);
+            expandButton.SetImageResource(Resource.Drawable.expand_down);
 
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
                 LeftMargin = DistanceSmall,
-                Gravity = (int)GravityFlags.CenterVertical,
+                Gravity = (int)GravityFlags.Top,
             };
             expandButton.Click += ExpandButton_Click;
             expandButton.LayoutParameters = addButtonLp;
@@ -54,6 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             };
             compositeNameEditText.SetHint(Resource.String.edit_contact_name);
             compositeNameEditText.TextChanged += CompositeNameEditText_TextChanged;
+            compositeNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             namesLayout.AddView(compositeNameEditText);
 
             expandedLayout = new LinearLayoutCompat(context)
@@ -70,6 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
             };
             firstNameEditText.SetHint(Resource.String.edit_contact_first_name);
+            firstNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             firstNameEditText.TextChanged += FirstNameEditText_TextChanged;
             expandedLayout.AddView(firstNameEditText);
 
@@ -79,7 +82,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
             };
             middleNameEditText.SetHint(Resource.String.edit_contact_middle_name);
-            middleNameEditText.TextChanged += MiddleNameEditText_TextChanged; ;
+            middleNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            middleNameEditText.TextChanged += MiddleNameEditText_TextChanged;
             expandedLayout.AddView(middleNameEditText);
 
             lastNameEditText = new AppCompatEditText(context)
@@ -88,7 +92,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
             };
             lastNameEditText.SetHint(Resource.String.edit_contact_last_name);
-            lastNameEditText.TextChanged += LastNameEditText_TextChanged; ;
+            lastNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            lastNameEditText.TextChanged += LastNameEditText_TextChanged;
             expandedLayout.AddView(lastNameEditText);
         }
 
@@ -98,13 +103,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 expandedLayout.Visibility = ViewStates.Visible;
                 compositeNameEditText.Visibility = ViewStates.Gone;
-                expandButton.SetColorFilter(Color.Red);
+                expandButton.Animate().Rotation(180).SetInterpolator(new AccelerateDecelerateInterpolator());
             }
             else
             {
                 expandedLayout.Visibility = ViewStates.Gone;
                 compositeNameEditText.Visibility = ViewStates.Visible;
-                expandButton.SetColorFilter(Color.Blue);
+                expandButton.Animate().Rotation(0).SetInterpolator(new AccelerateDecelerateInterpolator());
                 UpdateCompositeName();
             }
         }
