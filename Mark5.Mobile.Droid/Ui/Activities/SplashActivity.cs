@@ -4,7 +4,9 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
+using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
@@ -29,10 +31,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             SetContentView(Resource.Layout.activity_splash);
 
-            var uiOptions = (int) Window.DecorView.SystemUiVisibility;
-            uiOptions |= (int) SystemUiFlags.Immersive;
-            uiOptions |= (int) SystemUiFlags.HideNavigation;
-            Window.DecorView.SystemUiVisibility = (StatusBarVisibility) uiOptions;
+            var uiOptions = (int)Window.DecorView.SystemUiVisibility;
+            uiOptions |= (int)SystemUiFlags.Immersive;
+            uiOptions |= (int)SystemUiFlags.HideNavigation;
+            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
 
             if (CommonConfig.Logger.IsInfoEnabled())
                 CommonConfig.Logger.Info($"Created {nameof(SplashActivity)}");
@@ -148,11 +150,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         if (t.Result)
                             StartActivity(new Intent(this, typeof(MainActivity)));
                         else
-                            StartActivity(new Intent(this, typeof(LoginActivity)));
+                            ShowLoginButton();
                     },
                     TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
+        }
+
+        void ShowLoginButton()
+        {
+            var progressBar = FindViewById<ProgressBar>(Resource.Id.progress_bar);
+            var loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
+
+            loginButton.Click += (sender, e) => StartActivity(new Intent(this, typeof(LoginActivity)));
+
+            progressBar.Visibility = ViewStates.Gone;
+            loginButton.Visibility = ViewStates.Visible;
         }
     }
 }
