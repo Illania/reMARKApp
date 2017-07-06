@@ -1,8 +1,6 @@
 ﻿using System;
 using Android.Content;
-using Android.Graphics;
 using Android.Support.Design.Widget;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -10,39 +8,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
     public abstract class AbstractSimpleFieldView : AddEditContactView
     {
-        AppCompatEditText contentEditText;
+        TextInputEditText contentEditText;
 
         protected string Content { get => contentEditText.Text; set => contentEditText.Text = value; }
 
         protected AbstractSimpleFieldView(Context context, int hintResourceId, bool floatingHint, bool editable = true)
             : base(context)
         {
-            if (floatingHint)
+            var layout = new TextInputLayout(Context)
             {
-                var layout = new TextInputLayout(Context)
-                {
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                };
-                AddView(layout);
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+            };
+            AddView(layout);
 
-                contentEditText = new TextInputEditText(Context)
-                {
-                    LayoutParameters = new Android.Widget.LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
-                };
-                contentEditText.SetHint(hintResourceId);
-                layout.AddView(contentEditText);
-            }
-            else
+            contentEditText = new TextInputEditText(Context)
             {
-                contentEditText = new AppCompatEditText(Context)
-                {
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
-                };
-                contentEditText.SetHint(hintResourceId);
-                AddView(contentEditText);
-            }
+                LayoutParameters = new Android.Widget.LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
+            };
+            contentEditText.SetHint(hintResourceId);
 
             contentEditText.TextChanged += ContentChanged;
             contentEditText.Click += ContentClicked;
@@ -53,6 +37,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 contentEditText.Focusable = false;
                 contentEditText.KeyListener = null;
             }
+
+            layout.AddView(contentEditText);
+            layout.HintEnabled = floatingHint;
+
+            var topBottomDistance = DistanceLarge;
+            var leftRightDistance = floatingHint ? 0 : DistanceSmall;
+
+            SetPadding(topBottomDistance, leftRightDistance, topBottomDistance, leftRightDistance);
         }
 
         protected virtual void ContentClicked(object sender, EventArgs e) { }

@@ -27,14 +27,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected AbstractMultipleRowsView(Context context, int titleResourceId, bool isSingleRow) : base(context)
         {
-            topLayout = new LinearLayoutCompat(context);
-            topLayout.Orientation = Horizontal;
-            topLayout.LayoutTransition = new LayoutTransition();
+            topLayout = new LinearLayoutCompat(context)
+            {
+                Orientation = Horizontal,
+                LayoutTransition = new LayoutTransition()
+            };
             AddView(topLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-            contentLayout = new LinearLayoutCompat(context);
-            contentLayout.Orientation = Vertical;
-            contentLayout.LayoutTransition = new LayoutTransition();
+            contentLayout = new LinearLayoutCompat(context)
+            {
+                Orientation = Vertical,
+                LayoutTransition = new LayoutTransition()
+            };
             AddView(contentLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             this.isSingleRow = isSingleRow;
@@ -76,8 +80,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         abstract protected void AddButton_Click(object sender, EventArgs e);
 
         abstract protected void Row_DeleteClicked(object sender, EventArgs e);
-
-        //TODO change name
 
         virtual protected void AddRow(T content = default(T))
         {
@@ -122,8 +124,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
+                TopMargin = plus ? 0 : DistanceSmall,
                 LeftMargin = DistanceNormal,
-                Gravity = (int)GravityFlags.CenterVertical,
+                Gravity = plus ? (int)GravityFlags.CenterVertical : (int)GravityFlags.Top,
             };
             button.LayoutParameters = addButtonLp;
             return button;

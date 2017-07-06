@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text;
 using Android.Content;
-using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.Animations;
@@ -41,6 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
+                TopMargin = DistanceSmall,
                 LeftMargin = DistanceSmall,
                 Gravity = (int)GravityFlags.Top,
             };
