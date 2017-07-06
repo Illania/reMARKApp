@@ -36,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
+        public Guid FailedDocumentToUploadGuid { get; set; }
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
         public int? DocumentId { get; set; }
@@ -244,6 +245,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             if (DocumentPreview == null)
+                return;
+
+            if (FailedDocumentToUploadGuid != Guid.Empty)
                 return;
 
             if (Activity is SwitchDocumentActivity && Folder != null)
@@ -521,12 +525,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void SetPriority()
         {
-            var possiblePriorities = new List<Priority>
-            {
-                Priority.Urgent,
-                Priority.Normal,
-                Priority.Low
-            };
+            var possiblePriorities = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
             var documentPriority = DocumentPreview.Priority;
 
             if (!possiblePriorities.Contains(documentPriority))
@@ -769,6 +768,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (NotificationGuid != default(Guid))
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
 
+                if (FailedDocumentToUploadGuid != Guid.Empty)
+                {
+                    (DocumentPreview, Document) = await Managers.DocumentsManager.GetFailedDocumentToUpload(FailedDocumentToUploadGuid);
+                    DocumentId = Document.Id;
+                }
+
                 if (DocumentId.HasValue && DocumentPreview == null && Document == null)
                 {
                     var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
@@ -793,9 +798,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshView()
         {
-            button1.Enabled = true;
-            button2.Enabled = true;
-            button3.Enabled = true;
+            var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;
+            if (activateButtons)
+            {
+                button1.Enabled = true;
+                button2.Enabled = true;
+                button3.Enabled = true;
+                button1.Alpha = 1f;
+                button2.Alpha = 1f;
+                button3.Alpha = 1f;
+            }
+            else
+            {
+                button1.Enabled = false;
+                button2.Enabled = false;
+                button3.Enabled = false;
+                button1.Alpha = .5f;
+                button2.Alpha = .5f;
+                button3.Alpha = .5f;
+            }
 
             progress.Visibility = ViewStates.Gone;
             relativeLayout.Visibility = ViewStates.Visible;

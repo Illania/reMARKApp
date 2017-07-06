@@ -13,6 +13,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using TinyMessenger;
 
@@ -131,6 +132,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, (Guid Guid, DocumentPreview DocumentPreview) data)
         {
+            if (actionMode == null &&
+                adapter.FailedGuids.Contains(data.Guid))
+            {
+                var i = new Intent(Activity, typeof(DocumentActivity));
+                i.PutExtra(DocumentActivity.FailedDocumentToUploadGuidIntentKey, data.Guid.ToString());
+                StartActivity(i);
+            }
+
             if (actionMode != null &&
                 adapter.FailedGuids.Contains(data.Guid))
             {
