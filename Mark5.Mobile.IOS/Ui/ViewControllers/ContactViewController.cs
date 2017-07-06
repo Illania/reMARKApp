@@ -1118,15 +1118,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (Contact.PrimaryPerson != null)
                         Rows.Add(new LinkedContactRow(ContactPreview, Contact, Contact.PrimaryPerson));
 
-                    var cps = Contact.Children.Where(cp => cp.Type == ContactType.Person);
+                    var cps = Contact.Children.Where(cp => cp.Type == ContactType.Person).OrderBy(cp => cp.Name);
                     foreach (var cp in cps)
                         Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
 
-                    cps = Contact.Children.Where(cp => cp.Type == ContactType.Department);
+                    cps = Contact.Children.Where(cp => cp.Type == ContactType.Department).OrderBy(cp => cp.Name);
                     foreach (var cp in cps)
                         Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
 
-                    cps = Contact.Children.Where(cp => cp.Type == ContactType.Company);
+                    cps = Contact.Children.Where(cp => cp.Type == ContactType.Company).OrderBy(cp => cp.Name);
                     foreach (var cp in cps)
                         Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
                 }

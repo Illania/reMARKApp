@@ -38,13 +38,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
                             contacts.Add(Contact.PrimaryPerson);
                         break;
                     case LinkedContactType.Person:
-                        contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Person));
+                        contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Person).OrderBy(cp => cp.Name));
                         break;
                     case LinkedContactType.Department:
-                        contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Department));
+                        contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Department).OrderBy(cp => cp.Name));
                         break;
                     case LinkedContactType.Company:
-                        contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Company));
+                        contacts.AddRange(Contact.Children.Where(c => c.Type == ContactType.Company).OrderBy(cp => cp.Name));
                         break;
                 }
 
