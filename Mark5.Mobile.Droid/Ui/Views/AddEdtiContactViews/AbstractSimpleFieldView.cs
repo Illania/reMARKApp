@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Support.Design.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
@@ -41,10 +42,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             layout.AddView(contentEditText);
             layout.HintEnabled = floatingHint;
 
-            var topBottomDistance = DistanceLarge;
-            var leftRightDistance = floatingHint ? 0 : DistanceSmall;
+            var topBottomDistance = floatingHint ? 0 : DistanceSmall;
+            var leftDistance = DistanceLarge;
+            var rightDistance = DistanceLarge + ConversionUtils.ConvertDpToPixels(24) + DistanceSmall;
 
-            SetPadding(topBottomDistance, leftRightDistance, topBottomDistance, leftRightDistance);
+            SetPadding(leftDistance, topBottomDistance, rightDistance, topBottomDistance);
         }
 
         protected virtual void ContentClicked(object sender, EventArgs e) { }

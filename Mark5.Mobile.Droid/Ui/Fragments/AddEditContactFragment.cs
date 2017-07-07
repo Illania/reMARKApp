@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
@@ -12,6 +13,8 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews;
 
@@ -19,6 +22,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class AddEditContactFragment : RetainableStateFragment
     {
+        static class RequestCodes
+        {
+            public const int ParentContactRequestCode = 111;
+        }
+
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public Folder Folder { get; set; }
@@ -107,7 +115,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected void PrepareViewsForPerson()
         {
             //Company
-            subviews.Add(new PersonNameView(Context, OnPersonNameChanged);
+            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
@@ -154,6 +163,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                            .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
                            .Replace(Resource.Id.fragment_container, f, tag)
                            .AddToBackStack(tag).Commit();
+        }
+
+        public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (requestCode == RequestCodes.ParentContactRequestCode && resultCode == (int)Android.App.Result.Ok)
+            {
+                ParentContactPreview = SerializationUtils.Deserialize<ContactPreview>(data.GetStringExtra(ParentContactSelectorFoldersListActivity.ParentContactResultKey));
+                RefreshView();
+            }
         }
 
         #region Refresh methods
@@ -219,9 +237,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void OnPersonNameChanged(string name)
+        void OnPersonNameChanged(string name) //TODO move
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = name;
+        }
+
+        void OnParentContactRequest()
+        {
+            var i = new Intent(Activity, typeof(ParentContactSelectorFoldersListActivity));
+            StartActivityForResult(i, RequestCodes.ParentContactRequestCode);
         }
 
         #endregion
@@ -246,6 +270,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 ContactPreview = ContactPreview,
                 Contact = Contact,
+                ParentContactPreview = ParentContactPreview,
                 Folder = Folder,
                 FolderId = FolderId,
                 ContactId = ContactId,
@@ -260,6 +285,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Contact = state.Contact;
                 ContactPreview = state.ContactPreview;
+                ParentContactPreview = state.ParentContactPreview;
                 Folder = state.Folder;
                 FolderId = state.FolderId;
                 ContactId = state.ContactId;
@@ -272,6 +298,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public Contact Contact { get; set; }
             public ContactPreview ContactPreview { get; set; }
+            public ContactPreview ParentContactPreview { get; set; }
             public Folder Folder { get; set; }
             public int? FolderId { get; set; }
             public int? ContactId { get; set; }

@@ -5,9 +5,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
     public class ParentContactView : AbstractSimpleFieldView
     {
-        public ParentContactView(Context context)
+        private Action onParentContactRequest;
+
+        public ParentContactView(Context context, Action onParentContactRequest)
             : base(context, Resource.String.edit_contact_company_department, false, false)
         {
+            this.onParentContactRequest = onParentContactRequest;
         }
 
         public override void RefreshView()
@@ -21,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected override void ContentClicked(object sender, EventArgs e)
         {
-            base.ContentClicked(sender, e);
+            onParentContactRequest();
         }
     }
 }

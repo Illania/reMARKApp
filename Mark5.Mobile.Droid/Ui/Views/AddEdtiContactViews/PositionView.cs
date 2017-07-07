@@ -8,7 +8,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class PositionView : AbstractSimpleFieldView
     {
         public PositionView(Context context)
-            : base(context, Resource.String.edit_contact_position, false)
+            : base(context, Resource.String.edit_contact_position, true)
         {
         }
 

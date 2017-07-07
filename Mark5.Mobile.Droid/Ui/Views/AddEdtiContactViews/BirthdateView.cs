@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             if (Contact.BirthDateTimestamp != -6847804800000 && Contact.BirthDateTimestamp != -1)
                 userTimestamp = Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
 
-            var newTimestamp = await Dialogs.ShowDatePicker(Context, userTimestamp, addDeleteDate: true);
+            var newTimestamp = await Dialogs.ShowDatePicker(Context, userTimestamp, addRemoveDateChoice: true);
 
             if (newTimestamp == 0) //TODO eventually decide on another value for reset
             {

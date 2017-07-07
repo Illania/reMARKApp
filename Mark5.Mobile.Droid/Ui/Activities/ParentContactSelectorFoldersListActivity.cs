@@ -11,11 +11,11 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class PickerContactFolderListActivity : BaseAppCompatActivity
+    public class ParentContactSelectorFoldersListActivity : BaseAppCompatActivity
     {
-        public const string RecipientResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
+        public const string ParentContactResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
 
-        public const int ContactRequestCode = 321;
+        public const int ContactRequestCode = 123;
 
         Toolbar toolbar;
 
@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                var pcflf = new PickerContactFolderListFragment();
+                var pcflf = new ParentContactSelectorFoldersListFragment();
                 ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
                 ft.Commit();
 
@@ -51,12 +51,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            if (requestCode == ContactRequestCode && resultCode == Result.Ok && data.HasExtra(PickerContactsListActivity.RecipientResultKey))
+            if (requestCode == ContactRequestCode && resultCode == Result.Ok && data.HasExtra(ParentContactSelectorActivity.ParentContactResultKey))
             {
-                var recipientString = data.GetStringExtra(PickerContactsListActivity.RecipientResultKey);
+                var parentContactString = data.GetStringExtra(ParentContactSelectorActivity.ParentContactResultKey);
 
                 var resultIntent = new Intent();
-                resultIntent.PutExtra(RecipientResultKey, recipientString);
+                resultIntent.PutExtra(ParentContactResultKey, parentContactString);
                 SetResult(Result.Ok, resultIntent);
                 Finish();
             }

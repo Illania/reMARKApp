@@ -60,6 +60,8 @@
 	<string name="create_new_document">Create new email</string>
 	<string name="create_system_report">Create system report</string>
 	<string name="creator">Creator:</string>
+	<string name="company">Company</string>
+	<string name="department">Department</string>
 	<string name="date">Date:</string>
 	<string name="delete">Delete</string>
 	<string name="delete_are_you_sure">Are you sure you want to delete selected?</string>
@@ -124,6 +126,9 @@
 	<string name="edit_contact_zip">ZIP</string>
 	<string name="edit_contact_area">Area</string>
 	<string name="edit_contact_company_department">Company/Department</string>
+	<string name="parent_contact_selector_person_title">Invalid choice</string>
+	<string name="parent_contact_selector_person_content">It is not possible to select a person</string>
+	<string name="parent_contact_selector_choose">Choose which contact you want to select</string>
 	<string name="email">Email</string>
 	<string name="email_not_valid">Email not valid</string>
 	<string name="empty_folder">This folder is empty</string>

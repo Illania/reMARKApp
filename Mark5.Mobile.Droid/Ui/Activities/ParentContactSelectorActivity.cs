@@ -14,8 +14,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ParentContactSelectorActivity : BaseAppCompatActivity
     {
-        public const string RecipientResultKey = "RecipientResult_ecf8b6fd-8908-4330-aef4-d6724b1a97b2";
-        public const string FolderIntentKey = "FromFolderIntent_3a68d401-f581-4094-b526-4478cc43d3f4";
+        public const string ParentContactResultKey = "ParentContactResult_7b800032-5a7b-412a-bad5-0a07858fb689";
+        public const string FolderIntentKey = "FromFolderIntent_86f55550-979e-4d08-853f-b44c1d0234c9";
 
         Toolbar toolbar;
 
@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                var pcflf = new PickerContactsListFragment
+                var pcflf = new ParentContactSelectorFragment
                 {
                     Folder = folder,
                 };
