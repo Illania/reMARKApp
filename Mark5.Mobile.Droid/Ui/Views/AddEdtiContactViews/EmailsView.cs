@@ -115,6 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 ca.Address = emailEditText.Text;
                 ca.Description = descriptionEditText.Text;
                 ca.IsPrimary = preferableCheckBox.Checked;
+                ca.Type = CommunicationAddressType.Email;
 
                 if (ca.IsPrimary)
                 {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Android.Content;
 using Android.Support.V7.Widget;
+using Android.Text;
 using Android.Views;
 using Android.Views.Animations;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -54,7 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             compositeNameEditText = new AppCompatEditText(Context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
             };
             compositeNameEditText.SetHint(Resource.String.edit_contact_name);
             compositeNameEditText.AfterTextChanged += CompositeNameEditText_TextChanged;
@@ -69,10 +70,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             expandedLayout.Visibility = ViewStates.Gone;
             namesLayout.AddView(expandedLayout);
 
+            //TODO doesn't get capitalied
+
             firstNameEditText = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
             };
             firstNameEditText.SetHint(Resource.String.edit_contact_first_name);
             firstNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
@@ -82,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             middleNameEditText = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
             };
             middleNameEditText.SetHint(Resource.String.edit_contact_middle_name);
             middleNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
@@ -92,7 +95,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             lastNameEditText = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
             };
             lastNameEditText.SetHint(Resource.String.edit_contact_last_name);
             lastNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
@@ -119,6 +122,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         void CompositeNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
         {
+            if (!compositeNameEditText.HasFocus)
+                return;
+
             var parts = compositeNameEditText.Text.Split(' ');
             if (parts.Any())
             {
@@ -127,24 +133,33 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 Contact.LastName = string.Join(" ", parts.Skip(1));
             }
 
-            //UpdateSingleNames();
+            UpdateSingleNames();
             onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
         void FirstNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
         {
+            if (!firstNameEditText.HasFocus)
+                return;
+
             Contact.FirstName = firstNameEditText.Text;
             UpdateCompositeName();
         }
 
         void MiddleNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
         {
+            if (!middleNameEditText.HasFocus)
+                return;
+
             Contact.Patronymic = middleNameEditText.Text;
             UpdateCompositeName();
         }
 
         void LastNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
         {
+            if (!lastNameEditText.HasFocus)
+                return;
+
             Contact.LastName = lastNameEditText.Text;
             UpdateCompositeName();
         }
@@ -174,6 +189,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 sb.Append(" " + Contact.LastName);
             compositeNameEditText.Text = sb.ToString();
             onPersonNameChanged?.Invoke(compositeNameEditText.Text);
+        }
+    }
+
+    public class MyEditText : AppCompatEditText
+    {
+        public MyEditText(Context context)
+            : base(context)
+        {
         }
     }
 }
