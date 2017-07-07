@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Common.Utilities
             return ca.Address;
         }
 
-        public static (int, string) CommunicationAddressParts(CommunicationAddress ca)
+        public static (int CountryPrefix, string Number) CommunicationAddressParts(CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone
                 || ca.Type == CommunicationAddressType.Fax || ca.Type == CommunicationAddressType.Telex)

@@ -79,6 +79,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f),
             };
             phoneEditText.SetHint(GetResourceIdForType(type));
+            phoneEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            phoneEditText.TextChanged += (sender, e) =>
+            {
+                phoneEditText.Error = string.IsNullOrWhiteSpace(phoneEditText.Text) ? Context.GetString(Resource.String.edit_contact_empty_number) : null;
+            };
             firstLine.AddView(phoneEditText);
 
             var descriptionEditText = new AppCompatEditText(Context)
@@ -86,20 +91,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             descriptionEditText.SetHint(Resource.String.edit_contact_description);
+            descriptionEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
             container.AddView(descriptionEditText);
 
             var thirdLine = new LinearLayoutCompat(Context)
             {
                 Orientation = Horizontal,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    TopMargin = DistanceVerySmall,
+                }
             };
             container.AddView(thirdLine);
 
             var preferableTextView = new AppCompatTextView(Context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = DistanceVerySmall
+                }
             };
             preferableTextView.SetText(Resource.String.edit_contact_mark_as_preferable);
+            preferableTextView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
             thirdLine.AddView(preferableTextView);
 
             var preferableCheckBox = new AppCompatCheckBox(Context)
@@ -257,9 +270,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 if (Content != null)
                 {
                     var parts = AddressUtils.CommunicationAddressParts(Content);
-                    var country = parts.Item1 >= 0 ? $"+{parts.Item1}" : string.Empty;
-                    phoneEditText.Text = string.Join(" ", country, parts.Item2);
-                    Layout.SetBackgroundColor(Content.IsPrimary ? Color.BlanchedAlmond : Color.White);
+                    var country = parts.CountryPrefix > 0 ? $"+{parts.CountryPrefix}" : string.Empty;
+                    phoneEditText.Text = string.Join(" ", country, parts.Number);
+                    phoneEditText.SetTextAppearanceCompat(Context, Content.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
+                    phoneEditText.Error = string.IsNullOrWhiteSpace(parts.Number) ? Context.GetString(Resource.String.edit_contact_empty_number) : null;
                 }
             }
 

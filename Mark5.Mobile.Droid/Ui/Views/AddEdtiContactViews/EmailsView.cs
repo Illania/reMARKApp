@@ -59,12 +59,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             emailEditText.SetHint(Resource.String.edit_contact_address);
+            emailEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
             emailEditText.TextChanged += (sender, e) =>
             {
-                if (!Validator.IsEmailValid(emailEditText.Text))
-                {
-                    emailEditText.Error = Context.GetString(Resource.String.email_not_valid);
-                }
+                emailEditText.Error = !Validator.IsEmailValid(emailEditText.Text) ? Context.GetString(Resource.String.email_not_valid) : null;
             };
             container.AddView(emailEditText);
 
@@ -73,20 +71,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             descriptionEditText.SetHint(Resource.String.edit_contact_description);
+            descriptionEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
             container.AddView(descriptionEditText);
 
             var thirdLine = new LinearLayoutCompat(Context)
             {
                 Orientation = Horizontal,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    TopMargin = DistanceVerySmall,
+                }
             };
             container.AddView(thirdLine);
 
             var preferableTextView = new AppCompatTextView(Context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    LeftMargin = DistanceVerySmall
+                }
             };
             preferableTextView.SetText(Resource.String.edit_contact_mark_as_preferable);
+            preferableTextView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
             thirdLine.AddView(preferableTextView);
 
             var preferableCheckBox = new AppCompatCheckBox(Context)
@@ -166,15 +172,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             override public void UpdateRow()
             {
                 emailEditText.Text = Content.Address;
-                if (!Validator.IsEmailValid(Content.Address))
-                {
-                    emailEditText.Error = Context.GetString(Resource.String.email_not_valid);
-                }
-                else
-                {
-                    emailEditText.Error = null;
-                }
-                Layout.SetBackgroundColor(Content.IsPrimary ? Color.BlanchedAlmond : Color.White);
+                emailEditText.Error = !Validator.IsEmailValid(Content.Address) ? Context.GetString(Resource.String.email_not_valid) : null;
+                emailEditText.SetTextAppearanceCompat(Context, Content.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
             }
 
             public override bool ContainsValidContent()

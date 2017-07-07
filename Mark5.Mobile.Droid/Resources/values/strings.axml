@@ -125,6 +125,7 @@
 	<string name="edit_contact_city">City</string>
 	<string name="edit_contact_zip">ZIP</string>
 	<string name="edit_contact_area">Area</string>
+	<string name="edit_contact_empty_number">The number cannot be empty</string>
 	<string name="edit_contact_company_department">Company/Department</string>
 	<string name="parent_contact_selector_person_title">Invalid choice</string>
 	<string name="parent_contact_selector_person_content">It is not possible to select a person</string>
