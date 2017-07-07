@@ -55,7 +55,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var hintEditTextLp = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
             {
                 Gravity = (int)GravityFlags.CenterVertical,
-                RightMargin = DistanceNormal,
             };
 
             topLayout.AddView(titleEditText, hintEditTextLp);

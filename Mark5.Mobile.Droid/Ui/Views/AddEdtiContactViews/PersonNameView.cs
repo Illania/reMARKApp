@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
                 TopMargin = DistanceSmall,
-                LeftMargin = DistanceSmall,
+                LeftMargin = DistanceNormal,
                 Gravity = (int)GravityFlags.Top,
             };
             expandButton.Click += ExpandButton_Click;
