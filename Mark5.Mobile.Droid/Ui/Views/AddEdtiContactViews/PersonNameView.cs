@@ -134,6 +134,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             UpdateSingleNames();
+            UpdateErrors();
+            OnContentChanged();
+
             onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
@@ -147,6 +150,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             firstNameEditText.Error = string.IsNullOrEmpty(Contact.FirstName)
                 ? Context.GetString(Resource.String.edit_contact_first_name_error) : null;
+
+            OnContentChanged();
         }
 
         void MiddleNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
@@ -168,6 +173,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             lastNameEditText.Error = string.IsNullOrEmpty(Contact.LastName)
                 ? Context.GetString(Resource.String.edit_contact_last_name_error) : null;
+
+            OnContentChanged();
         }
 
         public override void RefreshView()

@@ -187,7 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                            .AddToBackStack(tag).Commit();
         }
 
-        public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (requestCode == RequestCodes.ParentContactRequestCode && resultCode == (int)Android.App.Result.Ok)
             {
@@ -257,6 +257,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 showMoreButton.Visibility = ViewStates.Gone;
                 secondaryLinearLayout.Visibility = ViewStates.Visible;
             }
+
+            UpdateButtonState();
         }
 
         void OnPersonNameChanged(string name) //TODO move
