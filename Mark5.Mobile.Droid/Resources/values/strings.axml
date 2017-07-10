@@ -60,6 +60,7 @@
 	<string name="create_new_document">Create new email</string>
 	<string name="create_system_report">Create system report</string>
 	<string name="creator">Creator:</string>
+	<string name="person">Person</string>
 	<string name="company">Company</string>
 	<string name="department">Department</string>
 	<string name="date">Date:</string>
@@ -81,6 +82,7 @@
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
+	<string name="edit_contact_dialog_title">Which kind of contact do you want to create?</string>
 	<string name="edit_contact_name">Name</string>
 	<string name="edit_contact_account">Account</string>
 	<string name="edit_contact_first_name">First</string>

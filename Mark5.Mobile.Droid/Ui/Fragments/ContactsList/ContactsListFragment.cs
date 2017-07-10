@@ -1,13 +1,30 @@
 ﻿
+using System;
+using System.Collections.Generic;
 using Android.Content;
+using Android.Support.Design.Widget;
+using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsListFragment : AbstractContactsListFragment
     {
+        FloatingActionButton fab;
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
+        {
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab.SetImageResource(Resource.Drawable.action_add_contact);
+            fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
+            fab.Visibility = ViewStates.Visible;
+
+            return base.OnCreateView(inflater, container, savedInstanceState);
+        }
+
         #region Adapter callbacks
 
         protected override void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
@@ -44,5 +61,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        async void CreateContact()
+        {
+            var values = new List<ContactType> { ContactType.Person, ContactType.Company, ContactType.Department };
+
+            var choice = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.edit_contact_dialog_title, values,
+                                                                   displayText: (arg) =>
+            {
+                switch (arg)
+                {
+                    case ContactType.Person:
+                        return GetString(Resource.String.person);
+                    case ContactType.Company:
+                        return GetString(Resource.String.company);
+                    case ContactType.Department:
+                        return GetString(Resource.String.department);
+                    default:
+                        throw new ArgumentException("Input type not valid");
+                }
+            });
+
+            if (choice != ContactType.None)
+            {
+                var intent = new Intent(Context, typeof(AddEditContactActivity));
+                intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
+                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)choice);
+                StartActivity(intent);
+            }
+        }
     }
 }

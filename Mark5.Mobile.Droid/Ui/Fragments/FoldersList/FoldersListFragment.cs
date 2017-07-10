@@ -146,6 +146,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
                 fab.Visibility = ViewStates.Visible;
             }
+            else if (RemoteFolder?.Module == ModuleType.Contacts)
+            {
+                fab.SetImageResource(Resource.Drawable.action_add_contact);
+                fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
+                fab.Visibility = ViewStates.Visible;
+            }
             else
             {
                 fab.Visibility = ViewStates.Gone;
@@ -213,7 +219,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            StartActivity(AddEditContactActivity.CreateIntent(Activity));
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentDirection.None));
+        }
+
+        async void CreateContact()
+        {
+            var values = new List<ContactType> { ContactType.Person, ContactType.Company, ContactType.Department };
+
+            var choice = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.edit_contact_dialog_title, values,
+                                                                   displayText: (arg) =>
+            {
+                switch (arg)
+                {
+                    case ContactType.Person:
+                        return GetString(Resource.String.person);
+                    case ContactType.Company:
+                        return GetString(Resource.String.company);
+                    case ContactType.Department:
+                        return GetString(Resource.String.department);
+                    default:
+                        throw new ArgumentException("Input type not valid");
+                }
+            });
+
+            if (choice != ContactType.None)
+            {
+                var intent = new Intent(Context, typeof(AddEditContactActivity));
+                intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
+                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)choice);
+                StartActivity(intent);
+            }
         }
 
         #endregion

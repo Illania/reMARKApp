@@ -713,6 +713,10 @@
     <AndroidResource Include="Resources\drawable-xhdpi\remove.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\remove.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\remove.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_add_contact.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_add_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_add_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_add_contact.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
