@@ -13,6 +13,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             this.onParentContactRequest = onParentContactRequest;
         }
 
+        public override bool ContainsValidContent() => true;
+
         public override void RefreshView()
         {
             if (ParentContactPreview != null)

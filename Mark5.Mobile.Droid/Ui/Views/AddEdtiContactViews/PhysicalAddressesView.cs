@@ -19,6 +19,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
         }
 
+        public override bool ContainsValidContent() => true;
+
         public override void RefreshView()
         {
             foreach (var address in Contact.PhysicalAddresses)

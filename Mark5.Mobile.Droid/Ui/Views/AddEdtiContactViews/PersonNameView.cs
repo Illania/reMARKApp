@@ -144,6 +144,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             Contact.FirstName = firstNameEditText.Text;
             UpdateCompositeName();
+
+            firstNameEditText.Error = string.IsNullOrEmpty(Contact.FirstName)
+                ? Context.GetString(Resource.String.edit_contact_first_name_error) : null;
         }
 
         void MiddleNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
@@ -162,12 +165,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             Contact.LastName = lastNameEditText.Text;
             UpdateCompositeName();
+
+            lastNameEditText.Error = string.IsNullOrEmpty(Contact.LastName)
+                ? Context.GetString(Resource.String.edit_contact_last_name_error) : null;
         }
 
         public override void RefreshView()
         {
             UpdateSingleNames();
             UpdateCompositeName();
+            UpdateErrors();
             onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
@@ -189,14 +196,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 sb.Append(" " + Contact.LastName);
             compositeNameEditText.Text = sb.ToString();
             onPersonNameChanged?.Invoke(compositeNameEditText.Text);
-        }
-    }
 
-    public class MyEditText : AppCompatEditText
-    {
-        public MyEditText(Context context)
-            : base(context)
+            compositeNameEditText.Error = ContainsValidContent() ? null
+                : Context.GetString(Resource.String.edit_contact_composite_name_error);
+        }
+
+        void UpdateErrors()
         {
+            firstNameEditText.Error = string.IsNullOrEmpty(Contact.FirstName)
+                ? Context.GetString(Resource.String.edit_contact_first_name_error) : null;
+
+            lastNameEditText.Error = string.IsNullOrEmpty(Contact.LastName)
+                ? Context.GetString(Resource.String.edit_contact_last_name_error) : null;
+
+            compositeNameEditText.Error = ContainsValidContent() ? null
+                : Context.GetString(Resource.String.edit_contact_composite_name_error);
+        }
+
+        public override bool ContainsValidContent()
+        {
+            return !string.IsNullOrEmpty(Contact.FirstName) && !string.IsNullOrEmpty(Contact.LastName);
         }
     }
 }

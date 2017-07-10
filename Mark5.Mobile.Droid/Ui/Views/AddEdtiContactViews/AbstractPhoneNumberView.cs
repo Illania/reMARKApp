@@ -48,6 +48,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var ca = row.GetContent();
             Contact.CommunicationAddresses.Remove(ca);
             RemoveRow(row);
+
+            OnContentChanged();
         }
 
         async void CreateDialog(PhoneNumberRow row = null)
@@ -125,11 +127,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 ca = row.GetContent();
                 var parts = AddressUtils.CommunicationAddressParts(ca);
-                if (parts.Item1 >= 0)
+                if (parts.CountryPrefix >= 0)
                 {
-                    countrySpinner.SetSelection(countries.FindIndex(c => c.FaxPrefix == parts.Item1));
+                    countrySpinner.SetSelection(countries.FindIndex(c => c.FaxPrefix == parts.CountryPrefix));
                 }
-                phoneEditText.Text = parts.Item2;
+                phoneEditText.Text = parts.Number;
                 descriptionEditText.Text = ca.Description;
                 preferableCheckBox.Checked = ca.IsPrimary;
             }
@@ -157,6 +159,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 {
                     row.UpdateRow();
                 }
+
+                OnContentChanged();
             }
         }
 
@@ -236,6 +240,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 countryTextView.Text = $"{countries[position].Name} (+{countries[position].FaxPrefix})";
                 return view;
             }
+        }
+
+        public override bool ContainsValidContent()
+        {
+            return Rows.All(r => r.ContainsValidContent());
         }
 
         protected class PhoneNumberRow : Row

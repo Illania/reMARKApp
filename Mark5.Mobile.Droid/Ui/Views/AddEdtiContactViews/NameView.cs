@@ -10,9 +10,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         readonly Action<string> onNameChanged;
 
         public NameView(Context context, Action<string> onNameChanged)
-            : base(context, Resource.String.edit_contact_name, false)
+            : base(context, Resource.String.edit_contact_name, false, true, Resource.String.edit_contact_name_error)
         {
             this.onNameChanged = onNameChanged;
+        }
+
+        public override bool ContainsValidContent()
+        {
+            return !string.IsNullOrEmpty(ContactPreview.Name);
         }
 
         public override void RefreshView()
@@ -25,6 +30,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
             ContactPreview.Name = Content;
             onNameChanged?.Invoke(Content);
+            SetError(string.IsNullOrEmpty(ContactPreview.Name));
+            OnContentChanged();
         }
     }
 }

@@ -31,6 +31,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             LayoutTransition = new LayoutTransition();
         }
 
+        protected void OnContentChanged() //TODO this should be used at least in the subc classes that can contain invalid content
+        {
+            Edited(this, EventArgs.Empty);
+        }
+
         abstract public void RefreshView();
+        abstract public bool ContainsValidContent();
     }
 }

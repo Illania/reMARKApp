@@ -115,8 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected void PrepareViewsForPerson()
         {
             //Company
-            var personNameView = new PersonNameView(Context, OnPersonNameChanged);
-            subviews.Add(personNameView);
+            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
@@ -130,6 +129,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.Add(new BirthdateView(Context));
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
+
+            subviews.Union(secondarySubviews).ToList().ForEach(s => s.Edited += SubViews_Edited);
+            //TODO make it less ugly
+        }
+
+        void SubViews_Edited(object sender, EventArgs e)
+        {
+            UpdateButtonState();
+        }
+
+        void UpdateButtonState() //TODO move
+        {
+            if (subviews.Union(secondarySubviews).All(s => s.ContainsValidContent()))
+            {
+                fab.Enabled = true;
+                fab.Alpha = 1;
+            }
+            else
+            {
+                fab.Enabled = false;
+                fab.Alpha = 0.6f;
+            }
         }
 
         void PrepareViewsForDeparment()

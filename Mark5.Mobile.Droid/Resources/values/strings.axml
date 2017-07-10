@@ -129,6 +129,10 @@
 	<string name="edit_contact_zip">ZIP</string>
 	<string name="edit_contact_area">Area</string>
 	<string name="edit_contact_empty_number">The number cannot be empty</string>
+	<string name="edit_contact_name_error">Name cannot be empty</string>
+	<string name="edit_contact_composite_name_error">Full name must contain at least first and last name</string>
+	<string name="edit_contact_first_name_error">First name cannot be empty</string>
+	<string name="edit_contact_last_name_error">Last name cannot be empty</string>
 	<string name="edit_contact_company_department">Company/Department</string>
 	<string name="parent_contact_selector_person_title">Invalid choice</string>
 	<string name="parent_contact_selector_person_content">It is not possible to select a person</string>

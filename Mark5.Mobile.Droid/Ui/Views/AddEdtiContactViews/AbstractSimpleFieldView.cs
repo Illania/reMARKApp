@@ -10,12 +10,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public abstract class AbstractSimpleFieldView : AddEditContactView
     {
         TextInputEditText contentEditText;
+        int errorResourceId;
 
         protected string Content { get => contentEditText.Text; set => contentEditText.Text = value; }
 
-        protected AbstractSimpleFieldView(Context context, int hintResourceId, bool floatingHint, bool editable = true)
+        protected AbstractSimpleFieldView(Context context, int hintResourceId, bool floatingHint, bool editable = true,
+                                          int errorResourceId = -1)
             : base(context)
         {
+            this.errorResourceId = errorResourceId;
+
             var layout = new TextInputLayout(Context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
@@ -47,6 +51,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var rightDistance = DistanceLarge + ConversionUtils.ConvertDpToPixels(24) + DistanceSmall;
 
             SetPadding(leftDistance, topBottomDistance, rightDistance, topBottomDistance);
+        }
+
+        protected void SetError(bool errorValue)
+        {
+            if (errorResourceId <= 0)
+            {
+                throw new InvalidOperationException("Need to set the resource id for error before using it!");
+            }
+
+            contentEditText.Error = errorValue ? Context.GetString(errorResourceId) : null;
         }
 
         protected virtual void ContentClicked(object sender, EventArgs e) { }

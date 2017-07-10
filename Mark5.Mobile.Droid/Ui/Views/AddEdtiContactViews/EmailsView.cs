@@ -42,6 +42,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var ca = row.GetContent();
             Contact.CommunicationAddresses.Remove(ca);
             RemoveRow(row);
+
+            OnContentChanged();
         }
 
         async void CreateDialog(EmailRow row = null)
@@ -131,6 +133,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 {
                     row.SetContent(ca);
                 }
+
+                OnContentChanged();
             }
         }
 
@@ -145,6 +149,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     emailRow.UpdateRow();
                 }
             }
+        }
+
+        public override bool ContainsValidContent()
+        {
+            return Rows.All(r => r.ContainsValidContent());
         }
 
         protected class EmailRow : Row

@@ -13,6 +13,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
         }
 
+        public override bool ContainsValidContent() => true;
+
         public override void RefreshView()
         {
             if (Contact.BirthDateTimestamp != -6847804800000 && Contact.BirthDateTimestamp != -1)
