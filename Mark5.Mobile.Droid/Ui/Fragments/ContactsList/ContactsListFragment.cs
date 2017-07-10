@@ -8,6 +8,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -67,20 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var values = new List<ContactType> { ContactType.Person, ContactType.Company, ContactType.Department };
 
             var choice = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.edit_contact_dialog_title, values,
-                                                                   displayText: (arg) =>
-            {
-                switch (arg)
-                {
-                    case ContactType.Person:
-                        return GetString(Resource.String.person);
-                    case ContactType.Company:
-                        return GetString(Resource.String.company);
-                    case ContactType.Department:
-                        return GetString(Resource.String.department);
-                    default:
-                        throw new ArgumentException("Input type not valid");
-                }
-            });
+                                                                   displayText: (arg) => GetString(UI.ContactTypeResourceId(arg)));
 
             if (choice != ContactType.None)
             {

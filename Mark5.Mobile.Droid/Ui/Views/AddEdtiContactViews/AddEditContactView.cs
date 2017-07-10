@@ -1,4 +1,5 @@
-﻿using Android.Animation;
+﻿using System;
+using Android.Animation;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -9,6 +10,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
     public abstract class AddEditContactView : LinearLayoutCompat
     {
+        public event EventHandler Edited = delegate { };
+
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public ContactPreview ParentContactPreview { get; set; }

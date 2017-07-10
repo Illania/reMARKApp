@@ -83,6 +83,7 @@
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
 	<string name="edit_contact_dialog_title">Which kind of contact do you want to create?</string>
+	<string name="edit_contact_children_dialog_title">Which kind of children contact do you want to add?</string>
 	<string name="edit_contact_name">Name</string>
 	<string name="edit_contact_account">Account</string>
 	<string name="edit_contact_first_name">First</string>

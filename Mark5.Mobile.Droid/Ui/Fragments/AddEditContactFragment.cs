@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.SetImageResource(Resource.Drawable.action_send);
+            fab.SetImageResource(Resource.Drawable.action_save_contact);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
             fab.Enabled = false;
             fab.Alpha = 0.6f;
@@ -115,7 +115,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected void PrepareViewsForPerson()
         {
             //Company
-            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            var personNameView = new PersonNameView(Context, OnPersonNameChanged);
+            subviews.Add(personNameView);
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
@@ -190,7 +191,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshView();
                 return;
             }
-            if (CreationModeFlag == ContactCreationModeFlag.Edit)
+            if (CreationModeFlag == ContactCreationModeFlag.Edit) //TODO actually we never reach here (usually) 
             {
                 try
                 {
