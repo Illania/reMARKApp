@@ -44,6 +44,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var cf = new AddEditContactFragment();
 
+                cf.CloseRequest = CloseRequest;
+
                 if (Intent.HasExtra(FolderIdIntentKey))
                     cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 

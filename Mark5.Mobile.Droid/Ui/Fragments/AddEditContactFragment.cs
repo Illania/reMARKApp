@@ -113,6 +113,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
+        public override void OnStop()
+        {
+            base.OnStop();
+            fab.Visibility = ViewStates.Gone;
+        }
+
         protected void PrepareViewsForPerson()
         {
             //Company
@@ -192,6 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Contact = new Contact();
                 ContactPreview = new ContactPreview();
+                ContactPreview.Type = ContactType;
                 RefreshView();
                 return;
             }
@@ -293,6 +300,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 var parentId = ParentContactPreview != null ? ParentContactPreview.Id : -1;
+
                 await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
 
                 dismissAction();

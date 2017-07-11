@@ -27,7 +27,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder RemoteFolder { get; set; }
+
         readonly bool hideSearch;
+        readonly bool hideFab;
 
         protected View Container;
         protected FolderListAdapter Adapter;
@@ -48,9 +50,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
-        public FoldersListFragment(bool hideSearch = false)
+        public FoldersListFragment(bool hideSearch = false, bool hideFab = false)
         {
             this.hideSearch = hideSearch;
+            this.hideFab = hideFab;
         }
 
         #region Overrides
@@ -140,13 +143,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             fab = ((View)Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            if (RemoteFolder?.Module == ModuleType.Documents)
+            if (!hideFab && RemoteFolder?.Module == ModuleType.Documents)
             {
                 fab.SetImageResource(Resource.Drawable.action_new);
                 fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
                 fab.Visibility = ViewStates.Visible;
             }
-            else if (RemoteFolder?.Module == ModuleType.Contacts)
+            else if (!hideFab && RemoteFolder?.Module == ModuleType.Contacts)
             {
                 fab.SetImageResource(Resource.Drawable.action_add_contact);
                 fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
