@@ -107,11 +107,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     throw new ArgumentException("Contact type needs to be defined");
             }
 
+            subviews.Union(secondarySubviews).ToList().ForEach(s => s.Edited += SubViews_Edited);
+
             linearLayout.AddView(showMoreButton);
             linearLayout.AddView(secondaryLinearLayout);
 
             return rootView;
         }
+
+        //TODO NOTE
+        // - We need to deal with the birthdate somehow
+        // - On the service we didn't consider the editing of the parent contact (either we change it on the server,
+        // or we make it umchangeable in edit mode)
 
         public override void OnStop()
         {
@@ -137,18 +144,43 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Add(new BirthdateView(Context));
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
 
-            subviews.Union(secondarySubviews).ToList().ForEach(s => s.Edited += SubViews_Edited);
             //TODO make it less ugly
         }
 
         void PrepareViewsForDeparment()
         {
+            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            subviews.Add(new ParentContactView(Context, OnParentContactRequest));
+            subviews.Add(new PositionView(Context));
+            subviews.Add(new EmailsView(Context));
+            subviews.Add(new PhoneView(Context));
+            subviews.Add(new MobileView(Context));
+            subviews.ForEach(linearLayout.AddView);
 
+            secondarySubviews.Add(new PhysicalAddressesView(Context));
+            secondarySubviews.Add(new ShortIdView(Context));
+            secondarySubviews.Add(new DescriptionView(Context));
+            secondarySubviews.Add(new ResponsibleUsersView(Context, this));
+            secondarySubviews.Add(new BirthdateView(Context));
+            secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
         void PrepareViewsForCompany()
         {
+            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            subviews.Add(new ParentContactView(Context, OnParentContactRequest));
+            subviews.Add(new PositionView(Context));
+            subviews.Add(new EmailsView(Context));
+            subviews.Add(new PhoneView(Context));
+            subviews.Add(new MobileView(Context));
+            subviews.ForEach(linearLayout.AddView);
 
+            secondarySubviews.Add(new PhysicalAddressesView(Context));
+            secondarySubviews.Add(new ShortIdView(Context));
+            secondarySubviews.Add(new DescriptionView(Context));
+            secondarySubviews.Add(new ResponsibleUsersView(Context, this));
+            secondarySubviews.Add(new BirthdateView(Context));
+            secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -273,6 +305,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateButtonState()
         {
+            fab.Visibility = ViewStates.Visible;
+
             if (subviews.Union(secondarySubviews).All(s => s.ContainsValidContent()))
             {
                 fab.Enabled = true;

@@ -25,6 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         public override void RefreshView()
         {
+            Clear();
+
             var addresses = Contact.CommunicationAddresses.Where(a => a.Type == type);
             foreach (var address in addresses)
             {

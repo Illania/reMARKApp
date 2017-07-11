@@ -112,6 +112,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         abstract protected Row GetNewRow();
 
+        protected void Clear()
+        {
+            Rows.ToList().ForEach(RemoveRow);
+        }
+
         #region Utilities
 
         static public AppCompatImageButton GetButton(Context context, bool addButton = true)

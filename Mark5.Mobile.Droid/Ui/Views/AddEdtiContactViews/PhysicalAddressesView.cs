@@ -23,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         public override void RefreshView()
         {
+            Clear();
+
             foreach (var address in Contact.PhysicalAddresses)
                 AddRow(address);
         }
