@@ -52,7 +52,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, type={ContactType}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
+                                     $"type={ContactType}, mode={CreationModeFlag}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -134,25 +135,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             //TODO make it less ugly
         }
 
-        void SubViews_Edited(object sender, EventArgs e)
-        {
-            UpdateButtonState();
-        }
-
-        void UpdateButtonState() //TODO move
-        {
-            if (subviews.Union(secondarySubviews).All(s => s.ContainsValidContent()))
-            {
-                fab.Enabled = true;
-                fab.Alpha = 1;
-            }
-            else
-            {
-                fab.Enabled = false;
-                fab.Alpha = 0.6f;
-            }
-        }
-
         void PrepareViewsForDeparment()
         {
 
@@ -167,7 +149,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, type={ContactType}]...");
+            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
+                                     $"type={ContactType}, mode={CreationModeFlag}]...");
         }
 
         public override async void OnResume()
@@ -230,11 +213,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}]", ex);
+                    CommonConfig.Logger.Error($"Downloading contact failed [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
+                                     $"type={ContactType}, mode={CreationModeFlag}]...", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
-                    CloseRequest?.Invoke();
+                    Activity.OnBackPressed();
                 }
             }
         }
@@ -261,7 +244,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             UpdateButtonState();
         }
 
-        void OnPersonNameChanged(string name) //TODO move
+        #endregion
+
+        #region Handlers
+
+        void OnPersonNameChanged(string name)
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = name;
         }
@@ -272,16 +259,60 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             StartActivityForResult(i, RequestCodes.ParentContactRequestCode);
         }
 
-        #endregion
-
-        void HandleSend()
+        void SubViews_Edited(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            UpdateButtonState();
         }
 
-        #region RetainableState 
+        void UpdateButtonState()
+        {
+            if (subviews.Union(secondarySubviews).All(s => s.ContainsValidContent()))
+            {
+                fab.Enabled = true;
+                fab.Alpha = 1;
+            }
+            else
+            {
+                fab.Enabled = false;
+                fab.Alpha = 0.6f;
+            }
+        }
 
-        //TODO need to add parent and check all
+        #endregion
+
+        #region Actions
+
+        async void HandleSend()
+        {
+            //TODO should we put a confirmation dialog before?
+
+            var titleResource = CreationModeFlag == ContactCreationModeFlag.Edit ? Resource.String.edit_contact_edit_loading :
+                                                                           Resource.String.edit_contact_add_loading;
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
+
+            try
+            {
+                var parentId = ParentContactPreview != null ? ParentContactPreview.Id : -1;
+                await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
+
+                dismissAction();
+
+                CloseRequest?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while adding/editing contact [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
+                                     $"type={ContactType}, mode={CreationModeFlag}]...", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        #endregion
+
+        #region RetainableState 
 
         public override string GenerateTag()
         {
@@ -295,6 +326,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactPreview = ContactPreview,
                 Contact = Contact,
                 ParentContactPreview = ParentContactPreview,
+                CreationModeFlag = CreationModeFlag,
                 Folder = Folder,
                 FolderId = FolderId,
                 ContactId = ContactId,
@@ -310,6 +342,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = state.Contact;
                 ContactPreview = state.ContactPreview;
                 ParentContactPreview = state.ParentContactPreview;
+                CreationModeFlag = state.CreationModeFlag;
                 Folder = state.Folder;
                 FolderId = state.FolderId;
                 ContactId = state.ContactId;
@@ -323,6 +356,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Contact Contact { get; set; }
             public ContactPreview ContactPreview { get; set; }
             public ContactPreview ParentContactPreview { get; set; }
+            public ContactCreationModeFlag CreationModeFlag { get; set; }
             public Folder Folder { get; set; }
             public int? FolderId { get; set; }
             public int? ContactId { get; set; }

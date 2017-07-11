@@ -80,6 +80,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
+        void CloseRequest()
+        {
+            var intent = new Intent();
+            SetResult(Result.Ok, intent);
+
+            base.OnBackPressed();
+        }
+
         public override void Finish()
         {
             base.Finish();
