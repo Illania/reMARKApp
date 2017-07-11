@@ -142,16 +142,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Add(new DescriptionView(Context));
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.Add(new BirthdateView(Context));
+            secondarySubviews.Add(new WebpageView(Context));
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
-
-            //TODO make it less ugly
         }
 
         void PrepareViewsForDeparment()
         {
-            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            subviews.Add(new NameView(Context, OnPersonNameChanged));
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
-            subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
             subviews.Add(new MobileView(Context));
@@ -161,15 +159,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Add(new ShortIdView(Context));
             secondarySubviews.Add(new DescriptionView(Context));
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
-            secondarySubviews.Add(new BirthdateView(Context));
+            secondarySubviews.Add(new WebpageView(Context));
+
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
         void PrepareViewsForCompany()
         {
-            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            subviews.Add(new NameView(Context, OnPersonNameChanged));
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
-            subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
             subviews.Add(new MobileView(Context));
@@ -179,7 +177,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Add(new ShortIdView(Context));
             secondarySubviews.Add(new DescriptionView(Context));
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
-            secondarySubviews.Add(new BirthdateView(Context));
+            secondarySubviews.Add(new LedgerView(Context));
+            secondarySubviews.Add(new VatView(Context));
+            secondarySubviews.Add(new WebpageView(Context));
+
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
         }
 
@@ -294,6 +295,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void OnParentContactRequest()
         {
+            //TODO a company cannot have a department as parent
             var i = new Intent(Activity, typeof(ParentContactSelectorFoldersListActivity));
             StartActivityForResult(i, RequestCodes.ParentContactRequestCode);
         }
