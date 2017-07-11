@@ -28,8 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Folder RemoteFolder { get; set; }
 
-        readonly bool hideSearch;
-        readonly bool hideFab;
+        bool hideSearch;
+        bool hideFab;
 
         protected View Container;
         protected FolderListAdapter Adapter;
@@ -379,7 +379,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new FoldersListFragment
+            return new FoldersListFragment(hideSearch, hideFab)
             {
                 RemoteFolder = folder,
             };
@@ -790,17 +790,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new FolderListFragmentState
             {
                 Folder = RemoteFolder,
-                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions)
+                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions),
+                HideFab = hideFab,
+                HideSearch = hideSearch,
             };
         }
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var flfs = restoredState as FolderListFragmentState;
-            if (flfs != null)
+            if (restoredState is FolderListFragmentState flfs)
             {
                 RemoteFolder = flfs.Folder;
                 recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
+                hideFab = flfs.HideFab;
+                hideSearch = flfs.HideSearch;
 
                 CommonConfig.Logger.Info($"Restored state state: [folderName={RemoteFolder.Name}, folderId={RemoteFolder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
             }
@@ -811,6 +814,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Folder Folder { get; set; }
             public Folder FavouriteRootFolder { get; set; }
             public List<int> SelectedItemPositions { get; set; }
+            public bool HideFab { get; set; }
+            public bool HideSearch { get; set; }
+
         }
 
         #endregion

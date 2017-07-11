@@ -30,6 +30,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public const int CommentsRequest = 1;
             public const int CategoriesRequest = 2;
+            public const int EditRequest = 3;
+            public const int ChildrenRequest = 4;
         }
 
         const int CardElevation = 0;
@@ -58,6 +60,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CardView descriptionCardView;
 
         AppCompatTextView descriptionCardTitle;
+
+        bool forceRefresh;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
@@ -109,7 +113,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
-            await RefreshData();
+            await RefreshData(forceRefresh);
 
             if (ContactPreview.Type == ContactType.Company || ContactPreview.Type == ContactType.Department)
             {
@@ -119,6 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 fab.Visibility = ViewStates.Visible;
             }
 
+            forceRefresh = false;
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -133,6 +138,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
+                }
+                else if (requestCode == RequestCodes.EditRequest || requestCode == RequestCodes.ChildrenRequest)
+                {
+                    forceRefresh = true;
                 }
         }
 
@@ -382,8 +391,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
             catch (Exception ex)
             {
@@ -417,7 +425,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
                 intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)choice);
                 intent.PutExtra(AddEditContactActivity.ParentContactPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
-                StartActivity(intent);
+                StartActivityForResult(intent, RequestCodes.ChildrenRequest);
             }
         }
 
@@ -429,7 +437,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             intent.PutExtra(AddEditContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
             intent.PutExtra(AddEditContactActivity.ContactIntentKey, SerializationUtils.Serialize(Contact));
 
-            StartActivity(intent);
+            StartActivityForResult(intent, RequestCodes.EditRequest);
         }
 
         #endregion
@@ -566,21 +574,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Refresh methods
 
-        async Task RefreshData()
+        async Task RefreshData(bool force = false)
         {
             try
             {
                 if (NotificationGuid != default(Guid))
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
 
-                if (ContactId.HasValue && ContactPreview == null && Contact == null)
+                if (force)
                 {
-                    var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder?.Id, ContactId.Value);
-                    ContactPreview = container.ContactPreview;
-                    Contact = container.Contact;
+                    var contacrContainer = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder?.Id, ContactId ?? ContactPreview.Id);
+                    ContactPreview = contacrContainer.ContactPreview;
+                    Contact = contacrContainer.Contact;
                 }
-
-                if (ContactPreview != null && Contact == null)
+                else if (ContactId.HasValue && ContactPreview == null && Contact == null)
+                {
+                    var contacrContainer = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder?.Id, ContactId.Value);
+                    ContactPreview = contacrContainer.ContactPreview;
+                    Contact = contacrContainer.Contact;
+                }
+                else if (ContactPreview != null && Contact == null)
                     Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder?.Id, ContactPreview.Id);
 
                 RefreshView();
@@ -591,8 +604,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
         }
 
@@ -853,8 +865,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var cfs = restoredState as ContactFragmentState;
-            if (cfs != null)
+            if (restoredState is ContactFragmentState cfs)
             {
                 FolderId = cfs.FolderId;
                 Folder = cfs.Folder;
