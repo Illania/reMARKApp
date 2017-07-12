@@ -85,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             middleNameEditText = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences | InputTypes.ClassText,
             };
             middleNameEditText.SetHint(Resource.String.edit_contact_middle_name);
             middleNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);

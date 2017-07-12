@@ -7,7 +7,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class ShortIdView : AbstractSimpleFieldView
     {
         public ShortIdView(Context context)
-            : base(context, Resource.String.edit_contact_short_id, true)
+            : base(context, Resource.String.edit_contact_short_id, true
+                   , inputType: InputTypes.TextFlagNoSuggestions
+                   | InputTypes.ClassText)
         {
         }
 
