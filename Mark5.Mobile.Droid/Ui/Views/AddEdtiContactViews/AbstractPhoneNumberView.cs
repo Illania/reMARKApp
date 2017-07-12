@@ -4,6 +4,7 @@ using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V7.Widget;
+using Android.Text;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Model;
@@ -96,6 +97,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             };
             descriptionEditText.SetHint(Resource.String.edit_contact_description);
             descriptionEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            descriptionEditText.InputType = InputTypes.TextFlagMultiLine
+                            | InputTypes.TextFlagCapSentences
+                            | InputTypes.TextFlagAutoCorrect | InputTypes.ClassText;
             container.AddView(descriptionEditText);
 
             var thirdLine = new LinearLayoutCompat(Context)

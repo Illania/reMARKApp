@@ -3,6 +3,7 @@ using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V7.Widget;
+using Android.Text;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -68,6 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 emailEditText.Error = !Validator.IsEmailValid(emailEditText.Text) ? Context.GetString(Resource.String.email_not_valid) : null;
             };
+            emailEditText.InputType = InputTypes.TextVariationEmailAddress | InputTypes.ClassText;
             container.AddView(emailEditText);
 
             var descriptionEditText = new AppCompatEditText(Context)
@@ -76,6 +78,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             };
             descriptionEditText.SetHint(Resource.String.edit_contact_description);
             descriptionEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            descriptionEditText.InputType = InputTypes.TextFlagMultiLine
+                   | InputTypes.TextFlagCapSentences
+                | InputTypes.TextFlagAutoCorrect | InputTypes.ClassText;
             container.AddView(descriptionEditText);
 
             var thirdLine = new LinearLayoutCompat(Context)

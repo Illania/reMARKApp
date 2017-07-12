@@ -55,7 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             compositeNameEditText = new AppCompatEditText(Context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences | InputTypes.ClassText,
             };
             compositeNameEditText.SetHint(Resource.String.edit_contact_name);
             compositeNameEditText.AfterTextChanged += CompositeNameEditText_TextChanged;
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             firstNameEditText = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences | InputTypes.ClassText,
             };
             firstNameEditText.SetHint(Resource.String.edit_contact_first_name);
             firstNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
@@ -95,7 +95,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             lastNameEditText = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences,
+                InputType = InputTypes.TextVariationPersonName | InputTypes.TextFlagCapSentences | InputTypes.ClassText,
             };
             lastNameEditText.SetHint(Resource.String.edit_contact_last_name);
             lastNameEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);

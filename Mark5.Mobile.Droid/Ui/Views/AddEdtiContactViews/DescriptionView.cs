@@ -6,7 +6,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class DescriptionView : AbstractSimpleFieldView
     {
         public DescriptionView(Context context)
-            : base(context, Resource.String.edit_contact_description, true)
+            : base(context, Resource.String.edit_contact_description, true, true,
+                   inputType: InputTypes.TextFlagMultiLine
+                   | InputTypes.TextFlagCapSentences
+                   | InputTypes.TextFlagAutoCorrect | InputTypes.ClassText)
         {
         }
 

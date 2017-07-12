@@ -9,7 +9,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class BirthdateView : AbstractSimpleFieldView
     {
         public BirthdateView(Context context)
-            : base(context, Resource.String.edit_contact_birthdate, true, false)
+            : base(context, Resource.String.edit_contact_birthdate, true, false,
+                   inputType: Android.Text.InputTypes.DatetimeVariationDate)
         {
         }
 
@@ -30,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             var newTimestamp = await Dialogs.ShowDatePicker(Context, userTimestamp, addRemoveDateChoice: true);
 
-            if (newTimestamp == 0) //TODO eventually decide on another value for reset
+            if (newTimestamp == 0)
             {
                 Clear();
                 return;

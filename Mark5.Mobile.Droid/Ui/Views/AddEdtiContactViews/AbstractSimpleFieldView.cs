@@ -1,6 +1,7 @@
 ﻿using System;
 using Android.Content;
 using Android.Support.Design.Widget;
+using Android.Text;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -15,7 +16,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         protected string Content { get => contentEditText.Text; set => contentEditText.Text = value; }
 
         protected AbstractSimpleFieldView(Context context, int hintResourceId, bool floatingHint, bool editable = true,
-                                          int errorResourceId = -1)
+                                          int errorResourceId = -1,
+                                          InputTypes inputType = InputTypes.TextFlagNoSuggestions
+                                          | InputTypes.TextFlagCapSentences
+                                          | InputTypes.ClassText)
             : base(context)
         {
             this.errorResourceId = errorResourceId;
@@ -29,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             contentEditText = new TextInputEditText(Context)
             {
                 LayoutParameters = new Android.Widget.LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                InputType = Android.Text.InputTypes.TextFlagNoSuggestions,
+                InputType = inputType,
             };
             contentEditText.SetHint(hintResourceId);
 
