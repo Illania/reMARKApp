@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new PickerContactFolderListFragment
+            return new ParentContactSelectorFoldersListFragment
             {
                 RemoteFolder = folder,
             };
