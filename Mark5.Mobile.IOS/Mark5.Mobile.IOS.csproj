@@ -267,6 +267,8 @@
 		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs">
 		  <DependentUpon>TemplatesSearchResultsTableViewCell.cs</DependentUpon>
 		</Compile>
+		<Compile Include="Ui\ViewControllers\AddEditContactView\AddEditContacViewController.cs" />
+		<Compile Include="Ui\ViewControllers\AddEditContactView\Subviews\AddEditContactSubView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -546,6 +548,8 @@
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
 	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
+	  <Folder Include="Ui\ViewControllers\AddEditContactView\" />
+	  <Folder Include="Ui\ViewControllers\AddEditContactView\Subviews\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
