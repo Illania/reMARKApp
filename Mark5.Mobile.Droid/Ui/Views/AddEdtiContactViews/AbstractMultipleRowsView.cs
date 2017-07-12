@@ -21,11 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         AppCompatTextView titleTextView;
         AppCompatImageButton addButton;
 
-        bool isSingleRow;
-
         protected List<Row> Rows = new List<Row>();
 
-        protected AbstractMultipleRowsView(Context context, int titleResourceId, bool isSingleRow) : base(context)
+        protected AbstractMultipleRowsView(Context context, int titleResourceId) : base(context)
         {
             topLayout = new LinearLayoutCompat(context)
             {
@@ -40,8 +38,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutTransition = new LayoutTransition()
             };
             AddView(contentLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-            this.isSingleRow = isSingleRow;
 
             titleEditText = new AppCompatEditText(context)
             {
@@ -76,15 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             topLayout.AddView(addButton);
         }
 
-        abstract protected void AddButton_Click(object sender, EventArgs e);
-
-        abstract protected void Row_DeleteClicked(object sender, EventArgs e);
-
         virtual protected void AddRow(T content = default(T))
         {
-            if (isSingleRow)
-                addButton.Visibility = ViewStates.Gone;
-
             titleEditText.Visibility = ViewStates.Gone;
             titleTextView.Visibility = ViewStates.Visible;
 
@@ -110,12 +99,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
         }
 
-        abstract protected Row GetNewRow();
-
         protected void Clear()
         {
             Rows.ToList().ForEach(RemoveRow);
         }
+
+        public override bool ContainsValidContent()
+        {
+            return Rows.All(r => r.ContainsValidContent());
+        }
+
+        abstract protected void AddButton_Click(object sender, EventArgs e);
+
+        abstract protected void Row_DeleteClicked(object sender, EventArgs e);
+
+        abstract protected Row GetNewRow();
 
         #region Utilities
 

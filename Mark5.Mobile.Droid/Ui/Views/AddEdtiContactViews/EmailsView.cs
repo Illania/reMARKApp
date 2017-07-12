@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class EmailsView : AbstractMultipleRowsView<CommunicationAddress>
     {
         public EmailsView(Context context)
-            : base(context, Resource.String.edit_contact_email, false)
+            : base(context, Resource.String.edit_contact_email)
         {
         }
 
@@ -156,11 +156,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     emailRow.UpdateRow();
                 }
             }
-        }
-
-        public override bool ContainsValidContent()
-        {
-            return Rows.All(r => r.ContainsValidContent());
         }
 
         protected class EmailRow : Row

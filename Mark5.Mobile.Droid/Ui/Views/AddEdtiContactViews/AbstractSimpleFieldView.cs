@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                                           InputTypes inputType = InputTypes.TextFlagNoSuggestions
                                           | InputTypes.TextFlagCapSentences
                                           | InputTypes.ClassText)
-            : base(context)
+                                         : base(context)
         {
             this.errorResourceId = errorResourceId;
 
@@ -69,6 +69,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected virtual void ContentClicked(object sender, EventArgs e) { }
 
-        protected virtual void ContentChanged(object sender, Android.Text.TextChangedEventArgs e) { }
+        protected virtual void ContentChanged(object sender, TextChangedEventArgs e) { }
     }
 }

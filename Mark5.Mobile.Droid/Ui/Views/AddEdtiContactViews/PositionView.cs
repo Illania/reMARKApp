@@ -1,6 +1,4 @@
-﻿using System;
-using Android.Content;
-using Android.Graphics;
+﻿using Android.Content;
 using Android.Text;
 
 namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews

@@ -118,9 +118,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
         }
 
-        void CompositeNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
+        void CompositeNameEditText_TextChanged(object sender, AfterTextChangedEventArgs e)
         {
-            if (!compositeNameEditText.HasFocus)
+            if (!compositeNameEditText.HasFocus) //To avoid loops while changing text programmatically
                 return;
 
             var parts = compositeNameEditText.Text.Split(' ');
@@ -138,7 +138,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
-        void FirstNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
+        void FirstNameEditText_TextChanged(object sender, AfterTextChangedEventArgs e)
         {
             if (!firstNameEditText.HasFocus)
                 return;
@@ -152,7 +152,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             OnContentChanged();
         }
 
-        void MiddleNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
+        void MiddleNameEditText_TextChanged(object sender, AfterTextChangedEventArgs e)
         {
             if (!middleNameEditText.HasFocus)
                 return;
@@ -161,7 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             UpdateCompositeName();
         }
 
-        void LastNameEditText_TextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
+        void LastNameEditText_TextChanged(object sender, AfterTextChangedEventArgs e)
         {
             if (!lastNameEditText.HasFocus)
                 return;

@@ -15,11 +15,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         List<CountryInfo> countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries;
 
         public PhysicalAddressesView(Context context)
-            : base(context, Resource.String.edit_contact_physical, false)
+            : base(context, Resource.String.edit_contact_physical)
         {
         }
-
-        public override bool ContainsValidContent() => true;
 
         public override void RefreshView()
         {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
-using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
@@ -19,7 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         List<CountryInfo> countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries;
 
         protected AbstractPhoneNumberView(Context context, CommunicationAddressType type)
-            : base(context, GetResourceIdForType(type), false)
+            : base(context, GetResourceIdForType(type))
         {
             this.type = type;
         }
@@ -248,11 +247,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
         }
 
-        public override bool ContainsValidContent()
-        {
-            return Rows.All(r => r.ContainsValidContent());
-        }
-
         protected class PhoneNumberRow : Row
         {
             readonly AppCompatEditText phoneEditText;
@@ -292,7 +286,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 }
             }
 
-            public override bool ContainsValidContent() => true;
+            public override bool ContainsValidContent()
+            {
+                var parts = AddressUtils.CommunicationAddressParts(Content);
+                return !string.IsNullOrWhiteSpace(parts.Number);
+            }
         }
     }
 }

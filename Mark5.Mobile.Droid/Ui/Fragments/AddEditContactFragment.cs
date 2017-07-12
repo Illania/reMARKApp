@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -115,11 +114,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        //TODO NOTE
-        // - We need to deal with the birthdate somehow
-        // - On the service we didn't consider the editing of the parent contact (either we change it on the server,
-        // or we make it umchangeable in edit mode)
-
         public override void OnStop()
         {
             base.OnStop();
@@ -128,7 +122,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected void PrepareViewsForPerson()
         {
-            //Company
             subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new PositionView(Context));
@@ -192,11 +185,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                      $"type={ContactType}, mode={CreationModeFlag}]...");
         }
 
-        public override async void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
 
-            await RefreshData();
+            RefreshData();
         }
 
         public void ReplaceFragment(Fragment f, string tag)
@@ -220,13 +213,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Refresh methods
 
-        async Task RefreshData()
+        void RefreshData()
         {
             if (Contact != null && ContactPreview != null)
             {
                 RefreshView();
                 return;
             }
+
             if (CreationModeFlag == ContactCreationModeFlag.New)
             {
                 Contact = new Contact();
@@ -234,31 +228,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactPreview.Type = ContactType;
                 RefreshView();
                 return;
-            }
-            if (CreationModeFlag == ContactCreationModeFlag.Edit) //TODO actually we never reach here (usually) 
-            {
-                try
-                {
-                    if (ContactId.HasValue && ContactPreview == null && Contact == null)
-                    {
-                        var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder?.Id, ContactId.Value);
-                        ContactPreview = container.ContactPreview;
-                        Contact = container.Contact;
-                    }
-
-                    if (ContactPreview != null && Contact == null)
-                        Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder?.Id, ContactPreview.Id);
-
-                    RefreshView();
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Downloading contact failed [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
-                                     $"type={ContactType}, mode={CreationModeFlag}]...", ex);
-
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                    Activity.OnBackPressed();
-                }
             }
         }
 
@@ -328,8 +297,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void HandleSend()
         {
-            //TODO should we put a confirmation dialog before?
-
             var titleResource = CreationModeFlag == ContactCreationModeFlag.Edit ? Resource.String.edit_contact_edit_loading :
                                                                            Resource.String.edit_contact_add_loading;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
