@@ -272,6 +272,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subview.Contact = Contact;
                 subview.ContactPreview = ContactPreview;
                 subview.ParentContactPreview = ParentContactPreview;
+                subview.CreationMode = CreationModeFlag;
                 subview.RefreshView();
             }
 
@@ -295,8 +296,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void OnParentContactRequest()
         {
-            //TODO a company cannot have a department as parent
             var i = new Intent(Activity, typeof(ParentContactSelectorFoldersListActivity));
+            i.PutExtra(ParentContactSelectorFoldersListActivity.ChildrenTypeIntentKey, (int)ContactPreview.Type);
             StartActivityForResult(i, RequestCodes.ParentContactRequestCode);
         }
 

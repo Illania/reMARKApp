@@ -136,8 +136,9 @@
 	<string name="edit_contact_first_name_error">First name cannot be empty</string>
 	<string name="edit_contact_last_name_error">Last name cannot be empty</string>
 	<string name="edit_contact_company_department">Company/Department</string>
-	<string name="parent_contact_selector_person_title">Invalid choice</string>
-	<string name="parent_contact_selector_person_content">It is not possible to select a person</string>
+	<string name="parent_contact_selector_invalid_title">Invalid choice</string>
+	<string name="parent_contact_selector_invalid_person_content">It is not possible to select a person</string>
+	<string name="parent_contact_selector_invalid_department_content">It is not possible to select a department</string>
 	<string name="parent_contact_selector_choose">Choose which contact you want to select</string>
 	<string name="email">Email</string>
 	<string name="email_not_valid">Email not valid</string>

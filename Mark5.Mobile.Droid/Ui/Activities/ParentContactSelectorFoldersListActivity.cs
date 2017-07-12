@@ -5,6 +5,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -13,6 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ParentContactSelectorFoldersListActivity : BaseAppCompatActivity
     {
+        public const string ChildrenTypeIntentKey = "ChildrenTypeKey_09ed9796-4e13-42ff-8848-df5ca3731c25";
         public const string ParentContactResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
 
         public const int ContactRequestCode = 123;
@@ -35,9 +37,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var ft = SupportFragmentManager.BeginTransaction();
+                var childrenType = (ContactType)Intent.Extras.GetInt(ChildrenTypeIntentKey);
 
-                var pcflf = new ParentContactSelectorFoldersListFragment();
+                var ft = SupportFragmentManager.BeginTransaction();
+                var pcflf = new ParentContactSelectorFoldersListFragment(childrenType);
+
                 ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
                 ft.Commit();
 

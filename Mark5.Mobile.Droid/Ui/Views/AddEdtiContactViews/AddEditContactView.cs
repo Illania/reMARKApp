@@ -15,6 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public ContactPreview ParentContactPreview { get; set; }
+        public ContactCreationModeFlag CreationMode { get; set; }
 
         protected static int DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
         protected static int DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
@@ -31,7 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             LayoutTransition = new LayoutTransition();
         }
 
-        protected void OnContentChanged() //TODO this should be used at least in the subc classes that can contain invalid content
+        //This needs to be used by all subclasses that can contain invalid content
+        protected void OnContentChanged()
         {
             Edited(this, EventArgs.Empty);
         }

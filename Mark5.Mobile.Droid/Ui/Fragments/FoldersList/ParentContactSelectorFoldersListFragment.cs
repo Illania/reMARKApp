@@ -6,16 +6,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ParentContactSelectorFoldersListFragment : FoldersListFragment
     {
-        public ParentContactSelectorFoldersListFragment()
+        ContactType childrenType;
+
+        public ParentContactSelectorFoldersListFragment(ContactType childrenType)
             : base(true, true)
         {
             RemoteFolder = Folder.RootForModule(ModuleType.Contacts);
+            this.childrenType = childrenType;
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
         {
             var folder = CurrentAdapter.GetItemAtPosition(position);
-            Activity.StartActivityForResult(ParentContactSelectorActivity.Create(Context, folder), ParentContactSelectorFoldersListActivity.ContactRequestCode);
+            Activity.StartActivityForResult(ParentContactSelectorActivity.Create(Context, folder, childrenType), ParentContactSelectorFoldersListActivity.ContactRequestCode);
         }
 
         protected override void Adapter_ItemLongClicked(object sender, int position)
@@ -25,7 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new ParentContactSelectorFoldersListFragment
+            return new ParentContactSelectorFoldersListFragment(childrenType)
             {
                 RemoteFolder = folder,
             };

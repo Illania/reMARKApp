@@ -70,8 +70,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             expandedLayout.Visibility = ViewStates.Gone;
             namesLayout.AddView(expandedLayout);
 
-            //TODO doesn't get capitalied
-
             firstNameEditText = new AppCompatEditText(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),

@@ -14,6 +14,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ParentContactSelectorFragment : AbstractContactsListFragment
     {
+        public ContactType ChildrenType { get; set; }
+
         #region Adapter callbacks
 
         protected override async void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
@@ -22,54 +24,66 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (contactPreview.Type == ContactType.Person)
             {
-                await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_person_title, Resource.String.parent_contact_selector_person_content);
+                await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_person_content);
                 return;
             }
             if (contactPreview.Type == ContactType.Department)
             {
+                if (ChildrenType == ContactType.Company)
+                {
+                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_department_content);
+                    return;
+                }
+
                 selectedContactPreview = contactPreview;
             }
             else if (contactPreview.Type == ContactType.Company)
             {
-
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
-
-                try
+                if (ChildrenType == ContactType.Company)
                 {
-                    var contact = await Managers.ContactsManager.GetContactAsync(Folder, contactPreview.Id);
-                    dismissAction();
+                    selectedContactPreview = contactPreview;
+                }
+                else
+                {
+                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
 
-                    var deparments = contact.Children.Where(c => c.Type == ContactType.Department);
-
-                    if (!deparments.Any())
+                    try
                     {
-                        selectedContactPreview = contactPreview;
+                        var contact = await Managers.ContactsManager.GetContactAsync(Folder, contactPreview.Id);
+                        dismissAction();
+
+                        var deparments = contact.Children.Where(c => c.Type == ContactType.Department);
+
+                        if (!deparments.Any())
+                        {
+                            selectedContactPreview = contactPreview;
+                        }
+                        else
+                        {
+                            var choices = new List<ContactPreview> { contactPreview };
+                            choices.AddRange(deparments);
+
+                            var choice = await Dialogs.ShowSingleSelectDialogAsync(Activity, Resource.String.parent_contact_selector_choose, choices, displayText: DisplayText);
+
+                            selectedContactPreview = choice;
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        var choices = new List<ContactPreview> { contactPreview };
-                        choices.AddRange(deparments);
-
-                        var choice = await Dialogs.ShowSingleSelectDialogAsync(Activity, Resource.String.parent_contact_selector_choose, choices, displayText: DisplayText);
-
-                        selectedContactPreview = choice;
+                        dismissAction();
+                        CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
+                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
                     }
                 }
-                catch (Exception ex)
-                {
-                    dismissAction();
-                    CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                }
+            }
 
-                if (selectedContactPreview != null)
-                {
-                    var data = new Intent();
-                    data.PutExtra(ParentContactSelectorActivity.ParentContactResultKey, SerializationUtils.Serialize(selectedContactPreview));
-                    Activity.SetResult(Android.App.Result.Ok, data);
-                    Activity.Finish();
-                    return;
-                }
+            if (selectedContactPreview != null)
+            {
+                var data = new Intent();
+                data.PutExtra(ParentContactSelectorActivity.ParentContactResultKey, SerializationUtils.Serialize(selectedContactPreview));
+                Activity.SetResult(Android.App.Result.Ok, data);
+                Activity.Finish();
+                return;
             }
         }
 
