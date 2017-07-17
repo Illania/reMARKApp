@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -49,11 +50,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Task DidDisappear { get => tcs.Task; }
 
-        UIBarButtonItem doneItem;
 
-        UILabel progress;
+        UIBarButtonItem doneItem;
+        UIView startView;
         UIButton startButton;
-        UIButton stopButton;
+        UILabel lastDownloadedLabel;
 
         Stopwatch sw;
         CancellationTokenSource cts;
@@ -65,14 +66,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             InitializeNavigationBar();
-            InitializeView();
+            InitializeStartView();
+            //InitializeProgressView();
+            //InitializeFinishedView();
         }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
-            ExtendedLayoutIncludesOpaqueBars = true;
+            ExtendedLayoutIncludesOpaqueBars = false;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -82,7 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBarTitle();
             InitializeHandlers();
 
-            ReachabilityBar.Attach(View, null, (float) NavigationController.BottomLayoutGuide.Length);
+            ReachabilityBar.Attach(View, null, (float)NavigationController.BottomLayoutGuide.Length);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -91,7 +94,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(Folder);
             if (info != null)
-                progress.Text = "Last downloaded on: " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString();
+                lastDownloadedLabel.Text = "Last downloaded on: " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString();
+            else
+                lastDownloadedLabel.Text = null;
 
             CommonConfig.Logger.Info($"{nameof(DownloadViewController)} appeared");
         }
@@ -118,45 +123,121 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        void InitializeView()
+        void InitializeStartView()
         {
-            progress = new UILabel
+            startView = new UIView
             {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Text = "Ready",
-                Lines = 5
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
-            View.AddSubview(progress);
+            View.AddSubview(startView);
             View.AddConstraints(new[] {
-                progress.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                progress.HeightAnchor.ConstraintEqualTo(120f),
-                progress.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                progress.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
+                startView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                startView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                startView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
+                startView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor)
             });
 
-            startButton = UIButton.FromType(UIButtonType.RoundedRect);
-            startButton.TranslatesAutoresizingMaskIntoConstraints = false;
-            startButton.TintColor = UIColor.Green;
-            startButton.SetTitle("Start", UIControlState.Normal);
-            View.AddSubview(startButton);
-            View.AddConstraints(new[] {
-                startButton.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                startButton.HeightAnchor.ConstraintEqualTo(22f),
-                startButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                startButton.TopAnchor.ConstraintEqualTo(progress.BottomAnchor),
+            var upView = new UIView
+            {
+                BackgroundColor = Theme.LightGray,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            startView.AddSubview(upView);
+            startView.AddConstraints(new[] {
+                upView.WidthAnchor.ConstraintEqualTo(startView.WidthAnchor),
+                upView.HeightAnchor.ConstraintEqualTo(startView.HeightAnchor, .5f),
+                upView.CenterXAnchor.ConstraintEqualTo(startView.CenterXAnchor),
+                upView.TopAnchor.ConstraintEqualTo(startView.TopAnchor)
             });
 
-            stopButton = UIButton.FromType(UIButtonType.RoundedRect);
-            stopButton.TranslatesAutoresizingMaskIntoConstraints = false;
-            stopButton.Enabled = false;
-            stopButton.TintColor = UIColor.Red;
-            stopButton.SetTitle("Stop", UIControlState.Normal);
-            View.AddSubview(stopButton);
+            var imageView = new UIView
+            {
+                BackgroundColor = Theme.DarkBlue,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            upView.AddSubview(imageView);
+            upView.AddConstraints(new[] {
+                imageView.WidthAnchor.ConstraintEqualTo(125f),
+                imageView.HeightAnchor.ConstraintEqualTo(125f),
+                imageView.CenterXAnchor.ConstraintEqualTo(upView.CenterXAnchor),
+                imageView.CenterYAnchor.ConstraintEqualTo(upView.CenterYAnchor)
+            });
+
+            var downView = new UIView
+            {
+                BackgroundColor = Theme.White,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            startView.AddSubview(downView);
+            startView.AddConstraints(new[] {
+                downView.WidthAnchor.ConstraintEqualTo(startView.WidthAnchor),
+                downView.HeightAnchor.ConstraintEqualTo(startView.HeightAnchor, .5f),
+                downView.CenterXAnchor.ConstraintEqualTo(startView.CenterXAnchor),
+                downView.BottomAnchor.ConstraintEqualTo(startView.BottomAnchor)
+            });
+
+            startButton = new UIButton
+            {
+                TintColor = Theme.LightGray,
+                BackgroundColor = Theme.DarkBlue,
+                ContentEdgeInsets = new UIEdgeInsets(12.5f, 40f, 12.5f, 40f),
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                ClipsToBounds = true
+            };
+            startButton.TitleLabel.Font = Theme.DefaultLightFont;
+            startButton.Layer.CornerRadius = 7.5f;
+            startButton.SetTitle("Download contacts", UIControlState.Normal);
+            downView.AddSubview(startButton);
+            downView.AddConstraints(new[]
+            {
+                startButton.CenterXAnchor.ConstraintEqualTo(downView.CenterXAnchor),
+                startButton.CenterYAnchor.ConstraintEqualTo(downView.CenterYAnchor)
+            });
+
+            lastDownloadedLabel = new UILabel
+            {
+                TintColor = Theme.LightGray,
+                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                TextAlignment = UITextAlignment.Center,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            downView.Add(lastDownloadedLabel);
+            downView.AddConstraints(new[]
+            {
+                lastDownloadedLabel.TopAnchor.ConstraintEqualTo(startButton.BottomAnchor, 15f),
+                lastDownloadedLabel.WidthAnchor.ConstraintEqualTo(downView.WidthAnchor),
+                lastDownloadedLabel.CenterXAnchor.ConstraintEqualTo(downView.CenterXAnchor)
+            });
+        }
+
+        void InitializeProgressView()
+        {
+            var progressView = new UIView
+            {
+                Alpha = 0f
+            };
+            View.AddSubview(progressView);
             View.AddConstraints(new[] {
-                stopButton.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                stopButton.HeightAnchor.ConstraintEqualTo(22f),
-                stopButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                stopButton.TopAnchor.ConstraintEqualTo(startButton.BottomAnchor),
+                progressView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
+                progressView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor),
+                progressView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                progressView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor)
+            });
+
+        }
+
+        void InitializeFinishedView()
+        {
+            var finishedView = new UIView
+            {
+                Alpha = 0f
+            };
+            View.AddSubview(finishedView);
+            View.AddConstraints(new[] {
+                finishedView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
+                finishedView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor),
+                finishedView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                finishedView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor)
             });
         }
 
@@ -178,8 +259,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (startButton != null)
                 startButton.TouchUpInside += StartButton_TouchUpInside;
 
-            if (stopButton != null)
-                stopButton.TouchUpInside += StopButton_TouchUpInside;
+            //if (stopButton != null)
+            //    stopButton.TouchUpInside += StopButton_TouchUpInside;
         }
 
         void DeinitializeHandlers()
@@ -190,8 +271,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (startButton != null)
                 startButton.TouchUpInside -= StartButton_TouchUpInside;
 
-            if (stopButton != null)
-                stopButton.TouchUpInside -= StopButton_TouchUpInside;
+            //if (stopButton != null)
+            //    stopButton.TouchUpInside -= StopButton_TouchUpInside;
         }
 
         void DoneItem_Clicked(object sender, EventArgs e) => NavigationController.DismissViewController(true, null);
@@ -203,9 +284,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 InvokeOnMainThread(() =>
                 {
                     doneItem.Enabled = false;
-                    progress.Text = "Starting...";
-                    startButton.Enabled = false;
-                    stopButton.Enabled = true;
+                    //progress.Text = "Starting...";
+                    //startButton.Enabled = false;
+                    //stopButton.Enabled = true;
 
                     sw = new Stopwatch();
 
@@ -229,7 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 InvokeOnMainThread(() =>
                 {
-                    progress.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItemsCount}\nLeftItems={pi.LeftItemsCount}\nErrorsCount={pi.FailedItemsCount}\nETA=around {timeLeft} minutes";
+                    //progress.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItemsCount}\nLeftItems={pi.LeftItemsCount}\nErrorsCount={pi.FailedItemsCount}\nETA=around {timeLeft} minutes";
 
                     UIApplication.SharedApplication.IdleTimerDisabled = false;
                     UIApplication.SharedApplication.IdleTimerDisabled = true;
@@ -244,9 +325,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 InvokeOnMainThread(() =>
                 {
                     doneItem.Enabled = true;
-                    progress.Text = "Stopped";
-                    startButton.Enabled = true;
-                    stopButton.Enabled = false;
+                    //progress.Text = "Stopped";
+                    //startButton.Enabled = true;
+                    //stopButton.Enabled = false;
 
                     UIApplication.SharedApplication.IdleTimerDisabled = false;
                 });
@@ -260,9 +341,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 InvokeOnMainThread(() =>
                 {
                     doneItem.Enabled = true;
-                    progress.Text = "Exception";
-                    startButton.Enabled = true;
-                    stopButton.Enabled = false;
+                    //progress.Text = "Exception";
+                    //startButton.Enabled = true;
+                    //stopButton.Enabled = false;
 
                     UIApplication.SharedApplication.IdleTimerDisabled = false;
 
@@ -278,7 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void StopButton_TouchUpInside(object sender, EventArgs e)
         {
-            stopButton.Enabled = false;
+            //stopButton.Enabled = false;
             cts?.Cancel();
         }
 
@@ -374,7 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 }
 
                                 //foreach (var child in c.Children.Where(cp => cp.Type == ContactType.Person))
-                                    //await Managers.ContactsManager.GetContactWithPreviewAsync(-1, child.Id, SourceType.Remote);
+                                //await Managers.ContactsManager.GetContactWithPreviewAsync(-1, child.Id, SourceType.Remote);
                             }
 
                             await DeepDownload(contact); // TODO consider making this optional

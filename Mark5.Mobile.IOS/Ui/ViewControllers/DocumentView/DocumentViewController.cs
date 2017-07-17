@@ -144,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (IsMovingFromParentViewController || IsBeingDismissed)
                 OnComplete?.Invoke();
 
-            DeInitializeHandlers();
+            DeinitializeHandlers();
         }
 
         public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
