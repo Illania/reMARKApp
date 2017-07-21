@@ -100,7 +100,7 @@
 "error_appserviceexception_title" = "Error";
 "error_dataaccessexception_title" = "Cache error occured";
 "error_datanotfoundexception_message" = "This item is not available offline";
-"error_datanotfoundexception_title" = "Unavailble offline";
+"error_datanotfoundexception_title" = "You are offline";
 "error_filetransferserviceexception_title" = "Error";
 "error_generalexception_title" = "Unexpected exception";
 "error_invalidsourcetypeexception_message" = "This action cannot be performed offline";
