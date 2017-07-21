@@ -42,6 +42,7 @@
 	<string name="connection_status">Connection status</string>
 	<string name="contact">Contact</string>
 	<string name="contacts">Contacts</string>
+	<string name="continue_work">Continue</string>
 	<string name="copied_to_clipboard">Copied to clipboard</string>
 	<string name="copy_to_folder">Copy to folder</string>
 	<string name="copy_to_worktray">Copy to worktray</string>
@@ -69,6 +70,9 @@
 	<string name="document_next">Next</string>
 	<string name="documents">Emails</string>
 	<string name="done">Done</string>
+	<string name="dont_close_app">Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!</string>
+	<string name="download">Download</string>
+	<string name="download_finished">Download completed!\nYou can now continue working.</string>
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
@@ -171,6 +175,7 @@
 	<string name="please_wait">Please wait...</string>
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid</string>
+	<string name="preparing">Preparing...</string>
 	<string name="priority">Priority</string>
 	<string name="priority_low">Low</string>
 	<string name="priority_normal">Normal</string>

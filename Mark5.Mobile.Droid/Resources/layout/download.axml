@@ -1,28 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minWidth="25px"
-    android:minHeight="25px">
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/textView"
-        android:text="Text"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_centerInParent="true"
-        android:gravity="center" />
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/startButton"
-        android:text="Start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/textView" />
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/stopButton"
-        android:text="Stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/startButton" />
-</RelativeLayout>
+    android:orientation="vertical"
+    android:animateLayoutChanges="true">
+    <LinearLayout
+        android:id="@+id/startLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/lightgray">
+            <View
+                android:background="@color/darkblue"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white">
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/startButton"
+                android:text="@string/download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/white"
+                style="@style/mark5colorbutton" />
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/lastDownloadedOnTextView"
+                android:textAppearance="@style/fontPrimaryLight"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/startButton"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/progressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/darkerblue">
+            <View
+                android:id="@+id/progress_placeholder"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_centerInParent="true" />
+            <View
+                android:id="@+id/progress_warning_image"
+                android:background="@color/white"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_marginBottom="25dp"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@id/progress_placeholder" />
+            <android.support.v7.widget.AppCompatTextView
+                android:text="@string/dont_close_app"
+                android:textAppearance="@style/fontSmallLight"
+                android:textColor="@color/lightgray"
+                android:gravity="center"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/progress_placeholder" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white">
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/progressStatus"
+                android:text="@string/preparing"
+                android:textAppearance="@style/fontSmall"
+                android:gravity="center"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:indeterminate="true"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:layout_above="@id/progressStatus"
+                style="@style/mark5progressbarhorizontaldark" />
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/cancelButton"
+                android:text="@string/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/darkblue"
+                style="@style/mark5colorbuttonflat" />
+        </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/finishedLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/lightgray">
+            <View
+                android:background="@color/darkblue"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white">
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/closeButton"
+                android:text="@string/continue_work"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/white"
+                style="@style/mark5colorbutton" />
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/lastDownloadedOnTextView"
+                android:text="@string/download_finished"
+                android:textAppearance="@style/fontPrimaryLight"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_above="@id/closeButton"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -49,9 +49,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Folder Folder { get; set; }
 
-        AppCompatTextView textView;
-        AppCompatButton startButton, stopButton;
-
         Stopwatch sw;
         CancellationTokenSource cts;
         PowerManager.WakeLock wakelock;
@@ -62,15 +59,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.download, container, false);
 
-            textView = rootView.FindViewById<AppCompatTextView>(Resource.Id.textView);
-            startButton = rootView.FindViewById<AppCompatButton>(Resource.Id.startButton);
-            stopButton = rootView.FindViewById<AppCompatButton>(Resource.Id.stopButton);
+            //textView = rootView.FindViewById<AppCompatTextView>(Resource.Id.textView);
+            //startButton = rootView.FindViewById<AppCompatButton>(Resource.Id.startButton);
+            //stopButton = rootView.FindViewById<AppCompatButton>(Resource.Id.stopButton);
 
-            startButton.Click += StartButton_Click;
-            stopButton.Click += StopButton_Click;
-
-            textView.Text = "Ready";
-            stopButton.Enabled = false;
+            //startButton.Click += StartButton_Click;
+            //stopButton.Click += StopButton_Click;
 
             return rootView;
         }
@@ -91,10 +85,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             wakelock?.Release();
             wakelock = null;
-
-            textView?.Dispose();
-            startButton?.Dispose();
-            stopButton?.Dispose();
         }
 
         void StartButton_Click(object sender, EventArgs e)
@@ -110,9 +100,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    textView.Text = "Starting...";
-                    startButton.Enabled = false;
-                    stopButton.Enabled = true;
+                    //textView.Text = "Starting...";
+                    //startButton.Enabled = false;
+                    //stopButton.Enabled = true;
 
                     sw = new Stopwatch();
                 });
@@ -133,7 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    textView.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItemsCount}\nLeftItems={pi.LeftItemsCount}\nErrorsCount={pi.FailedItemsCount}\nETA=around {timeLeft} minutes";
+                    //textView.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItemsCount}\nLeftItems={pi.LeftItemsCount}\nErrorsCount={pi.FailedItemsCount}\nETA=around {timeLeft} minutes";
                 });
             }
 
@@ -147,9 +137,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    textView.Text = "Stopped";
-                    startButton.Enabled = true;
-                    stopButton.Enabled = false;
+                    //textView.Text = "Stopped";
+                    //startButton.Enabled = true;
+                    //stopButton.Enabled = false;
                 });
             }
 
@@ -163,9 +153,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    textView.Text = "Exception";
-                    startButton.Enabled = true;
-                    stopButton.Enabled = false;
+                    //textView.Text = "Exception";
+                    //startButton.Enabled = true;
+                    //stopButton.Enabled = false;
 
                     Dialogs.ShowErrorDialog(Activity, ex);
                 });
@@ -179,7 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void StopButton_Click(object sender, EventArgs e)
         {
-            stopButton.Enabled = false;
+            //stopButton.Enabled = false;
             cts?.Cancel();
         }
 
