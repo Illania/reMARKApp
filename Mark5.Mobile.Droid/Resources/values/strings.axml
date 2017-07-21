@@ -73,6 +73,7 @@
 	<string name="dont_close_app">Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!</string>
 	<string name="download">Download</string>
 	<string name="download_finished">Download completed!\nYou can now continue working.</string>
+	<string name="downloading_percentage">Downloading %1$d%%...</string>
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
@@ -105,6 +106,7 @@
 	<string name="invalid_emails_title">Invalid emails entered</string>
 	<string name="invalid_emails_content">Not all emails you entered are valid. Do you still want to send the email?</string>
 	<string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
+	<string name="last_downloaded_on">Last downloaded on:</string>
 	<string name="ledger">Ledger</string>
 	<string name="line">Mailbox</string>
 	<string name="lines">Mailboxes</string>
@@ -303,6 +305,7 @@
 	</string-array>
 	<string name="testing_connection">Testing connection</string>
 	<string name="text">Text</string>
+	<string name="time_remaining_minutes_zero">Time remaining: less than one minute</string>
 	<string name="to">To</string>
 	<string name="to_prefix">to</string>
 	<string name="today">Today</string>

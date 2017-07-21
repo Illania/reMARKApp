@@ -13,6 +13,8 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Android.Support.V7.Widget;
 using System.Diagnostics;
 using Android.Support.V7.App;
+using Android.Widget;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -49,6 +51,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Folder Folder { get; set; }
 
+        LinearLayout startLayout;
+        LinearLayout progressLayout;
+        LinearLayout finishedLayout;
+
+        AppCompatButton startButton;
+        AppCompatTextView lastDownloadedOnTextView;
+        ProgressBar progressBar;
+        AppCompatTextView progressStatus;
+        AppCompatButton cancelButton;
+        AppCompatButton closeButton;
+
         Stopwatch sw;
         CancellationTokenSource cts;
         PowerManager.WakeLock wakelock;
@@ -59,12 +72,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.download, container, false);
 
-            //textView = rootView.FindViewById<AppCompatTextView>(Resource.Id.textView);
-            //startButton = rootView.FindViewById<AppCompatButton>(Resource.Id.startButton);
-            //stopButton = rootView.FindViewById<AppCompatButton>(Resource.Id.stopButton);
+            startLayout = rootView.FindViewById<LinearLayout>(Resource.Id.start_layout);
+            progressLayout = rootView.FindViewById<LinearLayout>(Resource.Id.progress_layout);
+            finishedLayout = rootView.FindViewById<LinearLayout>(Resource.Id.finished_layout);
 
-            //startButton.Click += StartButton_Click;
-            //stopButton.Click += StopButton_Click;
+            startButton = rootView.FindViewById<AppCompatButton>(Resource.Id.start_button);
+            lastDownloadedOnTextView = rootView.FindViewById<AppCompatTextView>(Resource.Id.last_downloaded_on_text_view);
+            progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress_bar);
+            progressStatus = rootView.FindViewById<AppCompatTextView>(Resource.Id.progress_status);
+            cancelButton = rootView.FindViewById<AppCompatButton>(Resource.Id.cancel_button);
+            closeButton = rootView.FindViewById<AppCompatButton>(Resource.Id.close_button);
+
+            startButton.Click += StartButton_Click;
+            cancelButton.Click += CancelButton_Click;
+            closeButton.Click += CloseButton_Click;
 
             return rootView;
         }
@@ -73,10 +94,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = "Download";
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.download);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(DownloadFragment)}");
+        }
+
+        public override async void OnResume()
+        {
+            base.OnResume();
+
+            var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(Folder);
+            if (info != null)
+                lastDownloadedOnTextView.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString(Context);
+            else
+                lastDownloadedOnTextView.Text = null;
         }
 
         public override void OnDestroy()
@@ -100,9 +132,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    //textView.Text = "Starting...";
-                    //startButton.Enabled = false;
-                    //stopButton.Enabled = true;
+                    progressLayout.Visibility = ViewStates.Visible;
+                    startLayout.Visibility = ViewStates.Gone;
+                    finishedLayout.Visibility = ViewStates.Gone;
 
                     sw = new Stopwatch();
                 });
@@ -123,7 +155,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    //textView.Text = $"Preparing={pi.Preparing}\nTotalItems={pi.TotalItemsCount}\nLeftItems={pi.LeftItemsCount}\nErrorsCount={pi.FailedItemsCount}\nETA=around {timeLeft} minutes";
+                    if (pi.Preparing)
+                    {
+                        progressBar.Indeterminate = true;
+                        progressStatus.Text = GetString(Resource.String.preparing);
+                    }
+                    else
+                    {
+                        progressBar.Indeterminate = false;
+                        progressBar.Max = pi.TotalItemsCount;
+                        progressBar.SetProgress(pi.TotalItemsCount - pi.LeftItemsCount, true);
+
+                        progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
+
+                        if (timeLeft > 0)
+                            progressStatus.Text += "\n" + Resources.GetQuantityString(Resource.Plurals.time_remaining_minutes, (int)timeLeft, (int)timeLeft);
+                        else if (timeLeft > -1)
+                            progressStatus.Text += "\n" + GetString(Resource.String.time_remaining_minutes_zero);
+                    }
                 });
             }
 
@@ -137,9 +186,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    //textView.Text = "Stopped";
-                    //startButton.Enabled = true;
-                    //stopButton.Enabled = false;
+                    finishedLayout.Visibility = ViewStates.Visible;
+                    startLayout.Visibility = ViewStates.Gone;
+                    progressLayout.Visibility = ViewStates.Gone;
                 });
             }
 
@@ -153,25 +202,43 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    //textView.Text = "Exception";
-                    //startButton.Enabled = true;
-                    //stopButton.Enabled = false;
+                    startLayout.Visibility = ViewStates.Visible;
+                    progressLayout.Visibility = ViewStates.Gone;
+                    finishedLayout.Visibility = ViewStates.Gone;
 
                     Dialogs.ShowErrorDialog(Activity, ex);
+                });
+            }
+
+            void OnCancelled()
+            {
+                wakelock?.Release();
+                wakelock = null;
+
+                sw.Stop();
+                sw = null;
+
+                Activity.RunOnUiThread(() =>
+                {
+                    startLayout.Visibility = ViewStates.Visible;
+                    progressLayout.Visibility = ViewStates.Gone;
+                    finishedLayout.Visibility = ViewStates.Gone;
                 });
             }
 
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, cts.Token));
+            Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
         }
 
-        void StopButton_Click(object sender, EventArgs e)
+        void CancelButton_Click(object sender, EventArgs e)
         {
-            //stopButton.Enabled = false;
+            cancelButton.Enabled = false;
             cts?.Cancel();
         }
+
+        void CloseButton_Click(object sender, EventArgs e) => Activity?.Finish();
 
         public override string GenerateTag()
         {
@@ -183,6 +250,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             Action<ProgressInfo> onProgressAction,
                             Action<FinishedInfo> onFinishedAction,
                             Action<Exception> onException,
+                            Action onCancelled,
                             CancellationToken ct)
         {
             try
@@ -232,7 +300,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (ct.IsCancellationRequested)
                 {
-                    onFinishedAction(new FinishedInfo(0, 0));
+                    onCancelled();
                     return;
                 }
 
@@ -273,7 +341,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 //await Managers.ContactsManager.GetContactWithPreviewAsync(-1, child.Id, SourceType.Remote);
                             }
 
-                            await DeepDownload(contact); // TODO consider making this optional
+                            await DeepDownload(contact);
                         }
                         if (folder.Module == ModuleType.Shortcodes)
                             await Managers.ShortcodesManager.GetShortcodeAsync(folder, item, SourceType.Remote);
@@ -287,11 +355,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
                 } while (!ct.IsCancellationRequested);
 
-                CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItemsCount} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
+                if (ct.IsCancellationRequested)
+                    onCancelled();
+                else
+                {
+                    CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItemsCount} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
 
-                await Managers.FoldersManager.AddSavedFolderInfo(folder);
+                    await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
-                onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItemsCount));
+                    onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItemsCount));
+                }
             }
             catch (Exception ex)
             {

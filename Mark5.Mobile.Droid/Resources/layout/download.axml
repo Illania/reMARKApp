@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:animateLayoutChanges="true">
     <LinearLayout
-        android:id="@+id/startLayout"
+        android:id="@+id/start_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:background="@color/white">
             <android.support.v7.widget.AppCompatButton
-                android:id="@+id/startButton"
+                android:id="@+id/start_button"
                 android:text="@string/download"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -36,18 +36,18 @@
                 android:textColor="@color/white"
                 style="@style/mark5colorbutton" />
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/lastDownloadedOnTextView"
+                android:id="@+id/last_downloaded_on_text_view"
                 android:textAppearance="@style/fontPrimaryLight"
                 android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:layout_below="@id/startButton"
+                android:layout_below="@id/start_button"
                 android:layout_centerHorizontal="true" />
         </RelativeLayout>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/progressLayout"
+        android:id="@+id/progress_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -88,7 +88,7 @@
             android:layout_weight="1"
             android:background="@color/white">
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/progressStatus"
+                android:id="@+id/progress_status"
                 android:text="@string/preparing"
                 android:textAppearance="@style/fontSmall"
                 android:gravity="center"
@@ -98,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true" />
             <ProgressBar
-                android:id="@+id/progressBar"
+                android:id="@+id/progress_bar"
                 android:indeterminate="true"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
@@ -106,10 +106,10 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="10dp"
-                android:layout_above="@id/progressStatus"
+                android:layout_above="@id/progress_status"
                 style="@style/mark5progressbarhorizontaldark" />
             <android.support.v7.widget.AppCompatButton
-                android:id="@+id/cancelButton"
+                android:id="@+id/cancel_button"
                 android:text="@string/cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
         </RelativeLayout>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/finishedLayout"
+        android:id="@+id/finished_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -143,7 +143,7 @@
             android:layout_weight="1"
             android:background="@color/white">
             <android.support.v7.widget.AppCompatButton
-                android:id="@+id/closeButton"
+                android:id="@+id/close_button"
                 android:text="@string/continue_work"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -151,14 +151,13 @@
                 android:textColor="@color/white"
                 style="@style/mark5colorbutton" />
             <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/lastDownloadedOnTextView"
                 android:text="@string/download_finished"
                 android:textAppearance="@style/fontPrimaryLight"
                 android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:layout_above="@id/closeButton"
+                android:layout_above="@id/close_button"
                 android:layout_centerHorizontal="true" />
         </RelativeLayout>
     </LinearLayout>
