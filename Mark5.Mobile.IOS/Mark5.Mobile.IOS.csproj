@@ -323,7 +323,7 @@
 		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.5.0\lib\netstandard1.6\HtmlAgilityPack.dll</HintPath>
+		  <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\netstandard1.6\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
