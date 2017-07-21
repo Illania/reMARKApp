@@ -102,7 +102,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(Folder);
             if (info != null)
-                lastDownloadedLabel.Text = "Last downloaded on: " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString();
+                lastDownloadedLabel.Text = Localization.GetString("last_downloaded_on") + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString();
             else
                 lastDownloadedLabel.Text = null;
 
@@ -282,7 +282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TextColor = Theme.LightGray,
                 Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
                 TextAlignment = UITextAlignment.Center,
-                Text = "Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!",
+                Text = Localization.GetString("dont_close_app"),
                 Lines = 6,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -355,7 +355,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             cancelButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-            cancelButton.SetTitle("Cancel", UIControlState.Normal);
+            cancelButton.SetTitle(Localization.GetString("cancel"), UIControlState.Normal);
             downView.Add(cancelButton);
             downView.AddConstraints(new[]
             {
@@ -428,7 +428,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             closeButton.TitleLabel.Font = Theme.DefaultLightFont;
             closeButton.Layer.CornerRadius = 7.5f;
-            closeButton.SetTitle("Continue", UIControlState.Normal);
+            closeButton.SetTitle(Localization.GetString("continue"), UIControlState.Normal);
             downView.AddSubview(closeButton);
             downView.AddConstraints(new[]
             {
@@ -439,7 +439,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var downloadedLabel = new UILabel
             {
                 TintColor = Theme.LightGray,
-                Text = "Download completed!\nYou can now continue working.",
+                Text = Localization.GetString("download_complete"),
                 Lines = 2,
                 Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
                 TextAlignment = UITextAlignment.Center,
@@ -459,7 +459,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetRightBarButtonItem(doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done), false);
         }
 
-        void InitializeNavigationBarTitle() => NavigationItem.Title = "Download";
+        void InitializeNavigationBarTitle() => NavigationItem.Title = Localization.GetString("download");
 
         void InitializeHandlers()
         {
@@ -497,7 +497,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
-                Dialogs.ShowConfirmDialogAsync(this, "You are offline", "This action cannot be performed offline");
+                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("youre_offile_title"), Localization.GetString("youre_offile_message"));
                 return;
             }
 
@@ -551,7 +551,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         progressPreparingIndicator.Hidden = false;
                         progressIndicator.Hidden = true;
 
-                        progressLabel.Text = "Preparing...";
+                        progressLabel.Text = Localization.GetString("preparing___");
                     }
                     else
                     {
@@ -560,11 +560,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         progressIndicator.SetProgress(1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount), true);
 
-                        progressLabel.Text = $"Downloading {(int)(progressIndicator.Progress * 100)}%...";
+                        progressLabel.Text = Localization.GetString("downloading_percentage___", (int)(progressIndicator.Progress * 100));
                         if (timeLeft > 0)
-                            progressLabel.Text += $" Time remaining: around {timeLeft} minutes";
+                            progressLabel.Text += " " + Localization.GetString("time_remaining_minutes", timeLeft);
                         else if (timeLeft > -1)
-                            progressLabel.Text += $" Time remaining: less than one minute";
+                            progressLabel.Text += " " + Localization.GetString("time_remaining_less_than_minute");
                     }
 
                     UIApplication.SharedApplication.IdleTimerDisabled = false;
@@ -657,7 +657,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             ((UIButton)sender).Enabled = false;
 
-            var result = await Dialogs.ShowYesNoDialogAsync(this, "Warning", "If you interrupt download all progress will be lost and you will have to download this folder again. Do you want to interrupt?");
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("download_interrupt_warning"));
             if (result)
                 cts?.Cancel();
             else
