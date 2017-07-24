@@ -186,7 +186,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void PrepareViewsForCompany()
         {
             subviews.Add(new NameView(Context));
-            subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
             subviews.Add(new MobileView(Context));

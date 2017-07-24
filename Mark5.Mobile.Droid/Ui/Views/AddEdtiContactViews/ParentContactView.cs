@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         bool disableEditing;
 
         public ParentContactView(Context context, Action onParentContactRequest)
-            : base(context, Resource.String.edit_contact_company_department, false, false)
+            : base(context, floatingHint: false, editable: false)
         {
             this.onParentContactRequest = onParentContactRequest;
         }
@@ -20,6 +20,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         public override void RefreshView()
         {
+            int hintResId = -1;
+
+            switch (ContactPreview.Type)
+            {
+                case ContactType.Person:
+                    hintResId = Resource.String.edit_contact_company_department;
+                    break;
+                case ContactType.Department:
+                    hintResId = Resource.String.edit_contact_company;
+                    break;
+                default:
+                    throw new ArgumentException("This view should not be visible for companies!");
+            }
+
+            SetHintResId(hintResId);
+
             disableEditing = false;
 
             if (CreationMode == ContactCreationModeFlag.New && ParentContactPreview != null) //Add from parent
