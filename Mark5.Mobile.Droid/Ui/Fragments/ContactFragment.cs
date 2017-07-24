@@ -409,21 +409,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ContactPreview.Type == ContactType.Company)
             {
-                values = new List<ContactType> { ContactType.Person, ContactType.Company, ContactType.Department };
+                values = new List<ContactType> { ContactType.Department, ContactType.Person };
             }
             else if (ContactPreview.Type == ContactType.Department)
             {
-                values = new List<ContactType> { ContactType.Person, ContactType.Department };
+                values = new List<ContactType> { ContactType.Person };
             }
 
-            var choice = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.edit_contact_children_dialog_title, values,
-                                                                   displayText: (arg) => GetString(UI.ContactTypeResourceId(arg)));
+            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_children_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(),
+                                                       true);
 
-            if (choice != ContactType.None)
+            if (index >= 0)
             {
                 var intent = new Intent(Context, typeof(AddEditContactActivity));
                 intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
-                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)choice);
+                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
                 intent.PutExtra(AddEditContactActivity.ParentContactPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
                 StartActivityForResult(intent, RequestCodes.ChildrenRequest);
             }

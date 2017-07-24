@@ -40,6 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     Content = ContactPreview.CompanyName;
                 }
             }
+
+            disableEditing |= ParentPreselected;
         }
 
         protected override void ContentClicked(object sender, EventArgs e)

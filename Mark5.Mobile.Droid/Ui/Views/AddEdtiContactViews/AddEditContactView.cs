@@ -16,6 +16,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         public ContactPreview ContactPreview { get; set; }
         public ContactPreview ParentContactPreview { get; set; }
         public ContactCreationModeFlag CreationMode { get; set; }
+        public bool ParentPreselected { get; set; }
+
 
         protected static int DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
         protected static int DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);

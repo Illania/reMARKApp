@@ -35,6 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public ContactCreationModeFlag CreationModeFlag { get; set; }
         public Action CloseRequest { get; set; }
         public ContactPreview ParentContactPreview { get; set; }
+        public bool ParentPreselected { get; set; }
 
         LinearLayoutCompat linearLayout;
         LinearLayoutCompat secondaryLinearLayout;
@@ -111,7 +112,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.AddView(showMoreButton);
             linearLayout.AddView(secondaryLinearLayout);
 
+            SetTitle();
+
             return rootView;
+        }
+
+        void SetTitle()
+        {
+            int resId = 0;
+
+            switch (ContactType)
+            {
+                case ContactType.Person:
+                    resId = Resource.String.edit_contact_create_person;
+                    break;
+                case ContactType.Company:
+                    resId = Resource.String.edit_contact_create_company;
+                    break;
+                case ContactType.Department:
+                    resId = Resource.String.edit_contact_create_department;
+                    break;
+                default:
+                    throw new ArgumentException("Contact type needs to be defined");
+            }
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(resId);
+
         }
 
         public override void OnStop()
@@ -122,7 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected void PrepareViewsForPerson()
         {
-            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            subviews.Add(new PersonNameView(Context));
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
@@ -141,7 +167,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void PrepareViewsForDeparment()
         {
-            subviews.Add(new NameView(Context, OnPersonNameChanged));
+            subviews.Add(new NameView(Context));
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
@@ -159,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void PrepareViewsForCompany()
         {
-            subviews.Add(new NameView(Context, OnPersonNameChanged));
+            subviews.Add(new NameView(Context));
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
@@ -242,6 +268,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subview.ContactPreview = ContactPreview;
                 subview.ParentContactPreview = ParentContactPreview;
                 subview.CreationMode = CreationModeFlag;
+                subview.ParentPreselected = ParentPreselected;
                 subview.RefreshView();
             }
 
@@ -257,11 +284,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
 
         #region Handlers
-
-        void OnPersonNameChanged(string name)
-        {
-            ((AppCompatActivity)Activity).SupportActionBar.Title = name;
-        }
 
         void OnParentContactRequest()
         {
@@ -344,6 +366,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactId = ContactId,
                 ContactType = ContactType,
                 SecondaryLayoutShown = secondaryLayoutShown,
+                ParentPreselected = ParentPreselected,
             };
         }
 
@@ -360,6 +383,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactId = state.ContactId;
                 ContactType = state.ContactType;
                 secondaryLayoutShown = state.SecondaryLayoutShown;
+                ParentPreselected = ParentPreselected;
             }
         }
 
@@ -374,6 +398,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? ContactId { get; set; }
             public ContactType ContactType { get; set; }
             public bool SecondaryLayoutShown { get; set; }
+            public bool ParentPreselected { get; set; }
         }
 
         #endregion
