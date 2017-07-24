@@ -58,6 +58,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            linearLayout.DescendantFocusability = DescendantFocusability.BeforeDescendants;
+            linearLayout.FocusableInTouchMode = true;
+
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
