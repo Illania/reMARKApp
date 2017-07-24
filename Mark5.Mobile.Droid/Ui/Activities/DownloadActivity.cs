@@ -55,6 +55,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public override void OnBackPressed()
         {
+            if (!df.OnBackPressed())
+                return;
+
             if (df != null)
                 SetResult(Result.Ok);
 

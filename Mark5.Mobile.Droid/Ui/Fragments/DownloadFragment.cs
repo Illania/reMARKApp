@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
+using Android.Support.V7.App;
+using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using Android.Support.V7.Widget;
-using System.Diagnostics;
-using Android.Support.V7.App;
-using Android.Widget;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -65,6 +65,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Stopwatch sw;
         CancellationTokenSource cts;
         PowerManager.WakeLock wakelock;
+        bool downloadRunning;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -119,10 +120,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             wakelock = null;
         }
 
+        public bool OnBackPressed()
+        {
+            if (downloadRunning)
+            {
+                Toast.MakeText(Context, Resource.String.download_in_progress_cancel_to_go_back, ToastLength.Long).Show();
+                return false;
+            }
+
+            return true;
+        }
+
         void StartButton_Click(object sender, EventArgs e)
         {
+            if (!CommonConfig.Reachability.IsReachable)
+            {
+                Dialogs.ShowConfirmDialog(this, Resource.String.youre_offline_title, Resource.String.youre_offline_message);
+                return;
+            }
+
             void OnStart()
             {
+                CommonConfig.Logger.Info($"Starting download... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}]");
+
                 wakelock?.Release();
                 wakelock = null;
 
@@ -132,6 +152,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
+                    downloadRunning = true;
+
+                    progressStatus.Text = null;
+                    cancelButton.Enabled = true;
+
                     progressLayout.Visibility = ViewStates.Visible;
                     startLayout.Visibility = ViewStates.Gone;
                     finishedLayout.Visibility = ViewStates.Gone;
@@ -142,6 +167,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             void OnProgress(ProgressInfo pi)
             {
+                CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
+
                 if (!pi.Preparing && pi.LeftItemsCount == pi.TotalItemsCount)
                     sw.Start();
 
@@ -178,6 +205,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             void OnFinished(FinishedInfo fi)
             {
+                CommonConfig.Logger.Info($"Finished [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, downloadedItemsCount={fi.DownloadedItemsCount}, failedItemsCount={fi.FailedItemsCount}]");
+
                 wakelock?.Release();
                 wakelock = null;
 
@@ -189,11 +218,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     finishedLayout.Visibility = ViewStates.Visible;
                     startLayout.Visibility = ViewStates.Gone;
                     progressLayout.Visibility = ViewStates.Gone;
+
+                    downloadRunning = false;
                 });
             }
 
             void OnException(Exception ex)
             {
+                CommonConfig.Logger.Error($"Error occured when downloading! [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}]", ex);
+
                 wakelock?.Release();
                 wakelock = null;
 
@@ -207,11 +240,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     finishedLayout.Visibility = ViewStates.Gone;
 
                     Dialogs.ShowErrorDialog(Activity, ex);
+ 
+                    downloadRunning = false;
                 });
             }
 
             void OnCancelled()
             {
+                CommonConfig.Logger.Info($"Cancelled download [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}]");
+
                 wakelock?.Release();
                 wakelock = null;
 
@@ -223,6 +260,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     startLayout.Visibility = ViewStates.Visible;
                     progressLayout.Visibility = ViewStates.Gone;
                     finishedLayout.Visibility = ViewStates.Gone;
+
+                    downloadRunning = false;
                 });
             }
 
@@ -232,10 +271,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
         }
 
-        void CancelButton_Click(object sender, EventArgs e)
+        async void CancelButton_Click(object sender, EventArgs e)
         {
             cancelButton.Enabled = false;
-            cts?.Cancel();
+
+            var result = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.download_in_progress_warning);
+            if (result)
+                cts?.Cancel();
+            else
+                cancelButton.Enabled = true;
         }
 
         void CloseButton_Click(object sender, EventArgs e) => Activity?.Finish();
@@ -337,6 +381,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                         await DeepDownload(childResult.Contact);
                                 }
 
+                                // Deep download of contacts is disabled
                                 //foreach (var child in c.Children.Where(cp => cp.Type == ContactType.Person))
                                 //await Managers.ContactsManager.GetContactWithPreviewAsync(-1, child.Id, SourceType.Remote);
                             }

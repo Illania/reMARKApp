@@ -497,7 +497,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
-                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("youre_offile_title"), Localization.GetString("youre_offile_message"));
+                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("youre_offline_title"), Localization.GetString("youre_offline_message"));
                 return;
             }
 
@@ -574,7 +574,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void OnFinished(FinishedInfo fi)
             {
-                CommonConfig.Logger.Info($"Finished... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, downloadedItemsCount={fi.DownloadedItemsCount}, failedItemsCount={fi.FailedItemsCount}]");
+                CommonConfig.Logger.Info($"Finished [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, downloadedItemsCount={fi.DownloadedItemsCount}, failedItemsCount={fi.FailedItemsCount}]");
 
                 sw.Stop();
                 sw = null;

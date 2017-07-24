@@ -72,8 +72,10 @@
 	<string name="done">Done</string>
 	<string name="dont_close_app">Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!</string>
 	<string name="download">Download</string>
-	<string name="download_finished">Download completed!\nYou can now continue working.</string>
-	<string name="downloading_percentage">Downloading %1$d%%...</string>
+    <string name="download_finished">Download completed!\nYou can now continue working.</string>
+    <string name="download_in_progress_cancel_to_go_back">Download is in progress, Cancel the download to go back.</string>
+	<string name="download_in_progress_warning">If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?</string>
+    <string name="downloading_percentage">Downloading %1$d%%...</string>
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
@@ -321,4 +323,6 @@
 	<string name="webpage">Webpage</string>
 	<string name="yes">Yes</string>
 	<string name="yesterday">Yesterday</string>
+	<string name="youre_offline_title">You are offline</string>
+    <string name="youre_offline_message">This action cannot be performed offline</string>
 </resources>

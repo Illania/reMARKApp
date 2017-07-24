@@ -91,7 +91,7 @@
 "dont_close_app" = "Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!";
 "download" = "Download";
 "download_complete" = "Download completed!\nYou can now continue working.";
-"download_interrupt_warning" = "If you interrupt download all progress will be lost and you will have to download this folder again. Do you want to interrupt?";
+"download_interrupt_warning" = "If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?";
 "downloading_attachment___" = "Downloading attachment...";
 "downloading_percentage___" = "Downloading {0}%...";
 "edit" = "Edit";
@@ -340,5 +340,5 @@
 "wrong_username_title" = "Wrong username";
 "yes" = "Yes";
 "yesterday" = "Yesterday";
-"youre_offile_title" = "You are offline";
-"youre_offile_message" = "This action cannot be performed offline";
+"youre_offline_title" = "You are offline";
+"youre_offline_message" = "This action cannot be performed offline";
