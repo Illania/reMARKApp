@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
-                Dialogs.ShowConfirmDialog(this, Resource.String.youre_offline_title, Resource.String.youre_offline_message);
+                Dialogs.ShowConfirmDialog(Context, Resource.String.youre_offline_title, Resource.String.youre_offline_message);
                 return;
             }
 
