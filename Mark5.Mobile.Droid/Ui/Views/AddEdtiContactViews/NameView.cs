@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
         }
 
-        public override bool ContainsValidContent()
+        public bool ContainsValidContent()
         {
             return !string.IsNullOrEmpty(ContactPreview.Name);
         }
@@ -25,8 +25,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
             ContactPreview.Name = Content;
-            SetError(string.IsNullOrEmpty(ContactPreview.Name));
-            OnContentChanged();
         }
     }
 }

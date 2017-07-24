@@ -10,8 +10,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 {
     public abstract class AddEditContactView : LinearLayoutCompat
     {
-        public event EventHandler Edited = delegate { };
-
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public ContactPreview ParentContactPreview { get; set; }
@@ -34,13 +32,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             LayoutTransition = new LayoutTransition();
         }
 
-        //This needs to be used by all subclasses that can contain invalid content
-        protected void OnContentChanged()
-        {
-            Edited(this, EventArgs.Empty);
-        }
-
         abstract public void RefreshView();
-        abstract public bool ContainsValidContent();
     }
 }

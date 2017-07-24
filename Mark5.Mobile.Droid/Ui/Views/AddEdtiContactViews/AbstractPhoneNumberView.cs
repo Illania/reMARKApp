@@ -50,8 +50,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var ca = row.GetContent();
             Contact.CommunicationAddresses.Remove(ca);
             RemoveRow(row);
-
-            OnContentChanged();
         }
 
         async void CreateDialog(PhoneNumberRow row = null)
@@ -84,10 +82,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             };
             phoneEditText.SetHint(GetResourceIdForType(type));
             phoneEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-            phoneEditText.TextChanged += (sender, e) =>
-            {
-                phoneEditText.Error = string.IsNullOrWhiteSpace(phoneEditText.Text) ? Context.GetString(Resource.String.edit_contact_empty_number) : null;
-            };
             firstLine.AddView(phoneEditText);
 
             var descriptionEditText = new AppCompatEditText(Context)
@@ -142,7 +136,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             var titleResource = GetResourceIdForDialogForType(type, row != null);
-            if (await Dialogs.ShowCustomViewDialogAsync(Context, titleResource, container) == true)
+
+            Func<bool> isContentValid = () =>
+            {
+                var isValid = !string.IsNullOrWhiteSpace(phoneEditText.Text);
+
+                if (!isValid)
+                {
+                    phoneEditText.Error = Context.GetString(Resource.String.edit_contact_empty_number);
+                    phoneEditText.TextChanged -= PhoneEditText_TextChanged;
+                    phoneEditText.TextChanged += PhoneEditText_TextChanged;
+                }
+
+                return isValid;
+            };
+
+            Action contentNotValidAction = () =>
+            {
+                phoneEditText.Error = string.IsNullOrWhiteSpace(phoneEditText.Text) ? Context.GetString(Resource.String.edit_contact_empty_number) : null;
+            };
+
+            if (await Dialogs.ShowCustomViewDialogWithValidityAsync(Context, titleResource, container, isContentValid) == true)
             {
                 ca = ca ?? new CommunicationAddress();
                 ca.Type = type;
@@ -164,9 +178,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 {
                     row.UpdateRow();
                 }
-
-                OnContentChanged();
             }
+        }
+
+        void PhoneEditText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var editText = (AppCompatEditText)sender;
+            editText.Error = string.IsNullOrWhiteSpace(editText.Text) ? Context.GetString(Resource.String.edit_contact_empty_number) : null;
         }
 
         void DisablePrimaryOnOtherRows(PhoneNumberRow primaryAddressRow)
@@ -284,12 +302,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     phoneEditText.SetTextAppearanceCompat(Context, Content.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
                     phoneEditText.Error = string.IsNullOrWhiteSpace(parts.Number) ? Context.GetString(Resource.String.edit_contact_empty_number) : null;
                 }
-            }
-
-            public override bool ContainsValidContent()
-            {
-                var parts = AddressUtils.CommunicationAddressParts(Content);
-                return !string.IsNullOrWhiteSpace(parts.Number);
             }
         }
     }
