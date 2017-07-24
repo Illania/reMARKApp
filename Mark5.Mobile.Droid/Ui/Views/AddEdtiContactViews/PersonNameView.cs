@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Text;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
@@ -36,8 +38,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             AddView(namesLayout);
 
             expandButton = new AppCompatImageButton(context);
-
             expandButton.SetImageResource(Resource.Drawable.expand_down);
+            expandButton.SetColorFilter(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
+
+            var typedArray = Context.ObtainStyledAttributes(new int[]
+            {
+                 Resource.Attribute.selectableItemBackgroundBorderless
+            });
+            expandButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
 
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
