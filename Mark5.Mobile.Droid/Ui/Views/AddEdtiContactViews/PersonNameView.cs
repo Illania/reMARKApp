@@ -128,6 +128,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             if (!compositeNameEditText.HasFocus) //To avoid loops while changing text programmatically
                 return;
 
+            ContactPreview.Name = compositeNameEditText.Text;
+
             var parts = compositeNameEditText.Text.Split(' ');
             if (parts.Any())
             {
@@ -188,7 +190,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 sb.Append(" " + Contact.Patronymic);
             if (!string.IsNullOrWhiteSpace(Contact.LastName))
                 sb.Append(" " + Contact.LastName);
-            compositeNameEditText.Text = sb.ToString();
+            ContactPreview.Name = compositeNameEditText.Text = sb.ToString();
         }
 
         public bool ContainsValidContent()

@@ -606,6 +606,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public void UpdateContactPreview(ContactPreviewChanged m)
+        {
+            var position = adapter.GetPosition(m.ContactPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                adapter.Items[position] = m.ContactPreview;
+            }
+
+            position = searchAdapter.GetPosition(m.ContactPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                adapter.Items[position] = m.ContactPreview;
+            }
+        }
+
         public void UpdateMovedEntities(EntityMovedFromFolderMessage m)
         {
             foreach (var entityId in m.EntitiesId)

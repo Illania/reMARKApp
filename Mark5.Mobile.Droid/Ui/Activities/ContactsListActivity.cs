@@ -24,6 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityMovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
+        TinyMessageSubscriptionToken contactPreviewChangedToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -56,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                clf = (ContactsListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                clf = (ContactsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ContactsListActivity)}");
             }
 
@@ -64,6 +65,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityMovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(clf.UpdateMovedEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
             entityRemovedFromFolderToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(clf.UpdateRemovedFromFolderEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
             entityRemovedToken = PlatformConfig.MessengerHub.Subscribe<EntityRemovedMessage>(clf.UpdateRemovedEntities, m => clf != null && m.Sender != clf && m.ObjectType == ObjectType.Contact);
+            contactPreviewChangedToken = PlatformConfig.MessengerHub.Subscribe<ContactPreviewChanged>(clf.UpdateContactPreview, m => clf != null && m.Sender != clf);
+
         }
 
         public override void Finish()
@@ -81,6 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityMovedFromFolderToken?.Dispose();
             entityRemovedFromFolderToken?.Dispose();
             entityRemovedToken?.Dispose();
+            contactPreviewChangedToken?.Dispose();
         }
     }
 }
