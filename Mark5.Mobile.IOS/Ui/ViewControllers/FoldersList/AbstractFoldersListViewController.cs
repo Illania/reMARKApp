@@ -14,6 +14,7 @@ using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using UIKit;
 
@@ -31,6 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected UIBarButtonItem EditModeItem;
         protected UIBarButtonItem ComposeDocumentItem;
+        protected UIBarButtonItem CreateContactItem;
 
         protected UIRefreshControl RefreshControl;
         protected UITableView TableView;
@@ -95,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, TableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, TableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -199,6 +201,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             }
 
+            if (ParentFolder.Module == ModuleType.Contacts)
+            {
+                CreateContactItem = new UIBarButtonItem();
+                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
+                NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
+            }
+
             if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
                 if (IsRootOfFoldersList)
                 {
@@ -263,6 +272,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (EditModeItem != null)
                 EditModeItem.Clicked += EditModeItem_Clicked;
 
+            if (CreateContactItem != null)
+                CreateContactItem.Clicked += CreateContactItem_Clicked;
+
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
@@ -273,6 +285,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (EditModeItem != null)
                 EditModeItem.Clicked -= EditModeItem_Clicked;
+
+            if (CreateContactItem != null)
+                CreateContactItem.Clicked -= CreateContactItem_Clicked;
 
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
@@ -292,6 +307,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
+        void CreateContactItem_Clicked(object sender, EventArgs e)
+        {
+            var vc = new AddEditContacViewController
+            {
+                CreationModeFlag = ContactCreationModeFlag.New,
+            };
+
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void EditModeItem_Clicked(object sender, EventArgs e)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -305,7 +330,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 try
                 {
-                    var gds = (GrouppedDataSource) TableView.Source;
+                    var gds = (GrouppedDataSource)TableView.Source;
                     await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFavoriteFolders());
                 }
                 catch (Exception ex)
@@ -379,7 +404,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (IsRootOfFoldersList)
                 {
-                    var gds = (GrouppedDataSource) TableView.Source;
+                    var gds = (GrouppedDataSource)TableView.Source;
 
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
@@ -408,7 +433,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
                 else
                 {
-                    var ds = (DataSource) TableView.Source;
+                    var ds = (DataSource)TableView.Source;
 
                     var favoritesStatus = new Dictionary<int, bool>();
                     var offlineStatus = new Dictionary<int, bool>();
@@ -448,7 +473,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
-                var gds = (GrouppedDataSource) TableView.Source;
+                var gds = (GrouppedDataSource)TableView.Source;
                 gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
             }
             catch (Exception ex)

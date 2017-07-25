@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public Folder Folder { get; set; }
-        public int? FolderId { get; set; }
+        public int? FolderId { get; set; } //TODO need to remove those, they are unused
         public int? ContactId { get; set; }
         public ContactType ContactType { get; set; }
         public ContactCreationModeFlag CreationModeFlag { get; set; }
