@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Text;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
@@ -22,13 +24,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         readonly LinearLayoutCompat namesLayout;
 
         readonly AppCompatImageButton expandButton;
-        readonly Action<string> onPersonNameChanged;
 
-        public PersonNameView(Context context, Action<string> onPersonNameChanged)
+        public PersonNameView(Context context)
             : base(context)
         {
-            this.onPersonNameChanged = onPersonNameChanged;
-
             Orientation = Horizontal;
 
             namesLayout = new LinearLayoutCompat(context)
@@ -39,8 +38,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             AddView(namesLayout);
 
             expandButton = new AppCompatImageButton(context);
-
             expandButton.SetImageResource(Resource.Drawable.expand_down);
+            expandButton.SetColorFilter(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
+
+            var typedArray = Context.ObtainStyledAttributes(new int[]
+            {
+                 Resource.Attribute.selectableItemBackgroundBorderless
+            });
+            expandButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
 
             var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
             {
@@ -123,6 +128,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             if (!compositeNameEditText.HasFocus) //To avoid loops while changing text programmatically
                 return;
 
+            ContactPreview.Name = compositeNameEditText.Text;
+
             var parts = compositeNameEditText.Text.Split(' ');
             if (parts.Any())
             {
@@ -132,10 +139,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             UpdateSingleNames();
-            UpdateErrors();
-            OnContentChanged();
-
-            onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
         void FirstNameEditText_TextChanged(object sender, AfterTextChangedEventArgs e)
@@ -145,11 +148,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             Contact.FirstName = firstNameEditText.Text;
             UpdateCompositeName();
-
-            firstNameEditText.Error = string.IsNullOrEmpty(Contact.FirstName)
-                ? Context.GetString(Resource.String.edit_contact_first_name_error) : null;
-
-            OnContentChanged();
         }
 
         void MiddleNameEditText_TextChanged(object sender, AfterTextChangedEventArgs e)
@@ -168,19 +166,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             Contact.LastName = lastNameEditText.Text;
             UpdateCompositeName();
-
-            lastNameEditText.Error = string.IsNullOrEmpty(Contact.LastName)
-                ? Context.GetString(Resource.String.edit_contact_last_name_error) : null;
-
-            OnContentChanged();
         }
 
         public override void RefreshView()
         {
             UpdateSingleNames();
             UpdateCompositeName();
-            UpdateErrors();
-            onPersonNameChanged?.Invoke(compositeNameEditText.Text);
         }
 
         void UpdateSingleNames()
@@ -199,26 +190,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 sb.Append(" " + Contact.Patronymic);
             if (!string.IsNullOrWhiteSpace(Contact.LastName))
                 sb.Append(" " + Contact.LastName);
-            compositeNameEditText.Text = sb.ToString();
-            onPersonNameChanged?.Invoke(compositeNameEditText.Text);
-
-            compositeNameEditText.Error = ContainsValidContent() ? null
-                : Context.GetString(Resource.String.edit_contact_composite_name_error);
+            ContactPreview.Name = compositeNameEditText.Text = sb.ToString();
         }
 
-        void UpdateErrors()
-        {
-            firstNameEditText.Error = string.IsNullOrEmpty(Contact.FirstName)
-                ? Context.GetString(Resource.String.edit_contact_first_name_error) : null;
-
-            lastNameEditText.Error = string.IsNullOrEmpty(Contact.LastName)
-                ? Context.GetString(Resource.String.edit_contact_last_name_error) : null;
-
-            compositeNameEditText.Error = ContainsValidContent() ? null
-                : Context.GetString(Resource.String.edit_contact_composite_name_error);
-        }
-
-        public override bool ContainsValidContent()
+        public bool ContainsValidContent()
         {
             return !string.IsNullOrEmpty(Contact.FirstName) && !string.IsNullOrEmpty(Contact.LastName);
         }

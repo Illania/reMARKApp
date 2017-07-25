@@ -59,7 +59,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     cf.ContactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
 
                 if (Intent.HasExtra(ParentContactPreviewIntentKey))
+                {
                     cf.ParentContactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ParentContactPreviewIntentKey));
+                    cf.ParentPreselected = true;
+                }
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
                     cf.Contact = SerializationUtils.Deserialize<Contact>(Intent.Extras.GetString(ContactIntentKey));

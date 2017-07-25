@@ -16,8 +16,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class ParentContactSelectorActivity : BaseAppCompatActivity
     {
         public const string ParentContactResultKey = "ParentContactResult_7b800032-5a7b-412a-bad5-0a07858fb689";
-        public const string FolderIntentKey = "FromFolderIntent_86f55550-979e-4d08-853f-b44c1d0234c9";
-        public const string ChildrenTypeIntentKey = "ChildrenTypeKey_f101cc8d-c10a-4b92-8a36-6b379fd1cd3d";
+
+        const string FolderIntentKey = "FromFolderIntent_86f55550-979e-4d08-853f-b44c1d0234c9";
+        const string ChildrenTypeIntentKey = "ChildrenTypeKey_f101cc8d-c10a-4b92-8a36-6b379fd1cd3d";
 
         Toolbar toolbar;
 

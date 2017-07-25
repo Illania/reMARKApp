@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Android.Content;
-using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
@@ -45,8 +44,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var ca = row.GetContent();
             Contact.CommunicationAddresses.Remove(ca);
             RemoveRow(row);
-
-            OnContentChanged();
         }
 
         async void CreateDialog(EmailRow row = null)
@@ -65,10 +62,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             };
             emailEditText.SetHint(Resource.String.edit_contact_address);
             emailEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-            emailEditText.TextChanged += (sender, e) =>
-            {
-                emailEditText.Error = !Validator.IsEmailValid(emailEditText.Text) ? Context.GetString(Resource.String.email_not_valid) : null;
-            };
             emailEditText.InputType = InputTypes.TextVariationEmailAddress | InputTypes.ClassText;
             container.AddView(emailEditText);
 
@@ -118,7 +111,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 preferableCheckBox.Checked = ca.IsPrimary;
             }
 
-            if (await Dialogs.ShowCustomViewDialogAsync(Context, Resource.String.edit_contact_email, container) == true)
+            Func<bool> isContentValid = () =>
+            {
+                var isValid = Validator.IsEmailValid(emailEditText.Text);
+
+                if (!isValid)
+                {
+                    emailEditText.Error = Context.GetString(Resource.String.email_not_valid);
+                    emailEditText.TextChanged -= EmailEditText_TextChanged;
+                    emailEditText.TextChanged += EmailEditText_TextChanged;
+                }
+
+                return isValid;
+            };
+
+            if (await Dialogs.ShowCustomViewDialogWithValidityAsync(Context, Resource.String.edit_contact_email, container, isContentValid) == true)
             {
                 ca = ca ?? new CommunicationAddress();
                 ca.Address = emailEditText.Text;
@@ -140,9 +147,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 {
                     row.SetContent(ca);
                 }
-
-                OnContentChanged();
             }
+        }
+
+        void EmailEditText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var emailEditText = (AppCompatEditText)sender;
+            emailEditText.Error = !Validator.IsEmailValid(emailEditText.Text) ? Context.GetString(Resource.String.email_not_valid) : null;
         }
 
         void SetIsPrimaryOnOtherRows(EmailRow primaryAddressRow)
@@ -186,11 +197,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 emailEditText.Text = Content.Address;
                 emailEditText.Error = !Validator.IsEmailValid(Content.Address) ? Context.GetString(Resource.String.email_not_valid) : null;
                 emailEditText.SetTextAppearanceCompat(Context, Content.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
-            }
-
-            public override bool ContainsValidContent()
-            {
-                return Validator.IsEmailValid(Content.Address);
             }
         }
     }

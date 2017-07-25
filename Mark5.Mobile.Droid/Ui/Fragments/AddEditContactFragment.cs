@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -35,12 +36,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public ContactCreationModeFlag CreationModeFlag { get; set; }
         public Action CloseRequest { get; set; }
         public ContactPreview ParentContactPreview { get; set; }
+        public bool ParentPreselected { get; set; }
 
         LinearLayoutCompat linearLayout;
         LinearLayoutCompat secondaryLinearLayout;
         ProgressBar progressBar;
         ScrollView scrollView;
         FloatingActionButton fab;
+
+        PersonNameView personNameView;
+        NameView nameView;
 
         List<AddEditContactView> subviews = new List<AddEditContactView>();
         List<AddEditContactView> secondarySubviews = new List<AddEditContactView>();
@@ -57,14 +62,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            linearLayout.DescendantFocusability = DescendantFocusability.BeforeDescendants;
+            linearLayout.FocusableInTouchMode = true;
+
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.SetImageResource(Resource.Drawable.action_save_contact);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
-            fab.Enabled = false;
-            fab.Alpha = 0.6f;
+            fab.Enabled = true;
             fab.Visibility = ViewStates.Visible;
 
             subviews.Clear();
@@ -106,12 +113,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     throw new ArgumentException("Contact type needs to be defined");
             }
 
-            subviews.Union(secondarySubviews).ToList().ForEach(s => s.Edited += SubViews_Edited);
-
             linearLayout.AddView(showMoreButton);
             linearLayout.AddView(secondaryLinearLayout);
 
+            SetTitle();
+
             return rootView;
+        }
+
+        void SetTitle()
+        {
+            int resId = 0;
+
+            switch (ContactType)
+            {
+                case ContactType.Person:
+                    resId = Resource.String.edit_contact_create_person;
+                    break;
+                case ContactType.Company:
+                    resId = Resource.String.edit_contact_create_company;
+                    break;
+                case ContactType.Department:
+                    resId = Resource.String.edit_contact_create_department;
+                    break;
+                default:
+                    throw new ArgumentException("Contact type needs to be defined");
+            }
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(resId);
+
         }
 
         public override void OnStop()
@@ -122,7 +152,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected void PrepareViewsForPerson()
         {
-            subviews.Add(new PersonNameView(Context, OnPersonNameChanged));
+            personNameView = new PersonNameView(Context);
+
+            subviews.Add(personNameView);
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
@@ -141,7 +173,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void PrepareViewsForDeparment()
         {
-            subviews.Add(new NameView(Context, OnPersonNameChanged));
+            nameView = new NameView(Context);
+
+            subviews.Add(nameView);
             subviews.Add(new ParentContactView(Context, OnParentContactRequest));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
@@ -159,8 +193,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void PrepareViewsForCompany()
         {
-            subviews.Add(new NameView(Context, OnPersonNameChanged));
-            subviews.Add(new ParentContactView(Context, OnParentContactRequest));
+            nameView = new NameView(Context);
+
+            subviews.Add(nameView);
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
             subviews.Add(new MobileView(Context));
@@ -242,6 +277,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subview.ContactPreview = ContactPreview;
                 subview.ParentContactPreview = ParentContactPreview;
                 subview.CreationMode = CreationModeFlag;
+                subview.ParentPreselected = ParentPreselected;
                 subview.RefreshView();
             }
 
@@ -250,18 +286,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 showMoreButton.Visibility = ViewStates.Gone;
                 secondaryLinearLayout.Visibility = ViewStates.Visible;
             }
-
-            UpdateButtonState();
         }
 
         #endregion
 
         #region Handlers
-
-        void OnPersonNameChanged(string name)
-        {
-            ((AppCompatActivity)Activity).SupportActionBar.Title = name;
-        }
 
         void OnParentContactRequest()
         {
@@ -270,33 +299,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             StartActivityForResult(i, RequestCodes.ParentContactRequestCode);
         }
 
-        void SubViews_Edited(object sender, EventArgs e)
-        {
-            UpdateButtonState();
-        }
-
-        void UpdateButtonState()
-        {
-            fab.Visibility = ViewStates.Visible;
-
-            if (subviews.Union(secondarySubviews).All(s => s.ContainsValidContent()))
-            {
-                fab.Enabled = true;
-                fab.Alpha = 1;
-            }
-            else
-            {
-                fab.Enabled = false;
-                fab.Alpha = 0.6f;
-            }
-        }
-
         #endregion
 
         #region Actions
 
         async void HandleSend()
         {
+            if (personNameView != null && !personNameView.ContainsValidContent())
+            {
+                await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.edit_contact_composite_name_error_title, Resource.String.edit_contact_composite_name_error);
+                return;
+            }
+
+            if (nameView != null && !nameView.ContainsValidContent())
+            {
+                await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.edit_contact_name_error_title, Resource.String.edit_contact_name_error);
+                return;
+            }
+
             var titleResource = CreationModeFlag == ContactCreationModeFlag.Edit ? Resource.String.edit_contact_edit_loading :
                                                                            Resource.String.edit_contact_add_loading;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
@@ -308,6 +328,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
 
                 dismissAction();
+
+                if (CreationModeFlag == ContactCreationModeFlag.Edit)
+                    PlatformConfig.MessengerHub.Publish(new ContactPreviewChanged(this, ContactPreview));
 
                 CloseRequest?.Invoke();
             }
@@ -344,6 +367,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactId = ContactId,
                 ContactType = ContactType,
                 SecondaryLayoutShown = secondaryLayoutShown,
+                ParentPreselected = ParentPreselected,
             };
         }
 
@@ -360,6 +384,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactId = state.ContactId;
                 ContactType = state.ContactType;
                 secondaryLayoutShown = state.SecondaryLayoutShown;
+                ParentPreselected = ParentPreselected;
             }
         }
 
@@ -374,6 +399,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int? ContactId { get; set; }
             public ContactType ContactType { get; set; }
             public bool SecondaryLayoutShown { get; set; }
+            public bool ParentPreselected { get; set; }
         }
 
         #endregion

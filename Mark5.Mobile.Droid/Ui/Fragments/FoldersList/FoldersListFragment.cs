@@ -227,16 +227,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void CreateContact()
         {
-            var values = new List<ContactType> { ContactType.Person, ContactType.Company, ContactType.Department };
+            var values = new List<ContactType> { ContactType.Company, ContactType.Department, ContactType.Person };
 
-            var choice = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.edit_contact_dialog_title, values,
-                                                                   displayText: (arg) => GetString(UI.ContactTypeResourceId(arg)));
+            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(),
+                                                                   true);
 
-            if (choice != ContactType.None)
+            if (index >= 0)
             {
                 var intent = new Intent(Context, typeof(AddEditContactActivity));
                 intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
-                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)choice);
+                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
                 StartActivity(intent);
             }
         }

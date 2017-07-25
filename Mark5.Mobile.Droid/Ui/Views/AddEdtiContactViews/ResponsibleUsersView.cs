@@ -18,8 +18,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             this.parentFragment = parentFragment;
         }
 
-        public override bool ContainsValidContent() => true;
-
         public override void RefreshView()
         {
             if (Contact.ResponsibleUsers.Any())

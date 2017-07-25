@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected string Content { get => contentEditText.Text; set => contentEditText.Text = value; }
 
-        protected AbstractSimpleFieldView(Context context, int hintResourceId, bool floatingHint, bool editable = true,
+        protected AbstractSimpleFieldView(Context context, int hintResourceId = -1, bool floatingHint = false, bool editable = true,
                                           int errorResourceId = -1,
                                           InputTypes inputType = InputTypes.TextFlagNoSuggestions
                                           | InputTypes.TextFlagCapSentences
@@ -35,7 +35,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 LayoutParameters = new Android.Widget.LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 InputType = inputType,
             };
-            contentEditText.SetHint(hintResourceId);
+
+            if (hintResourceId != -1)
+            {
+                contentEditText.SetHint(hintResourceId);
+            }
 
             contentEditText.TextChanged += ContentChanged;
             contentEditText.Click += ContentClicked;
@@ -55,6 +59,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var rightDistance = DistanceLarge + ConversionUtils.ConvertDpToPixels(24) + DistanceSmall;
 
             SetPadding(leftDistance, topBottomDistance, rightDistance, topBottomDistance);
+        }
+
+        protected void SetHintResId(int resId)
+        {
+            contentEditText.SetHint(resId);
         }
 
         protected void SetError(bool errorValue)

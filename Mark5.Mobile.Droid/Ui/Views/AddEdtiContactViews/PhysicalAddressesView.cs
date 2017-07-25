@@ -205,8 +205,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                     sb.AppendLine().Append(address.Country.Name);
                 return sb.ToString();
             }
-
-            public override bool ContainsValidContent() => true;
         }
 
     }

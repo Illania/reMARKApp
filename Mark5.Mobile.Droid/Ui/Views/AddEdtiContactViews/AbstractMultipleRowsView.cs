@@ -104,11 +104,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             Rows.ToList().ForEach(RemoveRow);
         }
 
-        public override bool ContainsValidContent()
-        {
-            return Rows.All(r => r.ContainsValidContent());
-        }
-
         abstract protected void AddButton_Click(object sender, EventArgs e);
 
         abstract protected void Row_DeleteClicked(object sender, EventArgs e);
@@ -173,8 +168,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             public T GetContent() => Content;
 
             public abstract void UpdateRow();
-
-            public abstract bool ContainsValidContent();
         }
     }
 }
