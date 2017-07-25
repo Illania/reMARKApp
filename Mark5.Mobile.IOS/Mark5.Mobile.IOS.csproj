@@ -270,9 +270,6 @@
 		<Compile Include="Ui\ViewControllers\AddEditContactView\AddEditContacViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactView\Subviews\AddEditContactSubView.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.designer.cs">
-		  <DependentUpon>TextFieldTableViewCell.cs</DependentUpon>
-		</Compile>
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -383,7 +380,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">

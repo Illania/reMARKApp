@@ -250,17 +250,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class NameRow : AbstractRow
             {
-                public override string Key => TextFieldTableViewCell.Key;
+                public override string Key => TestFieldCell.Key;
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var tfc = (TextFieldTableViewCell)cell;
+                    var tfc = (TestFieldCell)cell;
                     tfc.Initialize("Name"); //TODO test
                 }
 
                 public override UITableViewCell CreateCell()
                 {
-                    return TextFieldTableViewCell.Create();
+                    return TestFieldCell.Create();
                 }
             }
 

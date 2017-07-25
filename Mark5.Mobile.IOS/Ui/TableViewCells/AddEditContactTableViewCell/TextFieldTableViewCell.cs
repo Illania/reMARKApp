@@ -1,23 +1,34 @@
-﻿using System;
-
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public partial class TextFieldTableViewCell : UITableViewCell
+    public class TextFieldTableViewCell : UITableViewCell
     {
         public static readonly NSString Key = new NSString("TextFieldTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("TextFieldTableViewCell", NSBundle.MainBundle);
 
-        protected TextFieldTableViewCell(IntPtr handle) : base(handle)
+        UITextField TextField { get; set; }
+
+        public TextFieldTableViewCell() : base(UITableViewCellStyle.Default, Key)
         {
+            TextField = new UITextField();
+            TextField.TranslatesAutoresizingMaskIntoConstraints = false;
+
+            AddSubview(TextField);
+
+            AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.TopMargin, 1f, 0f),
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, this, NSLayoutAttribute.LeadingMargin, 1f, 8f),
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, this, NSLayoutAttribute.TrailingMargin, 1f, 0f),
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.BottomMargin, 1f, 0f),
+            });
         }
 
         public static TextFieldTableViewCell Create()
         {
-            var cell = (TextFieldTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = new TextFieldTableViewCell();
             cell.TextField.Font = Theme.DefaultFont;
             cell.TextField.BorderStyle = UITextBorderStyle.None;
 
