@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -116,6 +116,10 @@ namespace Mark5.Mobile.IOS
 
             return true;
         }
+
+        public override bool ShouldSaveApplicationState(UIApplication application, NSCoder coder) => true;
+
+        public override bool ShouldRestoreApplicationState(UIApplication application, NSCoder coder) => true;
 
         public override void OnActivated(UIApplication application)
         {

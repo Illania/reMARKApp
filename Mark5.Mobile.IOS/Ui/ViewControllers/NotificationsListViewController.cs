@@ -220,7 +220,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             switch (notification.ObjectType)
             {
                 case ObjectType.Document:
-                    PresentDocumentViewController(notification.ObjectId,notification.Guid);
+                    PresentDocumentViewController(notification.ObjectId, notification.Guid);
                     break;
             }
         }

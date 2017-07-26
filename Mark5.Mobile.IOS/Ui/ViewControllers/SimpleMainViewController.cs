@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Linq;
+using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -51,6 +53,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             SelectedIndex = 0;
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(SimpleMainViewController);
+            RestorationClass = Class;
+        }
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(SelectedIndex, nameof(SelectedIndex));
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            SelectedIndex = coder.DecodeInt(nameof(SelectedIndex));
         }
     }
 }
