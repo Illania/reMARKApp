@@ -180,7 +180,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                //return RowAtIndexPath(indexPath).IsEditable;
                 return true;
             }
 
@@ -272,6 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 public override void InitializeRows()
                 {
+                    Rows.Add(new CommunicationAddressRow());
                     Rows.Add(new EmailHeadRow());
 
                     Rows.ForEach(r =>
@@ -297,7 +297,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 public ContactCreationModeFlag CreationMode { get; set; }
                 public bool ParentPreselected { get; set; }
 
-                public virtual bool IsEditable => false;
                 public virtual UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.None;
 
                 public abstract string Key { get; }
@@ -352,12 +351,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             abstract class MultiHeaderRow : AbstractRow
             {
-                public override bool IsEditable => true;
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Insert;
 
                 public override string Key => MultiRowHeaderTableViewCell.Key;
 
                 public override UITableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
+
+                protected override void Initialize() { }
+            }
+
+            abstract class MultContentRow : AbstractRow
+            {
+                public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Delete;
 
                 protected override void Initialize() { }
             }
@@ -389,6 +394,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 {
                     var cell = (MultiRowHeaderTableViewCell)Cell;
                     cell.SetTitle("add email"); //TODO change
+                }
+            }
+
+            class CommunicationAddressRow : MultContentRow
+            {
+                public override string Key => CommunicationAddressTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new CommunicationAddressTableViewCell();
+
+                protected override void RefreshRow()
+                {
                 }
             }
 
