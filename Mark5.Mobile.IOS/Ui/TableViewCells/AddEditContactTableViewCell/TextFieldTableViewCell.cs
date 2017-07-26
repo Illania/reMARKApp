@@ -1,4 +1,5 @@
-﻿using Foundation;
+﻿using System;
+using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -8,36 +9,42 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
     {
         public static readonly NSString Key = new NSString("TextFieldTableViewCell");
 
+        public event EventHandler<string> ContentEdited = delegate { };
+
         UITextField TextField { get; set; }
 
-        public TextFieldTableViewCell() : base(UITableViewCellStyle.Default, Key)
+        public TextFieldTableViewCell()
+            : base(UITableViewCellStyle.Default, Key)
         {
-            TextField = new UITextField();
-            TextField.TranslatesAutoresizingMaskIntoConstraints = false;
+            SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            AddSubview(TextField);
-
-            AddConstraints(new[]
+            TextField = new UITextField
             {
-                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.TopMargin, 1f, 0f),
-                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, this, NSLayoutAttribute.LeadingMargin, 1f, 8f),
-                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, this, NSLayoutAttribute.TrailingMargin, 1f, 0f),
-                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.BottomMargin, 1f, 0f),
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Font = Theme.DefaultFont,
+                BorderStyle = UITextBorderStyle.None
+            };
+            TextField.EditingDidEnd += (object sender, EventArgs e) => ContentEdited(this, TextField.Text);
+
+            ContentView.AddSubview(TextField);
+
+            ContentView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, 0f),
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeadingMargin, 1f, 8f),
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TrailingMargin, 1f, 0f),
+                NSLayoutConstraint.Create(TextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, 0f),
             });
         }
 
-        public static TextFieldTableViewCell Create()
+        public void SetPlaceholder(string placeholder)
         {
-            var cell = new TextFieldTableViewCell();
-            cell.TextField.Font = Theme.DefaultFont;
-            cell.TextField.BorderStyle = UITextBorderStyle.None;
-
-            return cell;
+            TextField.Placeholder = placeholder;
         }
 
-        public void Initialize(string hint)
+        public void SetContent(string content)
         {
-            TextField.Placeholder = hint;
+            TextField.Text = content;
         }
     }
 }

@@ -270,6 +270,8 @@
 		<Compile Include="Ui\ViewControllers\AddEditContactView\AddEditContacViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactView\Subviews\AddEditContactSubView.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\DisclosureIndicatorTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowHeaderTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

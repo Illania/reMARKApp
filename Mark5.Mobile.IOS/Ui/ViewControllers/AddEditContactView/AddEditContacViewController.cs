@@ -77,6 +77,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
             tableView.ClipsToBounds = false;
             tableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
+            tableView.Editing = true;
+            tableView.AllowsSelectionDuringEditing = true;
             View.AddSubview(tableView);
 
             View.AddConstraints(new[]
@@ -147,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                var row = sections[indexPath.Section].Rows[indexPath.Row];
+                var row = RowAtIndexPath(indexPath);
                 var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
                 row.Bind(cell);
                 return cell;
@@ -163,10 +165,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 return sections.Count;
             }
 
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath);
+                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
+                var row = RowAtIndexPath(indexPath);
+                row.OnClicked(indexPath);
+
+                if (tableView?.IndexPathForSelectedRow != null)
+                    tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+            }
+
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                //return RowAtIndexPath(indexPath).IsEditable;
+                return true;
+            }
+
+            public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                return RowAtIndexPath(indexPath).EditingStyle;
+            }
+
+            public override void CommitEditingStyle(UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
+            {
+                base.CommitEditingStyle(tableView, editingStyle, indexPath);
+            }
+
             public void Refresh(Contact contact, ContactPreview contactPreview, ContactPreview parentContactPreview,
                                 ContactCreationModeFlag creationMode, bool parentPreselected)
             {
-                var sectionsToInsert = new List<AbstractSection> { new GeneralSection() };
+                var sectionsToInsert = new List<AbstractSection> {
+                    new GeneralSection(),
+                    new EmailSection()};
 
                 foreach (var section in sectionsToInsert)
                 {
@@ -195,6 +228,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 sections = null;
             }
 
+            AbstractRow RowAtIndexPath(NSIndexPath indexPath)
+            {
+                return sections[indexPath.Section].Rows[indexPath.Row];
+            }
+
             #region Support classes
 
             class SectionCollection : List<AbstractSection> { }
@@ -217,8 +255,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 public override void InitializeRows()
                 {
                     Rows.Add(new NameRow());
-                    Rows.Add(new NameRow());
-                    Rows.Add(new NameRow());
+                    Rows.Add(new ParentRow());
+
+                    Rows.ForEach(r =>
+                    {
+                        r.Contact = Contact;
+                        r.ContactPreview = ContactPreview;
+                        r.ParentPreselected = ParentPreselected;
+                        r.ParentContactPreview = ParentContactPreview;
+                        r.CreationMode = CreationMode;
+                    });
+                }
+            }
+
+            class EmailSection : AbstractSection
+            {
+                public override void InitializeRows()
+                {
+                    Rows.Add(new EmailHeadRow());
 
                     Rows.ForEach(r =>
                     {
@@ -235,32 +289,106 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             abstract class AbstractRow
             {
+                protected UITableViewCell Cell;
+
                 public Contact Contact { get; set; }
                 public ContactPreview ContactPreview { get; set; }
                 public ContactPreview ParentContactPreview { get; set; }
                 public ContactCreationModeFlag CreationMode { get; set; }
                 public bool ParentPreselected { get; set; }
 
+                public virtual bool IsEditable => false;
+                public virtual UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.None;
+
                 public abstract string Key { get; }
 
                 public abstract UITableViewCell CreateCell();
 
-                public abstract void Bind(UITableViewCell cell);
-            }
-
-            class NameRow : AbstractRow
-            {
-                public override string Key => TestFieldCell.Key;
-
-                public override void Bind(UITableViewCell cell)
+                public void Bind(UITableViewCell cell)
                 {
-                    var tfc = (TestFieldCell)cell;
-                    tfc.Initialize("Name"); //TODO test
+                    Cell = cell;
+                    Initialize();
+                    RefreshRow();
                 }
 
-                public override UITableViewCell CreateCell()
+                protected abstract void Initialize();
+                protected abstract void RefreshRow();
+
+                public virtual void OnClicked(NSIndexPath indexPath) { }
+            }
+
+            abstract class TextFieldRow : AbstractRow
+            {
+                readonly string placeholder;
+
+                protected TextFieldRow(string placeholder)
                 {
-                    return TestFieldCell.Create();
+                    this.placeholder = placeholder;
+                }
+
+                public override string Key => TextFieldTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new TextFieldTableViewCell();
+
+                protected override void Initialize()
+                {
+                    var tfc = (TextFieldTableViewCell)Cell;
+                    tfc.SetPlaceholder(placeholder);
+                    tfc.ContentEdited -= ContentEdited;
+                    tfc.ContentEdited += ContentEdited;
+                }
+
+                protected abstract void ContentEdited(object sender, string e);
+            }
+
+            abstract class DisclosureIndicatorRow : AbstractRow
+            {
+                public override string Key => DisclosureIndicatorTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new DisclosureIndicatorTableViewCell();
+
+                protected override void Initialize() { }
+            }
+
+            abstract class MultiHeaderRow : AbstractRow
+            {
+                public override bool IsEditable => true;
+                public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Insert;
+
+                public override string Key => MultiRowHeaderTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
+
+                protected override void Initialize() { }
+            }
+
+            class NameRow : TextFieldRow
+            {
+                public NameRow() : base("Name") //TODO correct
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => ContactPreview.Name = e;
+
+                protected override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.Name);
+            }
+
+            class ParentRow : DisclosureIndicatorRow
+            {
+                protected override void RefreshRow()
+                {
+                    var cell = (DisclosureIndicatorTableViewCell)Cell;
+                    cell.SetTitle("Parent"); //TODO change
+                    cell.SetContent("Marketing@NordicIT");
+                }
+            }
+
+            class EmailHeadRow : MultiHeaderRow
+            {
+                protected override void RefreshRow()
+                {
+                    var cell = (MultiRowHeaderTableViewCell)Cell;
+                    cell.SetTitle("add email"); //TODO change
                 }
             }
 
