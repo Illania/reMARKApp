@@ -69,7 +69,6 @@ namespace Mark5.Mobile.IOS
                     vc = new SimpleMainViewController();
 
                 Window.RootViewController = vc;
-                Window.MakeKeyAndVisible();
 
                 UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
                 UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
@@ -83,12 +82,13 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger?.Error(ex);
             }
 
-            return false; // Always return false to pass handling of notifications
-            // to FinishedLaunching
+            return false; // Always return false to pass handling of notifications to FinishedLaunching
         }
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            Window.MakeKeyAndVisible();
+
             if (launchOptions == null)
                 return true;
 
@@ -119,7 +119,27 @@ namespace Mark5.Mobile.IOS
 
         public override bool ShouldSaveApplicationState(UIApplication application, NSCoder coder) => true;
 
-        public override bool ShouldRestoreApplicationState(UIApplication application, NSCoder coder) => true;
+        public override bool ShouldRestoreApplicationState(UIApplication application, NSCoder coder)
+        {
+            var stateCreationDate = (NSDate)coder.DecodeObject(UIApplication.StateRestorationTimestampKey);
+            var yesterday = NSDate.Now.AddSeconds(-1 * 24 * 60 * 60);
+            if (stateCreationDate.Compare(yesterday) == NSComparisonResult.Ascending)
+                return false;
+
+            var bundleVersion = coder.DecodeObject(UIApplication.StateRestorationBundleVersionKey);
+            if (NSBundle.MainBundle.InfoDictionary["CFBundleVersion"] != bundleVersion)
+                return false;
+
+            var systemVersion = ((NSString)coder.DecodeObject(UIApplication.StateRestorationSystemVersionKey)).ToString();
+            if (UIDevice.CurrentDevice.SystemVersion != systemVersion)
+                return false;
+
+            var userInterfaceIdiom = (UIUserInterfaceIdiom)((NSNumber)coder.DecodeObject(UIApplication.StateRestorationUserInterfaceIdiomKey)).Int32Value;
+            if (UIDevice.CurrentDevice.UserInterfaceIdiom != userInterfaceIdiom)
+                return false;
+
+            return true;
+        }
 
         public override void OnActivated(UIApplication application)
         {

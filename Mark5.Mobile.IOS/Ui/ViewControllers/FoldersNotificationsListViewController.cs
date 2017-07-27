@@ -10,7 +10,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class FoldersNotificationsListViewController : AbstractViewController
+    public class FoldersNotificationsListViewController : AbstractViewController, IUIViewControllerRestoration
     {
         readonly ModuleType moduleType;
 
@@ -40,14 +40,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 Font = Theme.DefaultFont.WithRelativeSize(-3f),
                 TextColor = Theme.White
-            },
-                UIControlState.Normal);
+            }, UIControlState.Normal);
             segmentedControl.SetTitleTextAttributes(new UITextAttributes
             {
                 Font = Theme.DefaultFont.WithRelativeSize(-3f),
                 TextColor = Theme.White
-            },
-                UIControlState.Selected);
+            }, UIControlState.Selected);
             segmentedControl.TintColor = Theme.DarkBlue;
             segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
@@ -68,53 +66,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            RestorationIdentifier = nameof(FoldersNotificationsListViewController);
+            RestorationClass = Class;
+
             ExtendedLayoutIncludesOpaqueBars = true;
-
-            var vc = viewControllers[0];
-            vc.WillMoveToParentViewController(this);
-            AddChildViewController(vc);
-            vc.View.Frame = View.Bounds;
-            View.AddSubview(vc.View);
-            if (vc.NavigationItem.LeftBarButtonItems != null)
-                NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
-            else
-                NavigationItem.SetLeftBarButtonItem(null, false);
-            if (vc.NavigationItem.RightBarButtonItems != null)
-                NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
-            else
-                NavigationItem.SetRightBarButtonItem(null, false);
-            vc.DidMoveToParentViewController(this);
-            currentViewController = vc;
-        }
-
-        [Export("segmentedControlHasChangedValue:")]
-        void SegmentedControlHasChangedValue(UISegmentedControl sender)
-        {
-            var vc = viewControllers[sender.SelectedSegment];
-            currentViewController.WillMoveToParentViewController(null);
-            vc.WillMoveToParentViewController(this);
-            currentViewController.RemoveFromParentViewController();
-            AddChildViewController(vc);
-            currentViewController.View.RemoveFromSuperview();
-            vc.View.Frame = View.Bounds;
-            View.AddSubview(vc.View);
-            if (vc.NavigationItem.LeftBarButtonItems != null)
-                NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
-            else
-                NavigationItem.SetLeftBarButtonItem(null, false);
-            if (vc.NavigationItem.RightBarButtonItems != null)
-                NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
-            else
-                NavigationItem.SetRightBarButtonItem(null, false);
-            vc.DidMoveToParentViewController(this);
-            currentViewController.DidMoveToParentViewController(null);
-            currentViewController = vc;
-            AdjustScrollViewInsets();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            var vc = viewControllers[segmentedControl.SelectedSegment];
+            vc.WillMoveToParentViewController(this);
+            AddChildViewController(vc);
+            vc.View.Frame = View.Bounds;
+            View.AddSubview(vc.View);
+            if (vc.NavigationItem.LeftBarButtonItems != null)
+                NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
+            else
+                NavigationItem.SetLeftBarButtonItem(null, false);
+            if (vc.NavigationItem.RightBarButtonItems != null)
+                NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
+            else
+                NavigationItem.SetRightBarButtonItem(null, false);
+            vc.DidMoveToParentViewController(this);
+            currentViewController = vc;
 
             AdjustScrollViewInsets();
         }
@@ -144,6 +120,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             scrollView.LayoutIfNeeded();
         }
 
+        [Export("segmentedControlHasChangedValue:")]
+        void SegmentedControlHasChangedValue(UISegmentedControl sender)
+        {
+            var vc = viewControllers[sender.SelectedSegment];
+            currentViewController.WillMoveToParentViewController(null);
+            vc.WillMoveToParentViewController(this);
+            currentViewController.RemoveFromParentViewController();
+            AddChildViewController(vc);
+            currentViewController.View.RemoveFromSuperview();
+            vc.View.Frame = View.Bounds;
+            View.AddSubview(vc.View);
+            if (vc.NavigationItem.LeftBarButtonItems != null)
+                NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
+            else
+                NavigationItem.SetLeftBarButtonItem(null, false);
+            if (vc.NavigationItem.RightBarButtonItems != null)
+                NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
+            else
+                NavigationItem.SetRightBarButtonItem(null, false);
+            vc.DidMoveToParentViewController(this);
+            currentViewController.DidMoveToParentViewController(null);
+            currentViewController = vc;
+            AdjustScrollViewInsets();
+        }
+
         static string GetTitleForModule(ModuleType moduleType)
         {
             switch (moduleType)
@@ -160,5 +161,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return string.Empty;
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode((int)moduleType, "moduleType");
+            coder.Encode(segmentedControl.SelectedSegment, "selectedSegment");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            segmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            var moduleType = (ModuleType)coder.DecodeInt("moduleType");
+            return new FoldersNotificationsListViewController(moduleType);
+        }
+
+        #endregion
+
     }
 }

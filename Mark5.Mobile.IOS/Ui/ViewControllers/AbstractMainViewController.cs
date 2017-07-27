@@ -10,9 +10,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class AbstractMainViewController : UITabBarController
     {
-        protected const string DocumentTag = "document";
-        protected const string ContactTag = "contact";
-        protected const string ShortcodeTag = "shortcode";
+        protected const string DocumentsTag = "documents";
+        protected const string ContactsTag = "contacts";
+        protected const string ShortcodesTag = "shortcodes";
         protected const string SettingsTag = "settings";
 
         protected UINavigationController Dummy { get; } = new UINavigationController(new UIViewController());

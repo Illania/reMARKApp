@@ -19,19 +19,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentSplitViewController.TabBarItem.Title = Localization.GetString("documents");
             documentSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png"));
             documentSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png"));
-            documentSplitViewController.Tag = DocumentTag;
+            documentSplitViewController.Tag = DocumentsTag;
 
             contactSplitViewController = new ContactsSplitViewController();
             contactSplitViewController.TabBarItem.Title = Localization.GetString("contacts");
             contactSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "contacts.png"));
             contactSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "contacts-filled.png"));
-            contactSplitViewController.Tag = ContactTag;
+            contactSplitViewController.Tag = ContactsTag;
 
             shortcodeSplitViewController = new ShortcodesSplitViewController();
             shortcodeSplitViewController.TabBarItem.Title = Localization.GetString("shortcodes");
             shortcodeSplitViewController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "shortcodes.png"));
             shortcodeSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "shortcodes-filled.png"));
-            shortcodeSplitViewController.Tag = ShortcodeTag;
+            shortcodeSplitViewController.Tag = ShortcodesTag;
 
             settingsNavigationController = new NavigationController(new SettingsViewController());
             settingsNavigationController.TabBarItem.Title = Localization.GetString("settings");

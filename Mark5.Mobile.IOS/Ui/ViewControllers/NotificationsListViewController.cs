@@ -47,6 +47,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            RestorationIdentifier = nameof(NotificationsListViewController);
+            RestorationClass = Class;
+
             ExtendedLayoutIncludesOpaqueBars = true;
         }
 
