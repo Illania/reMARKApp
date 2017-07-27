@@ -192,6 +192,7 @@
 "no_private_templates" = "No private templates";
 "normal" = "Normal";
 "notifications" = "Notifications";
+"number" = "Number";
 "ok" = "OK";
 "open_in_apple_maps" = "Open in Apple Maps";
 "open_in_google_maps" = "Open in Google Maps";
@@ -208,12 +209,14 @@
 "please_restart" = "Please restart MARK5 app";
 "please_wait___" = "Please wait...";
 "port" = "Port";
+"prefix" = "Prefix"
 "primary_person" = "Primary person";
 "priority" = "Priority";
 "priority_low" = "Low";
 "priority_normal" = "Normal";
 "priority_urgent" = "High";
 "private" = "Private";
+"preferrable" = "Preferrable";
 "public" = "Public";
 "read_by" = "Read by";
 "reference_number" = "Reference number";
