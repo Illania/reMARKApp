@@ -271,7 +271,7 @@
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\DisclosureIndicatorTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowHeaderTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\CommunicationAddressTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\AddEditContactTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>

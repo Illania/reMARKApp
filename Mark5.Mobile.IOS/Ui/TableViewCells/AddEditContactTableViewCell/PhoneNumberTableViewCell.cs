@@ -1,38 +1,79 @@
-﻿using Foundation;
+﻿using System;
+using System.Linq;
+using CoreGraphics;
+using Foundation;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
+using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class CommunicationAddressTableViewCell : AddEditContactTableViewCell
+    public class PhoneNumberTableViewCell : AddEditContactTableViewCell
     {
-        public static readonly NSString Key = new NSString("CommunicationAddressTableViewCell");
+        protected CommunicationAddress address;
+
+        public static readonly NSString Key = new NSString("PhoneNumberTableViewCell");
 
         readonly UITextField numberTextField;
         readonly UITextField descriptionTextField;
         readonly UIButton chevronButton;
-        readonly UILabel prefixLabel;
+        readonly NoCareTextField prefixTextField;
         readonly UISwitch preferrableSwitch;
         readonly UILabel preferrableLabel;
 
-        public CommunicationAddressTableViewCell()
+        readonly UIToolbar countryPickerToolbar;
+        readonly UIPickerView countryPicker;
+        readonly Source countrySource;
+
+        CountryInfo selectedCountry;
+
+        public PhoneNumberTableViewCell()
           : base(UITableViewCellStyle.Default, Key)
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            prefixLabel = new UILabel
+            countrySource = new Source();
+            countryPicker = new UIPickerView
+            {
+                DataSource = countrySource,
+                Delegate = countrySource
+            };
+
+            countryPickerToolbar = new UIToolbar(new CGRect(0f, 0f, 0f, 44f))
+            {
+                Items = new[]
+                {
+                        new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("cancelTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        },
+                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                        new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("doneTapped:"))
+                        {
+                            TintColor = Theme.DarkerBlue
+                        }
+                }
+            };
+
+            prefixTextField = new NoCareTextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
+                TintColor = UIColor.Clear,
+                Text = Localization.GetString("prefix"),
+                InputView = countryPicker,
+                InputAccessoryView = countryPickerToolbar,
+                //AdjustsFontSizeToFitWidth = true,
             };
-            prefixLabel.Text = Localization.GetString("prefix");
-            prefixLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            ContentView.Add(prefixLabel);
+            prefixTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContentView.Add(prefixTextField);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(prefixLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(prefixLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(prefixLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
 
             chevronButton = new UIButton();
@@ -41,15 +82,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             ContentView.AddSubview(chevronButton);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, prefixLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, prefixLabel, NSLayoutAttribute.CenterY, 1f, 0f),
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.CenterY, 1f, 0f),
                 NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
 
-            var disclosureCell = new UITableViewCell();
-            disclosureCell.TranslatesAutoresizingMaskIntoConstraints = false;
-            disclosureCell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
-            disclosureCell.UserInteractionEnabled = false;
+            var disclosureCell = new UITableViewCell()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Accessory = UITableViewCellAccessory.DisclosureIndicator,
+                UserInteractionEnabled = false
+            };
             chevronButton.AddSubview(disclosureCell);
             chevronButton.AddConstraints(new[]
             {
@@ -65,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             {
                NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
                NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, prefixLabel, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
             });
 
             numberTextField = new UITextField
@@ -74,6 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("number"),
             };
+            numberTextField.EditingDidEnd += NumberTextField_EditingDidEnd;
             ContentView.Add(numberTextField);
             ContentView.AddConstraints(new[]
             {
@@ -98,6 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("description"),
             };
+            descriptionTextField.EditingDidEnd += DescriptionTextField_EditingDidEnd;
             ContentView.Add(descriptionTextField);
             ContentView.AddConstraints(new[]
             {
@@ -120,8 +165,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
+                Text = Localization.GetString("preferrable"),
             };
-            preferrableLabel.Text = Localization.GetString("preferrable");
             ContentView.Add(preferrableLabel);
             ContentView.AddConstraints(new[]
             {
@@ -143,13 +188,127 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
             });
-
             preferrableSwitch.ValueChanged += PreferrableSwitch_ValueChanged;
         }
 
-        void PreferrableSwitch_ValueChanged(object sender, System.EventArgs e)
+        public void BindContent(CommunicationAddress ca)
         {
+            address = ca;
 
+            preferrableSwitch.SetState(ca.IsPrimary, true);
+            descriptionTextField.Text = ca.Description ?? string.Empty;
+
+            if (ca.Address != null)
+            {
+                var parts = AddressUtils.CommunicationAddressParts(ca);
+
+                numberTextField.Text = parts.Number;
+                prefixTextField.Text = $"+{parts.CountryPrefix}";
+            }
         }
+
+        #region Event handlers
+
+        void PreferrableSwitch_ValueChanged(object sender, EventArgs e)
+        {
+            address.IsPrimary = preferrableSwitch.On;
+        }
+
+        void DescriptionTextField_EditingDidEnd(object sender, EventArgs e)
+        {
+            address.Description = descriptionTextField.Text;
+        }
+
+        void NumberTextField_EditingDidEnd(object sender, EventArgs e)
+        {
+            var prefixString = selectedCountry != null ? selectedCountry.FaxPrefix.ToString() : "0";
+            address.Address = string.Join("|", prefixString, "", numberTextField.Text);
+        }
+
+        void UpdatePrefix()
+        {
+            if (selectedCountry != null)
+                prefixTextField.Text = $"+{selectedCountry.FaxPrefix}";
+        }
+
+        #endregion
+
+        #region Country Picker
+
+        class Source : UIPickerViewDataSource, IUIPickerViewDelegate
+        {
+            readonly CountryInfo[] countries = ServerConfig.SystemSettings.ContactsModuleInfo.Countries.OrderBy(ci => ci.Name.Trim()).ToArray();
+
+            public override nint GetComponentCount(UIPickerView pickerView)
+            {
+                return 1;
+            }
+
+            public override nint GetRowsInComponent(UIPickerView pickerView, nint component)
+            {
+                return countries.Length;
+            }
+
+            [Export("pickerView:titleForRow:forComponent:")]
+            public string GetTitle(UIPickerView picker, nint row, nint component)
+            {
+                var ci = countries[row];
+
+                return $"{ci.Name} (+{ci.FaxPrefix})";
+            }
+
+            public void SelectCountryByFaxPrefix(UIPickerView picker, int faxPrefix)
+            {
+                var index = 0;
+                for (var i = 0; i < countries.Length; i++)
+                    if (countries[i].FaxPrefix == faxPrefix)
+                    {
+                        index = i;
+                        break;
+                    }
+
+                picker.Select(index, 0, true);
+            }
+
+            public CountryInfo SelectedCountry(UIPickerView picker)
+            {
+                var selectedIndex = picker.SelectedRowInComponent(0);
+                return countries[selectedIndex];
+            }
+
+            public CountryInfo CountryByPrefix(int faxPrefix)
+            {
+                for (var i = 0; i < countries.Length; i++)
+                    if (countries[i].FaxPrefix == faxPrefix)
+                        return countries[i];
+
+                return null;
+            }
+        }
+
+        [Export("doneTapped:")]
+        void DoneTapped(UIBarButtonItem sender)
+        {
+            selectedCountry = countrySource.SelectedCountry(countryPicker);
+            UpdatePrefix();
+            prefixTextField.ResignFirstResponder();
+        }
+
+        [Export("cancelTapped:")]
+        void CancelTapped(UIBarButtonItem sender)
+        {
+            prefixTextField.ResignFirstResponder();
+        }
+
+        #endregion
+
+        class NoCareTextField : UITextField
+        {
+            public override CGRect GetCaretRectForPosition(UITextPosition position)
+            {
+                return CGRect.Empty;
+            }
+        }
+
     }
 }

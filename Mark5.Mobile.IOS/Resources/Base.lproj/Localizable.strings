@@ -1,6 +1,11 @@
 "account" = "Account";
 "actions" = "Actions";
 "add" = "Add";
+"add_phone" = "add phone";
+"add_mobil" = "add mobile";
+"add_email" = "add email";
+"add_fax" = "add fax";
+"add_physical_address" = "add address";
 "add_to_favorites" = "Add to\nfavorites";
 "adding_comment___" = "Adding comment...";
 "address" = "Address";
@@ -209,7 +214,7 @@
 "please_restart" = "Please restart MARK5 app";
 "please_wait___" = "Please wait...";
 "port" = "Port";
-"prefix" = "Prefix"
+"prefix" = "Prefix";
 "primary_person" = "Primary person";
 "priority" = "Priority";
 "priority_low" = "Low";

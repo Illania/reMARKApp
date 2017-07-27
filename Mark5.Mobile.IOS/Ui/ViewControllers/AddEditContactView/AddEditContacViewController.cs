@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -136,22 +137,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
         class DataSource : UITableViewSource, IDisposable
         {
-            AddEditContacViewController viewController;
-            UITableView tableView;
+            public AddEditContacViewController ViewController;
+            public UITableView TableView;
 
             SectionCollection sections = new SectionCollection();
 
             public DataSource(AddEditContacViewController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
+                ViewController = viewController;
+                TableView = tableView;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var row = RowAtIndexPath(indexPath);
                 var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
-                row.Bind(cell);
+                row.BindCell(cell);
                 return cell;
             }
 
@@ -190,15 +191,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             public override void CommitEditingStyle(UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
             {
-                base.CommitEditingStyle(tableView, editingStyle, indexPath);
+                var row = RowAtIndexPath(indexPath);
+                row.OnCommit(indexPath);
             }
 
             public void Refresh(Contact contact, ContactPreview contactPreview, ContactPreview parentContactPreview,
                                 ContactCreationModeFlag creationMode, bool parentPreselected)
             {
                 var sectionsToInsert = new List<AbstractSection> {
-                    new GeneralSection(),
-                    new EmailSection()};
+                    new GeneralSection(this),
+                    new PhoneNumbersSection(this, CommunicationAddressType.Phone)
+                };
 
                 foreach (var section in sectionsToInsert)
                 {
@@ -212,17 +215,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     sections.Add(section);
                 }
 
-                tableView.BeginUpdates();
-                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
+                TableView.BeginUpdates();
+                TableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Fade);
+                TableView.EndUpdates();
             }
 
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
 
-                tableView = null;
-                viewController = null;
+                TableView = null;
+                ViewController = null;
 
                 sections = null;
             }
@@ -238,6 +241,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             abstract class AbstractSection
             {
+                protected DataSource DataSource;
+
                 public Contact Contact { get; set; }
                 public ContactPreview ContactPreview { get; set; }
                 public ContactPreview ParentContactPreview { get; set; }
@@ -247,10 +252,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 public RowCollection Rows { get; } = new RowCollection();
 
                 abstract public void InitializeRows();
+
+                public AbstractSection(DataSource dataSource)
+                {
+                    DataSource = dataSource;
+                }
+            }
+
+            abstract class MultiSection : AbstractSection
+            {
+                protected MultiSection(DataSource dataSource)
+                    : base(dataSource)
+                {
+                }
+
+                protected abstract void AddNewRow(NSIndexPath indexPath);
+                protected abstract void DeleteRow(NSIndexPath indexPath, AbstractRow row);
             }
 
             class GeneralSection : AbstractSection
             {
+                public GeneralSection(DataSource dataSource)
+                    : base(dataSource)
+                {
+                }
+
                 public override void InitializeRows()
                 {
                     Rows.Add(new NameRow());
@@ -269,10 +295,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class EmailSection : AbstractSection
             {
+                public EmailSection(DataSource dataSource) : base(dataSource)
+                {
+                }
+
                 public override void InitializeRows()
                 {
-                    Rows.Add(new CommunicationAddressRow());
-                    Rows.Add(new EmailHeadRow());
+                    //Rows.Add(new EmailHeadRow()); //TODO complete
 
                     Rows.ForEach(r =>
                     {
@@ -282,6 +311,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                         r.ParentContactPreview = ParentContactPreview;
                         r.CreationMode = CreationMode;
                     });
+                }
+            }
+
+            class PhoneNumbersSection : MultiSection
+            {
+                CommunicationAddressType type;
+
+                public PhoneNumbersSection(DataSource dataSource, CommunicationAddressType type)
+                    : base(dataSource)
+                {
+                    this.type = type;
+                }
+
+                public override void InitializeRows()
+                {
+                    var addresses = Contact.CommunicationAddresses.Where(c => c.Type == type);
+
+                    foreach (var address in addresses)
+                        Rows.Add(new PhoneNumberRow(address, DeleteRow));
+
+                    Rows.Add(new PhoneNumbersHeaderRow(type, AddNewRow));
+                }
+
+                protected override void AddNewRow(NSIndexPath indexPath)
+                {
+                    var ca = new CommunicationAddress();
+                    ca.Type = type;
+
+                    Contact.CommunicationAddresses.Add(ca);
+                    Rows.Insert(Rows.Count - 1, new PhoneNumberRow(ca, DeleteRow));
+                    DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
+
+                protected override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                {
+                    var pnRow = row as PhoneNumberRow;
+                    var ca = pnRow.Content;
+                    Contact.CommunicationAddresses.Remove(ca);
+                    Rows.Remove(row);
+                    DataSource.TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
             }
 
@@ -303,7 +372,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public abstract UITableViewCell CreateCell();
 
-                public void Bind(UITableViewCell cell)
+                public void BindCell(UITableViewCell cell)
                 {
                     Cell = cell;
                     Initialize();
@@ -314,6 +383,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 protected abstract void RefreshRow();
 
                 public virtual void OnClicked(NSIndexPath indexPath) { }
+                public virtual void OnCommit(NSIndexPath indexPath) { }
             }
 
             abstract class TextFieldRow : AbstractRow
@@ -351,6 +421,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             abstract class MultiHeaderRow : AbstractRow
             {
+                readonly Action<NSIndexPath> addNewRowAction;
+
+                protected MultiHeaderRow(Action<NSIndexPath> addNewRowAction)
+                {
+                    this.addNewRowAction = addNewRowAction;
+                }
+
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Insert;
 
                 public override string Key => MultiRowHeaderTableViewCell.Key;
@@ -358,13 +435,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 public override UITableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
 
                 protected override void Initialize() { }
+
+                public override void OnClicked(NSIndexPath indexPath)
+                {
+                    addNewRowAction?.Invoke(indexPath);
+                }
+
+                public override void OnCommit(NSIndexPath indexPath)
+                {
+                    addNewRowAction?.Invoke(indexPath);
+                }
             }
 
-            abstract class MultContentRow : AbstractRow
+            abstract class MultiContentRow<T> : AbstractRow where T : class
             {
+                public T Content { get; set; }
+                readonly Action<NSIndexPath, AbstractRow> deleteRowAction;
+
+                protected MultiContentRow(T content, Action<NSIndexPath, AbstractRow> deleteRowAction)
+                {
+                    Content = content;
+                    this.deleteRowAction = deleteRowAction;
+                }
+
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Delete;
 
                 protected override void Initialize() { }
+
+                public override void OnCommit(NSIndexPath indexPath)
+                {
+                    deleteRowAction?.Invoke(indexPath, this);
+                }
             }
 
             class NameRow : TextFieldRow
@@ -388,23 +489,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 }
             }
 
-            class EmailHeadRow : MultiHeaderRow
+            class PhoneNumbersHeaderRow : MultiHeaderRow
             {
+                readonly CommunicationAddressType type;
+                readonly Action<NSIndexPath> addNewRowAction;
+
+                public PhoneNumbersHeaderRow(CommunicationAddressType type, Action<NSIndexPath> addNewRowAction)
+                            : base(addNewRowAction)
+                {
+                    this.addNewRowAction = addNewRowAction;
+                    this.type = type;
+                }
+
                 protected override void RefreshRow()
                 {
                     var cell = (MultiRowHeaderTableViewCell)Cell;
-                    cell.SetTitle("add email"); //TODO change
+                    string titleString;
+                    switch (type)
+                    {
+                        case CommunicationAddressType.Phone:
+                            titleString = Localization.GetString("add_phone");
+                            break;
+                        case CommunicationAddressType.Mobile:
+                            titleString = Localization.GetString("add_mobile");
+                            break;
+                        case CommunicationAddressType.Fax:
+                            titleString = Localization.GetString("add_fax");
+                            break;
+                        default:
+                            throw new ArgumentException("The type is not yet supported!");
+                    }
+
+                    cell.SetTitle(titleString);
                 }
             }
 
-            class CommunicationAddressRow : MultContentRow
+            class PhoneNumberRow : MultiContentRow<CommunicationAddress>
             {
-                public override string Key => CommunicationAddressTableViewCell.Key;
+                public PhoneNumberRow(CommunicationAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
+                    : base(address, deleteRow)
+                { }
 
-                public override UITableViewCell CreateCell() => new CommunicationAddressTableViewCell();
+                public override string Key => PhoneNumberTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new PhoneNumberTableViewCell();
 
                 protected override void RefreshRow()
                 {
+                    var cell = (PhoneNumberTableViewCell)Cell;
+                    cell.BindContent(Content);
                 }
             }
 
