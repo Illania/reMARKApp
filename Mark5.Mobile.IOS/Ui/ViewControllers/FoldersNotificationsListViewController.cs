@@ -111,7 +111,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AdjustScrollViewInsets()
         {
-            var scrollView = currentViewController.View.Subviews[0] as UIScrollView;
+            var scrollView = currentViewController?.View?.Subviews[0] as UIScrollView;
             if (scrollView == null)
                 return;
 
@@ -169,6 +169,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.EncodeRestorableState(coder);
             coder.Encode((int)moduleType, "moduleType");
             coder.Encode(segmentedControl.SelectedSegment, "selectedSegment");
+            coder.Encode(viewControllers[0], "vc_0");
+            coder.Encode(viewControllers[1], "vc_1");
         }
 
         public override void DecodeRestorableState(NSCoder coder)

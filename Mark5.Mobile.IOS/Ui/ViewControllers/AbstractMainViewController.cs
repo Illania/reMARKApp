@@ -72,7 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var nc = new NavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
             {
-                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
+                RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
             };
             PresentViewController(nc, true, null);
         }

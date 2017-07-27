@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -12,7 +13,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-    public class ContactsSearchCriteriaViewController : AbstractSearchCriteriaViewController
+    public class ContactsSearchCriteriaViewController : AbstractSearchCriteriaViewController, IUIViewControllerRestoration
     {
         SearchContactsCriteria criteria = new SearchContactsCriteria();
 
@@ -25,21 +26,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             StackView.AddArrangedSubview(new AddressSearchView());
             StackView.AddArrangedSubview(new ShortIdDescriptionPhysicalAddressView());
             StackView.AddArrangedSubview(new CountryCategoriesView(this));
-
-            foreach (var view in StackView.Subviews.OfType<AbstractContactsSearchView>())
-                view.SetCriteria(criteria);
         }
 
-        protected override void ResetItem_Clicked(object sender, EventArgs e)
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(ContactsSearchCriteriaViewController);
+            RestorationClass = Class;
+        }
+
+        protected override async void ResetItem_Clicked(object sender, EventArgs e)
         {
             base.ResetItem_Clicked(sender, e);
 
             criteria = new SearchContactsCriteria();
 
-            foreach (var view in StackView.Subviews.OfType<AbstractContactsSearchView>())
-                view.SetCriteria(criteria);
-
-            SaveCriteria();
+            RefreshView();
+            await SaveCriteria();
         }
 
         protected override void SearchButton_TouchUpInside(object sender, EventArgs e)
@@ -51,13 +55,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new ContactsSearchResultsViewController
-                {
-                    Criteria = criteria
-                },
-                true);
+            {
+                Criteria = criteria
+            }, true);
         }
 
-        protected override async void SaveCriteria()
+        protected override async Task SaveCriteria()
         {
             try
             {
@@ -69,19 +72,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
         }
 
-        protected override async void RestoreCriteria()
+        protected override async Task RestoreCriteria()
         {
             try
             {
                 criteria = await Managers.SearchManager.GetLastSearchContactsCriteriaAsync();
-
-                foreach (var view in StackView.Subviews.OfType<AbstractContactsSearchView>())
-                    view.SetCriteria(criteria);
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
             }
+        }
+
+        protected override void RefreshView()
+        {
+            foreach (var view in StackView.Subviews.OfType<AbstractContactsSearchView>())
+                view.SetCriteria(criteria);
         }
 
         abstract class AbstractContactsSearchView : AbstractSearchView
@@ -951,5 +957,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 }
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(Serializer.SerializeToByteArray(criteria), "criteria");
+            coder.Encode(RestoreCriteriaFromStorage, "restoreCriteriaFromStorage");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            criteria = Serializer.DeserializeFromByteArray<SearchContactsCriteria>(coder.DecodeBytes("criteria"));
+            RestoreCriteriaFromStorage = coder.DecodeBool("restoreCriteriaFromStorage");
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new ContactsSearchCriteriaViewController();
+        }
+
+        #endregion
     }
 }

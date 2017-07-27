@@ -9,7 +9,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class SearchCriteriaViewController : AbstractViewController
+    public class SearchCriteriaViewController : AbstractViewController, IUIViewControllerRestoration
     {
         UISegmentedControl segmentedControl;
         UIViewController[] viewControllers;
@@ -62,9 +62,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            ExtendedLayoutIncludesOpaqueBars = true;
+            RestorationIdentifier = nameof(SearchCriteriaViewController);
+            RestorationClass = Class;
 
-            var vc = viewControllers[0];
+            ExtendedLayoutIncludesOpaqueBars = true;
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            var vc = viewControllers[segmentedControl.SelectedSegment];
             vc.WillMoveToParentViewController(this);
             AddChildViewController(vc);
             vc.View.Frame = View.Bounds;
@@ -79,6 +87,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationItem.SetRightBarButtonItem(null, false);
             vc.DidMoveToParentViewController(this);
             currentViewController = vc;
+
+            AdjustScrollViewInsets();
+        }
+
+        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        {
+            base.ViewWillTransitionToSize(toSize, coordinator);
+
+            coordinator.AnimateAlongsideTransition(ctx => { }, ctx => AdjustScrollViewInsets());
+        }
+
+        void AdjustScrollViewInsets()
+        {
+            var scrollView = currentViewController?.View?.Subviews[0] as UIScrollView;
+            if (scrollView == null)
+                return;
+
+            scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
+            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
+            scrollView.LayoutIfNeeded();
         }
 
         [Export("segmentedControlHasChangedValue:")]
@@ -108,31 +136,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             AdjustScrollViewInsets();
         }
 
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-
-            AdjustScrollViewInsets();
-        }
-
-        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
-        {
-            base.ViewWillTransitionToSize(toSize, coordinator);
-
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx => AdjustScrollViewInsets());
-        }
-
-        void AdjustScrollViewInsets()
-        {
-            var scrollView = currentViewController.View.Subviews[0] as UIScrollView;
-            if (scrollView == null)
-                return;
-
-            scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            scrollView.LayoutIfNeeded();
-        }
-
         static string GetTitleForModule(ModuleType moduleType)
         {
             switch (moduleType)
@@ -149,5 +152,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return string.Empty;
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(segmentedControl.SelectedSegment, "selectedSegment");
+            coder.Encode(viewControllers[0], "vc_0");
+            coder.Encode(viewControllers[1], "vc_1");
+            coder.Encode(viewControllers[2], "vc_2");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            segmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new SearchCriteriaViewController();
+        }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System.IO;
-using System.Linq;
-using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -24,28 +22,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "documents.png"));
             documentsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "documents-filled.png"));
             documentsNavigationController.Tag = DocumentsTag;
-            documentsNavigationController.RestorationIdentifier = DocumentsTag;
+            documentsNavigationController.RestorationIdentifier = "NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Documents);
 
             contactsNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Contacts));
             contactsNavigationController.TabBarItem.Title = Localization.GetString("contacts");
             contactsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "contacts.png"));
             contactsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "contacts-filled.png"));
             contactsNavigationController.Tag = ContactsTag;
-            contactsNavigationController.RestorationIdentifier = ContactsTag;
+            contactsNavigationController.RestorationIdentifier = "NavigationController_" + nameof(BrowseFoldersListViewController) + "_" + nameof(ModuleType.Contacts);
 
             shortcodesNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Shortcodes));
             shortcodesNavigationController.TabBarItem.Title = Localization.GetString("shortcodes");
             shortcodesNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "shortcodes.png"));
             shortcodesNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "shortcodes-filled.png"));
             shortcodesNavigationController.Tag = ShortcodesTag;
-            shortcodesNavigationController.RestorationIdentifier = ShortcodesTag;
+            shortcodesNavigationController.RestorationIdentifier = "NavigationController_" + nameof(BrowseFoldersListViewController) + "_" + nameof(ModuleType.Shortcodes);
 
             settingsNavigationController = new NavigationController(new SettingsViewController());
             settingsNavigationController.TabBarItem.Title = Localization.GetString("settings");
             settingsNavigationController.TabBarItem.Image = UIImage.FromBundle(Path.Combine("icons", "settings.png"));
             settingsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle(Path.Combine("icons", "settings-filled.png"));
             settingsNavigationController.Tag = SettingsTag;
-            settingsNavigationController.RestorationIdentifier = SettingsTag;
+            settingsNavigationController.RestorationIdentifier = "NavigationController_" + nameof(SettingsViewController);
 
             ViewControllers = new UIViewController[]
             {

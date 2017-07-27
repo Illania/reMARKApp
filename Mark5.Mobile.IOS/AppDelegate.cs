@@ -141,6 +141,24 @@ namespace Mark5.Mobile.IOS
             return true;
         }
 
+        public override UIViewController GetViewController(UIApplication application, string[] restorationIdentifierComponents, NSCoder coder)
+        {
+            var lastComponent = restorationIdentifierComponents.LastOrDefault();
+
+            if (lastComponent == nameof(SimpleMainViewController))
+                return Window.RootViewController;
+
+            if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))
+                return new NavigationController
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.FullScreen,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
+                    RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
+                };
+
+            return null;
+        }
+
         public override void OnActivated(UIApplication application)
         {
             Services.DocumentsUploadService?.Start();
