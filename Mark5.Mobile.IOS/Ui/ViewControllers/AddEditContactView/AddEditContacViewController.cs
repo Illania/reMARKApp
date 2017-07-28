@@ -6,6 +6,7 @@ using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
@@ -24,14 +25,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
         UITableView tableView;
 
+        NSObject didShowNotificationObserver;
+        NSObject willChangeFrameNotificationObserver;
+        NSObject willHideNotification;
+
+        UIView activeField;
+
         #region UIViewControllerOverrides
 
         public override void LoadView()
         {
             base.LoadView();
 
-            InitNavigationBar();
-            InitView();
+            InitializeNavigationBar();
+            InitializeView();
         }
 
         //TODO eventually put logging
@@ -41,21 +48,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
+            SubscribeToKeyboardEvents();
+        }
+
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
 
-            DeinitializeHandlers();
+            DeInitializeHandlers();
+            UnsubscribeToKeyboardEvents();
         }
-
 
         #endregion
 
         #region Init methods
 
-        void InitNavigationBar()
+        void InitializeNavigationBar()
         {
             cancelButton = new UIBarButtonItem();
             cancelButton.Title = Localization.GetString("cancel");
@@ -68,10 +84,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             NavigationItem.SetRightBarButtonItem(editButton, false);
         }
 
-        void InitView()
+        void InitializeView()
         {
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Plain);
-            tableView.Source = new DataSource(this, tableView);
+
+            var dataSource = new DataSource(this, tableView);
+            dataSource.ViewIsActivated += DataSource_ViewIsActivated;
+            tableView.Source = dataSource;
             tableView.TableFooterView = new UIView();
             tableView.EstimatedRowHeight = 60f;
             tableView.RowHeight = UITableView.AutomaticDimension;
@@ -97,18 +116,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 cancelButton.Clicked += CancelButton_Clicked;
         }
 
-        void DeinitializeHandlers()
+        void DeInitializeHandlers()
         {
             if (cancelButton != null)
                 cancelButton.Clicked -= CancelButton_Clicked;
         }
 
-        public override void ViewDidAppear(bool animated)
+        void SubscribeToKeyboardEvents()
         {
-            base.ViewWillAppear(animated);
-
-            RefreshData();
+            didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
+            willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
+            willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
         }
+
+        void UnsubscribeToKeyboardEvents()
+        {
+            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
+            {
+                didShowNotificationObserver,
+                willChangeFrameNotificationObserver,
+                willHideNotification
+            });
+        }
+
+        #endregion
 
         void RefreshData()
         {
@@ -124,21 +155,65 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             ds.Refresh(Contact, ContactPreview, ParentContactPreview, CreationModeFlag, ParentPreselected);
         }
 
-        #endregion
-
         #region Handlers
+
+        void DataSource_ViewIsActivated(object sender, EventArgs e)
+        {
+            activeField = (UIView)sender;
+        }
 
         void CancelButton_Clicked(object sender, EventArgs e) //TODO move
         {
             DismissViewController(true, null);
         }
 
+        void OnKeyboardDidShowNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true);
+        }
+
+        void OnKeyboardWillChangeFrameNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+        }
+
+        void OnKeyboardWillHideNotification(NSNotification notification)
+        {
+            AdjustViewToKeyboard(0f, notification);
+        }
+
+        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool correctOffset = false)
+        {
+            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, keyboardHeight, 0f);
+            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, keyboardHeight, 0f);
+
+            if (notification == null)
+            {
+                View.LayoutIfNeeded();
+                return;
+            }
+
+            if (correctOffset && activeField != null)
+            {
+                var difference = activeField.Frame.Bottom - tableView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
+
+                if (difference > 0)
+                {
+                    var co = tableView.ContentOffset;
+                    co.Y += difference;
+                    tableView.SetContentOffset(co, true);
+                }
+            }
+        }
+
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
             public AddEditContacViewController ViewController;
             public UITableView TableView;
+
+            public event EventHandler ViewIsActivated = delegate { };
 
             SectionCollection sections = new SectionCollection();
 
@@ -151,10 +226,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var row = RowAtIndexPath(indexPath);
-                var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
+                var cell = tableView.DequeueReusableCell(row.Key);
+                if (cell == null)
+                {
+                    cell = row.CreateCell();
+                    var gr = new UITapGestureRecognizer((obj) => ViewIsActivated(cell, EventArgs.Empty))
+                    {
+                        WeakDelegate = this,
+                        CancelsTouchesInView = false,
+                    };
+                    cell.AddGestureRecognizer(gr);
+                }
                 row.BindCell(cell);
                 return cell;
             }
+
+            //[Export("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
+            //public bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
+            //{
+            //    return true;
+            //}
 
             public override nint RowsInSection(UITableView tableView, nint section)
             {
@@ -204,9 +295,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
                     new EmailAddressesSection(this),
                     new PhysicalAddressesSection(this),
-
-
-
                 };
 
                 foreach (var section in sectionsToInsert)
@@ -259,7 +347,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 abstract public void InitializeRows();
 
-                public AbstractSection(DataSource dataSource)
+                protected AbstractSection(DataSource dataSource)
                 {
                     DataSource = dataSource;
                 }
