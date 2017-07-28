@@ -162,7 +162,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             activeField = (UIView)sender;
         }
 
-        void CancelButton_Clicked(object sender, EventArgs e) //TODO move
+        void CancelButton_Clicked(object sender, EventArgs e)
         {
             DismissViewController(true, null);
         }
@@ -208,7 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
+        class DataSource : UITableViewSource, IDisposable
         {
             public AddEditContacViewController ViewController;
             public UITableView TableView;
@@ -232,7 +232,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     cell = row.CreateCell();
                     var gr = new UITapGestureRecognizer((obj) => ViewIsActivated(cell, EventArgs.Empty))
                     {
-                        WeakDelegate = this,
                         CancelsTouchesInView = false,
                     };
                     cell.AddGestureRecognizer(gr);
@@ -240,12 +239,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 row.BindCell(cell);
                 return cell;
             }
-
-            //[Export("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:")]
-            //public bool ShouldRecognizeSimultaneously(UIGestureRecognizer gestureRecognizer, UIGestureRecognizer otherGestureRecognizer)
-            //{
-            //    return true;
-            //}
 
             public override nint RowsInSection(UITableView tableView, nint section)
             {
