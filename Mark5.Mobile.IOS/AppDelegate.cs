@@ -147,6 +147,9 @@ namespace Mark5.Mobile.IOS
 
             if (lastComponent == nameof(SimpleMainViewController))
                 return Window.RootViewController;
+ 
+            if (lastComponent == nameof(SplitMainViewController))
+                return Window.RootViewController;
 
             if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))
                 return new NavigationController
