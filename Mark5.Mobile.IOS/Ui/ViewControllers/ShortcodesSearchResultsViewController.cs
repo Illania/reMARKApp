@@ -6,6 +6,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -14,7 +15,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ShortcodesSearchResultsViewController : AbstractViewController, IPrimaryViewController, IUIGestureRecognizerDelegate
+    public class ShortcodesSearchResultsViewController : AbstractViewController, IPrimaryViewController, IUIGestureRecognizerDelegate, IUIViewControllerRestoration
     {
         public SearchShortcodesCriteria Criteria { get; set; }
 
@@ -36,6 +37,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(ShortcodesSearchResultsViewController);
+            RestorationClass = Class;
 
             ExtendedLayoutIncludesOpaqueBars = true;
         }
@@ -631,5 +635,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 shortcodePreviewsInView = null;
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(Serializer.SerializeToByteArray(Criteria), "criteria");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            Criteria = Serializer.DeserializeFromByteArray<SearchShortcodesCriteria>(coder.DecodeBytes("criteria"));
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new ShortcodesSearchResultsViewController();
+        }
+
+        #endregion
+
     }
 }
