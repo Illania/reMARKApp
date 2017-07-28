@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -83,6 +84,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            UIApplication.Notifications.ObserveDidEnterBackground(DidEnterBackgroundNotification);
+
             ExtendedLayoutIncludesOpaqueBars = false;
         }
 
@@ -131,6 +134,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
+        }
+
+        void DidEnterBackgroundNotification(object sender, NSNotificationEventArgs e)
+        {
+            cts?.Cancel();
         }
 
         void InitializeStartView()
