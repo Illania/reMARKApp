@@ -1,8 +1,9 @@
 "account" = "Account";
 "actions" = "Actions";
+"area" = "Area";
 "add" = "Add";
 "add_phone" = "add phone";
-"add_mobil" = "add mobile";
+"add_mobile" = "add mobile";
 "add_email" = "add email";
 "add_fax" = "add fax";
 "add_physical_address" = "add address";
@@ -28,6 +29,7 @@
 "categories" = "Categories";
 "cc" = "Cc";
 "chrome" = "Open in Google Chrome";
+"city" = "City";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
 "clear_contacts_cache_title" = "Clear contacts cache";
 "clear_shortcodes_cache_summary" = "Do you want to remove cached shortcodes?";
@@ -85,6 +87,7 @@
 "creating_system_report___" = "Creating system report...";
 "creator" = "Creator";
 "date" = "Date";
+"description" = "Description";
 "delete" = "Delete";
 "delete_from_folder" = "Delete from folder";
 "deleting___" = "Deleting...";
@@ -163,6 +166,7 @@
 "more" = "More";
 "move_to_folder" = "Move to folder";
 "moving___" = "Moving...";
+"name" = "Name";
 "network_interface" = "Network interface: ";
 "new_document" = "New email";
 "no" = "No";
@@ -335,3 +339,4 @@
 "wrong_username_title" = "Wrong username";
 "yes" = "Yes";
 "yesterday" = "Yesterday";
+"zip" = "Zip";

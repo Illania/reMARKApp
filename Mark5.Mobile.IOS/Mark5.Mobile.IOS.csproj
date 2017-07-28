@@ -273,6 +273,9 @@
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowHeaderTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\AddEditContactTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextFieldTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

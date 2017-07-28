@@ -200,7 +200,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 var sectionsToInsert = new List<AbstractSection> {
                     new GeneralSection(this),
-                    new PhoneNumbersSection(this, CommunicationAddressType.Phone)
+                    new PhoneNumbersSection(this, CommunicationAddressType.Phone),
+                    new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
+                    new EmailAddressesSection(this),
+                    new PhysicalAddressesSection(this),
+
+
+
                 };
 
                 foreach (var section in sectionsToInsert)
@@ -281,6 +287,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 {
                     Rows.Add(new NameRow());
                     Rows.Add(new ParentRow());
+                    Rows.Add(new DescriptionRow());
 
                     Rows.ForEach(r =>
                     {
@@ -293,24 +300,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 }
             }
 
-            class EmailSection : AbstractSection
+            class EmailAddressesSection : MultiSection
             {
-                public EmailSection(DataSource dataSource) : base(dataSource)
+                public EmailAddressesSection(DataSource dataSource)
+                    : base(dataSource)
                 {
                 }
 
                 public override void InitializeRows()
                 {
-                    //Rows.Add(new EmailHeadRow()); //TODO complete
+                    var addresses = Contact.CommunicationAddresses.Where(c => c.Type == CommunicationAddressType.Email);
 
-                    Rows.ForEach(r =>
+                    foreach (var address in addresses)
+                        Rows.Add(new EmailAddressRow(this, address, DeleteRow));
+
+                    Rows.Add(new EmailAddressesHeaderRow(AddNewRow));
+                }
+
+                protected override void AddNewRow(NSIndexPath indexPath)
+                {
+                    var ca = new CommunicationAddress();
+                    ca.Type = CommunicationAddressType.Email;
+
+                    Contact.CommunicationAddresses.Add(ca);
+                    Rows.Insert(Rows.Count - 1, new EmailAddressRow(this, ca, DeleteRow));
+                    DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
+
+                protected override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                {
+                    var pnRow = row as EmailAddressRow;
+                    var ca = pnRow.Content;
+                    Contact.CommunicationAddresses.Remove(ca);
+                    Rows.Remove(row);
+                    DataSource.TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
+
+                public void DisablePrimaryOnOtherRows(EmailAddressRow row)
+                {
+                    foreach (var otherRow in Rows)
                     {
-                        r.Contact = Contact;
-                        r.ContactPreview = ContactPreview;
-                        r.ParentPreselected = ParentPreselected;
-                        r.ParentContactPreview = ParentContactPreview;
-                        r.CreationMode = CreationMode;
-                    });
+                        if (otherRow != row && otherRow is EmailAddressRow emailAddressRow)
+                        {
+                            emailAddressRow.Content.IsPrimary = false;
+                            emailAddressRow.RefreshRow();
+                        }
+                    }
                 }
             }
 
@@ -329,7 +364,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     var addresses = Contact.CommunicationAddresses.Where(c => c.Type == type);
 
                     foreach (var address in addresses)
-                        Rows.Add(new PhoneNumberRow(address, DeleteRow));
+                        Rows.Add(new PhoneNumberRow(this, address, DeleteRow));
 
                     Rows.Add(new PhoneNumbersHeaderRow(type, AddNewRow));
                 }
@@ -340,7 +375,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     ca.Type = type;
 
                     Contact.CommunicationAddresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new PhoneNumberRow(ca, DeleteRow));
+                    Rows.Insert(Rows.Count - 1, new PhoneNumberRow(this, ca, DeleteRow));
                     DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
@@ -352,9 +387,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     Rows.Remove(row);
                     DataSource.TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
+
+                public void DisablePrimaryOnOtherRows(PhoneNumberRow row)
+                {
+                    foreach (var otherRow in Rows)
+                    {
+                        if (otherRow != row && otherRow is PhoneNumberRow phoneRow)
+                        {
+                            phoneRow.Content.IsPrimary = false;
+                            phoneRow.RefreshRow();
+                        }
+                    }
+                }
+            }
+
+            class PhysicalAddressesSection : MultiSection
+            {
+                public PhysicalAddressesSection(DataSource dataSource)
+                    : base(dataSource)
+                {
+                }
+
+                public override void InitializeRows()
+                {
+                    foreach (var address in Contact.PhysicalAddresses)
+                        Rows.Add(new PhysicalAddressRow(this, address, DeleteRow));
+
+                    Rows.Add(new PhysicalAddressesHeaderRow(AddNewRow));
+                }
+
+                protected override void AddNewRow(NSIndexPath indexPath)
+                {
+                    var ca = new PhysicalAddress();
+                    Contact.PhysicalAddresses.Add(ca);
+                    Rows.Insert(Rows.Count - 1, new PhysicalAddressRow(this, ca, DeleteRow));
+                    DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
+
+                protected override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                {
+                    var pnRow = row as PhysicalAddressRow;
+                    var ca = pnRow.Content;
+                    Contact.PhysicalAddresses.Remove(ca);
+                    Rows.Remove(row);
+                    DataSource.TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
             }
 
             class RowCollection : List<AbstractRow> { }
+
+            #region Abstract rows
 
             abstract class AbstractRow
             {
@@ -380,7 +462,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 }
 
                 protected abstract void Initialize();
-                protected abstract void RefreshRow();
+                public abstract void RefreshRow();
 
                 public virtual void OnClicked(NSIndexPath indexPath) { }
                 public virtual void OnCommit(NSIndexPath indexPath) { }
@@ -403,6 +485,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 {
                     var tfc = (TextFieldTableViewCell)Cell;
                     tfc.SetPlaceholder(placeholder);
+                    tfc.ContentEdited -= ContentEdited;
+                    tfc.ContentEdited += ContentEdited;
+                }
+
+                protected abstract void ContentEdited(object sender, string e);
+            }
+
+            abstract class TitledTextView : AbstractRow
+            {
+                readonly string title;
+
+                protected TitledTextView(string title)
+                {
+                    this.title = title;
+                }
+
+                public override string Key => TitledTextFieldTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new TitledTextFieldTableViewCell();
+
+                protected override void Initialize()
+                {
+                    var tfc = (TitledTextFieldTableViewCell)Cell;
+                    tfc.SetTitle(title);
                     tfc.ContentEdited -= ContentEdited;
                     tfc.ContentEdited += ContentEdited;
                 }
@@ -434,7 +540,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override UITableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
 
-                protected override void Initialize() { }
+                public override void RefreshRow() { }
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
@@ -460,28 +566,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Delete;
 
-                protected override void Initialize() { }
-
                 public override void OnCommit(NSIndexPath indexPath)
                 {
                     deleteRowAction?.Invoke(indexPath, this);
                 }
             }
 
+            #endregion
+
+
             class NameRow : TextFieldRow
             {
-                public NameRow() : base("Name") //TODO correct
+                public NameRow()
+                    : base(Localization.GetString("name"))
                 {
                 }
 
                 protected override void ContentEdited(object sender, string e) => ContactPreview.Name = e;
 
-                protected override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.Name);
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.Name);
             }
 
             class ParentRow : DisclosureIndicatorRow
             {
-                protected override void RefreshRow()
+                public override void RefreshRow()
                 {
                     var cell = (DisclosureIndicatorTableViewCell)Cell;
                     cell.SetTitle("Parent"); //TODO change
@@ -489,19 +597,127 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 }
             }
 
+            class DescriptionRow : TitledTextView
+            {
+                public DescriptionRow()
+                    : base(Localization.GetString("description"))
+                {
+                }
+
+                public override void RefreshRow()
+                {
+                    ((TitledTextFieldTableViewCell)Cell).SetContent(ContactPreview.Description);
+                }
+
+                protected override void ContentEdited(object sender, string e)
+                {
+                    ContactPreview.Description = e;
+                }
+            }
+
+            class PhysicalAddressesHeaderRow : MultiHeaderRow
+            {
+                readonly Action<NSIndexPath> addNewRowAction;
+
+                public PhysicalAddressesHeaderRow(Action<NSIndexPath> addNewRowAction)
+                            : base(addNewRowAction)
+                {
+                    this.addNewRowAction = addNewRowAction;
+                }
+
+                protected override void Initialize()
+                {
+                    var cell = (MultiRowHeaderTableViewCell)Cell;
+                    cell.SetTitle(Localization.GetString("add_physical_address"));
+                }
+            }
+
+            class PhysicalAddressRow : MultiContentRow<PhysicalAddress>
+            {
+                readonly PhysicalAddressesSection section;
+
+                public PhysicalAddressRow(PhysicalAddressesSection section, PhysicalAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
+                    : base(address, deleteRow)
+                {
+                    this.section = section;
+                }
+
+                public override string Key => PhysicalAddressTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new PhysicalAddressTableViewCell();
+
+                protected override void Initialize()
+                {
+                }
+
+                public override void RefreshRow()
+                {
+                    var cell = (PhysicalAddressTableViewCell)Cell;
+                    cell.BindContent(Content);
+                }
+            }
+
+            class EmailAddressesHeaderRow : MultiHeaderRow
+            {
+                readonly Action<NSIndexPath> addNewRowAction;
+
+                public EmailAddressesHeaderRow(Action<NSIndexPath> addNewRowAction)
+                            : base(addNewRowAction)
+                {
+                    this.addNewRowAction = addNewRowAction;
+                }
+
+                protected override void Initialize()
+                {
+                    var cell = (MultiRowHeaderTableViewCell)Cell;
+                    cell.SetTitle(Localization.GetString("add_email"));
+                }
+            }
+
+            class EmailAddressRow : MultiContentRow<CommunicationAddress>
+            {
+                readonly EmailAddressesSection section;
+
+                public EmailAddressRow(EmailAddressesSection section, CommunicationAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
+                    : base(address, deleteRow)
+                {
+                    this.section = section;
+                }
+
+                public override string Key => EmailAddressTableViewCell.Key;
+
+                public override UITableViewCell CreateCell() => new EmailAddressTableViewCell();
+
+                protected override void Initialize()
+                {
+                    var cell = (EmailAddressTableViewCell)Cell;
+                    cell.SelectedAsPrimary -= Cell_SelectedAsPrimary;
+                    cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
+                }
+
+                public override void RefreshRow()
+                {
+                    var cell = (EmailAddressTableViewCell)Cell;
+                    cell.BindContent(Content);
+                }
+
+                void Cell_SelectedAsPrimary(object sender, EventArgs e)
+                {
+                    section.DisablePrimaryOnOtherRows(this);
+                }
+            }
+
             class PhoneNumbersHeaderRow : MultiHeaderRow
             {
                 readonly CommunicationAddressType type;
-                readonly Action<NSIndexPath> addNewRowAction;
 
                 public PhoneNumbersHeaderRow(CommunicationAddressType type, Action<NSIndexPath> addNewRowAction)
                             : base(addNewRowAction)
                 {
-                    this.addNewRowAction = addNewRowAction;
                     this.type = type;
                 }
 
-                protected override void RefreshRow()
+                protected override void Initialize()
                 {
                     var cell = (MultiRowHeaderTableViewCell)Cell;
                     string titleString;
@@ -526,18 +742,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class PhoneNumberRow : MultiContentRow<CommunicationAddress>
             {
-                public PhoneNumberRow(CommunicationAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
+                readonly PhoneNumbersSection section;
+
+                public PhoneNumberRow(PhoneNumbersSection section, CommunicationAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
                     : base(address, deleteRow)
-                { }
+                {
+                    this.section = section;
+                }
 
                 public override string Key => PhoneNumberTableViewCell.Key;
 
                 public override UITableViewCell CreateCell() => new PhoneNumberTableViewCell();
 
-                protected override void RefreshRow()
+                protected override void Initialize()
+                {
+                    var cell = (PhoneNumberTableViewCell)Cell;
+                    cell.SelectedAsPrimary -= Cell_SelectedAsPrimary;
+                    cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
+                }
+
+                public override void RefreshRow()
                 {
                     var cell = (PhoneNumberTableViewCell)Cell;
                     cell.BindContent(Content);
+                }
+
+                void Cell_SelectedAsPrimary(object sender, EventArgs e)
+                {
+                    section.DisablePrimaryOnOtherRows(this);
                 }
             }
 

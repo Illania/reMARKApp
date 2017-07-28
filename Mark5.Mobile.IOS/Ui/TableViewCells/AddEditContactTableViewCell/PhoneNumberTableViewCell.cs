@@ -12,14 +12,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
     public class PhoneNumberTableViewCell : AddEditContactTableViewCell
     {
-        protected CommunicationAddress address;
-
         public static readonly NSString Key = new NSString("PhoneNumberTableViewCell");
+
+        protected CommunicationAddress address;
 
         readonly UITextField numberTextField;
         readonly UITextField descriptionTextField;
         readonly UIButton chevronButton;
-        readonly NoCareTextField prefixTextField;
+        readonly UITextField prefixTextField;
         readonly UISwitch preferrableSwitch;
         readonly UILabel preferrableLabel;
 
@@ -28,6 +28,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         readonly Source countrySource;
 
         CountryInfo selectedCountry;
+
+        public event EventHandler SelectedAsPrimary = delegate { };
 
         public PhoneNumberTableViewCell()
           : base(UITableViewCellStyle.Default, Key)
@@ -57,7 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 }
             };
 
-            prefixTextField = new NoCareTextField
+            prefixTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
@@ -65,8 +67,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Text = Localization.GetString("prefix"),
                 InputView = countryPicker,
                 InputAccessoryView = countryPickerToolbar,
-                //AdjustsFontSizeToFitWidth = true,
             };
+            //TODO need to fix the pushed to the left problem
             prefixTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(prefixTextField);
             ContentView.AddConstraints(new[]
@@ -212,6 +214,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         void PreferrableSwitch_ValueChanged(object sender, EventArgs e)
         {
             address.IsPrimary = preferrableSwitch.On;
+            SelectedAsPrimary(this, EventArgs.Empty);
         }
 
         void DescriptionTextField_EditingDidEnd(object sender, EventArgs e)
@@ -221,14 +224,21 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         void NumberTextField_EditingDidEnd(object sender, EventArgs e)
         {
-            var prefixString = selectedCountry != null ? selectedCountry.FaxPrefix.ToString() : "0";
-            address.Address = string.Join("|", prefixString, "", numberTextField.Text);
+            UpdateAddress();
         }
 
         void UpdatePrefix()
         {
             if (selectedCountry != null)
                 prefixTextField.Text = $"+{selectedCountry.FaxPrefix}";
+
+            UpdateAddress();
+        }
+
+        void UpdateAddress()
+        {
+            var prefixString = selectedCountry != null ? selectedCountry.FaxPrefix.ToString() : "0";
+            address.Address = string.Join("|", prefixString, "", numberTextField.Text);
         }
 
         #endregion
@@ -301,14 +311,5 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         }
 
         #endregion
-
-        class NoCareTextField : UITextField
-        {
-            public override CGRect GetCaretRectForPosition(UITextPosition position)
-            {
-                return CGRect.Empty;
-            }
-        }
-
     }
 }
