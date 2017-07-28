@@ -19,10 +19,11 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentViewController : AbstractViewController, ISecondaryViewController
+    public class DocumentViewController : AbstractViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
@@ -107,6 +108,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(DocumentViewController);
+            RestorationClass = Class;
 
             ExtendedLayoutIncludesOpaqueBars = true;
         }
@@ -225,8 +229,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            if (NavigationController != null)
+            {
+                mainScrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                mainScrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            }
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
             {
@@ -1343,6 +1350,58 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+
+            coder.Encode(Modal, "modal");
+
+            coder.Encode(failedDocumentToUploadGuid.ToByteArray(), "failedDocumentToUploadGuid");
+            if (folderId.HasValue)
+                coder.Encode(folderId.Value, "folderId");
+            if (folder != null)
+                coder.Encode(Serializer.SerializeToByteArray(folder.ShallowCopy()), "folder");
+            if (documentId.HasValue)
+                coder.Encode(documentId.Value, "documentId");
+            if (documentPreview != null)
+                coder.Encode(Serializer.SerializeToByteArray(documentPreview), "documentPreview");
+            if (document != null)
+                coder.Encode(Serializer.SerializeToByteArray(document), "document");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+
+            failedDocumentToUploadGuid = new Guid(coder.DecodeBytes("failedDocumentToUploadGuid"));
+            if (coder.ContainsKey("folderId"))
+                folderId = coder.DecodeInt("folderId");
+            if (folder != null)
+                folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
+            if (coder.ContainsKey("documentId"))
+                documentId = coder.DecodeInt("documentId");
+            if (coder.ContainsKey("documentPreview"))
+                documentPreview = Serializer.DeserializeFromByteArray<DocumentPreview>(coder.DecodeBytes("documentPreview"));
+            if (coder.ContainsKey("document"))
+                document = Serializer.DeserializeFromByteArray<Document>(coder.DecodeBytes("document"));
+
+            refreshDataOnAppear = true;
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            if (coder.DecodeBool("modal"))
+                return null;
+            
+            return new DocumentViewController();
+        }
+
+        #endregion
+
     }
 
     public class ReadStatusUpdatedEventArgs : EventArgs
