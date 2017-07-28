@@ -83,14 +83,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                Placeholder = Localization.GetString("zip"),
+                Placeholder = Localization.GetString("zip") + " ",
             };
             zipTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             zipTextField.EditingDidEnd += ZipTextField_EditingDidEnd;
             ContentView.Add(zipTextField);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
+                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
@@ -101,7 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             {
                NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, zipTextField, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
                 NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, zipTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, zipTextField, NSLayoutAttribute.Bottom, 1f, 0f),
             });
 
             areaTextField = new UITextField
@@ -114,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             ContentView.Add(areaTextField);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
+                NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, verticalSeparator, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
                 NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
@@ -143,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             ContentView.Add(countryTextField);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
@@ -179,7 +179,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             ContentView.AddConstraints(new[]
             {
                NSLayoutConstraint.Create(verticalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-               NSLayoutConstraint.Create(verticalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(verticalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                NSLayoutConstraint.Create(verticalSeparator2, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, countryTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
             });
 
@@ -197,6 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, verticalSeparator2, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
                 NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+                NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
             });
         }
 
