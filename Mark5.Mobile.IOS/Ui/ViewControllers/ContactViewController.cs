@@ -52,6 +52,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeView();
+        }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -66,9 +73,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            InitializeView();
             InitializeNavigationBar();
             InitializeHandlers();
+
+            if (headerViewOffset != null)
+                headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -151,7 +160,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
-                headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, NavigationController.NavigationBar.Frame.Bottom),
+                headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 140f)
