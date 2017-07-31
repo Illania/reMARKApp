@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -29,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         NSLayoutConstraint bottomLayoutConstraint;
 
-        bool firstRun = true;
+        protected bool RestoreCriteriaFromStorage = true;
 
         public override void LoadView()
         {
@@ -57,9 +58,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 ShowsHorizontalScrollIndicator = false,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkerBlue,
-                ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f),
-                ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f)
             };
+            if (NavigationController != null)
+            {
+                scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+                scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize, 0f);
+            }
             View.AddSubview(scrollView);
             View.AddConstraints(new[]
             {
@@ -138,7 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             ExtendedLayoutIncludesOpaqueBars = true;
         }
 
-        public override void ViewWillAppear(bool animated)
+        public override async void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
@@ -156,11 +160,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
             willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
 
-            if (firstRun)
+            if (RestoreCriteriaFromStorage)
             {
-                firstRun = false;
-                RestoreCriteria();
+                RestoreCriteriaFromStorage = false;
+                await RestoreCriteria();
             }
+
+            RefreshView();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -210,11 +216,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             activeField = sender as UIView;
         }
 
-        void CloseItem_Clicked(object sender, EventArgs e)
+        async void CloseItem_Clicked(object sender, EventArgs e)
         {
             DismissViewController(true, null);
 
-            SaveCriteria();
+            await SaveCriteria();
         }
 
         protected virtual void ResetItem_Clicked(object sender, EventArgs e)
@@ -224,9 +230,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         protected abstract void SearchButton_TouchUpInside(object sender, EventArgs e);
 
-        protected abstract void SaveCriteria();
+        protected abstract Task SaveCriteria();
 
-        protected abstract void RestoreCriteria();
+        protected abstract Task RestoreCriteria();
+
+        protected abstract void RefreshView();
 
         void OnKeyboardDidShowNotification(NSNotification notification)
         {

@@ -222,7 +222,7 @@
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCritriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\DocumentsSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ShortcodesSearchCriteriaViewController.cs" />

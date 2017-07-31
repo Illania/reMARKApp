@@ -20,7 +20,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ContactViewController : AbstractViewController, ISecondaryViewController
+    public class ContactViewController : AbstractViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
         public bool Modal { get; set; }
 
@@ -63,6 +63,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            RestorationIdentifier = nameof(ContactViewController);
+            RestorationClass = Class;
+
             ExtendedLayoutIncludesOpaqueBars = true;
         }
 
@@ -72,6 +75,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeHandlers();
+
+            if (headerViewOffset != null)
+                headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -154,7 +160,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
-                headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, NavigationController.NavigationBar.Frame.Bottom),
+                headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 140f)
@@ -1523,5 +1529,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             #endregion
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+
+            coder.Encode(Modal, "modal");
+
+            if (folderId.HasValue)
+                coder.Encode(folderId.Value, "folderId");
+            if (folder != null)
+                coder.Encode(Serializer.SerializeToByteArray(folder.ShallowCopy()), "folder");
+            if (contactId.HasValue)
+                coder.Encode(contactId.Value, "contactId");
+            if (contactPreview != null)
+                coder.Encode(Serializer.SerializeToByteArray(contactPreview), "contactPreview");
+            if (contact != null)
+                coder.Encode(Serializer.SerializeToByteArray(contact), "contact");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+
+            if (coder.ContainsKey("folderId"))
+                folderId = coder.DecodeInt("folderId");
+            if (folder != null)
+                folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
+            if (coder.ContainsKey("contactId"))
+                contactId = coder.DecodeInt("contactId");
+            if (coder.ContainsKey("contactPreview"))
+                contactPreview = Serializer.DeserializeFromByteArray<ContactPreview>(coder.DecodeBytes("contactPreview"));
+            if (coder.ContainsKey("contact"))
+                contact = Serializer.DeserializeFromByteArray<Contact>(coder.DecodeBytes("contact"));
+
+            refreshDataOnAppear = true;
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            if (coder.DecodeBool("modal"))
+                return null;
+
+            return new ContactViewController();
+        }
+
+        #endregion
+
     }
 }

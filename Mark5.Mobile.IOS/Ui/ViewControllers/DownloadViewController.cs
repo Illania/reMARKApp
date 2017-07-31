@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -83,6 +84,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            UIApplication.Notifications.ObserveDidEnterBackground(DidEnterBackgroundNotification);
+
             ExtendedLayoutIncludesOpaqueBars = false;
         }
 
@@ -133,6 +136,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
+        void DidEnterBackgroundNotification(object sender, NSNotificationEventArgs e)
+        {
+            cts?.Cancel();
+        }
+
         void InitializeStartView()
         {
             startView = new UIView
@@ -168,8 +176,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             upView.AddSubview(imageView);
             upView.AddConstraints(new[] {
-                imageView.WidthAnchor.ConstraintEqualTo(125f),
-                imageView.HeightAnchor.ConstraintEqualTo(125f),
+                imageView.WidthAnchor.ConstraintEqualTo(120f),
+                imageView.HeightAnchor.ConstraintEqualTo(120f),
                 imageView.CenterXAnchor.ConstraintEqualTo(upView.CenterXAnchor),
                 imageView.CenterYAnchor.ConstraintEqualTo(upView.CenterYAnchor)
             });
@@ -399,8 +407,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             upView.AddSubview(imageView);
             upView.AddConstraints(new[] {
-                imageView.WidthAnchor.ConstraintEqualTo(125f),
-                imageView.HeightAnchor.ConstraintEqualTo(125f),
+                imageView.WidthAnchor.ConstraintEqualTo(120f),
+                imageView.HeightAnchor.ConstraintEqualTo(120f),
                 imageView.CenterXAnchor.ConstraintEqualTo(upView.CenterXAnchor),
                 imageView.CenterYAnchor.ConstraintEqualTo(upView.CenterYAnchor)
             });

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -8,13 +9,12 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-    public class DocumentsSearchCriteriaViewController : AbstractSearchCriteriaViewController
+    public class DocumentsSearchCriteriaViewController : AbstractSearchCriteriaViewController, IUIViewControllerRestoration
     {
         SearchDocumentsCriteria criteria = new SearchDocumentsCriteria();
 
@@ -33,21 +33,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             StackView.AddArrangedSubview(new AttachmentsUnreadSearchView());
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
                 StackView.AddArrangedSubview(new HandledSearchView());
-
-            foreach (var view in StackView.Subviews.OfType<AbstractDocumentsSearchView>())
-                view.SetCriteria(criteria);
         }
 
-        protected override void ResetItem_Clicked(object sender, EventArgs e)
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(DocumentsSearchCriteriaViewController);
+            RestorationClass = Class;
+        }
+
+        protected override async void ResetItem_Clicked(object sender, EventArgs e)
         {
             base.ResetItem_Clicked(sender, e);
 
             criteria = new SearchDocumentsCriteria();
 
-            foreach (var view in StackView.Subviews.OfType<AbstractDocumentsSearchView>())
-                view.SetCriteria(criteria);
-
-            SaveCriteria();
+            RefreshView();
+            await SaveCriteria();
         }
 
         protected override void SearchButton_TouchUpInside(object sender, EventArgs e)
@@ -60,13 +63,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new DocumentsSearchResultsViewController
-                {
-                    Criteria = criteria
-                },
-                true);
+            {
+                Criteria = criteria
+            }, true);
         }
 
-        protected override async void SaveCriteria()
+        protected override async Task SaveCriteria()
         {
             try
             {
@@ -78,19 +80,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
         }
 
-        protected override async void RestoreCriteria()
+        protected override async Task RestoreCriteria()
         {
             try
             {
                 criteria = await Managers.SearchManager.GetLastSearchDocumentsCriteriaAsync();
-
-                foreach (var view in StackView.Subviews.OfType<AbstractDocumentsSearchView>())
-                    view.SetCriteria(criteria);
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
             }
+        }
+
+        protected override void RefreshView()
+        {
+            foreach (var view in StackView.Subviews.OfType<AbstractDocumentsSearchView>())
+                view.SetCriteria(criteria);
         }
 
         abstract class AbstractDocumentsSearchView : AbstractSearchView
@@ -897,7 +902,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                     var selectedDate = fromDatePicker.Date;
                     var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
-                    var fromDate = new DateTime((int) selectedDateComponents.Year, (int) selectedDateComponents.Month, (int) selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
+                    var fromDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
                     dateRange.StartTimestamp = fromDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
@@ -916,7 +921,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                     var selectedDate = toDatePicker.Date;
                     var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
-                    var toDate = new DateTime((int) selectedDateComponents.Year, (int) selectedDateComponents.Month, (int) selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Utc);
+                    var toDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Utc);
 
                     dateRange.Enabled = true;
                     dateRange.EndTimestamp = toDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
@@ -1709,5 +1714,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 UpdateRow();
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(Serializer.SerializeToByteArray(criteria), "criteria");
+            coder.Encode(RestoreCriteriaFromStorage, "restoreCriteriaFromStorage");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            criteria = Serializer.DeserializeFromByteArray<SearchDocumentsCriteria>(coder.DecodeBytes("criteria"));
+            RestoreCriteriaFromStorage = coder.DecodeBool("restoreCriteriaFromStorage");
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new DocumentsSearchCriteriaViewController();
+        }
+
+        #endregion
+
     }
 }
