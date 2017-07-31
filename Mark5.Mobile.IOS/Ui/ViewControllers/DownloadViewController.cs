@@ -176,8 +176,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             upView.AddSubview(imageView);
             upView.AddConstraints(new[] {
-                imageView.WidthAnchor.ConstraintEqualTo(125f),
-                imageView.HeightAnchor.ConstraintEqualTo(125f),
+                imageView.WidthAnchor.ConstraintEqualTo(120f),
+                imageView.HeightAnchor.ConstraintEqualTo(120f),
                 imageView.CenterXAnchor.ConstraintEqualTo(upView.CenterXAnchor),
                 imageView.CenterYAnchor.ConstraintEqualTo(upView.CenterYAnchor)
             });
@@ -407,8 +407,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             upView.AddSubview(imageView);
             upView.AddConstraints(new[] {
-                imageView.WidthAnchor.ConstraintEqualTo(125f),
-                imageView.HeightAnchor.ConstraintEqualTo(125f),
+                imageView.WidthAnchor.ConstraintEqualTo(120f),
+                imageView.HeightAnchor.ConstraintEqualTo(120f),
                 imageView.CenterXAnchor.ConstraintEqualTo(upView.CenterXAnchor),
                 imageView.CenterYAnchor.ConstraintEqualTo(upView.CenterYAnchor)
             });
