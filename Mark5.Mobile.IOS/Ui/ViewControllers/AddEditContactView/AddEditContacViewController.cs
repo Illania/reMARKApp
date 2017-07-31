@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
@@ -160,6 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
         void DataSource_ViewIsActivated(object sender, EventArgs e)
         {
             activeField = (UIView)sender;
+            CommonConfig.Logger.Debug("Activated!!");
         }
 
         void CancelButton_Clicked(object sender, EventArgs e)
@@ -208,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
             public AddEditContacViewController ViewController;
             public UITableView TableView;
@@ -230,10 +232,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 if (cell == null)
                 {
                     cell = row.CreateCell();
-                    var gr = new UITapGestureRecognizer((obj) => ViewIsActivated(cell, EventArgs.Empty))
+                    var gr = new UITapGestureRecognizer
                     {
                         CancelsTouchesInView = false,
+                        WeakDelegate = this,
                     };
+
                     cell.AddGestureRecognizer(gr);
                 }
                 row.BindCell(cell);
@@ -320,6 +324,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             AbstractRow RowAtIndexPath(NSIndexPath indexPath)
             {
                 return sections[indexPath.Section].Rows[indexPath.Row];
+            }
+
+            [Export("gestureRecognizer:shouldReceiveTouch:")]
+            public bool ShouldReceiveTouch(UIGestureRecognizer recognizer, UITouch touch)
+            {
+                return true;
+            }
+
+            [Export("gestureRecognizerShouldBegin:")]
+            public bool ShouldBegin(UIGestureRecognizer recognizer)
+            {
+                ViewIsActivated(recognizer.View, EventArgs.Empty);
+                return true;
             }
 
             #region Support classes
@@ -533,7 +550,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public abstract string Key { get; }
 
-                public abstract UITableViewCell CreateCell();
+                public abstract AddEditContactTableViewCell CreateCell();
 
                 public void BindCell(UITableViewCell cell)
                 {
@@ -560,7 +577,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override string Key => TextFieldTableViewCell.Key;
 
-                public override UITableViewCell CreateCell() => new TextFieldTableViewCell();
+                public override AddEditContactTableViewCell CreateCell() => new TextFieldTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -584,7 +601,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override string Key => TitledTextFieldTableViewCell.Key;
 
-                public override UITableViewCell CreateCell() => new TitledTextFieldTableViewCell();
+                public override AddEditContactTableViewCell CreateCell() => new TitledTextFieldTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -601,7 +618,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 public override string Key => DisclosureIndicatorTableViewCell.Key;
 
-                public override UITableViewCell CreateCell() => new DisclosureIndicatorTableViewCell();
+                public override AddEditContactTableViewCell CreateCell() => new DisclosureIndicatorTableViewCell();
 
                 protected override void Initialize() { }
             }
@@ -619,7 +636,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override string Key => MultiRowHeaderTableViewCell.Key;
 
-                public override UITableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
+                public override AddEditContactTableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
 
                 public override void RefreshRow() { }
 
@@ -725,7 +742,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override string Key => PhysicalAddressTableViewCell.Key;
 
-                public override UITableViewCell CreateCell() => new PhysicalAddressTableViewCell();
+                public override AddEditContactTableViewCell CreateCell() => new PhysicalAddressTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -767,7 +784,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override string Key => EmailAddressTableViewCell.Key;
 
-                public override UITableViewCell CreateCell() => new EmailAddressTableViewCell();
+                public override AddEditContactTableViewCell CreateCell() => new EmailAddressTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -833,7 +850,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override string Key => PhoneNumberTableViewCell.Key;
 
-                public override UITableViewCell CreateCell() => new PhoneNumberTableViewCell();
+                public override AddEditContactTableViewCell CreateCell() => new PhoneNumberTableViewCell();
 
                 protected override void Initialize()
                 {
