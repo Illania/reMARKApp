@@ -276,6 +276,7 @@
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextFieldTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

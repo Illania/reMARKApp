@@ -8,6 +8,7 @@
 "add_fax" = "add fax";
 "add_physical_address" = "add address";
 "add_to_favorites" = "Add to\nfavorites";
+"add_birthdate" = "add birthdate";
 "adding_comment___" = "Adding comment...";
 "address" = "Address";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";

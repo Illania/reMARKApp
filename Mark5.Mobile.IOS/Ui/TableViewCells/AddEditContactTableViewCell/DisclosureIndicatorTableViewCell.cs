@@ -9,8 +9,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
     {
         public static readonly NSString Key = new NSString("DisclosureIndicatorTableViewCell");
 
-        UILabel TitleLabel { get; set; }
-        UILabel ContentLabel { get; set; }
+        protected UILabel TitleLabel { get; set; }
+        protected UILabel ContentLabel { get; set; }
 
         public DisclosureIndicatorTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
