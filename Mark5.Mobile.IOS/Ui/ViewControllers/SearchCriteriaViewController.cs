@@ -87,26 +87,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationItem.SetRightBarButtonItem(null, false);
             vc.DidMoveToParentViewController(this);
             currentViewController = vc;
-
-            AdjustScrollViewInsets();
         }
 
-        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        public override void ViewDidAppear(bool animated)
         {
-            base.ViewWillTransitionToSize(toSize, coordinator);
-
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx => AdjustScrollViewInsets());
+            base.ViewDidAppear(animated);
         }
 
-        void AdjustScrollViewInsets()
+        public override void ViewDidLayoutSubviews()
         {
+            base.ViewDidLayoutSubviews();
+
+            if (ParentViewController == null || NavigationController == null)
+                return;
+
             var scrollView = currentViewController?.View?.Subviews[0] as UIScrollView;
             if (scrollView == null)
                 return;
 
             scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
             scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            scrollView.LayoutIfNeeded();
         }
 
         [Export("segmentedControlHasChangedValue:")]
@@ -133,7 +133,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             vc.DidMoveToParentViewController(this);
             currentViewController.DidMoveToParentViewController(null);
             currentViewController = vc;
-            AdjustScrollViewInsets();
         }
 
         static string GetTitleForModule(ModuleType moduleType)
