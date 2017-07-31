@@ -277,6 +277,7 @@
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextFieldTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
+		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

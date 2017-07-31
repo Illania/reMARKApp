@@ -129,6 +129,7 @@
 "favorites" = "Favorites";
 "fax" = "Fax";
 "filter" = "Filter";
+"first_name" = "First name";
 "folder_empty" = "Folder is empty";
 "folders" = "Folders";
 "forward" = "Forward";
@@ -139,6 +140,7 @@
 "incorrect_email_addresses" = "There are email addresses who do not appear to be correct. Do you want to send anyway?";
 "internal" = "Internal";
 "internet_access" = "Internet access: ";
+"last_name" = "Last name";
 "ledger" = "Ledger";
 "line" = "Mailbox";
 "links" = "Links";
@@ -163,6 +165,7 @@
 "marking_document_as_read___" = "Marking email as read...";
 "marking_document_as_unread___" = "Marking email as unread...";
 "me" = "Me";
+"middle_name" = "Middle name";
 "mobile" = "Mobile";
 "more" = "More";
 "move_to_folder" = "Move to folder";
@@ -219,6 +222,7 @@
 "please_restart" = "Please restart MARK5 app";
 "please_wait___" = "Please wait...";
 "port" = "Port";
+"position" = "Position";
 "prefix" = "Prefix";
 "primary_person" = "Primary person";
 "priority" = "Priority";
@@ -290,6 +294,7 @@
 "search_unread" = "Unread emails";
 "search_where" = "Where: ";
 "search_with_attachments" = "With attachments";
+"select_users" = "Select users";
 "select_priority" = "Select priority";
 "send" = "Send";
 "send_text" = "Send message";
@@ -330,6 +335,7 @@
 "warning" = "Warning";
 "warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between MARK5 server and your device.";
 "warning_ssl_off" = "SSL is disabled. Please be aware that all the communication between your device and MARK5 server will not be secure.";
+"webpage" = "Webpage";
 "wrong_hostname_summary" = "You need to provide valid hostname.";
 "wrong_hostname_title" = "Wrong hostname";
 "wrong_password_summary" = "You need to provide valid password.";

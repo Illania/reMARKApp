@@ -5,7 +5,6 @@ using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
 using Mark5.Mobile.IOS.Utilities;
@@ -92,6 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             var dataSource = new DataSource(this, tableView);
             dataSource.ViewIsActivated += DataSource_ViewIsActivated;
+            dataSource.ResponsibleUserRowClicked += DataSource_ResponsibleUserRowClicked;
             tableView.Source = dataSource;
             tableView.TableFooterView = new UIView();
             tableView.EstimatedRowHeight = 60f;
@@ -165,6 +165,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             CommonConfig.Logger.Debug("Activated!!");
         }
 
+        void DataSource_ResponsibleUserRowClicked(object sender,
+                                                  DataSource.ResponsibleUsersRow e)
+        {
+
+        }
+
         void CancelButton_Clicked(object sender, EventArgs e)
         {
             DismissViewController(true, null);
@@ -213,6 +219,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             }
         }
 
+        public void Test()
+        {
+
+        }
+
         #endregion
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
@@ -221,6 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             public UITableView TableView;
 
             public event EventHandler ViewIsActivated = delegate { };
+            public event EventHandler<ResponsibleUsersRow> ResponsibleUserRowClicked = delegate { };
 
             SectionCollection sections = new SectionCollection();
 
@@ -729,6 +741,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             #endregion
 
+            class FirstNameRow : TextFieldRow
+            {
+                public FirstNameRow()
+                    : base(Localization.GetString("first_name"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.FirstName = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.FirstName);
+            }
+
+            class MiddleNameRow : TextFieldRow
+            {
+                public MiddleNameRow()
+                    : base(Localization.GetString("middle_name"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.Patronymic = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Patronymic);
+            }
+
+            class LastNameRow : TextFieldRow
+            {
+                public LastNameRow()
+                    : base(Localization.GetString("last_name"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.FirstName = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.FirstName);
+            }
+
+            //To be used with Deparment and Company
             class NameRow : TextFieldRow
             {
                 public NameRow()
@@ -751,6 +800,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 }
             }
 
+            public class ResponsibleUsersRow : DisclosureIndicatorRow
+            {
+                public override void RefreshRow()
+                {
+                    var cell = (DisclosureIndicatorTableViewCell)Cell;
+                    cell.SetTitle(Localization.GetString("responsible_users")); //TODO change
+                    if (Contact?.ResponsibleUsers?.Count > 0)
+                    {
+                        cell.SetContent(string.Join(", ", Contact?.ResponsibleUsers.Values));
+                    }
+                }
+
+                public override void OnClicked(NSIndexPath indexPath)
+                {
+                    var vc = new ResponsibleUsersSelectionController();
+
+                }
+            }
+
             class DescriptionRow : TitledTextView
             {
                 public DescriptionRow()
@@ -767,6 +835,66 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 {
                     ContactPreview.Description = e;
                 }
+            }
+
+            class AccountRow : TitledTextView
+            {
+                public AccountRow()
+                    : base(Localization.GetString("account"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.Account = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Account);
+            }
+
+            class LedgerRow : TitledTextView
+            {
+                public LedgerRow()
+                    : base(Localization.GetString("ledger"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.Ledger = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Ledger);
+            }
+
+            class PositionRow : TitledTextView
+            {
+                public PositionRow()
+                    : base(Localization.GetString("position"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.Position = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Position);
+            }
+
+            class ShortIdRow : TitledTextView
+            {
+                public ShortIdRow()
+                    : base(Localization.GetString("short_id"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => ContactPreview.ShortId = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.ShortId);
+            }
+
+            class WebpageRow : TitledTextView
+            {
+                public WebpageRow()
+                    : base(Localization.GetString("webpage"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.WebPageAddress = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.WebPageAddress);
             }
 
             class BirthdateHeaderRow : MultiHeaderRow
