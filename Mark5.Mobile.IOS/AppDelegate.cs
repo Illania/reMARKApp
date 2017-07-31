@@ -138,7 +138,11 @@ namespace Mark5.Mobile.IOS
             if (UIDevice.CurrentDevice.UserInterfaceIdiom != userInterfaceIdiom)
                 return false;
 
+#if DEBUG
+            return false;
+#else
             return true;
+#endif
         }
 
         public override UIViewController GetViewController(UIApplication application, string[] restorationIdentifierComponents, NSCoder coder)
@@ -147,7 +151,7 @@ namespace Mark5.Mobile.IOS
 
             if (lastComponent == nameof(SimpleMainViewController))
                 return Window.RootViewController;
- 
+
             if (lastComponent == nameof(SplitMainViewController))
                 return Window.RootViewController;
 
