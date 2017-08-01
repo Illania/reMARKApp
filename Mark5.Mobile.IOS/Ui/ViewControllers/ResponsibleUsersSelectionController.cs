@@ -15,14 +15,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ResponsibleUsersSelectionController : AbstractViewController
     {
-        public List<IBusinessEntity> BusinessEntities { get; set; }
+        public List<int> PreselectedSystemUsersId { get; set; }
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
         UITableView tableView;
 
-        TaskCompletionSource<List<SystemUser>> ResultTask;
+        public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
+
+        public Task<List<SystemUser>> Task => tcs.Task;
 
         public override void LoadView()
         {
@@ -45,8 +47,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBarTitle();
             InitializeHandlers();
-
-            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length);
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(CopyToWorktrayViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(ResponsibleUsersSelectionController)} appeared");
 
             var ds = (DataSource)tableView.Source;
             if (ds.Empty)
@@ -71,7 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(CopyToWorktrayViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(ResponsibleUsersSelectionController)} received memory warning!");
 
             var ds = tableView?.Source as DataSource;
             ds?.Reset();
@@ -86,7 +86,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.SetLeftBarButtonItem(cancelItem, false);
 
             doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            doneItem.Enabled = false;
             NavigationItem.SetRightBarButtonItem(doneItem, false);
         }
 
@@ -135,7 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            ResultTask.SetResult(null);
+            tcs.SetResult(null);
 
             NavigationController.DismissViewController(true, null);
         }
@@ -146,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var selectedUsers = ds.SelectedItems;
 
-            ResultTask.SetResult(selectedUsers);
+            tcs.SetResult(selectedUsers);
 
             NavigationController.DismissViewController(true, null);
         }
@@ -158,8 +157,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
                 var ds = (DataSource)tableView.Source;
-                ds.SetItems(usersDepartments.Users);
+                ds.SetItems(usersDepartments.Users, PreselectedSystemUsersId);
             }
             catch (Exception ex)
             {
@@ -173,17 +173,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             public bool Empty => systemUsersInView.Count < 1;
 
-            public List<SystemUser> SelectedItems
-            {
-                get
-                {
-                    if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
-                        return new List<SystemUser>();
-
-                    var rows = tableView.IndexPathsForSelectedRows.Where(indexPath => indexPath.Section != 0).ToArray();
-                    return rows.Select(ip => systemUsersInView[ip.Row]).ToList();
-                }
-            }
+            public List<SystemUser> SelectedItems { get; set; } = new List<SystemUser>();
 
             ResponsibleUsersSelectionController viewController;
             UITableView tableView;
@@ -216,11 +206,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
                 cell.DetailTextLabel.Text = su.Username;
+                cell.Accessory = SelectedItems.Contains(su) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
                 cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
-                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-
                 return cell;
+            }
+
+            public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+            {
+                if (SelectedItems.Contains(systemUsersInView.ElementAtOrDefault(indexPath.Row)))
+                    tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
+                else
+                    tableView.DeselectRow(indexPath, false);
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -248,20 +245,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var cell = tableView.CellAt(indexPath);
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
+                SelectedItems.Add(systemUsersInView[indexPath.Row]);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
                 cell.Accessory = UITableViewCellAccessory.None;
+                SelectedItems.Remove(systemUsersInView[indexPath.Row]);
             }
 
-            public void SetItems(List<SystemUser> systemUsers)
+            public void SetItems(List<SystemUser> systemUsers, List<int> preselectedSystemUsersId)
             {
                 loading = false;
 
                 systemUsersInView.Clear();
-                systemUsersInView.AddRange(systemUsers);
+                systemUsersInView.AddRange(systemUsers.OrderBy(s => s.Username));
+
+                SelectedItems.AddRange(systemUsersInView.Where(s => preselectedSystemUsersId.Contains(s.Id)));
 
                 tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
