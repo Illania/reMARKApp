@@ -56,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             var topBottomDistance = floatingHint ? 0 : DistanceSmall;
             var leftDistance = DistanceLarge;
-            var rightDistance = DistanceLarge + ConversionUtils.ConvertDpToPixels(24) + DistanceSmall;
+            var rightDistance = DistanceLarge + Conversion.ConvertDpToPixels(24) + DistanceSmall;
 
             SetPadding(leftDistance, topBottomDistance, rightDistance, topBottomDistance);
         }

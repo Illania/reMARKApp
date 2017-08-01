@@ -119,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             button.SetImageResource(addButton ? Resource.Drawable.add : Resource.Drawable.remove);
             button.SetColorFilter(addButton ? new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)) : Color.Red);
 
-            var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
+            var addButtonLp = new LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
             {
                 TopMargin = addButton ? 0 : DistanceSmall,
                 LeftMargin = DistanceNormal,

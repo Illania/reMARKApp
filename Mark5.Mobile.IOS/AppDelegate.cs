@@ -11,13 +11,13 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
-using Mark5.Mobile.IOS.Services;
+using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.IOS
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
 #else
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus =
-PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BITCrashManagerStatus.Disabled;
+                PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BITCrashManagerStatus.Disabled;
 #endif
                 BITHockeyManager.SharedHockeyManager.StartManager();
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
@@ -69,7 +69,6 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                     vc = new SimpleMainViewController();
 
                 Window.RootViewController = vc;
-                Window.MakeKeyAndVisible();
 
                 UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
                 UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
@@ -83,26 +82,26 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
                 CommonConfig.Logger?.Error(ex);
             }
 
-            return false; // Always return false to pass handling of notifications
-            // to FinishedLaunching
+            return false; // Always return false to pass handling of notifications to FinishedLaunching
         }
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            Window.MakeKeyAndVisible();
+
             if (launchOptions == null)
                 return true;
 
             try
             {
-                var userInfo = (NSDictionary) launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
+                var userInfo = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
                 if (userInfo != null)
                 {
                     var n = userInfo.ConvertToNotification();
 
-                    if (n.ObjectType == ObjectType.Document)
+                    if (n != null && n.ObjectType == ObjectType.Document)
                     {
-                        var vc = new DocumentViewController();
-                        vc.Modal = true;
+                        var vc = new DocumentViewController { Modal = true };
                         vc.SetRefreshDataOnAppear();
                         vc.SetData(n.ObjectId);
 
@@ -116,6 +115,69 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
             }
 
             return true;
+        }
+
+        public override bool ShouldSaveApplicationState(UIApplication application, NSCoder coder) => true;
+
+        public override bool ShouldRestoreApplicationState(UIApplication application, NSCoder coder)
+        {
+            var stateCreationDate = (NSDate)coder.DecodeObject(UIApplication.StateRestorationTimestampKey);
+            var yesterday = NSDate.Now.AddSeconds(-1 * 24 * 60 * 60);
+            if (stateCreationDate.Compare(yesterday) == NSComparisonResult.Ascending)
+                return false;
+
+            var bundleVersion = coder.DecodeObject(UIApplication.StateRestorationBundleVersionKey);
+            if (NSBundle.MainBundle.InfoDictionary["CFBundleVersion"] != bundleVersion)
+                return false;
+
+            var systemVersion = ((NSString)coder.DecodeObject(UIApplication.StateRestorationSystemVersionKey)).ToString();
+            if (UIDevice.CurrentDevice.SystemVersion != systemVersion)
+                return false;
+
+            var userInterfaceIdiom = (UIUserInterfaceIdiom)((NSNumber)coder.DecodeObject(UIApplication.StateRestorationUserInterfaceIdiomKey)).Int32Value;
+            if (UIDevice.CurrentDevice.UserInterfaceIdiom != userInterfaceIdiom)
+                return false;
+
+#if DEBUG
+            return false;
+#else
+            return true;
+#endif
+        }
+
+        public override UIViewController GetViewController(UIApplication application, string[] restorationIdentifierComponents, NSCoder coder)
+        {
+            var lastComponent = restorationIdentifierComponents.LastOrDefault();
+
+            if (lastComponent == nameof(SimpleMainViewController))
+                return Window.RootViewController;
+
+            if (lastComponent == nameof(SplitMainViewController))
+                return Window.RootViewController;
+
+            if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))
+                return new NavigationController
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.FullScreen,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
+                    RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
+                };
+
+            return null;
+        }
+
+        public override void OnActivated(UIApplication application)
+        {
+            Services.DocumentsUploadService?.Start();
+            Services.DocumentPreviewsDownloadService?.Start();
+            Services.DocumentsDownloadService?.Start();
+        }
+
+        public override void DidEnterBackground(UIApplication application)
+        {
+            Services.DocumentsUploadService?.Stop();
+            Services.DocumentPreviewsDownloadService?.Stop();
+            Services.DocumentsDownloadService?.Stop();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -154,12 +216,18 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
         {
             try
             {
+                if (notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                {
+                    options(UNNotificationPresentationOptions.Alert);
+                    return;
+                }
+
                 var n = notification.ConvertToNotification();
 
                 if (n.ObjectType == ObjectType.Document)
                 {
-                    if (notification.Request.Identifier != LocalNotificationsListener.FailedSendingIdentifier)
-                        PlatformConfig.MessengerHub.PublishAsync(new NewNotificationsMessage(this));
+                    if (notification.Request.Identifier != LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                        CommonConfig.MessengerHub.Publish(new NewNotificationsMessage(this));
 
                     options(UNNotificationPresentationOptions.Alert);
                 }
@@ -181,12 +249,17 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
         {
             try
             {
+                if (response?.Notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                {
+                    completionHandler();
+                    return;
+                }
+
                 var n = response.Notification.ConvertToNotification();
 
                 if (n.ObjectType == ObjectType.Document)
                 {
-                    var vc = new DocumentViewController();
-                    vc.Modal = true;
+                    var vc = new DocumentViewController { Modal = true };
                     vc.SetRefreshDataOnAppear();
                     vc.SetData(n.ObjectId);
 
@@ -206,164 +279,156 @@ PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BI
         void InitializeCommon()
         {
             Task.Run(async () =>
-                {
-                    var mainFolder = FileSystem.Current.LocalStorage;
+            {
+                var mainFolder = FileSystem.Current.LocalStorage;
 
-                    var preferences = new Preferences();
+                var preferences = new Preferences();
 
-                    if (preferences.ResetOnLaunch)
-                        Integration.ClearData();
+                if (preferences.ResetOnLaunch)
+                    Integration.ClearData();
 
-                    CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
-                    CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.OutgoingFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "out"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.Logger = new ConsoleAndFileLogger();
-                    CommonConfig.ReachabilityService = new ReachabilityService();
-                    CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
-                    CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
-                    CommonConfig.HttpClientHandler = () => { return new NativeMessageHandler(); };
-                    CommonConfig.PhonebookUtilities = new PhonebookUtilities();
+                CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
+                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.Logger = new ConsoleAndFileLogger();
+                CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
+                CommonConfig.HttpClientHandler = () => new NativeMessageHandler();
+                CommonConfig.OnStartTransmission = ActivityIndicator.Show;
+                CommonConfig.OnStopTransmission = ActivityIndicator.Hide;
+                CommonConfig.MessengerHub = new TinyMessengerHub();
+                CommonConfig.Phonebook = new Phonebook();
+                CommonConfig.Reachability = new Reachability();
+                CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
 
-                    if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
-                        CommonConfig.Utf8Normalizer = filename =>
-                        {
-                            var url = NSUrl.FromFilename(filename);
-                            var fsPtr = url.GetFileSystemRepresentationAsUtf8Ptr;
-                            var numBytes = 0;
-                            while (Marshal.ReadByte(fsPtr, numBytes) != 0)
-                                numBytes++;
+                if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
+                    CommonConfig.Utf8Normalizer = filename =>
+                    {
+                        var url = NSUrl.FromFilename(filename);
+                        var fsPtr = url.GetFileSystemRepresentationAsUtf8Ptr;
+                        var numBytes = 0;
+                        while (Marshal.ReadByte(fsPtr, numBytes) != 0)
+                            numBytes++;
 
-                            var utf8Bytes = new byte[numBytes];
-                            Marshal.Copy(fsPtr, utf8Bytes, 0, numBytes);
-                            return Encoding.UTF8.GetString(utf8Bytes).SafeSubstringAfterLast(Path.DirectorySeparatorChar);
-                        };
-                    else
-                        CommonConfig.Utf8Normalizer = filename => filename;
+                        var utf8Bytes = new byte[numBytes];
+                        Marshal.Copy(fsPtr, utf8Bytes, 0, numBytes);
+                        return Encoding.UTF8.GetString(utf8Bytes).SafeSubstringAfterLast(Path.DirectorySeparatorChar);
+                    };
+                else
+                    CommonConfig.Utf8Normalizer = filename => filename;
 
 #if !DEBUG
                 CommonConfig.Logger.Level = LogLevel.INFO;
 #else
-                    CommonConfig.Logger.Level = LogLevel.DEBUG;
+                CommonConfig.Logger.Level = LogLevel.DEBUG;
 #endif
 
-                    Dialogs.Initialize();
+                Dialogs.Initialize();
 
-                    ((ConsoleAndFileLogger) CommonConfig.Logger).CleanUpOldLogFiles();
-                    await DatabaseUtils.InitializeDatabases();
+                ((ConsoleAndFileLogger)CommonConfig.Logger).CleanUpOldLogFiles();
+                await DatabaseUtils.InitializeDatabases();
 
-                    PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
-                    PlatformConfig.Preferences = preferences;
-                    PlatformConfig.ReachabilityReceiver = new ReachabilityReceiver();
-                    PlatformConfig.MessengerHub = new TinyMessengerHub();
+                PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
+                PlatformConfig.Preferences = preferences;
+                PlatformConfig.ReachabilityReceiver = new ReachabilityReceiver();
 
-                    UNUserNotificationCenter.Current.Delegate = this;
-                })
-                .Wait();
+                UNUserNotificationCenter.Current.Delegate = this;
+            })
+            .Wait();
         }
 
         bool InitializePlatform(UIApplication application)
         {
             return Task.Run(async () =>
+            {
+                var authenticator = AuthenticatorFactory.Create();
+                if (!await authenticator.IsAuthenticatedAsync())
                 {
-                    var authenticator = AuthenticatorFactory.Create();
-                    if (!await authenticator.IsAuthenticatedAsync())
-                    {
-                        CommonConfig.Logger.Info($"Writing required file system storage version...");
-                        await FileSystemStorageUpdater.WriteRequiredStorageVersion();
-                        CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginViewController)}");
+                    CommonConfig.Logger.Info($"Writing required file system storage version...");
+                    await FileSystemStorageUpdater.WriteRequiredStorageVersion();
+                    CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginViewController)}");
 
-                        return false;
-                    }
+                    return false;
+                }
 
-                    CommonConfig.Logger.Info("Updating file system storage...");
-                    var updated = await FileSystemStorageUpdater.UpdateStorage();
-                    CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
+                CommonConfig.Logger.Info("Updating file system storage...");
+                var updated = await FileSystemStorageUpdater.UpdateStorage();
+                CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
 
-                    CommonConfig.Logger.Info($"User is authenticated - initializing...");
-                    var ci = await authenticator.GetConnectionInfoAsync();
-                    CommonConfig.Logger.Info($"Current connection info: {ci}");
+                CommonConfig.Logger.Info($"User is authenticated - initializing...");
+                var ci = await authenticator.GetConnectionInfoAsync();
+                CommonConfig.Logger.Info($"Current connection info: {ci}");
 
-                    switch (ci.SslMode)
-                    {
-                        case SslMode.AllowSelfSigned:
-                            PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                            break;
-                        default:
-                            PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                            break;
-                    }
+                switch (ci.SslMode)
+                {
+                    case SslMode.AllowSelfSigned:
+                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                        break;
+                    default:
+                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                        break;
+                }
 
-                    CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
-                    Managers.Initialize(ci);
-                    Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                    Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    var policies = Managers.DownloadManager.DownloadPolicies;
-                    policies[ObjectType.Document] = new DownloadFoldersPolicy();
-                    if (PlatformConfig.Preferences.SynchroniseContacts)
-                        policies[ObjectType.Contact] = new DownloadAllPolicy();
-                    if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                        policies[ObjectType.Shortcode] = new DownloadAllPolicy();
+                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+                Managers.Initialize(ci);
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                    if (PlatformConfig.Preferences.ClearCache)
-                    {
-                        CommonConfig.Logger.Info("Clearing cache...");
-                        await DatabaseUtils.ResetDatabases();
-                        PlatformConfig.Preferences.ClearCache = false;
-                        CommonConfig.Logger.Info("Cleared cache");
-                    }
+                if (PlatformConfig.Preferences.ClearCache)
+                {
+                    CommonConfig.Logger.Info("Clearing cache...");
+                    await DatabaseUtils.ResetDatabases();
+                    PlatformConfig.Preferences.ClearCache = false;
+                    CommonConfig.Logger.Info("Cleared cache");
+                }
 
-                    if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
-                    {
-                        CommonConfig.Logger.Info("Cleaning up cache....");
-                        await Managers.CleanUpManager.CleanUp();
-                        CommonConfig.Logger.Info("Cleaned up cache");
-                    }
+                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
+                {
+                    CommonConfig.Logger.Info("Cleaning up cache....");
+                    await Managers.CleanUpManager.CleanUp();
+                    CommonConfig.Logger.Info("Cleaned up cache");
+                }
 
-                    CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
-                    await Managers.DownloadManager.Start();
-                    await Managers.OutgoingDocumentsManager.Start();
+                CommonConfig.Logger.Info($"Refreshing reachability status...");
+                await CommonConfig.Reachability.Refresh();
 
-                    CommonConfig.Logger.Info($"Refreshing reachability status...");
-                    await CommonConfig.ReachabilityService.Refresh();
+                LocalNotificationsListener.Initialize();
 
-                    LocalNotificationsListener.Initialize();
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
+                PlatformConfig.ReachabilityReceiver.Register();
 
-                    CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
-                    PlatformConfig.ReachabilityReceiver.Register();
+                CommonConfig.Logger.Info("Retrieving system settings...");
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                    CommonConfig.Logger.Info("Retrieving system settings...");
-                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
 
-                    Utilities.DateTimeUtils.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
+                BeginInvokeOnMainThread(() =>
+                {
+                    CommonConfig.Logger.Info("Refreshing APNS token...");
 
-                    BeginInvokeOnMainThread(() =>
-                    {
-                        CommonConfig.Logger.Info("Refreshing APNS token...");
-
-                        UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-                            (result, error) =>
+                    UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
+                        (result, error) =>
+                        {
+                            if (result)
                             {
-                                if (result)
-                                {
-                                    BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
-                                }
-                                else
-                                {
-                                    if (error != null)
-                                        CommonConfig.Logger.Error(new NSErrorException(error));
-                                }
-                            });
-                    });
+                                BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
+                            }
+                            else
+                            {
+                                if (error != null)
+                                    CommonConfig.Logger.Error(new NSErrorException(error));
+                            }
+                        });
+                });
 
-                    CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
 
-                    return true;
-                })
-                .Result;
+                return true;
+            }).Result;
         }
     }
 }

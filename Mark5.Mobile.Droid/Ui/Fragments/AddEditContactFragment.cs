@@ -10,7 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -241,7 +241,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (requestCode == RequestCodes.ParentContactRequestCode && resultCode == (int)Android.App.Result.Ok)
             {
-                ParentContactPreview = SerializationUtils.Deserialize<ContactPreview>(data.GetStringExtra(ParentContactSelectorFoldersListActivity.ParentContactResultKey));
+                ParentContactPreview = Serializer.Deserialize<ContactPreview>(data.GetStringExtra(ParentContactSelectorFoldersListActivity.ParentContactResultKey));
                 RefreshView();
             }
         }
@@ -317,8 +317,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            var titleResource = CreationModeFlag == ContactCreationModeFlag.Edit ? Resource.String.edit_contact_edit_loading :
-                                                                           Resource.String.edit_contact_add_loading;
+            var titleResource = CreationModeFlag == ContactCreationModeFlag.Edit ? Resource.String.edit_contact_edit_loading : Resource.String.edit_contact_add_loading;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
 
             try
@@ -330,7 +329,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
 
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                    PlatformConfig.MessengerHub.Publish(new ContactPreviewChanged(this, ContactPreview));
+                    CommonConfig.MessengerHub.Publish(new ContactPreviewChanged(this, ContactPreview));
 
                 CloseRequest?.Invoke();
             }

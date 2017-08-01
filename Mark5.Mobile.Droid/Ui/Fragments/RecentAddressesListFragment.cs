@@ -10,7 +10,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -95,9 +95,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, RecentAddress ra)
         {
             var intent = new Intent();
-            intent.PutExtra(RecentAddressesListActivity.RecipientResultKey, SerializationUtils.Serialize(new Recipient(ra)));
+            intent.PutExtra(RecentAddressesListActivity.RecipientResultKey, Serializer.Serialize(new Recipient(ra)));
             Activity.SetResult(Result.Ok, intent);
-            Activity.Finish();
+            Activity?.Finish();
         }
 
         #region Retainable State

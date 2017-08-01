@@ -60,9 +60,6 @@
 	<string name="pref_contacts_sub_comm_other_title">Communication: Other</string>
 	<string name="pref_contacts_sub_comm_telex_title">Communication: Telex numbers</string>
 	<string name="pref_contacts_sub_vat_title">VAT number</string>
-	<string name="pref_contacts_synchronised_summary_off">Contacts will not be downloaded automatically</string>
-	<string name="pref_contacts_synchronised_summary_on">Whenever folder is opened all contacts will be downloaded automatically and available offline</string>
-	<string name="pref_contacts_synchronised_title">Synchronise contacts</string>
 	<string name="pref_contacts_view_options_summary">Turn on or off visibility of contact fields</string>
 	<string name="pref_contacts_view_options_title">Contact view options</string>
 	<string name="pref_documents_compact_list_summary_off">Preview of the email will be shown on the list</string>
@@ -125,7 +122,6 @@
 	<string name="pref_key_contacts_sub_comm_other">pref_key_contacts_sub_comm_other</string>
 	<string name="pref_key_contacts_sub_comm_telex">pref_key_contacts_sub_comm_telex</string>
 	<string name="pref_key_contacts_sub_vat">pref_key_contacts_sub_vat</string>
-	<string name="pref_key_contacts_synchronised">pref_key_contacts_synchronised</string>
 	<string name="pref_key_contacts_view_options">pref_key_contacts_view_options</string>
 	<string name="pref_key_documents_compact_list">pref_key_documents_compact_list</string>
 	<string name="pref_key_documents_download_as_plaintext">pref_key_documents_download_as_plaintext</string>
@@ -139,7 +135,6 @@
 	<string name="pref_key_notification_ringtone">pref_key_notification_ringtone</string>
 	<string name="pref_key_notification_silence">pref_key_notification_silence</string>
 	<string name="pref_key_notification_vibrate">pref_key_notification_vibrate</string>
-	<string name="pref_key_shortcodes_synchronised">pref_key_shortcodes_synchronised</string>
 	<string name="pref_key_search_documents_to_get">pref_key_search_documents_to_get</string>
 	<string name="pref_key_search_contacts_to_get">pref_key_search_contacts_to_get</string>
 	<string name="pref_key_search_shortcodes_to_get">pref_key_search_shortcodes_to_get</string>
@@ -152,9 +147,6 @@
 	<string name="pref_notification_silence_summary_on">Notifications will be visible only in MARK5 app</string>
 	<string name="pref_notification_silence_title">Silence notifications</string>
 	<string name="pref_notification_vibrate_title">Vibration</string>
-	<string name="pref_shortcodes_synchronised_summary_off">Shortcodes will no be downloaded automatically</string>
-	<string name="pref_shortcodes_synchronised_summary_on">Whenever folder is opened all shortcodes will be downloaded automatically and available offline</string>
-	<string name="pref_shortcodes_synchronised_title">Synchronise shortcodes</string>
 	<string name="pref_search_documents_to_get_title">Emails search results</string>
 	<string name="pref_search_documents_to_get_summary">Max %s emails will appear in the search results</string>
 	<string name="pref_search_contacts_to_get_title">Contacts search results</string>

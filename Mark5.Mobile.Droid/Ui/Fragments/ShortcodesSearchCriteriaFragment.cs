@@ -13,7 +13,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -48,8 +48,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.Focusable = true;
             containerLinearLayout.FocusableInTouchMode = true;
 
-            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(12);
-            var bottomPadding = ConversionUtils.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
+            var paddingLinearLayout = Conversion.ConvertDpToPixels(12);
+            var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
             containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
 
             fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
@@ -193,8 +193,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             GetCriteria();
 
             var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, SerializationUtils.Serialize(GetCriteria()));
+            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
+            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
             StartActivity(i);
         }
 
@@ -204,7 +204,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
 
-            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(searchCriteria)}]");
+            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
 
             return searchCriteria;
         }

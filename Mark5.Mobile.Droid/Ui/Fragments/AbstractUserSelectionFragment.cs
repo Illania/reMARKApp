@@ -11,7 +11,7 @@ using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -137,13 +137,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
                 if (includeCurrentUser)
-                {
                     Adapter.SetItems(userDepartments.Users.OrderBy(su => su.Username).ToList());
-                }
                 else
-                {
                     Adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
-                }
 
                 if (PreselectedUserIds != null && PreselectedUserIds.Any())
                 {

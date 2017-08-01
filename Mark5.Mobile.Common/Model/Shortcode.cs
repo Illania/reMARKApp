@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("AddressString")]
-        public string AddressString { get => SerializationUtils.Serialize(Addresses); set => Addresses = SerializationUtils.Deserialize<List<DocumentAddress>>(value); }
+        public string AddressString { get => Serializer.Serialize(Addresses); set => Addresses = Serializer.Deserialize<List<DocumentAddress>>(value); }
 
         #endregion
 

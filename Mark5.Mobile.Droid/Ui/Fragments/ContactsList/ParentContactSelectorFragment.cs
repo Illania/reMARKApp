@@ -1,10 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -85,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedContactPreview != null)
             {
                 var data = new Intent();
-                data.PutExtra(ParentContactSelectorActivity.ParentContactResultKey, SerializationUtils.Serialize(selectedContactPreview));
+                data.PutExtra(ParentContactSelectorActivity.ParentContactResultKey, Serializer.Serialize(selectedContactPreview));
                 Activity.SetResult(Android.App.Result.Ok, data);
                 Activity.Finish();
                 return;

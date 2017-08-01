@@ -5,7 +5,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Utilities;
 using ModernHttpClient;
 
-namespace Mark5.Mobile.Droid.Utilities
+namespace Mark5.Mobile.IOS.Utilities
 {
     public class SSLCertificateVerificationManager
     {

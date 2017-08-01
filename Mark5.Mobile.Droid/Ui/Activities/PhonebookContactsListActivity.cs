@@ -1,5 +1,4 @@
-﻿
-using Android.App;
+﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -15,6 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string RecipientResultKey = "RecipientResult_30f359c2-8e26-4149-979a-80fd76d7d118";
 
         Toolbar toolbar;
+
         PhonebookContactsListFragment plf;
 
         protected override void OnCreate(Bundle savedInstanceState)

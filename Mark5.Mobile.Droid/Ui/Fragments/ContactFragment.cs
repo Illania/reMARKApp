@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,12 +13,12 @@ using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -81,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             button4Layout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.button4_layout);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
-            var paddingLinearLayout = ConversionUtils.ConvertDpToPixels(10);
+            var paddingLinearLayout = Conversion.ConvertDpToPixels(10);
             linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout);
             linearLayout.SetClipToPadding(false);
 
@@ -114,16 +114,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnResume();
 
             await RefreshData(forceRefresh);
-
-            if (ContactPreview.Type == ContactType.Company || ContactPreview.Type == ContactType.Department)
-            {
-                var fab = ((View)container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-                fab.SetImageResource(Resource.Drawable.action_add_contact);
-                fab.SetOnClickListener(new ActionOnClickListener(AddChildrenContact));
-                fab.Visibility = ViewStates.Visible;
-            }
-
             forceRefresh = false;
+
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
+            {
+                if (ContactPreview.Type == ContactType.Company || ContactPreview.Type == ContactType.Department)
+                {
+                    var fab = ((View)container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetOnClickListener(new ActionOnClickListener(AddChildrenContact));
+                    fab.Visibility = ViewStates.Visible;
+                }
+            }
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -131,12 +133,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (resultCode == (int)Result.Ok)
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
-                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    var comments = Serializer.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
                     UpdateComments(comments);
                 }
                 else if (requestCode == RequestCodes.CategoriesRequest)
                 {
-                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    var categories = Serializer.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
                 }
                 else if (requestCode == RequestCodes.EditRequest || requestCode == RequestCodes.ChildrenRequest)
@@ -207,9 +209,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    Serializer.Serialize(new List<IBusinessEntity>
                     {
                         ContactPreview
                     }));
@@ -222,13 +224,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Contacts));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    Serializer.Serialize(new List<IBusinessEntity>
                     {
                         ContactPreview
                     }));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
                 StartActivity(i);
 
                 return true;
@@ -237,7 +239,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(ContactPreview));
                 StartActivityForResult(i, RequestCodes.CategoriesRequest);
 
                 return true;
@@ -246,7 +248,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Comments)
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
-                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Contact));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, Serializer.Serialize(Contact));
                 StartActivityForResult(i, RequestCodes.CommentsRequest);
 
                 return true;
@@ -255,7 +257,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, Serializer.Serialize(ContactPreview));
                 StartActivity(i);
 
                 return true;
@@ -264,7 +266,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(ContactPreview));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, Serializer.Serialize(ContactPreview));
                 StartActivity(i);
 
                 return true;
@@ -321,11 +323,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
-                    new List<IBusinessEntity>
-                    {
-                        ContactPreview
-                    }));
+            {
+                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
+                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(new List<IBusinessEntity> { ContactPreview }));
+                StartActivity(i);
+            }
         }
 
         async void DeleteFromFolderAction()
@@ -340,19 +342,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                    {
-                        ContactPreview
-                    },
-                    Folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { ContactPreview }, Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
                     ObjectType.Contact,
                     Folder.Id,
-                    new List<int>
-                    {
-                        ContactPreview.Id
-                    }));
+                    new List<int> { ContactPreview.Id }));
 
                 dismissAction();
             }
@@ -383,7 +378,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     ContactPreview
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
                     ObjectType.Contact,
                     new List<int>
                     {
@@ -408,23 +403,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             List<ContactType> values = null;
 
             if (ContactPreview.Type == ContactType.Company)
-            {
                 values = new List<ContactType> { ContactType.Department, ContactType.Person };
-            }
-            else if (ContactPreview.Type == ContactType.Department)
-            {
+            if (ContactPreview.Type == ContactType.Department)
                 values = new List<ContactType> { ContactType.Person };
-            }
 
-            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_children_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(),
-                                                       true);
-
+            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_children_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
             if (index >= 0)
             {
                 var intent = new Intent(Context, typeof(AddEditContactActivity));
                 intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
                 intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
-                intent.PutExtra(AddEditContactActivity.ParentContactPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
+                intent.PutExtra(AddEditContactActivity.ParentContactPreviewIntentKey, Serializer.Serialize(ContactPreview));
                 StartActivityForResult(intent, RequestCodes.ChildrenRequest);
             }
         }
@@ -434,8 +423,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var intent = new Intent(Context, typeof(AddEditContactActivity));
             intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.Edit);
             intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)ContactPreview.Type);
-            intent.PutExtra(AddEditContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(ContactPreview));
-            intent.PutExtra(AddEditContactActivity.ContactIntentKey, SerializationUtils.Serialize(Contact));
+            intent.PutExtra(AddEditContactActivity.ContactPreviewIntentKey, Serializer.Serialize(ContactPreview));
+            intent.PutExtra(AddEditContactActivity.ContactIntentKey, Serializer.Serialize(Contact));
 
             StartActivityForResult(intent, RequestCodes.EditRequest);
         }
@@ -452,7 +441,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             addressesCardView.Radius = CardRadius;
             addressesCardView.UseCompatPadding = true;
 
-            var paddingTopBottom = ConversionUtils.ConvertDpToPixels(16f);
+            var paddingTopBottom = Conversion.ConvertDpToPixels(16f);
             var internalLayout = new LinearLayoutCompat(Context)
             {
                 Orientation = LinearLayoutCompat.Vertical,
@@ -495,9 +484,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             relatedCardView.Radius = CardRadius;
             relatedCardView.UseCompatPadding = true;
 
-            var veryLargeDistance = ConversionUtils.ConvertDpToPixels(24f);
-            var largeDistance = ConversionUtils.ConvertDpToPixels(16f);
-            var normalDistance = ConversionUtils.ConvertDpToPixels(8f);
+            var veryLargeDistance = Conversion.ConvertDpToPixels(24f);
+            var largeDistance = Conversion.ConvertDpToPixels(16f);
+            var normalDistance = Conversion.ConvertDpToPixels(8f);
 
             var relatedCardInternalLayout = new LinearLayoutCompat(Context)
             {
@@ -534,9 +523,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             descriptionCardView.Radius = CardRadius;
             descriptionCardView.UseCompatPadding = true;
 
-            var veryLargeDistance = ConversionUtils.ConvertDpToPixels(24f);
-            var largeDistance = ConversionUtils.ConvertDpToPixels(16f);
-            var normalDistance = ConversionUtils.ConvertDpToPixels(8f);
+            var veryLargeDistance = Conversion.ConvertDpToPixels(24f);
+            var largeDistance = Conversion.ConvertDpToPixels(16f);
+            var normalDistance = Conversion.ConvertDpToPixels(8f);
 
             var descriptionCardViewInternalLayout = new LinearLayoutCompat(Context)
             {
@@ -703,17 +692,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                DocumentCreationModeFlag.New,
-                DocumentDirection.None,
-                preconfiguredEmailToAddresses: new List<string>
-                {
-                    communicationAddress.Address
-                }));
+                                                               DocumentCreationModeFlag.New,
+                                                               CopyToNewOption.None,
+                                                               preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
+            {
+                { DocumentAddressType.To, new [] {communicationAddress.Address} }
+            }));
         }
 
         async void Button2Layout_Click(object sender, EventArgs e)
         {
-            var formattedNumbers = Contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressUtils.FormatCommunicationAddress(ca)).ToArray();
+            var formattedNumbers = Contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
             {
                 Toast.MakeText(Context, Resource.String.no_primary_mobile_or_phone, ToastLength.Short).Show();
@@ -742,7 +731,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            Integration.TextNumber(Context, AddressUtils.FormatCommunicationAddress(communicationAddresses));
+            Integration.TextNumber(Context, AddressFormatter.FormatCommunicationAddress(communicationAddresses));
         }
 
         async void Button4Layout_Click(object sender, EventArgs e)
@@ -756,7 +745,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (physicalAddress.Length == 1)
             {
-                Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(physicalAddress[0]));
+                Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(physicalAddress[0]));
                 return;
             }
 
@@ -764,7 +753,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedItem < 0)
                 return;
 
-            Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(physicalAddress[selectedItem]));
+            Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(physicalAddress[selectedItem]));
         }
 
         async void AddressClicked(object sender, CommunicationAddress e)
@@ -777,19 +766,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                    DocumentCreationModeFlag.New,
-                    DocumentDirection.None,
-                    preconfiguredEmailToAddresses: new List<string>
-                    {
-                        e.Address
-                    }));
+                                                                   DocumentCreationModeFlag.New,
+                                                                   CopyToNewOption.None,
+                                                                   preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, new [] {e.Address} }
+                }));
                 return;
             }
 
             if (e.Type == CommunicationAddressType.Mobile)
             {
-                var formattedAddress = AddressUtils.FormatCommunicationAddress(e);
+                var formattedAddress = AddressFormatter.FormatCommunicationAddress(e);
 
                 var selection = await Dialogs.ShowListDialog(Context, formattedAddress, Resource.Array.call_or_text, true);
                 if (selection < 0)
@@ -803,12 +793,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (e.Type == CommunicationAddressType.Phone)
-                Integration.DialNumber(Context, AddressUtils.FormatCommunicationAddress(e));
+                Integration.DialNumber(Context, AddressFormatter.FormatCommunicationAddress(e));
         }
 
         void PhysicalAddressClicked(object sender, PhysicalAddress e)
         {
-            Integration.OpenMap(Context, AddressUtils.FormatPhysicalAddress(e));
+            Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(e));
         }
 
         void ContactClicked(object sender, ContactPreview cp)

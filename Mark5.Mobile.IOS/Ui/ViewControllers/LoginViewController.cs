@@ -5,10 +5,11 @@ using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Services;
+using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -494,9 +495,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void LoginButton_TouchUpInside(object sender, EventArgs e)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             loginButton.TouchUpInside -= LoginButton_TouchUpInside;
 
@@ -614,26 +613,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                var policies = Managers.DownloadManager.DownloadPolicies;
-                policies[ObjectType.Document] = new DownloadFoldersPolicy();
-                if (PlatformConfig.Preferences.SynchroniseContacts)
-                    policies[ObjectType.Contact] = new DownloadAllPolicy();
-                if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                    policies[ObjectType.Shortcode] = new DownloadAllPolicy();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
-                CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
-
-                await Managers.DownloadManager.Start();
-                await Managers.OutgoingDocumentsManager.Start();
+                CommonConfig.Logger.Info($"Starting services...");
+                Services.DocumentsUploadService.Start();
+                Services.DocumentPreviewsDownloadService.Start();
+                Services.DocumentsDownloadService.Start();
 
                 LocalNotificationsListener.Initialize();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
-                await CommonConfig.ReachabilityService.Refresh();
+                await CommonConfig.Reachability.Refresh();
 
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
                 PlatformConfig.ReachabilityReceiver.Register();

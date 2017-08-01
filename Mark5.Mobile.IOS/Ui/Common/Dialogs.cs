@@ -38,6 +38,17 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowYesNoCancelDialogAsync(UIViewController vc, string title, string content, string yesText, string noText, string cancelText)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
+            alert.AddAction(UIAlertAction.Create(yesText, UIAlertActionStyle.Default, a => tcs.SetResult(1)));
+            alert.AddAction(UIAlertAction.Create(noText, UIAlertActionStyle.Default, a => tcs.SetResult(0)));
+            alert.AddAction(UIAlertAction.Create(cancelText, UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
+            vc.PresentViewController(alert, true, null);
+            return tcs.Task;
+        }
+
         public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content)
         {
             return ShowConfirmDialogAsync(vc, title, content, Localization.GetString("ok"));

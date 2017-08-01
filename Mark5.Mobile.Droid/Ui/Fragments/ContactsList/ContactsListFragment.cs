@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
@@ -19,10 +18,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.SetImageResource(Resource.Drawable.action_add_contact);
-            fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
-            fab.Visibility = ViewStates.Visible;
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
+            {
+                fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+                fab.SetImageResource(Resource.Drawable.action_add_contact);
+                fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
+                fab.Visibility = ViewStates.Visible;
+            }
 
             return base.OnCreateView(inflater, container, savedInstanceState);
         }
@@ -34,8 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (ActionMode == null)
             {
                 var i = new Intent(Activity, typeof(ContactActivity));
-                i.PutExtra(ContactActivity.ContactPreviewIntentKey, SerializationUtils.Serialize(contactPreview));
-                i.PutExtra(ContactActivity.FolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(ContactActivity.ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
+                i.PutExtra(ContactActivity.FolderIntentKey, Serializer.Serialize(Folder));
                 StartActivity(i);
             }
             else

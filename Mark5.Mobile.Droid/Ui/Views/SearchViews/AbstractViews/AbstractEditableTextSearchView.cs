@@ -80,12 +80,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 }
             };
 
-            var cancelIconSize = ConversionUtils.ConvertDpToPixels(20f);
+            var cancelIconSize = Conversion.ConvertDpToPixels(20f);
             var cancelIconView = new AppCompatImageView(context)
             {
                 LayoutParameters = new LayoutParams(cancelIconSize, cancelIconSize)
                 {
-                    RightMargin = ConversionUtils.ConvertDpToPixels(4),
+                    RightMargin = Conversion.ConvertDpToPixels(4),
                 }
             };
             cancelIconView.SetImageResource(Resource.Drawable.cross);

@@ -3,7 +3,7 @@ using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -193,10 +193,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         [Export("settingsViewController:buttonTappedForSpecifier:")]
         public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             if (specifier.Key == LogoutKey)
             {
@@ -311,9 +309,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void SettingsChanged(NSNotification n)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var key = n.Object.ToString();
 
@@ -332,84 +328,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
-                return;
-            }
-
-            if (key == SynchroniseContactsKey)
-            {
-                if (PlatformConfig.Preferences.SynchroniseContacts)
-                {
-                    Managers.DownloadManager.DownloadPolicies[ObjectType.Contact] = new DownloadAllPolicy();
-                }
-                else
-                {
-                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Contact);
-
-                    var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_contacts_cache_title"), Localization.GetString("clear_contacts_cache_summary"));
-                    if (result)
-                    {
-                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_contacts_cache___"));
-
-                        try
-                        {
-                            await Managers.CleanUpManager.ClearContactsCache();
-                            await Managers.CleanUpManager.CleanUp(new[]
-                            {
-                                ModuleType.Contacts
-                            });
-
-                            dismissAction();
-                        }
-                        catch (Exception ex)
-                        {
-                            dismissAction();
-
-                            CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
-
-                            await Dialogs.ShowErrorDialogAsync(this, ex);
-                        }
-                    }
-                }
-
-                return;
-            }
-
-            if (key == SynchroniseShortcodesKey)
-            {
-                if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                {
-                    Managers.DownloadManager.DownloadPolicies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                }
-                else
-                {
-                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
-
-                    var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("clear_shortcodes_cache_title"), Localization.GetString("clear_shortcodes_cache_summary"));
-                    if (result)
-                    {
-                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("clearing_shortcodes_cache___"));
-
-                        try
-                        {
-                            await Managers.CleanUpManager.ClearShortcodeCache();
-                            await Managers.CleanUpManager.CleanUp(new[]
-                            {
-                                ModuleType.Shortcodes
-                            });
-
-                            dismissAction();
-                        }
-                        catch (Exception ex)
-                        {
-                            dismissAction();
-
-                            CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
-
-                            await Dialogs.ShowErrorDialogAsync(this, ex);
-                        }
-                    }
-                }
 
                 return;
             }

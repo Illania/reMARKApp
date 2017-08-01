@@ -30,12 +30,6 @@
 	<string name="categories">Categories</string>
 	<string name="cc">Cc</string>
 	<string name="choose_application">Choose an application</string>
-	<string name="clear_contacts_cache_title">Clear contacts cache</string>
-	<string name="clear_contacts_cache_summary">Do you want to remove cached contacts?</string>
-	<string name="clear_shortcodes_cache_title">Clear shortcodes cache</string>
-	<string name="clear_shortcodes_cache_summary">Do you want to remove cached shortcodes?</string>
-	<string name="clearing_contacts_cache">Clearing contacts cache</string>
-	<string name="clearing_shortcodes_cache">Clearing shortcodes cache</string>
 	<string name="close_drawer">Close navigation drawer</string>
 	<string name="comments">Comments</string>
 	<string name="confirm">Confirm</string>
@@ -45,10 +39,10 @@
 	<string name="confirm_copy_to_folder">Copy</string>
 	<string name="confirm_move_to_folder">Move</string>
 	<string name="confirm_save_as_draft">Do you want to save the email as draft?</string>
-	<string name="confirm_save_modified_document">Do you want to save the modified email?</string>
 	<string name="connection_status">Connection status</string>
 	<string name="contact">Contact</string>
 	<string name="contacts">Contacts</string>
+	<string name="continue_work">Continue</string>
 	<string name="copied_to_clipboard">Copied to clipboard</string>
 	<string name="copy_to_folder">Copy to folder</string>
 	<string name="copy_to_worktray">Copy to worktray</string>
@@ -79,6 +73,12 @@
 	<string name="document_next">Next</string>
 	<string name="documents">Emails</string>
 	<string name="done">Done</string>
+	<string name="dont_close_app">Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!</string>
+	<string name="download">Download</string>
+    <string name="download_finished">Download completed!\nYou can now continue working.</string>
+    <string name="download_in_progress_cancel_to_go_back">Download is in progress, Cancel the download to go back.</string>
+	<string name="download_in_progress_warning">If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?</string>
+    <string name="downloading_percentage">Downloading %1$d%%...</string>
 	<string name="edit">Edit</string>
 	<string name="edit_comment_message">Edit comment message</string>
 	<string name="editing_comment">Editing comment</string>
@@ -155,11 +155,15 @@
 	<string name="error_removing_local_attachment">Error while removing local attachment</string>
 	<string name="error_saving_local_attachment">Error while saving local attachment</string>
 	<string name="error_while_sending_document">There was an error while sending the email</string>
-	<string name="failed_send_document_notification_content">One or more emails could not be sent</string>
+	<string name="failed_send_document_notification_content">One or more emails could not be sent. Please check Outgoing folder for details.</string>
 	<string name="failed_send_document_notification_title">Failed to send emails</string>
 	<string name="filter">Filter...</string>
 	<string name="folder_favorites">Favorites</string>
 	<string name="folder_local">Local folders</string>
+	<string name="folder_offline_message">This folder is saved offline. You can make the folder online again or redownload its contents.</string>
+	<string name="folder_offline_go_online">Go online</string>
+	<string name="folder_offline_redownload">Redownload</string>
+	<string name="folder_offline_title">Folder is offline</string>
 	<string name="folder_remote">Folders</string>
 	<string name="folders">Folders</string>
 	<string name="forward">Forward</string>
@@ -173,6 +177,7 @@
 	<string name="invalid_emails_title">Invalid emails entered</string>
 	<string name="invalid_emails_content">Not all emails you entered are valid. Do you still want to send the email?</string>
 	<string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
+	<string name="last_downloaded_on">Last downloaded on:</string>
 	<string name="ledger">Ledger</string>
 	<string name="line">Mailbox</string>
 	<string name="lines">Mailboxes</string>
@@ -232,6 +237,7 @@
 	<string name="on">on</string>
 	<string name="open_drawer">Open navigation drawer</string>
 	<string name="opening_attachment">Opening attachment</string>
+	<string name="outgoing">Outgoing</string>
 	<string name="password">Password</string>
 	<string name="password_invalid">Password is not valid</string>
 	<string name="permissions_snackbar_action">Ok</string>
@@ -242,6 +248,7 @@
 	<string name="please_wait">Please wait...</string>
 	<string name="port">Port</string>
 	<string name="port_invalid">Port is not valid</string>
+	<string name="preparing">Preparing...</string>
 	<string name="priority">Priority</string>
 	<string name="priority_low">Low</string>
 	<string name="priority_normal">Normal</string>
@@ -262,10 +269,11 @@
 	<string name="reply">Reply</string>
 	<string name="reply_all">Reply all</string>
 	<string name="reply_to">Reply to:</string>
+	<string name="resend">Resend</string>
 	<string name="responsible_users">Responsible users</string>
 	<string name="save">Save</string>
 	<string name="save_draft">Save draft</string>
-	<string name="save_modifications">Save modifications</string>
+	<string name="save_offline">Save offline</string>
 	<string name="saving_draft">Saving draft</string>
 	<string name="search">Search</string>
 	<string name="search_editable_empty">___</string>
@@ -369,6 +377,7 @@
 	</string-array>
 	<string name="testing_connection">Testing connection</string>
 	<string name="text">Text</string>
+	<string name="time_remaining_minutes_zero">Time remaining: less than one minute</string>
 	<string name="to">To</string>
 	<string name="to_prefix">to</string>
 	<string name="today">Today</string>
@@ -384,4 +393,6 @@
 	<string name="webpage">Webpage</string>
 	<string name="yes">Yes</string>
 	<string name="yesterday">Yesterday</string>
+	<string name="youre_offline_title">You are offline</string>
+    <string name="youre_offline_message">This action cannot be performed offline</string>
 </resources>

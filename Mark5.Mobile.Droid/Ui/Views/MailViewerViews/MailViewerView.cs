@@ -21,9 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
+            DistanceLarge = Conversion.ConvertDpToPixels(16f);
+            DistanceNormal = Conversion.ConvertDpToPixels(8f);
+            DistanceSmall = Conversion.ConvertDpToPixels(4f);
 
             Visibility = ViewStates.Gone;
         }

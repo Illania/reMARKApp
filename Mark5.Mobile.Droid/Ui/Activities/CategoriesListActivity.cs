@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid
 
             if (savedInstanceState == null)
             {
-                var bep = SerializationUtils.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
+                var bep = Serializer.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
                 clf = new CategoriesListFragment
                 {
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid
             if (clf != null)
             {
                 var intent = new Intent();
-                intent.PutExtra(CategoriesResultKey, SerializationUtils.Serialize(clf.Categories));
+                intent.PutExtra(CategoriesResultKey, Serializer.Serialize(clf.Categories));
                 SetResult(Result.Ok, intent);
             }
 

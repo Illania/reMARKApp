@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             Orientation = Horizontal;
             SetBackgroundColor(BackgroundColorNormalState);
 
-            var searchIconSize = ConversionUtils.ConvertDpToPixels(16f);
+            var searchIconSize = Conversion.ConvertDpToPixels(16f);
             var searchIconView = new AppCompatImageView(context)
             {
                 LayoutParameters = new LayoutParams(searchIconSize, searchIconSize)
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 {
                     Gravity = (int) GravityFlags.End,
                     Weight = 1.0f,
-                    LeftMargin = ConversionUtils.ConvertDpToPixels(2),
+                    LeftMargin = Conversion.ConvertDpToPixels(2),
                 }
             };
             var drawable = Spinner.Background.GetConstantState().NewDrawable();

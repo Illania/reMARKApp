@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             });
             expandButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
 
-            var addButtonLp = new LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
+            var addButtonLp = new LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
             {
                 TopMargin = DistanceSmall,
                 LeftMargin = DistanceNormal,

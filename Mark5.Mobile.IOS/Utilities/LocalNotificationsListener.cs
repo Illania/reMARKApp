@@ -1,38 +1,38 @@
 ﻿using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UserNotifications;
+using Mark5.Mobile.Common.Model.HubMessages;
+using Foundation;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
     public static class LocalNotificationsListener
     {
-        public const string FailedSendingIdentifier = "FailedSendingIdentifier";
+        public const string DocumentFailedToSendIdentifier = "DocumentFailedToSend";
 
         public static void Initialize()
         {
-            Managers.OutgoingDocumentsManager.DocumentSendingFailed += OutgoingDocumentsManager_DocumentSendingFailed;
-        }
-
-        static void OutgoingDocumentsManager_DocumentSendingFailed(object sender, OutgoingDocumentContainer e)
-        {
-            var notificatioContent = new UNMutableNotificationContent();
-
-            var titleString = Localization.GetString("failed_send_document_notification_title");
-            var contentString = Localization.GetString("failed_send_document_notification_content");
-
-            notificatioContent.Title = titleString;
-            notificatioContent.Body = contentString;
-
-            var request = UNNotificationRequest.FromIdentifier(FailedSendingIdentifier, notificatioContent, null);
-
-            UNUserNotificationCenter.Current.AddNotificationRequest(request,
-                err =>
+            CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            {
+                NSOperationQueue.MainQueue.InvokeOnMainThread(() =>
                 {
-                    if (err != null)
-                        CommonConfig.Logger.Error($"Error while sending notification for failed send document: {err}");
+                    var notificatioContent = new UNMutableNotificationContent();
+
+                    var titleString = Localization.GetString("failed_send_document_notification_title");
+                    var contentString = Localization.GetString("failed_send_document_notification_content");
+
+                    notificatioContent.Title = titleString;
+                    notificatioContent.Body = contentString;
+
+                    var request = UNNotificationRequest.FromIdentifier(DocumentFailedToSendIdentifier, notificatioContent, null);
+                    UNUserNotificationCenter.Current.AddNotificationRequest(request, null);
                 });
+            }, m =>
+            {
+                return m.Change == DocumentUploadStatusChanged.Status.DocumentSentFailed;
+            });
         }
     }
 }

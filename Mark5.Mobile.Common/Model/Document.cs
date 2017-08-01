@@ -109,22 +109,22 @@ namespace Mark5.Mobile.Common.Model
         #region Serialization
 
         [Column("LinesString")]
-        public string LinesString { get => SerializationUtils.Serialize(Lines); set => Lines = SerializationUtils.Deserialize<List<Line>>(value); }
+        public string LinesString { get => Serializer.Serialize(Lines); set => Lines = Serializer.Deserialize<List<Line>>(value); }
 
         [Column("ReadByUserIdsString")]
-        public string ReadByUserIdsString { get => SerializationUtils.Serialize(ReadByUserIds); set => ReadByUserIds = SerializationUtils.Deserialize<List<int>>(value); }
+        public string ReadByUserIdsString { get => Serializer.Serialize(ReadByUserIds); set => ReadByUserIds = Serializer.Deserialize<List<int>>(value); }
 
         [Column("ReadByUserNamesString")]
-        public string ReadByUserNamesString { get => SerializationUtils.Serialize(ReadByUserNames); set => ReadByUserNames = SerializationUtils.Deserialize<Dictionary<int, string>>(value); }
+        public string ReadByUserNamesString { get => Serializer.Serialize(ReadByUserNames); set => ReadByUserNames = Serializer.Deserialize<Dictionary<int, string>>(value); }
 
         [Column("AttachmentsString")]
-        public string AttachmentsString { get => SerializationUtils.Serialize(Attachments); set => Attachments = SerializationUtils.Deserialize<List<AttachmentDescription>>(value); }
+        public string AttachmentsString { get => Serializer.Serialize(Attachments); set => Attachments = Serializer.Deserialize<List<AttachmentDescription>>(value); }
 
         [Column("CommentsString")]
-        public string CommentsString { get => SerializationUtils.Serialize(Comments); set => Comments = SerializationUtils.Deserialize<List<Comment>>(value); }
+        public string CommentsString { get => Serializer.Serialize(Comments); set => Comments = Serializer.Deserialize<List<Comment>>(value); }
 
         [Column("ExtraFieldsString")]
-        public string ExtraFieldsString { get => SerializationUtils.Serialize(ExtraFields); set => ExtraFields = SerializationUtils.Deserialize<Dictionary<DocumentExtraFieldInfo, string>>(value); }
+        public string ExtraFieldsString { get => Serializer.Serialize(ExtraFields); set => ExtraFields = Serializer.Deserialize<Dictionary<DocumentExtraFieldInfo, string>>(value); }
 
         #endregion
 

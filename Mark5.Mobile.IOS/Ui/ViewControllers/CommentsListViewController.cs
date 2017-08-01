@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
@@ -272,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
+                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
@@ -323,7 +323,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         case ObjectType.Document:
                             var document = Entity as Document;
                             await Managers.DocumentsManager.DeleteComment(document, comment);
-                            PlatformConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
+                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
                             var contact = Entity as Contact;

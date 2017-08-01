@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -20,7 +22,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public class DocumentsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate, IUIViewControllerRestoration
     {
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
@@ -60,6 +62,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            RestorationIdentifier = nameof(DocumentsListViewController);
+            RestorationClass = Class;
+
             ExtendedLayoutIncludesOpaqueBars = true;
         }
 
@@ -77,18 +82,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
                     tableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(DocumentsListViewController)} appeared");
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource)tableView.Source;
             if (ds.Empty)
                 await RefreshData();
 
@@ -118,10 +121,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (DocumentViewController) nc.ViewControllers[0];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
                 vc.ClearData();
             }
         }
@@ -160,11 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             tableView = new UITableView();
             tableView.ClipsToBounds = false;
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
             tableView.Source = new DataSource(this, tableView, async (startId) => await RefreshData(startId), Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = DocumentsTableViewCell.Height;
             tableView.AllowsSelectionDuringEditing = false;
@@ -221,12 +220,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            PlatformConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
-            PlatformConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
+            CommonConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
+            CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
 
-            PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
-            PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Document);
-            PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
+            CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
+            CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Document);
+            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
         }
 
         void InitializeHandlers()
@@ -270,12 +269,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
 
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
-                var vc = (DocumentViewController) nc.ViewControllers[0];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
 
                 if (vc.IsShowingDocumentWithId(documentPreview.Id))
                     return;
@@ -301,10 +300,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
 
                 var vc = new DocumentViewController();
                 vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
+                vc.OnComplete = () => vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
                 if (!searchController.Active)
                     vc.SetData(Folder, documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
                 else
@@ -334,10 +334,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (DocumentViewController) nc.ViewControllers[0];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
                 vc.ClearData();
             }
 
@@ -350,8 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                CreationModeFlag = DocumentCreationModeFlag.New,
-                PreviousDocumentDirection = DocumentDirection.None
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -377,7 +376,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
             var rows = tableView.IndexPathsForSelectedRows.ToArray();
-            var selectedDocuments = rows.Select(ip => ((DataSource) tableView.Source).Items[ip.Row]).ToList();
+            var selectedDocuments = rows.Select(ip => ((DataSource)tableView.Source).Items[ip.Row]).ToList();
 
             if (selectedDocuments.Any(dp => !dp.IsReadByCurrent))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"),
@@ -421,7 +420,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         EndEditing();
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem) sender)));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments)));
@@ -432,15 +431,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
         }
 
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void ShowPriorityActionSheet(List<DocumentPreview> selectedDocuments, UIBarButtonItem barButtonItem)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var priorities = new List<Priority>
             {
@@ -459,9 +456,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             await SetPriority(selectedDocuments, priority);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, UITableViewCell cell)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var priorities = new List<Priority>
             {
@@ -517,9 +512,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<DocumentPreview> selectedDocuments)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_documents"));
 
@@ -559,9 +552,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<DocumentPreview> selectedDocuments)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_documents"));
 
@@ -594,15 +585,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void Reply(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
+        void Respond(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
         {
             var vc = new ComposeDocumentViewController
             {
-                PreviousDocumentId = documentPreview.Id,
-                CreationModeFlag = creationModeFlag,
-                PreviousDocumentFolderId = Folder.Id,
+                DocumentCreationModeFlag = creationModeFlag,
                 PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocumentPreview = documentPreview
+                PreviousDocumentFolderId = Folder.Id,
+                PreviousDocumentId = documentPreview.Id
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -676,9 +666,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
 
@@ -707,9 +695,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreviews={documentPreviews.Count}]...");
 
@@ -742,21 +728,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    Reply(selectedDocument, DocumentCreationModeFlag.Reply);
+                    Respond(selectedDocument, DocumentCreationModeFlag.Reply);
                     EndEditing();
                 }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    Reply(selectedDocument, DocumentCreationModeFlag.ReplyAll);
+                    Respond(selectedDocument, DocumentCreationModeFlag.ReplyAll);
                     EndEditing();
                 }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    Reply(selectedDocument, DocumentCreationModeFlag.Forward);
+                    Respond(selectedDocument, DocumentCreationModeFlag.Forward);
                     EndEditing();
                 }));
 
@@ -804,13 +790,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (searchController.Active)
                     searchResultsDataSource.RemoveItems(ids.ToList());
 
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
                 ds.RemoveItems(ids.ToList());
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                 {
-                    var nc = (UINavigationController) SplitViewController.ViewControllers[1];
-                    var vc = (DocumentViewController) nc.ViewControllers[0];
+                    var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                    var vc = (DocumentViewController)nc.ViewControllers[0];
                     if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
                         vc.ClearData();
                 }
@@ -821,8 +807,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
-                var vc = (DocumentViewController) nc.ViewControllers[0];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                var vc = (DocumentViewController)nc.ViewControllers[0];
                 if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
                     vc.UpdatePriority();
             }
@@ -849,7 +835,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
 
                 if (forceClear)
                     ds.Reset();
@@ -858,7 +844,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {ds.LoadMoreEnabled}");
 
-                Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+                Services.DocumentsDownloadService.Notify();
+
                 ds.AppendItems(documentPreviews);
 
                 if (documentPreviews.Any() && newDocumentsAvailableAction != null)
@@ -903,13 +890,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
 
-                    Managers.DownloadManager.Notify(ObjectType.Document, Folder.Id);
+                    Services.DocumentsDownloadService.Notify();
 
                     var ds = tableView.Source as DataSource;
                     ds?.PrependItems(documents);
 
-                    if (newDocumentsAvailableAction != null)
-                        newDocumentsAvailableAction();
+                    newDocumentsAvailableAction?.Invoke();
                 }
             }
             catch (Exception ex)
@@ -1026,9 +1012,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void DoSearchDocuments(string searchText, CancellationToken ct)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             searchResultsDataSource.Reset();
 
@@ -1037,7 +1021,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (ct.IsCancellationRequested)
                 return;
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource)tableView.Source;
             var filteredDocuments = ds.Items.Where(dp => MatchesQuery(dp, searchText)).ToList();
 
             if (ct.IsCancellationRequested)
@@ -1423,9 +1407,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
                                 InvokeOnMainThread(async () => await work(first.Id));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                         }
                     });
                 }
@@ -1439,5 +1421,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(Serializer.SerializeToByteArray(Folder.ShallowCopy()), "folder");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            Folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new DocumentsListViewController ();
+        }
+
+        #endregion
+
     }
 }

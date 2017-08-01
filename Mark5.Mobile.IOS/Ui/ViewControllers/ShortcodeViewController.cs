@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,20 +6,20 @@ using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
-using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ShortcodeViewController : AbstractViewController, ISecondaryViewController
+    public class ShortcodeViewController : AbstractViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
         public bool Modal { get; set; }
 
@@ -43,17 +43,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
-        public override void LoadView()
-        {
-            base.LoadView();
-
-            InitializeNavigationBar();
-            InitializeView();
-        }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(ShortcodeViewController);
+            RestorationClass = Class;
 
             ExtendedLayoutIncludesOpaqueBars = true;
         }
@@ -62,6 +57,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            InitializeNavigationBar();
+            InitializeView();
             InitializeNavigationBarTitle();
             InitializeHandlers();
         }
@@ -132,18 +129,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             AutomaticallyAdjustsScrollViewInsets = false;
 
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.ClipsToBounds = false;
+            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped)
+            {
+                ClipsToBounds = false,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                RowHeight = UITableView.AutomaticDimension,
+                EstimatedRowHeight = 60f
+            };
             tableView.Source = new DataSource(this, tableView);
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            tableView.EstimatedRowHeight = 60f;
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed)
             {
                 MinimumPressDuration = 1f
             });
+            if (NavigationController != null)
+            {
+                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
+            }
             View.AddSubview(tableView);
             View.AddConstraints(new[]
             {
@@ -167,8 +169,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             toolbar.BarTintColor = Theme.Gray;
             toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
             {
@@ -226,11 +228,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                PreconfiguredEmailAddresses = new string[]
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
                 {
-                    documentAddress.FullAddress
-                },
-                CreationModeFlag = DocumentCreationModeFlag.New
+                    { DocumentAddressType.To, new [] { documentAddress.FullAddress } }
+                }
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -290,7 +292,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
         }
@@ -299,8 +301,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ComposeDocumentViewController
             {
-                CreationModeFlag = DocumentCreationModeFlag.New,
-                PreConfiguredShortcode = shortcode
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.FullAddress).ToArray() },
+                    { DocumentAddressType.Cc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.FullAddress).ToArray() },
+                    { DocumentAddressType.Bcc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.FullAddress).ToArray() }
+                }
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -355,9 +362,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void RefreshData()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             cts?.Cancel();
             cts = new CancellationTokenSource();
@@ -371,7 +376,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info("Loading shortcode...");
 
-            var ds = (DataSource) tableView?.Source;
+            var ds = (DataSource)tableView?.Source;
 
             try
             {
@@ -466,9 +471,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcode"));
 
@@ -487,7 +490,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     },
                     folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
                     ObjectType.Shortcode,
                     folder.Id,
                     new List<int>
@@ -511,9 +514,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(UIAlertAction a)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcode"));
 
@@ -531,7 +532,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     shortcode
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
                     ObjectType.Shortcode,
                     new List<int>
                     {
@@ -804,5 +805,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 bccAddresses = null;
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+
+            coder.Encode(Modal, "modal");
+
+            if (folderId.HasValue)
+                coder.Encode(folderId.Value, "folderId");
+            if (folder != null)
+                coder.Encode(Serializer.SerializeToByteArray(folder.ShallowCopy()), "folder");
+            if (shortcodeId.HasValue)
+                coder.Encode(shortcodeId.Value, "shortcodeId");
+            if (shortcodePreview != null)
+                coder.Encode(Serializer.SerializeToByteArray(shortcodePreview), "shortcodePreview");
+            if (shortcode != null)
+                coder.Encode(Serializer.SerializeToByteArray(shortcode), "shortcode");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+
+            if (coder.ContainsKey("folderId"))
+                folderId = coder.DecodeInt("folderId");
+            if (folder != null)
+                folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
+            if (coder.ContainsKey("shortcodeId"))
+                shortcodeId = coder.DecodeInt("shortcodeId");
+            if (coder.ContainsKey("shortcodePreview"))
+                shortcodePreview = Serializer.DeserializeFromByteArray<ShortcodePreview>(coder.DecodeBytes("shortcodePreview"));
+            if (coder.ContainsKey("shortcode"))
+                shortcode = Serializer.DeserializeFromByteArray<Shortcode>(coder.DecodeBytes("shortcode"));
+
+            refreshDataOnAppear = true;
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            if (coder.DecodeBool("modal"))
+                return null;
+
+            return new ShortcodeViewController();
+        }
+
+        #endregion
+
     }
 }

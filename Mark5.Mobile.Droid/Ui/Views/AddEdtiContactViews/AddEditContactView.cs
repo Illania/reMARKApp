@@ -17,10 +17,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         public bool ParentPreselected { get; set; }
 
 
-        protected static int DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
-        protected static int DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
-        protected static int DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
-        protected static int DistanceVerySmall = ConversionUtils.ConvertDpToPixels(4f);
+        protected static int DistanceLarge = Conversion.ConvertDpToPixels(16f);
+        protected static int DistanceNormal = Conversion.ConvertDpToPixels(8f);
+        protected static int DistanceSmall = Conversion.ConvertDpToPixels(4f);
+        protected static int DistanceVerySmall = Conversion.ConvertDpToPixels(4f);
 
         protected AddEditContactView(Context context)
             : base(context)

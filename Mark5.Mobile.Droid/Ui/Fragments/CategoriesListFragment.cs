@@ -304,7 +304,7 @@ namespace Mark5.Mobile.Droid
                 {
                     var gd = new GradientDrawable();
                     gd.SetShape(ShapeType.Oval);
-                    gd.SetStroke(ConversionUtils.ConvertDpToPixels(1), Color.Black);
+                    gd.SetStroke(Conversion.ConvertDpToPixels(1), Color.Black);
                     gd.SetColor(Color.ParseColor(value));
 
                     colorImageView.Background = gd;

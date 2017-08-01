@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -115,7 +114,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error($"Error while retrieving template previews", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                Activity.Finish();
+                Activity?.Finish();
             }
             finally
             {
@@ -130,9 +129,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, TemplatePreview tp)
         {
             var data = new Intent();
-            data.PutExtra(TemplatesListActivity.TemplatePreviewResultKey, SerializationUtils.Serialize(tp));
+            data.PutExtra(TemplatesListActivity.TemplatePreviewResultKey, Serializer.Serialize(tp));
             Activity.SetResult(Android.App.Result.Ok, data);
-            Activity.Finish();
+            Activity?.Finish();
         }
 
         #endregion
@@ -227,7 +226,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public event EventHandler<TemplatePreview> ItemClicked = delegate { };
 
-            readonly int sectionHeight = ConversionUtils.ConvertDpToPixels(56);
+            readonly int sectionHeight = Conversion.ConvertDpToPixels(56);
 
             public static class ViewType
             {

@@ -14,7 +14,7 @@ using Android.Text.Style;
 using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -110,62 +110,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (preference.Key == GetString(Resource.String.pref_key_documents_use_server_timezone))
                 Dialogs.ShowConfirmDialog(Context, Resource.String.dialog_restart_required_title, Resource.String.dialog_restart_required_content);
 
-            if (preference.Key == GetString(Resource.String.pref_key_contacts_synchronised) && !PlatformConfig.Preferences.SynchroniseContacts)
-                Dialogs.ShowYesNoDialog(Context,
-                    Resource.String.clear_contacts_cache_title,
-                    Resource.String.clear_contacts_cache_summary,
-                    async () =>
-                    {
-                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_contacts_cache, Resource.String.please_wait);
-
-                        try
-                        {
-                            await Managers.CleanUpManager.ClearContactsCache();
-                            await Managers.CleanUpManager.CleanUp(new[]
-                            {
-                                ModuleType.Contacts
-                            });
-
-                            dismissAction();
-                        }
-                        catch (Exception ex)
-                        {
-                            dismissAction();
-
-                            CommonConfig.Logger.Error("Could not clear contacts cache!", ex);
-
-                            await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                        }
-                    });
-
-            if (preference.Key == GetString(Resource.String.pref_key_shortcodes_synchronised) && !PlatformConfig.Preferences.SynchroniseShortcodes)
-                Dialogs.ShowYesNoDialog(Context,
-                    Resource.String.clear_shortcodes_cache_title,
-                    Resource.String.clear_shortcodes_cache_summary,
-                    async () =>
-                    {
-                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.clearing_shortcodes_cache, Resource.String.please_wait);
-
-                        try
-                        {
-                            await Managers.CleanUpManager.ClearShortcodeCache();
-                            await Managers.CleanUpManager.CleanUp(new[]
-                            {
-                                ModuleType.Shortcodes
-                            });
-
-                            dismissAction();
-                        }
-                        catch (Exception ex)
-                        {
-                            dismissAction();
-
-                            CommonConfig.Logger.Error("Could not clear shortcodes cache!", ex);
-
-                            await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                        }
-                    });
-
             if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
             {
                 var i = new Intent(RingtoneManager.ActionRingtonePicker);
@@ -184,7 +128,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sendIntent.SetAction(Intent.ActionSendto);
                 sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20for%20Android%20Feedback"));
                 StartActivity(sendIntent);
-
                 return true;
             }
 
@@ -290,16 +233,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
-            if (key == GetString(Resource.String.pref_key_contacts_synchronised))
-                if (PlatformConfig.Preferences.SynchroniseContacts)
-                    Managers.DownloadManager.DownloadPolicies[ObjectType.Contact] = new DownloadAllPolicy();
-                else
-                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Contact);
-            if (key == GetString(Resource.String.pref_key_shortcodes_synchronised))
-                if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                    Managers.DownloadManager.DownloadPolicies[ObjectType.Shortcode] = new DownloadAllPolicy();
-                else
-                    Managers.DownloadManager.DownloadPolicies.Remove(ObjectType.Shortcode);
         }
 
         public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)
