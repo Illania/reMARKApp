@@ -538,6 +538,12 @@
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
 		<BundleResource Include="Resources\icons\add%402x.png" />
 		<BundleResource Include="Resources\icons\add%403x.png" />
+		<BundleResource Include="Resources\icons\done%402x.png" />
+		<BundleResource Include="Resources\icons\done%403x.png" />
+		<BundleResource Include="Resources\icons\download%402x.png" />
+		<BundleResource Include="Resources\icons\download%403x.png" />
+		<BundleResource Include="Resources\icons\warning%402x.png" />
+		<BundleResource Include="Resources\icons\warning%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">

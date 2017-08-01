@@ -12,6 +12,7 @@ using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
 using TinyMessenger;
 using Xamarin.Android.Net;
+using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid
 {
@@ -28,6 +29,8 @@ namespace Mark5.Mobile.Droid
         public override void OnCreate()
         {
             base.OnCreate();
+
+            AppCompatDelegate.CompatVectorFromResourcesEnabled = true;
 
             Task.Run(async () =>
                 {

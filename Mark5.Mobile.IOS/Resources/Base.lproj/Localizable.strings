@@ -91,7 +91,9 @@
 "dont_close_app" = "Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!";
 "download" = "Download";
 "download_complete" = "Download completed!\nYou can now continue working.";
+"download_contacts" = "Download contacts";
 "download_interrupt_warning" = "If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?";
+"download_shortcodes" = "Download shortcodes";
 "downloading_attachment___" = "Downloading attachment...";
 "downloading_percentage___" = "Downloading {0}%...";
 "edit" = "Edit";

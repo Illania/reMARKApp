@@ -688,6 +688,9 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\login.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\login.png" />
     <AndroidResource Include="Resources\layout\login_spinner.axml" />
+    <AndroidResource Include="Resources\drawable\icon_download_done.xml" />
+    <AndroidResource Include="Resources\drawable\icon_download_download.xml" />
+    <AndroidResource Include="Resources\drawable\icon_download_warning.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

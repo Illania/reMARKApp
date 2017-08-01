@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -169,9 +170,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 upView.TopAnchor.ConstraintEqualTo(startView.TopAnchor)
             });
 
-            var imageView = new UIView
+            var imageView = new UIImageView
             {
-                BackgroundColor = Theme.DarkBlue,
+                Image = UIImage.FromBundle(Path.Combine("icons", "download.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             upView.AddSubview(imageView);
@@ -205,7 +206,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             startButton.TitleLabel.Font = Theme.DefaultLightFont;
             startButton.Layer.CornerRadius = 7.5f;
-            startButton.SetTitle("Download contacts", UIControlState.Normal);
+
+            switch (Folder.Module)
+            {
+                case ModuleType.Contacts:
+                    startButton.SetTitle(Localization.GetString("download_contacts"), UIControlState.Normal);
+                    break;
+                case ModuleType.Shortcodes:
+                    startButton.SetTitle(Localization.GetString("download_shortcodes"), UIControlState.Normal);
+                    break;
+                default:
+                    startButton.SetTitle(Localization.GetString("download"), UIControlState.Normal);
+                    break;
+            }
+
             downView.AddSubview(startButton);
             downView.AddConstraints(new[]
             {
@@ -272,9 +286,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 infoView.BottomAnchor.ConstraintEqualTo(upView.BottomAnchor)
             });
 
-            var warningImage = new UIView
+            var warningImage = new UIImageView
             {
-                BackgroundColor = Theme.White,
+                Image = UIImage.FromBundle(Path.Combine("icons", "warning.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                TintColor = Theme.LightGray,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             infoView.AddSubview(warningImage);
@@ -400,9 +415,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 upView.TopAnchor.ConstraintEqualTo(finishedView.TopAnchor)
             });
 
-            var imageView = new UIView
+            var imageView = new UIImageView
             {
-                BackgroundColor = Theme.DarkBlue,
+                Image = UIImage.FromBundle(Path.Combine("icons", "done.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             upView.AddSubview(imageView);
