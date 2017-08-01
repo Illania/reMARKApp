@@ -254,7 +254,7 @@
 		<Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\PickerContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFolderListViewController %28copy%29.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\PickerShortcodesFolderListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
@@ -278,6 +278,8 @@
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextFieldTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />
+		<Compile Include="Ui\ViewControllers\ContactsList\ParentContactSelectorListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

@@ -40,6 +40,7 @@
 "close" = "Close";
 "comments" = "Comments";
 "company" = "Company";
+"company_department" = "Company/Department";
 "confirm" = "Confirm";
 "confirm_copy_to_folder" = "Copy";
 "confirm_copy_to_folder" = "Copy";
@@ -212,6 +213,11 @@
 "opening_attachment___" = "Opening attachment...";
 "originator" = "Originator";
 "own_worktray" = "My worktray";
+"parent_contact_selector_invalid_title" = "Invalid choice";
+"parent_contact_selector_invalid_person_content" = "It is not possible to select a person";
+"parent_contact_selector_invalid_department_content" = "It is not possible to select a department";
+"parent_contact_selector_invalid_company_content" = "It is not possible to select a company";
+"parent_contact_selector_choose" = "Choose which contact you want to select";
 "password" = "Password";
 "person" = "Person";
 "phone" = "Phone";
