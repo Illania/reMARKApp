@@ -7,7 +7,7 @@ using Android.Net;
 using Android.OS;
 using Firebase;
 using Firebase.Iid;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sb = new StringBuilder();
             sb.AppendLine("===== Server information =====");
-            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine(Serializer.Serialize(ServerConfig.SystemSettings));
             return sb.ToString();
         }
 

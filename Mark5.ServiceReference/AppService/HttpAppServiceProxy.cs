@@ -19,11 +19,15 @@ namespace Mark5.ServiceReference.AppService
         public Version Version => new Version(3, 0, 0);
 
         readonly Func<HttpMessageHandler> httpClientHandler;
+        readonly Action onStartTransmission;
+        readonly Action onStopTransmission;
         readonly string requestUri;
 
-        public HttpAppServiceProxy(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler)
+        public HttpAppServiceProxy(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
         {
             this.httpClientHandler = httpClientHandler;
+            this.onStartTransmission = onStartTransmission;
+            this.onStopTransmission = onStopTransmission;
 
             requestUri = $"{(ssl ? "https" : "http")}://{hostname}:{port}/app3";
         }
@@ -33,6 +37,8 @@ namespace Mark5.ServiceReference.AppService
             HttpStatusCode statusCode = 0;
             try
             {
+                onStartTransmission?.Invoke();
+
                 using (var c = new HttpClient(httpClientHandler())
                 {
                     Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
@@ -53,6 +59,10 @@ namespace Mark5.ServiceReference.AppService
                 }
 
                 throw new HttpAppServiceException(statusCode, ex.Message, ex);
+            }
+            finally
+            {
+                onStopTransmission?.Invoke();
             }
         }
 

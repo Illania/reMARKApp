@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var businessEntity = SerializationUtils.Deserialize<BusinessEntity>(Intent.Extras.GetString(EntityIntentKey));
+                var businessEntity = Serializer.Deserialize<BusinessEntity>(Intent.Extras.GetString(EntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
                 cf = new CommentsListFragment
                 {
@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (cf != null)
             {
                 var intent = new Intent();
-                intent.PutExtra(CommentsResultKey, SerializationUtils.Serialize(cf.Comments));
+                intent.PutExtra(CommentsResultKey, Serializer.Serialize(cf.Comments));
                 SetResult(Result.Ok, intent);
             }
 

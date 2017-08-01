@@ -6,13 +6,9 @@ namespace Mark5.ServiceReference
 {
     public static class AppServiceProxyFactory
     {
-        public static IAppServiceProxy Create(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler)
+        public static IAppServiceProxy Create(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
         {
-#if DEBUG
-            return new HttpAppServiceProxy(ssl, hostname, port, httpClientHandler);
-#else
-            return new WcfAppServiceProxy(ssl, hostname, port);
-#endif
+            return new HttpAppServiceProxy(ssl, hostname, port, httpClientHandler, onStartTransmission, onStopTransmission);
         }
     }
 }

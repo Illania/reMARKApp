@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;
@@ -8,7 +7,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -19,58 +18,42 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
         ComposeDocumentFragment cdf;
 
-        const string CreationModeFlagIntentKey = "CreationModeFlagIntent_290d1383-175d-4e2d-8f5e-ca899baff3f7";
-        const string PreviousDocumentIdIntentKey = "PreviousDocumentIdIntent_a2066147-a27b-454f-bc5c-03e6b8266697";
-
-        const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderIdIntent_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
-
-        const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirectionIntent_edefdcd2-764f-439d-891b-178b8de29333";
-
-        const string OutgoingDocumentGuidIntentKey = "OutgoingDocumentGuidIntent_7901fa2b-f096-4e9e-82b9-5aeae9f39d05";
-
-        const string PreconfiguredEmailToAddressesIntentKey = "PreconfiguredEmailToAddressesIntent_25ff402c-268e-477c-890c-80d68e60ab01";
-
-        const string PreconfiguredEmailCcAddressesIntentKey = "PreconfiguredEmailCcAddressesIntent_051636c4-f032-4736-9d05-b9c0427bba5b";
-
-        const string PreconfiguredEmailBccAddressesIntentKey = "PreconfiguredEmailBccAddressesIntent_c7d5b5ce-497c-460d-bcbd-331b3e01b656";
-        const string CopyToNewOptionsIntentKey = "CopyToNewOptionsIntent_f298d024-4df0-431d-ad3d-1834eb0dede0";
+        const string DocumentCreationModeFlagIntentKey = "DocumentCreationModeFlag_290d1383-175d-4e2d-8f5e-ca899baff3f7";
+        const string CopyToNewOptionsIntentKey = "CopyToNewOptions_f298d024-4df0-431d-ad3d-1834eb0dede0";
+        const string RestoreWorkingCopyIntentKey = "RestoreWorkingCopy_7c921825-0a4b-47e6-91b6-9c3d59a895e6";
+        const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirection_edefdcd2-764f-439d-891b-178b8de29333";
+        const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderId_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
+        const string PreviousDocumentIdIntentKey = "PreviousDocumentId_a2066147-a27b-454f-bc5c-03e6b8266697";
+        const string PreconfiguredEmailAddressesIntentKey = "PreconfiguredEmailAddresses_25ff402c-268e-477c-890c-80d68e60ab01";
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
 
         public static Intent CreateIntent(Context context,
-                                          DocumentCreationModeFlag creationModeFlag,
-                                          DocumentDirection previousDocumentDirection,
-                                          int? precedingDocumentId = null,
-                                          int? precedingDocumentFolderId = null,
-                                          Guid outgoingDocumentGuid = default(Guid),
-                                          List<string> preconfiguredEmailToAddresses = null,
-                                          List<string> preconfiguredEmailCcAddresses = null,
-                                          List<string> preconfiguredEmailBccAddresses = null,
-                                          CopyToNewOption copyToNewOptions = CopyToNewOption.None)
+                                          DocumentCreationModeFlag documentCreationModeFlag,
+                                          CopyToNewOption copyToNewOptions,
+                                          bool restoreWorkingCopy = false,
+                                          DocumentDirection previousDocumentDirection = DocumentDirection.None,
+                                          int? previousDocumentFolderId = null,
+                                          int? previousDocumentId = null,
+                                          Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
-            intent.PutExtra(CreationModeFlagIntentKey, (int)creationModeFlag);
-            intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
+            intent.PutExtra(DocumentCreationModeFlagIntentKey, (int)documentCreationModeFlag);
             intent.PutExtra(CopyToNewOptionsIntentKey, (int)copyToNewOptions);
+            intent.PutExtra(RestoreWorkingCopyIntentKey, restoreWorkingCopy);
 
-            if (precedingDocumentId != null)
-                intent.PutExtra(PreviousDocumentIdIntentKey, precedingDocumentId.Value);
+            if (previousDocumentDirection != DocumentDirection.None)
+                intent.PutExtra(PreviousDocumentDirectionIntentKey, (int)previousDocumentDirection);
 
-            if (precedingDocumentFolderId != null)
-                intent.PutExtra(PreviousDocumentFolderIdIntentKey, precedingDocumentFolderId.Value);
+            if (previousDocumentFolderId != null)
+                intent.PutExtra(PreviousDocumentFolderIdIntentKey, previousDocumentFolderId.Value);
 
-            if (outgoingDocumentGuid != default(Guid))
-                intent.PutExtra(OutgoingDocumentGuidIntentKey, outgoingDocumentGuid.ToString());
+            if (previousDocumentId != null)
+                intent.PutExtra(PreviousDocumentIdIntentKey, previousDocumentId.Value);
 
-            if (preconfiguredEmailToAddresses != null)
-                intent.PutExtra(PreconfiguredEmailToAddressesIntentKey, preconfiguredEmailToAddresses.ToArray());
-
-            if (preconfiguredEmailCcAddresses != null)
-                intent.PutExtra(PreconfiguredEmailCcAddressesIntentKey, preconfiguredEmailCcAddresses.ToArray());
-
-            if (preconfiguredEmailBccAddresses != null)
-                intent.PutExtra(PreconfiguredEmailBccAddressesIntentKey, preconfiguredEmailBccAddresses.ToArray());
+            if (preconfiguredEmailAddresses != null)
+                intent.PutExtra(PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(preconfiguredEmailAddresses));
 
             return intent;
         }
@@ -91,41 +74,24 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                cdf = new ComposeDocumentFragment();
-
-                if (Intent.HasExtra(CreationModeFlagIntentKey))
-                    cdf.CreationModeFlag = (DocumentCreationModeFlag) Intent.Extras.GetInt(CreationModeFlagIntentKey);
+                cdf = new ComposeDocumentFragment()
+                {
+                    DocumentCreationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey),
+                    CopyToNewOption = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey),
+                    RestoreWorkingCopy = Intent.Extras.GetBoolean(RestoreWorkingCopyIntentKey)
+                };
 
                 if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
-                    cdf.PreviousDocumentDirection = (DocumentDirection) Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
+                    cdf.PreviousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
+                
+                if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
+                    cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
 
                 if (Intent.HasExtra(PreviousDocumentIdIntentKey))
                     cdf.PreviousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
 
-                if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
-                    cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
-
-                if (Intent.HasExtra(PreconfiguredEmailToAddressesIntentKey))
-                    cdf.PreconfiguredEmailToAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailToAddressesIntentKey);
-
-                if (Intent.HasExtra(PreconfiguredEmailCcAddressesIntentKey))
-                    cdf.PreconfiguredEmailCcAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailCcAddressesIntentKey);
-
-                if (Intent.HasExtra(PreconfiguredEmailBccAddressesIntentKey))
-                    cdf.PreconfiguredEmailBccAddresses = Intent.Extras.GetStringArray(PreconfiguredEmailBccAddressesIntentKey);
-
-                if (Intent.HasExtra(CopyToNewOptionsIntentKey))
-                    cdf.CopyToNewOption = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey);
-
-                if (Intent.HasExtra(OutgoingDocumentGuidIntentKey))
-                {
-                    cdf.OutgoingDocumentGuid = new Guid(Intent.Extras.GetString(OutgoingDocumentGuidIntentKey));
-                    cdf.LocalDocument = true;
-                }
-                else
-                {
-                    cdf.LocalDocument = false;
-                }
+                if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
+                    cdf.PreconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
 
                 cdf.CloseRequest = OnBackPressed;
 
@@ -153,25 +119,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public override bool OnOptionsItemSelected(Android.Views.IMenuItem item)
         {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                OnBackPressed();
-                return true;
-            }
-
             return base.OnOptionsItemSelected(item);
-        }
-
-        public override void OnBackPressed()
-        {
-            cdf.AskIfShouldSave();
         }
 
         public override void Finish()
         {
             base.Finish();
-
-            cdf?.DeleteAutoSavedDocument();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }

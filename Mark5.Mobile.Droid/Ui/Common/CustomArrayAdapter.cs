@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         public static ArrayAdapter CreateWithLeftPaddingMatchingEditText(Context context, int textArrayResId, int textViewResId, int dropDownViewResId)
         {
             var strings = context.Resources.GetStringArray(textArrayResId);
-            var adapter = new CustomArrayAdapter(context, textViewResId, strings, ConversionUtils.ConvertDpToPixels(4f));
+            var adapter = new CustomArrayAdapter(context, textViewResId, strings, Conversion.ConvertDpToPixels(4f));
             adapter.SetDropDownViewResource(dropDownViewResId);
             return adapter;
         }

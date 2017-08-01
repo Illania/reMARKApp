@@ -15,10 +15,7 @@ using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
-using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -28,15 +25,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class RecipientsView : ComposeDocumentView
     {
+        const string EmailSeparator = ", ";
+        const string RecipentRegex = @".*<.*@.*>";
+        const string RecipentFormat = "{0} <{1}>";
+
         public event EventHandler Edited = delegate { };
         public event EventHandler AddButtonClicked = delegate { };
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
-
-        const string EmailSeparator = ", ";
-        const string RecipentRegex = @".*<.*@.*>";
-        const string RecipentFormat = "{0} <{1}>";
 
         string savedRecipient;
 
@@ -96,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.TextSize = 15;
             emailEditor.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
             emailEditor.Ellipsize = TextUtils.TruncateAt.End;
-            emailEditor.DropDownVerticalOffset = ConversionUtils.ConvertDpToPixels(4);
+            emailEditor.DropDownVerticalOffset = Conversion.ConvertDpToPixels(4);
 
             emailEditor.BeforeTextChanged += TextView_BeforeTextChanged;
             emailEditor.AfterTextChanged += TextView_AfterTextChanged;
@@ -108,7 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             addButton.Click += AddButton_Click;
             addButton.SetImageResource(Resource.Drawable.add);
             addButton.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
-            var addButtonLp = new LinearLayout.LayoutParams(ConversionUtils.ConvertDpToPixels(24), ConversionUtils.ConvertDpToPixels(24))
+            var addButtonLp = new LinearLayout.LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
             {
                 Gravity = GravityFlags.CenterVertical,
             };
@@ -121,23 +118,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             if (State != null)
             {
-                RestoreState();
+                SetState();
                 State = null;
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.None
-                || CreationModeFlag == DocumentCreationModeFlag.Forward)
+            if (RestoreWorkingCopy)
             {
+                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit || (CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepOnlyAddresses))
-            {
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses)
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
-            }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Reply)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
             {
                 if (AddressType != DocumentAddressType.To)
                     return Task.CompletedTask;
@@ -156,7 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
             {
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
@@ -185,46 +183,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public override Task UpdateDocument()
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
-            GetEmails()
-                .ForEach(s => DocumentPreview.Addresses.Add(new DocumentAddress
+            foreach (var email in GetEmails())
+            {
+                DocumentPreview.Addresses.Add(new DocumentAddress
                 {
-                    Address = s,
+                    Address = email,
                     AddressType = AddressType,
                     Type = CommunicationAddressType.Email
-                }));
+                });
+            }
             return Task.CompletedTask;
         }
 
         public void SetEmails(IEnumerable<string> emails)
         {
             SetEmails(string.Join(EmailSeparator, emails));
-        }
-
-        public void RemoveAddressFromLine(string lineAddress)
-        {
-            if (lineAddress == savedRecipient)
-                return;
-
-            var currentRecipients = GetRecipents().ToList();
-
-            if (!string.IsNullOrEmpty(savedRecipient))
-                currentRecipients.Add(savedRecipient);
-
-            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress));
-            if (lineRelatedRecipient != null)
-            {
-                savedRecipient = lineRelatedRecipient;
-                currentRecipients.Remove(lineRelatedRecipient);
-            }
-            else
-            {
-                savedRecipient = null;
-            }
-
-            if (currentRecipients.Any())
-                SetRecipients(currentRecipients);
-            else
-                Clear();
         }
 
         public void AddEmails(IEnumerable<string> emails)
@@ -278,10 +251,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             Edited(this, EventArgs.Empty);
         }
 
-        public void RequestEditorFocus()
+        public void RemoveAddressFromLine(string lineAddress)
         {
-            emailEditor.RequestFocus();
+            if (lineAddress == savedRecipient)
+                return;
+
+            var currentRecipients = GetRecipents().ToList();
+
+            if (!string.IsNullOrEmpty(savedRecipient))
+                currentRecipients.Add(savedRecipient);
+
+            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress));
+            if (lineRelatedRecipient != null)
+            {
+                savedRecipient = lineRelatedRecipient;
+                currentRecipients.Remove(lineRelatedRecipient);
+            }
+            else
+            {
+                savedRecipient = null;
+            }
+
+            if (currentRecipients.Any())
+                SetRecipients(currentRecipients);
+            else
+                Clear();
         }
+
+        public void RequestEditorFocus() => emailEditor.RequestFocus();
 
         #endregion
 
@@ -304,21 +301,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetEmails()
-        {
-            return Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() : new List<string>();
-        }
+        IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ?
+                                                    matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
+                                                    new List<string>();
 
-        IEnumerable<string> GetRecipents()
-        {
-            return emailEditor.Text.Split(new[]
-                    {
-                        EmailSeparator
-                    },
-                    StringSplitOptions.RemoveEmptyEntries)
+        IEnumerable<string> GetRecipents() => emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => Validator.ContainsValidEmail(s))
                 .Select(s => s.Trim());
-        }
 
         void SetRecipients(IEnumerable<string> recipients)
         {
@@ -334,10 +323,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Control event handlers
 
-        void AddButton_Click(object sender, EventArgs e)
-        {
-            AddButtonClicked(this, EventArgs.Empty);
-        }
+        void AddButton_Click(object sender, EventArgs e) => AddButtonClicked(this, EventArgs.Empty);
 
         void TextView_FocusChange(object sender, FocusChangeEventArgs e)
         {
@@ -461,9 +447,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region State related
 
-        void RestoreState()
+        void SetState()
         {
-            var recipientsViewState = State as RecipientsViewState;
+            var recipientsViewState = (RecipientsViewState)State;
             emailEditor.Text = recipientsViewState.Content;
             savedRecipient = recipientsViewState.SavedRecipient;
             if (recipientsViewState.HasFocus)
@@ -472,7 +458,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        public override IComposeDocumentViewState ReturnState()
+        public override IComposeDocumentViewState GetState()
         {
             return new RecipientsViewState
             {
@@ -517,7 +503,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 var progressBar = view.FindViewById<ProgressBar>(Resource.Id.suggestionProgressBar);
                 var separator = view.FindViewById<View>(Resource.Id.suggestionSeparator);
 
-                var isLoading = (Filter as SuggestionsFilter).Loading;
+                var isLoading = ((SuggestionsFilter)Filter).Loading;
                 var suggestion = suggestions[position];
 
                 separator.Visibility = position == Count - 1 && !isLoading ? ViewStates.Invisible : ViewStates.Visible;
@@ -600,7 +586,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 public bool Loading => answersReceived < 3;
 
                 readonly SuggestionsAdapter suggestionsAdapter;
-                SuggestionsRetrievalService suggestionService;
 
                 CancellationTokenSource searchCancellationTokenSource;
                 List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
@@ -610,7 +595,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 public SuggestionsFilter(SuggestionsAdapter suggestionsAdapter)
                 {
                     this.suggestionsAdapter = suggestionsAdapter;
-                    suggestionService = new SuggestionsRetrievalService();
                 }
 
                 #region Overrides
@@ -632,7 +616,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         suggestionsAdapter.ActualConstraint = constraint.ToString();
                         searchCancellationTokenSource = new CancellationTokenSource();
                         searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                        suggestionService.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSugguestions);
+                        RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSugguestions);
                     }
                     else
                     {

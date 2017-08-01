@@ -10,10 +10,12 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
-using Mark5.Mobile.Droid.Services;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
 #if !DEBUG
 using HockeyApp.Android;
@@ -96,13 +98,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                     Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                    var policies = Managers.DownloadManager.DownloadPolicies;
-                    policies[ObjectType.Document] = new DownloadFoldersPolicy();
-                    if (PlatformConfig.Preferences.SynchroniseContacts)
-                        policies[ObjectType.Contact] = new DownloadAllPolicy();
-                    if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                        policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-
                     if (PlatformConfig.Preferences.ClearCache)
                     {
                         CommonConfig.Logger.Info("Clearing cache...");
@@ -122,13 +117,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         CommonConfig.Logger.Info("Cleaned up cache");
                     }
 
-                    CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
-
-                    await Managers.DownloadManager.Start();
-                    await Managers.OutgoingDocumentsManager.Start();
-
                     CommonConfig.Logger.Info($"Refreshing reachability status...");
-                    await CommonConfig.ReachabilityService.Refresh();
+                    await CommonConfig.Reachability.Refresh();
 
                     CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                     PlatformConfig.ReachabilityBroadcastReceiver.Register();
@@ -139,7 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     LocalNotificationsListener.Initialize();
 
-                    DateTimeUtils.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+                    DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
                     CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
@@ -147,6 +137,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 })
                 .ContinueWith(t =>
                     {
+                        Services.DocumentsUploadService?.Start();
+                        Services.DocumentPreviewsDownloadService?.Start();
+                        Services.DocumentsDownloadService?.Start();
+
                         if (t.Result)
                             StartActivity(new Intent(this, typeof(MainActivity)));
                         else

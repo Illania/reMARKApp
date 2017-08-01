@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -11,7 +12,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
-    public class ShortcodesSearchCriteriaViewController : AbstractSearchCriteriaViewController
+    public class ShortcodesSearchCriteriaViewController : AbstractSearchCriteriaViewController, IUIViewControllerRestoration
     {
         SearchShortcodesCriteria criteria = new SearchShortcodesCriteria();
 
@@ -22,21 +23,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             StackView.AddArrangedSubview(new NameSearchView());
             StackView.AddArrangedSubview(new DescritpionSearchView());
             StackView.AddArrangedSubview(new AddressSearchView());
-
-            foreach (var view in StackView.Subviews.OfType<AbstractShortcodesSearchView>())
-                view.SetCriteria(criteria);
         }
 
-        protected override void ResetItem_Clicked(object sender, EventArgs e)
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(ShortcodesSearchCriteriaViewController);
+            RestorationClass = Class;
+        }
+
+        protected override async void ResetItem_Clicked(object sender, EventArgs e)
         {
             base.ResetItem_Clicked(sender, e);
 
             criteria = new SearchShortcodesCriteria();
 
-            foreach (var view in StackView.Subviews.OfType<AbstractShortcodesSearchView>())
-                view.SetCriteria(criteria);
-
-            SaveCriteria();
+            RefreshView();
+            await SaveCriteria();
         }
 
         protected override void SearchButton_TouchUpInside(object sender, EventArgs e)
@@ -45,18 +49,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             criteria.MaxToFetch = PlatformConfig.Preferences.ShortcodesToSearch;
 
-            CommonConfig.Logger.Info($"Starting search... [criteria={SerializationUtils.Serialize(criteria)}]");
+            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
             NavigationController.PushViewController(new ShortcodesSearchResultsViewController
-                {
-                    Criteria = criteria
-                },
-                true);
+            {
+                Criteria = criteria
+            }, true);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        protected override async void SaveCriteria()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        protected override async Task SaveCriteria()
         {
             try
             {
@@ -68,21 +69,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        protected override async void RestoreCriteria()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        protected override async Task RestoreCriteria()
         {
             try
             {
                 criteria = await Managers.SearchManager.GetLastSearchShortcodesCrtieriaAsync();
-
-                foreach (var view in StackView.Subviews.OfType<AbstractShortcodesSearchView>())
-                    view.SetCriteria(criteria);
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
             }
+        }
+
+        protected override void RefreshView()
+        {
+            foreach (var view in StackView.Subviews.OfType<AbstractShortcodesSearchView>())
+                view.SetCriteria(criteria);
         }
 
         abstract class AbstractShortcodesSearchView : AbstractSearchView
@@ -395,5 +397,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 text.UserInteractionEnabled = false;
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(Serializer.SerializeToByteArray(criteria), "criteria");
+            coder.Encode(RestoreCriteriaFromStorage, "restoreCriteriaFromStorage");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            criteria = Serializer.DeserializeFromByteArray<SearchShortcodesCriteria>(coder.DecodeBytes("criteria"));
+            RestoreCriteriaFromStorage = coder.DecodeBool("restoreCriteriaFromStorage");
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new ShortcodesSearchCriteriaViewController();
+        }
+
+        #endregion
     }
 }

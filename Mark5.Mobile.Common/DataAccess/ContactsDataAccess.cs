@@ -54,7 +54,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     query += $"order by {nameof(ContactPreview.Name)} ";
 
                     if (maxItems > 0)
-                        query += $"limit {maxItems - 1} ";
+                        query += $"limit {maxItems} ";
                     if (startRowId > 0)
                         query += $"offset {startRowId} ";
                     var result = c.Query<ContactPreview>(query);
@@ -410,73 +410,6 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<IEnumerable<int>> GetPendingFolders()
-        {
-            try
-            {
-                var fIds = new List<int>();
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var queryString = $"select {nameof(FolderContactLink.FolderId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderContactLink)}" + $"   where {nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
-
-                    var result = c.Query<IdValue>(queryString);
-
-                    fIds = result.Select(v => v.Id).ToList();
-                });
-
-                return fIds;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while getting pending folders id for contacts.", ex);
-            }
-        }
-
-        public async Task<bool> IsContactCached(int contactId)
-        {
-            try
-            {
-                var found = false;
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var result = c.Table<Contact>().Count(co => co.Id == contactId);
-                    found = result >= 1;
-                });
-
-                return found;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while checking contact existence.", ex);
-            }
-        }
-
-        public async Task<IEnumerable<int>> GetPendingContactsId(int folderId)
-        {
-            try
-            {
-                var contactIds = new List<int>();
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var folderCondition = $"{nameof(FolderContactLink.FolderId)} = ?";
-                    var inCondition = $"{nameof(FolderContactLink.ContactId)} not in (select {nameof(Contact.Id)} from {nameof(Contact)})";
-                    var queryString = $"select {nameof(FolderContactLink.ContactId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderContactLink)}" + $"   where {folderCondition} and {inCondition}";
-
-                    var result = c.Query<IdValue>(queryString, folderId);
-                    contactIds = result.Select(v => v.Id).ToList();
-                });
-
-                return contactIds;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while getting pending contacts id.", ex);
-            }
-        }
-
         public async Task RemoveOrphans()
         {
             try
@@ -512,7 +445,18 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(Recipient.Name)}," + $" CP.{nameof(ContactPreview.ShortId)} as {nameof(Recipient.ShortId)}, " + $" CP.{nameof(ContactPreview.Description)} as {nameof(Recipient.ContactDescription)}, " + $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(Recipient.Address)}, " + $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(Recipient.AddressDescription)} " + $" from {nameof(ContactPreview)} CP inner join {nameof(ContactCommunicationAddress)} CA" + $" on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)}" + $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) AND " + $" ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase)" + $" OR (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase))  " + "COLLATE Nocase";
+                    var commandString = $"select CP.{nameof(ContactPreview.Name)} as {nameof(Recipient.Name)},"
+                        + $" CP.{nameof(ContactPreview.ShortId)} as {nameof(Recipient.ShortId)}, "
+                        + $" CP.{nameof(ContactPreview.Description)} as {nameof(Recipient.ContactDescription)}, "
+                        + $" CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(Recipient.Address)}, "
+                        + $" CA.{nameof(ContactCommunicationAddress.Description)} as {nameof(Recipient.AddressDescription)} "
+                        + $" from {nameof(ContactPreview)} CP "
+                        + $"  inner join {nameof(ContactCommunicationAddress)} CA on CP.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)} "
+                        + $" where (CA.{nameof(ContactCommunicationAddress.Type)} = @addressType) "
+                        + $" and ((CP.{nameof(ContactPreview.Name)} like @phrase) OR (CP.{nameof(ContactPreview.ShortId)} like @phrase) "
+                        + $" or (CA.{nameof(ContactCommunicationAddress.Address)} like @phrase)) "
+                        + $"limit 100 "
+                        + " collate Nocase";
                     var cmd = c.CreateCommand(commandString);
                     cmd.Bind("@phrase", $"%{phrase}%");
                     cmd.Bind("@addressType", (int) CommunicationAddressType.Email);

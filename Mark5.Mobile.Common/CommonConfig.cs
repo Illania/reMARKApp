@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net.Http;
-using Mark5.Mobile.Common.Services;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Common
 {
@@ -12,13 +12,17 @@ namespace Mark5.Mobile.Common
         public static IFolder DataFolder { get; set; }
         public static IFolder DatabaseFolder { get; set; }
         public static IFolder AttachmentsFolder { get; set; }
-        public static IFolder OutgoingFolder { get; set; }
+        public static IFolder DocumentsToUploadFolder { get; set; }
+        public static IFolder DocumentWorkingCopyFolder { get; set; }
         public static ILogger Logger { get; set; }
-        public static IReachabilityService ReachabilityService { get; set; }
         public static IDeviceInfoProvider DeviceInfoProvider { get; set; }
-        public static Type ConcurrentQueueType { get; set; }
         public static Func<HttpMessageHandler> HttpClientHandler { get; set; }
-        public static IPhonebookUtils PhonebookUtilities { get; set; }
+        public static Action OnStartTransmission { get; set; }
+        public static Action OnStopTransmission { get; set; }
+        public static ITinyMessengerHub MessengerHub { get; set; }
+        public static IPhonebook Phonebook { get; set; }
+        public static IReachability Reachability { get; set; }
+        public static Type ConcurrentQueueType { get; set; }
         public static Func<string, string> Utf8Normalizer { get; set; }
     }
 }

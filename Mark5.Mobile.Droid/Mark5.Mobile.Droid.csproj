@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.props')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -30,7 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;armeabi;arm64-v8a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a;armeabi</AndroidSupportedAbis>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <MandroidI18n>cjk;mideast;west</MandroidI18n>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
@@ -59,7 +59,7 @@
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
-    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi;armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
     <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
@@ -109,16 +109,7 @@
     <Reference Include="SQLite-net">
       <HintPath>..\packages\sqlite-net-pcl.1.3.3\lib\netstandard1.1\SQLite-net.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\portable-net45+netcore45+wp8+MonoAndroid+MonoTouch\HtmlAgilityPack.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="HockeySDK.AndroidBindings">
-      <HintPath>..\packages\HockeySDK.Xamarin.4.1.4\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
-    </Reference>
-    <Reference Include="HockeySDK">
-      <HintPath>..\packages\HockeySDK.Xamarin.4.1.4\lib\MonoAndroid403\HockeySDK.dll</HintPath>
-    </Reference>
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
     </Reference>
@@ -174,23 +165,32 @@
     <Reference Include="MailBee.NET">
       <HintPath>..\packages\MailBee.NET.11.1.0\lib\netstandard1.3\MailBee.NET.dll</HintPath>
     </Reference>
-    <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.6\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.6\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.6\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.6\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.6\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK.AndroidBindings">
+      <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK">
+      <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\MonoAndroid403\HockeySDK.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.7\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.7\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.7\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\netstandard1.6\HtmlAgilityPack.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -201,10 +201,26 @@
     <Compile Include="ServerConfig.cs" />
     <Compile Include="Model\PushNotification.cs" />
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
-    <Compile Include="Services\PushNotificationInstanceIdService.cs" />
-    <Compile Include="Services\PushNotificationMessagingService.cs" />
-    <Compile Include="Services\ReachabilityBroadcastReceiver.cs" />
-    <Compile Include="Services\ReachabilityService.cs" />
+    <Compile Include="Service\PushNotificationInstanceIdService.cs" />
+    <Compile Include="Service\PushNotificationMessagingService.cs" />
+    <Compile Include="Service\ReachabilityBroadcastReceiver.cs" />
+    <Compile Include="Service\Reachability.cs" />
+    <Compile Include="Utilities\Conversion.cs" />
+    <Compile Include="Utilities\DateTimeFormatter.cs" />
+    <Compile Include="Utilities\DeviceInfoProvider.cs" />
+    <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
+    <Compile Include="Utilities\Integration.cs" />
+    <Compile Include="Utilities\LocalNotificationsListener.cs" />
+    <Compile Include="Utilities\MimeTypeMap.cs" />
+    <Compile Include="Utilities\Phonebook.cs" />
+    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
+    <Compile Include="Utilities\Preferences.cs" />
+    <Compile Include="Utilities\PushNotificationsConverter.cs" />
+    <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
+    <Compile Include="Utilities\SimpleLogger.cs" />
+    <Compile Include="Utilities\SystemReportCollector.cs" />
+    <Compile Include="Utilities\UI.cs" />
+    <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Ui\Activities\CategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\CommentsListActivity.cs" />
     <Compile Include="Ui\Activities\ComposeDocumentActivity.cs" />
@@ -251,15 +267,6 @@
     <Compile Include="Ui\Common\RetainedFragment.cs" />
     <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
-    <Compile Include="Ui\Common\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityMovedFromFolderMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityRemovedFromFolderMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\EntityRemovedMessage.cs" />
-    <Compile Include="Ui\Common\HubMessages\NewNotificationsReceived.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Fragments\ComposeDocumentFragment.cs" />
@@ -276,7 +283,7 @@
     <Compile Include="Ui\Fragments\NotificationsListFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
-    <Compile Include="Ui\Fragments\OutgoingDocumentsListFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsToUploadListFragment.cs" />
     <Compile Include="Ui\Fragments\PhonebookContactsListFragment.cs" />
     <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\PickCountryFragment.cs" />
@@ -371,24 +378,21 @@
     <Compile Include="Ui\Views\ShortcodeViews\AddressesView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\DescriptionView.cs" />
     <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
-    <Compile Include="Utilities\ConversionUtils.cs" />
-    <Compile Include="Utilities\DateTimeUtils.cs" />
-    <Compile Include="Utilities\DeviceInfoProvider.cs" />
-    <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
-    <Compile Include="Utilities\Integration.cs" />
-    <Compile Include="Utilities\LocalNotificationsListener.cs" />
-    <Compile Include="Utilities\MimeTypeMap.cs" />
-    <Compile Include="Utilities\PhonebookUtilities.cs" />
-    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
-    <Compile Include="Utilities\Preferences.cs" />
-    <Compile Include="Utilities\PushNotificationsConverter.cs" />
-    <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
-    <Compile Include="Utilities\SimpleLogger.cs" />
-    <Compile Include="Utilities\SystemReportCollector.cs" />
-    <Compile Include="Utilities\UI.cs" />
-    <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
+    <Compile Include="Ui\Activities\DownloadActivity.cs" />
+    <Compile Include="Ui\Fragments\DownloadFragment.cs" />
+    <Compile Include="Model\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
+    <Compile Include="Model\HubMessages\EntityRemovedMessage.cs" />
+    <Compile Include="Model\HubMessages\NewNotificationsReceived.cs" />
     <Compile Include="Ui\Activities\TemplatesListActivity.cs" />
     <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
+    <Compile Include="Model\FileDescription.cs" />
+    <Compile Include="Utilities\Extensions\ViewGroupExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -398,6 +402,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
+    <Folder Include="Model\HubMessages\" />
+    <Folder Include="Ui\Activities\Activities\" />
+    <Folder Include="Utilities\Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -627,7 +634,7 @@
     <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents.axml" />
     <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
-    <AndroidResource Include="Resources\layout\list_item_documents_outgoing.axml" />
+    <AndroidResource Include="Resources\layout\list_item_documents_to_upload.axml" />
     <AndroidResource Include="Resources\layout\list_item_folders.axml" />
     <AndroidResource Include="Resources\layout\list_item_notifications.axml" />
     <AndroidResource Include="Resources\layout\list_item_section.axml" />
@@ -673,12 +680,17 @@
     <AndroidResource Include="Resources\drawable-xhdpi\add.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\add.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
+    <AndroidResource Include="Resources\layout\download.axml" />
+    <AndroidResource Include="Resources\layout\list_no_refresh.axml" />
     <AndroidResource Include="Resources\drawable\login_page_divider.axml" />
     <AndroidResource Include="Resources\drawable-hdpi\login.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\login.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\login.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\login.png" />
     <AndroidResource Include="Resources\layout\login_spinner.axml" />
+    <AndroidResource Include="Resources\drawable\icon_download_done.xml" />
+    <AndroidResource Include="Resources\drawable\icon_download_download.xml" />
+    <AndroidResource Include="Resources\drawable\icon_download_warning.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
@@ -721,5 +733,5 @@
   <Import Project="..\packages\Xamarin.Android.Support.Transition.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.Transition.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Transition.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.Transition.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.Design.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.Design.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.v7.CardView.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.CardView.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets')" />
-  <Import Project="..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.targets')" />
 </Project>

@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.Content;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -23,9 +23,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
 
                 var data = new Intent();
-                data.PutExtra(PickerShortcodesListActivity.ShortcodeResultKey, SerializationUtils.Serialize(shortcode));
+                data.PutExtra(PickerShortcodesListActivity.ShortcodeResultKey, Serializer.Serialize(shortcode));
                 Activity.SetResult(Android.App.Result.Ok, data);
-                Activity.Finish();
+                Activity?.Finish();
             }
             catch (Exception ex)
             {

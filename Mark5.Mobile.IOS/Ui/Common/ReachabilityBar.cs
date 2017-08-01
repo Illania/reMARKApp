@@ -4,7 +4,7 @@ using System.Text;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Utilities;
 using ObjCRuntime;
 using UIKit;
 
@@ -69,14 +69,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 {
                     registered = true;
 
-                    CommonConfig.ReachabilityService.RefreshingReachability += ReachabilityService_RefreshingReachability;
-                    CommonConfig.ReachabilityService.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
+                    CommonConfig.Reachability.RefreshingReachability += ReachabilityService_RefreshingReachability;
+                    CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
                 }
             }
             else
             {
-                CommonConfig.ReachabilityService.RefreshingReachability -= ReachabilityService_RefreshingReachability;
-                CommonConfig.ReachabilityService.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
+                CommonConfig.Reachability.RefreshingReachability -= ReachabilityService_RefreshingReachability;
+                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
 
                 Layer.RemoveAllAnimations();
             }
@@ -91,9 +91,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             parentFrame = Superview.Frame;
 
-            if (CommonConfig.ReachabilityService.IsCheckingReachability)
+            if (CommonConfig.Reachability.IsCheckingReachability)
                 ShowConnecting(false);
-            else if (!CommonConfig.ReachabilityService.IsReachable)
+            else if (!CommonConfig.Reachability.IsReachable)
                 ShowDisconnected(false);
             else
                 Hide(false);
@@ -113,13 +113,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("tapped:")]
         public void Tapped(UILongPressGestureRecognizer recognizer)
         {
-            CommonConfig.ReachabilityService.Refresh();
+            CommonConfig.Reachability.Refresh();
         }
 
         [Export("longPressed:")]
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public async void LongPressed(UILongPressGestureRecognizer recognizer)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             UserInteractionEnabled = false;
 
@@ -127,10 +125,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             try
             {
-                var network = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.NetworkAvailability, true);
-                var google = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Google, true);
-                var serviceConnection = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.ServiceConnection, true);
-                var service = await CommonConfig.ReachabilityService.Refresh(ReachabilityMode.Service, true);
+                var network = await CommonConfig.Reachability.Refresh(ReachabilityMode.NetworkAvailability, true);
+                var google = await CommonConfig.Reachability.Refresh(ReachabilityMode.Google, true);
+                var serviceConnection = await CommonConfig.Reachability.Refresh(ReachabilityMode.ServiceConnection, true);
+                var service = await CommonConfig.Reachability.Refresh(ReachabilityMode.Service, true);
 
                 var title = Localization.GetString("connection_status");
 

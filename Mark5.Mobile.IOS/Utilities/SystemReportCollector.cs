@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Utilities;
 using MessageUI;
 using UIKit;
@@ -102,7 +102,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");
-            sb.AppendLine(SerializationUtils.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine(Serializer.Serialize(ServerConfig.SystemSettings));
             sb.AppendLine();
 
             sb.AppendLine("===== Memory information =====");

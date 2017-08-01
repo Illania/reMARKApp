@@ -36,6 +36,10 @@
     <item quantity="one">%1$d new document received.</item>
     <item quantity="other">%1$d new documents received.</item>
   </plurals>
+  <plurals name="time_remaining_minutes">
+	<item quantity="one">Time remaining: around one minute</item>
+	<item quantity="other">Time remaining: around %1$d minutes</item>
+  </plurals>
   <plurals name="users_selected">
     <item quantity="one">%1$d user selected</item>
     <item quantity="other">%1$d users selected</item>

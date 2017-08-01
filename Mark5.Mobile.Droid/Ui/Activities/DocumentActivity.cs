@@ -14,6 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class DocumentActivity : BaseAppCompatActivity
     {
+        public const string FailedDocumentToUploadGuidIntentKey = "FailedDocumentToUploadGuid_d76eb08a-1873-49f2-8e91-b6bc80417ccf";
         public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
         public const string DocumentIdIntentKey = "DocumentId_690fc3d6-ae73-4f5e-844a-06bdc44b6747";
@@ -41,20 +42,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var df = new DocumentFragment();
 
+                if (Intent.HasExtra(FailedDocumentToUploadGuidIntentKey))
+                    df.FailedDocumentToUploadGuid = Guid.Parse(Intent.Extras.GetString(FailedDocumentToUploadGuidIntentKey));
+
                 if (Intent.HasExtra(FolderIdIntentKey))
                     df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    df.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    df.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(DocumentIdIntentKey))
                     df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    df.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    df.DocumentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    df.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 df.CloseRequest = OnBackPressed;
 

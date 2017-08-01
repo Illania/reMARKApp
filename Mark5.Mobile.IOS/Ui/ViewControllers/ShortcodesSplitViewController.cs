@@ -8,12 +8,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         protected override NavigationController CreatePrimaryNavigationController()
         {
-            return new NavigationController(new BrowseFoldersListViewController(ModuleType.Shortcodes));
+            return new NavigationController(new BrowseFoldersListViewController(ModuleType.Shortcodes))
+            {
+                RestorationIdentifier = "Primary_NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Shortcodes)
+            };
         }
 
         protected override NavigationController CreateSecondaryNavigationController()
         {
-            return new NavigationController(new ShortcodeViewController());
+            return new NavigationController(new ShortcodeViewController())
+            {
+                RestorationIdentifier = "Secondary_NavigationController_" + nameof(ShortcodeViewController)
+            };
         }
     }
 }

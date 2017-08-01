@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
-using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using UIKit;
@@ -12,9 +10,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class AbstractMainViewController : UITabBarController
     {
-        protected const string DocumentTag = "document";
-        protected const string ContactTag = "contact";
-        protected const string ShortcodeTag = "shortcode";
+        protected const string DocumentsTag = "documents";
+        protected const string ContactsTag = "contacts";
+        protected const string ShortcodesTag = "shortcodes";
         protected const string SettingsTag = "settings";
 
         protected UINavigationController Dummy { get; } = new UINavigationController(new UIViewController());
@@ -74,7 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var nc = new NavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
             {
-                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
+                RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
             };
             PresentViewController(nc, true, null);
         }
@@ -83,35 +82,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             try
             {
-                var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
-
-                if (container == null)
+                var isAvailable = await Managers.DocumentsManager.IsDocumentWorkingCopyAvailableAsync();
+                if (!isAvailable)
                     return;
 
-                var title = Localization.GetString("autosave_recover_title");
-                var content = Localization.GetString("autosave_recover_content");
-
-                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, title, content);
+                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("autosave_recover_title"), Localization.GetString("autosave_recover_content"));
                 if (shouldRecover)
                 {
-                    var vc = new ComposeDocumentViewController
-                    {
-                        LocalDocument = true,
-                        CreationModeFlag = DocumentCreationModeFlag.Edit,
-                        PreviousDocumentDirection = container.DocumentPreview.Direction,
-                        OutgoingDocumentGuid = container.Info.Identifier
-                    };
-
+                    var vc = new ComposeDocumentViewController { RestoreWorkingCopy = true };
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }
                 else
-                {
-                    await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
-                }
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error while checking if autosaved document is present", ex);
+                CommonConfig.Logger.Error("Error while checking if document working copy is available!", ex);
             }
         }
     }

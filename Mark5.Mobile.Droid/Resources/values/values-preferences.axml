@@ -39,7 +39,6 @@
 	<bool name="pref_documents_sub_creator_default">true</bool>
 	<bool name="pref_documents_sub_originator_default">true</bool>
 	<bool name="pref_documents_download_as_plaintext_default">false</bool>
-	<bool name="pref_contacts_synchronised_default">false</bool>
 	<bool name="pref_contacts_sub_comm_fax_default">true</bool>
 	<bool name="pref_contacts_sub_comm_telex_default">true</bool>
 	<bool name="pref_contacts_sub_comm_im_default">true</bool>
@@ -49,7 +48,6 @@
 	<bool name="pref_contacts_sub_birthdate_default">true</bool>
 	<bool name="pref_contacts_sub_account_default">true</bool>
 	<bool name="pref_contacts_sub_vat_default">true</bool>
-	<bool name="pref_shortcodes_synchronised_default">false</bool>
 	<bool name="pref_compose_priority_enabled_default">false</bool>
 	<bool name="pref_compose_remove_line_default">false</bool>
 	<string-array name="pref_compose_template_mode_entries">

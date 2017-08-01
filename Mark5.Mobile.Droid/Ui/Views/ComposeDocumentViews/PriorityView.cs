@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -15,12 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     {
         readonly AppCompatSpinner prioritySpinner;
 
-        readonly List<Priority> priorities = new List<Priority>
-        {
-            Priority.Low,
-            Priority.Normal,
-            Priority.Urgent
-        };
+        readonly Priority[] priorities = { Priority.Low, Priority.Normal, Priority.Urgent };
 
         public PriorityView(Context context)
             : base(context)
@@ -36,8 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             AddView(titleTextView);
 
             prioritySpinner = new AppCompatSpinner(context);
-            var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
-            spinnerLayoutParams.Weight = 1;
+            var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent) { Weight = 1 };
             prioritySpinner.LayoutParameters = spinnerLayoutParams;
             var adapter = new ArrayAdapter(context, Android.Resource.Layout.SimpleSpinnerItem, priorities);
             adapter.SetDropDownViewResource(Resource.Layout.support_simple_spinner_dropdown_item);
@@ -56,18 +48,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 State = null;
                 return Task.CompletedTask;
             }
-
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit)
+            if (RestoreWorkingCopy)
             {
-                var possiblePriorities = new[]
-                {
-                    Priority.Urgent,
-                    Priority.Normal,
-                    Priority.Low
-                };
+                SetPriority(DocumentPreview.Priority);
+                return Task.CompletedTask;
+            }
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
                 var previousDocumentPriority = PreviousDocumentPreview.Priority;
 
-                if (!possiblePriorities.Contains(previousDocumentPriority))
+                if (previousDocumentPriority != Priority.Low && previousDocumentPriority != Priority.Normal && previousDocumentPriority != Priority.Urgent)
                     previousDocumentPriority = Priority.Normal;
 
                 SetPriority(previousDocumentPriority);
@@ -88,7 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetPriority(Priority priority)
         {
-            prioritySpinner.SetSelection(priorities.IndexOf(priority));
+            prioritySpinner.SetSelection(Array.IndexOf(priorities, priority));
         }
 
         Priority GetPriority()
@@ -102,16 +93,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void RestoreState()
         {
-            var priorityViewState = State as PriorityViewState;
+            var priorityViewState = (PriorityViewState)State;
             SetPriority(priorityViewState.SelectedPriority);
         }
 
-        public override IComposeDocumentViewState ReturnState()
+        public override IComposeDocumentViewState GetState()
         {
-            return new PriorityViewState
-            {
-                SelectedPriority = GetPriority()
-            };
+            return new PriorityViewState { SelectedPriority = GetPriority() };
         }
 
         class PriorityViewState : IComposeDocumentViewState

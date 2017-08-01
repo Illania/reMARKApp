@@ -5,8 +5,8 @@ using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
 
@@ -41,11 +41,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var moduleType = SerializationUtils.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
+                var moduleType = Serializer.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
 
                 if (moduleType == ModuleType.Documents)
                 {
-                    var criteria = SerializationUtils.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
+                    var criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
                     dlf = new DocumentsSearchResultsFragment
@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (moduleType == ModuleType.Contacts)
                 {
-                    var criteria = SerializationUtils.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
+                    var criteria = Serializer.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
                     var csrf = new ContactsSearchResultsFragment
@@ -73,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (moduleType == ModuleType.Shortcodes)
                 {
-                    var criteria = SerializationUtils.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
+                    var criteria = Serializer.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
                     var ssrf = new ShortcodesSearchResultsFragment
@@ -94,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (dlf != null)
             {
-                readStatusToken = PlatformConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
+                readStatusToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
             }
         }
 

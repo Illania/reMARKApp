@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -14,17 +15,22 @@ using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public abstract class AbstractShortcodesListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        static class RequestCodes
+        {
+            public const int SaveOfflineRequest = 1;
+        }
+
         public Folder Folder { get; set; }
         public Action CloseRequest { get; set; }
 
@@ -131,6 +137,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (requestCode == RequestCodes.SaveOfflineRequest && resultCode == (int)Result.Ok)
+                RefreshData(force: true, skipOfflineCheck: true);
+        }
+
         public override void OnPause()
         {
             base.OnPause();
@@ -162,7 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == 10)
             {
                 var i = new Intent(Activity, typeof(SearchActivity));
-                i.PutExtra(SearchActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(SearchActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
                 StartActivity(i);
 
                 return true;
@@ -226,7 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Refreshing
 
-        void RefreshData(int startRowId = -1, bool force = false)
+        async void RefreshData(int startRowId = -1, bool force = false, bool skipOfflineCheck = false)
         {
             CommonConfig.Logger.Info($"Attempting refresh [startRowId={startRowId}, force={force}]...");
 
@@ -235,6 +247,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             refreshing = true;
             refreshLayout.Refreshing = true;
+
+            if (force && !skipOfflineCheck && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            {
+                var result = await Dialogs.ShowYesNoCancelDialogAsync(Activity,
+                                                                      Resource.String.folder_offline_title,
+                                                                      Resource.String.folder_offline_message,
+                                                                      Resource.String.folder_offline_go_online,
+                                                                      Resource.String.folder_offline_redownload,
+                                                                      Resource.String.cancel);
+
+                if (result == 1)
+                    await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
+                if (result == 0)
+                {
+                    var i = new Intent(Activity, typeof(DownloadActivity));
+                    i.PutExtra(DownloadActivity.FolderIntentKey, Serializer.Serialize(Folder));
+                    StartActivityForResult(i, RequestCodes.SaveOfflineRequest);
+
+                    refreshLayout.Refreshing = false;
+                    refreshing = false;
+
+                    return;
+                }
+                if (result == -1)
+                {
+                    refreshLayout.Refreshing = false;
+                    refreshing = false;
+
+                    return;
+                }
+            }
 
             CommonConfig.Logger.Info($"Refresh running...");
 
@@ -249,7 +292,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
 
-                    Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
                     Activity.RunOnUiThread(() => adapter.AppendItems(cps));
                 },
                 () =>
@@ -336,8 +378,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 StartActivity(i);
 
                 ActionMode?.Finish();
@@ -348,9 +390,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
                 i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, SerializationUtils.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
+                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
                 StartActivity(i);
 
                 ActionMode?.Finish();
@@ -409,7 +451,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+            {
+                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
+                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(i);
+            }
         }
 
         async void DeleteFromFolderAction()

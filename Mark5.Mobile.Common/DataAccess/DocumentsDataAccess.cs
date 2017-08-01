@@ -19,17 +19,17 @@ namespace Mark5.Mobile.Common.DataAccess
             this.documentsDatabase = documentsDatabase;
         }
 
-        public async Task SaveDocumentPreviewsAsync(Folder folder, List<DocumentPreview> documentPreviews, bool clean)
+        public async Task SaveDocumentPreviewsAsync(int folderId, List<DocumentPreview> documentPreviews, bool clean)
         {
             try
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
                     if (clean)
-                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.FolderId == folder.Id);
+                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.FolderId == folderId);
                     c.InsertOrReplaceAll(documentPreviews.Select(dp => new FolderDocumentLink
                     {
-                        FolderId = folder.Id,
+                        FolderId = folderId,
                         DocumentId = dp.Id
                     }));
                     c.InsertOrReplaceAll(documentPreviews);
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, int maxItems = 500)
+        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(int folderId, int startId = -1, int endId = -1, int maxItems = 500)
         {
             try
             {
@@ -49,7 +49,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select * " + $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} " + $"     and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
+                    var query = $"select * " + $"from {nameof(DocumentPreview)}, {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folderId} " +
+                        $" and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} = {nameof(FolderDocumentLink)}.{nameof(FolderDocumentLink.DocumentId)} ";
 
                     if (startId > 0)
                         query += $"    and {nameof(DocumentPreview)}.{nameof(DocumentPreview.Id)} < \"{startId}\" ";
@@ -75,7 +76,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<int>> GetNeighbourDocumentsIdAsync(Folder folder, int documentId, bool getPrevious, bool getNext, int maxItems)
+        public async Task<List<int>> GetNeighbourDocumentsIdAsync(int folderId, int documentId, bool getPrevious, bool getNext, int maxItems)
         {
             try
             {
@@ -85,7 +86,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " + $"from {nameof(FolderDocumentLink)} " + $"where {nameof(FolderDocumentLink.FolderId)} = {folder.Id} ";
+                    var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " + $"from {nameof(FolderDocumentLink)} " +
+                        $"where {nameof(FolderDocumentLink.FolderId)} = {folderId} ";
 
                     string getPreviousQuery;
                     string getNextQuery;
@@ -664,70 +666,31 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<IEnumerable<int>> GetPendingFolders()
+        public async Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds, int limit = -1)
         {
             try
             {
-                var fIds = new List<int>();
+                var ids = new int[0];
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var queryString = $"select {nameof(FolderDocumentLink.FolderId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderDocumentLink)}" + $"   where {nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
+                    var query = $"select distinct DP.{nameof(DocumentPreview.Id)} " +
+                                $"from {nameof(DocumentPreview)} as DP " +
+                                $"where DP.{nameof(DocumentPreview.Id)} not in (select {nameof(Document.Id)} from {nameof(Document)}) " +
+                                $" and DP.{nameof(DocumentPreview.Id)} in (select distinct {nameof(FolderDocumentLink.DocumentId)} from {nameof(FolderDocumentLink)} where {nameof(FolderDocumentLink.FolderId)} in ({string.Join(",", folderIds)})) " +
+                                $"order by DP.{nameof(DocumentPreview.Id)} desc ";
 
-                    var result = c.Query<IdValue>(queryString);
+                    if (limit > 0)
+                        query += $"limit {limit}";
 
-                    fIds = result.Select(v => v.Id).ToList();
+                    var result = c.Query<IdValue>(query);
+                    ids = result.Select(v => v.Id).ToArray();
                 });
-
-                return fIds;
+                return ids;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error while getting pending folder ids for documents.", ex);
-            }
-        }
-
-        public async Task<bool> IsDocumentCached(int documentId)
-        {
-            try
-            {
-                var found = false;
-
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    var result = c.Table<Document>().Count(d => d.Id == documentId);
-                    found = result >= 1;
-                });
-
-                return found;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while checking document existence.", ex);
-            }
-        }
-
-        public async Task<IEnumerable<int>> GetPendingDocumentsId(int folderId)
-        {
-            try
-            {
-                var documentIds = new List<int>();
-
-                await documentsDatabase.RunInConnectionAsync(c =>
-                {
-                    var folderCondition = $"{nameof(FolderDocumentLink.FolderId)} = ?";
-                    var inCondition = $"{nameof(FolderDocumentLink.DocumentId)} not in (select {nameof(Document.Id)} from {nameof(Document)})";
-                    var queryString = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}'" + $"   from {nameof(FolderDocumentLink)}" + $"   where {folderCondition} and {inCondition}";
-
-                    var result = c.Query<IdValue>(queryString, folderId);
-                    documentIds = result.Select(v => v.Id).ToList();
-                });
-
-                return documentIds;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error while getting pending document ids.", ex);
+                throw new DataAccessException("Error getting document preview IDs of non-cached documents.", ex);
             }
         }
 

@@ -85,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Task.Run(() =>
               {
-                  contacts = CommonConfig.PhonebookUtilities.GetPhonebookContacts();
+                  contacts = CommonConfig.Phonebook.GetPhonebookContacts();
               }).ContinueWith(t =>
                {
                    Activity.RunOnUiThread(async () =>
@@ -101,7 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                        {
                            await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.phonebook_contacts_no_access_title,
                                                                 Resource.String.phonebook_contacts_no_access_content);
-                           Activity.Finish();
+                           Activity?.Finish();
                        }
                        else
                        {
@@ -114,9 +114,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, Recipient r)
         {
             var intent = new Intent();
-            intent.PutExtra(PhonebookContactsListActivity.RecipientResultKey, SerializationUtils.Serialize(r));
+            intent.PutExtra(PhonebookContactsListActivity.RecipientResultKey, Serializer.Serialize(r));
             Activity.SetResult(Result.Ok, intent);
-            Activity.Finish();
+            Activity?.Finish();
         }
 
         #region Retainable state

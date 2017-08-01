@@ -57,15 +57,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool ContactVatEnabled => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_vat), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_vat_default));
 
-
-        public bool SynchroniseContacts => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_synchronised_default));
-
-        #endregion
-
-        #region Shortcodes
-
-        public bool SynchroniseShortcodes => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_shortcodes_synchronised), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_shortcodes_synchronised_default));
-
         #endregion
 
         #region Composing Documents

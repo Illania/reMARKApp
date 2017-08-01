@@ -27,10 +27,6 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string HideReadNotificationsKey = "HideReadNotifications";
 
-            public const string SynchroniseContactsKey = "SynchroniseContacts";
-
-            public const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
-
             public const string ComposePriorityEnabledKey = "ComposePriorityEnabled";
             public const string RemoveLineKey = "RemoveLine";
             public const string UseTemplateKey = "UseTemplate";
@@ -88,12 +84,6 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.HideReadNotificationsKey), NSNumber.FromBoolean(false)
-                },
-                {
-                    new NSString(Keys.SynchroniseContactsKey), NSNumber.FromBoolean(true)
-                },
-                {
-                    new NSString(Keys.SynchroniseShortcodesKey), NSNumber.FromBoolean(false)
                 },
                 {
                     new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false)
@@ -160,10 +150,6 @@ namespace Mark5.Mobile.IOS.Utilities
         public DocumentBodyTypeRequest DocumentBodyRequestType => ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
 
         public bool HideReadNotifications => ud.BoolForKey(Keys.HideReadNotificationsKey);
-
-        public bool SynchroniseContacts => ud.BoolForKey(Keys.SynchroniseContactsKey);
-
-        public bool SynchroniseShortcodes => ud.BoolForKey(Keys.SynchroniseShortcodesKey);
 
         public bool ComposePriorityEnabled => ud.BoolForKey(Keys.ComposePriorityEnabledKey);
 

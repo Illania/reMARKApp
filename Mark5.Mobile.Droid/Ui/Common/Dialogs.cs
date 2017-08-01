@@ -52,6 +52,23 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowYesNoCancelDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no, int cancelTextId = Resource.String.cancel)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Content(contentId);
+            builder.PositiveText(positiveTextId);
+            builder.NegativeText(negativeTextId);
+            builder.NeutralText(cancelTextId);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(1)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(0)));
+            builder.OnNeutral(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task ShowConfirmDialogAsync(Context context, int titleId, int contentId)
         {
             var tcs = new TaskCompletionSource<bool>();

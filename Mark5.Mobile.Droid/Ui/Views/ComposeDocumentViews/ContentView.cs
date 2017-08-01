@@ -11,14 +11,12 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Webkit;
-using AngleSharp.Dom;
 using AngleSharp.Html;
 using AngleSharp.Parser.Html;
 using Java.Interop;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -63,9 +61,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             this.context = context;
             Orientation = Vertical;
-            var layoutParams = new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0);
-            layoutParams.Weight = 1;
-            LayoutParameters = layoutParams;
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0)
+            {
+                Weight = 1
+            };
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
 
             newContentWebView = new CustomWebView(context)
@@ -138,9 +137,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             await SetNewHtmlContentAsync(DefaultEditContent);
+            if (RestoreWorkingCopy)
+            {
+                await SetWebContentPart(NewEditableContentClass, ContentType.Html, Document.HtmlBody);
+                return;
+            }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Edit
-                || CreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
+                (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments))
             {
                 if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
                     await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
@@ -149,10 +153,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                if (PreviousDocument != null && CreationModeFlag != DocumentCreationModeFlag.New)
-                {
-                    showOldContentButton.Visibility = ViewStates.Visible;
-                }
+                showOldContentButton.Visibility = DocumentCreationModeFlag == DocumentCreationModeFlag.New ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
+                    PreviousDocument == null ? ViewStates.Gone : ViewStates.Visible;
+
                 await LoadOldContent();
             }
         }
@@ -179,7 +183,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         async Task LoadOldContent()
         {
-            if (!oldContentLoaded && CreationModeFlag != DocumentCreationModeFlag.Edit && CreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
+            if (!oldContentLoaded && DocumentCreationModeFlag != DocumentCreationModeFlag.Edit && DocumentCreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
             {
                 string oldContentString = null;
 
@@ -300,7 +304,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task SetNewHtmlContentAsync(string htmlString)
         {
             await NewSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity) context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+            ((Activity)context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
         async Task<string> GetNewHtmlContentAsync(bool processing)
@@ -308,7 +312,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             try
             {
                 await NewSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity) context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
+                ((Activity)context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
 
                 await newGetHtmlContentInterfaceSemaphore.WaitAsync();
             }
@@ -323,7 +327,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         async Task SetOldHtmlContentAsync(string htmlString)
         {
             await OldSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity) context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
+            ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
         async Task<string> GetOldHtmlContentAsync(bool processing)
@@ -331,7 +335,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             try
             {
                 await OldSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity) context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
+                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
 
                 await oldGetHtmlContentInterfaceSemaphore.WaitAsync();
             }
@@ -460,7 +464,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         async Task RestoreState()
         {
-            var contentViewState = State as ContentViewState;
+            var contentViewState = (ContentViewState)State;
             oldContentLoaded = contentViewState.OldContentLoaded;
             oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
             showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
@@ -472,10 +476,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 await SetOldHtmlContentAsync(contentViewState.OldContent);
         }
 
-        public override IComposeDocumentViewState ReturnState()
+        public override IComposeDocumentViewState GetState()
         {
             var newContentString = AsyncHelpers.RunSync(() => { return GetNewHtmlContentAsync(false); });
             var oldContentString = AsyncHelpers.RunSync(() => { return GetOldHtmlContentAsync(false); });
+
             return new ContentViewState
             {
                 NewContent = newContentString,
@@ -503,13 +508,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void FinalizeGetNewHtmlContent(Java.Lang.String content)
         {
-            newContent = (string) content;
+            newContent = (string)content;
             newGetHtmlContentInterfaceSemaphore.Release();
         }
 
         public void FinalizeGetOldHtmlContent(Java.Lang.String content)
         {
-            oldContent = (string) content;
+            oldContent = (string)content;
             oldGetHtmlContentInterfaceSemaphore.Release();
         }
 

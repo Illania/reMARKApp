@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -139,12 +139,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            TableView = new UITableView();
-            TableView.ClipsToBounds = false;
+            TableView = new UITableView
+            {
+                ClipsToBounds = false,
+                AllowsSelectionDuringEditing = false,
+                AllowsMultipleSelectionDuringEditing = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), DisableRowActions);
-            TableView.AllowsSelectionDuringEditing = false;
-            TableView.AllowsMultipleSelectionDuringEditing = true;
-            TableView.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(TableView);
             View.AddConstraints(new[]
             {
@@ -161,8 +163,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             };
             TableView.AddGestureRecognizer(longPressRecognizer);
 
-            RefreshControl = new UIRefreshControl();
-            RefreshControl.BackgroundColor = UIColor.White;
+            RefreshControl = new UIRefreshControl
+            {
+                BackgroundColor = UIColor.White
+            };
             TableView.AddSubview(RefreshControl);
         }
 
@@ -188,10 +192,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void SubscribeToMessages()
         {
-            PlatformConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
-            PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
+            CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
+            CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
+            CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
+            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
         }
 
         void InitializeNavigationBarTitle()
@@ -341,13 +345,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             RefreshData(forceClear: true);
         }
 
-        void RefreshData(int startRowId = -1, bool forceClear = false)
+        async void RefreshData(int startRowId = -1, bool forceClear = false)
         {
             if (refreshing)
                 return;
 
             refreshing = true;
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
+
+            if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            {
+                var result = await Dialogs.ShowYesNoCancelDialogAsync(this,
+                                                                      Localization.GetString("folder_offline_title"),
+                                                                      Localization.GetString("folder_offline_message"),
+                                                                      Localization.GetString("folder_offline_go_online"),
+                                                                      Localization.GetString("folder_offline_redownload"),
+                                                                      Localization.GetString("cancel"));
+
+                if (result == 1)
+                    await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
+                if (result == 0)
+                {
+                    var vc = new DownloadViewController { Folder = Folder };
+                    NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    await vc.DidDisappear;
+                }
+                if (result == -1)
+                {
+                    RefreshControl.EndRefreshing();
+                    RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+                    refreshing = false;
+
+                    return;
+                }
+            }
 
             CommonConfig.Logger.Info($"Refreshing contacts list [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]");
 
@@ -360,10 +392,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 ds.Reset();
             }
 
+            var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
+
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
                 {
-                    Managers.DownloadManager.Notify(ObjectType.Contact, Folder.Id);
                     InvokeOnMainThread(() =>
                     {
                         var ds = (DataSource)TableView.Source;
@@ -378,10 +411,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     refreshing = false;
 
                     CommonConfig.Logger.Info($"Refresh finished");
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
                 },
                 async ex =>
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                 {
                     RefreshControl.EndRefreshing();
                     RefreshControl.ValueChanged += RefreshControl_ValueChanged;
@@ -395,7 +426,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     NavigationController?.PopViewController(true);
                 },
                 startRowId,
-                cts.Token);
+                cts.Token,
+                sourceType);
         }
 
         #endregion
@@ -428,9 +460,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void DoSearchContacts(string searchText, CancellationToken ct)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             SearchResultsDataSource.Reset();
 
@@ -483,9 +513,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<ContactPreview> selectedContacts)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contacts"));
 
@@ -526,9 +554,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ContactPreview> selectedContacts)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contacts"));
 

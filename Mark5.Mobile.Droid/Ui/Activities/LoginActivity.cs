@@ -10,10 +10,11 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Services;
+using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -218,24 +219,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                var policies = Managers.DownloadManager.DownloadPolicies;
-                policies[ObjectType.Document] = new DownloadFoldersPolicy();
-                if (PlatformConfig.Preferences.SynchroniseContacts)
-                    policies[ObjectType.Contact] = new DownloadAllPolicy();
-                if (PlatformConfig.Preferences.SynchroniseShortcodes)
-                    policies[ObjectType.Shortcode] = new DownloadAllPolicy();
-
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
-                CommonConfig.Logger.Info($"Starting {nameof(IDownloadManager)} and {nameof(IOutgoingDocumentsManager)}...");
-
-                await Managers.DownloadManager.Start();
-                await Managers.OutgoingDocumentsManager.Start();
+                CommonConfig.Logger.Info($"Starting services...");
+                Services.DocumentsUploadService.Start();
+                Services.DocumentPreviewsDownloadService.Start();
+                Services.DocumentsDownloadService.Start();
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
-                await CommonConfig.ReachabilityService.Refresh();
+                await CommonConfig.Reachability.Refresh();
 
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();

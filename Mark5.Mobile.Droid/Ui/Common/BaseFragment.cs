@@ -38,11 +38,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             UserVisibleHint = false;
         }
 
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-        }
-
         public override void OnResume()
         {
             base.OnResume();
