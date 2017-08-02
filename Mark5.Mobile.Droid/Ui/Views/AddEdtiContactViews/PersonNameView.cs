@@ -138,6 +138,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 Contact.LastName = string.Join(" ", parts.Skip(1));
             }
 
+            compositeNameEditText.Error = null;
+
             UpdateSingleNames();
         }
 
@@ -147,6 +149,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 return;
 
             Contact.FirstName = firstNameEditText.Text;
+            firstNameEditText.Error = null;
             UpdateCompositeName();
         }
 
@@ -165,6 +168,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 return;
 
             Contact.LastName = lastNameEditText.Text;
+            lastNameEditText.Error = null;
             UpdateCompositeName();
         }
 
@@ -196,6 +200,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         public bool ContainsValidContent()
         {
             return !string.IsNullOrEmpty(Contact.FirstName) && !string.IsNullOrEmpty(Contact.LastName);
+        }
+
+        public void ShowError()
+        {
+            if (expandedLayout.Visibility == ViewStates.Gone)
+            {
+                compositeNameEditText.Error = Context.GetString(Resource.String.edit_contact_composite_name_error);
+            }
+            else
+            {
+                firstNameEditText.Error = string.IsNullOrEmpty(Contact.FirstName) ? Context.GetString(Resource.String.edit_contact_first_name_error) : null;
+                lastNameEditText.Error = string.IsNullOrEmpty(Contact.LastName) ? Context.GetString(Resource.String.edit_contact_last_name_error) : null;
+            }
         }
     }
 }

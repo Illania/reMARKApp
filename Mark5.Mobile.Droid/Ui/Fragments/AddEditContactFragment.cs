@@ -48,6 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         PersonNameView personNameView;
         NameView nameView;
+        ParentContactView parentContactView;
 
         List<AddEditContactView> subviews = new List<AddEditContactView>();
         List<AddEditContactView> secondarySubviews = new List<AddEditContactView>();
@@ -80,7 +81,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Clear();
 
             showMoreButton = new AppCompatButton(Context);
-            showMoreButton.Gravity = GravityFlags.Center;
             showMoreButton.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 Gravity = (int)GravityFlags.CenterHorizontal
@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Resource.Attribute.selectableItemBackground,
             });
             showMoreButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
-            showMoreButton.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
+            showMoreButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
             showMoreButton.Text = "View more";
             showMoreButton.Click += (sender, e) =>
             {
@@ -159,9 +159,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected void PrepareViewsForPerson()
         {
             personNameView = new PersonNameView(Context);
+            parentContactView = new ParentContactView(Context, OnParentContactRequest, OnParentContactRemoved);
 
             subviews.Add(personNameView);
-            subviews.Add(new ParentContactView(Context, OnParentContactRequest, OnParentContactRemoved));
+            subviews.Add(parentContactView);
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
@@ -180,9 +181,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void PrepareViewsForDeparment()
         {
             nameView = new NameView(Context);
+            parentContactView = new ParentContactView(Context, OnParentContactRequest, OnParentContactRemoved);
 
             subviews.Add(nameView);
-            subviews.Add(new ParentContactView(Context, OnParentContactRequest, OnParentContactRemoved));
+            subviews.Add(parentContactView);
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
             subviews.Add(new MobileView(Context));
@@ -229,6 +231,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnResume()
         {
             base.OnResume();
+
+            fab.Enabled = true;
+            fab.Visibility = ViewStates.Visible;
 
             RefreshData();
         }
@@ -318,13 +323,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (personNameView != null && !personNameView.ContainsValidContent())
             {
-                await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.edit_contact_composite_name_error_title, Resource.String.edit_contact_composite_name_error);
+                personNameView.ShowError();
                 return;
             }
 
             if (nameView != null && !nameView.ContainsValidContent())
             {
-                await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.edit_contact_name_error_title, Resource.String.edit_contact_name_error);
+                nameView.ShowError();
+                return;
+            }
+
+            if (parentContactView != null && !parentContactView.ContainsValidContent())
+            {
+                parentContactView.ShowError();
                 return;
             }
 

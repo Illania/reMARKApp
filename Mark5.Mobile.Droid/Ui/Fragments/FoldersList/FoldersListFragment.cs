@@ -148,7 +148,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
                     fab.Visibility = ViewStates.Visible;
                 }
-                if (RemoteFolder?.Module == ModuleType.Contacts)
+                if (RemoteFolder?.Module == ModuleType.Contacts
+                    && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
                 {
                     fab.SetImageResource(Resource.Drawable.action_add_contact);
                     fab.SetOnClickListener(new ActionOnClickListener(CreateContact));

@@ -118,12 +118,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
+                var fab = ((View)container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+
                 if (ContactPreview.Type == ContactType.Company || ContactPreview.Type == ContactType.Department)
                 {
-                    var fab = ((View)container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
                     fab.SetImageResource(Resource.Drawable.action_add_contact);
                     fab.SetOnClickListener(new ActionOnClickListener(AddChildrenContact));
                     fab.Visibility = ViewStates.Visible;
+                }
+                else
+                {
+                    fab.Visibility = ViewStates.Gone;
                 }
             }
         }

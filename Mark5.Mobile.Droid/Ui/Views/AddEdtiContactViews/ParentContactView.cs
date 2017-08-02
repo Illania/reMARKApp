@@ -9,11 +9,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         readonly Action onParentContactRequest;
         readonly Action onParentContactRemoved;
 
-
         bool disableEditing;
 
         public ParentContactView(Context context, Action onParentContactRequest, Action onParentContactRemoved)
-            : base(context, floatingHint: false, editable: false)
+            : base(context, errorResourceId: Resource.String.edit_contact_parent_error, floatingHint: false, editable: false)
         {
             this.onParentContactRequest = onParentContactRequest;
             this.onParentContactRemoved = onParentContactRemoved;
@@ -23,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         {
             int hintResId = -1;
 
+            SetError(false);
             Content = string.Empty;
 
             switch (ContactPreview.Type)
@@ -82,6 +82,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             ParentContactPreview = null;
             onParentContactRemoved();
             RefreshView();
+        }
+
+        public bool ContainsValidContent()
+        {
+            if (ContactPreview.Type == ContactType.Department && ParentContactPreview == null)
+                return false;
+
+            return true;
+        }
+
+        public void ShowError()
+        {
+            SetError(true);
         }
     }
 }
