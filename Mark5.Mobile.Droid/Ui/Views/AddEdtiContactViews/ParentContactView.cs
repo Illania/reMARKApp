@@ -64,7 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             if (!string.IsNullOrEmpty(Content) && !disableEditing)
             {
-                AddDeleteButton();
+                ShowDeleteButton();
             }
         }
 
@@ -78,7 +78,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected override void DeleteButtonClicked(object sender, EventArgs e)
         {
-            RemoveDeleteButton();
+            HideDeleteButton();
             ParentContactPreview = null;
             onParentContactRemoved();
             RefreshView();

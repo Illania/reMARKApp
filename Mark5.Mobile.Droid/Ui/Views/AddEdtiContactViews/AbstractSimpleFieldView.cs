@@ -98,12 +98,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             contentEditText.Error = errorValue ? Context.GetString(errorResourceId) : null;
         }
 
-        protected void AddDeleteButton()
+        protected void ShowDeleteButton()
         {
             deleteButton.Visibility = ViewStates.Visible;
         }
 
-        protected void RemoveDeleteButton()
+        protected void HideDeleteButton()
         {
             deleteButton.Visibility = ViewStates.Invisible;
         }
