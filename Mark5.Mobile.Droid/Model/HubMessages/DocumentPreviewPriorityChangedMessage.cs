@@ -1,0 +1,20 @@
+﻿using System.Collections.Generic;
+using Mark5.Mobile.Common.Model;
+using TinyMessenger;
+
+namespace Mark5.Mobile.Droid.Model.HubMessages
+{
+    public class DocumentPreviewCategoriesChangedMessage : TinyMessageBase
+    {
+        public int DocumentPreviewId { get; }
+
+        public List<Category> Categories { get; }
+
+        public DocumentPreviewCategoriesChangedMessage(object sender, int documentPreviewId, List<Category> categories)
+            : base(sender)
+        {
+            DocumentPreviewId = documentPreviewId;
+            Categories = categories;
+        }
+    }
+}

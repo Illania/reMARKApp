@@ -24,7 +24,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         protected override void ContentChanged(object sender, TextChangedEventArgs e)
         {
+            SetError(false);
             ContactPreview.Name = Content;
+        }
+
+        public void ShowError()
+        {
+            SetError(true);
         }
     }
 }

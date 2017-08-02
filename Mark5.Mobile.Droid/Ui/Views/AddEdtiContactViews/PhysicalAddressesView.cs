@@ -92,11 +92,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             var countrySpinner = new Spinner(Context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 {
                     TopMargin = DistanceSmall,
                     LeftMargin = DistanceSmall,
-                }
+                },
             };
             countrySpinner.Adapter = new CountryAdapter(Context, countries);
             container.AddView(countrySpinner);

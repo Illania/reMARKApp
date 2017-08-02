@@ -85,7 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 };
 
                 var fromNSDate = NSCalendar.CurrentCalendar.DateFromComponents(components);
-                dateTextField.Text = Utilities.DateTimeUtils.DateFormatter.StringFor(fromNSDate);
+                dateTextField.Text = DateTimeFormatter.LongDateFormatter.StringFor(fromNSDate);
 
                 datePicker.SetDate(fromNSDate, false);
             }

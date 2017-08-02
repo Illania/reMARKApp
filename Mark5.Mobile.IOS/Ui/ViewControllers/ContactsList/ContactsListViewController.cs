@@ -1,14 +1,23 @@
 using Foundation;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
-    public class ContactsListViewController : AbstractContactsListViewController
+    public class ContactsListViewController : AbstractContactsListViewController, IUIViewControllerRestoration
     {
         public ContactsListViewController()
             : base(false)
         {
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(ContactsListViewController);
+            RestorationClass = Class;
         }
 
         public override void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
@@ -40,5 +49,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 NavigationController.PushViewController(vc, true);
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(Serializer.SerializeToByteArray(Folder.ShallowCopy()), "folder");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            Folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new ContactsListViewController();
+        }
+
+        #endregion
+
     }
 }

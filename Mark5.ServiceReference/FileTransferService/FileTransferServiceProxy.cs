@@ -36,19 +36,26 @@ namespace Mark5.ServiceReference.FileTransferService
 
         readonly string endpointUrl;
         readonly Func<HttpMessageHandler> httpClientHandler;
+        readonly Action onStartTransmission;
+        readonly Action onStopTransmission;
 
         Version currentServiceVersion;
 
-        public FileTransferServiceProxy(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler)
+        public FileTransferServiceProxy(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
         {
-            endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}:{port}/fts3";
             this.httpClientHandler = httpClientHandler;
+            this.onStartTransmission = onStartTransmission;
+            this.onStopTransmission = onStopTransmission;
+
+            endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}:{port}/fts3";
         }
 
         public async Task<GetServiceVersionResponse> GetServiceVersionAsync(GetServiceVersionRequest req, CancellationToken ct = default(CancellationToken))
         {
             try
             {
+                onStartTransmission?.Invoke();
+
                 using (var client = new HttpClient(httpClientHandler())
                 {
                     Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
@@ -74,6 +81,10 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 throw new FileTransferServiceException(ex);
             }
+            finally
+            {
+                onStopTransmission?.Invoke();
+            }
         }
 
         public async Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, Func<Stream, Task> saveHandler, CancellationToken ct = default(CancellationToken))
@@ -94,6 +105,8 @@ namespace Mark5.ServiceReference.FileTransferService
             if (currentServiceVersion == Version300)
                 try
                 {
+                    onStartTransmission?.Invoke();
+
                     using (var client = new HttpClient(httpClientHandler())
                     {
                         Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
@@ -140,10 +153,16 @@ namespace Mark5.ServiceReference.FileTransferService
                 {
                     throw new FileTransferServiceException(ex);
                 }
+                finally
+                {
+                    onStopTransmission?.Invoke();
+                }
 
             if (currentServiceVersion >= Version301)
                 try
                 {
+                    onStartTransmission?.Invoke();
+
                     using (var client = new HttpClient(httpClientHandler())
                     {
                         Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
@@ -190,6 +209,10 @@ namespace Mark5.ServiceReference.FileTransferService
                 {
                     throw new FileTransferServiceException(ex);
                 }
+                finally
+                {
+                    onStopTransmission?.Invoke();
+                }
 
             throw new FileTransferServiceException($"Unsupported service version {currentServiceVersion}");
         }
@@ -212,6 +235,8 @@ namespace Mark5.ServiceReference.FileTransferService
             if (currentServiceVersion == Version300)
                 try
                 {
+                    onStartTransmission?.Invoke();
+
                     using (var client = new HttpClient(httpClientHandler())
                     {
                         Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
@@ -248,10 +273,16 @@ namespace Mark5.ServiceReference.FileTransferService
                 {
                     throw new FileTransferServiceException(ex);
                 }
+                finally
+                {
+                    onStopTransmission?.Invoke();
+                }
 
             if (currentServiceVersion >= Version301)
                 try
                 {
+                    onStartTransmission?.Invoke();
+
                     using (var client = new HttpClient(httpClientHandler())
                     {
                         Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
@@ -287,6 +318,10 @@ namespace Mark5.ServiceReference.FileTransferService
                 catch (Exception ex)
                 {
                     throw new FileTransferServiceException(ex);
+                }
+                finally
+                {
+                    onStopTransmission?.Invoke();
                 }
 
             throw new FileTransferServiceException($"Unsupported service version {currentServiceVersion}");

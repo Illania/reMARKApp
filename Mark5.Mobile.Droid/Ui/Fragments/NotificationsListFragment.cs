@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +10,12 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
 using TinyMessenger;
 
@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             await RefreshData();
 
-            newNotificationsToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsReceived>(m => Activity.RunOnUiThread(async () => await RefreshData()));
+            newNotificationsToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsReceived>(m => Activity.RunOnUiThread(async () => await RefreshData()));
         }
 
         public override void OnPause()
@@ -100,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(NotificationsListFragment)}...");
 
             if (newNotificationsToken != null)
-                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsReceived>(newNotificationsToken);
+                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsReceived>(newNotificationsToken);
         }
 
         #endregion

@@ -2,7 +2,7 @@
 using System.Linq;
 using Android.Content;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -31,9 +31,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
 
                     var data = new Intent();
-                    data.PutExtra(PickerContactsListActivity.RecipientResultKey, SerializationUtils.Serialize(new Recipient(contactPreview.Name, emailAddress, RecipientType.Contact)));
+                    data.PutExtra(PickerContactsListActivity.RecipientResultKey, Serializer.Serialize(new Recipient(contactPreview.Name, emailAddress, RecipientType.Contact)));
                     Activity.SetResult(Android.App.Result.Ok, data);
-                    Activity.Finish();
+                    Activity?.Finish();
                 }
                 else
                 {

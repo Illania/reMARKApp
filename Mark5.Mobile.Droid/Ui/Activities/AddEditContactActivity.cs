@@ -50,22 +50,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    cf.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    cf.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(ContactIdIntentKey))
                     cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
-                    cf.ContactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
+                    cf.ContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
 
                 if (Intent.HasExtra(ParentContactPreviewIntentKey))
                 {
-                    cf.ParentContactPreview = SerializationUtils.Deserialize<ContactPreview>(Intent.Extras.GetString(ParentContactPreviewIntentKey));
+                    cf.ParentContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ParentContactPreviewIntentKey));
                     cf.ParentPreselected = true;
                 }
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
-                    cf.Contact = SerializationUtils.Deserialize<Contact>(Intent.Extras.GetString(ContactIntentKey));
+                    cf.Contact = Serializer.Deserialize<Contact>(Intent.Extras.GetString(ContactIntentKey));
 
                 if (Intent.HasExtra(ContactCreationModeFlag))
                     cf.CreationModeFlag = (ContactCreationModeFlag)Intent.Extras.GetInt(ContactCreationModeFlag);

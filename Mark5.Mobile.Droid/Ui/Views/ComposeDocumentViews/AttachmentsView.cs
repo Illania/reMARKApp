@@ -9,18 +9,21 @@ using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
+using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Droid.Utilities.Extensions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class AttachmentsView : ComposeDocumentView
     {
         LinearLayoutCompat container;
-        List<IAttachmentDescription> attachmentsDescription = new List<IAttachmentDescription>();
 
-        public event EventHandler<IAttachmentDescription> AttachmentClicked = delegate { };
+        List<AttachmentDescription> attachmentDescriptions = new List<AttachmentDescription>();
+        List<FileDescription> fileDescriptions = new List<FileDescription>();
+
+        public event EventHandler<ClickedEventArgs> Clicked = delegate { };
 
         public AttachmentsView(Context context)
             : base(context)
@@ -60,8 +63,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (CreationModeFlag == DocumentCreationModeFlag.Forward || CreationModeFlag == DocumentCreationModeFlag.New
-                && (CopyToNewOptions == CopyToNewOption.KeepOnlyAttachments || CopyToNewOptions == CopyToNewOption.KeepTextAndAttachments))
+            if (RestoreWorkingCopy)
+            {
+                foreach (var attachmentDescription in Document.Attachments)
+                    AddAttachment(attachmentDescription);
+
+                return Task.CompletedTask;
+            }
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
+                DocumentCreationModeFlag == DocumentCreationModeFlag.New && (CopyToNewOption == CopyToNewOption.KeepOnlyAttachments || CopyToNewOption == CopyToNewOption.KeepTextAndAttachments))
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);
@@ -72,64 +84,93 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task UpdateDocument()
         {
-            var remoteAttachments = attachmentsDescription.OfType<AttachmentDescription>().ToList();
+            var remoteAttachments = attachmentDescriptions.ToArray();
+            DocumentPreview.AttachmentsCount = remoteAttachments.Length;
+            Document.Attachments.Clear();
             Document.Attachments.AddRange(remoteAttachments);
-            DocumentPreview.AttachmentsCount = attachmentsDescription.Count;
 
-            //Nothing to do for local attachments, they're saved on disk
             return Task.CompletedTask;
         }
 
-        public List<OutgoingDocumentAttachmentDescription> GetOutgoingAttachments()
+        public void AddAttachment(AttachmentDescription attachment)
         {
-            return attachmentsDescription.OfType<OutgoingDocumentAttachmentDescription>().ToList();
-        }
+            attachmentDescriptions.Add(attachment);
 
-        public void AddAttachment(IAttachmentDescription attachment)
-        {
-            attachmentsDescription.Add(attachment);
-
-            var av = new AttachmentView(Context, attachment, DistanceLarge, DistanceNormal);
+            var av = new AttachmentView(Context, attachment, null, DistanceLarge, DistanceNormal);
             av.Click += Attachment_Click;
             container.AddView(av);
 
-            Visibility = ViewStates.Visible;
+            UpdateVisibility();
         }
 
-        public void RemoveAttachment(object senderView, IAttachmentDescription attachment)
+        public void RemoveAttachment(object senderView, AttachmentDescription attachment)
         {
-            attachmentsDescription.Remove(attachment);
+            attachmentDescriptions.Remove(attachment);
             container.RemoveView(senderView as AttachmentView);
 
-            if (!attachmentsDescription.Any())
-                Visibility = ViewStates.Gone;
+            UpdateVisibility();
+        }
+
+        public void InitializeFileDescriptions(FileDescription[] newFileDescriptions)
+        {
+            fileDescriptions.Clear();
+            foreach (var fdsv in container.GetChildren().OfType<AttachmentView>().Where(av => av.FileDescription != null).ToArray())
+                container.RemoveView(fdsv);
+
+            foreach (var fd in newFileDescriptions)
+            {
+                fileDescriptions.Add(fd);
+                var av = new AttachmentView(Context, null, fd, DistanceLarge, DistanceNormal);
+                av.Click += Attachment_Click;
+                container.AddView(av);
+            }
+
+            UpdateVisibility();
+        }
+
+        public void AddFileDescription(FileDescription fileDescription)
+        {
+            fileDescriptions.Add(fileDescription);
+
+            var av = new AttachmentView(Context, null, fileDescription, DistanceLarge, DistanceNormal);
+            av.Click += Attachment_Click;
+            container.AddView(av);
+
+            UpdateVisibility();
+        }
+
+        public void RemoveFileDescription(object senderView, FileDescription fileDescription)
+        {
+            fileDescriptions.Remove(fileDescription);
+            container.RemoveView((AttachmentView)senderView);
+
+            UpdateVisibility();
         }
 
         void Attachment_Click(object sender, EventArgs e)
         {
-            var attachmentView = sender as AttachmentView;
-            AttachmentClicked(sender, attachmentView.AttachmentDescription);
+            var attachmentView = (AttachmentView)sender;
+            Clicked(sender, new ClickedEventArgs(attachmentView.AttachmentDescription, attachmentView.FileDescription));
         }
+
+        void UpdateVisibility() => Visibility = attachmentDescriptions.Any() || fileDescriptions.Any() ? ViewStates.Visible : ViewStates.Gone;
 
         #region State related
 
         void RestoreState()
         {
-            var attachmentsViewState = State as AttachmentsViewState;
+            var attachmentsViewState = (AttachmentsViewState)State;
             attachmentsViewState.AttachmentDescriptions.ForEach(AddAttachment);
         }
 
-        public override IComposeDocumentViewState ReturnState()
+        public override IComposeDocumentViewState GetState()
         {
-            return new AttachmentsViewState
-            {
-                AttachmentDescriptions = attachmentsDescription,
-            };
+            return new AttachmentsViewState { AttachmentDescriptions = attachmentDescriptions };
         }
 
         class AttachmentsViewState : IComposeDocumentViewState
         {
-            public List<IAttachmentDescription> AttachmentDescriptions { get; set; }
+            public List<AttachmentDescription> AttachmentDescriptions { get; set; }
         }
 
         #endregion
@@ -138,15 +179,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class AttachmentView : LinearLayoutCompat
         {
-            public IAttachmentDescription AttachmentDescription { get; }
+            public AttachmentDescription AttachmentDescription { get; }
+            public FileDescription FileDescription { get; }
 
-            public AttachmentView(Context context, IAttachmentDescription attachmentDescription, int distanceLarge, int distanceNormal)
+            public AttachmentView(Context context, AttachmentDescription attachmentDescription, FileDescription fileDescription, int distanceLarge, int distanceNormal)
                 : base(context)
             {
                 AttachmentDescription = attachmentDescription;
+                FileDescription = fileDescription;
 
-                var maximumWidth = ConversionUtils.ConvertDpToPixels(250f);
-                var innerMargin = ConversionUtils.ConvertDpToPixels(4f);
+                var maximumWidth = Conversion.ConvertDpToPixels(250f);
+                var innerMargin = Conversion.ConvertDpToPixels(4f);
 
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
@@ -155,19 +198,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     RightMargin = distanceLarge,
                     BottomMargin = distanceNormal
                 };
-                Elevation = ConversionUtils.ConvertDpToPixels(2f);
+                Elevation = Conversion.ConvertDpToPixels(2f);
 
                 SetBackgroundResource(Resource.Drawable.rounded_background);
 
                 Clickable = true;
 
-                var imageSize = ConversionUtils.ConvertDpToPixels(16f);
+                var imageSize = Conversion.ConvertDpToPixels(16f);
                 var image = new AppCompatImageView(Context)
                 {
                     LayoutParameters = new LayoutParams(imageSize, imageSize)
                     {
                         RightMargin = innerMargin,
-                        Gravity = (int) GravityFlags.Center
+                        Gravity = (int)GravityFlags.Center
                     }
                 };
                 image.SetImageResource(Resource.Drawable.attachment);
@@ -178,9 +221,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int) GravityFlags.Center
+                        Gravity = (int)GravityFlags.Center
                     },
-                    Text = attachmentDescription.Name,
                     Ellipsize = TextUtils.TruncateAt.End,
                 };
                 title.SetMaxWidth(maximumWidth);
@@ -192,16 +234,38 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int) GravityFlags.Center
-                    },
-                    Text = " (" + Formatters.FormatFileSize(attachmentDescription.SizeInBytes) + ")",
+                        Gravity = (int)GravityFlags.Center
+                    }
                 };
                 size.SetSingleLine(true);
                 size.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
                 AddView(size);
+
+                if (attachmentDescription != null)
+                {
+                    title.Text = attachmentDescription.Name;
+                    size.Text = " (" + Formatters.FormatFileSize(attachmentDescription.SizeInBytes) + ")";
+                }
+                if (fileDescription != null)
+                {
+                    title.Text = fileDescription.Name;
+                    size.Text = " (" + Formatters.FormatFileSize(fileDescription.SizeInBytes) + ")";
+                }
             }
         }
 
         #endregion
+
+        public class ClickedEventArgs : EventArgs
+        {
+            public AttachmentDescription AttachmentDescription { get; }
+            public FileDescription FileDescription { get; }
+
+            public ClickedEventArgs(AttachmentDescription attachmentDescription, FileDescription fileDescription)
+            {
+                AttachmentDescription = attachmentDescription;
+                FileDescription = fileDescription;
+            }
+        }
     }
 }

@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
                 if (!isValid)
                 {
-                    emailEditText.Error = Context.GetString(Resource.String.email_not_valid);
+                    emailEditText.Error = Context.GetString(Resource.String.edit_contact_invalid_email);
                     emailEditText.TextChanged -= EmailEditText_TextChanged;
                     emailEditText.TextChanged += EmailEditText_TextChanged;
                 }
@@ -153,7 +153,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         void EmailEditText_TextChanged(object sender, TextChangedEventArgs e)
         {
             var emailEditText = (AppCompatEditText)sender;
-            emailEditText.Error = !Validator.IsEmailValid(emailEditText.Text) ? Context.GetString(Resource.String.email_not_valid) : null;
+            emailEditText.Error = !Validator.IsEmailValid(emailEditText.Text) ? Context.GetString(Resource.String.edit_contact_invalid_email) : null;
         }
 
         void SetIsPrimaryOnOtherRows(EmailRow primaryAddressRow)
@@ -195,7 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             override public void UpdateRow()
             {
                 emailEditText.Text = Content.Address;
-                emailEditText.Error = !Validator.IsEmailValid(Content.Address) ? Context.GetString(Resource.String.email_not_valid) : null;
+                emailEditText.Error = !Validator.IsEmailValid(Content.Address) ? Context.GetString(Resource.String.edit_contact_invalid_email) : null;
                 emailEditText.SetTextAppearanceCompat(Context, Content.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);
             }
         }

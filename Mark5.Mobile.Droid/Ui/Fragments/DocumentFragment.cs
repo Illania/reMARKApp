@@ -14,13 +14,12 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Support;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.DocumentViews;
 using Mark5.Mobile.Droid.Utilities;
@@ -37,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
+        public Guid FailedDocumentToUploadGuid { get; set; }
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
         public int? DocumentId { get; set; }
@@ -82,7 +82,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Reply, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.Reply,
+                                                                   CopyToNewOption.None,
+                                                                   previousDocumentDirection: DocumentPreview.Direction,
+                                                                   previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                                   previousDocumentId: DocumentPreview.Id));
             };
             button1.LongClickable = true;
             button1.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply, ToastLength.Short).Show();
@@ -101,8 +106,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
                     return;
                 }
-
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.ReplyAll, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.ReplyAll,
+                                                                   CopyToNewOption.None,
+                                                                   previousDocumentDirection: DocumentPreview.Direction,
+                                                                   previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                                   previousDocumentId: DocumentPreview.Id));
             };
             button2.LongClickable = true;
             button2.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.reply_all, ToastLength.Short).Show();
@@ -122,7 +131,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.Forward, DocumentPreview.Direction, Document.Id, FolderId ?? Folder?.Id));
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.Forward,
+                                                                   CopyToNewOption.None,
+                                                                   previousDocumentDirection: DocumentPreview.Direction,
+                                                                   previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                                   previousDocumentId: DocumentPreview.Id));
             };
             button3.LongClickable = true;
             button3.LongClick += (sender, e) => Toast.MakeText(Context, Resource.String.forward, ToastLength.Short).Show();
@@ -148,8 +162,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = string.Empty;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = string.Empty;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
         }
@@ -162,7 +176,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!IsAdded || IsDetached || IsRemoving)
                 return;
-            if (!UserVisibleHint)
+            if ((Activity is SwipeDocumentActivity) && !UserVisibleHint)
                 return;
 
             MarkAsReadIfNecessary();
@@ -193,15 +207,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int) Result.Ok)
+            if (resultCode == (int)Result.Ok)
                 if (requestCode == RequestCodes.CommentsRequest)
                 {
-                    var comments = SerializationUtils.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
+                    var comments = Serializer.Deserialize<List<Comment>>(data.GetStringExtra(CommentsListActivity.CommentsResultKey));
                     UpdateComments(comments);
                 }
                 else if (requestCode == RequestCodes.CategoriesRequest)
                 {
-                    var categories = SerializationUtils.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
+                    var categories = Serializer.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
                 }
         }
@@ -230,13 +244,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (DocumentPreview == null)
                 return;
 
+            if (FailedDocumentToUploadGuid != Guid.Empty)
+                return;
+
             if (Activity is SwitchDocumentActivity && Folder != null)
             {
                 var goToPreviousItem = menu.Add(Menu.None, MenuItemActions.GoToPrevious, MenuItemActions.GoToPrevious, Resource.String.document_previous);
-                goToPreviousItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
+                goToPreviousItem.SetShowAsAction(ShowAsAction.Always);
 
                 var goToNextItem = menu.Add(Menu.None, MenuItemActions.GoToNext, MenuItemActions.GoToNext, Resource.String.document_next);
-                goToNextItem.SetShowAsAction(ShowAsAction.Always); //TODO need to put icons, and grey them out when disabled
+                goToNextItem.SetShowAsAction(ShowAsAction.Always);
             }
 
             if (!DocumentPreview.IsReadByCurrent)
@@ -288,21 +305,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var goToPreviousItem = menu.FindItem(MenuItemActions.GoToPrevious);
                 if (goToPreviousItem != null)
-                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity) Activity).HasPrevious(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToPreviousItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasPrevious(DocumentId ?? DocumentPreview.Id));
 
                 var goToNextItem = menu.FindItem(MenuItemActions.GoToNext);
                 if (goToNextItem != null)
-                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity) Activity).HasNext(DocumentId ?? DocumentPreview.Id)); // TODO set color alpha for disabled state
+                    goToNextItem.SetEnabled(await ((SwitchDocumentActivity)Activity).HasNext(DocumentId ?? DocumentPreview.Id));
             }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToPrevious)
-                ((SwitchDocumentActivity) Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
+                ((SwitchDocumentActivity)Activity).GoToPrevious(DocumentId ?? DocumentPreview.Id);
 
             if (Activity is SwitchDocumentActivity && item.ItemId == MenuItemActions.GoToNext)
-                ((SwitchDocumentActivity) Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
+                ((SwitchDocumentActivity)Activity).GoToNext(DocumentId ?? DocumentPreview.Id);
 
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
@@ -325,10 +342,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    Serializer.Serialize(new List<IBusinessEntity>
                     {
                         DocumentPreview
                     }));
@@ -340,14 +357,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
                 var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int) CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, SerializationUtils.Serialize(ModuleType.Documents));
+                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
+                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
                 i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    SerializationUtils.Serialize(new List<IBusinessEntity>
+                    Serializer.Serialize(new List<IBusinessEntity>
                     {
                         DocumentPreview
                     }));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, SerializationUtils.Serialize(Folder));
+                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
                 StartActivity(i);
 
                 return true;
@@ -362,7 +379,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Categories)
             {
                 var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, SerializationUtils.Serialize(DocumentPreview));
+                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(DocumentPreview));
                 StartActivityForResult(i, RequestCodes.CategoriesRequest);
 
                 return true;
@@ -371,7 +388,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Comments)
             {
                 var i = new Intent(Activity, typeof(CommentsListActivity));
-                i.PutExtra(CommentsListActivity.EntityIntentKey, SerializationUtils.Serialize(Document));
+                i.PutExtra(CommentsListActivity.EntityIntentKey, Serializer.Serialize(Document));
                 StartActivityForResult(i, RequestCodes.CommentsRequest);
 
                 return true;
@@ -380,7 +397,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview as IBusinessEntity));
+                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
                 StartActivity(i);
 
                 return true;
@@ -389,7 +406,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Links)
             {
                 var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, SerializationUtils.Serialize(DocumentPreview as IBusinessEntity));
+                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
                 StartActivity(i);
 
                 return true;
@@ -427,7 +444,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
 
                 RefreshView<RecipentsView>();
-                PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
+                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
 
                 dismissAction();
             }
@@ -452,7 +469,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, false, ServerConfig.SystemSettings.UserInfo.User);
 
                 RefreshView<RecipentsView>();
-                PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
+                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
 
                 dismissAction();
             }
@@ -496,21 +513,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (option == 1)
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,
-                    new List<IBusinessEntity>
-                    {
-                        DocumentPreview
-                    }));
+            {
+                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
+                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(new List<IBusinessEntity> { DocumentPreview }));
+                StartActivity(i);
+            }
         }
 
         async void SetPriority()
         {
-            var possiblePriorities = new List<Priority>
-            {
-                Priority.Urgent,
-                Priority.Normal,
-                Priority.Low
-            };
+            var possiblePriorities = new List<Priority> { Priority.Urgent, Priority.Normal, Priority.Low };
             var documentPriority = DocumentPreview.Priority;
 
             if (!possiblePriorities.Contains(documentPriority))
@@ -533,7 +545,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     priority);
 
                 RefreshView<PriorityView>();
-                PlatformConfig.MessengerHub.Publish(new DocumentPreviewPriorityChangedMessage(this, DocumentPreview.Id, DocumentPreview.Priority));
+                CommonConfig.MessengerHub.Publish(new DocumentPreviewPriorityChangedMessage(this, DocumentPreview.Id, DocumentPreview.Priority));
 
                 dismissAction();
             }
@@ -565,7 +577,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     },
                     Folder);
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
                     ObjectType.Document,
                     Folder.Id,
                     new List<int>
@@ -602,7 +614,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     DocumentPreview
                 });
 
-                PlatformConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
                     ObjectType.Document,
                     new List<int>
                     {
@@ -610,8 +622,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
             catch (Exception ex)
             {
@@ -650,9 +661,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     break;
             }
 
-            var intent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, DocumentPreview.Direction, Document.Id,
-                                                         FolderId ?? Folder?.Id, copyToNewOptions: option);
-            StartActivity(intent);
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                               DocumentCreationModeFlag.New,
+                                                               option,
+                                                               previousDocumentDirection: DocumentPreview.Direction,
+                                                               previousDocumentFolderId: Folder?.Id ?? FolderId,
+                                                               previousDocumentId: DocumentPreview.Id));
         }
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
@@ -751,6 +765,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (NotificationGuid != default(Guid))
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
 
+                if (FailedDocumentToUploadGuid != Guid.Empty)
+                {
+                    (DocumentPreview, Document) = await Managers.DocumentsManager.GetFailedDocumentToUpload(FailedDocumentToUploadGuid);
+                    DocumentId = Document.Id;
+                }
+
                 if (DocumentId.HasValue && DocumentPreview == null && Document == null)
                 {
                     var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
@@ -769,31 +789,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
         }
 
         void RefreshView()
         {
-            button1.Enabled = true;
-            button2.Enabled = true;
-            button3.Enabled = true;
+            var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;
+            if (activateButtons)
+            {
+                button1.Enabled = true;
+                button2.Enabled = true;
+                button3.Enabled = true;
+                button1.Alpha = 1f;
+                button2.Alpha = 1f;
+                button3.Alpha = 1f;
+            }
+            else
+            {
+                button1.Enabled = false;
+                button2.Enabled = false;
+                button3.Enabled = false;
+                button1.Alpha = .5f;
+                button2.Alpha = .5f;
+                button3.Alpha = .5f;
+            }
 
             progress.Visibility = ViewStates.Gone;
             relativeLayout.Visibility = ViewStates.Visible;
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as DocumentView;
-                if (dv != null)
+                if (linearLayout.GetChildAt(i) is DocumentView dv)
                 {
                     dv.DocumentPreview = DocumentPreview;
                     dv.Document = Document;
                     dv.RefreshView();
 
-                    var d = linearLayout.GetChildAt(i + 1) as Divider;
-                    if (d != null)
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {
                         d.Visibility = dv.Visibility;
                         i++;
@@ -814,15 +847,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as T;
-                if (dv != null)
+                if (linearLayout.GetChildAt(i) is T dv)
                 {
                     dv.DocumentPreview = DocumentPreview;
                     dv.Document = Document;
                     dv.RefreshView();
 
-                    var d = linearLayout.GetChildAt(i + 1) as Divider;
-                    if (d != null)
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {
                         d.Visibility = dv.Visibility;
                         i++;
@@ -878,7 +909,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             return;
 
                         RefreshView<RecipentsView>();
-                        PlatformConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
+                        CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
                     });
                 }
                 catch (Exception ex)
@@ -919,8 +950,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var dfs = restoredState as DocumentFragmentState;
-            if (dfs != null)
+            if (restoredState is DocumentFragmentState dfs)
             {
                 FolderId = dfs.FolderId;
                 Folder = dfs.Folder;

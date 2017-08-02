@@ -1,18 +1,28 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿using Foundation;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
-    public class ShortcodesListViewController : AbstractShortcodesListViewController
+    public class ShortcodesListViewController : AbstractShortcodesListViewController, IUIViewControllerRestoration
     {
         public ShortcodesListViewController()
             : base(false)
         {
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            RestorationIdentifier = nameof(ShortcodesListViewController);
+            RestorationClass = Class;
+        }
+
         public override void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
-            if (tableView == searchResultsController.TableView)
+            if (tableView == SearchResultsController.TableView)
             {
                 var ds = (DataSource) tableView.Source;
                 var indexPath = ds.FindItemIndexPath(shortcodePreview);
@@ -42,5 +52,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 NavigationController.PushViewController(vc, true);
             }
         }
+
+        #region State restoration
+
+        public override void EncodeRestorableState(NSCoder coder)
+        {
+            base.EncodeRestorableState(coder);
+            coder.Encode(Serializer.SerializeToByteArray(Folder.ShallowCopy()), "folder");
+        }
+
+        public override void DecodeRestorableState(NSCoder coder)
+        {
+            base.DecodeRestorableState(coder);
+            Folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
+        }
+
+        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
+        {
+            return new ShortcodesListViewController();
+        }
+
+        #endregion
     }
 }

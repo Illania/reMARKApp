@@ -9,10 +9,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ContactType childrenType;
 
         public ParentContactSelectorFoldersListFragment(ContactType childrenType)
-            : base(true, true)
         {
-            RemoteFolder = Folder.RootForModule(ModuleType.Contacts);
             this.childrenType = childrenType;
+
+            RemoteFolder = Folder.RootForModule(ModuleType.Contacts);
+            HideSearch = true;
+            HideFab = true;
+            LoadRemoteFromCache = true;
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)

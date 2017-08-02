@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -47,6 +47,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            RestorationIdentifier = nameof(NotificationsListViewController);
+            RestorationClass = Class;
+
             ExtendedLayoutIncludesOpaqueBars = true;
         }
 
@@ -64,27 +67,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
                     tableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
 
-            if (newNotificationsMessageToken != null)
-            {
-                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
-                newNotificationsMessageToken = null;
-            }
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-            newNotificationsMessageToken = PlatformConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+            newNotificationsMessageToken?.Dispose();
+            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource)tableView.Source;
             await RefreshData();
         }
 
@@ -94,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (newNotificationsMessageToken != null)
             {
-                PlatformConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
+                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
                 newNotificationsMessageToken = null;
             }
 
@@ -202,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource)tableView.Source;
                 ds.SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
@@ -223,52 +218,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public async void NotificationSelected(Notification notification, NSIndexPath row)
         {
             await Managers.NotificationsManager.MarkAsRead(notification);
-            tableView.ReloadRows(new[]
-                {
-                    row
-                },
-                UITableViewRowAnimation.Fade);
+            tableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
 
             switch (notification.ObjectType)
             {
                 case ObjectType.Document:
-                    PresentDocumentViewController(notification.ObjectId);
-                    break;
-                case ObjectType.Contact:
-                    PresentContactViewController(notification.ObjectId);
-                    break;
-                case ObjectType.Shortcode:
-                    PresentShortcodeViewController(notification.ObjectId);
+                    PresentDocumentViewController(notification.ObjectId, notification.Guid);
                     break;
             }
         }
 
-        public void PresentDocumentViewController(int documentId)
+        void PresentDocumentViewController(int documentId, Guid notificationGuid)
         {
             var vc = new DocumentViewController();
             vc.Modal = true;
             vc.SetRefreshDataOnAppear();
-            vc.SetData(documentId);
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        public void PresentContactViewController(int contactId)
-        {
-            var vc = new ContactViewController();
-            vc.Modal = true;
-            vc.SetRefreshDataOnAppear();
-            vc.SetData(contactId);
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        public void PresentShortcodeViewController(int shortcodeId)
-        {
-            var vc = new ShortcodeViewController();
-            vc.Modal = true;
-            vc.SetRefreshDataOnAppear();
-            vc.SetData(shortcodeId);
+            vc.SetData(documentId, notificationGuid);
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }

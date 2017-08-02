@@ -15,12 +15,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         void Initialize(string labelText)
         {
-            label = new UILabel();
-            label.Text = labelText + ":";
-            label.Font = Theme.DefaultFont;
-            label.TextColor = UIColor.LightGray;
-            label.Opaque = false;
-            label.TranslatesAutoresizingMaskIntoConstraints = false;
+            label = new UILabel
+            {
+                Text = labelText + ":",
+                Font = Theme.DefaultFont,
+                TextColor = UIColor.LightGray,
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -31,18 +33,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
             });
 
-            TextView = new UITextView();
-            TextView.Font = Theme.DefaultFont;
-            TextView.Editable = false;
-            TextView.Opaque = false;
-            TextView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            TextView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            TextView.SpellCheckingType = UITextSpellCheckingType.Yes;
+            TextView = new UITextView
+            {
+                Font = Theme.DefaultFont,
+                Editable = false,
+                Opaque = false,
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                SpellCheckingType = UITextSpellCheckingType.Yes,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             TextView.TextContainer.LineFragmentPadding = 0f;
-            TextView.TextContainerInset = UIEdgeInsets.Zero;
-            TextView.ClipsToBounds = false;
-            TextView.ScrollEnabled = false;
-            TextView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(TextView);
             ContainerView.AddConstraints(new[]
             {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -69,9 +69,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
@@ -284,12 +282,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         case ObjectType.Document:
                             var documentPreview = BusinessEntityPreview as DocumentPreview;
                             await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, categoriesToAssign);
-                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, categoriesToAssign));
+                            CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, categoriesToAssign));
                             break;
                         case ObjectType.Contact:
                             var contactPreview = BusinessEntityPreview as ContactPreview;
                             await Managers.ContactsManager.SetCategoriesAsync(contactPreview, categoriesToAssign);
-                            PlatformConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, categoriesToAssign));
+                            CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, categoriesToAssign));
                             break;
                         default:
                             throw new ArgumentException("Invalid BusinessEntityPreview!");
@@ -361,9 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void DoSearchCategory(string searchText, CancellationTokenSource ct)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             searchDataSource.Reset();
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -126,9 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DismissViewController(true, null);
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void CopyBusinessEntityToFolder(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             string key;
             switch (businessEntities.First().ObjectType)
@@ -171,9 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void MoveBusinessEntityToFolder(Folder folder)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             string key;
             switch (businessEntities.First().ObjectType)
@@ -201,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, folder);
-                PlatformConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
+                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
                 dismissAction();
             }
             catch (Exception ex)

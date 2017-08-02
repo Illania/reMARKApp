@@ -5,7 +5,7 @@ using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Services;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -26,8 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         NSLayoutConstraint spaceHeightConstraint;
 
-        SuggestionsRetrievalService suggestionService;
-
         CancellationTokenSource searchCancellationTokenSource;
         List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
 
@@ -45,7 +43,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public SuggestionsListView(ComposeDocumentViewController composeDocumentViewController)
         {
             viewController = composeDocumentViewController;
-            suggestionService = new SuggestionsRetrievalService();
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
@@ -58,10 +55,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             BackgroundColor = UIColor.White;
 
-            spaceView = new UIView();
-            spaceView.Opaque = false;
-            spaceView.BackgroundColor = UIColor.Clear;
-            spaceView.TranslatesAutoresizingMaskIntoConstraints = false;
+            spaceView = new UIView
+            {
+                Opaque = false,
+                BackgroundColor = UIColor.Clear,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
             AddSubview(spaceView);
             AddConstraints(new[]
@@ -72,8 +71,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 spaceHeightConstraint
             });
 
-            suggestionsTextView = new SuggestionsTextView();
-            suggestionsTextView.TranslatesAutoresizingMaskIntoConstraints = false;
+            suggestionsTextView = new SuggestionsTextView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             AddSubview(suggestionsTextView);
             AddConstraints(new[]
             {
@@ -87,8 +88,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsTextView.CommaOrEnterPressed += (sender, e) => Dismiss();
             suggestionsTextView.ReachedOriginalState += (sender, e) => Dismiss();
 
-            separator = new SeparatorSubView();
-            separator.TranslatesAutoresizingMaskIntoConstraints = false;
+            separator = new SeparatorSubView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             AddSubview(separator);
             AddConstraints(new[]
             {
@@ -101,13 +104,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitializeListView()
         {
-            suggestionsTableView = new UITableView();
-            suggestionsTableView.BackgroundColor = Theme.Gray;
-            suggestionsTableView.RowHeight = UITableView.AutomaticDimension;
-            suggestionsTableView.EstimatedRowHeight = 44f;
-            suggestionsTableView.TableFooterView = new UIView(CGRect.Empty); //Used to avoid showing empty rows at the bottom
+            suggestionsTableView = new UITableView
+            {
+                BackgroundColor = Theme.Gray,
+                RowHeight = UITableView.AutomaticDimension,
+                EstimatedRowHeight = 44f,
+                TableFooterView = new UIView(CGRect.Empty),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             suggestionsTableView.Source = suggestionsListViewSource = new SuggestionsListViewSource(this, suggestionsTableView);
-            suggestionsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(suggestionsTableView);
             AddConstraints(new[]
             {
@@ -186,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 suggestionsListViewSource.Searching = true;
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                suggestionService.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
+                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
             }
             else
             {
@@ -239,162 +244,162 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             spaceHeightConstraint.Constant = offset;
             LayoutIfNeeded();
         }
-    }
 
-    public class SuggestionsListViewSource : UITableViewSource
-    {
-        public bool Empty => !Suggestions.Any();
-
-        public bool Searching { get; set; }
-
-        public bool Loading => answersReceived < 3 && Searching;
-
-        int answersReceived;
-
-        UITableView tableView;
-        SuggestionsListView suggestionsListView;
-
-        public SuggestionsObservableCollection Suggestions { get; set; } = new SuggestionsObservableCollection();
-
-        public SuggestionsListViewSource(SuggestionsListView emailCompositionView, UITableView suggestionsTableView)
+        class SuggestionsListViewSource : UITableViewSource
         {
-            tableView = suggestionsTableView;
-            suggestionsListView = emailCompositionView;
-        }
+            public bool Empty => !Suggestions.Any();
 
-        #region UITableViewDataSource implementation
+            public bool Searching { get; set; }
 
-        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-        {
-            if (Loading && indexPath.Row == Suggestions.Count)
+            public bool Loading => answersReceived < 3 && Searching;
+
+            int answersReceived;
+
+            UITableView tableView;
+            SuggestionsListView suggestionsListView;
+
+            public SuggestionsObservableCollection Suggestions { get; set; } = new SuggestionsObservableCollection();
+
+            public SuggestionsListViewSource(SuggestionsListView emailCompositionView, UITableView suggestionsTableView)
             {
-                var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) ?? WaitTableViewCell.Create();
-                waitingCell.BackgroundColor = UIColor.Clear;
-                return waitingCell;
+                tableView = suggestionsTableView;
+                suggestionsListView = emailCompositionView;
             }
 
-            if (Empty)
+            #region UITableViewDataSource implementation
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                emptyCell.Initialize(Localization.GetString("no_suggestions_available"));
-                emptyCell.BackgroundColor = UIColor.Clear;
-                return emptyCell;
+                if (Loading && indexPath.Row == Suggestions.Count)
+                {
+                    var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) ?? WaitTableViewCell.Create();
+                    waitingCell.BackgroundColor = UIColor.Clear;
+                    return waitingCell;
+                }
+
+                if (Empty)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    emptyCell.Initialize(Localization.GetString("no_suggestions_available"));
+                    emptyCell.BackgroundColor = UIColor.Clear;
+                    return emptyCell;
+                }
+
+                var printableSuggestion = Suggestions[indexPath.Row];
+
+                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
+                cell.Initialize(printableSuggestion);
+
+                return cell;
             }
 
-            var printableSuggestion = Suggestions[indexPath.Row];
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                return Loading || Empty ? Suggestions.Count + 1 : Suggestions.Count;
+            }
 
-            var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
-            cell.Initialize(printableSuggestion);
+            #endregion
 
-            return cell;
+            #region UITableViewDelegate implementation
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (Empty)
+                    return;
+
+                var printableSuggestion = Suggestions[indexPath.Row];
+                suggestionsListView.SuggestionSelected(printableSuggestion);
+            }
+
+            #endregion
+
+            #region Public methods
+
+            public void ReloadData()
+            {
+                tableView.ReloadData();
+            }
+
+            public virtual void RefreshData(List<Recipient> printableSuggestions, bool clean = false)
+            {
+                answersReceived += 1;
+                Suggestions.AddOrReplaceAllSorted(printableSuggestions);
+            }
+
+            public void Clean()
+            {
+                answersReceived = 0;
+                Suggestions.Clear();
+            }
+
+            #endregion
         }
 
-        public override nint RowsInSection(UITableView tableview, nint section)
+        class SuggestionsObservableCollection : SortedObservableCollection<Recipient>
         {
-            return Loading || Empty ? Suggestions.Count + 1 : Suggestions.Count;
+            public SuggestionsObservableCollection()
+                : base(Recipient.LookupComparison, Recipient.SortingComparison)
+            {
+            }
         }
 
-        #endregion
-
-        #region UITableViewDelegate implementation
-
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        class SuggestionsTextView : RecipientsView
         {
-            if (Empty)
-                return;
+            string originalState;
 
-            var printableSuggestion = Suggestions[indexPath.Row];
-            suggestionsListView.SuggestionSelected(printableSuggestion);
-        }
+            public event EventHandler ReachedOriginalState = delegate { };
 
-        #endregion
+            public SuggestionsTextView()
+                : base(DocumentAddressType.None, true)
+            {
+                CollapseExpandAnimationEnabled = false;
+            }
 
-        #region Public methods
+            #region Public methods
 
-        public void ReloadData()
-        {
-            tableView.ReloadData();
-        }
-
-        public virtual void RefreshData(List<Recipient> printableSuggestions, bool clean = false)
-        {
-            answersReceived += 1;
-            Suggestions.AddOrReplaceAllSorted(printableSuggestions);
-        }
-
-        public void Clean()
-        {
-            answersReceived = 0;
-            Suggestions.Clear();
-        }
-
-        #endregion
-    }
-
-    public class SuggestionsObservableCollection : SortedObservableCollection<Recipient>
-    {
-        public SuggestionsObservableCollection()
-            : base(Recipient.LookupComparison, Recipient.SortingComparison)
-        {
-        }
-    }
-
-    public class SuggestionsTextView : RecipientsView
-    {
-        string originalState;
-
-        public event EventHandler ReachedOriginalState = delegate { };
-
-        public SuggestionsTextView()
-            : base(DocumentAddressType.None, true)
-        {
-            CollapseExpandAnimationEnabled = false;
-        }
-
-        #region Public methods
-
-        public void AddSuggestion(Recipient printableSuggestion)
-        {
-            var text = TextView.Text;
-            var splittedRecipients = text.Split(new[]
-                    {
+            public void AddSuggestion(Recipient printableSuggestion)
+            {
+                var text = TextView.Text;
+                var splittedRecipients = text.Split(new[]
+                        {
                         EmailSeparator
                     },
-                    StringSplitOptions.None)
-                .ToList();
-            splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
-            splittedRecipients.Add(printableSuggestion.ToString());
-            TextView.Text = string.Join(EmailSeparator, splittedRecipients) + EmailSeparator;
+                        StringSplitOptions.None)
+                    .ToList();
+                splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
+                splittedRecipients.Add(printableSuggestion.ToString());
+                TextView.Text = string.Join(EmailSeparator, splittedRecipients) + EmailSeparator;
 
-            CorrectMarkup();
+                CorrectMarkup();
+            }
+
+            public void SetOriginalState(RecipientsView recipientsView)
+            {
+                var originalText = recipientsView.GetText();
+                originalState = originalText.Length > 1 ? originalText.Substring(0, originalText.Length - 1) : string.Empty;
+                SetDocumentAddressType(recipientsView.AddressType);
+                SetText(originalText);
+            }
+
+            #endregion
+
+            #region Private methods
+
+            protected void SetDocumentAddressType(DocumentAddressType type)
+            {
+                AddressType = type;
+                Label.Text = GetTitleFromAddressType();
+            }
+
+            protected override void HandleTextViewChanged(object sender, EventArgs e)
+            {
+                base.HandleTextViewChanged(sender, e);
+
+                if (TextView.Text == originalState)
+                    ReachedOriginalState(this, EventArgs.Empty);
+            }
+
+            #endregion
         }
-
-        public void SetOriginalState(RecipientsView recipientsView)
-        {
-            var originalText = recipientsView.GetText();
-            originalState = originalText.Length > 1 ? originalText.Substring(0, originalText.Length - 1) : string.Empty;
-            SetDocumentAddressType(recipientsView.AddressType);
-            SetText(originalText);
-        }
-
-        #endregion
-
-        #region Private methods
-
-        protected void SetDocumentAddressType(DocumentAddressType type)
-        {
-            AddressType = type;
-            Label.Text = GetTitleFromAddressType();
-        }
-
-        protected override void HandleTextViewChanged(object sender, EventArgs e)
-        {
-            base.HandleTextViewChanged(sender, e);
-
-            if (TextView.Text == originalState)
-                ReachedOriginalState(this, EventArgs.Empty);
-        }
-
-        #endregion
     }
 }

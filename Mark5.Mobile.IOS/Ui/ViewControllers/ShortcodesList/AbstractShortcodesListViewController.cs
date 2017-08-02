@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -23,14 +23,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         public Folder Folder { get; set; }
 
-        protected UIBarButtonItem exitEditItem;
-        protected UIBarButtonItem editItem;
+        protected UIBarButtonItem ExitEditItem;
+        protected UIBarButtonItem EditItem;
 
-        protected UIRefreshControl refreshControl;
-        protected UITableView tableView;
-        protected UISearchController searchController;
-        protected UITableViewController searchResultsController;
-        protected DataSource searchResultsDataSource;
+        protected UIRefreshControl RefreshControl;
+        protected UITableView TableView;
+        protected UISearchController SearchController;
+        protected UITableViewController SearchResultsController;
+        protected DataSource SearchResultsDataSource;
 
         protected CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
@@ -70,14 +70,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             InitializeNavigationBarTitle();
             InitializeHandlers();
 
-            if (tableView?.IndexPathForSelectedRow != null)
-                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+            if (TableView?.IndexPathForSelectedRow != null)
+                TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
 
-            if (tableView?.IndexPathsForSelectedRows?.Length > 0)
-                foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
-                    tableView.DeselectRow(selectedIndexPath, true);
+            if (TableView?.IndexPathsForSelectedRows?.Length > 0)
+                foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
+                    TableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, TableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -86,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             CommonConfig.Logger.Info($"{nameof(AbstractShortcodesListViewController)} appeared");
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource) TableView.Source;
             if (ds.Empty)
                 RefreshData();
         }
@@ -118,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             CommonConfig.Logger.Warning($"{nameof(AbstractShortcodesListViewController)} received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
+            var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
             GC.Collect();
@@ -131,27 +131,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void InitializeNavigationBar()
         {
-            exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
+            ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+            EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
         }
 
         void InitializeView()
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            tableView = new UITableView();
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("folder_empty"), DisableRowActions);
-            tableView.AllowsSelectionDuringEditing = false;
-            tableView.AllowsMultipleSelectionDuringEditing = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
+            TableView = new UITableView
+            {
+                ClipsToBounds = false,
+                AllowsSelectionDuringEditing = false,
+                AllowsMultipleSelectionDuringEditing = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), DisableRowActions);
+            View.AddSubview(TableView);
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
             });
 
             var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))
@@ -159,38 +161,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 MinimumPressDuration = 1f,
                 Delegate = this
             };
-            tableView.AddGestureRecognizer(longPressRecognizer);
+            TableView.AddGestureRecognizer(longPressRecognizer);
 
-            refreshControl = new UIRefreshControl();
-            refreshControl.BackgroundColor = UIColor.White;
-            tableView.AddSubview(refreshControl);
+            RefreshControl = new UIRefreshControl
+            {
+                BackgroundColor = UIColor.White
+            };
+            TableView.AddSubview(RefreshControl);
         }
 
         void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
 
-            searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_shortcodes"), DisableRowActions);
-            searchResultsController.TableView.Source = searchResultsDataSource;
+            SearchResultsController = new UITableViewController();
+            SearchResultsDataSource = new DataSource(this, SearchResultsController.TableView, Localization.GetString("no_matching_shortcodes"), DisableRowActions);
+            SearchResultsController.TableView.Source = SearchResultsDataSource;
 
-            searchController = new UISearchController(searchResultsController)
+            SearchController = new UISearchController(SearchResultsController)
             {
                 HidesNavigationBarDuringPresentation = true,
                 DimsBackgroundDuringPresentation = true,
                 ObscuresBackgroundDuringPresentation = true,
                 SearchResultsUpdater = this
             };
-            searchController.SearchBar.Placeholder = Localization.GetString("filter");
+            SearchController.SearchBar.Placeholder = Localization.GetString("filter");
 
-            tableView.TableHeaderView = searchController.SearchBar;
+            TableView.TableHeaderView = SearchController.SearchBar;
         }
 
         void SubscribeToMessages()
         {
-            PlatformConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            PlatformConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            PlatformConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
+            CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
         }
 
         void InitializeNavigationBarTitle()
@@ -203,26 +207,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void InitializeHandlers()
         {
-            if (exitEditItem != null)
-                exitEditItem.Clicked += ExitEditItem_Clicked;
+            if (ExitEditItem != null)
+                ExitEditItem.Clicked += ExitEditItem_Clicked;
 
-            if (editItem != null)
-                editItem.Clicked += EditItem_Clicked;
+            if (EditItem != null)
+                EditItem.Clicked += EditItem_Clicked;
 
-            if (refreshControl != null)
-                refreshControl.ValueChanged += RefreshControl_ValueChanged;
+            if (RefreshControl != null)
+                RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
         void DeinitializeHandlers()
         {
-            if (exitEditItem != null)
-                exitEditItem.Clicked -= ExitEditItem_Clicked;
+            if (ExitEditItem != null)
+                ExitEditItem.Clicked -= ExitEditItem_Clicked;
 
-            if (editItem != null)
-                editItem.Clicked -= EditItem_Clicked;
+            if (EditItem != null)
+                EditItem.Clicked -= EditItem_Clicked;
 
-            if (refreshControl != null)
-                refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+            if (RefreshControl != null)
+                RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
 
         #endregion
@@ -237,25 +241,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         [Export("longPressed:")]
         public void LongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (tableView.Editing)
+            if (TableView.Editing)
                 return;
 
             StartEditing();
 
-            var point = recognizer.LocationInView(tableView);
-            var indexPath = tableView.IndexPathForRowAtPoint(point);
+            var point = recognizer.LocationInView(TableView);
+            var indexPath = TableView.IndexPathForRowAtPoint(point);
 
-            tableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
+            TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
         void StartEditing()
         {
-            tableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
-            NavigationItem.SetLeftBarButtonItem(editItem, true);
+            TableView.SetEditing(true, true);
+            NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
+            NavigationItem.SetLeftBarButtonItem(EditItem, true);
 
-            searchController.SearchBar.UserInteractionEnabled = false;
-            searchController.SearchBar.Alpha = .5f;
+            SearchController.SearchBar.UserInteractionEnabled = false;
+            SearchController.SearchBar.Alpha = .5f;
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
@@ -274,23 +278,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void EndEditing()
         {
-            tableView.SetEditing(false, true);
+            TableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
 
-            searchController.SearchBar.UserInteractionEnabled = true;
-            searchController.SearchBar.Alpha = 1f;
+            SearchController.SearchBar.UserInteractionEnabled = true;
+            SearchController.SearchBar.Alpha = 1f;
         }
 
         void EditItem_Clicked(object sender, EventArgs e)
         {
-            if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
+            if (TableView.IndexPathsForSelectedRows == null || TableView.IndexPathsForSelectedRows.Length < 1)
                 return;
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            var rows = tableView.IndexPathsForSelectedRows.ToArray();
-            var selectedShortcodes = rows.Select(ip => ((DataSource) tableView.Source).FindItemAtIndexPath(ip)).ToList();
+            var rows = TableView.IndexPathsForSelectedRows.ToArray();
+            var selectedShortcodes = rows.Select(ip => ((DataSource) TableView.Source).FindItemAtIndexPath(ip)).ToList();
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
                 UIAlertActionStyle.Default,
@@ -323,12 +327,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => ExitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
 
-            exitEditItem.Enabled = false;
+            ExitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
         }
 
@@ -341,13 +345,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RefreshData(forceClear: true);
         }
 
-        void RefreshData(int startRowId = -1, bool forceClear = false)
+        async void RefreshData(int startRowId = -1, bool forceClear = false)
         {
             if (refreshing)
                 return;
 
             refreshing = true;
-            refreshControl.ValueChanged -= RefreshControl_ValueChanged;
+            RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
+
+            if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            {
+                var result = await Dialogs.ShowYesNoCancelDialogAsync(this,
+                                                                      Localization.GetString("folder_offline_title"),
+                                                                      Localization.GetString("folder_offline_message"),
+                                                                      Localization.GetString("folder_offline_go_online"),
+                                                                      Localization.GetString("folder_offline_redownload"),
+                                                                      Localization.GetString("cancel"));
+
+                if (result == 1)
+                    await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
+                if (result == 0)
+                {
+                    var vc = new DownloadViewController { Folder = Folder };
+                    NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    await vc.DidDisappear;
+                }
+                if (result == -1)
+                {
+                    RefreshControl.EndRefreshing();
+                    RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+
+                    refreshing = false;
+
+                    return;
+                }
+            }
 
             CommonConfig.Logger.Info($"Refreshing shortcodes list [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]");
 
@@ -356,35 +388,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (forceClear)
             {
-                var ds = (DataSource) tableView.Source;
+                var ds = (DataSource) TableView.Source;
                 ds.Reset();
             }
+
+            var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder,
                 sps =>
                 {
-                    Managers.DownloadManager.Notify(ObjectType.Shortcode, Folder.Id);
                     InvokeOnMainThread(() =>
                     {
-                        var ds = (DataSource) tableView.Source;
+                        var ds = (DataSource) TableView.Source;
                         ds.AppendItems(sps);
                     });
                 },
                 () =>
                 {
-                    refreshControl.EndRefreshing();
-                    refreshControl.ValueChanged += RefreshControl_ValueChanged;
+                    RefreshControl.EndRefreshing();
+                    RefreshControl.ValueChanged += RefreshControl_ValueChanged;
 
                     refreshing = false;
 
                     CommonConfig.Logger.Info($"Refresh finished");
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
                 },
                 async ex =>
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
                 {
-                    refreshControl.EndRefreshing();
-                    refreshControl.ValueChanged += RefreshControl_ValueChanged;
+                    RefreshControl.EndRefreshing();
+                    RefreshControl.ValueChanged += RefreshControl_ValueChanged;
 
                     refreshing = false;
 
@@ -395,7 +426,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     NavigationController?.PopViewController(true);
                 },
                 startRowId,
-                cts.Token);
+                cts.Token,
+                sourceType);
         }
 
         #endregion
@@ -410,7 +442,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             {
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
-                searchResultsDataSource.Reset();
+                SearchResultsDataSource.Reset();
             }
             else
             {
@@ -428,24 +460,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             }
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void DoSearchShortcodes(string searchText, CancellationToken ct)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            searchResultsDataSource.Reset();
+            SearchResultsDataSource.Reset();
 
             await Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource) TableView.Source;
             var filteredShortcodes = ds.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
 
             if (ct.IsCancellationRequested)
                 return;
 
-            searchResultsDataSource.AppendItems(filteredShortcodes);
+            SearchResultsDataSource.AppendItems(filteredShortcodes);
         }
 
         static bool MatchesQuery(ShortcodePreview sp, string query)
@@ -471,9 +501,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcodes"));
 
@@ -514,9 +542,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             });
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void Delete(List<ShortcodePreview> selectedShortcodes)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcodes"));
 
@@ -624,7 +650,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => EndEditing()));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
             PresentViewController(eas, true, null);
         }
@@ -654,10 +680,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void RemoveShortcodesFromList(IEnumerable<int> ids)
         {
-            if (searchController.Active)
-                searchResultsDataSource.RemoveItems(ids.ToList());
+            if (SearchController.Active)
+                SearchResultsDataSource.RemoveItems(ids.ToList());
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource) TableView.Source;
             ds.RemoveItems(ids.ToList());
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {

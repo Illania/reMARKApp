@@ -1,10 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -24,14 +23,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (contactPreview.Type == ContactType.Person)
             {
-                await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_person_content);
+                var contentResource = ChildrenType == ContactType.Person ? Resource.String.parent_contact_selector_invalid_person_content : Resource.String.parent_contact_selector_invalid_department_content;
+
+                await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_person_title, contentResource);
                 return;
             }
             if (contactPreview.Type == ContactType.Department)
             {
                 if (ChildrenType == ContactType.Company || ChildrenType == ContactType.Department)
                 {
-                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_department_content);
+                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_department_title, Resource.String.parent_contact_selector_invalid_department_content);
                     return;
                 }
 
@@ -39,12 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (contactPreview.Type == ContactType.Company)
             {
-                if (ChildrenType == ContactType.Company)
-                {
-                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_company_content);
-                    return;
-                }
-                else if (ChildrenType == ContactType.Department)
+                if (ChildrenType == ContactType.Department)
                 {
                     selectedContactPreview = contactPreview;
                 }
@@ -85,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedContactPreview != null)
             {
                 var data = new Intent();
-                data.PutExtra(ParentContactSelectorActivity.ParentContactResultKey, SerializationUtils.Serialize(selectedContactPreview));
+                data.PutExtra(ParentContactSelectorActivity.ParentContactResultKey, Serializer.Serialize(selectedContactPreview));
                 Activity.SetResult(Android.App.Result.Ok, data);
                 Activity.Finish();
                 return;

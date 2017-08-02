@@ -1,13 +1,7 @@
-﻿using Mark5.Mobile.IOS.Ui.Common;
-
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
+﻿namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
     public class SubjectView : LargeTextSubView
     {
-        public SubjectView()
-        {
-        }
-
         public override void RefreshView()
         {
             if (DocumentPreview != null)

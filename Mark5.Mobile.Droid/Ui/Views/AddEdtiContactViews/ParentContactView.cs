@@ -7,18 +7,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class ParentContactView : AbstractSimpleFieldView
     {
         readonly Action onParentContactRequest;
+        readonly Action onParentContactRemoved;
 
         bool disableEditing;
 
-        public ParentContactView(Context context, Action onParentContactRequest)
-            : base(context, floatingHint: false, editable: false)
+        public ParentContactView(Context context, Action onParentContactRequest, Action onParentContactRemoved)
+            : base(context, errorResourceId: Resource.String.edit_contact_parent_error, floatingHint: false, editable: false)
         {
             this.onParentContactRequest = onParentContactRequest;
+            this.onParentContactRemoved = onParentContactRemoved;
         }
 
         public override void RefreshView()
         {
             int hintResId = -1;
+
+            SetError(false);
+            Content = string.Empty;
 
             switch (ContactPreview.Type)
             {
@@ -56,6 +61,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             disableEditing |= ParentPreselected;
+
+            if (!string.IsNullOrEmpty(Content) && !disableEditing)
+            {
+                ShowDeleteButton();
+            }
         }
 
         protected override void ContentClicked(object sender, EventArgs e)
@@ -64,6 +74,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 return;
 
             onParentContactRequest();
+        }
+
+        protected override void DeleteButtonClicked(object sender, EventArgs e)
+        {
+            HideDeleteButton();
+            ParentContactPreview = null;
+            onParentContactRemoved();
+            RefreshView();
+        }
+
+        public bool ContainsValidContent()
+        {
+            if (ContactPreview.Type == ContactType.Department && ParentContactPreview == null)
+                return false;
+
+            return true;
+        }
+
+        public void ShowError()
+        {
+            SetError(true);
         }
     }
 }

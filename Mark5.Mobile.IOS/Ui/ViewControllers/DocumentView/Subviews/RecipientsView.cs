@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         bool expanded;
 
-        public event EventHandler<RecipentTappedEventArgs> RecipentTapped = delegate { };
+        public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
 
         public RecipientsView(DocumentAddressType addressType)
         {
@@ -147,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             if (CommonConfig.Logger.IsTraceEnabled())
                 CommonConfig.Logger.Trace(string.Format("Tapped recipent. [recipent={0}]", tappedRecipent));
 
-            RecipentTapped(this, new RecipentTappedEventArgs(tappedRecipent));
+            RecipientTapped(this, new RecipientTappedEventArgs(tappedRecipent));
         }
 
         #endregion
@@ -217,11 +217,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         #endregion
     }
 
-    public class RecipentTappedEventArgs : EventArgs
+    public class RecipientTappedEventArgs : EventArgs
     {
         public string Recipent { get; }
 
-        public RecipentTappedEventArgs(string recipent)
+        public RecipientTappedEventArgs(string recipent)
         {
             Recipent = recipent;
         }

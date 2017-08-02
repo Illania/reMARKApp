@@ -25,7 +25,7 @@
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<CodesignKey>iPhone Developer</CodesignKey>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -41,7 +41,7 @@
 		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
 		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
@@ -58,7 +58,7 @@
 		<CodesignKey>iPhone Developer</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -74,7 +74,7 @@
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
 		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<MtouchI18n>cjk,mideast,west</MtouchI18n>
+		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 	</PropertyGroup>
 	<ItemGroup>
@@ -82,7 +82,6 @@
 		<Compile Include="AppDelegate.cs" />
 		<Compile Include="Main.cs" />
 		<Compile Include="PlatformConfig.cs" />
-		<Compile Include="ServerConfig.cs" />
 		<Compile Include="Model\PushNotification.cs" />
 		<Compile Include="Model\Exceptions\MailViewerException.cs" />
 		<Compile Include="Model\HubMessages\DocumentPreviewCommentsCountChangedMessage.cs" />
@@ -91,9 +90,9 @@
 		<Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
 		<Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
 		<Compile Include="Model\HubMessages\NewNotificationsMessage.cs" />
-		<Compile Include="Services\ReachabilityProvider.cs" />
-		<Compile Include="Services\ReachabilityReceiver.cs" />
-		<Compile Include="Services\ReachabilityService.cs" />
+		<Compile Include="Service\ReachabilityProvider.cs" />
+		<Compile Include="Service\ReachabilityReceiver.cs" />
+		<Compile Include="Service\Reachability.cs" />
 		<Compile Include="Ui\Common\AbstractSplitViewController.cs" />
 		<Compile Include="Ui\Common\AbstractViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
@@ -173,7 +172,7 @@
 		<Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ObjectActionsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ObjectLinksListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\OutgoingDocumentListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentsToUploadListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
@@ -223,19 +222,19 @@
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCritriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\DocumentsSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ShortcodesSearchCriteriaViewController.cs" />
 		<Compile Include="Utilities\ConsoleAndFileLogger.cs" />
-		<Compile Include="Utilities\DateTimeUtils.cs" />
+		<Compile Include="Utilities\DateTimeFormatter.cs" />
 		<Compile Include="Utilities\DeviceInfoProvider.cs" />
 		<Compile Include="Utilities\Hacks.cs" />
 		<Compile Include="Utilities\InsecureNativeMessageHandler.cs" />
 		<Compile Include="Utilities\Integration.cs" />
 		<Compile Include="Utilities\LocalNotificationsListener.cs" />
-		<Compile Include="Utilities\NotificationsUtilities.cs" />
-		<Compile Include="Utilities\PhonebookUtilities.cs" />
+		<Compile Include="Utilities\NotificationConverter.cs" />
+		<Compile Include="Utilities\Phonebook.cs" />
 		<Compile Include="Utilities\PortableConcurrentQueue.cs" />
 		<Compile Include="Utilities\Preferences.cs" />
 		<Compile Include="Utilities\PushNotificationsConverter.cs" />
@@ -248,6 +247,8 @@
 		<Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+		<Compile Include="Ui\ViewControllers\DownloadViewController.cs" />
+		<Compile Include="Utilities\ActivityIndicator.cs" />
 		<Compile Include="Ui\ViewControllers\RecentAddressesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFolderListViewController.cs" />
@@ -260,13 +261,13 @@
 		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
 		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs">
-		  <DependentUpon>TemplatesTableViewCell.cs</DependentUpon>
-		</Compile>
+		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs">
-		  <DependentUpon>TemplatesSearchResultsTableViewCell.cs</DependentUpon>
-		</Compile>
+		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs" />
+		<Compile Include="Model\FileDescription.cs" />
+		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
+		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\DisclosureIndicatorTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowHeaderTableViewCell.cs" />
@@ -295,26 +296,14 @@
 		<Reference Include="PCLStorage">
 			<HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
 		</Reference>
-		<Reference Include="SQLite-net">
-			<HintPath>..\packages\sqlite-net-pcl.1.3.3\lib\netstandard1.1\SQLite-net.dll</HintPath>
-		</Reference>
 		<Reference Include="ModernHttpClient">
 			<HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
 		</Reference>
 		<Reference Include="InAppSettingsKit">
 			<HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
 		</Reference>
-		<Reference Include="HockeySDK">
-			<HintPath>..\packages\HockeySDK.Xamarin.4.1.4\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
-		</Reference>
-		<Reference Include="HockeySDK.iOSBindings">
-			<HintPath>..\packages\HockeySDK.Xamarin.4.1.4\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
-		</Reference>
 		<Reference Include="AngleSharp">
 			<HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="HtmlAgilityPack">
-			<HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\portable-net45+netcore45+wp8+MonoAndroid+MonoTouch\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 		<Reference Include="PreMailer.Net">
 			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
@@ -322,20 +311,32 @@
 		<Reference Include="MailBee.NET">
 		  <HintPath>..\packages\MailBee.NET.11.1.0\lib\netstandard1.3\MailBee.NET.dll</HintPath>
 		</Reference>
-		<Reference Include="SQLitePCLRaw.core">
-		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.6\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.provider.sqlite3">
-		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.6\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_green">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.6\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_v2">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.6\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
-		</Reference>
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="HockeySDK">
+		  <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+		</Reference>
+		<Reference Include="HockeySDK.iOSBindings">
+		  <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.core">
+		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.provider.sqlite3">
+		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_green">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_v2">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+		</Reference>
+		<Reference Include="HtmlAgilityPack">
+		  <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\netstandard1.6\HtmlAgilityPack.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLite-net">
+		  <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -390,6 +391,7 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.xib" />
+		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">
@@ -549,6 +551,12 @@
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
 		<BundleResource Include="Resources\icons\add%402x.png" />
 		<BundleResource Include="Resources\icons\add%403x.png" />
+		<BundleResource Include="Resources\icons\done%402x.png" />
+		<BundleResource Include="Resources\icons\done%403x.png" />
+		<BundleResource Include="Resources\icons\download%402x.png" />
+		<BundleResource Include="Resources\icons\download%403x.png" />
+		<BundleResource Include="Resources\icons\warning%402x.png" />
+		<BundleResource Include="Resources\icons\warning%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">

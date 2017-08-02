@@ -15,7 +15,7 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
@@ -209,20 +209,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             try
             {
-                var container = await Managers.DocumentsManager.GetAutoSavedDocumentAsync();
-
-                if (container == null)
+                var isAvailable = await Managers.DocumentsManager.IsDocumentWorkingCopyAvailableAsync();
+                if (!isAvailable)
                     return;
 
                 var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
                 if (shouldRecover)
                 {
-                    var composeActivity = ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.Edit, container.DocumentPreview.Direction, outgoingDocumentGuid: container.Info.Identifier);
-                    StartActivity(composeActivity);
+                    StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.None, CopyToNewOption.None, true));
                 }
                 else
                 {
-                    await Managers.DocumentsManager.DeleteAutoSavedDocumentAsync();
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
                 }
             }
             catch (Exception ex)

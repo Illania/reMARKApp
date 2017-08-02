@@ -29,13 +29,13 @@ namespace Mark5.Mobile.Droid.Ui.Views
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             Elevation = 0;
-            Radius = ConversionUtils.ConvertDpToPixels(2f);
+            Radius = Conversion.ConvertDpToPixels(2f);
             UseCompatPadding = true;
 
-            distanceVeryLarge = ConversionUtils.ConvertDpToPixels(24f);
-            distanceLarge = ConversionUtils.ConvertDpToPixels(16f);
-            distanceNormal = ConversionUtils.ConvertDpToPixels(8f);
-            distanceSmall = ConversionUtils.ConvertDpToPixels(4f);
+            distanceVeryLarge = Conversion.ConvertDpToPixels(24f);
+            distanceLarge = Conversion.ConvertDpToPixels(16f);
+            distanceNormal = Conversion.ConvertDpToPixels(8f);
+            distanceSmall = Conversion.ConvertDpToPixels(4f);
 
             innerLayout = new LinearLayoutCompat(Context)
             {

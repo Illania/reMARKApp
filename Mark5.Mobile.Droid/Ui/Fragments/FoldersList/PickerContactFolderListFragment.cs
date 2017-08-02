@@ -1,5 +1,4 @@
-﻿using Android.Content;
-using Mark5.Mobile.Common.Model;
+﻿using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -8,9 +7,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class PickerContactFolderListFragment : FoldersListFragment
     {
         public PickerContactFolderListFragment()
-            : base(true, true)
         {
             RemoteFolder = Folder.RootForModule(ModuleType.Contacts);
+            HideSearch = true;
+            HideFab = true;
+            LoadRemoteFromCache = true;
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)

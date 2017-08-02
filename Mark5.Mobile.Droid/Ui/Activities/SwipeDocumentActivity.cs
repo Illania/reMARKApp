@@ -6,7 +6,7 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Managers;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     activityState.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    activityState.Folder = SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    activityState.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 activityState.CloseRequest = OnBackPressed;
 
@@ -68,10 +68,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     mainFragmentState.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    mainFragmentState.DocumentPreview = SerializationUtils.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    mainFragmentState.DocumentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    mainFragmentState.NotificationGuid = SerializationUtils.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    mainFragmentState.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
                 activityState.FragmentStates.Add(mainFragmentState);
                 activityState.Position = 0;
@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                var activityState = SerializationUtils.Deserialize<SwipeDocumentActivityState>(savedInstanceState.GetString("state"));
+                var activityState = Serializer.Deserialize<SwipeDocumentActivityState>(savedInstanceState.GetString("state"));
                 activityState.CloseRequest = OnBackPressed;
 
                 state = activityState;
@@ -134,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnSaveInstanceState(Bundle outState)
         {
-            outState.PutString("state", SerializationUtils.Serialize(state));
+            outState.PutString("state", Serializer.Serialize(state));
 
             base.OnSaveInstanceState(outState);
         }

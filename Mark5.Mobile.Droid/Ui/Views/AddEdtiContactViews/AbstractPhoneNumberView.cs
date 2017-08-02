@@ -125,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             if (row != null)
             {
                 ca = row.GetContent();
-                var parts = AddressUtils.CommunicationAddressParts(ca);
+                var parts = AddressFormatter.CommunicationAddressParts(ca);
                 if (parts.CountryPrefix >= 0)
                 {
                     countrySpinner.SetSelection(countries.FindIndex(c => c.FaxPrefix == parts.CountryPrefix));
@@ -296,7 +296,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             {
                 if (Content != null)
                 {
-                    var parts = AddressUtils.CommunicationAddressParts(Content);
+                    var parts = AddressFormatter.CommunicationAddressParts(Content);
                     var country = parts.CountryPrefix > 0 ? $"+{parts.CountryPrefix}" : string.Empty;
                     phoneEditText.Text = string.Join(" ", country, parts.Number);
                     phoneEditText.SetTextAppearanceCompat(Context, Content.IsPrimary ? Resource.Style.fontPrimaryBold : Resource.Style.fontPrimary);

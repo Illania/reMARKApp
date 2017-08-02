@@ -30,9 +30,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             DescendantFocusability = DescendantFocusability.BeforeDescendants;
 
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
+            DistanceLarge = Conversion.ConvertDpToPixels(16f);
+            DistanceNormal = Conversion.ConvertDpToPixels(8f);
+            DistanceSmall = Conversion.ConvertDpToPixels(4f);
 
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
 

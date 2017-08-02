@@ -45,9 +45,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var listMode = (ModeType) Intent.Extras.GetInt(ModeIntentKey);
-                var moduleType = SerializationUtils.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
-                var be = Intent.HasExtra(BusinessEntitiesIntentKey) ? SerializationUtils.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey)) : null;
-                var fromFolder = Intent.HasExtra(FromFolderIntentKey) ? SerializationUtils.Deserialize<Folder>(Intent.Extras.GetString(FromFolderIntentKey)) : null;
+                var moduleType = Serializer.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
+                var be = Intent.HasExtra(BusinessEntitiesIntentKey) ? Serializer.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey)) : null;
+                var fromFolder = Intent.HasExtra(FromFolderIntentKey) ? Serializer.Deserialize<Folder>(Intent.Extras.GetString(FromFolderIntentKey)) : null;
 
                 var ft = SupportFragmentManager.BeginTransaction();
 

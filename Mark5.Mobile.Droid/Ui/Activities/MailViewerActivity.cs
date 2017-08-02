@@ -129,8 +129,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                         try
                         {
-                            var mm = new MailMessage();
-                            mm.ThrowExceptions = true;
+                            var mm = new MailMessage
+                            {
+                                ThrowExceptions = true
+                            };
                             mm.LoadMessage(bytes);
                             bytes = null;
                             MakeHtmlSafe(mm);
@@ -161,8 +163,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                                         emlStream.Position = 0;
 
-                                        var mm = new MailMessage();
-                                        mm.ThrowExceptions = true;
+                                        var mm = new MailMessage
+                                        {
+                                            ThrowExceptions = true
+                                        };
                                         mm.LoadMessage(emlStream.ToArray());
                                         emlStream.Dispose();
                                         MakeHtmlSafe(mm);
@@ -208,14 +212,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as MailViewerView;
-                if (dv != null)
+                if (linearLayout.GetChildAt(i) is MailViewerView dv)
                 {
                     dv.MailMessage = mailMessage;
                     dv.RefreshView();
 
-                    var d = linearLayout.GetChildAt(i + 1) as Divider;
-                    if (d != null)
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {
                         d.Visibility = dv.Visibility;
                         i++;

@@ -26,13 +26,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
         {
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             Elevation = 0;
-            Radius = ConversionUtils.ConvertDpToPixels(2f);
+            Radius = Conversion.ConvertDpToPixels(2f);
             UseCompatPadding = true;
 
-            DistanceVeryLarge = ConversionUtils.ConvertDpToPixels(24f);
-            DistanceLarge = ConversionUtils.ConvertDpToPixels(16f);
-            DistanceNormal = ConversionUtils.ConvertDpToPixels(8f);
-            DistanceSmall = ConversionUtils.ConvertDpToPixels(4f);
+            DistanceVeryLarge = Conversion.ConvertDpToPixels(24f);
+            DistanceLarge = Conversion.ConvertDpToPixels(16f);
+            DistanceNormal = Conversion.ConvertDpToPixels(8f);
+            DistanceSmall = Conversion.ConvertDpToPixels(4f);
 
             Visibility = ViewStates.Gone;
 
