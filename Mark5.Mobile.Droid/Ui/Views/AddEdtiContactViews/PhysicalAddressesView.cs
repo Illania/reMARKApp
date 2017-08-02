@@ -96,7 +96,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 {
                     TopMargin = DistanceSmall,
                     LeftMargin = DistanceSmall,
-                }
+                },
             };
             countrySpinner.Adapter = new CountryAdapter(Context, countries);
             container.AddView(countrySpinner);

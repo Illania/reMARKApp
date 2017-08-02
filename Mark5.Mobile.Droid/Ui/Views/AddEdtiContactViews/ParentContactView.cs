@@ -7,18 +7,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public class ParentContactView : AbstractSimpleFieldView
     {
         readonly Action onParentContactRequest;
+        readonly Action onParentContactRemoved;
+
 
         bool disableEditing;
 
-        public ParentContactView(Context context, Action onParentContactRequest)
+        public ParentContactView(Context context, Action onParentContactRequest, Action onParentContactRemoved)
             : base(context, floatingHint: false, editable: false)
         {
             this.onParentContactRequest = onParentContactRequest;
+            this.onParentContactRemoved = onParentContactRemoved;
         }
 
         public override void RefreshView()
         {
             int hintResId = -1;
+
+            Content = string.Empty;
 
             switch (ContactPreview.Type)
             {
@@ -56,6 +61,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             disableEditing |= ParentPreselected;
+
+            if (!string.IsNullOrEmpty(Content) && !disableEditing)
+            {
+                AddDeleteButton();
+            }
         }
 
         protected override void ContentClicked(object sender, EventArgs e)
@@ -64,6 +74,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 return;
 
             onParentContactRequest();
+        }
+
+        protected override void DeleteButtonClicked(object sender, EventArgs e)
+        {
+            RemoveDeleteButton();
+            ParentContactPreview = null;
+            onParentContactRemoved();
+            RefreshView();
         }
     }
 }

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -78,13 +80,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Clear();
 
             showMoreButton = new AppCompatButton(Context);
-            showMoreButton.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            showMoreButton.Gravity = GravityFlags.Center;
+            showMoreButton.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            {
+                Gravity = (int)GravityFlags.CenterHorizontal
+            };
             var typedArray = Context.ObtainStyledAttributes(new int[]
             {
                 Resource.Attribute.selectableItemBackground,
             });
             showMoreButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
-
+            showMoreButton.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
             showMoreButton.Text = "View more";
             showMoreButton.Click += (sender, e) =>
             {
@@ -155,7 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             personNameView = new PersonNameView(Context);
 
             subviews.Add(personNameView);
-            subviews.Add(new ParentContactView(Context, OnParentContactRequest));
+            subviews.Add(new ParentContactView(Context, OnParentContactRequest, OnParentContactRemoved));
             subviews.Add(new PositionView(Context));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
@@ -176,7 +182,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             nameView = new NameView(Context);
 
             subviews.Add(nameView);
-            subviews.Add(new ParentContactView(Context, OnParentContactRequest));
+            subviews.Add(new ParentContactView(Context, OnParentContactRequest, OnParentContactRemoved));
             subviews.Add(new EmailsView(Context));
             subviews.Add(new PhoneView(Context));
             subviews.Add(new MobileView(Context));
@@ -297,6 +303,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var i = new Intent(Activity, typeof(ParentContactSelectorFoldersListActivity));
             i.PutExtra(ParentContactSelectorFoldersListActivity.ChildrenTypeIntentKey, (int)ContactPreview.Type);
             StartActivityForResult(i, RequestCodes.ParentContactRequestCode);
+        }
+
+        void OnParentContactRemoved()
+        {
+            ParentContactPreview = null;
         }
 
         #endregion

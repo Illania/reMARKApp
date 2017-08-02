@@ -23,14 +23,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (contactPreview.Type == ContactType.Person)
             {
-                await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_person_content);
+                await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_person_title, Resource.String.parent_contact_selector_invalid_person_content);
                 return;
             }
             if (contactPreview.Type == ContactType.Department)
             {
                 if (ChildrenType == ContactType.Company || ChildrenType == ContactType.Department)
                 {
-                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_department_content);
+                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_department_title, Resource.String.parent_contact_selector_invalid_department_content);
                     return;
                 }
 
@@ -38,12 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (contactPreview.Type == ContactType.Company)
             {
-                if (ChildrenType == ContactType.Company)
-                {
-                    await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_title, Resource.String.parent_contact_selector_invalid_company_content);
-                    return;
-                }
-                else if (ChildrenType == ContactType.Department)
+
+                if (ChildrenType == ContactType.Department)
                 {
                     selectedContactPreview = contactPreview;
                 }

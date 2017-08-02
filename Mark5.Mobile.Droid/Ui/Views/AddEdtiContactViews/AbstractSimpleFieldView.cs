@@ -1,8 +1,11 @@
 ﻿using System;
 using Android.Content;
+using Android.Graphics;
 using Android.Support.Design.Widget;
+using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
+using Android.Widget;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -11,6 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     public abstract class AbstractSimpleFieldView : AddEditContactView
     {
         TextInputEditText contentEditText;
+        AppCompatImageButton deleteButton;
         int errorResourceId;
 
         protected string Content { get => contentEditText.Text; set => contentEditText.Text = value; }
@@ -22,17 +26,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                                           | InputTypes.ClassText)
                                          : base(context)
         {
+            Orientation = Horizontal;
+
             this.errorResourceId = errorResourceId;
 
             var layout = new TextInputLayout(Context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f),
             };
             AddView(layout);
 
             contentEditText = new TextInputEditText(Context)
             {
-                LayoutParameters = new Android.Widget.LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 InputType = inputType,
             };
 
@@ -56,9 +62,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             var topBottomDistance = floatingHint ? 0 : DistanceSmall;
             var leftDistance = DistanceLarge;
-            var rightDistance = DistanceLarge + Conversion.ConvertDpToPixels(24) + DistanceSmall;
+            var rightDistance = DistanceLarge;
 
             SetPadding(leftDistance, topBottomDistance, rightDistance, topBottomDistance);
+
+            deleteButton = new AppCompatImageButton(Context);
+
+            deleteButton.SetImageResource(Resource.Drawable.remove);
+            deleteButton.SetColorFilter(Color.Red);
+
+            var addButtonLp = new LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
+            {
+                TopMargin = DistanceSmall,
+                LeftMargin = DistanceNormal,
+                Gravity = (int)GravityFlags.Top,
+            };
+            deleteButton.LayoutParameters = addButtonLp;
+            deleteButton.Click += DeleteButtonClicked;
+            deleteButton.Visibility = ViewStates.Invisible;
+            AddView(deleteButton);
         }
 
         protected void SetHintResId(int resId)
@@ -75,6 +97,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             contentEditText.Error = errorValue ? Context.GetString(errorResourceId) : null;
         }
+
+        protected void AddDeleteButton()
+        {
+            deleteButton.Visibility = ViewStates.Visible;
+        }
+
+        protected void RemoveDeleteButton()
+        {
+            deleteButton.Visibility = ViewStates.Invisible;
+        }
+
+        protected virtual void DeleteButtonClicked(object sender, EventArgs e) { }
 
         protected virtual void ContentClicked(object sender, EventArgs e) { }
 
