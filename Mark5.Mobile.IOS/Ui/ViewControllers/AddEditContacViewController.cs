@@ -7,10 +7,11 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
+namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class AddEditContacViewController : AbstractViewController
     {
@@ -31,6 +32,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
         NSObject willHideNotification;
 
         UIView activeField;
+
+        bool refreshed;
+
+        DataSource dataSource;
 
         #region UIViewControllerOverrides
 
@@ -56,7 +61,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
         public override void ViewDidAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-
             RefreshData();
         }
 
@@ -89,9 +93,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
         {
             tableView = new UITableView(CGRect.Empty, UITableViewStyle.Plain);
 
-            var dataSource = new DataSource(this, tableView);
+            dataSource = new DataSource(this, tableView);
             dataSource.ViewIsActivated += DataSource_ViewIsActivated;
             dataSource.ResponsibleUserRowClicked += DataSource_ResponsibleUserRowClicked;
+            dataSource.ParentRowClicked += DataSource_ParentRowClicked;
             tableView.Source = dataSource;
             tableView.TableFooterView = new UIView();
             tableView.EstimatedRowHeight = 60f;
@@ -145,6 +150,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
         void RefreshData()
         {
+            if (refreshed)
+                return;
+
             var ds = (DataSource)tableView.Source;
 
             if (CreationModeFlag == ContactCreationModeFlag.New)
@@ -155,6 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             }
 
             ds.Refresh(Contact, ContactPreview, ParentContactPreview, CreationModeFlag, ParentPreselected);
+            refreshed = true;
         }
 
         #region Handlers
@@ -162,13 +171,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
         void DataSource_ViewIsActivated(object sender, EventArgs e)
         {
             activeField = (UIView)sender;
-            CommonConfig.Logger.Debug("Activated!!");
         }
 
-        void DataSource_ResponsibleUserRowClicked(object sender,
-                                                  DataSource.ResponsibleUsersRow e)
-        {
+        //TODO add rights check on edit and add
+        //TODO cannot add deparment without company 
+        //TODO how to remove parent
+        //TODO check all the stuff that was written for android
+        //TODO 
 
+        //Multiple line description
+        //Add birthdate should disappear
+        // Keyboard issues
+        // Once company or responsible users are present, just remove them
+
+
+        async void DataSource_ParentRowClicked(object sender, EventArgs e)
+        {
+            var vc = new ParentContactSelectorFolderListView(ContactPreview.Type);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+
+            var selectedParent = await vc.Task;
+            if (selectedParent != null)
+            {
+                ParentContactPreview = selectedParent;
+                dataSource.UpdateParentContact(ParentContactPreview);
+                ((DataSource.ParentRow)sender).RefreshRow();
+            }
+
+            DismissViewController(true, null);
+        }
+
+        async void DataSource_ResponsibleUserRowClicked(object sender, EventArgs e)
+        {
+            var vc = new ResponsibleUsersSelectionController
+            {
+                PreselectedSystemUsersId = Contact.ResponsibleUserIds,
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+
+            var selectedUsers = await vc.Task;
+            if (selectedUsers != null)
+            {
+                Contact.ResponsibleUsers.Clear();
+                Contact.ResponsibleUserIds.Clear();
+                selectedUsers.ForEach(su =>
+                {
+                    Contact.ResponsibleUsers.Add(su.Id, su.Username);
+                    Contact.ResponsibleUserIds.Add(su.Id);
+                });
+
+                ((DataSource.ResponsibleUsersRow)sender).RefreshRow();
+            }
+
+            DismissViewController(true, null);
         }
 
         void CancelButton_Clicked(object sender, EventArgs e)
@@ -219,11 +274,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             }
         }
 
-        public void Test()
-        {
-
-        }
-
         #endregion
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
@@ -232,7 +282,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             public UITableView TableView;
 
             public event EventHandler ViewIsActivated = delegate { };
-            public event EventHandler<ResponsibleUsersRow> ResponsibleUserRowClicked = delegate { };
+            public event EventHandler ResponsibleUserRowClicked = delegate { };
+            public event EventHandler ParentRowClicked = delegate { };
 
             SectionCollection sections = new SectionCollection();
 
@@ -240,6 +291,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 ViewController = viewController;
                 TableView = tableView;
+                InitializeSections();
+            }
+
+            void InitializeSections()
+            {
+                var sectionsToInsert = new List<AbstractSection> {
+                    new GeneralSection(this),
+                    new BirthdateSection(this),
+                    new PhoneNumbersSection(this, CommunicationAddressType.Phone),
+                    new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
+                    new EmailAddressesSection(this),
+                    new PhysicalAddressesSection(this),
+                };
+
+                foreach (var section in sectionsToInsert)
+                {
+                    sections.Add(section);
+                }
+
+                //TODO start from here, need to decide how to set new data
+
+                TableView.BeginUpdates();
+                TableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Fade);
+                TableView.EndUpdates();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -309,16 +384,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             public void Refresh(Contact contact, ContactPreview contactPreview, ContactPreview parentContactPreview,
                                 ContactCreationModeFlag creationMode, bool parentPreselected)
             {
-                var sectionsToInsert = new List<AbstractSection> {
-                    new GeneralSection(this),
-                    new BirthdateSection(this),
-                    new PhoneNumbersSection(this, CommunicationAddressType.Phone),
-                    new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
-                    new EmailAddressesSection(this),
-                    new PhysicalAddressesSection(this),
-                };
-
-                foreach (var section in sectionsToInsert)
+                foreach (var section in sections)
                 {
                     section.Contact = contact;
                     section.ContactPreview = contactPreview;
@@ -327,12 +393,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     section.ParentPreselected = parentPreselected;
 
                     section.InitializeRows();
-                    sections.Add(section);
                 }
 
-                TableView.BeginUpdates();
-                TableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Fade);
-                TableView.EndUpdates();
+                TableView.ReloadData();
             }
 
             protected override void Dispose(bool disposing)
@@ -363,13 +426,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 return true;
             }
 
+            public void RequestResponsibleUsersSelection(ResponsibleUsersRow row)
+            {
+                ResponsibleUserRowClicked(row, EventArgs.Empty);
+            }
+
+            public void RequestParentSelection(ParentRow row)
+            {
+                ParentRowClicked(row, EventArgs.Empty);
+            }
+
+            public void UpdateParentContact(ContactPreview parentContactPreview)
+            {
+                sections.ForEach(s => s.ParentContactPreview = parentContactPreview);
+            }
+
             #region Support classes
 
             class SectionCollection : List<AbstractSection> { }
 
-            abstract class AbstractSection
+            public abstract class AbstractSection
             {
-                protected DataSource DataSource;
+                public DataSource DataSource;
 
                 public Contact Contact { get; set; }
                 public ContactPreview ContactPreview { get; set; }
@@ -394,8 +472,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 {
                 }
 
-                protected abstract void AddNewRow(NSIndexPath indexPath);
-                protected abstract void DeleteRow(NSIndexPath indexPath, AbstractRow row);
+                public abstract void AddNewRow(NSIndexPath indexPath);
+                public abstract void DeleteRow(NSIndexPath indexPath, AbstractRow row);
             }
 
             class GeneralSection : AbstractSection
@@ -407,18 +485,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override void InitializeRows()
                 {
-                    Rows.Add(new NameRow());
-                    Rows.Add(new ParentRow());
-                    Rows.Add(new DescriptionRow());
-
-                    Rows.ForEach(r =>
-                    {
-                        r.Contact = Contact;
-                        r.ContactPreview = ContactPreview;
-                        r.ParentPreselected = ParentPreselected;
-                        r.ParentContactPreview = ParentContactPreview;
-                        r.CreationMode = CreationMode;
-                    });
+                    Rows.Add(new NameRow(this));
+                    Rows.Add(new ParentRow(this));
+                    Rows.Add(new DescriptionRow(this));
+                    Rows.Add(new ResponsibleUsersRow(this));
                 }
             }
 
@@ -433,31 +503,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 {
                     if (Contact.BirthDateTimestamp != -6847804800000 && Contact.BirthDateTimestamp != -1)
                     {
-                        var row = new BirthdateRow(DeleteRow)
-                        {
-                            Contact = Contact,
-                        };
+                        var row = new BirthdateRow(this);
                         Rows.Add(row);
                     }
 
-                    Rows.Add(new BirthdateHeaderRow(AddNewRow));
+                    Rows.Add(new BirthdateHeaderRow(this));
                 }
 
-                protected override void AddNewRow(NSIndexPath indexPath)
+                public override void AddNewRow(NSIndexPath indexPath)
                 {
                     if (Rows.Count >= 2)
                         return;
 
-                    var row = new BirthdateRow(DeleteRow)
-                    {
-                        Contact = Contact,
-                    };
-
+                    var row = new BirthdateRow(this);
                     Rows.Insert(Rows.Count - 1, row);
                     DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                protected override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
                 {
                     Contact.BirthDateTimestamp = -1;
 
@@ -478,22 +541,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     var addresses = Contact.CommunicationAddresses.Where(c => c.Type == CommunicationAddressType.Email);
 
                     foreach (var address in addresses)
-                        Rows.Add(new EmailAddressRow(this, address, DeleteRow));
+                        Rows.Add(new EmailAddressRow(this, address));
 
-                    Rows.Add(new EmailAddressesHeaderRow(AddNewRow));
+                    Rows.Add(new EmailAddressesHeaderRow(this));
                 }
 
-                protected override void AddNewRow(NSIndexPath indexPath)
+                public override void AddNewRow(NSIndexPath indexPath)
                 {
                     var ca = new CommunicationAddress();
                     ca.Type = CommunicationAddressType.Email;
 
                     Contact.CommunicationAddresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new EmailAddressRow(this, ca, DeleteRow));
+                    Rows.Insert(Rows.Count - 1, new EmailAddressRow(this, ca));
                     DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                protected override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
                 {
                     var pnRow = row as EmailAddressRow;
                     var ca = pnRow.Content;
@@ -530,22 +593,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                     var addresses = Contact.CommunicationAddresses.Where(c => c.Type == type);
 
                     foreach (var address in addresses)
-                        Rows.Add(new PhoneNumberRow(this, address, DeleteRow));
+                        Rows.Add(new PhoneNumberRow(this, address));
 
-                    Rows.Add(new PhoneNumbersHeaderRow(type, AddNewRow));
+                    Rows.Add(new PhoneNumbersHeaderRow(this, type));
                 }
 
-                protected override void AddNewRow(NSIndexPath indexPath)
+                public override void AddNewRow(NSIndexPath indexPath)
                 {
                     var ca = new CommunicationAddress();
                     ca.Type = type;
 
                     Contact.CommunicationAddresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new PhoneNumberRow(this, ca, DeleteRow));
+                    Rows.Insert(Rows.Count - 1, new PhoneNumberRow(this, ca));
                     DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                protected override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
                 {
                     var pnRow = row as PhoneNumberRow;
                     var ca = pnRow.Content;
@@ -577,20 +640,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 public override void InitializeRows()
                 {
                     foreach (var address in Contact.PhysicalAddresses)
-                        Rows.Add(new PhysicalAddressRow(this, address, DeleteRow));
+                        Rows.Add(new PhysicalAddressRow(this, address));
 
-                    Rows.Add(new PhysicalAddressesHeaderRow(AddNewRow));
+                    Rows.Add(new PhysicalAddressesHeaderRow(this));
                 }
 
-                protected override void AddNewRow(NSIndexPath indexPath)
+                public override void AddNewRow(NSIndexPath indexPath)
                 {
                     var ca = new PhysicalAddress();
                     Contact.PhysicalAddresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new PhysicalAddressRow(this, ca, DeleteRow));
+                    Rows.Insert(Rows.Count - 1, new PhysicalAddressRow(this, ca));
                     DataSource.TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                protected override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
                 {
                     var pnRow = row as PhysicalAddressRow;
                     var ca = pnRow.Content;
@@ -600,23 +663,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 }
             }
 
-            class RowCollection : List<AbstractRow> { }
+            public class RowCollection : List<AbstractRow> { }
 
             #region Abstract rows
 
-            abstract class AbstractRow
+            public abstract class AbstractRow
             {
                 protected UITableViewCell Cell;
+                protected AbstractSection Section;
 
-                public Contact Contact { get; set; }
-                public ContactPreview ContactPreview { get; set; }
-                public ContactPreview ParentContactPreview { get; set; }
-                public ContactCreationModeFlag CreationMode { get; set; }
-                public bool ParentPreselected { get; set; }
+                public DataSource DataSource { get => Section.DataSource; }
+                public Contact Contact { get => Section.Contact; }
+                public ContactPreview ContactPreview { get => Section.ContactPreview; }
+                public ContactPreview ParentContactPreview { get => Section.ParentContactPreview; }
+                public ContactCreationModeFlag CreationMode { get => Section.CreationMode; }
+                public bool ParentPreselected { get => Section.ParentPreselected; }
 
                 public virtual UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.None;
 
                 public abstract string Key { get; }
+
+                protected AbstractRow(AbstractSection section)
+                {
+                    Section = section;
+                }
 
                 public abstract AddEditContactTableViewCell CreateCell();
 
@@ -639,7 +709,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 readonly string placeholder;
 
-                protected TextFieldRow(string placeholder)
+                protected TextFieldRow(AbstractSection section, string placeholder)
+                    : base(section)
                 {
                     this.placeholder = placeholder;
                 }
@@ -663,7 +734,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 readonly string title;
 
-                protected TitledTextView(string title)
+                protected TitledTextView(AbstractSection section, string title)
+                    : base(section)
                 {
                     this.title = title;
                 }
@@ -683,8 +755,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 protected abstract void ContentEdited(object sender, string e);
             }
 
-            abstract class DisclosureIndicatorRow : AbstractRow
+            public abstract class DisclosureIndicatorRow : AbstractRow
             {
+                protected DisclosureIndicatorRow(AbstractSection section)
+                    : base(section)
+                {
+                }
+
                 public override string Key => DisclosureIndicatorTableViewCell.Key;
 
                 public override AddEditContactTableViewCell CreateCell() => new DisclosureIndicatorTableViewCell();
@@ -694,11 +771,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             abstract class MultiHeaderRow : AbstractRow
             {
-                readonly Action<NSIndexPath> addNewRowAction;
-
-                protected MultiHeaderRow(Action<NSIndexPath> addNewRowAction)
+                protected MultiHeaderRow(MultiSection section)
+                    : base(section)
                 {
-                    this.addNewRowAction = addNewRowAction;
                 }
 
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Insert;
@@ -711,31 +786,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
-                    addNewRowAction?.Invoke(indexPath);
+                    ((MultiSection)Section).AddNewRow(indexPath);
                 }
 
                 public override void OnCommit(NSIndexPath indexPath)
                 {
-                    addNewRowAction?.Invoke(indexPath);
+                    ((MultiSection)Section).AddNewRow(indexPath);
                 }
             }
 
             abstract class MultiContentRow<T> : AbstractRow where T : class
             {
                 public T Content { get; set; }
-                readonly Action<NSIndexPath, AbstractRow> deleteRowAction;
 
-                protected MultiContentRow(T content, Action<NSIndexPath, AbstractRow> deleteRowAction)
+                protected MultiContentRow(MultiSection section,
+                                          T content)
+                    : base(section)
                 {
                     Content = content;
-                    this.deleteRowAction = deleteRowAction;
                 }
 
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Delete;
 
                 public override void OnCommit(NSIndexPath indexPath)
                 {
-                    deleteRowAction?.Invoke(indexPath, this);
+                    ((MultiSection)Section).DeleteRow(indexPath, this);
                 }
             }
 
@@ -743,8 +818,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class FirstNameRow : TextFieldRow
             {
-                public FirstNameRow()
-                    : base(Localization.GetString("first_name"))
+                public FirstNameRow(AbstractSection section)
+                    : base(section, Localization.GetString("first_name"))
                 {
                 }
 
@@ -755,8 +830,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class MiddleNameRow : TextFieldRow
             {
-                public MiddleNameRow()
-                    : base(Localization.GetString("middle_name"))
+                public MiddleNameRow(AbstractSection section)
+                    : base(section, Localization.GetString("middle_name"))
                 {
                 }
 
@@ -767,8 +842,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class LastNameRow : TextFieldRow
             {
-                public LastNameRow()
-                    : base(Localization.GetString("last_name"))
+                public LastNameRow(AbstractSection section)
+                    : base(section, Localization.GetString("last_name"))
                 {
                 }
 
@@ -780,8 +855,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             //To be used with Deparment and Company
             class NameRow : TextFieldRow
             {
-                public NameRow()
-                    : base(Localization.GetString("name"))
+                public NameRow(AbstractSection section)
+                    : base(section, Localization.GetString("name"))
                 {
                 }
 
@@ -790,39 +865,95 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
                 public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.Name);
             }
 
-            class ParentRow : DisclosureIndicatorRow
+            public class ParentRow : DisclosureIndicatorRow
             {
+                bool disableEditing;
+
+                public ParentRow(AbstractSection section)
+                    : base(section)
+                {
+                }
+
                 public override void RefreshRow()
                 {
                     var cell = (DisclosureIndicatorTableViewCell)Cell;
-                    cell.SetTitle("Parent"); //TODO change
-                    cell.SetContent("Marketing@NordicIT");
+                    switch (ContactPreview.Type)
+                    {
+                        case ContactType.Department:
+                            cell.SetTitle(Localization.GetString("company"));
+                            break;
+                        case ContactType.Person:
+                            cell.SetTitle(Localization.GetString("company_department"));
+                            break;
+                        default:
+                            throw new ArgumentException("Not valid contact type");
+                    }
+
+                    disableEditing = false;
+
+                    if (CreationMode == ContactCreationModeFlag.New && ParentContactPreview != null) //Add from parent
+                    {
+                        var name = ParentContactPreview.Name;
+                        cell.SetContent(ParentContactPreview.Type == ContactType.Company ? name : $"{name} @ {ParentContactPreview.CompanyName}");
+                    }
+                    else if (CreationMode == ContactCreationModeFlag.Edit)
+                    {
+                        disableEditing = true;
+
+                        if (string.IsNullOrEmpty(ContactPreview.CompanyName))
+                        {
+                            //TODO The view should be removed
+                        }
+                        else
+                        {
+                            cell.SetContent(ContactPreview.CompanyName);
+                        }
+                    }
+
+                    disableEditing |= ParentPreselected;
+                }
+
+                public override void OnClicked(NSIndexPath indexPath)
+                {
+                    if (disableEditing)
+                        return;
+
+                    DataSource.RequestParentSelection(this);
                 }
             }
 
             public class ResponsibleUsersRow : DisclosureIndicatorRow
             {
-                public override void RefreshRow()
+                public ResponsibleUsersRow(AbstractSection section)
+                    : base(section)
+                {
+                }
+
+                protected override void Initialize()
                 {
                     var cell = (DisclosureIndicatorTableViewCell)Cell;
                     cell.SetTitle(Localization.GetString("responsible_users")); //TODO change
+                }
+
+                public override void RefreshRow()
+                {
+                    var cell = (DisclosureIndicatorTableViewCell)Cell;
                     if (Contact?.ResponsibleUsers?.Count > 0)
-                    {
                         cell.SetContent(string.Join(", ", Contact?.ResponsibleUsers.Values));
-                    }
+                    else
+                        cell.SetContent(string.Empty);
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
-                    var vc = new ResponsibleUsersSelectionController();
-
+                    DataSource.RequestResponsibleUsersSelection(this);
                 }
             }
 
             class DescriptionRow : TitledTextView
             {
-                public DescriptionRow()
-                    : base(Localization.GetString("description"))
+                public DescriptionRow(AbstractSection section)
+                    : base(section, Localization.GetString("description"))
                 {
                 }
 
@@ -839,8 +970,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class AccountRow : TitledTextView
             {
-                public AccountRow()
-                    : base(Localization.GetString("account"))
+                public AccountRow(AbstractSection section)
+                    : base(section, Localization.GetString("account"))
                 {
                 }
 
@@ -851,8 +982,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class LedgerRow : TitledTextView
             {
-                public LedgerRow()
-                    : base(Localization.GetString("ledger"))
+                public LedgerRow(AbstractSection section)
+                    : base(section, Localization.GetString("ledger"))
                 {
                 }
 
@@ -863,8 +994,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class PositionRow : TitledTextView
             {
-                public PositionRow()
-                    : base(Localization.GetString("position"))
+                public PositionRow(AbstractSection section)
+                    : base(section, Localization.GetString("position"))
                 {
                 }
 
@@ -875,8 +1006,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class ShortIdRow : TitledTextView
             {
-                public ShortIdRow()
-                    : base(Localization.GetString("short_id"))
+                public ShortIdRow(AbstractSection section)
+                    : base(section, Localization.GetString("short_id"))
                 {
                 }
 
@@ -887,8 +1018,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class WebpageRow : TitledTextView
             {
-                public WebpageRow()
-                    : base(Localization.GetString("webpage"))
+                public WebpageRow(AbstractSection section)
+                    : base(section, Localization.GetString("webpage"))
                 {
                 }
 
@@ -899,8 +1030,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class BirthdateHeaderRow : MultiHeaderRow
             {
-                public BirthdateHeaderRow(Action<NSIndexPath> addNewRowAction)
-                            : base(addNewRowAction)
+                public BirthdateHeaderRow(BirthdateSection section)
+                            : base(section)
                 {
                 }
 
@@ -915,13 +1046,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Delete;
 
-                readonly Action<NSIndexPath, AbstractRow> deleteRowAction;
-
                 public override string Key => BirthdateTableViewCell.Key;
 
-                public BirthdateRow(Action<NSIndexPath, AbstractRow> deleteRow)
+                public BirthdateRow(AbstractSection section)
+                    : base(section)
                 {
-                    deleteRowAction = deleteRow;
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
@@ -949,14 +1078,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
                 public override void OnCommit(NSIndexPath indexPath)
                 {
-                    deleteRowAction?.Invoke(indexPath, this);
+                    ((BirthdateSection)Section).DeleteRow(indexPath, this);
                 }
             }
 
             class PhysicalAddressesHeaderRow : MultiHeaderRow
             {
-                public PhysicalAddressesHeaderRow(Action<NSIndexPath> addNewRowAction)
-                            : base(addNewRowAction)
+                public PhysicalAddressesHeaderRow(PhysicalAddressesSection section)
+                            : base(section)
                 {
                 }
 
@@ -971,8 +1100,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 readonly PhysicalAddressesSection section;
 
-                public PhysicalAddressRow(PhysicalAddressesSection section, PhysicalAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
-                    : base(address, deleteRow)
+                public PhysicalAddressRow(PhysicalAddressesSection section, PhysicalAddress address)
+                    : base(section, address)
                 {
                     this.section = section;
                 }
@@ -994,8 +1123,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
 
             class EmailAddressesHeaderRow : MultiHeaderRow
             {
-                public EmailAddressesHeaderRow(Action<NSIndexPath> addNewRowAction)
-                            : base(addNewRowAction)
+                public EmailAddressesHeaderRow(EmailAddressesSection section)
+                            : base(section)
                 {
                 }
 
@@ -1010,8 +1139,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 readonly EmailAddressesSection section;
 
-                public EmailAddressRow(EmailAddressesSection section, CommunicationAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
-                    : base(address, deleteRow)
+                public EmailAddressRow(EmailAddressesSection section, CommunicationAddress address)
+                    : base(section, address)
                 {
                     this.section = section;
                 }
@@ -1043,8 +1172,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 readonly CommunicationAddressType type;
 
-                public PhoneNumbersHeaderRow(CommunicationAddressType type, Action<NSIndexPath> addNewRowAction)
-                            : base(addNewRowAction)
+                public PhoneNumbersHeaderRow(PhoneNumbersSection section, CommunicationAddressType type)
+                            : base(section)
                 {
                     this.type = type;
                 }
@@ -1076,8 +1205,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AddEditContactView
             {
                 readonly PhoneNumbersSection section;
 
-                public PhoneNumberRow(PhoneNumbersSection section, CommunicationAddress address, Action<NSIndexPath, AbstractRow> deleteRow)
-                    : base(address, deleteRow)
+                public PhoneNumberRow(PhoneNumbersSection section, CommunicationAddress address)
+                    : base(section, address)
                 {
                     this.section = section;
                 }

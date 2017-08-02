@@ -1,3 +1,4 @@
+using Foundation;
 using Mark5.Mobile.Common.Model;
 using UIKit;
 
@@ -10,22 +11,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
-        public override void ContactSelected(UITableView tableView, ContactPreview contactPreview)
+        public override void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
         {
             if (tableView == SearchResultsController.TableView)
             {
-                var ds = (DataSource) tableView.Source;
-                var indexPath = ds.FindItemIndexPath(contactPreview);
-                if (indexPath != null)
-                    tableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
+                tableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
             }
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (ContactViewController) nc.ViewControllers[0];
+                var vc = (ContactViewController)nc.ViewControllers[0];
 
                 if (vc.IsShowingContactWithId(contactPreview.Id))
                     return;

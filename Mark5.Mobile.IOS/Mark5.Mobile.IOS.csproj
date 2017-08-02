@@ -267,7 +267,6 @@
 		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs">
 		  <DependentUpon>TemplatesSearchResultsTableViewCell.cs</DependentUpon>
 		</Compile>
-		<Compile Include="Ui\ViewControllers\AddEditContactView\AddEditContacViewController.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\DisclosureIndicatorTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowHeaderTableViewCell.cs" />
@@ -280,6 +279,7 @@
 		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\ParentContactSelectorListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\AddEditContacViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -559,7 +559,6 @@
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
 	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
-	  <Folder Include="Ui\ViewControllers\AddEditContactView\" />
 	  <Folder Include="Ui\TableViewCells\AddEditContactTableViewCell\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

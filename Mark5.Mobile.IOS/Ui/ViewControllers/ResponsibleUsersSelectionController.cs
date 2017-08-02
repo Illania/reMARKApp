@@ -135,8 +135,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CancelItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
-
-            NavigationController.DismissViewController(true, null);
         }
 
         void DoneItem_Clicked(object sender, EventArgs e)
@@ -146,8 +144,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var selectedUsers = ds.SelectedItems;
 
             tcs.SetResult(selectedUsers);
-
-            NavigationController.DismissViewController(true, null);
         }
 
         async Task RefreshData()

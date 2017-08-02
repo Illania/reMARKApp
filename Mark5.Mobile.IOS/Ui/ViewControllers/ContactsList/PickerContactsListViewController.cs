@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Managers;
 using Mark5.Mobile.Common.Model;
@@ -20,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
-        public async override void ContactSelected(UITableView tableView, ContactPreview contactPreview)
+        public async override void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_contact___"));
 

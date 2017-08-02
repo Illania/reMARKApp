@@ -307,11 +307,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CreateContactItem_Clicked(object sender, EventArgs e)
+        async void CreateContactItem_Clicked(object sender, EventArgs e)
         {
             var vc = new AddEditContacViewController
             {
                 CreationModeFlag = ContactCreationModeFlag.New,
+                ContactType = ContactType.Person,
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);

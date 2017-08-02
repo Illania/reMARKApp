@@ -230,7 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Actions
 
-        public virtual void ContactSelected(UITableView tableView, ContactPreview contactPreview)
+        public virtual void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
         {
         }
 
@@ -850,7 +850,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     return;
 
                 var cp = contactPreviewsInView[indexPath.Section][indexPath.Row];
-                viewController.ContactSelected(tableView, cp);
+                viewController.ContactSelected(tableView, cp, indexPath);
             }
 
             public void AppendItems(List<ContactPreview> contactPreviews)

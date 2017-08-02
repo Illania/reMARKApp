@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Font = Theme.DefaultBoldFont,
             };
             TitleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-
+            TitleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(TitleLabel);
 
             ContentView.AddConstraints(new[]
@@ -40,11 +40,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
+                Lines = 0, //TODO need to fix height problem
             };
             ContentView.AddSubview(ContentLabel);
-
             ContentView.AddConstraints(new[]
             {
+                NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.Height, 1f, 20f),
                 NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
                 NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, TitleLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
                 NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
