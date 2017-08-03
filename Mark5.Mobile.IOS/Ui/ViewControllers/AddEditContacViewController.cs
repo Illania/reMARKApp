@@ -264,9 +264,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool correctOffset = false)
         {
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, keyboardHeight, 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, keyboardHeight, 0f);
-
             if (notification == null)
             {
                 View.LayoutIfNeeded();
