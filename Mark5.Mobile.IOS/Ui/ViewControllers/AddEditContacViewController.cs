@@ -190,8 +190,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         //TODO cannot add deparment without company 
         //TODO check all the stuff that was written for android
 
-        // Keyboard issues
-
         async void DataSource_ParentRowClicked(object sender, EventArgs e)
         {
             var vc = new ParentContactSelectorFolderListView(ContactPreview.Type);
@@ -308,11 +306,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var sectionsToInsert = new List<AbstractSection> {
                     new GeneralSection(this),
-                    new BirthdateSection(this),
+                    new EmailAddressesSection(this),
                     new PhoneNumbersSection(this, CommunicationAddressType.Phone),
                     new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
-                    new EmailAddressesSection(this),
                     new PhysicalAddressesSection(this),
+                    new BirthdateSection(this),
                 };
 
                 foreach (var section in sectionsToInsert)
@@ -499,10 +497,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void InitializeRows()
                 {
-                    Rows.Add(new NameRow(this));
-                    Rows.Add(new ParentRow(this));
+                    switch (ContactPreview.Type)
+                    {
+                        case ContactType.Person:
+                            Rows.Add(new FirstNameRow(this));
+                            Rows.Add(new MiddleNameRow(this));
+                            Rows.Add(new LastNameRow(this));
+                            Rows.Add(new PositionRow(this));
+                            break;
+                        case ContactType.Department:
+                            Rows.Add(new NameRow(this));
+                            Rows.Add(new ParentRow(this));
+                            break;
+                        case ContactType.Company:
+                            Rows.Add(new NameRow(this));
+                            break;
+                    }
+                }
+            }
+
+            class AdditionalSection : AbstractSection
+            {
+                public AdditionalSection(DataSource dataSource)
+                    : base(dataSource)
+                {
+                }
+
+                public override void InitializeRows()
+                {
+                    Rows.Add(new ShortIdRow(this));
                     Rows.Add(new DescriptionRow(this));
                     Rows.Add(new ResponsibleUsersRow(this));
+                    if (ContactPreview.Type == ContactType.Company)
+                    {
+                        Rows.Add(new LedgerRow(this));
+                        Rows.Add(new VatRow(this));
+                    }
+                    if (ContactPreview.Type == ContactType.Department || ContactPreview.Type == ContactType.Company)
+                        Rows.Add(new AccountRow(this));
+                    Rows.Add(new WebpageRow(this));
                 }
             }
 
@@ -1073,6 +1106,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void ContentEdited(object sender, string e) => Contact.Ledger = e;
 
                 public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Ledger);
+            }
+
+            class VatRow : TitledTextView
+            {
+                public VatRow(AbstractSection section)
+                    : base(section, Localization.GetString("vat"))
+                {
+                }
+
+                protected override void ContentEdited(object sender, string e) => Contact.Vat = e;
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Vat);
             }
 
             class PositionRow : TitledTextView
