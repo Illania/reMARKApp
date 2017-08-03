@@ -113,12 +113,6 @@
     <Reference Include="PreMailer.Net">
       <HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
     </Reference>
-    <Reference Include="materialdialogs">
-      <HintPath>..\lib\materialdialogs.dll</HintPath>
-    </Reference>
-    <Reference Include="materialprogressbar">
-      <HintPath>..\lib\materialprogressbar.dll</HintPath>
-    </Reference>
     <Reference Include="Xamarin.Android.Support.v7.RecyclerView">
       <HintPath>..\packages\Xamarin.Android.Support.v7.RecyclerView.25.3.1\lib\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
     </Reference>
@@ -708,6 +702,10 @@
     <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
       <Project>{A54356BD-9CC4-4DE0-A8DC-9B2D9D6ED288}</Project>
       <Name>TinyMessenger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MaterialDialogs\MaterialDialogs.csproj">
+      <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
+      <Name>MaterialDialogs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
