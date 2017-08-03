@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         bool refreshing;
 
         CancellationTokenSource cts;
+
+        UIBarButtonItem leftButton;
+        UIBarButtonItem rightButton;
 
         protected AbstractContactsListViewController(bool disableRowActions)
         {
@@ -129,7 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Initialization
 
-        void InitializeNavigationBar()
+        protected virtual void InitializeNavigationBar()
         {
             ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -206,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             UIView.AnimationsEnabled = true;
         }
 
-        void InitializeHandlers()
+        protected virtual void InitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked += ExitEditItem_Clicked;
@@ -218,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        void DeinitializeHandlers()
+        protected virtual void DeinitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked -= ExitEditItem_Clicked;
@@ -255,6 +259,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         void StartEditing()
         {
             TableView.SetEditing(true, true);
+
+            leftButton = NavigationItem.LeftBarButtonItem;
+            rightButton = NavigationItem.RightBarButtonItem;
+
             NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(EditItem, true);
 
@@ -279,8 +287,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(null, true);
-            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+            NavigationItem.SetRightBarButtonItem(rightButton, true);
+            NavigationItem.SetLeftBarButtonItem(leftButton, true);
 
             SearchController.SearchBar.UserInteractionEnabled = true;
             SearchController.SearchBar.Alpha = 1f;

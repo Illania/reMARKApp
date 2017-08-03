@@ -48,6 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem fileToButton;
         UIBarButtonItem actionsLinksButton;
         UIBarButtonItem doneButtonItem;
+        UIBarButtonItem editButtonItem;
         NSLayoutConstraint headerViewOffset;
 
         CancellationTokenSource cts;
@@ -314,6 +315,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
+
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed) //TODO need to talk with Emilie about where to put the button
+            {
+                editButtonItem = new UIBarButtonItem();
+                editButtonItem.Title = Localization.GetString("edit");
+                editButtonItem.Enabled = false;
+                NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+            }
+
         }
 
         void InitializeHandlers()
@@ -341,6 +351,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
+
+            if (editButtonItem != null)
+                editButtonItem.Clicked += EditButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
@@ -368,6 +381,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
+
+            if (editButtonItem != null)
+                editButtonItem.Clicked -= EditButtonItem_Clicked;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -446,6 +462,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
+        }
+
+        void EditButtonItem_Clicked(object sender, EventArgs e)
+        {
+            var vc = new AddEditContactViewController
+            {
+                ContactPreview = contactPreview,
+                Contact = contact,
+                CreationModeFlag = ContactCreationModeFlag.Edit,
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
@@ -554,9 +581,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                     PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
-	                {
-	                    { DocumentAddressType.To, new [] { ca.Address } }
-	                }
+                    {
+                        { DocumentAddressType.To, new [] { ca.Address } }
+                    }
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }
@@ -712,6 +739,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     actionsLinksButton.Enabled = true;
 
                 ds.EndRefresh(this.contactPreview, contact);
+
+                if (editButtonItem != null)
+                    editButtonItem.Enabled = true;
             }
             catch (Exception ex)
             {

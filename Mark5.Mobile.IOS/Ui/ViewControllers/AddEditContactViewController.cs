@@ -13,7 +13,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class AddEditContacViewController : AbstractViewController
+    public class AddEditContactViewController : AbstractViewController
     {
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void ViewDidAppear(bool animated)
         {
-            CommonConfig.Logger.Info($"{nameof(AddEditContacViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(AddEditContactViewController)} appeared");
             base.ViewWillAppear(animated);
             RefreshData();
         }
@@ -70,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DeInitializeHandlers();
             UnsubscribeToKeyboardEvents();
 
-            CommonConfig.Logger.Info($"{nameof(AddEditContacViewController)} will disappear");
+            CommonConfig.Logger.Info($"{nameof(AddEditContactViewController)} will disappear");
         }
 
         #endregion
@@ -119,6 +119,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (cancelButton != null)
                 cancelButton.Clicked += CancelButton_Clicked;
 
+            if (saveButton != null)
+                saveButton.Clicked += SaveButton_Clicked;
+
             if (dataSource != null)
             {
                 dataSource.ViewIsActivated += DataSource_ViewIsActivated;
@@ -132,6 +135,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (cancelButton != null)
                 cancelButton.Clicked -= CancelButton_Clicked;
+
+            if (saveButton != null)
+                saveButton.Clicked -= SaveButton_Clicked;
 
             if (dataSource != null)
             {
@@ -241,6 +247,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DismissViewController(true, null);
         }
 
+        void SaveButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
         #endregion
 
         #region Keyboard
@@ -285,7 +296,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
-            public AddEditContacViewController ViewController;
+            public AddEditContactViewController ViewController;
             public UITableView TableView;
 
             public event EventHandler ViewIsActivated = delegate { };
@@ -295,7 +306,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             SectionCollection sections = new SectionCollection();
 
-            public DataSource(AddEditContacViewController viewController, UITableView tableView)
+            public DataSource(AddEditContactViewController viewController, UITableView tableView)
             {
                 ViewController = viewController;
                 TableView = tableView;
@@ -348,7 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 row.OnDisplayed(indexPath);
             }
 
-            public override nint RowsInSection(UITableView tableView, nint section)
+            public override nint RowsInSection(UITableView tableview, nint section)
             {
                 return sections[(int)section].Rows.Count;
             }
@@ -497,17 +508,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void InitializeRows()
                 {
+                    var addParentRow = !(CreationMode == ContactCreationModeFlag.Edit && string.IsNullOrEmpty(ContactPreview.CompanyName));
+
                     switch (ContactPreview.Type)
                     {
                         case ContactType.Person:
                             Rows.Add(new FirstNameRow(this));
                             Rows.Add(new MiddleNameRow(this));
                             Rows.Add(new LastNameRow(this));
+                            if (addParentRow)
+                                Rows.Add(new ParentRow(this));
                             Rows.Add(new PositionRow(this));
                             break;
                         case ContactType.Department:
                             Rows.Add(new NameRow(this));
-                            Rows.Add(new ParentRow(this));
+                            if (addParentRow)
+                                Rows.Add(new ParentRow(this));
                             break;
                         case ContactType.Company:
                             Rows.Add(new NameRow(this));
@@ -991,7 +1007,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         if (string.IsNullOrEmpty(ContactPreview.CompanyName))
                         {
-                            //TODO The view should be removed
+                            throw new Exception("This should not happen!"); //TODO for testing
                         }
                         else
                         {

@@ -201,13 +201,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             }
 
-            if (ParentFolder.Module == ModuleType.Contacts)
+            if (ParentFolder.Module == ModuleType.Contacts && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
                 CreateContactItem = new UIBarButtonItem();
                 CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
                 NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
             }
-
             if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
                 if (IsRootOfFoldersList)
                 {
@@ -329,7 +328,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 try
                 {
-                    var gds = (GrouppedDataSource) TableView.Source;
+                    var gds = (GrouppedDataSource)TableView.Source;
                     await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFolders(GrouppedDataSource.Section.Favorites));
                 }
                 catch (Exception ex)
@@ -411,7 +410,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
                 else
                 {
-                    var ds = (DataSource) TableView.Source;
+                    var ds = (DataSource)TableView.Source;
                     ds.SetFolders(remoteFolders);
 
                     CommonConfig.Logger.Info($"Refreshed folders list [parentFolder={ParentFolder}]");
@@ -438,7 +437,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                var gds = (GrouppedDataSource) TableView.Source;
+                var gds = (GrouppedDataSource)TableView.Source;
                 var currentFavorites = gds.GetFolders(GrouppedDataSource.Section.Favorites);
                 var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
@@ -466,7 +465,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             if (IsRootOfFoldersList)
             {
-                var gds = (GrouppedDataSource) TableView.Source;
+                var gds = (GrouppedDataSource)TableView.Source;
                 var ids = gds.FoldersInViewIds;
 
                 var favoritesStatus = new SortedDictionary<int, bool>();
@@ -487,7 +486,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             else
             {
-                var ds = (DataSource) TableView.Source;
+                var ds = (DataSource)TableView.Source;
                 var ids = ds.FoldersInViewIds;
 
                 var favoritesStatus = new SortedDictionary<int, bool>();
