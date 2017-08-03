@@ -238,6 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (negativeAction != null)
                 builder.OnNegative(new SingleButtonCallback(negativeAction));
             builder.Cancelable(false);
+            builder.StackingBehavior(StackingBehavior.Adaptive);
             builder.Show();
         }
 
