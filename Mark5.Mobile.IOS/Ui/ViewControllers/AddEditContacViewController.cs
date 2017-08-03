@@ -21,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public ContactPreview ParentContactPreview { get; set; }
         public bool ParentPreselected { get; set; }
 
-        UIBarButtonItem editButton;
+        UIBarButtonItem saveButton;
         UIBarButtonItem cancelButton;
 
         UITableView tableView;
@@ -81,11 +81,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cancelButton.Title = Localization.GetString("cancel");
             NavigationItem.SetLeftBarButtonItem(cancelButton, false);
 
-            editButton = new UIBarButtonItem();
-            editButton.Title = "Edit"; //TODO put right one
-            //editButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-            editButton.Enabled = false;
-            NavigationItem.SetRightBarButtonItem(editButton, false);
+            saveButton = new UIBarButtonItem();
+            saveButton.Title = Localization.GetString("save");
+            saveButton.Enabled = false;
+            NavigationItem.SetRightBarButtonItem(saveButton, false);
         }
 
         void InitializeView()
