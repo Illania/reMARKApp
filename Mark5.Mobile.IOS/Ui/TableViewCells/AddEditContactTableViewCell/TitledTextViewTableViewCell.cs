@@ -5,16 +5,16 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class TitledTextFieldTableViewCell : AddEditContactTableViewCell
+    public class TitledTextViewTableViewCell : AddEditContactTableViewCell
     {
         public static readonly NSString Key = new NSString("TitledTextFieldTableViewCell");
 
         public event EventHandler<string> ContentEdited = delegate { };
 
-        readonly UITextField textField;
+        readonly UITextView textView;
         readonly UILabel titleLabel;
 
-        public TitledTextFieldTableViewCell()
+        public TitledTextViewTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
@@ -32,21 +32,31 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
             });
 
-            textField = new UITextField
+            textView = new UITextView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                BorderStyle = UITextBorderStyle.None
+                Editable = true,
+                ScrollEnabled = false,
             };
-            textField.EditingDidEnd += (object sender, EventArgs e) => ContentEdited(this, textField.Text);
-            ContentView.AddSubview(textField);
+            textView.TextContainer.LineFragmentPadding = 0f;
+            textView.TextContainerInset = UIEdgeInsets.Zero;
+            textView.Changed += TextView_Changed;
+            textView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            textView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            ContentView.AddSubview(textView);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
             });
+        }
+
+        void TextView_Changed(object sender, EventArgs e)
+        {
+            ContentEdited(this, textView.Text);
         }
 
         public void SetTitle(string title)
@@ -56,7 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public void SetContent(string content)
         {
-            textField.Text = content;
+            textView.Text = content;
         }
     }
 }

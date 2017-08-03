@@ -275,7 +275,7 @@
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\AddEditContactTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextFieldTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextViewTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />

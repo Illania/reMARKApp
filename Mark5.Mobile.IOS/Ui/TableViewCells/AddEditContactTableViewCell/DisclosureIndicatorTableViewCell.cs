@@ -62,5 +62,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         {
             ContentLabel.Text = content;
         }
+
+        public void Reset()
+        {
+            TitleLabel.Text = string.Empty;
+            ContentLabel.Text = string.Empty;
+        }
     }
 }
