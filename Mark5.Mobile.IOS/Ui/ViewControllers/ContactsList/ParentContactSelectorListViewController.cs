@@ -30,11 +30,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
             if (contactPreview.Type == ContactType.Person)
             {
-                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_title"), Localization.GetString("parent_contact_selector_invalid_person_content"));
+                var content = ChildrenType == ContactType.Person ? Localization.GetString("parent_contact_selector_invalid_person_content") : Localization.GetString("parent_contact_selector_invalid_department_content");
+
+                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_title"), content);
             }
             else if (contactPreview.Type == ContactType.Department)
             {
-                if (ChildrenType == ContactType.Company || ChildrenType == ContactType.Department)
+                if (ChildrenType == ContactType.Department)
                 {
                     await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_title"), Localization.GetString("parent_contact_selector_invalid_department_content"));
                 }
@@ -43,12 +45,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             }
             else if (contactPreview.Type == ContactType.Company)
             {
-                if (ChildrenType == ContactType.Company)
-                {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_title"), Localization.GetString("parent_contact_selector_invalid_company_content"));
-                    return;
-                }
-
                 if (ChildrenType == ContactType.Department)
                 {
                     selectedContactPreview = contactPreview;
