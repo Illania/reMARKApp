@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Graphics;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
@@ -15,6 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
     {
         TextInputEditText contentEditText;
         AppCompatImageButton deleteButton;
+
         int errorResourceId;
 
         protected string Content { get => contentEditText.Text; set => contentEditText.Text = value; }
@@ -30,11 +32,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             this.errorResourceId = errorResourceId;
 
-            var layout = new TextInputLayout(Context)
+            var textInputLayout = new TextInputLayout(Context)
             {
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f),
             };
-            AddView(layout);
+            AddView(textInputLayout);
 
             contentEditText = new TextInputEditText(Context)
             {
@@ -57,8 +59,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
                 contentEditText.KeyListener = null;
             }
 
-            layout.AddView(contentEditText);
-            layout.HintEnabled = floatingHint;
+            textInputLayout.AddView(contentEditText);
+            textInputLayout.HintEnabled = floatingHint;
 
             var topBottomDistance = floatingHint ? 0 : DistanceSmall;
             var leftDistance = DistanceLarge;
@@ -69,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             deleteButton = new AppCompatImageButton(Context);
 
             deleteButton.SetImageResource(Resource.Drawable.remove);
-            deleteButton.SetColorFilter(Color.Red);
+            deleteButton.SetColorFilter(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
 
             var addButtonLp = new LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
             {

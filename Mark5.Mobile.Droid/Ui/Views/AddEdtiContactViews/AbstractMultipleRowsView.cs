@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             var button = new AppCompatImageButton(context);
 
             button.SetImageResource(addButton ? Resource.Drawable.add : Resource.Drawable.remove);
-            button.SetColorFilter(addButton ? new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)) : Color.Red);
+            button.SetColorFilter(addButton ? new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)) : new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
 
             var addButtonLp = new LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
             {
