@@ -308,7 +308,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async void CreateContactItem_Clicked(object sender, EventArgs e)
         {
-            var vc = new AddEditContacViewController
+            var vc = new AddEditContactViewController
             {
                 CreationModeFlag = ContactCreationModeFlag.New,
                 ContactType = ContactType.Person,
