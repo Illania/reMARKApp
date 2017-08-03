@@ -1,5 +1,6 @@
 using System;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -21,6 +22,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string NotificationGuidIntentKey = "NotificationGuid_d0224832-22e3-481b-9c0d-78b361a57691";
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, int folderId = 0, Folder folder = null, int contactId = 0, ContactPreview contactPreview = null)
+        {
+            var intent = new Intent(context, typeof(ContactActivity));
+            if (folderId != 0)
+                intent.PutExtra(FolderIdIntentKey, folderId);
+            if (folder != null)
+                intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+            if (contactId != 0)
+                intent.PutExtra(ContactIdIntentKey, contactId);
+            if (contactPreview != null)
+                intent.PutExtra(ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

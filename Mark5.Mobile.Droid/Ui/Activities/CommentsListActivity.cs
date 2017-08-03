@@ -19,6 +19,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         CommentsListFragment cf;
 
+        public static Intent CreateIntent(Context context, Contact contact = null, Document document = null)
+        {
+            var intent = new Intent(context, typeof(CommentsListActivity));
+            if(contact != null)
+                intent.PutExtra(EntityIntentKey, Serializer.Serialize(contact));
+            if(document != null)
+                intent.PutExtra(EntityIntentKey, Serializer.Serialize(document));
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

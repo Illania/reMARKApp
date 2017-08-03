@@ -659,9 +659,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void ShowCategories(DocumentPreview documentPreview)
         {
-            var i = new Intent(Activity, typeof(CategoriesListActivity));
-            i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(documentPreview));
-            StartActivity(i);
+            StartActivity(CategoriesListActivity.CreateIntent(Context, documentPreview:documentPreview));
         }
 
         async void SetPriority()

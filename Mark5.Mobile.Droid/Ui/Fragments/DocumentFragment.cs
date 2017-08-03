@@ -378,18 +378,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(DocumentPreview));
-                StartActivityForResult(i, RequestCodes.CategoriesRequest);
-
+                StartActivityForResult(CategoriesListActivity.CreateIntent(Context, documentPreview:DocumentPreview), RequestCodes.CategoriesRequest);
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Comments)
             {
-                var i = new Intent(Activity, typeof(CommentsListActivity));
-                i.PutExtra(CommentsListActivity.EntityIntentKey, Serializer.Serialize(Document));
-                StartActivityForResult(i, RequestCodes.CommentsRequest);
+                StartActivityForResult(CommentsListActivity.CreateIntent(Context, document:Document), RequestCodes.CommentsRequest);
 
                 return true;
             }

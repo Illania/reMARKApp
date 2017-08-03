@@ -411,10 +411,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.First()));
-                StartActivity(i);
-
+                StartActivity(CategoriesListActivity.CreateIntent(Context,CurrentAdapter.SelectedItems.First()));
                 ActionMode?.Finish();
                 return true;
             }
