@@ -194,6 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Add(new ShortIdView(Context));
             secondarySubviews.Add(new DescriptionView(Context));
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
+            secondarySubviews.Add(new AccountView(Context));
             secondarySubviews.Add(new WebpageView(Context));
 
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
@@ -215,6 +216,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondarySubviews.Add(new ResponsibleUsersView(Context, this));
             secondarySubviews.Add(new LedgerView(Context));
             secondarySubviews.Add(new VatView(Context));
+            secondarySubviews.Add(new AccountView(Context));
             secondarySubviews.Add(new WebpageView(Context));
 
             secondarySubviews.ForEach(secondaryLinearLayout.AddView);
