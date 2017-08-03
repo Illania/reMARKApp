@@ -188,14 +188,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         //TODO add rights check on edit and add
         //TODO cannot add deparment without company 
-        //TODO how to remove parent
         //TODO check all the stuff that was written for android
 
-        //Multiple line description
-        //Add birthdate should disappear
         // Keyboard issues
-        // Once company or responsible users are present, just remove them
-
 
         async void DataSource_ParentRowClicked(object sender, EventArgs e)
         {
@@ -327,8 +322,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     sections.Add(section);
                 }
-
-                //TODO start from here, need to decide how to set new data
 
                 TableView.BeginUpdates();
                 TableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Fade);
@@ -727,6 +720,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     RefreshRow();
                 }
 
+                protected void ReloadRow()
+                {
+                    if (Cell == null)
+                        return;
+
+                    var indexPath = TableView.IndexPathForCell(Cell);
+                    if (indexPath != null)
+                        TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
+
                 protected abstract void Initialize();
                 public abstract void RefreshRow();
 
@@ -968,10 +971,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     disableEditing |= ParentPreselected;
 
-                    var indexPath = TableView.IndexPathForCell(Cell);
-                    if (indexPath != null)
-                        TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
-
+                    ReloadRow();
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
@@ -996,24 +996,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
+                public override UITableViewCellEditingStyle EditingStyle
+                {
+                    get
+                    {
+                        return Contact.ResponsibleUsers.Count == 0 ? UITableViewCellEditingStyle.None : UITableViewCellEditingStyle.Delete;
+                    }
+                }
+
                 protected override void Initialize()
                 {
                     var cell = (DisclosureIndicatorTableViewCell)Cell;
-                    cell.SetTitle(Localization.GetString("responsible_users")); //TODO change
                 }
 
                 public override void RefreshRow()
                 {
                     var cell = (DisclosureIndicatorTableViewCell)Cell;
-                    if (Contact?.ResponsibleUsers?.Count > 0)
-                        cell.SetContent(string.Join(", ", Contact?.ResponsibleUsers.Values));
+                    cell.Reset();
+
+                    if (Contact.ResponsibleUsers.Count > 0)
+                        cell.SetContent(string.Join(", ", Contact.ResponsibleUsers.Values));
                     else
-                        cell.SetContent(string.Empty);
+                        cell.SetTitle(Localization.GetString("responsible_users"));
+
+                    ReloadRow();
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
                     DataSource.RequestResponsibleUsersSelection(this);
+                }
+
+                public override void OnCommit(NSIndexPath indexPath)
+                {
+                    Contact.ResponsibleUsers.Clear();
+                    Contact.ResponsibleUserIds.Clear();
+
+                    RefreshRow();
                 }
             }
 
