@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -29,9 +30,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             base.InitializeNavigationBar();
 
-            CreateContactItem = new UIBarButtonItem();
-            CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"));
-            NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
+            {
+                CreateContactItem = new UIBarButtonItem();
+                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"));
+                NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
+            }
         }
 
         protected override void InitializeHandlers()

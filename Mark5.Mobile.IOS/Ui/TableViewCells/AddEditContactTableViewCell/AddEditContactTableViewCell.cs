@@ -41,5 +41,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             };
             return separator;
         }
+
+        public void SetErrorState(bool error)
+        {
+            BackgroundColor = error ? UIColor.FromRGB(255, 160, 160) : UIColor.Clear;
+        }
     }
 }

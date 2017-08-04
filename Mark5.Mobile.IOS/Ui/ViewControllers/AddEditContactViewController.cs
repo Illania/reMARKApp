@@ -4,7 +4,9 @@ using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -68,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeInitializeHandlers();
-            UnsubscribeToKeyboardEvents();
+            UnsubscribeFromKeyboardEvents();
 
             CommonConfig.Logger.Info($"{nameof(AddEditContactViewController)} will disappear");
         }
@@ -85,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             saveButton = new UIBarButtonItem();
             saveButton.Title = Localization.GetString("save");
-            saveButton.Enabled = false;
+            saveButton.Enabled = true;
             NavigationItem.SetRightBarButtonItem(saveButton, false);
         }
 
@@ -155,7 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
         }
 
-        void UnsubscribeToKeyboardEvents()
+        void UnsubscribeFromKeyboardEvents()
         {
             NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
             {
@@ -192,7 +194,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             activeField = (UIView)sender;
         }
 
-        //TODO add rights check on edit and add
         //TODO cannot add deparment without company 
         //TODO check all the stuff that was written for android
 
@@ -247,9 +248,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DismissViewController(true, null);
         }
 
-        void SaveButton_Clicked(object sender, EventArgs e)
+        async void SaveButton_Clicked(object sender, EventArgs e)
         {
+            if (!dataSource.IsFormCorrect())
+                return;
 
+            var contentString = CreationModeFlag == ContactCreationModeFlag.New ? Localization.GetString("adding_contact___") : Localization.GetString("editing_contact___");
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(contentString);
+
+            try
+            {
+                var parentId = ParentContactPreview == null ? -1 : ParentContactPreview.Id;
+                await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
+
+                if (CreationModeFlag == ContactCreationModeFlag.Edit)
+                    CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
+
+            }
+            catch (Exception ex)
+            {
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+                CommonConfig.Logger.Error($"Error while sending/editing contact [creationMode = {CreationModeFlag}, contactId = {ContactPreview?.Id}]", ex);
+            }
         }
 
         #endregion
@@ -338,7 +358,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var row = RowAtIndexPath(indexPath);
-                var cell = tableView.DequeueReusableCell(row.Key);
+                var cell = tableView.DequeueReusableCell(row.Key) as AddEditContactTableViewCell;
                 if (cell == null)
                 {
                     cell = row.CreateCell();
@@ -426,6 +446,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 sections = null;
             }
 
+            public bool IsFormCorrect()
+            {
+                return sections.All(s => s.IsSectionValid());
+            }
+
             AbstractRow RowAtIndexPath(NSIndexPath indexPath)
             {
                 return sections[indexPath.Section].Rows[indexPath.Row];
@@ -482,6 +507,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public RowCollection Rows { get; } = new RowCollection();
 
                 abstract public void InitializeRows();
+
+                public bool IsSectionValid()
+                {
+                    return Rows.All(r => r.IsRowValid());
+                }
 
                 protected AbstractSection(DataSource dataSource)
                 {
@@ -738,7 +768,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public abstract class AbstractRow
             {
-                protected UITableViewCell Cell;
+                protected AddEditContactTableViewCell Cell;
                 protected AbstractSection Section;
 
                 public DataSource DataSource { get => Section.DataSource; }
@@ -753,6 +783,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public abstract string Key { get; }
 
+                public virtual bool IsRowValid() { return true; }
+
                 protected AbstractRow(AbstractSection section)
                 {
                     Section = section;
@@ -760,7 +792,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public abstract AddEditContactTableViewCell CreateCell();
 
-                public void BindCell(UITableViewCell cell)
+                public void BindCell(AddEditContactTableViewCell cell)
                 {
                     Cell = cell;
                     Initialize();
@@ -775,6 +807,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var indexPath = TableView.IndexPathForCell(Cell);
                     if (indexPath != null)
                         TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
+
+                protected void SetErrorState(bool error)
+                {
+                    if (Cell == null)
+                        return;
+
+                    Cell.SetErrorState(error);
+                    ReloadRow();
                 }
 
                 protected abstract void Initialize();
@@ -916,6 +957,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
+                public override bool IsRowValid()
+                {
+                    SetErrorState(true);
+                    return false;
+                }
+
                 protected override void ContentEdited(object sender, string e) => Contact.FirstName = e;
 
                 public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.FirstName);
@@ -966,7 +1013,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     get
                     {
-                        return ParentContactPreview == null ? UITableViewCellEditingStyle.None : UITableViewCellEditingStyle.Delete;
+                        return ParentContactPreview == null || ParentPreselected ? UITableViewCellEditingStyle.None : UITableViewCellEditingStyle.Delete;
                     }
                 }
 

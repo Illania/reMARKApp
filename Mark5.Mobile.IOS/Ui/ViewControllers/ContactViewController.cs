@@ -9,6 +9,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -16,6 +17,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -53,6 +55,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        TinyMessageSubscriptionToken token;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -76,6 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeHandlers();
+            SubscribeToMessages();
 
             if (headerViewOffset != null)
                 headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
@@ -111,6 +116,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ContactViewController)} received memory warning!");
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -318,15 +325,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
-
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed) //TODO need to talk with Emilie about where to put the button
+            else
             {
-                editButtonItem = new UIBarButtonItem();
-                editButtonItem.Title = Localization.GetString("edit");
-                editButtonItem.Enabled = false;
-                NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
+                {
+                    editButtonItem = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle(Path.Combine("icons", "pencil")),
+                        Enabled = false
+                    };
+                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                }
             }
-
         }
 
         void InitializeHandlers()
@@ -389,6 +399,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 editButtonItem.Clicked -= EditButtonItem_Clicked;
         }
 
+
+        void SubscribeToMessages()
+        {
+            token?.Dispose();
+            token = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            if (token != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(token);
+                token = null;
+            }
+        }
+
+        void HandleContactChangedMessage(ContactChangedMessage obj)
+        {
+            if (contactPreview?.Id == obj.ContactPreview.Id) //TODO add on document list (and test)
+                refreshDataOnAppear = true;
+        }
+
         void RowLongPressed(UILongPressGestureRecognizer gr)
         {
             if (gr.State != UIGestureRecognizerState.Began)
@@ -422,7 +454,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
-            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
+            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
+                                          .Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
                 return;
 
@@ -467,15 +500,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
         }
 
-        void EditButtonItem_Clicked(object sender, EventArgs e)
+        async void EditButtonItem_Clicked(object sender, EventArgs e)
         {
-            var vc = new AddEditContactViewController
+            var listString = new List<string> { };
+
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
-                ContactPreview = contactPreview,
-                Contact = contact,
-                CreationModeFlag = ContactCreationModeFlag.Edit,
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                listString.Add(Localization.GetString("edit_contact"));
+            }
+
+            var editAllowed = ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed;
+
+            if (editAllowed && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
+            {
+                listString.Add(Localization.GetString("add_person"));
+            }
+            if (editAllowed && contactPreview.Type == ContactType.Company)
+            {
+                listString.Add(Localization.GetString("add_department"));
+            }
+
+            var index = await Dialogs.ShowListDialogAsync(this, string.Empty, listString.ToArray(), editButtonItem);
+
+            if (index <= 0)
+                return;
+
+            var selectedString = listString[index];
+
+            if (selectedString == Localization.GetString("edit_contact"))
+            {
+                var vc = new AddEditContactViewController
+                {
+                    ContactPreview = contactPreview,
+                    Contact = contact,
+                    CreationModeFlag = ContactCreationModeFlag.Edit,
+                };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else
+            {
+                var type = selectedString == Localization.GetString("add_person") ? ContactType.Person : ContactType.Department;
+                var vc = new AddEditContactViewController
+                {
+                    ContactType = type,
+                    ParentContactPreview = contactPreview,
+                    ParentPreselected = true,
+                    CreationModeFlag = ContactCreationModeFlag.New,
+                };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
         }
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)

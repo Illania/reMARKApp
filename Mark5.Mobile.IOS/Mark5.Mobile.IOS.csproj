@@ -281,6 +281,7 @@
 		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\ParentContactSelectorListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
+		<Compile Include="Model\HubMessages\ContactChangedMessage.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                Lines = 0, //TODO need to fix height problem
+                Lines = 0,
             };
             ContentView.AddSubview(ContentLabel);
             ContentView.AddConstraints(new[]

@@ -31,8 +31,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
-        public Folder Folder { get; set; }
-        public int? FolderId { get; set; } //TODO need to remove those, they are unused
         public int? ContactId { get; set; }
         public ContactType ContactType { get; set; }
         public ContactCreationModeFlag CreationModeFlag { get; set; }
@@ -59,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={ContactId ?? ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -224,7 +222,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={ContactId ?? ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...");
         }
 
@@ -359,7 +357,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing contact [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}, " +
+                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={ContactId ?? ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -383,8 +381,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = Contact,
                 ParentContactPreview = ParentContactPreview,
                 CreationModeFlag = CreationModeFlag,
-                Folder = Folder,
-                FolderId = FolderId,
                 ContactId = ContactId,
                 ContactType = ContactType,
                 SecondaryLayoutShown = secondaryLayoutShown,
@@ -400,8 +396,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactPreview = state.ContactPreview;
                 ParentContactPreview = state.ParentContactPreview;
                 CreationModeFlag = state.CreationModeFlag;
-                Folder = state.Folder;
-                FolderId = state.FolderId;
                 ContactId = state.ContactId;
                 ContactType = state.ContactType;
                 secondaryLayoutShown = state.SecondaryLayoutShown;
@@ -415,8 +409,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public ContactPreview ContactPreview { get; set; }
             public ContactPreview ParentContactPreview { get; set; }
             public ContactCreationModeFlag CreationModeFlag { get; set; }
-            public Folder Folder { get; set; }
-            public int? FolderId { get; set; }
             public int? ContactId { get; set; }
             public ContactType ContactType { get; set; }
             public bool SecondaryLayoutShown { get; set; }
