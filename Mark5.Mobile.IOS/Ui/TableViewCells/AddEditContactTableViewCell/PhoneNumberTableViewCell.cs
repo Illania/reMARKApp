@@ -71,6 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 InputAccessoryView = countryPickerToolbar,
             };
             //TODO need to fix the pushed to the left problem
+            //TODO need to fix issue with accessory view too much on the left
             prefixTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(prefixTextField);
             ContentView.AddConstraints(new[]
