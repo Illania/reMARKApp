@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Font = Theme.DefaultFont,
                 BorderStyle = UITextBorderStyle.None
             };
-            textField.EditingDidEnd += (object sender, EventArgs e) => ContentEdited(this, textField.Text);
+            textField.EditingChanged += (object sender, EventArgs e) => ContentEdited(this, textField.Text);
 
             ContentView.AddSubview(textField);
 

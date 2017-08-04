@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
@@ -44,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public void SetErrorState(bool error)
         {
-            BackgroundColor = error ? UIColor.FromRGB(255, 160, 160) : UIColor.Clear;
+            BackgroundColor = error ? Theme.LightBrown : UIColor.Clear;
         }
     }
 }

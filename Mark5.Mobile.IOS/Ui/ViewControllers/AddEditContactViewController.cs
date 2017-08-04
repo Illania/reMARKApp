@@ -106,6 +106,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
             tableView.Editing = true;
             tableView.AllowsSelectionDuringEditing = true;
+            tableView.CellLayoutMarginsFollowReadableWidth = true;
             View.AddSubview(tableView);
 
             View.AddConstraints(new[]
@@ -520,8 +521,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     foreach (var row in Rows)
                     {
                         var isRowValid = row.IsRowValid();
+                        row.SetErrorState(!isRowValid);
+
                         valid &= isRowValid;
-                        row.SetErrorState(isRowValid);
                     }
                     return valid;
                 }
@@ -828,7 +830,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public void SetErrorState(bool errorState)
                 {
                     error = errorState;
-                    Cell.SetErrorState(errorState);
+                    Cell?.SetErrorState(errorState);
                 }
 
                 protected abstract void Initialize();

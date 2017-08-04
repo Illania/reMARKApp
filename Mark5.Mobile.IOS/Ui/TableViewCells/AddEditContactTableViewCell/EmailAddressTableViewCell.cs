@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("address"),
             };
-            addressTextField.EditingDidEnd += AddressTextField_EditingDidEnd;
+            addressTextField.EditingChanged += AddressTextField_EditingChanged;
             ContentView.Add(addressTextField);
             ContentView.AddConstraints(new[]
             {
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("description"),
             };
-            descriptionTextField.EditingDidEnd += DescriptionTextField_EditingDidEnd; ;
+            descriptionTextField.EditingChanged += DescriptionTextField_EditingChanged;
             ContentView.Add(descriptionTextField);
             ContentView.AddConstraints(new[]
             {
@@ -121,13 +121,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             SelectedAsPrimary(this, EventArgs.Empty);
         }
 
-        void AddressTextField_EditingDidEnd(object sender, EventArgs e)
+        void AddressTextField_EditingChanged(object sender, EventArgs e)
         {
             address.Address = addressTextField.Text;
             AddressChanged(this, EventArgs.Empty);
         }
 
-        void DescriptionTextField_EditingDidEnd(object sender, EventArgs e)
+        void DescriptionTextField_EditingChanged(object sender, EventArgs e)
         {
             address.Description = descriptionTextField.Text;
         }
