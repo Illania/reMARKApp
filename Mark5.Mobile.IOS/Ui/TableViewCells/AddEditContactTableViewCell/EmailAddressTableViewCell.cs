@@ -18,6 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         readonly UILabel preferrableLabel;
 
         public event EventHandler SelectedAsPrimary = delegate { };
+        public event EventHandler AddressChanged = delegate { };
 
         public EmailAddressTableViewCell() : base(UITableViewCellStyle.Default, Key)
         {
@@ -123,6 +124,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         void AddressTextField_EditingDidEnd(object sender, EventArgs e)
         {
             address.Address = addressTextField.Text;
+            AddressChanged(this, EventArgs.Empty);
         }
 
         void DescriptionTextField_EditingDidEnd(object sender, EventArgs e)

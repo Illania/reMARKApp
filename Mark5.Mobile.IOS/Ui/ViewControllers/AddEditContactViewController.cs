@@ -6,6 +6,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
@@ -448,7 +449,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public bool IsFormCorrect()
             {
-                return sections.All(s => s.IsSectionValid());
+                var valid = true;
+                foreach (var section in sections)
+                {
+                    valid &= section.IsSectionValid();
+                }
+                return valid;
             }
 
             AbstractRow RowAtIndexPath(NSIndexPath indexPath)
@@ -510,7 +516,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public bool IsSectionValid()
                 {
-                    return Rows.All(r => r.IsRowValid());
+                    var valid = true;
+                    foreach (var row in Rows)
+                    {
+                        var isRowValid = row.IsRowValid();
+                        valid &= isRowValid;
+                        row.SetErrorState(isRowValid);
+                    }
+                    return valid;
                 }
 
                 protected AbstractSection(DataSource dataSource)
@@ -785,6 +798,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public virtual bool IsRowValid() { return true; }
 
+                bool error;
+
                 protected AbstractRow(AbstractSection section)
                 {
                     Section = section;
@@ -797,6 +812,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Cell = cell;
                     Initialize();
                     RefreshRow();
+                    SetErrorState(error);
                 }
 
                 protected void ReloadRow()
@@ -809,13 +825,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                protected void SetErrorState(bool error)
+                public void SetErrorState(bool errorState)
                 {
-                    if (Cell == null)
-                        return;
-
-                    Cell.SetErrorState(error);
-                    ReloadRow();
+                    error = errorState;
+                    Cell.SetErrorState(errorState);
                 }
 
                 protected abstract void Initialize();
@@ -959,11 +972,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override bool IsRowValid()
                 {
-                    SetErrorState(true);
-                    return false;
+                    return !string.IsNullOrWhiteSpace(Contact.FirstName);
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.FirstName = e;
+                protected override void ContentEdited(object sender, string e)
+                {
+                    Contact.FirstName = e;
+                    SetErrorState(false);
+                }
 
                 public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.FirstName);
             }
@@ -987,9 +1003,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.FirstName = e;
+                public override bool IsRowValid()
+                {
+                    return !string.IsNullOrWhiteSpace(Contact.LastName);
+                }
 
-                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.FirstName);
+                protected override void ContentEdited(object sender, string e)
+                {
+                    Contact.LastName = e;
+                    SetErrorState(false);
+                }
+
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.LastName);
             }
 
             //To be used with Deparment and Company
@@ -1000,7 +1025,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => ContactPreview.Name = e;
+                public override bool IsRowValid()
+                {
+                    return !string.IsNullOrWhiteSpace(ContactPreview.Name);
+                }
+
+                protected override void ContentEdited(object sender, string e)
+                {
+                    ContactPreview.Name = e;
+                    SetErrorState(false);
+                }
 
                 public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.Name);
             }
@@ -1022,6 +1056,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
+                public override bool IsRowValid()
+                {
+                    return !(ParentContactPreview == null && ContactPreview.Type == ContactType.Department);
+                }
+
                 public override void RefreshRow()
                 {
                     var cell = (DisclosureIndicatorTableViewCell)Cell;
@@ -1041,10 +1080,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 throw new ArgumentException("Not valid contact type");
                         }
                     }
+                    else
+                    {
+                        SetErrorState(false);
+                    }
 
                     disableEditing = false;
 
-                    if (CreationMode == ContactCreationModeFlag.New && ParentContactPreview != null) //Add from parent
+                    if (CreationMode == ContactCreationModeFlag.New && ParentContactPreview != null)
                     {
                         var name = ParentContactPreview.Name;
                         cell.SetContent(ParentContactPreview.Type == ContactType.Company ? name : $"{name} @ {ParentContactPreview.CompanyName}");
@@ -1054,16 +1097,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         disableEditing = true;
 
                         if (string.IsNullOrEmpty(ContactPreview.CompanyName))
-                        {
                             throw new Exception("This should not happen!"); //TODO for testing
-                        }
                         else
-                        {
                             cell.SetContent(ContactPreview.CompanyName);
-                        }
                     }
 
                     disableEditing |= ParentPreselected;
+
 
                     ReloadRow();
                 }
@@ -1339,6 +1379,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override string Key => EmailAddressTableViewCell.Key;
 
+                public override bool IsRowValid()
+                {
+                    return Validator.IsEmailValid(Content.Address);
+                }
+
                 public override AddEditContactTableViewCell CreateCell() => new EmailAddressTableViewCell();
 
                 protected override void Initialize()
@@ -1346,6 +1391,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var cell = (EmailAddressTableViewCell)Cell;
                     cell.SelectedAsPrimary -= Cell_SelectedAsPrimary;
                     cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
+                    cell.AddressChanged -= Cell_AddressChanged;
+                    cell.AddressChanged += Cell_AddressChanged;
                 }
 
                 public override void RefreshRow()
@@ -1357,6 +1404,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 void Cell_SelectedAsPrimary(object sender, EventArgs e)
                 {
                     section.DisablePrimaryOnOtherRows(this);
+                }
+
+                void Cell_AddressChanged(object sender, EventArgs e)
+                {
+                    if (Validator.IsEmailValid(Content.Address))
+                        SetErrorState(false);
                 }
             }
 
@@ -1403,6 +1456,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     this.section = section;
                 }
 
+                public override bool IsRowValid()
+                {
+                    return !string.IsNullOrWhiteSpace(Content.Address);
+                }
+
                 public override string Key => PhoneNumberTableViewCell.Key;
 
                 public override AddEditContactTableViewCell CreateCell() => new PhoneNumberTableViewCell();
@@ -1412,6 +1470,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var cell = (PhoneNumberTableViewCell)Cell;
                     cell.SelectedAsPrimary -= Cell_SelectedAsPrimary;
                     cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
+                    cell.AddressChanged += Cell_AddressChanged;
+                    cell.AddressChanged -= Cell_AddressChanged;
                 }
 
                 public override void RefreshRow()
@@ -1423,6 +1483,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 void Cell_SelectedAsPrimary(object sender, EventArgs e)
                 {
                     section.DisablePrimaryOnOtherRows(this);
+                }
+
+                void Cell_AddressChanged(object sender, EventArgs e)
+                {
+                    if (!string.IsNullOrWhiteSpace(Content.Address))
+                        SetErrorState(false);
                 }
             }
 

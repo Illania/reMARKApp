@@ -31,6 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         CountryInfo selectedCountry;
 
         public event EventHandler SelectedAsPrimary = delegate { };
+        public event EventHandler AddressChanged = delegate { };
 
         public PhoneNumberTableViewCell()
           : base(UITableViewCellStyle.Default, Key)
@@ -240,6 +241,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         {
             var prefixString = selectedCountry != null ? selectedCountry.FaxPrefix.ToString() : "0";
             address.Address = string.Join("|", prefixString, "", numberTextField.Text);
+            AddressChanged(this, EventArgs.Empty);
         }
 
         #endregion
