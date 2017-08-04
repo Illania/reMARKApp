@@ -2,6 +2,7 @@
 "actions" = "Actions";
 "area" = "Area";
 "add" = "Add";
+"add_contact" = "Add contact";
 "add_phone" = "add phone";
 "add_mobile" = "add mobile";
 "add_email" = "add email";

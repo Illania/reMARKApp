@@ -204,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (ParentFolder.Module == ModuleType.Contacts && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
                 CreateContactItem = new UIBarButtonItem();
-                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
+                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"));
                 NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
             }
             if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
@@ -307,13 +307,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async void CreateContactItem_Clicked(object sender, EventArgs e)
         {
-            var vc = new AddEditContactViewController
-            {
-                CreationModeFlag = ContactCreationModeFlag.New,
-                ContactType = ContactType.Person,
-            };
+            var choices = new[] { Localization.GetString("company"), Localization.GetString("department"), Localization.GetString("person") };
+            var choice = await Dialogs.ShowListDialogAsync(this, Localization.GetString("add_contact"), choices, CreateContactItem);
 
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            if (choice >= 0)
+            {
+                ContactType type = ContactType.None;
+                switch (choice)
+                {
+                    case 0:
+                        type = ContactType.Company;
+                        break;
+                    case 1:
+                        type = ContactType.Department;
+                        break;
+                    case 2:
+                        type = ContactType.Person;
+                        break;
+                }
+
+                var vc = new AddEditContactViewController
+                {
+                    CreationModeFlag = ContactCreationModeFlag.New,
+                    ContactType = type,
+                };
+
+                PresentViewController(new NavigationController(vc), true, null);
+            }
         }
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void

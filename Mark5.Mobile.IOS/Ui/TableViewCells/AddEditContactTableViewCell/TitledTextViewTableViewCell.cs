@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             titleLabel = new UILabel
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultBoldFont,
             };
             ContentView.AddSubview(titleLabel);
             ContentView.AddConstraints(new[]

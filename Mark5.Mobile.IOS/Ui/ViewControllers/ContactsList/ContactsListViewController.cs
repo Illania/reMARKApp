@@ -52,8 +52,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         async void CreateContactItem_Clicked(object sender, EventArgs e)
         {
-            var choices = new[] { Localization.GetString("company"), Localization.GetString("deparment"), Localization.GetString("person") };  //TODo need to add deparment to strings
-            var choice = await Dialogs.ShowListDialogAsync(this, "", choices, CreateContactItem); //TODO put title
+            var choices = new[] { Localization.GetString("company"), Localization.GetString("department"), Localization.GetString("person") };
+            var choice = await Dialogs.ShowListDialogAsync(this, Localization.GetString("add_contact"), choices, CreateContactItem);
 
             if (choice >= 0)
             {

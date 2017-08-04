@@ -96,6 +96,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
+
+            if (editButtonItem != null && contact != null && contactPreview != null)
+                editButtonItem.Enabled = true;
         }
 
         public override void ViewWillDisappear(bool animated)

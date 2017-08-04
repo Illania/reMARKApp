@@ -322,6 +322,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
                     new PhysicalAddressesSection(this),
                     new BirthdateSection(this),
+                    new AdditionalSection(this)
                 };
 
                 foreach (var section in sectionsToInsert)
@@ -1109,7 +1110,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 protected override void ContentEdited(object sender, string e) => Contact.Account = e;
 
-                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Account);
+                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Account);
             }
 
             class LedgerRow : TitledTextView
@@ -1121,7 +1122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 protected override void ContentEdited(object sender, string e) => Contact.Ledger = e;
 
-                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Ledger);
+                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Ledger);
             }
 
             class VatRow : TitledTextView
@@ -1133,7 +1134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 protected override void ContentEdited(object sender, string e) => Contact.Vat = e;
 
-                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Vat);
+                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Vat);
             }
 
             class PositionRow : TitledTextView
@@ -1145,7 +1146,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 protected override void ContentEdited(object sender, string e) => Contact.Position = e;
 
-                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Position);
+                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Position);
             }
 
             class ShortIdRow : TitledTextView
@@ -1157,7 +1158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 protected override void ContentEdited(object sender, string e) => ContactPreview.ShortId = e;
 
-                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.ShortId);
+                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(ContactPreview.ShortId);
             }
 
             class WebpageRow : TitledTextView
@@ -1169,7 +1170,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 protected override void ContentEdited(object sender, string e) => Contact.WebPageAddress = e;
 
-                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.WebPageAddress);
+                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.WebPageAddress);
             }
 
             class BirthdateHeaderRow : MultiHeaderRow
