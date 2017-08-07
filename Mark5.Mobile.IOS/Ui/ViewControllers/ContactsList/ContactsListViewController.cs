@@ -35,6 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 CreateContactItem = new UIBarButtonItem();
                 CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"));
                 NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
+                RightButton = CreateContactItem;
             }
         }
 

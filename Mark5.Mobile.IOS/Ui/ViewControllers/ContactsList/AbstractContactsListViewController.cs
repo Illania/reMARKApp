@@ -40,8 +40,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         CancellationTokenSource cts;
 
-        UIBarButtonItem leftButton;
-        UIBarButtonItem rightButton;
+        protected UIBarButtonItem LeftButton;
+        protected UIBarButtonItem RightButton;
 
         protected AbstractContactsListViewController(bool disableRowActions)
         {
@@ -260,8 +260,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             TableView.SetEditing(true, true);
 
-            leftButton = NavigationItem.LeftBarButtonItem;
-            rightButton = NavigationItem.RightBarButtonItem;
+            LeftButton = NavigationItem.LeftBarButtonItem;
+            RightButton = NavigationItem.RightBarButtonItem;
 
             NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(EditItem, true);
@@ -287,8 +287,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(rightButton, true);
-            NavigationItem.SetLeftBarButtonItem(leftButton, true);
+            NavigationItem.SetRightBarButtonItem(RightButton, true);
+            NavigationItem.SetLeftBarButtonItem(LeftButton, true);
 
             SearchController.SearchBar.UserInteractionEnabled = true;
             SearchController.SearchBar.Alpha = 1f;
