@@ -204,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 selectedCountry = null;
             }
 
-            UpdatePrefix();
+            UpdatePrefix(false);
         }
 
         #region Event handlers
@@ -225,7 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             UpdateAddress();
         }
 
-        void UpdatePrefix()
+        void UpdatePrefix(bool updatedAddress = true)
         {
             if (selectedCountry != null)
                 prefixTextField.Text = $"+{selectedCountry.FaxPrefix}";
@@ -236,7 +236,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             var width = prefixTextField.IntrinsicContentSize.Width;
             prefixWidthConstraint.Constant = width + 5.0f;
 
-            UpdateAddress();
+            if (updatedAddress)
+                UpdateAddress();
         }
 
         void UpdateAddress()

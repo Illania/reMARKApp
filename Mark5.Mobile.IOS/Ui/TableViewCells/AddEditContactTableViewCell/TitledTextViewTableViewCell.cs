@@ -51,6 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
         }
 
@@ -67,6 +68,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         public void SetContent(string content)
         {
             textView.Text = content;
+        }
+
+        public void SetMultiline(bool isMultiline)
+        {
+            textView.TextContainer.MaximumNumberOfLines = isMultiline ? 0 : (nuint)1;
+            textView.ScrollEnabled = !isMultiline;
+        }
+
+        public void Reset()
+        {
+            SetErrorState(false);
+
+            SetTitle(string.Empty);
+            SetContent(string.Empty);
         }
     }
 }

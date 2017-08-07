@@ -67,6 +67,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public void BindContact(Contact contact)
         {
+            SetErrorState(false);
+
             this.contact = contact;
             RefreshDate();
         }

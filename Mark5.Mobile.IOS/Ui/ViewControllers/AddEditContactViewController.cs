@@ -858,6 +858,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void Initialize()
                 {
                     var tfc = (TextFieldTableViewCell)Cell;
+                    tfc.Reset();
                     tfc.SetPlaceholder(placeholder);
                     tfc.ContentEdited -= ContentEdited;
                     tfc.ContentEdited += ContentEdited;
@@ -869,11 +870,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             abstract class TitledTextView : AbstractRow
             {
                 readonly string title;
+                readonly bool isMultiline;
 
-                protected TitledTextView(AbstractSection section, string title)
+                protected TitledTextView(AbstractSection section, string title, bool isMultiline)
                     : base(section)
                 {
                     this.title = title;
+                    this.isMultiline = isMultiline;
                 }
 
                 public override string Key => TitledTextViewTableViewCell.Key;
@@ -883,6 +886,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void Initialize()
                 {
                     var tfc = (TitledTextViewTableViewCell)Cell;
+                    tfc.Reset();
+                    tfc.SetMultiline(isMultiline);
                     tfc.SetTitle(title);
                     tfc.ContentEdited -= ContentEditedHandler;
                     tfc.ContentEdited += ContentEditedHandler;
@@ -915,7 +920,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override AddEditContactTableViewCell CreateCell() => new DisclosureIndicatorTableViewCell();
 
-                protected override void Initialize() { }
+                protected override void Initialize()
+                {
+                    var cell = (DisclosureIndicatorTableViewCell)Cell;
+                    cell.Reset();
+                }
             }
 
             abstract class MultiHeaderRow : AbstractRow
@@ -1175,7 +1184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class DescriptionRow : TitledTextView
             {
                 public DescriptionRow(AbstractSection section)
-                    : base(section, Localization.GetString("description"))
+                    : base(section, Localization.GetString("description"), true)
                 {
                 }
 
@@ -1193,7 +1202,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class AccountRow : TitledTextView
             {
                 public AccountRow(AbstractSection section)
-                    : base(section, Localization.GetString("account"))
+                    : base(section, Localization.GetString("account"), true)
                 {
                 }
 
@@ -1205,7 +1214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class LedgerRow : TitledTextView
             {
                 public LedgerRow(AbstractSection section)
-                    : base(section, Localization.GetString("ledger"))
+                    : base(section, Localization.GetString("ledger"), true)
                 {
                 }
 
@@ -1217,7 +1226,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class VatRow : TitledTextView
             {
                 public VatRow(AbstractSection section)
-                    : base(section, Localization.GetString("vat"))
+                    : base(section, Localization.GetString("vat"), false)
                 {
                 }
 
@@ -1229,7 +1238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class PositionRow : TitledTextView
             {
                 public PositionRow(AbstractSection section)
-                    : base(section, Localization.GetString("position"))
+                    : base(section, Localization.GetString("position"), true)
                 {
                 }
 
@@ -1241,7 +1250,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class ShortIdRow : TitledTextView
             {
                 public ShortIdRow(AbstractSection section)
-                    : base(section, Localization.GetString("short_id"))
+                    : base(section, Localization.GetString("short_id"), false)
                 {
                 }
 
@@ -1253,7 +1262,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class WebpageRow : TitledTextView
             {
                 public WebpageRow(AbstractSection section)
-                    : base(section, Localization.GetString("webpage"))
+                    : base(section, Localization.GetString("webpage"), false)
                 {
                 }
 
