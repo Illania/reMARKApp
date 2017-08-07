@@ -71,7 +71,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 InputAccessoryView = countryPickerToolbar,
             };
             //TODO need to fix the pushed to the left problem
-            //TODO need to fix issue with accessory view too much on the left
             prefixTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(prefixTextField);
             ContentView.AddConstraints(new[]
@@ -81,7 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
 
-            chevronButton = new UIButton();
+            chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(chevronButton);
@@ -90,21 +89,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.CenterY, 1f, 0f),
                 NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
-
-            var disclosureCell = new UITableViewCell()
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Accessory = UITableViewCellAccessory.DisclosureIndicator,
-                UserInteractionEnabled = false
-            };
-            chevronButton.AddSubview(disclosureCell);
-            chevronButton.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Right, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Top, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Bottom, 1f, 0f),
             });
 
             var verticalSeparator = GetVerticalSeparator();

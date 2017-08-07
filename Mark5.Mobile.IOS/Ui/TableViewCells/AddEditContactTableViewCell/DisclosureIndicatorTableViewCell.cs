@@ -20,9 +20,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         {
             SelectionStyle = UITableViewCellSelectionStyle.Default;
 
-            Accessory = UITableViewCellAccessory.DisclosureIndicator;
-            EditingAccessory = UITableViewCellAccessory.DisclosureIndicator;
-
             TitleLabel = new UILabel
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -51,9 +48,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             {
                 NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.Height, 1f, 20f),
                 NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
                 leftContentConstraint,
+            });
+
+            var chevronButton = GetChevron();
+            chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContentView.AddSubview(chevronButton);
+            ContentView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, ContentLabel, NSLayoutAttribute.CenterY, 1f, 0f),
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
             });
         }
 

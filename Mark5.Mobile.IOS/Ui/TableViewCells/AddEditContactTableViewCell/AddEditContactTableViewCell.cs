@@ -43,6 +43,28 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             return separator;
         }
 
+        protected UIButton GetChevron()
+        {
+            var chevronButton = new UIButton();
+
+            var disclosureCell = new UITableViewCell
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Accessory = UITableViewCellAccessory.DisclosureIndicator,
+                UserInteractionEnabled = false
+            };
+            chevronButton.AddSubview(disclosureCell);
+            chevronButton.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Right, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Top, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Bottom, 1f, 0f),
+            });
+
+            return chevronButton;
+        }
+
         public void SetErrorState(bool error)
         {
             BackgroundColor = error ? Theme.LightBrown : UIColor.Clear;

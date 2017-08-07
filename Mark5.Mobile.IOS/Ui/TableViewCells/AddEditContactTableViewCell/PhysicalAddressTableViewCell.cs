@@ -149,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
 
-            chevronButton = new UIButton();
+            chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(chevronButton);
@@ -158,21 +158,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, countryTextField, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, countryTextField, NSLayoutAttribute.CenterY, 1f, 0f),
                 NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
-
-            var disclosureCell = new UITableViewCell()
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Accessory = UITableViewCellAccessory.DisclosureIndicator,
-                UserInteractionEnabled = false
-            };
-            chevronButton.AddSubview(disclosureCell);
-            chevronButton.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Right, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Top, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Bottom, 1f, 0f),
             });
 
             var verticalSeparator2 = GetVerticalSeparator();
