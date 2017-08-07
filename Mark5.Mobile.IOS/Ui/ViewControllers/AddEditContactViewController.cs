@@ -1202,7 +1202,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class AccountRow : TitledTextView
             {
                 public AccountRow(AbstractSection section)
-                    : base(section, Localization.GetString("account"), true)
+                    : base(section, Localization.GetString("account"), false)
                 {
                 }
 
@@ -1214,7 +1214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class LedgerRow : TitledTextView
             {
                 public LedgerRow(AbstractSection section)
-                    : base(section, Localization.GetString("ledger"), true)
+                    : base(section, Localization.GetString("ledger"), false)
                 {
                 }
 
@@ -1238,7 +1238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class PositionRow : TitledTextView
             {
                 public PositionRow(AbstractSection section)
-                    : base(section, Localization.GetString("position"), true)
+                    : base(section, Localization.GetString("position"), false)
                 {
                 }
 

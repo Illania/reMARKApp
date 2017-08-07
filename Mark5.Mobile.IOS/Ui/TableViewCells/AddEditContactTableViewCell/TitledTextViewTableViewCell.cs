@@ -5,7 +5,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class TitledTextViewTableViewCell : AddEditContactTableViewCell
+    public class TitledTextViewTableViewCell : AddEditContactTableViewCell, IUITextViewDelegate
     {
         public static readonly NSString Key = new NSString("TitledTextFieldTableViewCell");
 
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             };
             textView.TextContainer.LineFragmentPadding = 0f;
             textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.Changed += TextView_Changed;
+            textView.Delegate = this;
             textView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             textView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             ContentView.AddSubview(textView);
@@ -55,7 +55,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             });
         }
 
-        void TextView_Changed(object sender, EventArgs e)
+        [Export("textView:shouldChangeTextInRange:replacementText:")]
+        public bool ShouldChangeText(UITextView textView, NSRange range, string text)
+        {
+            if (textView.TextContainer.MaximumNumberOfLines == 1)
+                return !text.Contains(Environment.NewLine);
+
+            return true;
+        }
+
+        [Export("textViewDidChange:")]
+        public void Changed(UITextView textView)
         {
             ContentEdited(this, textView.Text);
         }
