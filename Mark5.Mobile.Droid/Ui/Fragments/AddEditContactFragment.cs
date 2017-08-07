@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Resource.Attribute.selectableItemBackground,
             });
             showMoreButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
-            showMoreButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
+            showMoreButton.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
             showMoreButton.Text = "View more";
             showMoreButton.Click += (sender, e) =>
             {
