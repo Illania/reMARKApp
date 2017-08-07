@@ -380,7 +380,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var row = RowAtIndexPath(indexPath);
                 row.OnDisplayed(indexPath);
+                test[indexPath] = cell.Frame.Size.Height;
             }
+
+            Dictionary<NSIndexPath, nfloat> test = new Dictionary<NSIndexPath, nfloat>();
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
@@ -403,6 +406,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (tableView?.IndexPathForSelectedRow != null)
                     tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+            }
+
+            public override nfloat EstimatedHeight(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (test.ContainsKey(indexPath))
+                {
+                    return test[indexPath];
+                }
+                else return 60.0f;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
@@ -898,12 +910,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 void ContentEditedHandler(object sender, string e)
                 {
                     //Used to make the cell grow with the content
-                    var offset = TableView.ContentOffset;
-                    UIView.AnimationsEnabled = false;
-                    TableView.BeginUpdates();
-                    TableView.EndUpdates();
-                    UIView.AnimationsEnabled = true;
-                    TableView.SetContentOffset(offset, false);
+                    //var offset = TableView.ContentOffset;
+                    //UIView.AnimationsEnabled = false;
+                    //TableView.BeginUpdates();
+                    //TableView.EndUpdates();
+                    //UIView.AnimationsEnabled = true;
+                    //TableView.SetContentOffset(offset, false);
 
                     ContentEdited(sender, e);
                 }
