@@ -27,6 +27,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         readonly UIPickerView countryPicker;
         readonly Source countrySource;
 
+        readonly NSLayoutConstraint countryWidthConstraint;
+
         public PhysicalAddressTableViewCell()
           : base(UITableViewCellStyle.Default, Key)
         {
@@ -139,14 +141,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 InputView = countryPicker,
                 InputAccessoryView = countryPickerToolbar,
             };
-            //TODO need to fix the pushed to the left problem
             countryTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(countryTextField);
+            countryWidthConstraint = NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0.0f);
             ContentView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+                countryWidthConstraint,
             });
 
             chevronButton = GetChevron();
@@ -189,6 +192,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public void BindContent(PhysicalAddress pa)
         {
+            SetErrorState(false);
+
             address = pa;
 
             addressTextField.Text = pa.Street ?? string.Empty;
@@ -225,6 +230,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         {
             if (address.Country != null)
                 countryTextField.Text = $"+{address.Country.FaxPrefix}";
+            else
+                countryTextField.Text = Localization.GetString("country");
+
+            countryTextField.SizeToFit();
+            var width = countryTextField.IntrinsicContentSize.Width;
+            countryWidthConstraint.Constant = width + 5.0f;
         }
 
         #endregion

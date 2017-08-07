@@ -35,6 +35,7 @@
 "cc" = "Cc";
 "chrome" = "Open in Google Chrome";
 "city" = "City";
+"country" = "Country";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
 "clear_contacts_cache_title" = "Clear contacts cache";
 "clear_shortcodes_cache_summary" = "Do you want to remove cached shortcodes?";

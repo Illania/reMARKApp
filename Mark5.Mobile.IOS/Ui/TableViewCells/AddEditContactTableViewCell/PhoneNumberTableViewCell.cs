@@ -27,6 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         readonly UIToolbar countryPickerToolbar;
         readonly UIPickerView countryPicker;
         readonly Source countrySource;
+        readonly NSLayoutConstraint prefixWidthConstraint;
 
         CountryInfo selectedCountry;
 
@@ -70,14 +71,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 InputView = countryPicker,
                 InputAccessoryView = countryPickerToolbar,
             };
-            //TODO need to fix the pushed to the left problem
             prefixTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(prefixTextField);
+            prefixWidthConstraint = NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0.0f);
             ContentView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
                 NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+                prefixWidthConstraint,
             });
 
             chevronButton = GetChevron();
@@ -182,6 +184,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public void BindContent(CommunicationAddress ca)
         {
+            SetErrorState(false);
+
             address = ca;
 
             preferrableSwitch.SetState(ca.IsPrimary, true);
@@ -192,8 +196,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 var parts = AddressFormatter.CommunicationAddressParts(ca);
 
                 numberTextField.Text = parts.Number;
-                prefixTextField.Text = $"+{parts.CountryPrefix}";
+                selectedCountry = countrySource.CountryByPrefix(parts.CountryPrefix);
             }
+            else
+            {
+                numberTextField.Text = string.Empty;
+                selectedCountry = null;
+            }
+
+            UpdatePrefix();
         }
 
         #region Event handlers
@@ -218,6 +229,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         {
             if (selectedCountry != null)
                 prefixTextField.Text = $"+{selectedCountry.FaxPrefix}";
+            else
+                prefixTextField.Text = Localization.GetString("prefix");
+
+            prefixTextField.SizeToFit();
+            var width = prefixTextField.IntrinsicContentSize.Width;
+            prefixWidthConstraint.Constant = width + 5.0f;
 
             UpdateAddress();
         }
