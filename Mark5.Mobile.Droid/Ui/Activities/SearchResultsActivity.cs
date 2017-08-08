@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -23,6 +24,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         DocumentsSearchResultsFragment dlf;
 
         TinyMessageSubscriptionToken readStatusToken;
+
+        public static Intent CreateIntent(Context context, ModuleType moduleType, SearchContactsCriteria contactCriteria = null, 
+                                          SearchDocumentsCriteria documentCriteria = null, SearchShortcodesCriteria shortcodeCriteria = null) 
+        {
+            var intent = new Intent(context, typeof(SearchResultsActivity));
+            intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+            if (contactCriteria != null)
+                intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(contactCriteria));
+            if(documentCriteria != null)
+                intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(documentCriteria));
+            if(shortcodeCriteria != null)
+                intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(shortcodeCriteria));
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

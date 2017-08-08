@@ -250,10 +250,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             GetCriteria();
 
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
-            StartActivity(i);
+            StartActivity(SearchResultsActivity.CreateIntent(Activity, ModuleType.Contacts, GetCriteria()));
         }
 
         SearchContactsCriteria GetCriteria()

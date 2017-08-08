@@ -19,6 +19,11 @@ namespace Mark5.Mobile.Droid
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(PickCategoriesListActivity));
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

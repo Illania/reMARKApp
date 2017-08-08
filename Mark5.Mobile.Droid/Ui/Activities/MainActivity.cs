@@ -38,8 +38,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         bool permissionsAsked;
 
-        #region Activity lifecycle
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(MainActivity));
+        }
 
+        #region Activity lifecycle
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -243,8 +247,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             drawerToggle.RunWhenIdle(() =>
             {
-                var i = new Intent(this, typeof(PreferenceActivity));
-                StartActivity(i);
+                StartActivity(PreferenceActivity.CreateIntent(this));
             });
 
             drawer.CloseDrawer(GravityCompat.Start);

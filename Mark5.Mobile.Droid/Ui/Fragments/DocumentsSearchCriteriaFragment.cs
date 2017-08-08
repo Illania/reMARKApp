@@ -272,10 +272,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             GetCriteria();
 
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
-            StartActivity(i);
+            StartActivity(SearchResultsActivity.CreateIntent(Activity, ModuleType.Documents, documentCriteria: GetCriteria()));
         }
 
         SearchDocumentsCriteria GetCriteria()

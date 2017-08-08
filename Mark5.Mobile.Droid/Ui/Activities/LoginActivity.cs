@@ -32,6 +32,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         IAuthenticator authenticator;
 
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(LoginActivity));
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -236,7 +241,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
-                StartActivity(new Intent(this, typeof(MainActivity)));
+                StartActivity(MainActivity.CreateIntent(this));
                 Finish();
             }
             catch (Exception ex)

@@ -157,7 +157,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 													                    {
 													                        ShortcodePreview
 													                    }));
-
                 return true;
             }
 
@@ -171,25 +170,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 				                                                                            ShortcodePreview
 				                                                        },
                                                                         Folder));
-
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Actions)
             {
-                var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, Serializer.Serialize(ShortcodePreview as IBusinessEntity));
-                StartActivity(i);
-
+                StartActivity(ObjectActionsActivity.CreateIntent(Activity, ShortcodePreview as IBusinessEntity));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Links)
             {
-                var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, Serializer.Serialize(ShortcodePreview as IBusinessEntity));
-                StartActivity(i);
-
+                StartActivity(ObjectLinksActivity.CreateIntent(Activity, ShortcodePreview as IBusinessEntity));
                 return true;
             }
 

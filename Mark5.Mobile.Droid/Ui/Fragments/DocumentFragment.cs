@@ -344,11 +344,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, 
                                                                         (int)CopyMoveToFolderListActivity.ModeType.Copy, 
                                                                         ModuleType.Documents,
-				                                                        new List<IBusinessEntity>
-				                                                        {
+                                                                        new List<IBusinessEntity>
+                                                                        {
                                                                             DocumentPreview
-				                                                        }));
-
+                                                                        }));
                 return true;
             }
 
@@ -356,13 +355,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity,
                                                                         (int)CopyMoveToFolderListActivity.ModeType.Move,
-				                                                        ModuleType.Documents,
-				                                                        new List<IBusinessEntity>
-				                                                        {
-				                                                            DocumentPreview
-				                                                        },
+                                                                        ModuleType.Documents,
+                                                                        new List<IBusinessEntity>
+                                                                        {
+                                                                            DocumentPreview
+                                                                        },
                                                                         Folder));
-
                 return true;
             }
 
@@ -381,25 +379,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.Comments)
             {
                 StartActivityForResult(CommentsListActivity.CreateIntent(Context, document:Document), RequestCodes.CommentsRequest);
-
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Actions)
             {
-                var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
-                StartActivity(i);
-
+                StartActivity(ObjectActionsActivity.CreateIntent(Activity, DocumentPreview as IBusinessEntity));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Links)
             {
-                var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
-                StartActivity(i);
-
+                StartActivity(ObjectLinksActivity.CreateIntent(Activity, DocumentPreview as IBusinessEntity));
                 return true;
             }
 

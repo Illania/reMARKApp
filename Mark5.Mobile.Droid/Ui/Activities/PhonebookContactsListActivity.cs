@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -16,6 +17,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
 
         PhonebookContactsListFragment plf;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(PhonebookContactsListActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -15,6 +16,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
         RecentAddressesListFragment ralf;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(RecentAddressesListActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

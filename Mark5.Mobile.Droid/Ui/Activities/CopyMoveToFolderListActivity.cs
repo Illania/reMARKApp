@@ -37,8 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             intent.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(be));
             if (folder != null)
                 intent.PutExtra(FromFolderIntentKey, Serializer.Serialize(folder));
-            return intent;
-            
+            return intent;     
         }
 
         protected override void OnCreate(Bundle savedInstanceState)

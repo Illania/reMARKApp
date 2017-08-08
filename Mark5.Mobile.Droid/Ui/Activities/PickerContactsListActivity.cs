@@ -19,11 +19,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent Create(Context context, Folder folder)
+        public static Intent CreateIntent(Context context, Folder folder)
         {
             var intent = new Intent(context, typeof(PickerContactsListActivity));
             intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
-
             return intent;
         }
 

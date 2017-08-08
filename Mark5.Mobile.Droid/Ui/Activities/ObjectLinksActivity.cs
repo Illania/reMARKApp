@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -16,6 +17,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string BusinessEntityIntentKey = "BusinessEntity_ef8f3886-1478-4b4c-8bdb-7a6188035674";
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, IBusinessEntity businessEntity)
+        {
+            var intent = new Intent(context, typeof(ObjectLinksActivity));
+            intent.PutExtra(BusinessEntityIntentKey, Serializer.Serialize(businessEntity));
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

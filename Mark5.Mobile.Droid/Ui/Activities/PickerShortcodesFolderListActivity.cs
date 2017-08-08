@@ -18,6 +18,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(PickerShortcodesFolderListActivity));
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

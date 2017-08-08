@@ -341,26 +341,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DoOpenRecentAddresses()
         {
-            var i = new Intent(Activity, typeof(RecentAddressesListActivity));
-            StartActivityForResult(i, RequestCodes.RecentAddressesRequestCode);
+            StartActivityForResult(RecentAddressesListActivity.CreateIntent(Activity), RequestCodes.RecentAddressesRequestCode);
         }
 
         void DoOpenContacts()
         {
-            var i = new Intent(Activity, typeof(PickerContactFolderListActivity));
-            StartActivityForResult(i, RequestCodes.ContactsRequestCode);
+            StartActivityForResult(PickerContactFolderListActivity.CreateIntent(Activity), RequestCodes.ContactsRequestCode);
         }
 
         void DoOpenShortcodes()
         {
-            var i = new Intent(Activity, typeof(PickerShortcodesFolderListActivity));
-            StartActivityForResult(i, RequestCodes.ShortcodesRequestCode);
+            StartActivityForResult(PickerShortcodesFolderListActivity.CreateIntent(Activity), RequestCodes.ShortcodesRequestCode);
         }
 
         void DoOpenPhonebook()
         {
-            var i = new Intent(Activity, typeof(PhonebookContactsListActivity));
-            StartActivityForResult(i, RequestCodes.PhonebookRequestCode);
+            StartActivityForResult(PhonebookContactsListActivity.CreateIntent(Activity), RequestCodes.PhonebookRequestCode);
         }
 
         void Subview_Edited(object sender, EventArgs e)

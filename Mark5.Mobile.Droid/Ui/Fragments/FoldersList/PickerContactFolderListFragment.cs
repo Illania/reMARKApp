@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected override void Adapter_ItemClicked(object sender, int position)
         {
             var folder = CurrentAdapter.GetItemAtPosition(position);
-            Activity.StartActivityForResult(PickerContactsListActivity.Create(Context, folder), PickerContactFolderListActivity.ContactRequestCode);
+            Activity.StartActivityForResult(PickerContactsListActivity.CreateIntent(Context, folder), PickerContactFolderListActivity.ContactRequestCode);
         }
 
         protected override void Adapter_ItemLongClicked(object sender, int position)

@@ -200,7 +200,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 				                                                                            ContactPreview
 				                                                        },
                                                                         Folder));
-
                 return true;
             }
 
@@ -218,19 +217,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Actions)
             {
-                var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, Serializer.Serialize(ContactPreview));
-                StartActivity(i);
+                StartActivity(ObjectActionsActivity.CreateIntent(Activity, ContactPreview));
 
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Links)
             {
-                var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, Serializer.Serialize(ContactPreview));
-                StartActivity(i);
-
+                StartActivity(ObjectLinksActivity.CreateIntent(Activity,ContactPreview));
                 return true;
             }
 

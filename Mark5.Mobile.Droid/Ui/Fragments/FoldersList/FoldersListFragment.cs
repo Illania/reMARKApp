@@ -185,11 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                var i = new Intent(Activity, typeof(SearchActivity));
-                i.PutExtra(SearchActivity.ModuleIntentKey, Serializer.Serialize(RemoteFolder.Module));
-
-                StartActivity(i);
-
+                StartActivity(SearchActivity.CreateIntent(Activity, RemoteFolder.Module));
                 return true;
             }
 

@@ -50,6 +50,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         MailMessage mailMessage;
 
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(MailViewerActivity));
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
