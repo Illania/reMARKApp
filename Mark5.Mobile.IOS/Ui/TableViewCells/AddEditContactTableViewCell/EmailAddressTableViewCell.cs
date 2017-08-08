@@ -6,7 +6,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class EmailAddressTableViewCell : AddEditContactTableViewCell
+    public class EmailAddressTableViewCell : MultiRowContentTableViewCell
     {
         public static readonly NSString Key = new NSString("EmailAddressTableViewCell");
 
@@ -115,6 +115,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             preferrableSwitch.SetState(ca.IsPrimary, true);
             descriptionTextField.Text = ca.Description ?? string.Empty;
             addressTextField.Text = ca.Address ?? string.Empty;
+        }
+
+        public override void StartEditing()
+        {
+            addressTextField.BecomeFirstResponder();
         }
 
         #region EventHandlers

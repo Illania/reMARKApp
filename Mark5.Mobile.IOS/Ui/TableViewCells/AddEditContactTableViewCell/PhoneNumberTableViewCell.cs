@@ -11,7 +11,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class PhoneNumberTableViewCell : AddEditContactTableViewCell
+    public class PhoneNumberTableViewCell : MultiRowContentTableViewCell
     {
         public static readonly NSString Key = new NSString("PhoneNumberTableViewCell");
 
@@ -208,6 +208,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             }
 
             UpdatePrefix(false);
+        }
+
+        public override void StartEditing()
+        {
+            numberTextField.BecomeFirstResponder();
         }
 
         #region Event handlers

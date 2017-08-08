@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -196,9 +197,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             activeField = (UIView)sender;
         }
 
-        //TODO cannot add deparment without company 
-        //TODO check all the stuff that was written for android
-
         async void DataSource_ParentRowClicked(object sender, EventArgs e)
         {
             var vc = new ParentContactSelectorFolderListView(ContactPreview.Type);
@@ -328,6 +326,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             SectionCollection sections = new SectionCollection();
 
+            Dictionary<NSIndexPath, nfloat> cellHeights = new Dictionary<NSIndexPath, nfloat>();
+
             public DataSource(AddEditContactViewController viewController, UITableView tableView)
             {
                 ViewController = viewController;
@@ -380,10 +380,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var row = RowAtIndexPath(indexPath);
                 row.OnDisplayed(indexPath);
-                test[indexPath] = cell.Frame.Size.Height;
+                cellHeights[indexPath] = cell.Frame.Size.Height;
             }
-
-            Dictionary<NSIndexPath, nfloat> test = new Dictionary<NSIndexPath, nfloat>();
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
@@ -410,11 +408,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat EstimatedHeight(UITableView tableView, NSIndexPath indexPath)
             {
-                if (test.ContainsKey(indexPath))
+                if (cellHeights.ContainsKey(indexPath))
                 {
-                    return test[indexPath];
+                    return cellHeights[indexPath];
                 }
-                else return 60.0f;
+
+                return 60.0f;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
@@ -900,22 +899,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tfc.Reset();
                     tfc.SetMultiline(isMultiline);
                     tfc.SetTitle(title);
-                    tfc.ContentEdited += ContentEditedHandler;
+                    tfc.ContentEdited += ContentEdited;
+                    tfc.NewLineAdded += NewLineAdded;
                 }
 
                 protected abstract void ContentEdited(object sender, string e);
 
-                void ContentEditedHandler(object sender, string e)
+                void NewLineAdded(object sender, EventArgs e)
                 {
-                    //Used to make the cell grow with the content //TODO it's for testing
-                    //var offset = TableView.ContentOffset;
-                    //UIView.AnimationsEnabled = false;
-                    //TableView.BeginUpdates();
-                    //TableView.EndUpdates();
-                    //UIView.AnimationsEnabled = true;
-                    //TableView.SetContentOffset(offset, false);
-
-                    ContentEdited(sender, e);
+                    if (isMultiline) //TODO still need to find a solution to this issue
+                    {
+                        //Used to make the cell grow with the content
+                        var offset = TableView.ContentOffset;
+                        UIView.AnimationsEnabled = false;
+                        TableView.BeginUpdates();
+                        TableView.EndUpdates();
+                        UIView.AnimationsEnabled = true;
+                        TableView.SetContentOffset(offset, false);
+                    }
                 }
             }
 
@@ -967,8 +968,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 public T Content { get; set; }
 
-                protected MultiContentRow(MultiSection section,
-                                          T content)
+                protected MultiContentRow(MultiSection section, T content)
                     : base(section)
                 {
                     Content = content;
@@ -979,6 +979,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void OnCommit(NSIndexPath indexPath)
                 {
                     ((MultiSection)Section).DeleteRow(indexPath, this);
+                }
+
+                protected void StartEditing()
+                {
+                    ((MultiRowContentTableViewCell)Cell)?.StartEditing();
                 }
             }
 
@@ -1316,12 +1321,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void RefreshRow()
                 {
-                }
-
-                public override void OnDisplayed(NSIndexPath indexPath)
-                {
-                    var cell = (BirthdateTableViewCell)Cell;
-                    cell.StartSelection();
                 }
 
                 public override void OnCommit(NSIndexPath indexPath)

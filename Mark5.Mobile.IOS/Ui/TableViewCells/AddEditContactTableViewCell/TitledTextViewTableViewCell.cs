@@ -1,4 +1,5 @@
 ﻿using System;
+using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -10,6 +11,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         public static readonly NSString Key = new NSString("TitledTextFieldTableViewCell");
 
         public event EventHandler<string> ContentEdited = delegate { };
+        public event EventHandler NewLineAdded = delegate { };
 
         readonly UITextView textView;
         readonly UILabel titleLabel;
@@ -54,12 +56,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
             });
         }
+        CGRect previous = CGRect.Empty;
 
         [Export("textView:shouldChangeTextInRange:replacementText:")]
         public bool ShouldChangeText(UITextView textView, NSRange range, string text)
         {
             if (textView.TextContainer.MaximumNumberOfLines == 1)
                 return !text.Contains(Environment.NewLine);
+
+            previous = textView.GetCaretRectForPosition(textView.EndOfDocument);
 
             return true;
         }
@@ -68,6 +73,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         public void Changed(UITextView textView)
         {
             ContentEdited(this, textView.Text);
+
+            if (textView.GetCaretRectForPosition(textView.EndOfDocument).Y > previous.Y)
+            {
+                NewLineAdded(this, EventArgs.Empty);
+            }
         }
 
         public void SetTitle(string title)
@@ -89,6 +99,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         public void Reset()
         {
             ContentEdited = delegate { };
+            NewLineAdded = delegate { };
+
             SetErrorState(false);
 
             SetTitle(string.Empty);

@@ -10,7 +10,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class PhysicalAddressTableViewCell : AddEditContactTableViewCell
+    public class PhysicalAddressTableViewCell : MultiRowContentTableViewCell
     {
         public static readonly NSString Key = new NSString("PhysicalAddressTableViewCell");
 
@@ -202,6 +202,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             cityTextField.Text = pa.City ?? string.Empty;
 
             UpdatePrefix();
+        }
+
+        public override void StartEditing()
+        {
+            addressTextField.BecomeFirstResponder();
         }
 
         #region Event handlers

@@ -10,7 +10,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class BirthdateTableViewCell : AddEditContactTableViewCell
+    public class BirthdateTableViewCell : MultiRowContentTableViewCell
     {
         public static readonly NSString Key = new NSString("BirthdateTableViewCell");
 
@@ -73,6 +73,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             RefreshDate();
         }
 
+        public override void StartEditing()
+        {
+            dateTextField.BecomeFirstResponder();
+        }
+
+        //TODO need to find a way to have a date anyway
+
         void RefreshDate()
         {
             if (contact.BirthDateTimestamp != -6847804800000 && contact.BirthDateTimestamp != -1)
@@ -107,12 +114,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             contact.BirthDateTimestamp = birthdate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
             RefreshDate();
             dateTextField.ResignFirstResponder();
-        }
-
-        public void StartSelection()
-        {
-            if (string.IsNullOrEmpty(dateTextField.Text))
-                dateTextField.BecomeFirstResponder();
         }
     }
 }
