@@ -179,31 +179,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    Serializer.Serialize(new List<IBusinessEntity>
-                    {
-                        ContactPreview
-                    }));
-                StartActivity(i);
-
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, 
+                                                                        (int)CopyMoveToFolderListActivity.ModeType.Copy, 
+                                                                        ModuleType.Contacts, 
+                                                                        new List<IBusinessEntity>
+													                    {
+													                        ContactPreview
+													                    }));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    Serializer.Serialize(new List<IBusinessEntity>
-                    {
-                        ContactPreview
-                    }));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
-                StartActivity(i);
+
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, 
+                                                                        (int)CopyMoveToFolderListActivity.ModeType.Move, 
+                                                                        ModuleType.Contacts,
+				                                                        new List<IBusinessEntity>
+				                                                        {
+				                                                                            ContactPreview
+				                                                        },
+                                                                        Folder));
 
                 return true;
             }
@@ -284,9 +280,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
-                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(new List<IBusinessEntity> { ContactPreview }));
-                StartActivity(i);
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,new List<IBusinessEntity> { ContactPreview }));
             }
         }
 

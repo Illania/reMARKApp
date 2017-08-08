@@ -376,11 +376,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                StartActivity(i);
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
 
                 ActionMode?.Finish();
                 return true;
@@ -388,12 +384,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
-                StartActivity(i);
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(),Folder));
 
                 ActionMode?.Finish();
                 return true;
@@ -452,9 +443,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
-                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
-                StartActivity(i);
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 

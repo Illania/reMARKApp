@@ -19,6 +19,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context, List<IBusinessEntity> be)
+        {
+            var intent = new Intent(context, typeof(CopyToUserWorktrayActivity));
+            intent.PutExtra(BusinessEntitiesIntentKey,Serializer.Serialize(be));
+            return intent;
+
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

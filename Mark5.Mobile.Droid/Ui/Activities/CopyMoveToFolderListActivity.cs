@@ -29,15 +29,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Context context, int modeType = 0, ModuleType moduleType = ModuleType.None, List<IBusinessEntity> be = null, Folder folder = null)
+        public static Intent CreateIntent(Context context, int modeType, ModuleType moduleType, List<IBusinessEntity> be, Folder folder = null)
         {
             var intent = new Intent(context, typeof(CopyMoveToFolderListActivity));
-            if(modeType != 0)
-                intent.PutExtra(ModeIntentKey, modeType);
-            if(moduleType != 0)
-                intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
-            if(be != null)
-                intent.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(be));
+            intent.PutExtra(ModeIntentKey, modeType);
+            intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+            intent.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(be));
             if (folder != null)
                 intent.PutExtra(FromFolderIntentKey, Serializer.Serialize(folder));
             return intent;

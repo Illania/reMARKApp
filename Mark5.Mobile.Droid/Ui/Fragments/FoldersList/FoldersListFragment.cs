@@ -379,7 +379,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 if (folder.Module == ModuleType.Contacts)
                 {
-                    StartActivity(ContactsListActivity.CreateIntent(Context, folder.ShallowCopy()));
+                    StartActivity(ContactsListActivity.CreateIntent(Activity, folder.ShallowCopy()));
                 }
                 if (folder.Module == ModuleType.Shortcodes)
                 {
