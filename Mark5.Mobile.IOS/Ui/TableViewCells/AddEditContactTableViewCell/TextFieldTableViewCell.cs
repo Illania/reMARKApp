@@ -49,6 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public void Reset()
         {
+            ContentEdited = delegate { };
             SetErrorState(false);
 
             SetPlaceholder(string.Empty);

@@ -872,7 +872,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var tfc = (TextFieldTableViewCell)Cell;
                     tfc.Reset();
                     tfc.SetPlaceholder(placeholder);
-                    tfc.ContentEdited -= ContentEdited;
                     tfc.ContentEdited += ContentEdited;
                 }
 
@@ -901,7 +900,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tfc.Reset();
                     tfc.SetMultiline(isMultiline);
                     tfc.SetTitle(title);
-                    tfc.ContentEdited -= ContentEditedHandler;
                     tfc.ContentEdited += ContentEditedHandler;
                 }
 
@@ -909,7 +907,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 void ContentEditedHandler(object sender, string e)
                 {
-                    //Used to make the cell grow with the content
+                    //Used to make the cell grow with the content //TODO it's for testing
                     //var offset = TableView.ContentOffset;
                     //UIView.AnimationsEnabled = false;
                     //TableView.BeginUpdates();
@@ -1412,9 +1410,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void Initialize()
                 {
                     var cell = (EmailAddressTableViewCell)Cell;
-                    cell.SelectedAsPrimary -= Cell_SelectedAsPrimary;
                     cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
-                    cell.AddressChanged -= Cell_AddressChanged;
                     cell.AddressChanged += Cell_AddressChanged;
                 }
 
@@ -1491,10 +1487,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void Initialize()
                 {
                     var cell = (PhoneNumberTableViewCell)Cell;
-                    cell.SelectedAsPrimary -= Cell_SelectedAsPrimary;
                     cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
                     cell.AddressChanged += Cell_AddressChanged;
-                    cell.AddressChanged -= Cell_AddressChanged;
                 }
 
                 public override void RefreshRow()
