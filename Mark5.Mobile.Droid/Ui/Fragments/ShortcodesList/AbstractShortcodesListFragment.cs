@@ -261,9 +261,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
                 if (result == 0)
                 {
-                    var i = new Intent(Activity, typeof(DownloadActivity));
-                    i.PutExtra(DownloadActivity.FolderIntentKey, Serializer.Serialize(Folder));
-                    StartActivityForResult(i, RequestCodes.SaveOfflineRequest);
+                    StartActivityForResult(DownloadActivity.CreateIntent(Activity, Folder), RequestCodes.SaveOfflineRequest);
 
                     refreshLayout.Refreshing = false;
                     refreshing = false;

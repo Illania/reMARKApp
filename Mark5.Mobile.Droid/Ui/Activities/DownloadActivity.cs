@@ -18,6 +18,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         DownloadFragment df;
 
+        public static Intent CreateIntent(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(DownloadActivity));
+            intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

@@ -1,5 +1,6 @@
 ﻿using System;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -22,6 +23,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string NotificationGuidIntentKey = "NotificationGuid_0473a08d-5f96-4acd-924a-6d160a23cdf2";
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, string failedDocumentToUploadGuid = null, int folderId = 0, int documentId = 0, string documentPreview = null, string notificationGuid = null)
+        {
+            var intent = new Intent(context, typeof(DocumentActivity));
+            if (failedDocumentToUploadGuid != null)
+                intent.PutExtra(FailedDocumentToUploadGuidIntentKey, failedDocumentToUploadGuid);
+            if (folderId != 0)
+                intent.PutExtra(FolderIdIntentKey, folderId);
+            if (documentId != 0)
+                intent.PutExtra(DocumentIdIntentKey, documentId);
+            if(documentPreview != null)
+                intent.PutExtra(DocumentPreviewIntentKey, documentPreview);
+            if (notificationGuid != null)
+                intent.PutExtra(NotificationGuidIntentKey, notificationGuid);
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

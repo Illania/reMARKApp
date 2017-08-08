@@ -373,9 +373,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (folder.Module == ModuleType.Documents)
                 {
-                    var i = new Intent(Activity, typeof(DocumentsListActivity));
-                    i.PutExtra(DocumentsListActivity.FolderIntentKey, Serializer.Serialize(folder.ShallowCopy()));
-                    StartActivity(i);
+                    StartActivity(DocumentsListActivity.CreateIntent(Activity, folder.ShallowCopy()));
                 }
                 if (folder.Module == ModuleType.Contacts)
                 {
@@ -669,9 +667,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedFolder == null)
                 return;
 
-            var i = new Intent(Activity, typeof(DownloadActivity));
-            i.PutExtra(DownloadActivity.FolderIntentKey, Serializer.Serialize(selectedFolder.ShallowCopy()));
-            StartActivity(i);
+            StartActivity(DownloadActivity.CreateIntent(Activity, selectedFolder.ShallowCopy()));
         }
 
         #endregion

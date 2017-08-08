@@ -137,9 +137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (ol.FromObjectType == ObjectType.Document)
                 {
-                    var i = new Intent(Activity, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.DocumentIdIntentKey, ol.FromObjectId);
-                    StartActivity(i);
+                    StartActivity(DocumentActivity.CreateIntent(Activity, documentId: ol.FromObjectId));
                 }
                 else if (ol.FromObjectType == ObjectType.Contact)
                 {
@@ -156,9 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (ol.ToObjectType == ObjectType.Document)
                 {
-                    var i = new Intent(Activity, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.DocumentIdIntentKey, ol.ToObjectId);
-                    StartActivity(i);
+                    StartActivity(DocumentActivity.CreateIntent(Activity, documentId: ol.ToObjectId));
                 }
                 else if (ol.ToObjectType == ObjectType.Contact)
                 {
