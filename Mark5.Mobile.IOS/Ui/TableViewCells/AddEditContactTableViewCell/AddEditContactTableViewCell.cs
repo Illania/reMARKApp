@@ -65,9 +65,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             return chevronButton;
         }
 
-        public void SetErrorState(bool error)
+        public void SetErrorState(bool error, bool animate = true)
         {
-            BackgroundColor = error ? Theme.LightBrown : UIColor.Clear;
+            if (!animate || !error)
+                BackgroundColor = error ? Theme.LightBrown : UIColor.Clear;
+            else
+            {
+                AnimateKeyframes(1.0f, 0, UIViewKeyframeAnimationOptions.CalculationModeLinear, () =>
+                 {
+                     AddKeyframeWithRelativeStartTime(0, 0.33, () => BackgroundColor = Theme.LightBrown);
+                     AddKeyframeWithRelativeStartTime(0.33, 0.33, () => BackgroundColor = UIColor.Clear);
+                     AddKeyframeWithRelativeStartTime(0.66, 0.33, () => BackgroundColor = Theme.LightBrown);
+                 }, (finished) => { });
+            }
         }
     }
 }

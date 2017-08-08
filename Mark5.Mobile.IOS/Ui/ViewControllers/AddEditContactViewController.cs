@@ -826,7 +826,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Cell = cell;
                     Initialize();
                     RefreshRow();
-                    SetErrorState(error);
+                    SetErrorState(error, false);
                 }
 
                 protected void ReloadRow()
@@ -839,10 +839,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                public void SetErrorState(bool errorState)
+                public void SetErrorState(bool errorState, bool animate = true)
                 {
                     error = errorState;
-                    Cell?.SetErrorState(errorState);
+                    Cell?.SetErrorState(errorState, animate);
                 }
 
                 protected abstract void Initialize();
@@ -1101,10 +1101,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 throw new ArgumentException("Not valid contact type");
                         }
                     }
-                    else
-                    {
-                        SetErrorState(false);
-                    }
 
                     disableEditing = false;
 
@@ -1119,12 +1115,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         if (string.IsNullOrEmpty(ContactPreview.CompanyName))
                             throw new Exception("This should not happen!"); //TODO for testing
-                        else
-                            cell.SetContent(ContactPreview.CompanyName);
+
+                        cell.SetContent(ContactPreview.CompanyName);
                     }
 
                     disableEditing |= ParentPreselected;
-
 
                     ReloadRow();
                 }
