@@ -16,7 +16,7 @@ namespace MaterialDialogs.Utils
             {
                 try
                 {
-                    Typeface t = Typeface.CreateFromAsset(c.Assets, $"fonts{name}");
+                    var t = Typeface.CreateFromAsset(c.Assets, $"fonts{name}");
                     Cache.Put(name, t);
                     return t;
                 }

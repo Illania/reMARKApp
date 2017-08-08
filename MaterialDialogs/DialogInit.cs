@@ -70,11 +70,11 @@ namespace MaterialDialogs
             var builder = dialog.builder;
 
             // Set cancelable flag and dialog background color
-            dialog.SetCancelable((bool)builder.cancelable);
-            dialog.SetCanceledOnTouchOutside((bool)builder.canceledOnTouchOutside);
+            dialog.SetCancelable(builder.cancelable);
+            dialog.SetCanceledOnTouchOutside(builder.canceledOnTouchOutside);
             if (builder.backgroundColor == 0)
             {
-                builder.backgroundColor = DialogUtils.ResolveColor((Android.Content.Context)builder.context,
+                builder.backgroundColor = DialogUtils.ResolveColor(builder.context,
                                                                    Resource.Attribute.md_background_color,
                                                                    DialogUtils.ResolveColor(dialog.Context, Resource.Attribute.colorBackgroundFloating));
             }
@@ -82,36 +82,36 @@ namespace MaterialDialogs
             {
                 var drawable = new GradientDrawable();
                 drawable.SetCornerRadius(builder.context.Resources.GetDimension(Resource.Dimension.md_bg_corner_radius));
-                drawable.SetColor((int)builder.backgroundColor);
+                drawable.SetColor(builder.backgroundColor);
                 dialog.Window.SetBackgroundDrawable(drawable);
             }
 
             // Retrieve color theme attributes
             if (!builder.positiveColorSet)
-                builder.positiveColor = DialogUtils.ResolveActionTextColorStateList((Android.Content.Context)builder.context, Resource.Attribute.md_positive_color, (ColorStateList)builder.positiveColor);
+                builder.positiveColor = DialogUtils.ResolveActionTextColorStateList(builder.context, Resource.Attribute.md_positive_color, builder.positiveColor);
 
             if (!builder.neutralColorSet)
-                builder.neutralColor = DialogUtils.ResolveActionTextColorStateList((Android.Content.Context)builder.context, Resource.Attribute.md_neutral_color, (ColorStateList)builder.neutralColor);
+                builder.neutralColor = DialogUtils.ResolveActionTextColorStateList(builder.context, Resource.Attribute.md_neutral_color, builder.neutralColor);
 
             if (!builder.negativeColorSet)
-                builder.negativeColor = DialogUtils.ResolveActionTextColorStateList((Android.Content.Context)builder.context, Resource.Attribute.md_negative_color, (ColorStateList)builder.negativeColor);
+                builder.negativeColor = DialogUtils.ResolveActionTextColorStateList(builder.context, Resource.Attribute.md_negative_color, builder.negativeColor);
 
             if (!builder.widgetColorSet)
-                builder.widgetColor = DialogUtils.ResolveColor((Android.Content.Context)builder.context, Resource.Attribute.md_widget_color, (int)builder.widgetColor);
+                builder.widgetColor = DialogUtils.ResolveColor(builder.context, Resource.Attribute.md_widget_color, builder.widgetColor);
 
             // Retrieve default title/content colors
             if (!builder.titleColorSet)
             {
                 var titleColorFallback = DialogUtils.ResolveColor(dialog.Context, Android.Resource.Attribute.TextColorPrimary);
-                builder.titleColor = DialogUtils.ResolveColor((Android.Content.Context)builder.context, Resource.Attribute.md_title_color, titleColorFallback);
+                builder.titleColor = DialogUtils.ResolveColor(builder.context, Resource.Attribute.md_title_color, titleColorFallback);
             }
             if (!builder.contentColorSet)
             {
                 var contentColorFallback = DialogUtils.ResolveColor(dialog.Context, Android.Resource.Attribute.TextColorSecondary);
-                builder.contentColor = DialogUtils.ResolveColor((Android.Content.Context)builder.context, Resource.Attribute.md_content_color, contentColorFallback);
+                builder.contentColor = DialogUtils.ResolveColor(builder.context, Resource.Attribute.md_content_color, contentColorFallback);
             }
             if (!builder.itemColorSet)
-                builder.itemColor = DialogUtils.ResolveColor((Android.Content.Context)builder.context, Resource.Attribute.md_item_color, (int)builder.contentColor);
+                builder.itemColor = DialogUtils.ResolveColor(builder.context, Resource.Attribute.md_item_color, builder.contentColor);
 
             // Retrieve references to views
             dialog.title = (TextView)dialog.View.FindViewById(Resource.Id.md_title);
@@ -152,11 +152,11 @@ namespace MaterialDialogs
             if (builder.icon != null)
             {
                 dialog.icon.Visibility = ViewStates.Visible;
-                dialog.icon.SetImageDrawable((Drawable)builder.icon);
+                dialog.icon.SetImageDrawable(builder.icon);
             }
             else
             {
-                var d = DialogUtils.ResolveDrawable((Android.Content.Context)builder.context, Resource.Attribute.md_icon);
+                var d = DialogUtils.ResolveDrawable(builder.context, Resource.Attribute.md_icon);
                 if (d != null)
                 {
                     dialog.icon.Visibility = ViewStates.Visible;
@@ -167,11 +167,11 @@ namespace MaterialDialogs
             }
 
             // Setup icon size limiting
-            int maxIconSize = builder.maxIconSize;
+            var maxIconSize = builder.maxIconSize;
             if (maxIconSize == -1)
-                maxIconSize = DialogUtils.ResolveDimension((Android.Content.Context)builder.context, Resource.Attribute.md_icon_max_size);
+                maxIconSize = DialogUtils.ResolveDimension(builder.context, Resource.Attribute.md_icon_max_size);
 
-            if (builder.limitIconToDefaultSize || DialogUtils.ResolveBoolean((Android.Content.Context)builder.context, Resource.Attribute.md_icon_limit_icon_to_default_size))
+            if (builder.limitIconToDefaultSize || DialogUtils.ResolveBoolean(builder.context, Resource.Attribute.md_icon_limit_icon_to_default_size))
                 maxIconSize = builder.context.Resources.GetDimensionPixelSize(Resource.Dimension.md_icon_max_size);
 
             if (maxIconSize > -1)
@@ -186,7 +186,7 @@ namespace MaterialDialogs
             if (!builder.dividerColorSet)
             {
                 var dividerFallback = DialogUtils.ResolveColor(dialog.Context, Resource.Attribute.md_divider);
-                builder.dividerColor = DialogUtils.ResolveColor((Android.Content.Context)builder.context, Resource.Attribute.md_divider_color, dividerFallback);
+                builder.dividerColor = DialogUtils.ResolveColor(builder.context, Resource.Attribute.md_divider_color, dividerFallback);
             }
 
             dialog.View.SetDividerColor(new Color(builder.dividerColor));
@@ -194,11 +194,10 @@ namespace MaterialDialogs
             // Setup title and title frame
             if (dialog.title != null)
             {
-                dialog.SetTypeface(dialog.title, (Typeface)builder.mediumFont);
+                dialog.SetTypeface(dialog.title, builder.mediumFont);
                 dialog.title.SetTextColor(new Color(builder.titleColor));
                 dialog.title.Gravity = builder.titleGravity.GetGravityInt();
                 dialog.title.TextAlignment = builder.titleGravity.GetTextAlignment();
-
 
                 if (builder.title == null)
                     dialog.titleFrame.Visibility = ViewStates.Gone;
@@ -213,16 +212,15 @@ namespace MaterialDialogs
             if (dialog.content != null)
             {
                 dialog.content.MovementMethod = new LinkMovementMethod();
-                dialog.SetTypeface(dialog.content, (Typeface)builder.regularFont);
-                dialog.content.SetLineSpacing(0f, (float)builder.contentLineSpacingMultiplier);
+                dialog.SetTypeface(dialog.content, builder.regularFont);
+                dialog.content.SetLineSpacing(0f, builder.contentLineSpacingMultiplier);
                 if (builder.linkColor == null)
                     dialog.content.SetLinkTextColor(new Color(DialogUtils.ResolveColor(dialog.Context, Android.Resource.Attribute.TextColorPrimary)));
                 else
-                    dialog.content.SetLinkTextColor((ColorStateList)builder.linkColor);
+                    dialog.content.SetLinkTextColor(builder.linkColor);
                 dialog.content.SetTextColor(new Color(builder.contentColor));
                 dialog.content.Gravity = builder.contentGravity.GetGravityInt();
                 dialog.content.TextAlignment = builder.contentGravity.GetTextAlignment();
-
 
                 if (builder.content != null)
                 {
@@ -238,27 +236,27 @@ namespace MaterialDialogs
             {
                 dialog.checkBoxPrompt.Text = builder.checkBoxPrompt;
                 dialog.checkBoxPrompt.Checked = builder.checkBoxPromptInitiallyChecked;
-                dialog.checkBoxPrompt.SetOnCheckedChangeListener((CompoundButton.IOnCheckedChangeListener)builder.checkBoxPromptListener);
-                dialog.SetTypeface(dialog.checkBoxPrompt, (Typeface)builder.regularFont);
+				dialog.checkBoxPrompt.SetOnCheckedChangeListener(builder.checkBoxPromptListener);
+                dialog.SetTypeface(dialog.checkBoxPrompt, builder.regularFont);
                 dialog.checkBoxPrompt.SetTextColor(new Color(builder.contentColor));
-                MDTintHelper.SetTint(dialog.checkBoxPrompt, (int)builder.widgetColor);
+                MDTintHelper.SetTint(dialog.checkBoxPrompt, builder.widgetColor);
             }
 
             // Setup action buttons
-            dialog.View.SetButtonGravity((GravityEnum)builder.buttonsGravity);
-            dialog.View.SetButtonStackedGravity((GravityEnum)builder.btnStackedGravity);
-            dialog.View.SetStackingBehavior((StackingBehavior)builder.stackingBehavior);
+            dialog.View.SetButtonGravity(builder.buttonsGravity);
+            dialog.View.SetButtonStackedGravity(builder.btnStackedGravity);
+            dialog.View.SetStackingBehavior(builder.stackingBehavior);
             bool textAllCaps;
 
-            textAllCaps = DialogUtils.ResolveBoolean((Android.Content.Context)builder.context, Resource.Attribute.textAllCaps, true);
+            textAllCaps = DialogUtils.ResolveBoolean(builder.context, Resource.Attribute.textAllCaps, true);
             if (textAllCaps)
-                textAllCaps = DialogUtils.ResolveBoolean((Android.Content.Context)builder.context, Resource.Attribute.textAllCaps, true);
+                textAllCaps = DialogUtils.ResolveBoolean(builder.context, Resource.Attribute.textAllCaps, true);
 
             var positiveTextView = dialog.positiveButton;
-            dialog.SetTypeface(positiveTextView, (Typeface)builder.mediumFont);
+            dialog.SetTypeface(positiveTextView, builder.mediumFont);
             positiveTextView.SetAllCaps(textAllCaps);
             positiveTextView.Text = builder.positiveText;
-            positiveTextView.SetTextColor((ColorStateList)builder.positiveColor);
+            positiveTextView.SetTextColor(builder.positiveColor);
             dialog.positiveButton.SetStackedSelector(dialog.GetButtonSelector(DialogAction.Positive, true));
             dialog.positiveButton.SetDefaultSelector(dialog.GetButtonSelector(DialogAction.Positive, false));
             dialog.positiveButton.Tag = (int)DialogAction.Positive;
@@ -266,10 +264,10 @@ namespace MaterialDialogs
             dialog.positiveButton.Visibility = ViewStates.Visible;
 
             var negativeTextView = dialog.negativeButton;
-            dialog.SetTypeface(negativeTextView, (Typeface)builder.mediumFont);
+            dialog.SetTypeface(negativeTextView, builder.mediumFont);
             negativeTextView.SetAllCaps(textAllCaps);
             negativeTextView.Text = builder.negativeText;
-            negativeTextView.SetTextColor((ColorStateList)builder.negativeColor);
+            negativeTextView.SetTextColor(builder.negativeColor);
             dialog.negativeButton.SetStackedSelector(dialog.GetButtonSelector(DialogAction.Negative, true));
             dialog.negativeButton.SetDefaultSelector(dialog.GetButtonSelector(DialogAction.Negative, false));
             dialog.negativeButton.Tag = (int)DialogAction.Negative;
@@ -277,10 +275,10 @@ namespace MaterialDialogs
             dialog.negativeButton.Visibility = ViewStates.Visible;
 
             var neutralTextView = dialog.neutralButton;
-            dialog.SetTypeface(neutralTextView, (Typeface)builder.mediumFont);
+            dialog.SetTypeface(neutralTextView, builder.mediumFont);
             neutralTextView.SetAllCaps(textAllCaps);
             neutralTextView.Text = builder.neutralText;
-            neutralTextView.SetTextColor((ColorStateList)builder.neutralColor);
+            neutralTextView.SetTextColor(builder.neutralColor);
             dialog.neutralButton.SetStackedSelector(dialog.GetButtonSelector(DialogAction.Neutral, true));
             dialog.neutralButton.SetDefaultSelector(dialog.GetButtonSelector(DialogAction.Neutral, false));
             dialog.neutralButton.Tag = (int)DialogAction.Neutral;
@@ -329,9 +327,9 @@ namespace MaterialDialogs
             if (builder.customView != null)
             {
                 ((MDRootLayout)dialog.View.FindViewById(Resource.Id.md_root)).NoTitleNoPadding();
-                FrameLayout frame = (FrameLayout)dialog.View.FindViewById(Resource.Id.md_customViewFrame);
+                var frame = (FrameLayout)dialog.View.FindViewById(Resource.Id.md_customViewFrame);
                 dialog.customViewFrame = frame;
-                View innerView = builder.customView;
+                var innerView = builder.customView;
                 if (innerView.Parent != null)
                 {
                     ((ViewGroup)innerView.Parent).RemoveView(innerView);
@@ -340,11 +338,11 @@ namespace MaterialDialogs
                 {
                     /* Apply the frame padding to the content, this allows the ScrollView to draw it's
 					over scroll glow without clipping */
-                    Resources r = dialog.Context.Resources;
-                    int framePadding = r.GetDimensionPixelSize(Resource.Dimension.md_dialog_frame_margin);
-                    ScrollView sv = new ScrollView(dialog.Context);
-                    int paddingTop = r.GetDimensionPixelSize(Resource.Dimension.md_content_padding_top);
-                    int paddingBottom = r.GetDimensionPixelSize(Resource.Dimension.md_content_padding_bottom);
+                    var r = dialog.Context.Resources;
+                    var framePadding = r.GetDimensionPixelSize(Resource.Dimension.md_dialog_frame_margin);
+                    var sv = new ScrollView(dialog.Context);
+                    var paddingTop = r.GetDimensionPixelSize(Resource.Dimension.md_content_padding_top);
+                    var paddingBottom = r.GetDimensionPixelSize(Resource.Dimension.md_content_padding_bottom);
                     sv.SetClipToPadding(false);
                     if (innerView is EditText)
                     {
@@ -367,16 +365,16 @@ namespace MaterialDialogs
 
             // Setup user listeners
             if (builder.showListener != null)
-                dialog.SetOnShowListener((Android.Content.IDialogInterfaceOnShowListener)builder.showListener);
+                dialog.SetOnShowListener(builder.showListener);
 
             if (builder.cancelListener != null)
-                dialog.SetOnCancelListener((Android.Content.IDialogInterfaceOnCancelListener)builder.cancelListener);
+                dialog.SetOnCancelListener(builder.cancelListener);
 
             if (builder.dismissListener != null)
-                dialog.SetOnDismissListener((Android.Content.IDialogInterfaceOnDismissListener)builder.dismissListener);
+                dialog.SetOnDismissListener(builder.dismissListener);
 
             if (builder.keyListener != null)
-                dialog.SetOnKeyListener((Android.Content.IDialogInterfaceOnKeyListener)builder.keyListener);
+                dialog.SetOnKeyListener(builder.keyListener);
 
             // Setup internal show listener
             dialog.SetOnShowListenerInternal();
@@ -411,7 +409,7 @@ namespace MaterialDialogs
             var builder = dialog.builder;
             if (builder.indeterminateProgress || builder.progress > -2)
             {
-                dialog.progressBar = (Android.Widget.ProgressBar)dialog.View.FindViewById(Android.Resource.Id.Progress);
+                dialog.progressBar = (ProgressBar)dialog.View.FindViewById(Android.Resource.Id.Progress);
                 if (dialog.progressBar == null)
                     return; 
 
@@ -419,16 +417,14 @@ namespace MaterialDialogs
                 {
                     if (builder.indeterminateIsHorizontalProgress)
                     {
-                        ProgBar.IndeterminateHorizontalProgressDrawable d =
-                                new ProgBar.IndeterminateHorizontalProgressDrawable(builder.context);
+                        var d = new MaterialProgressBar.IndeterminateHorizontalProgressDrawable(builder.context);
                         d.SetTint(builder.widgetColor);
                         dialog.progressBar.ProgressDrawable = d;
                         dialog.progressBar.IndeterminateDrawable = d;
                     }
                     else
                     {          
-                        ProgBar.IndeterminateCircularProgressDrawable d =
-                                new ProgBar.IndeterminateCircularProgressDrawable(builder.context);
+                        var d = new MaterialProgressBar.IndeterminateCircularProgressDrawable(builder.context);
 						d.SetTint(builder.widgetColor);
 						dialog.progressBar.ProgressDrawable = d;
 						dialog.progressBar.IndeterminateDrawable = d;
@@ -451,20 +447,20 @@ namespace MaterialDialogs
                     if (dialog.progressLabel != null)
                     {
                         dialog.progressLabel.SetTextColor(new Color(builder.contentColor));
-                        dialog.SetTypeface(dialog.progressLabel, (Typeface)builder.mediumFont);
+                        dialog.SetTypeface(dialog.progressLabel, builder.mediumFont);
                         dialog.progressLabel.Text = builder.progressPercentFormat.Format(0);
                     }
                     dialog.progressMinMax = (TextView)dialog.View.FindViewById(Resource.Id.md_minMax);
                     if (dialog.progressMinMax != null)
                     {
                         dialog.progressMinMax.SetTextColor(new Color(builder.contentColor));
-                        dialog.SetTypeface(dialog.progressMinMax, (Typeface)builder.regularFont);
+                        dialog.SetTypeface(dialog.progressMinMax, builder.regularFont);
 
                         if (builder.showMinMax)
                         {
                             dialog.progressMinMax.Visibility = ViewStates.Visible;
-                            dialog.progressMinMax.Text = Java.Lang.String.Format((string)builder.progressNumberFormat, 0, (Java.Lang.Object)builder.progressMax);
-                            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)dialog.progressBar.LayoutParameters;
+                            dialog.progressMinMax.Text = Java.Lang.String.Format(builder.progressNumberFormat, 0, builder.progressMax);
+                            var lp = (ViewGroup.MarginLayoutParams)dialog.progressBar.LayoutParameters;
                             lp.LeftMargin = 0;
                             lp.RightMargin = 0;
                         }
@@ -483,7 +479,7 @@ namespace MaterialDialogs
 
         static void SetupInputDialog(MaterialDialog dialog)
         {
-            MaterialDialog.Builder builder = dialog.builder;
+            var builder = dialog.builder;
             dialog.input = (EditText)dialog.View.FindViewById(Android.Resource.Id.Input);
             if (dialog.input == null)
                 return;

@@ -20,7 +20,7 @@ namespace MaterialDialogs
 
         public static void SetTint([NonNull] RadioButton radioButton, [ColorInt] int color)
         {
-            int disabledColor = DialogUtils.GetDisabledColor(radioButton.Context);
+            var disabledColor = DialogUtils.GetDisabledColor(radioButton.Context);
             var stateList = new ColorStateList(new int[][] {
                 new [] {Android.Resource.Attribute.StateEnabled,-Android.Resource.Attribute.StateChecked},
                 new [] {Android.Resource.Attribute.StateEnabled,Android.Resource.Attribute.StateChecked},
@@ -42,7 +42,7 @@ namespace MaterialDialogs
 
         public static void SetTint([NonNull] CheckBox checkBox, [ColorInt] int color)
         {
-            int disabledColor = DialogUtils.GetDisabledColor(checkBox.Context);
+            var disabledColor = DialogUtils.GetDisabledColor(checkBox.Context);
             var sl = new ColorStateList(
                     new int[][] {
                         new [] {Android.Resource.Attribute.StateEnabled,-Android.Resource.Attribute.StateChecked},
@@ -66,12 +66,12 @@ namespace MaterialDialogs
             seekBar.ProgressTintList = stateList;
         }
 
-        public static void SetTint([NonNull] Android.Widget.ProgressBar progressBar, [ColorInt] int color)
+        public static void SetTint([NonNull] ProgressBar progressBar, [ColorInt] int color)
         {
             SetTint(progressBar, color, false);
         }
 
-        public static void SetTint([NonNull] Android.Widget.ProgressBar progressBar, [ColorInt] int color, bool skipIndeterminate)
+        public static void SetTint([NonNull] ProgressBar progressBar, [ColorInt] int color, bool skipIndeterminate)
         {
             var stateList = ColorStateList.ValueOf(new Color(color));
             progressBar.ProgressTintList = stateList;
@@ -84,7 +84,7 @@ namespace MaterialDialogs
         {
             int[][] states = new int[3][];
             int[] colors = new int[3];
-            int i = 0;
+            var i = 0;
             states[0] = new [] { -Android.Resource.Attribute.StateEnabled };
             colors[0] = DialogUtils.ResolveColor(context, Android.Resource.Attribute.ColorControlNormal);
             i++;
@@ -109,7 +109,7 @@ namespace MaterialDialogs
             {
                 var fCursorDrawableRes = editText.Class.GetDeclaredField("mCursorDrawableRes");
                 fCursorDrawableRes.Accessible = true;
-                int mCursorDrawableRes = fCursorDrawableRes.GetInt(editText);
+                var mCursorDrawableRes = fCursorDrawableRes.GetInt(editText);
 
                 var fEditor = editText.Class.GetDeclaredField("mEditor");
                 fEditor.Accessible = true;

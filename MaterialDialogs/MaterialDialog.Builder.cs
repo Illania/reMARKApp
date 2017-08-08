@@ -122,7 +122,7 @@ namespace MaterialDialogs
             public Builder([NonNull] Context context)
             {
                 this.context = context;
-                int materialBlue = DialogUtils.GetColor(context, Resource.Color.md_material_blue_600);
+                var materialBlue = DialogUtils.GetColor(context, Resource.Color.md_material_blue_600);
 
                 //Get default accent colors for action buttons and progress bars.
                 widgetColor = DialogUtils.ResolveColor(context, Android.Resource.Attribute.ColorAccent, widgetColor);
@@ -193,7 +193,6 @@ namespace MaterialDialogs
 
             public Builder Title([StringRes] int titleRes)
             {
-
                 Title(context.GetText(titleRes));
                 return this;
             }
@@ -254,7 +253,6 @@ namespace MaterialDialogs
             //Sets fonts used in dialog by filename.
             public Builder SetTypeface([Nullable] string medium, [Nullable] string regular)
             {
-
                 if (medium != null && !(string.IsNullOrEmpty(medium.Trim())))
                 {
                     mediumFont = TypefaceHelper.Get(context, medium);
@@ -301,9 +299,7 @@ namespace MaterialDialogs
                     if (Android.OS.Build.VERSION.SdkInt >= BuildVersionCodes.N)
                         text = Html.FromHtml(text.Replace("\n", "<br/>"), FromHtmlOptions.ModeLegacy).ToString();
                     else
-#pragma warning disable CS0618 // Type or member is obsolete
                         Html.FromHtml(text.Replace("\n", "<br/>")).ToString();
-#pragma warning restore CS0618 // Type or member is obsolete
                 }
 
                 return Content(text);
@@ -324,9 +320,7 @@ namespace MaterialDialogs
                 if (Android.OS.Build.VERSION.SdkInt >= BuildVersionCodes.N)
                     return Content(Html.FromHtml(str, FromHtmlOptions.ModeLegacy).ToString());
 
-#pragma warning disable CS0618 // Type or member is obsolete
                 return Content(Html.FromHtml(str).ToString());
-#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             public Builder ContentColor([ColorInt] int color)
@@ -1061,8 +1055,7 @@ namespace MaterialDialogs
                 else
                     inputRangeErrorColor = errorColor;
 
-                if (inputMinLength > 0)
-                    inputAllowEmpty = false;
+                inputAllowEmpty &= inputMinLength <= 0;
 
                 return this;
             }

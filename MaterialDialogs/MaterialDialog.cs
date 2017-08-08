@@ -19,7 +19,7 @@ namespace MaterialDialogs
 {
     public partial class MaterialDialog : DialogBase, View.IOnClickListener, DefaultRvAdapter.IInternalListCallBack
     {
-        readonly Handler Handler;
+        readonly Handler handler;
 
         internal Builder builder;
         internal ImageView icon;
@@ -45,7 +45,7 @@ namespace MaterialDialogs
         public MaterialDialog(Builder builder)
             : base(builder.context, DialogInit.GetTheme(builder))
         {
-            Handler = new Handler();
+            handler = new Handler();
             this.builder = builder;
             var inflater = LayoutInflater.From(builder.context);
             View = (MDRootLayout)inflater.Inflate(DialogInit.GetInflateLayout(builder), null);
@@ -95,7 +95,7 @@ namespace MaterialDialogs
                         selectedIndex = selectedIndicesList[0];
                     }
 
-                    int fSelectedIndex = selectedIndex;
+                    var fSelectedIndex = selectedIndex;
                     recyclerView.Post(() =>
                     {
                         recyclerView.RequestFocus();
@@ -607,7 +607,6 @@ namespace MaterialDialogs
             icon.Visibility = d != null ? ViewStates.Visible : ViewStates.Gone;
         }
 
-
         [UiThread]
         public void SetIconAttribute([AttrRes] int attrId)
         {
@@ -694,7 +693,7 @@ namespace MaterialDialogs
                 return;
 
             progressBar.Progress = progress;
-            Handler.Post(() =>
+            handler.Post(() =>
             {
                 if (progressLabel != null)
                     progressLabel.Text = builder.progressPercentFormat.Format((float)GetCurrentProgress() / (float)GetMaxProgress());
@@ -883,8 +882,8 @@ namespace MaterialDialogs
 
             input.AddTextChangedListener(new TextWatcher((s) =>
             {
-                int length = s.Length;
-                bool emptyDisabled = false;
+                var length = s.Length;
+                var emptyDisabled = false;
                 if (!builder.inputAllowEmpty)
                 {
                     emptyDisabled = length == 0;

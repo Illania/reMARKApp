@@ -16,18 +16,18 @@ namespace MaterialDialogs.Utils
         [ColorInt]
         public static int GetDisabledColor(Context context)
         {
-            int primaryColor = ResolveColor(context, Android.Resource.Attribute.TextColorPrimary);
-            int disabledColor = IsColorDark(primaryColor) ? Color.Black : Color.White;
+            var primaryColor = ResolveColor(context, Android.Resource.Attribute.TextColorPrimary);
+            var disabledColor = IsColorDark(primaryColor) ? Color.Black : Color.White;
             return AdjustAlpha(disabledColor, 0.3f);
         }
 
         [ColorInt]
         public static int AdjustAlpha([ColorInt] int color, float factor)
         {
-            int alpha = (int)Math.Round(Color.GetAlphaComponent(color) * factor);
-            int red = Color.GetRedComponent(color);
-            int green = Color.GetGreenComponent(color);
-            int blue = Color.GetBlueComponent(color);
+            var alpha = (int)Math.Round(Color.GetAlphaComponent(color) * factor);
+            var red = Color.GetRedComponent(color);
+            var green = Color.GetGreenComponent(color);
+            var blue = Color.GetBlueComponent(color);
 
             return Color.Argb(alpha, red, green, blue);
         }
@@ -96,7 +96,7 @@ namespace MaterialDialogs.Utils
         public static string ResolveString(Context context, [AttrRes] int attr)
         {
             var v = new TypedValue();
-            bool output = context.Theme.ResolveAttribute(attr, v, false);
+            var output = context.Theme.ResolveAttribute(attr, v, false);
             if (v.String == null)
                 return null;
 
@@ -224,7 +224,7 @@ namespace MaterialDialogs.Utils
 
         public static ColorStateList GetActionTextStateList(Context context, int newPrimaryColor)
         {
-            int fallBackButtonColor = ResolveColor(context, Android.Resource.Attribute.TextColorPrimary);
+            var fallBackButtonColor = ResolveColor(context, Android.Resource.Attribute.TextColorPrimary);
             if (newPrimaryColor == 0)
                 newPrimaryColor = fallBackButtonColor;
 

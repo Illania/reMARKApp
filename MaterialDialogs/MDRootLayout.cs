@@ -230,7 +230,7 @@ namespace MaterialDialogs
                 stacked = false;
             else
             {
-                int buttonsWidth = 0;
+                var buttonsWidth = 0;
                 foreach (var button in buttons)
                 {
                     if (button != null && IsVisible(button))
@@ -242,12 +242,12 @@ namespace MaterialDialogs
                     }
                 }
 
-                int buttonBarPadding = Context.Resources.GetDimensionPixelSize(Resource.Dimension.md_neutral_button_margin);
-                int buttonFrameWidth = width - 2 * buttonBarPadding;
+                var buttonBarPadding = Context.Resources.GetDimensionPixelSize(Resource.Dimension.md_neutral_button_margin);
+                var buttonFrameWidth = width - 2 * buttonBarPadding;
                 stacked = buttonsWidth > buttonFrameWidth;
             }
 
-            int stackedHeight = 0;
+            var stackedHeight = 0;
             isStacked = stacked;
             if (stacked)
             {
@@ -263,9 +263,9 @@ namespace MaterialDialogs
                 }
             }
 
-            int availableHeight = height;
-            int fullPadding = 0;
-            int minPadding = 0;
+            var availableHeight = height;
+            var fullPadding = 0;
+            var minPadding = 0;
             if (hasButtons)
             {
                 if (isStacked)
@@ -386,11 +386,11 @@ namespace MaterialDialogs
 				  Positive  Negative  Neutral
 				  (With no Positive, Negative takes it's place except for CENTER)
 				*/
-                int offset = buttonHorizontalEdgeMargin;
+                var offset = buttonHorizontalEdgeMargin;
 
                 /* Used with CENTER gravity */
-                int neutralLeft = -1;
-                int neutralRight = -1;
+                var neutralLeft = -1;
+                var neutralRight = -1;
 
                 if (IsVisible(buttons[IndexPositive]))
                 {
@@ -499,30 +499,24 @@ namespace MaterialDialogs
             if (view == null)
                 return;
 
-            if (view is ScrollView)
+            if (view is ScrollView sv)
             {
-                var sv = (ScrollView)view;
                 if (CanScrollViewScroll(sv))
                     AddScrollListener(sv, setForTop, setForBottom);
                 else
                 {
-                    if (setForTop)
-                        drawTopDivider = false;
-                    if (setForBottom)
-                        drawBottomDivider = false;
+                    drawTopDivider &= !setForTop;
+                    drawBottomDivider &= !setForBottom;
                 }
             }
-            else if (view is AdapterView)
+            else if (view is AdapterView av)
             {
-                var sv = (AdapterView)view;
-                if (CanAdapterViewScroll(sv))
-                    AddScrollListener(sv, setForTop, setForBottom);
+                if (CanAdapterViewScroll(av))
+                    AddScrollListener(av, setForTop, setForBottom);
                 else
                 {
-                    if (setForTop)
-                        drawTopDivider = false;
-                    if (setForBottom)
-                        drawBottomDivider = false;
+                    drawTopDivider &= !setForTop;
+                    drawBottomDivider &= !setForBottom;
                 }
             }
             else if (view is WebView)
@@ -536,10 +530,8 @@ namespace MaterialDialogs
                     {
                         if (!CanWebViewScroll((WebView)view))
                         {
-                            if (setForTop)
-                                drawTopDivider = false;
-                            if (setForBottom)
-                                drawBottomDivider = false;
+                            drawTopDivider &= !setForTop;
+                            drawBottomDivider &= !setForBottom;
                         }
                         else
                             AddScrollListener((ViewGroup)view, setForTop, setForBottom);
@@ -549,7 +541,7 @@ namespace MaterialDialogs
             }
             else if (view is RecyclerView)
             {
-                bool canScroll = CanRecyclerViewScroll((RecyclerView)view);
+                var canScroll = CanRecyclerViewScroll((RecyclerView)view);
                 if (setForTop)
                     drawTopDivider = canScroll;
                 if (setForBottom)
@@ -576,7 +568,7 @@ namespace MaterialDialogs
                 {
                     var scrollListener = new RecyclerViewOnScrollListener(() =>
                     {
-                        bool hasButtons = false;
+                        var hasButtons = false;
                         foreach (var button in buttons)
                         {
                             if (button != null && button.Visibility != ViewStates.Gone)
@@ -595,7 +587,7 @@ namespace MaterialDialogs
                 {
                     var onScrollChangedListener = new OnScrollChangedListener(() =>
                     {
-                        bool hasButtons = false;
+                        var hasButtons = false;
                         foreach (MDButton button in buttons)
                         {
                             if (button != null && button.Visibility != ViewStates.Gone)
