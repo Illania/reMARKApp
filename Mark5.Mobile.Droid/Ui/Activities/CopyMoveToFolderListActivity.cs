@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -27,6 +28,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string FoldersResultKey = "FoldersResult_32e7327a-f02e-4628-850a-6d86e2109b3e";
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, int modeType = 0, ModuleType moduleType = ModuleType.None, List<IBusinessEntity> be = null, Folder folder = null)
+        {
+            var intent = new Intent(context, typeof(CopyMoveToFolderListActivity));
+            if(modeType != 0)
+                intent.PutExtra(ModeIntentKey, modeType);
+            if(moduleType != 0)
+                intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+            if(be != null)
+                intent.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(be));
+            if (folder != null)
+                intent.PutExtra(FromFolderIntentKey, Serializer.Serialize(folder));
+            return intent;
+            
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
