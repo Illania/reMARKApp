@@ -22,8 +22,8 @@ namespace Mark5.Mobile.Droid
     {
         public List<Category> Categories => adapter.Items;
 
-        BusinessEntityPreview businessEntityPreview { get; set; }
-        Action closeRequest { get; set; }
+        BusinessEntityPreview businessEntityPreview;
+        Action closeRequest;
 
         RecyclerView recyclerView;
         SearchView searchView;

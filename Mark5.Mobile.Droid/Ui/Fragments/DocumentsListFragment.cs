@@ -37,9 +37,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         public Folder Folder { get; set; }
-        public Action CloseRequest { get; set; }
 
         DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
+
+        Action closeRequest;
 
         bool refreshing;
 
@@ -61,6 +62,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         AutoRefreshWorker autoRefreshWorker;
+
+        public DocumentsListFragment(Folder folder, Action closeRequest)
+        {
+            Folder = folder;
+            this.closeRequest = closeRequest;
+        }
 
         #region Fragment overrides
 
@@ -347,8 +354,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                if (closeRequest != null)
+                    closeRequest();
             }
             finally
             {

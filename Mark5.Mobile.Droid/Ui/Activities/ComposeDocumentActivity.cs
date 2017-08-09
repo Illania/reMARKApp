@@ -74,12 +74,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                cdf = new ComposeDocumentFragment()
-                {
-                    DocumentCreationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey),
-                    CopyToNewOption = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey),
-                    RestoreWorkingCopy = Intent.Extras.GetBoolean(RestoreWorkingCopyIntentKey)
-                };
+                cdf = new ComposeDocumentFragment((DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey),
+                                                  (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey),
+                                                  Intent.Extras.GetBoolean(RestoreWorkingCopyIntentKey));
 
                 if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
                     cdf.PreviousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);

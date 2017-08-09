@@ -11,6 +11,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerShortcodesListFragment : AbstractShortcodesListFragment
     {
+        public PickerShortcodesListFragment(Folder folder)
+        {
+            Folder = folder;
+        }
+
         #region Adapter callbacks
 
         protected override async void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)

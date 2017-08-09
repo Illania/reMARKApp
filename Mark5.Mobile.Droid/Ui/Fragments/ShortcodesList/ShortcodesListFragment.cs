@@ -1,13 +1,18 @@
-﻿using Android.Content;
+﻿using System;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesListFragment : AbstractShortcodesListFragment
     {
+        public ShortcodesListFragment(Folder folder, Action closeRequest)
+        {
+            Folder = folder;
+            CloseRequest = closeRequest;
+        }
+
         #region Adapter callbacks
 
         protected override void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)

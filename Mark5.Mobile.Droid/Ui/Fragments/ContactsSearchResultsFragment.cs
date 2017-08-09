@@ -23,18 +23,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsSearchResultsFragment : RetainableStateFragment
     {
-        public SearchContactsCriteria Criteria { get; set; }
-        public Action CloseRequest { get; set; }
+        SearchContactsCriteria criteria;
+        Action closeRequest;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ContactSearchResultsAdapter adapter;
 
+        public ContactsSearchResultsFragment(SearchContactsCriteria criteria, Action closeRequest)
+        {
+            this.criteria = criteria;
+            this.closeRequest = closeRequest;
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -60,14 +66,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts_result);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(ContactsSearchResultsFragment)} [criteria={Criteria}]");
+            CommonConfig.Logger.Info($"Created {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(ContactsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -81,7 +87,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(ContactsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]...");
         }
 
         #endregion
@@ -90,11 +96,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [criteria={Criteria}, contactPreviews.Count={adapter?.ItemCount}]...");
+            CommonConfig.Logger.Info($"Retaining state [criteria={criteria}, contactPreviews.Count={adapter?.ItemCount}]...");
 
             return new ContactSearchResultsFragmentState
             {
-                Criteria = Criteria,
+                Criteria = criteria,
                 ContactPreviews = adapter.Items
             };
         }
@@ -106,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.ContactPreviews?.Count}]...");
 
-                Criteria = dlfs.Criteria;
+                criteria = dlfs.Criteria;
                 adapter.AppendItems(dlfs.ContactPreviews);
             }
         }
@@ -128,13 +134,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                var contactPreviews = await Managers.SearchManager.SearchContactsAsync(Criteria);
+                var contactPreviews = await Managers.SearchManager.SearchContactsAsync(criteria);
 
                 if (contactPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_contacts);
-                    if (CloseRequest != null)
-                        CloseRequest();
+                    if (closeRequest != null)
+                        closeRequest();
                     return;
                 }
 
@@ -145,12 +151,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading contacts failed [criteria={Criteria}]", ex);
+                CommonConfig.Logger.Error($"Downloading contacts failed [criteria={criteria}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                if (closeRequest != null)
+                    closeRequest();
             }
             finally
             {

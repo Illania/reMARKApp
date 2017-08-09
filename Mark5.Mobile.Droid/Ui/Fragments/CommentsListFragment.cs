@@ -21,9 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         const int SecondsToEdit = 60;
 
-        public BusinessEntity Entity { get; set; }
-
         public List<Comment> Comments => adapter.Items;
+
+        BusinessEntity entity;
 
         RecyclerView recyclerView;
         CommentsListAdapter adapter;
@@ -31,9 +31,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         AppCompatEditText addCommentEditText;
         AppCompatImageButton addCommentButton;
 
+        public CommentsListFragment(BusinessEntity be)
+        {
+            entity = be;
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_comments, container, false);
 
@@ -79,14 +84,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.comments);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
+            CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
+            CommonConfig.Logger.Info($"Resuming {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]");
 
             if (adapter.ItemCount < 1)
             {
@@ -98,13 +103,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void RefreshView()
         {
-            switch (Entity.ObjectType)
+            switch (entity.ObjectType)
             {
                 case ObjectType.Document:
-                    adapter.AppendItems((Entity as Document).Comments);
+                    adapter.AppendItems((entity as Document).Comments);
                     break;
                 case ObjectType.Contact:
-                    adapter.AppendItems((Entity as Contact).Comments);
+                    adapter.AppendItems((entity as Contact).Comments);
                     break;
                 default:
                     throw new ArgumentException("The input business entity does not have comments defined in the model");
@@ -167,15 +172,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Comment newComment;
 
-                switch (Entity.ObjectType)
+                switch (entity.ObjectType)
                 {
                     case ObjectType.Document:
-                        var document = Entity as Document;
+                        var document = entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
                         CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
-                        var contact = Entity as Contact;
+                        var contact = entity as Contact;
                         newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
                         break;
                     default:
@@ -188,7 +193,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={Entity?.Id}, commentContent={newCommentContent}] ", ex);
+                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={entity?.Id}, commentContent={newCommentContent}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -205,15 +210,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Task.Run(async () =>
                 {
-                    switch (Entity.ObjectType)
+                    switch (entity.ObjectType)
                     {
                         case ObjectType.Document:
-                            var document = Entity as Document;
+                            var document = entity as Document;
                             await Managers.DocumentsManager.DeleteComment(document, comment);
                             CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
-                            var contact = Entity as Contact;
+                            var contact = entity as Contact;
                             await Managers.ContactsManager.DeleteComment(contact, comment);
                             break;
                         default:
@@ -226,7 +231,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                         if (t.IsFaulted)
                         {
-                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
                             await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                         }
                         else
@@ -245,15 +250,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Task.Run(async () =>
                 {
-                    switch (Entity.ObjectType)
+                    switch (entity.ObjectType)
                     {
                         case ObjectType.Document:
-                            var document = Entity as Document;
+                            var document = entity as Document;
                             await Managers.DocumentsManager.EditComment(document, newComment);
                             CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
-                            var contact = Entity as Contact;
+                            var contact = entity as Contact;
                             await Managers.ContactsManager.EditComment(contact, newComment);
                             break;
                         default:
@@ -266,7 +271,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                         if (t.IsFaulted)
                         {
-                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
                             await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                         }
                         else
@@ -288,11 +293,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [entity.Id={Entity?.Id}, addCommentText={addCommentEditText?.Text}");
+            CommonConfig.Logger.Info($"Retaining state [entity.Id={entity?.Id}, addCommentText={addCommentEditText?.Text}");
 
             return new CommentsFragmentState
             {
-                Entity = Entity,
+                Entity = entity,
                 AddCommentText = addCommentEditText.Text
             };
         }
@@ -301,7 +306,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (restoredState is CommentsFragmentState cfs)
             {
-                Entity = cfs.Entity;
+                entity = cfs.Entity;
                 addCommentEditText.Text = cfs.AddCommentText;
 
                 RefreshView();
@@ -310,7 +315,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(CommentsListFragment)} [businessEntity.Id={Entity.Id}]";
+            return $"{nameof(CommentsListFragment)} [businessEntity.Id={entity.Id}]";
         }
 
         class CommentsFragmentState : IRetainableState

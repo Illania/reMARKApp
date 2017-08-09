@@ -75,11 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
                 else
                 {
-                    dlf = new DocumentsListFragment
-                    {
-                        Folder = folder,
-                        CloseRequest = OnBackPressed
-                    };
+                    dlf = new DocumentsListFragment(folder, OnBackPressed);
                     dlfFragmentTag = dlf.GenerateTag();
                     ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                 }

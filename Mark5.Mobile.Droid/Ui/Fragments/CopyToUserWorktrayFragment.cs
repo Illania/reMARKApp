@@ -19,8 +19,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public List<IBusinessEntity> BusinessEntities { get; set; }
-        public Action CloseRequest { get; set; }
+        List<IBusinessEntity> businessEntities;
+        Action closeRequest;
 
         CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
 
@@ -35,11 +35,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
+        public CopyToUserWorktrayFragment(List<IBusinessEntity> be, Action closeRequest)
+        {
+            businessEntities = be;
+            this.closeRequest = closeRequest;
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
@@ -63,22 +69,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             copyButton.Enabled = false;
             copyButton.Click += async (sender, e) =>
             {
-                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={BusinessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={businessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
-                    await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, selectedSystemUsers.Values.ToList());
+                    await Managers.CommonActionsManager.CopyToUserWorktray(businessEntities, selectedSystemUsers.Values.ToList());
 
-                    if (CloseRequest != null)
-                        CloseRequest();
+                    if (closeRequest != null)
+                        closeRequest();
                 }
                 catch (Exception ex)
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={BusinessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]", ex);
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={businessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
@@ -96,14 +102,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={BusinessEntities?.Count}]");
+            CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={businessEntities?.Count}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -136,11 +142,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={BusinessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Count={selectedSystemUsers.Count}]...");
+            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={businessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Count={selectedSystemUsers.Count}]...");
 
             return new CopyToUserWorktrayFragmentState
             {
-                BusinessEntities = BusinessEntities,
+                BusinessEntities = businessEntities,
                 SystemUsers = adapter.Items,
                 SelectedSystemUsers = selectedSystemUsers
             };
@@ -153,7 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.businessEntities.Count={dlfs.BusinessEntities?.Count}, dlfs.systemUsers.Count={dlfs.SystemUsers?.Count}, dlfs.selectedSystemUsers.Cound={dlfs.SelectedSystemUsers?.Count}]...");
 
-                BusinessEntities = dlfs.BusinessEntities;
+                businessEntities = dlfs.BusinessEntities;
                 adapter.SetItems(dlfs.SystemUsers);
 
                 selectedSystemUsers.Clear();
