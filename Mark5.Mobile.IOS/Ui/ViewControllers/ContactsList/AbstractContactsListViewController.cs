@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using ObjCRuntime;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
@@ -42,6 +42,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         protected UIBarButtonItem LeftButton;
         protected UIBarButtonItem RightButton;
+
+        TinyMessageSubscriptionToken contactChangedToken;
+        TinyMessageSubscriptionToken categoriesChangedToken;
+        TinyMessageSubscriptionToken removedFromFolderToken;
+        TinyMessageSubscriptionToken movedFromFolderToken;
+        TinyMessageSubscriptionToken deletedToken;
 
         protected AbstractContactsListViewController(bool disableRowActions)
         {
@@ -125,6 +131,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
+            UnsubscribeToMessages();
+
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
@@ -196,10 +204,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void SubscribeToMessages()
         {
-            CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
-            CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
+            categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
+            removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
+            movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleAction);
+        }
+
+        void UnsubscribeToMessages()
+        {
+            if (categoriesChangedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityCategoriesChangedMessage>(categoriesChangedToken);
+                categoriesChangedToken = null;
+            }
+
+            if (removedFromFolderToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityRemovedFromFolderMessage>(removedFromFolderToken);
+                removedFromFolderToken = null;
+            }
+
+            if (movedFromFolderToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityMovedFromFolderMessage>(movedFromFolderToken);
+                movedFromFolderToken = null;
+            }
+
+            if (deletedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityDeletedMessage>(deletedToken);
+                deletedToken = null;
+            }
+
+            if (contactChangedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(contactChangedToken);
+                contactChangedToken = null;
+            }
+
         }
 
         void InitializeNavigationBarTitle()
@@ -697,6 +740,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Messages handlers
 
+        void HandleAction(ContactChangedMessage m)
+        {
+            UpdateContactFromList(m.ContactPreview);
+        }
+
         void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
         {
             RemoveContactsFromList(m.EntitiesId);
@@ -757,6 +805,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 if (ids.Select(id => vc.IsShowingContactWithId(id)).Any(v => v))
                     vc.ClearData();
             }
+        }
+
+        void UpdateContactFromList(ContactPreview cp)
+        {
+            if (SearchController.Active)
+                SearchResultsDataSource.UpdateItem(cp);
+
+            var ds = (DataSource)TableView.Source;
+            ds.UpdateItem(cp);
         }
 
         #endregion
@@ -930,6 +987,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 }
 
                 tableView.EndUpdates();
+            }
+
+            public void UpdateItem(ContactPreview cp)
+            {
+                var indexPath = FindItemIndexPath(cp);
+                if (indexPath != null)
+                {
+                    contactPreviewsInView[indexPath.Section][indexPath.Row] = cp;
+                    tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
             }
 
             public void Reset()

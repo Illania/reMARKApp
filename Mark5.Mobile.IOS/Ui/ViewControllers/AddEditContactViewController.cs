@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -252,6 +253,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (!dataSource.IsFormCorrect())
                 return;
 
+            if (ContactPreview.Type == ContactType.Person)
+                UpdatePersonName();
+
             var contentString = CreationModeFlag == ContactCreationModeFlag.New ? Localization.GetString("adding_contact___") : Localization.GetString("editing_contact___");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(contentString);
 
@@ -264,6 +268,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
                     CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
 
+                if (ParentContactPreview != null)
+                    CommonConfig.MessengerHub.Publish(new ChildrenContactAddedMessage(this, ParentContactPreview));
+
                 dismissAction();
                 DismissViewController(true, null);
             }
@@ -273,6 +280,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Dialogs.ShowErrorDialogAsync(this, ex);
                 CommonConfig.Logger.Error($"Error while sending/editing contact [creationMode = {CreationModeFlag}, contactId = {ContactPreview?.Id}]", ex);
             }
+        }
+
+        void UpdatePersonName()
+        {
+            var sb = new StringBuilder();
+            if (!string.IsNullOrWhiteSpace(Contact.FirstName))
+                sb.Append(Contact.FirstName);
+            if (!string.IsNullOrWhiteSpace(Contact.Patronymic))
+                sb.Append(" " + Contact.Patronymic);
+            if (!string.IsNullOrWhiteSpace(Contact.LastName))
+                sb.Append(" " + Contact.LastName);
+            ContactPreview.Name = sb.ToString();
         }
 
         #endregion

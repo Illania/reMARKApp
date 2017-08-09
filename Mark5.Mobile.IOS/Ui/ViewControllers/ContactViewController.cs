@@ -9,7 +9,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -55,7 +54,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
-        TinyMessageSubscriptionToken token;
+        TinyMessageSubscriptionToken contactChangedToken;
+        TinyMessageSubscriptionToken childrenAddedToken;
 
         public override void LoadView()
         {
@@ -402,23 +402,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            token?.Dispose();
-            token = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage);
+            contactChangedToken?.Dispose();
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage, (m) => contactPreview?.Id == m.ContactPreview.Id);
+
+            childrenAddedToken?.Dispose();
+            childrenAddedToken = CommonConfig.MessengerHub.Subscribe<ChildrenContactAddedMessage>(HandleChildrenAddedMessage, (m) => contactPreview?.Id == m.ParentContactPreview.Id);
         }
 
         void UnsubscribeFromMessages()
         {
-            if (token != null)
+            if (contactChangedToken != null)
             {
-                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(token);
-                token = null;
+                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(contactChangedToken);
+                contactChangedToken = null;
+            }
+
+            if (childrenAddedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<ChildrenContactAddedMessage>(childrenAddedToken);
+                childrenAddedToken = null;
             }
         }
 
         void HandleContactChangedMessage(ContactChangedMessage obj)
         {
-            if (contactPreview?.Id == obj.ContactPreview.Id) //TODO add on document list (and test)
-                refreshDataOnAppear = true;
+            RefreshAllOnAppear();
+        }
+
+        void HandleChildrenAddedMessage(ChildrenContactAddedMessage obj)
+        {
+            RefreshAllOnAppear();
+        }
+
+        void RefreshAllOnAppear()
+        {
+            contactId = contactPreview.Id;
+            contactPreview = null;
+            var ds = tableView?.Source as DataSource;
+            ds?.Clear();
+            refreshDataOnAppear = true;
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -522,7 +544,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var index = await Dialogs.ShowListDialogAsync(this, string.Empty, listString.ToArray(), editButtonItem);
 
-            if (index <= 0)
+            if (index < 0)
                 return;
 
             var selectedString = listString[index];
@@ -759,9 +781,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ds.StartRefresh();
 
-                if (folderId != null && contactId != null)
+                if ((folderId != null || folder != null) && contactId != null)
                 {
-                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId.Value, contactId.Value);
+                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folder == null ? folderId.Value : folder.Id, contactId.Value);
                     this.contactPreview = swp.ContactPreview;
                     contact = swp.Contact;
                 }

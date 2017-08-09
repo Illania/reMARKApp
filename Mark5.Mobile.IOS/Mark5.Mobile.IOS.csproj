@@ -283,6 +283,7 @@
 		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
 		<Compile Include="Model\HubMessages\ContactChangedMessage.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowContentTableViewCell.cs" />
+		<Compile Include="Model\HubMessages\ChildrenContactAddedMessage.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

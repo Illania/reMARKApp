@@ -78,8 +78,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             dateTextField.BecomeFirstResponder();
         }
 
-        //TODO need to find a way to have a date anyway
-
         void RefreshDate()
         {
             if (contact.BirthDateTimestamp != -6847804800000 && contact.BirthDateTimestamp != -1)
