@@ -884,12 +884,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 readonly string title;
                 readonly bool isMultiline;
+                readonly UITextAutocapitalizationType autocapitalizationType;
+                readonly UITextAutocorrectionType autocorrectionType;
 
-                protected TitledTextView(AbstractSection section, string title, bool isMultiline)
+                protected TitledTextView(AbstractSection section, string title, bool isMultiline
+                                         , UITextAutocapitalizationType autocapitalizationType,
+                                         UITextAutocorrectionType autocorrectionType)
                     : base(section)
                 {
                     this.title = title;
                     this.isMultiline = isMultiline;
+                    this.autocorrectionType = autocorrectionType;
+                    this.autocapitalizationType = autocapitalizationType;
                 }
 
                 public override string Key => TitledTextViewTableViewCell.Key;
@@ -900,6 +906,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var tfc = (TitledTextViewTableViewCell)Cell;
                     tfc.Reset();
+                    tfc.SetAutocorrectionType(autocorrectionType);
+                    tfc.SetAutocapitalizationType(autocapitalizationType);
                     tfc.SetMultiline(isMultiline);
                     tfc.SetTitle(title);
                     tfc.ContentEdited += ContentEdited;
@@ -1206,7 +1214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class DescriptionRow : TitledTextView
             {
                 public DescriptionRow(AbstractSection section)
-                    : base(section, Localization.GetString("description"), true)
+                    : base(section, Localization.GetString("description"), true, UITextAutocapitalizationType.Sentences, UITextAutocorrectionType.Default)
                 {
                 }
 
@@ -1224,7 +1232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class AccountRow : TitledTextView
             {
                 public AccountRow(AbstractSection section)
-                    : base(section, Localization.GetString("account"), false)
+                    : base(section, Localization.GetString("account"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
                 {
                 }
 
@@ -1236,7 +1244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class LedgerRow : TitledTextView
             {
                 public LedgerRow(AbstractSection section)
-                    : base(section, Localization.GetString("ledger"), false)
+                    : base(section, Localization.GetString("ledger"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
                 {
                 }
 
@@ -1248,7 +1256,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class VatRow : TitledTextView
             {
                 public VatRow(AbstractSection section)
-                    : base(section, Localization.GetString("vat"), false)
+                    : base(section, Localization.GetString("vat"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
                 {
                 }
 
@@ -1260,7 +1268,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class PositionRow : TitledTextView
             {
                 public PositionRow(AbstractSection section)
-                    : base(section, Localization.GetString("position"), false)
+                    : base(section, Localization.GetString("position"), false, UITextAutocapitalizationType.Sentences, UITextAutocorrectionType.Default)
                 {
                 }
 
@@ -1272,7 +1280,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class ShortIdRow : TitledTextView
             {
                 public ShortIdRow(AbstractSection section)
-                    : base(section, Localization.GetString("short_id"), false)
+                    : base(section, Localization.GetString("short_id"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
                 {
                 }
 
@@ -1284,7 +1292,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             class WebpageRow : TitledTextView
             {
                 public WebpageRow(AbstractSection section)
-                    : base(section, Localization.GetString("webpage"), false)
+                    : base(section, Localization.GetString("webpage"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
                 {
                 }
 

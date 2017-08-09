@@ -96,15 +96,28 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             textView.ScrollEnabled = !isMultiline;
         }
 
-        public void Reset()
+        public void SetAutocapitalizationType(UITextAutocapitalizationType type)
+        {
+            textView.AutocapitalizationType = type;
+        }
+
+        public void SetAutocorrectionType(UITextAutocorrectionType type)
+        {
+            textView.AutocorrectionType = type;
+        }
+
+        public override void Reset()
         {
             ContentEdited = delegate { };
             NewLineAdded = delegate { };
 
+            textView.AutocorrectionType = UITextAutocorrectionType.Default;
+            textView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
+
             SetErrorState(false);
 
-            SetTitle(string.Empty);
-            SetContent(string.Empty);
+            titleLabel.Text = string.Empty;
+            textView.Text = string.Empty;
         }
     }
 }

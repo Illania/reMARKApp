@@ -25,6 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 BorderStyle = UITextBorderStyle.None
             };
             textField.EditingChanged += (object sender, EventArgs e) => ContentEdited(this, textField.Text);
+            textField.AutocorrectionType = UITextAutocorrectionType.No;
 
             ContentView.AddSubview(textField);
 
@@ -47,13 +48,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             textField.Text = content;
         }
 
-        public void Reset()
+        public override void Reset()
         {
             ContentEdited = delegate { };
             SetErrorState(false);
 
-            SetPlaceholder(string.Empty);
-            SetContent(string.Empty);
+            textField.Placeholder = string.Empty;
+            textField.Text = string.Empty;
         }
     }
 }

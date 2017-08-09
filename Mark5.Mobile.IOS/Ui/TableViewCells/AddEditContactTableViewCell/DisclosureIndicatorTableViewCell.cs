@@ -84,12 +84,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             ContentLabel.Text = content;
         }
 
-        public void Reset()
+        public override void Reset()
         {
             SetErrorState(false);
 
-            SetTitle(string.Empty);
-            SetContent(string.Empty);
+            TitleLabel.Text = string.Empty;
+            ContentLabel.Text = string.Empty;
         }
     }
 }
