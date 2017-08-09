@@ -732,7 +732,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 WebPageAddress = c.WebPageAddress,
                 Account = c.Account,
                 Vat = c.Vat,
-                BirthDate = c.BirthDateTimestamp == -1 ? default(DateTime) : c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                BirthDate = (c.BirthDateTimestamp == -1 || c.BirthDateTimestamp == -6847804800000) ? default(DateTime) : c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 Ledger = c.Ledger,
                 PrimaryPerson = c.PrimaryPerson?.Convert(),
                 Children = c.Children.Select(ch => ch.Convert()).ToList(),

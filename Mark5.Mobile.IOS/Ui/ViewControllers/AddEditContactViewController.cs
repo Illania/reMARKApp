@@ -1161,7 +1161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         disableEditing = true;
 
                         if (string.IsNullOrEmpty(ContactPreview.CompanyName))
-                            throw new Exception("This should not happen!"); //TODO for testing
+                            throw new Exception("This should not happen!");
 
                         cell.SetContent(ContactPreview.CompanyName);
                     }
