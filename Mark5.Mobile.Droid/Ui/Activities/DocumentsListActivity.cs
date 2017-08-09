@@ -41,6 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var intent = new Intent(context, typeof(DocumentsListActivity));
             intent.PutExtra(FolderIntentKey,Serializer.Serialize(folder));
+
             return intent;
         }
 

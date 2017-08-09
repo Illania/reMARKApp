@@ -219,10 +219,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (notification.ObjectType == ObjectType.Shortcode)
             {
-                var i = new Intent(Activity, typeof(ShortcodeActivity));
-                i.PutExtra(ShortcodeActivity.FolderIdIntentKey, notification.FolderId);
-                i.PutExtra(ShortcodeActivity.ShortcodeIdIntentKey, notification.ObjectId);
-                StartActivity(i);
+                StartActivity(ShortcodeActivity.CreateIntent(Activity, notification.FolderId, shortcodeId: notification.ObjectId));
             }
         }
 

@@ -163,9 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
-            var i = new Intent(Activity, typeof(ShortcodeActivity));
-            i.PutExtra(ShortcodeActivity.ShortcodePreviewIntentKey, Serializer.Serialize(shortcodePreview));
-            StartActivity(i);
+            StartActivity(ShortcodeActivity.CreateIntent(Activity, shortcodePreview: shortcodePreview));
         }
 
         #endregion

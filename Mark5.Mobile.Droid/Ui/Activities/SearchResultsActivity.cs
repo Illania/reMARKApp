@@ -30,12 +30,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var intent = new Intent(context, typeof(SearchResultsActivity));
             intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+
             if (contactCriteria != null)
                 intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(contactCriteria));
+            
             if(documentCriteria != null)
                 intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(documentCriteria));
+            
             if(shortcodeCriteria != null)
                 intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(shortcodeCriteria));
+            
             return intent;
         }
 

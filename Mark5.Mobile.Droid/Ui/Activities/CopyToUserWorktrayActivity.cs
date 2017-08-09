@@ -23,8 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var intent = new Intent(context, typeof(CopyToUserWorktrayActivity));
             intent.PutExtra(BusinessEntitiesIntentKey,Serializer.Serialize(be));
-            return intent;
 
+            return intent;
         }
 
         protected override void OnCreate(Bundle savedInstanceState)

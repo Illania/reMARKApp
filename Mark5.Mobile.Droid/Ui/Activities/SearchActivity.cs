@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var intent = new Intent(context, typeof(SearchActivity));
             intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+
             return intent;
         }
 

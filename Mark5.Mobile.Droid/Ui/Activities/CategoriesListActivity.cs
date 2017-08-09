@@ -23,10 +23,13 @@ namespace Mark5.Mobile.Droid
         public static Intent CreateIntent(Context context, ContactPreview contactPreview = null, DocumentPreview documentPreview = null)
         {
             var intent = new Intent(context, typeof(CategoriesListActivity));
+
             if(contactPreview != null)
                 intent.PutExtra(BusinessEntityPreviewIntentKey,Serializer.Serialize(contactPreview));
+            
             if(documentPreview != null)
                intent.PutExtra(BusinessEntityPreviewIntentKey, Serializer.Serialize(documentPreview)); 
+            
             return intent;
         }
 

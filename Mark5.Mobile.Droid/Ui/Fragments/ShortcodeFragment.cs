@@ -131,9 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
                     return true;
                 }
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                                                                   DocumentCreationModeFlag.New,
-                                                                   CopyToNewOption.None,
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None,
                                                                    preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
                 {
                     { DocumentAddressType.To, Shortcode.Addresses.Where(a => a.Type == CommunicationAddressType.Email && a.AddressType == DocumentAddressType.To).Select(a => a.Address).ToArray() },
@@ -150,26 +148,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, 
-                                                                        (int)CopyMoveToFolderListActivity.ModeType.Copy,
-                                                                        ModuleType.Shortcodes,
-                                                                        new List<IBusinessEntity>
-													                    {
-													                        ShortcodePreview
-													                    }));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes,
+                                                                        new List<IBusinessEntity>{  ShortcodePreview  }));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity,
-				                                                        (int)CopyMoveToFolderListActivity.ModeType.Move,
-				                                                        ModuleType.Shortcodes,
-				                                                        new List<IBusinessEntity>
-				                                                        {
-				                                                                            ShortcodePreview
-				                                                        },
-                                                                        Folder));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes,
+				                                                        new List<IBusinessEntity>{  ShortcodePreview  }, Folder));
                 return true;
             }
 
@@ -323,9 +310,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
                 }
 
-                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                                                                   DocumentCreationModeFlag.New,
-                                                                   CopyToNewOption.None,
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None,
                                                                    preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>
                 {
                     { DocumentAddressType.To, new [] {e.Address} }

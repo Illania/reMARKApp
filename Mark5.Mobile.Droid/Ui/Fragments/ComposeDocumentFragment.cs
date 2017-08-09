@@ -754,8 +754,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void GetAllTemplates()
         {
-            var i = new Intent(Context, typeof(TemplatesListActivity));
-            StartActivityForResult(i, RequestCodes.TemplatePreviewRequestCode);
+            StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
         }
 
         async Task GetLocalTemplate()

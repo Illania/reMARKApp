@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var intent = new Intent(context, typeof(ObjectActionsActivity));
             intent.PutExtra(BusinessEntityIntentKey,Serializer.Serialize(businessEntity));
+
             return intent;
         }
 

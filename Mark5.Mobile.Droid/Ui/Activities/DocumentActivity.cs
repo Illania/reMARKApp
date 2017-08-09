@@ -24,19 +24,25 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Context context, string failedDocumentToUploadGuid = null, int folderId = 0, int documentId = 0, string documentPreview = null, string notificationGuid = null)
+        public static Intent CreateIntent(Context context, string failedDocumentToUploadGuid = null, int? folderId = null, int? documentId = null, string documentPreview = null, string notificationGuid = null)
         {
             var intent = new Intent(context, typeof(DocumentActivity));
+
             if (failedDocumentToUploadGuid != null)
                 intent.PutExtra(FailedDocumentToUploadGuidIntentKey, failedDocumentToUploadGuid);
-            if (folderId != 0)
-                intent.PutExtra(FolderIdIntentKey, folderId);
-            if (documentId != 0)
-                intent.PutExtra(DocumentIdIntentKey, documentId);
+            
+            if (folderId != null)
+                intent.PutExtra(FolderIdIntentKey, folderId.Value);
+            
+            if (documentId != null)
+                intent.PutExtra(DocumentIdIntentKey, documentId.Value);
+            
             if(documentPreview != null)
                 intent.PutExtra(DocumentPreviewIntentKey, documentPreview);
+            
             if (notificationGuid != null)
                 intent.PutExtra(NotificationGuidIntentKey, notificationGuid);
+            
             return intent;
         }
 

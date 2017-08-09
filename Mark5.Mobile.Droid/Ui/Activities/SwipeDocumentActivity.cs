@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V4.App;
@@ -30,6 +31,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         ViewPager pager;
 
         SwipeDocumentActivityState state;
+
+        public static Intent CreateIntent(Context context, Folder folder, DocumentPreview documentPreview)
+        {
+            var intent = new Intent(context, typeof(SwipeDocumentActivity));
+            intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+            intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+
+            return intent;    
+        }
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {

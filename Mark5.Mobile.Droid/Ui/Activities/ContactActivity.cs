@@ -23,17 +23,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Context context, int folderId = 0, Folder folder = null, int contactId = 0, ContactPreview contactPreview = null)
+        public static Intent CreateIntent(Context context, int? folderId = null, Folder folder = null, int? contactId = null, ContactPreview contactPreview = null)
         {
             var intent = new Intent(context, typeof(ContactActivity));
-            if (folderId != 0)
-                intent.PutExtra(FolderIdIntentKey, folderId);
+
+            if (folderId != null)
+                intent.PutExtra(FolderIdIntentKey, folderId.Value);
+            
             if (folder != null)
                 intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
-            if (contactId != 0)
-                intent.PutExtra(ContactIdIntentKey, contactId);
+            
+            if (contactId != null)
+                intent.PutExtra(ContactIdIntentKey, contactId.Value);
+            
             if (contactPreview != null)
                 intent.PutExtra(ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
+            
             return intent;
         }
 

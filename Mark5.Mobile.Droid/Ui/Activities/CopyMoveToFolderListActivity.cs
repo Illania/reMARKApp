@@ -35,8 +35,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             intent.PutExtra(ModeIntentKey, modeType);
             intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
             intent.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(be));
+
             if (folder != null)
                 intent.PutExtra(FromFolderIntentKey, Serializer.Serialize(folder));
+            
             return intent;     
         }
 

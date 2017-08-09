@@ -14,10 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ActionMode == null)
             {
-                var i = new Intent(Activity, typeof(ShortcodeActivity));
-                i.PutExtra(ShortcodeActivity.FolderIntentKey, Serializer.Serialize(Folder));
-                i.PutExtra(ShortcodeActivity.ShortcodePreviewIntentKey, Serializer.Serialize(shortcodePreview));
-                StartActivity(i);
+                StartActivity(ShortcodeActivity.CreateIntent(Activity, folder: Folder, shortcodePreview: shortcodePreview));
             }
             else
             {

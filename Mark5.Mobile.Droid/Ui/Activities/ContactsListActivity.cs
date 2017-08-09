@@ -30,6 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var intent = new Intent(context, typeof(ContactsListActivity));
             intent.PutExtra(FolderIntentKey,Serializer.Serialize(folder));
+
             return intent;
         }
 

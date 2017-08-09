@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -23,6 +24,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityMovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
+
+        public static Intent CreateIntent(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(ShortcodesListActivity));
+            intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
