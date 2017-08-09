@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using Android.Content;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -8,6 +8,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsListFragment : AbstractContactsListFragment
     {
+        public ContactsListFragment(Folder folder, Action closeRequest)
+        {
+            Folder = folder;
+            CloseRequest = closeRequest;
+        }
+
         #region Adapter callbacks
 
         protected override void Adapter_ItemClicked(object sender, ContactPreview contactPreview)

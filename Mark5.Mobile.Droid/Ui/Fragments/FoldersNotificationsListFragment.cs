@@ -120,10 +120,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 switch (position)
                 {
                     case 0:
-                        return new FoldersListFragment
-                        {
-                            RemoteFolder = folder
-                        };
+                        return new FoldersListFragment(folder);
                     case 1:
                         return new NotificationsListFragment
                         {

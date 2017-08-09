@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public Folder RemoteFolder { get; set; }
+        protected Folder RemoteFolder;
         protected bool HideSearch;
 
         protected View Container;
@@ -47,6 +47,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected virtual bool LoadRemoteFromCache { get; }
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
+
+        public FoldersListFragment(Folder remoteFolder = null, bool? hideSearch = null)
+        {
+            if (remoteFolder != null)
+                RemoteFolder = remoteFolder;
+            if (hideSearch != null)
+                HideSearch = hideSearch.Value;
+        }
 
         #region Overrides
 
@@ -345,11 +353,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new FoldersListFragment
-            {
-                RemoteFolder = folder,
-                HideSearch = HideSearch
-            };
+            return new FoldersListFragment(folder, HideSearch);
         }
 
         #endregion

@@ -12,6 +12,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerContactsListFragment : AbstractContactsListFragment
     {
+        public PickerContactsListFragment(Folder folder)
+        {
+            Folder = folder;
+        }
+
         #region Adapter callbacks
 
         protected override async void Adapter_ItemClicked(object sender, ContactPreview contactPreview)

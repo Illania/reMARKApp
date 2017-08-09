@@ -20,9 +20,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override bool LoadRemoteFromCache => true;
 
-        public List<IBusinessEntity> BusinessEntities { get; set; }
-        public Folder FromFolder { get; set; }
-        public ActionType Type { get; set; }
+        List<IBusinessEntity> businessEntities;
+        Folder fromFolder;
+        ActionType type;
+
+        public CopyMoveToFolderListFragment(Folder remoteFolder = null, List<IBusinessEntity> businessEntities = null, Folder fromFolder = null, ActionType? actionType = null)
+        {
+            if (remoteFolder != null)
+                RemoteFolder = remoteFolder;
+            if (businessEntities != null)
+                this.businessEntities = businessEntities;
+            if (fromFolder != null)
+                this.fromFolder = fromFolder;
+            if (actionType != null)
+                type = (ActionType)actionType;
+        }
 
         protected override void SetSections()
         {
@@ -47,17 +59,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new CopyMoveToFolderListFragment
             {
-                BusinessEntities = BusinessEntities,
-                FromFolder = FromFolder,
+                businessEntities = businessEntities,
+                fromFolder = fromFolder,
                 RemoteFolder = folder,
-                Type = Type
+                type = type
             };
         }
 
         protected override async void Adapter_ItemClicked(object sender, int position)
         {
             var toFolder = CurrentAdapter.GetItemAtPosition(position);
-            if (Type == ActionType.Copy)
+            if (type == ActionType.Copy)
                 await CopyBusinessEntityToFolder(toFolder);
             else
                 await MoveBusinessEntityToFolder(toFolder);
@@ -72,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var title = GetString(Resource.String.confirm_move_to_folder);
 
             var resourceId = 0;
-            switch (BusinessEntities.First().ObjectType)
+            switch (businessEntities.First().ObjectType)
             {
                 case ObjectType.Document:
                     resourceId = Resource.Plurals.confirm_move_to_folder_documents;
@@ -88,22 +100,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
 
-            var content = Resources.GetQuantityString(resourceId, BusinessEntities.Count, toFolder.Name);
+            var content = Resources.GetQuantityString(resourceId, businessEntities.Count, toFolder.Name);
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
             if (!confirmed)
                 return;
 
-            CommonConfig.Logger.Info($"Moving business entity to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities.First().ObjectType}, toFolder.Id={toFolder?.Id}, fromFolder.Id={FromFolder?.Id}]");
+            CommonConfig.Logger.Info($"Moving business entity to folder [businessEntities.Count={businessEntities?.Count}, businessEntity.Type={businessEntities.First().ObjectType}, toFolder.Id={toFolder?.Id}, fromFolder.Id={fromFolder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.moving_to_folder, Resource.String.please_wait);
 
             try
             {
-                await Managers.CommonActionsManager.MoveToFolder(BusinessEntities, FromFolder, toFolder);
-                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, BusinessEntities.First().ObjectType, FromFolder.Id, BusinessEntities.Select(b => b.Id).ToList()));
+                await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, toFolder);
+                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while moving business entity to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities?.First().ObjectType}, toFolder.Id={toFolder?.Id}, fromFolder.Id={FromFolder?.Id}]", ex);
+                CommonConfig.Logger.Error($"Error while moving business entity to folder [businessEntities.Count={businessEntities?.Count}, businessEntity.Type={businessEntities?.First().ObjectType}, toFolder.Id={toFolder?.Id}, fromFolder.Id={fromFolder?.Id}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -120,7 +132,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var title = Resources.GetString(Resource.String.confirm_copy_to_folder);
 
             var resourceId = 0;
-            switch (BusinessEntities.First().ObjectType)
+            switch (businessEntities.First().ObjectType)
             {
                 case ObjectType.Document:
                     resourceId = Resource.Plurals.confirm_copy_to_folder_documents;
@@ -135,22 +147,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     throw new ArgumentException("Object type not supported!");
             }
 
-            var content = Resources.GetQuantityString(resourceId, BusinessEntities.Count, folder.Name);
+            var content = Resources.GetQuantityString(resourceId, businessEntities.Count, folder.Name);
             var confirmed = await Dialogs.ShowYesNoDialogAsync(Context, title, content);
 
             if (!confirmed)
                 return;
 
-            CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntities.Type={BusinessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
+            CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);
 
             try
             {
-                await Managers.CommonActionsManager.CopyToFolder(BusinessEntities, folder);
+                await Managers.CommonActionsManager.CopyToFolder(businessEntities, folder);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={BusinessEntities?.Count}, businessEntities.Type={BusinessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
+                CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -166,22 +178,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return base.GenerateTag() + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={BusinessEntities.Count}, businessEntity.Type={BusinessEntities.First().ObjectType}, fromFolder.Id={FromFolder?.Id ?? -1}]";
+            return base.GenerateTag() + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={businessEntities.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id ?? -1}]";
         }
 
         public override IRetainableState OnRetainInstanceState()
         {
             var baseState = base.OnRetainInstanceState() as FolderListFragmentState;
 
-            CommonConfig.Logger.Info($"Retaining state: [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities.First().ObjectType}, fromFolder.Id={FromFolder?.Id}]");
+            CommonConfig.Logger.Info($"Retaining state: [businessEntities.Count={businessEntities?.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id}]");
 
             return new MoveToFolderListFragmentState
             {
                 Folder = baseState.Folder,
                 SelectedItemPositions = baseState.SelectedItemPositions,
-                BusinessEntities = BusinessEntities,
-                FromFolder = FromFolder,
-                Type = Type
+                BusinessEntities = businessEntities,
+                FromFolder = fromFolder,
+                Type = type
             };
         }
 
@@ -191,10 +203,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (restoredState is MoveToFolderListFragmentState flfs)
             {
-                BusinessEntities = flfs.BusinessEntities;
-                FromFolder = flfs.FromFolder;
-                Type = flfs.Type;
-                CommonConfig.Logger.Info($"Restored state state: [businessEntities.Count={BusinessEntities?.Count}, businessEntity.Type={BusinessEntities?.First().ObjectType}, fromFolder.Id={FromFolder?.Id}]");
+                businessEntities = flfs.BusinessEntities;
+                fromFolder = flfs.FromFolder;
+                type = flfs.Type;
+                CommonConfig.Logger.Info($"Restored state state: [businessEntities.Count={businessEntities?.Count}, businessEntity.Type={businessEntities?.First().ObjectType}, fromFolder.Id={fromFolder?.Id}]");
             }
         }
 

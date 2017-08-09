@@ -7,10 +7,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerContactFolderListFragment : FoldersListFragment
     {
-        public PickerContactFolderListFragment()
+        public PickerContactFolderListFragment(Folder remoteFolder = null, bool? hideSearch = null)
         {
-            RemoteFolder = Folder.RootForModule(ModuleType.Contacts);
-            HideSearch = true;
+            if (remoteFolder != null)
+                RemoteFolder = remoteFolder;
+            if (hideSearch != null)
+                HideSearch = hideSearch.Value;
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
@@ -26,10 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new PickerContactFolderListFragment
-            {
-                RemoteFolder = folder,
-            };
+            return new PickerContactFolderListFragment(folder);
         }
     }
 }

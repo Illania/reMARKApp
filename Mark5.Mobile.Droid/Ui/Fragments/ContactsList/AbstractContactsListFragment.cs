@@ -32,8 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int SaveOfflineRequest = 1;
         }
 
-        public Folder Folder { get; set; }
-        public Action CloseRequest { get; set; }
+        internal Folder Folder { get; set; }
+        protected Action CloseRequest { get; set; }
 
         bool refreshing;
 

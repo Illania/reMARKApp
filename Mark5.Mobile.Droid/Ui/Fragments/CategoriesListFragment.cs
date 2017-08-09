@@ -20,10 +20,10 @@ namespace Mark5.Mobile.Droid
 {
     public class CategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public BusinessEntityPreview BusinessEntityPreview { get; set; }
-        public Action CloseRequest { get; set; }
-
         public List<Category> Categories => adapter.Items;
+
+        BusinessEntityPreview businessEntityPreview { get; set; }
+        Action closeRequest { get; set; }
 
         RecyclerView recyclerView;
         SearchView searchView;
@@ -33,9 +33,15 @@ namespace Mark5.Mobile.Droid
 
         readonly Handler searchHandler = new Handler();
 
+        public CategoriesListFragment(BusinessEntityPreview businessEntityPreview, Action closeRequest)
+        {
+            this.businessEntityPreview = businessEntityPreview;
+            this.closeRequest = closeRequest;
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Creating {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -74,7 +80,7 @@ namespace Mark5.Mobile.Droid
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.categories);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
         }
 
         public override void OnResume()
@@ -83,7 +89,7 @@ namespace Mark5.Mobile.Droid
 
             if (adapter.ItemCount < 1)
             {
-                CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+                CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
                 RefreshView();
             }
         }
@@ -108,8 +114,8 @@ namespace Mark5.Mobile.Droid
             {
                 var clf = new EditCategoriesListFragment
                 {
-                    BusinessEntityPreview = BusinessEntityPreview,
-                    CloseRequest = CloseRequest
+                    BusinessEntityPreview = businessEntityPreview,
+                    CloseRequest = closeRequest
                 };
 
                 var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
@@ -125,14 +131,14 @@ namespace Mark5.Mobile.Droid
 
         void RefreshView()
         {
-            switch (BusinessEntityPreview.ObjectType)
+            switch (businessEntityPreview.ObjectType)
             {
                 case ObjectType.Document:
-                    var documentPreview = BusinessEntityPreview as DocumentPreview;
+                    var documentPreview = businessEntityPreview as DocumentPreview;
                     adapter.SetItems(documentPreview.Categories);
                     break;
                 case ObjectType.Contact:
-                    var contactPreview = BusinessEntityPreview as ContactPreview;
+                    var contactPreview = businessEntityPreview as ContactPreview;
                     adapter.SetItems(contactPreview.Categories);
                     break;
                 default:
@@ -205,7 +211,7 @@ namespace Mark5.Mobile.Droid
         {
             return new CategoriesListFragmentState
             {
-                BusinessEntityPreview = BusinessEntityPreview
+                BusinessEntityPreview = businessEntityPreview
             };
         }
 
@@ -213,12 +219,12 @@ namespace Mark5.Mobile.Droid
         {
             var clfs = restoredState as CategoriesListFragmentState;
             if (clfs != null)
-                BusinessEntityPreview = clfs.BusinessEntityPreview;
+                businessEntityPreview = clfs.BusinessEntityPreview;
         }
 
         public override string GenerateTag()
         {
-            return $"{nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]";
+            return $"{nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview.Id}, businessEntity.objectType={businessEntityPreview.ObjectType}]";
         }
 
         class CategoriesListFragmentState : IRetainableState

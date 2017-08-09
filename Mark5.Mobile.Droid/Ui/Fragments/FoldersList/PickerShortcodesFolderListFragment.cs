@@ -6,10 +6,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerShortcodesFolderListFragment : FoldersListFragment
     {
-        public PickerShortcodesFolderListFragment()
+        public PickerShortcodesFolderListFragment(Folder remoteFolder = null, bool? hideSearch = null)
         {
-            RemoteFolder = Folder.RootForModule(ModuleType.Shortcodes);
-            HideSearch = true;
+            if (remoteFolder != null)
+                RemoteFolder = remoteFolder;
+            if (hideSearch != null)
+                HideSearch = hideSearch.Value;
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
@@ -25,10 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new PickerShortcodesFolderListFragment
-            {
-                RemoteFolder = folder,
-            };
+            return new PickerShortcodesFolderListFragment(folder);
         }
     }
 }

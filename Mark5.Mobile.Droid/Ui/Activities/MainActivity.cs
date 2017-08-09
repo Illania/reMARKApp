@@ -357,10 +357,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         RemoteFolder = Folder.RootForModule(ModuleType)
                     };
                 else if (ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
-                    f = new FoldersListFragment
-                    {
-                        RemoteFolder = Folder.RootForModule(ModuleType)
-                    };
+                    f = new FoldersListFragment(Folder.RootForModule(ModuleType));
 
                 var tag = f.GenerateTag();
                 var ft = fm.BeginTransaction();
