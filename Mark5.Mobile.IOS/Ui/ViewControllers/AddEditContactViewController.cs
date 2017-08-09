@@ -331,6 +331,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             Dictionary<NSIndexPath, nfloat> cellHeights = new Dictionary<NSIndexPath, nfloat>();
 
+            BirthdateSection birthdateSection;
+
             public DataSource(AddEditContactViewController viewController, UITableView tableView)
             {
                 ViewController = viewController;
@@ -340,13 +342,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void InitializeSections()
             {
+                birthdateSection = new BirthdateSection(this);
+
                 var sectionsToInsert = new List<AbstractSection> {
                     new GeneralSection(this),
                     new EmailAddressesSection(this),
                     new PhoneNumbersSection(this, CommunicationAddressType.Phone),
                     new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
                     new PhysicalAddressesSection(this),
-                    new BirthdateSection(this),
+                    birthdateSection,
                     new AdditionalSection(this)
                 };
 
@@ -354,10 +358,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     sections.Add(section);
                 }
-
-                TableView.BeginUpdates();
-                TableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Fade);
-                TableView.EndUpdates();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -438,6 +438,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void Refresh(Contact contact, ContactPreview contactPreview, ContactPreview parentContactPreview,
                                 ContactCreationModeFlag creationMode, bool parentPreselected)
             {
+                if (contactPreview.Type != ContactType.Person)
+                    sections.Remove(birthdateSection);
+
                 foreach (var section in sections)
                 {
                     section.Contact = contact;
