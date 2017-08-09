@@ -100,13 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         void OpenDateRangeFragment(bool startWithTo)
         {
-            var f = new PickDateRangeFragment
-            {
-                FromTimestamp = fromTimestamp,
-                ToTimestamp = toTimestamp,
-                StartWithToDate = startWithTo,
-                CloseRequest = UpdateTimestamps,
-            };
+            var f = new PickDateRangeFragment(fromTimestamp, toTimestamp, startWithTo, UpdateTimestamps);
             parentFragment.ReplaceFragment(f, f.GenerateTag());
         }
 

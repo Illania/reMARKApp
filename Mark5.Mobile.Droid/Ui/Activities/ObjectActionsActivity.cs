@@ -45,10 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var be = Serializer.Deserialize<IBusinessEntity>(Intent.Extras.GetString(BusinessEntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var oaf = new ObjectActionsFragment
-                {
-                    BusinessEntity = be
-                };
+                var oaf = new ObjectActionsFragment(be);
                 ft.Replace(Resource.Id.fragment_container, oaf, oaf.GenerateTag());
                 ft.Commit();
 

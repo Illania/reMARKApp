@@ -18,8 +18,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         LinesListViewAdapter adapter;
 
-        public List<Guid> SelectedLinesGuid { get; set; }
-        public Action<List<Guid>> CloseRequest { get; set; }
+        List<Guid> selectedLinesGuid;
+        Action<List<Guid>> closeRequest;
+
+        public PickLinesListFragment(List<Guid> selectedLinesGuid, Action<List<Guid>> closeRequest)
+        {
+            this.selectedLinesGuid = selectedLinesGuid;
+            this.closeRequest = closeRequest;
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -62,7 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void RefreshData()
         {
             var availableLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
-            adapter.SetSelectedLinesGuid(SelectedLinesGuid);
+            adapter.SetSelectedLinesGuid(selectedLinesGuid);
             adapter.SetItems(availableLines);
         }
 
@@ -86,8 +92,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (CloseRequest != null)
-                CloseRequest(adapter.SelectedLinesGuid);
+            if (closeRequest != null)
+                closeRequest(adapter.SelectedLinesGuid);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 
@@ -105,7 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-                SelectedLinesGuid = clfs.SelectedLinesGuid;
+                selectedLinesGuid = clfs.SelectedLinesGuid;
         }
 
         public override string GenerateTag()

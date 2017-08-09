@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class NotificationsListFragment : RetainableStateFragment
     {
-        public ObjectType[] ObjectTypes { get; set; }
+        ObjectType[] objectTypes;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -32,6 +32,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         TinyMessageSubscriptionToken newNotificationsToken;
 
         Func<Notification, bool> unreadFilter = (n) => !n.IsRead;
+
+        public NotificationsListFragment(ObjectType[] objectTypes)
+        {
+            this.objectTypes = objectTypes;
+        }
 
         #region Fragment overrides
 
@@ -143,7 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return new NotificationsFragmentState
             {
-                ObjectTypes = ObjectTypes,
+                ObjectTypes = objectTypes,
                 Notifications = adapter.Items
             };
         }
@@ -155,7 +160,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.items.count={dlfs.Notifications?.Count}]...");
 
-                ObjectTypes = dlfs.ObjectTypes;
+                objectTypes = dlfs.ObjectTypes;
                 adapter.AppendItems(dlfs.Notifications);
             }
         }
@@ -178,7 +183,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Refreshing = true;
 
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
-                notifications = notifications.Where(n => ObjectTypes.Contains(n.ObjectType)).ToList();
+                notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
 
                 adapter.Clear();
                 adapter.AppendItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);

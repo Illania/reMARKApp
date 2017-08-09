@@ -16,12 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         protected override void ClickAction()
         {
-            var pllf = new PickLinesListFragment
-            {
-                SelectedLinesGuid = selectedLineGuids,
-                CloseRequest = UpdateLines,
-            };
-
+            var pllf = new PickLinesListFragment(selectedLineGuids, UpdateLines);
             ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
         }
 

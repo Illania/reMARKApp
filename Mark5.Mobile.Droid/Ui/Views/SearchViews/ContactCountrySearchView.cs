@@ -15,11 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         protected override void ClickAction()
         {
-            var pllf = new PickCountryFragment
-            {
-                CloseRequest = UpdateCountryCode
-            };
-
+            var pllf = new PickCountryFragment(UpdateCountryCode);
             ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
         }
 

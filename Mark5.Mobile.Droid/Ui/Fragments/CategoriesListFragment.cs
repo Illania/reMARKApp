@@ -112,11 +112,7 @@ namespace Mark5.Mobile.Droid
         {
             if (item.ItemId == 10)
             {
-                var clf = new EditCategoriesListFragment
-                {
-                    BusinessEntityPreview = businessEntityPreview,
-                    CloseRequest = closeRequest
-                };
+                var clf = new EditCategoriesListFragment(businessEntityPreview, closeRequest);
 
                 var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);

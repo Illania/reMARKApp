@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Android.Content;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -12,7 +11,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -20,18 +18,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesSearchResultsFragment : RetainableStateFragment
     {
-        public SearchShortcodesCriteria Criteria { get; set; }
-        public Action CloseRequest { get; set; }
+        SearchShortcodesCriteria criteria;
+        Action closeRequest;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ShortcodeSearchResultsAdapter adapter;
 
+        public ShortcodesSearchResultsFragment(SearchShortcodesCriteria criteria, Action closeRequest)
+        {
+            this.criteria = criteria;
+            this.closeRequest = closeRequest;
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -57,14 +61,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes_result);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchResultsFragment)} [criteria={Criteria}]");
+            CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(ShortcodesSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -78,7 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(ShortcodesSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]...");
         }
 
         #endregion
@@ -87,11 +91,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [criteria={Criteria}, shortcodePreviews.Count={adapter?.ItemCount}]...");
+            CommonConfig.Logger.Info($"Retaining state [criteria={criteria}, shortcodePreviews.Count={adapter?.ItemCount}]...");
 
             return new ShortcodeSearchResultsFragmentState
             {
-                Criteria = Criteria,
+                Criteria = criteria,
                 ShortcodePreviews = adapter.Items
             };
         }
@@ -103,7 +107,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.ShortcodePreviews?.Count}]...");
 
-                Criteria = dlfs.Criteria;
+                criteria = dlfs.Criteria;
                 adapter.AppendItems(dlfs.ShortcodePreviews);
             }
         }
@@ -125,13 +129,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                var shortcodePreviews = await Managers.SearchManager.SearchShortcodesAsync(Criteria);
+                var shortcodePreviews = await Managers.SearchManager.SearchShortcodesAsync(criteria);
 
                 if (shortcodePreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_shortcodes);
-                    if (CloseRequest != null)
-                        CloseRequest();
+                    if (closeRequest != null)
+                        closeRequest();
                     return;
                 }
 
@@ -142,12 +146,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading shortcodes failed [criteria={Criteria}]", ex);
+                CommonConfig.Logger.Error($"Downloading shortcodes failed [criteria={criteria}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                if (closeRequest != null)
+                    closeRequest();
             }
             finally
             {

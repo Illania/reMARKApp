@@ -18,8 +18,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         PrioritiesListViewAdapter adapter;
 
-        public List<Priority> SelectedPriorities { get; set; }
-        public Action<List<Priority>> CloseRequest { get; set; }
+        List<Priority> selectedPriorities;
+        Action<List<Priority>> closeRequest;
+
+        public PickPrioritiesListFragment(List<Priority> selectedPriorities, Action<List<Priority>> closeRequest)
+        {
+            this.selectedPriorities = selectedPriorities;
+            this.closeRequest = closeRequest;
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -67,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Priority.Normal,
                 Priority.Low
             };
-            adapter.SetSelectedPriorities(SelectedPriorities);
+            adapter.SetSelectedPriorities(selectedPriorities);
             adapter.SetItems(priorities);
         }
 
@@ -91,8 +97,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (CloseRequest != null)
-                CloseRequest(adapter.SelectedPriorities);
+            if (closeRequest != null)
+                closeRequest(adapter.SelectedPriorities);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 
@@ -110,7 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-                SelectedPriorities = clfs.SelectedPriorities;
+                selectedPriorities = clfs.SelectedPriorities;
         }
 
         public override string GenerateTag()

@@ -352,10 +352,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 RetainableStateFragment f = null;
 
                 if (ModuleType == ModuleType.Documents)
-                    f = new FoldersNotificationsListFragment
-                    {
-                        RemoteFolder = Folder.RootForModule(ModuleType)
-                    };
+                    f = new FoldersNotificationsListFragment(Folder.RootForModule(ModuleType));
                 else if (ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
                     f = new FoldersListFragment(Folder.RootForModule(ModuleType));
 

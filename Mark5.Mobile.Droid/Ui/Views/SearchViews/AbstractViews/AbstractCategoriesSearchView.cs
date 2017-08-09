@@ -19,13 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         protected override void ClickAction()
         {
-            var pclf = new PickCategoriesListFragment
-            {
-                ObjectType = objectType,
-                PreselectedCategoryIds = selectedCategoryIds.ToArray(),
-                CloseRequest = UpdateCategories
-            };
-
+            var pclf = new PickCategoriesListFragment(objectType, selectedCategoryIds.ToArray(), UpdateCategories);
             ParentFragment.ReplaceFragment(pclf, pclf.GenerateTag());
         }
 

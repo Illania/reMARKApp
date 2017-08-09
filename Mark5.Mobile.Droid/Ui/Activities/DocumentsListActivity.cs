@@ -66,10 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 if (folder.Local && folder.Id == Folder.LocalRootForModule(ModuleType.Documents).SubFolders[0].Id)
                 {
-                    odlf = new DocumentsToUploadListFragment
-                    {
-                        CloseRequest = OnBackPressed
-                    };
+                    odlf = new DocumentsToUploadListFragment(OnBackPressed);
                     dtuFragmentTag = odlf.GenerateTag();
                     ft.Replace(Resource.Id.fragment_container, odlf, dtuFragmentTag);
                 }

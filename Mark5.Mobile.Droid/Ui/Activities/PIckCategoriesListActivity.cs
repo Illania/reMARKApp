@@ -44,18 +44,14 @@ namespace Mark5.Mobile.Droid
                 var ot = (ObjectType) Intent.Extras.GetInt(ObjectTypeIntentKey);
                 var pci = Intent.Extras.GetIntArray(PreselectedCategoryIdsIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
-                var pclf = new PickCategoriesListFragment
+                var pclf = new PickCategoriesListFragment(ot, pci, categories => 
                 {
-                    ObjectType = ot,
-                    PreselectedCategoryIds = pci,
-                    CloseRequest = categories =>
-                    {
-                        var intent = new Intent();
-                        intent.PutExtra(CategoriesResultKey, Serializer.Serialize(categories));
-                        SetResult(Result.Ok, intent);
-                        OnBackPressed();
-                    }
-                };
+                    var intent = new Intent();
+                    intent.PutExtra(CategoriesResultKey, Serializer.Serialize(categories));
+                    SetResult(Result.Ok, intent);
+                    OnBackPressed();
+                });
+
                 ft.Replace(Resource.Id.fragment_container, pclf, pclf.GenerateTag());
                 ft.Commit();
 

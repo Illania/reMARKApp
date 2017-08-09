@@ -17,7 +17,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         CountriesListViewAdapter adapter;
 
-        public Action<int> CloseRequest { get; set; }
+        Action<int> closeRequest;
+
+        public PickCountryFragment(Action<int> closeRequest)
+        {
+            this.closeRequest = closeRequest;
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -64,8 +69,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void CountrySelected(CountryInfo c)
         {
-            if (CloseRequest != null)
-                CloseRequest(c.FaxPrefix);
+            if (closeRequest != null)
+                closeRequest(c.FaxPrefix);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 

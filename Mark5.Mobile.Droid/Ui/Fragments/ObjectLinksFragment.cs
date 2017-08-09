@@ -22,9 +22,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectLinksFragment : RetainableStateFragment
     {
-        public IBusinessEntity BusinessEntity { get; set; }
-
         public Action CloseRequest { get; set; }
+
+        IBusinessEntity businessEntity;
 
         List<ObjectLink> objectLinks;
 
@@ -32,9 +32,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
+        public ObjectLinksFragment(IBusinessEntity businessEntity)
+        {
+            this.businessEntity = businessEntity;
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
@@ -55,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.links);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
         }
 
         public override async void OnResume()
@@ -71,7 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (objectLinks == null)
                 {
-                    objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(BusinessEntity);
+                    objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(businessEntity);
                     ProcessObjectLinks(objectLinks);
                 }
 
@@ -79,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading object actions failed [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]", ex);
+                CommonConfig.Logger.Error($"Downloading object actions failed [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -169,7 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new ObjectLinksFragmentState
             {
-                BusinessEntity = BusinessEntity,
+                BusinessEntity = businessEntity,
                 ObjectLinks = objectLinks
             };
         }
@@ -179,14 +184,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var oafs = restoredState as ObjectLinksFragmentState;
             if (oafs != null)
             {
-                BusinessEntity = oafs.BusinessEntity;
+                businessEntity = oafs.BusinessEntity;
                 objectLinks = oafs.ObjectLinks;
             }
         }
 
         public override string GenerateTag()
         {
-            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity?.objectType={BusinessEntity.ObjectType}]";
+            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
         }
 
         class ObjectLinksFragmentState : IRetainableState

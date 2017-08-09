@@ -23,13 +23,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         bool refreshing;
 
-        public Action CloseRequest { get; set; }
+        Action closeRequest;
 
         RecyclerView recyclerView;
         DocumentsToUploadListAdapter adapter;
         ActionMode actionMode;
 
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
+
+        public DocumentsToUploadListFragment(Action closeRequest)
+        {
+            this.closeRequest = closeRequest;
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -120,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                CloseRequest?.Invoke();
+                closeRequest?.Invoke();
             }
             finally
             {

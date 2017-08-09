@@ -25,8 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentsSearchResultsFragment : RetainableStateFragment
     {
-        public SearchDocumentsCriteria Criteria { get; set; }
-        public Action CloseRequest { get; set; }
+        public SearchDocumentsCriteria criteria;
+        public Action closeRequest;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -34,11 +34,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool shouldNotifyAdapter;
 
+        public DocumentsSearchResultsFragment(SearchDocumentsCriteria criteria, Action closeRequest)
+        {
+            this.criteria = criteria;
+            this.closeRequest = closeRequest;
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -64,14 +70,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -91,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
         }
 
         #endregion
@@ -100,11 +106,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [criteria={Criteria}, documentPreviews.Count={adapter?.ItemCount}]...");
+            CommonConfig.Logger.Info($"Retaining state [criteria={criteria}, documentPreviews.Count={adapter?.ItemCount}]...");
 
             return new DocumentSearchResultsFragmentState
             {
-                Criteria = Criteria,
+                Criteria = criteria,
                 DocumentPreviews = adapter.Items
             };
         }
@@ -116,7 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.DocumentPreviews?.Count}]...");
 
-                Criteria = dlfs.Criteria;
+                criteria = dlfs.Criteria;
                 adapter.AppendItems(dlfs.DocumentPreviews);
             }
         }
@@ -138,13 +144,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                var documentPreviews = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
+                var documentPreviews = await Managers.SearchManager.SearchDocumentsAsync(criteria);
 
                 if (documentPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_documents);
-                    if (CloseRequest != null)
-                        CloseRequest();
+                    if (closeRequest != null)
+                        closeRequest();
                     return;
                 }
 
@@ -155,12 +161,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading documents failed [criteria={Criteria}]", ex);
+                CommonConfig.Logger.Error($"Downloading documents failed [criteria={criteria}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                if (closeRequest != null)
+                    closeRequest();
             }
             finally
             {

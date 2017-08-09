@@ -15,12 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         protected override void ClickAction()
         {
-            var pllf = new PickPrioritiesListFragment
-            {
-                SelectedPriorities = selectedPriorities,
-                CloseRequest = UpdatePriorities
-            };
-
+            var pllf = new PickPrioritiesListFragment(selectedPriorities, UpdatePriorities);
             ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
         }
 

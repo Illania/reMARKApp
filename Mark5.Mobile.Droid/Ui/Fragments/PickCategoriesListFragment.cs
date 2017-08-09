@@ -20,9 +20,9 @@ namespace Mark5.Mobile.Droid
 {
     public class PickCategoriesListFragment : RetainableStateFragment
     {
-        public ObjectType ObjectType { get; set; }
-        public int[] PreselectedCategoryIds { get; set; }
-        public Action<List<Category>> CloseRequest { get; set; }
+        ObjectType objectType;
+        int[] preselectedCategoryIds;
+        Action<List<Category>> closeRequest;
 
         CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
 
@@ -32,10 +32,16 @@ namespace Mark5.Mobile.Droid
 
         readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
 
+        public PickCategoriesListFragment(ObjectType objectType, int[] preselectedCategoryIds, Action<List<Category>> closeRequest)
+        {
+            this.objectType = objectType;
+            this.preselectedCategoryIds = preselectedCategoryIds;
+            this.closeRequest = closeRequest;
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
+            CommonConfig.Logger.Info($"Creating {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -62,7 +68,7 @@ namespace Mark5.Mobile.Droid
 
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
 
-            CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
         }
 
         public override async void OnResume()
@@ -71,7 +77,7 @@ namespace Mark5.Mobile.Droid
 
             if (adapter.ItemCount < 1)
             {
-                CommonConfig.Logger.Info($"Refreshing {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
+                CommonConfig.Logger.Info($"Refreshing {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
                 await RefreshData();
             }
         }
@@ -101,8 +107,8 @@ namespace Mark5.Mobile.Droid
 
         void CloseFragment()
         {
-            if (CloseRequest != null)
-                CloseRequest(selectedCategories.Values.ToList());
+            if (closeRequest != null)
+                closeRequest(selectedCategories.Values.ToList());
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 
@@ -117,7 +123,7 @@ namespace Mark5.Mobile.Droid
                 refreshLayout.Refreshing = true;
 
                 List<Category> availableCategories;
-                switch (ObjectType)
+                switch (objectType)
                 {
                     case ObjectType.Document:
                         availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
@@ -130,14 +136,14 @@ namespace Mark5.Mobile.Droid
                 }
 
                 foreach (var category in availableCategories)
-                    if (PreselectedCategoryIds.Contains(category.Id))
+                    if (preselectedCategoryIds.Contains(category.Id))
                         ToggleSelected(category);
 
                 adapter.SetItems(availableCategories);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while retrieving available categories [objectType={ObjectType}]", ex);
+                CommonConfig.Logger.Error($"Error while retrieving available categories [objectType={objectType}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -194,7 +200,7 @@ namespace Mark5.Mobile.Droid
 
         public override string GenerateTag()
         {
-            return $"{nameof(PickCategoriesListFragment)} [objectType={ObjectType}]";
+            return $"{nameof(PickCategoriesListFragment)} [objectType={objectType}]";
         }
 
         class AvailableCategoriesListFragmentState : IRetainableState
