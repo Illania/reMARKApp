@@ -542,7 +542,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 listString.Add(Localization.GetString("add_department"));
             }
 
-            var index = await Dialogs.ShowListDialogAsync(this, string.Empty, listString.ToArray(), editButtonItem);
+            var index = await Dialogs.ShowListDialogAsync(this, null, listString.ToArray(), editButtonItem);
 
             if (index < 0)
                 return;
