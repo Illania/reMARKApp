@@ -93,6 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             ContentView.Add(zipTextField);
             ContentView.AddConstraints(new[]
             {
+                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 55f),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
@@ -137,7 +138,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 TintColor = UIColor.Clear,
-                Text = Localization.GetString("country"), //TODO need to have one
+                Text = Localization.GetString("country"),
                 InputView = countryPicker,
                 InputAccessoryView = countryPickerToolbar,
             };
@@ -233,11 +234,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         void UpdatePrefix()
         {
-            if (address.Country != null)
-                countryTextField.Text = $"+{address.Country.FaxPrefix}";
-            else
-                countryTextField.Text = Localization.GetString("country");
+            address.Country = address.Country ?? countrySource.CountryByPrefix(0);
 
+            countryTextField.Text = $"+{address.Country.FaxPrefix}";
             countryTextField.SizeToFit();
             var width = countryTextField.IntrinsicContentSize.Width;
             countryWidthConstraint.Constant = width + 5.0f;

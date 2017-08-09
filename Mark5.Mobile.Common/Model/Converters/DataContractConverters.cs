@@ -860,11 +860,11 @@ namespace Mark5.Mobile.Common.Model.Converters
             return new DataContract.PhysicalAddress
             {
                 Type = pa.Type?.Convert(),
-                Country = pa.Country.Convert(),
-                Street = pa.Street,
-                ZipCode = pa.ZipCode,
-                Area = pa.Area,
-                City = pa.City
+                Country = pa.Country?.Convert(),
+                Street = pa.Street ?? string.Empty,
+                ZipCode = pa.ZipCode ?? string.Empty,
+                Area = pa.Area ?? string.Empty,
+                City = pa.City ?? string.Empty,
             };
         }
 

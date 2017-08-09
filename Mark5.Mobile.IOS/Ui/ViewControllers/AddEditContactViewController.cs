@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -258,6 +257,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                tableView.EndEditing(true);
                 var parentId = ParentContactPreview == null ? -1 : ParentContactPreview.Id;
                 await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
 
