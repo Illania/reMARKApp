@@ -182,11 +182,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             preferrableSwitch.ValueChanged += PreferrableSwitch_ValueChanged;
         }
 
-        public void BindContent(CommunicationAddress ca)
+        public override void Reset()
         {
             SelectedAsPrimary = delegate { };
             AddressChanged = delegate { };
+        }
 
+        public void BindContent(CommunicationAddress ca)
+        {
             SetErrorState(false);
 
             address = ca;

@@ -264,9 +264,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
                     CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
 
+                dismissAction();
+                DismissViewController(true, null);
             }
             catch (Exception ex)
             {
+                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
                 CommonConfig.Logger.Error($"Error while sending/editing contact [creationMode = {CreationModeFlag}, contactId = {ContactPreview?.Id}]", ex);
             }
@@ -1379,6 +1382,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 protected override void Initialize()
                 {
+                    var cell = (PhysicalAddressTableViewCell)Cell;
+                    cell.Reset();
                 }
 
                 public override void RefreshRow()
@@ -1422,6 +1427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void Initialize()
                 {
                     var cell = (EmailAddressTableViewCell)Cell;
+                    cell.Reset();
                     cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
                     cell.AddressChanged += Cell_AddressChanged;
                 }
@@ -1497,6 +1503,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void Initialize()
                 {
                     var cell = (PhoneNumberTableViewCell)Cell;
+                    cell.Reset();
                     cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
                     cell.AddressChanged += Cell_AddressChanged;
                 }

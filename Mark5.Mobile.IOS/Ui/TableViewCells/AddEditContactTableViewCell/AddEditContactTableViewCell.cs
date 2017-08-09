@@ -79,5 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                  }, (finished) => { });
             }
         }
+
+        public virtual void Reset() { }
     }
 }
