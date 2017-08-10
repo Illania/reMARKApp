@@ -11,7 +11,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         public static readonly NSString Key = new NSString("TitledTextFieldTableViewCell");
 
         public event EventHandler<string> ContentEdited = delegate { };
-        public event EventHandler NewLineAdded = delegate { };
+        public event EventHandler NumberOfLinesChanged = delegate { };
 
         readonly UITextView textView;
         readonly UILabel titleLabel;
@@ -74,9 +74,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         {
             ContentEdited(this, textView.Text);
 
-            if (textView.GetCaretRectForPosition(textView.EndOfDocument).Y > previous.Y)
+            if (textView.GetCaretRectForPosition(textView.EndOfDocument).Y != previous.Y)
             {
-                NewLineAdded(this, EventArgs.Empty);
+                NumberOfLinesChanged(this, EventArgs.Empty);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         public override void Reset()
         {
             ContentEdited = delegate { };
-            NewLineAdded = delegate { };
+            NumberOfLinesChanged = delegate { };
 
             textView.AutocorrectionType = UITextAutocorrectionType.Default;
             textView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;

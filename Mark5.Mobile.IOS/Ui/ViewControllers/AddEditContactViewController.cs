@@ -933,12 +933,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tfc.SetMultiline(isMultiline);
                     tfc.SetTitle(title);
                     tfc.ContentEdited += ContentEdited;
-                    tfc.NewLineAdded += NewLineAdded;
+                    tfc.NumberOfLinesChanged += NumberOfLinesChanged;
                 }
 
                 protected abstract void ContentEdited(object sender, string e);
 
-                void NewLineAdded(object sender, EventArgs e)
+                void NumberOfLinesChanged(object sender, EventArgs e)
                 {
                     if (isMultiline) //TODO still need to find a solution to this issue
                     {
@@ -1134,7 +1134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var cell = (DisclosureIndicatorTableViewCell)Cell;
                     cell.Reset();
 
-                    if (ParentContactPreview == null)
+                    if (ParentContactPreview == null && CreationMode != ContactCreationModeFlag.Edit)
                     {
                         switch (ContactPreview.Type)
                         {
