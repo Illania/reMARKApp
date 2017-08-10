@@ -18,7 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             titleLabel = new UILabel
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkBlue,
             };
 
             ContentView.AddSubview(titleLabel);

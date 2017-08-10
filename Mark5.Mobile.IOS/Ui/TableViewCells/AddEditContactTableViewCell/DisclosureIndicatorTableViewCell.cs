@@ -15,6 +15,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         NSLayoutConstraint leftContentConstraint;
         NSLayoutConstraint leftTitleConstraint;
 
+        readonly UIButton chevronButton;
+
         public DisclosureIndicatorTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
         {
@@ -23,7 +25,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             TitleLabel = new UILabel
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkBlue,
             };
             TitleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             TitleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -52,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 leftContentConstraint,
             });
 
-            var chevronButton = GetChevron();
+            chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(chevronButton);
@@ -82,6 +85,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         public void SetContent(string content)
         {
             ContentLabel.Text = content;
+        }
+
+        public void RemoveChevron()
+        {
+            chevronButton.RemoveFromSuperview();
         }
 
         public override void Reset()

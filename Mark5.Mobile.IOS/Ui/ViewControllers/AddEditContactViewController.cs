@@ -676,6 +676,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Rows.Add(headerRow);
 
                     TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView.EndEditing(true);
                 }
             }
 
@@ -713,6 +714,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact.CommunicationAddresses.Remove(ca);
                     Rows.Remove(row);
                     TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView.EndEditing(true);
                 }
 
                 public void DisablePrimaryOnOtherRows(EmailAddressRow row)
@@ -765,6 +767,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact.CommunicationAddresses.Remove(ca);
                     Rows.Remove(row);
                     TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView.EndEditing(true);
                 }
 
                 public void DisablePrimaryOnOtherRows(PhoneNumberRow row)
@@ -810,6 +813,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact.PhysicalAddresses.Remove(ca);
                     Rows.Remove(row);
                     TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView.EndEditing(true);
                 }
             }
 
@@ -948,7 +952,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         TableView.BeginUpdates();
                         TableView.EndUpdates();
                         UIView.AnimationsEnabled = true;
-                        TableView.SetContentOffset(offset, false);
+                        Cell.BeginInvokeOnMainThread(() =>
+                        {
+                            TableView.ScrollToRow(TableView.IndexPathForCell(Cell), UITableViewScrollPosition.None, false);
+                            TableView.SetContentOffset(offset, false);
+                        });
                     }
                 }
             }
@@ -1148,6 +1156,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 throw new ArgumentException("Not valid contact type");
                         }
                     }
+                    else
+                    {
+                        cell.SetTitle(string.Empty);
+                    }
 
                     disableEditing = false;
 
@@ -1167,6 +1179,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     disableEditing |= ParentPreselected;
+
+                    if (disableEditing)
+                    {
+                        cell.RemoveChevron();
+                    }
 
                     ReloadRow();
                 }
@@ -1251,76 +1268,100 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            class AccountRow : TitledTextView
+            class AccountRow : TextFieldRow
             {
                 public AccountRow(AbstractSection section)
-                    : base(section, Localization.GetString("account"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("account"))
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.Account = e;
+                protected override void ContentEdited(object sender, string e)
+                {
+                    Contact.Account = e;
+                    SetErrorState(false);
+                }
 
-                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Account);
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Account);
             }
 
-            class LedgerRow : TitledTextView
+            class LedgerRow : TextFieldRow
             {
                 public LedgerRow(AbstractSection section)
-                    : base(section, Localization.GetString("ledger"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("ledger"))
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.Ledger = e;
+                protected override void ContentEdited(object sender, string e)
+                {
+                    Contact.Ledger = e;
+                    SetErrorState(false);
+                }
 
-                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Ledger);
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Ledger);
             }
 
-            class VatRow : TitledTextView
+            class VatRow : TextFieldRow
             {
                 public VatRow(AbstractSection section)
-                    : base(section, Localization.GetString("vat"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("vat"))
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.Vat = e;
+                protected override void ContentEdited(object sender, string e)
+                {
+                    Contact.Vat = e;
+                    SetErrorState(false);
+                }
 
-                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Vat);
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Vat);
             }
 
-            class PositionRow : TitledTextView
+            class PositionRow : TextFieldRow
             {
                 public PositionRow(AbstractSection section)
-                    : base(section, Localization.GetString("position"), false, UITextAutocapitalizationType.Sentences, UITextAutocorrectionType.Default)
+                    : base(section, Localization.GetString("position"))
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.Position = e;
+                protected override void ContentEdited(object sender, string e)
+                {
+                    Contact.Position = e;
+                    SetErrorState(false);
+                }
 
-                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.Position);
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Position);
             }
 
-            class ShortIdRow : TitledTextView
+            class ShortIdRow : TextFieldRow
             {
                 public ShortIdRow(AbstractSection section)
-                    : base(section, Localization.GetString("short_id"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("short_id"))
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => ContactPreview.ShortId = e;
+                protected override void ContentEdited(object sender, string e)
+                {
+                    ContactPreview.ShortId = e;
+                    SetErrorState(false);
+                }
 
-                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(ContactPreview.ShortId);
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(ContactPreview.ShortId);
             }
 
-            class WebpageRow : TitledTextView
+            class WebpageRow : TextFieldRow
             {
                 public WebpageRow(AbstractSection section)
-                    : base(section, Localization.GetString("webpage"), false, UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("webpage"))
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.WebPageAddress = e;
+                protected override void ContentEdited(object sender, string e)
+                {
+                    Contact.WebPageAddress = e;
+                    SetErrorState(false);
+                }
 
-                public override void RefreshRow() => ((TitledTextViewTableViewCell)Cell).SetContent(Contact.WebPageAddress);
+                public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.WebPageAddress);
             }
 
             class BirthdateHeaderRow : MultiHeaderRow
