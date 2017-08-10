@@ -300,20 +300,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void OnKeyboardDidShowNotification(NSNotification notification)
         {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true);
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true, true);
         }
 
         void OnKeyboardWillChangeFrameNotification(NSNotification notification)
         {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, false, false);
         }
 
         void OnKeyboardWillHideNotification(NSNotification notification)
         {
-            AdjustViewToKeyboard(0f, notification);
+            AdjustViewToKeyboard(0f, notification, false, true);
         }
 
-        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool correctOffset = false)
+        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool adjustContentOffset, bool adjustInsets)
         {
             if (notification == null)
             {
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            if (correctOffset && activeField != null)
+            if (adjustContentOffset && activeField != null)
             {
                 var difference = activeField.Frame.Bottom - tableView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
 
@@ -331,6 +331,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     co.Y += difference;
                     tableView.SetContentOffset(co, true);
                 }
+            }
+
+            if (adjustInsets)
+            {
+                var ci = tableView.ContentInset;
+                ci.Bottom = keyboardHeight;
+                tableView.ContentInset = ci;
+
+                ci = tableView.ScrollIndicatorInsets;
+                ci.Bottom = keyboardHeight;
+                tableView.ScrollIndicatorInsets = ci;
             }
         }
 
@@ -944,19 +955,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 void NumberOfLinesChanged(object sender, EventArgs e)
                 {
-                    if (isMultiline) //TODO still need to find a solution to this issue
+                    if (isMultiline)
                     {
                         //Used to make the cell grow with the content
-                        var offset = TableView.ContentOffset;
                         UIView.AnimationsEnabled = false;
                         TableView.BeginUpdates();
                         TableView.EndUpdates();
                         UIView.AnimationsEnabled = true;
-                        Cell.BeginInvokeOnMainThread(() =>
-                        {
-                            TableView.ScrollToRow(TableView.IndexPathForCell(Cell), UITableViewScrollPosition.None, false);
-                            TableView.SetContentOffset(offset, false);
-                        });
                     }
                 }
             }
