@@ -35,6 +35,28 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context, int? folderId = null, Folder folder = null, int? documentId = null, DocumentPreview documentPreview = null, Guid? guid = null)
+        {
+            var intent = new Intent(context, typeof(SwitchDocumentActivity));
+
+            if (folderId != null)
+                intent.PutExtra(FolderIdIntentKey, folderId.Value);
+            
+            if (folder != null)
+                intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+            
+            if (documentId != null)
+                intent.PutExtra(DocumentIdIntentKey, documentId.Value);
+            
+            if (documentPreview != null)
+                intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+            
+            if (guid != null)
+                intent.PutExtra(NotificationGuidIntentKey, Serializer.Serialize(guid.Value));
+            
+            return intent;
+        }
+
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
