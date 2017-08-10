@@ -18,6 +18,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
+        const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
+        const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
+
         Toolbar toolbar;
 
         DocumentsListFragment dlf;
@@ -30,9 +33,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityMovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
-
-        const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
-        const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
 
         string dlfFragmentTag;
         string dtuFragmentTag;

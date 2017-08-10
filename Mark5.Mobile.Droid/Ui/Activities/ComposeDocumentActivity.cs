@@ -15,9 +15,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ComposeDocumentActivity : AppCompatActivity
     {
-        Toolbar toolbar;
-        ComposeDocumentFragment cdf;
-
         const string DocumentCreationModeFlagIntentKey = "DocumentCreationModeFlag_290d1383-175d-4e2d-8f5e-ca899baff3f7";
         const string CopyToNewOptionsIntentKey = "CopyToNewOptions_f298d024-4df0-431d-ad3d-1834eb0dede0";
         const string RestoreWorkingCopyIntentKey = "RestoreWorkingCopy_7c921825-0a4b-47e6-91b6-9c3d59a895e6";
@@ -28,6 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
+
+        Toolbar toolbar;
+        ComposeDocumentFragment cdf;
 
         public static Intent CreateIntent(Context context,
                                           DocumentCreationModeFlag documentCreationModeFlag,

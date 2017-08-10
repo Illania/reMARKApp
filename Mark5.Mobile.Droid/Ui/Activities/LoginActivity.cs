@@ -106,11 +106,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             portEditText.SetSelection(savedInstanceState.GetInt("ssl"));
         }
 
-        static class MenuItemActions
-        {
-            public const int SystemReport = 10;
-        }
-
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             menu.Add(Menu.None, MenuItemActions.SystemReport, MenuItemActions.SystemReport, Resource.String.create_system_report);
@@ -255,6 +250,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }
+        }
+
+        static class MenuItemActions
+        {
+            public const int SystemReport = 10;
         }
     }
 }

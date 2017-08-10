@@ -205,9 +205,69 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             drawerToggle.OnConfigurationChanged(newConfig);
         }
 
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (drawerToggle.OnOptionsItemSelected(item))
+                return true;
+
+            return base.OnOptionsItemSelected(item);
+        }
+
         #endregion
 
         #region Utility methods
+
+        public void LockDrawer()
+        {
+            drawer?.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
+        }
+        
+        public void UnlockDrawer()
+        {
+            drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
+        }
+
+        public bool OnNavigationItemSelected(IMenuItem menuItem)
+        {
+            CommonConfig.Logger.Info($"Switching to {menuItem.TitleFormatted}...");
+
+            drawerToggle.RunWhenIdle(() =>
+                {
+                    if (lastSelectedItem != menuItem)
+                    {
+                        if (lastSelectedItem != null)
+                            stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
+
+                        if (SupportFragmentManager.BackStackEntryCount > 0)
+                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) AndroidApp.PopBackStackFlags.Inclusive);
+
+                        stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
+
+                        lastSelectedItem = menuItem;
+                    }
+                },
+                lastSelectedItem == null);
+
+            drawer.CloseDrawer(GravityCompat.Start);
+
+            return true;
+        }
+
+        public void OnBackStackChanged()
+        {
+            drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
+            drawerToggle.SyncState();
+        }
+
+        void NavHeaderSettingsButton_Click(object sender, EventArgs e)
+        {
+            drawerToggle.RunWhenIdle(() =>
+            {
+                StartActivity(PreferenceActivity.CreateIntent(this));
+            });
+
+            drawer.CloseDrawer(GravityCompat.Start);
+        }
 
         async void CheckAutoSavedDocument()
         {
@@ -229,68 +289,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error while checking is there is an autosaved document", ex);
+                CommonConfig.Logger.Error("Error while checking if there is an autosaved document", ex);
             }
-        }
-
-        public void LockDrawer()
-        {
-            drawer?.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
-        }
-
-        public void UnlockDrawer()
-        {
-            drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
-        }
-
-        void NavHeaderSettingsButton_Click(object sender, EventArgs e)
-        {
-            drawerToggle.RunWhenIdle(() =>
-            {
-                StartActivity(PreferenceActivity.CreateIntent(this));
-            });
-
-            drawer.CloseDrawer(GravityCompat.Start);
-        }
-
-        public bool OnNavigationItemSelected(IMenuItem menuItem)
-        {
-            CommonConfig.Logger.Info($"Switching to {menuItem.TitleFormatted}...");
-
-            drawerToggle.RunWhenIdle(() =>
-                {
-                    if (lastSelectedItem != menuItem)
-                    {
-                        if (lastSelectedItem != null)
-                            stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
-
-                        if (SupportFragmentManager.BackStackEntryCount > 0)
-                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) Android.App.PopBackStackFlags.Inclusive);
-
-                        stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
-
-                        lastSelectedItem = menuItem;
-                    }
-                },
-                lastSelectedItem == null);
-
-            drawer.CloseDrawer(GravityCompat.Start);
-
-            return true;
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (drawerToggle.OnOptionsItemSelected(item))
-                return true;
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-        public void OnBackStackChanged()
-        {
-            drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
-            drawerToggle.SyncState();
         }
 
         #endregion

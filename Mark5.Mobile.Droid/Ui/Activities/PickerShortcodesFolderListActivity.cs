@@ -14,7 +14,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class PickerShortcodesFolderListActivity : BaseAppCompatActivity
     {
         public const string ShortcodesResultKey = "ShortcodesResult_3e9d47b4-4d50-401e-ac1c-7ae03dedfb4f";
-
         public const int ShortcodesRequestCode = 123;
 
         Toolbar toolbar;

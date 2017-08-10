@@ -135,62 +135,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
         }
 
-        public async Task<bool> HasPrevious(int documentId)
-        {
-            if (folder == null)
-                return false;
-
-            var documentIndex = documentIds.FindIndex(d => d == documentId);
-            if (documentIndex == -1)
-                return false;
-
-            if (documentIndex == 0)
-                try
-                {
-                    var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, MaxNeighbours);
-                    if (previous == null || !previous.Any())
-                        return false;
-
-                    documentIds.InsertRange(0, previous);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Error while checking if previous document exists", ex);
-                    return false;
-                }
-
-            return true;
-        }
-
-        public async Task<bool> HasNext(int documentId)
-        {
-            if (folder == null)
-                return false;
-
-            var documentIndex = documentIds.FindIndex(d => d == documentId);
-            if (documentIndex == -1)
-                return false;
-
-            if (documentIndex == documentIds.Count - 1)
-                try
-                {
-                    var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, MaxNeighbours);
-                    if (next == null || !next.Any())
-                        return false;
-
-                    documentIds.AddRange(next);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Error while checking if next document exists", ex);
-                    return false;
-                }
-
-            return true;
-        }
-
         public void GoToPrevious(int documentId)
         {
             var previousId = GetPreviousId(documentId);
@@ -245,6 +189,62 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 return documentIds[documentIndex - 1];
 
             return null;
+        }
+
+        public async Task<bool> HasPrevious(int documentId)
+        {
+            if (folder == null)
+                return false;
+
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex == -1)
+                return false;
+
+            if (documentIndex == 0)
+                try
+                {
+                    var previous = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, true, false, MaxNeighbours);
+                    if (previous == null || !previous.Any())
+                        return false;
+
+                    documentIds.InsertRange(0, previous);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while checking if previous document exists", ex);
+                    return false;
+                }
+
+            return true;
+        }
+
+        public async Task<bool> HasNext(int documentId)
+        {
+            if (folder == null)
+                return false;
+
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex == -1)
+                return false;
+
+            if (documentIndex == documentIds.Count - 1)
+                try
+                {
+                    var next = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentId, false, true, MaxNeighbours);
+                    if (next == null || !next.Any())
+                        return false;
+
+                    documentIds.AddRange(next);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while checking if next document exists", ex);
+                    return false;
+                }
+
+            return true;
         }
     }
 }

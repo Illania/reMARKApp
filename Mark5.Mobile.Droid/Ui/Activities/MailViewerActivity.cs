@@ -85,6 +85,67 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             LoadMailFromUri();
         }
 
+        static byte[] ReadToEnd(Stream input)
+        {
+            var buffer = new byte[16 * 1024];
+            using (var ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                    ms.Write(buffer, 0, read);
+
+                return ms.ToArray();
+            }
+        }
+
+        static void InlineImages(MailMessage mm)
+        {
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(mm.BodyHtmlText);
+
+            var nodes = htmlDoc.DocumentNode.Descendants("img").Where(n => n.GetAttributeValue("src", null).StartsWith("cid:", StringComparison.CurrentCultureIgnoreCase)).ToArray();
+            var atts = mm.Attachments;
+
+            foreach (var node in nodes)
+            {
+                var srcAttrValue = node.GetAttributeValue("src", null);
+                var cid = srcAttrValue.SafeSubstringAfter("cid:", StringComparison.CurrentCultureIgnoreCase);
+
+                if (string.IsNullOrWhiteSpace(cid))
+                    continue;
+
+                MailBee.Mime.Attachment matchingAtt = null;
+                foreach (var obj in atts)
+                {
+                    var att = (MailBee.Mime.Attachment)obj;
+                    if (att.ContentID == cid)
+                    {
+                        matchingAtt = att;
+                        break;
+                    }
+                }
+
+                if (matchingAtt == null)
+                    continue;
+
+                var matchingAttExt = Path.GetExtension(matchingAtt.FilenameOriginal);
+
+                if (string.IsNullOrWhiteSpace(matchingAttExt))
+                    continue;
+
+                node.SetAttributeValue("src", $"data:image/{matchingAttExt};base64,{Convert.ToBase64String(matchingAtt.GetData())}");
+            }
+
+            mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
+        }
+
+        static void MakeHtmlSafe(MailMessage mm)
+        {
+            var p = new Processor();
+            p.Dom.OuterHtml = mm.BodyHtmlText;
+            mm.BodyHtmlText = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
+        }
+
         void LoadMailFromUri()
         {
             var uri = Intent.Data;
@@ -295,67 +356,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
-        }
-
-        static byte[] ReadToEnd(Stream input)
-        {
-            var buffer = new byte[16 * 1024];
-            using (var ms = new MemoryStream())
-            {
-                int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                    ms.Write(buffer, 0, read);
-
-                return ms.ToArray();
-            }
-        }
-
-        static void InlineImages(MailMessage mm)
-        {
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(mm.BodyHtmlText);
-
-            var nodes = htmlDoc.DocumentNode.Descendants("img").Where(n => n.GetAttributeValue("src", null).StartsWith("cid:", StringComparison.CurrentCultureIgnoreCase)).ToArray();
-            var atts = mm.Attachments;
-
-            foreach (var node in nodes)
-            {
-                var srcAttrValue = node.GetAttributeValue("src", null);
-                var cid = srcAttrValue.SafeSubstringAfter("cid:", StringComparison.CurrentCultureIgnoreCase);
-
-                if (string.IsNullOrWhiteSpace(cid))
-                    continue;
-
-                MailBee.Mime.Attachment matchingAtt = null;
-                foreach (var obj in atts)
-                {
-                    var att = (MailBee.Mime.Attachment) obj;
-                    if (att.ContentID == cid)
-                    {
-                        matchingAtt = att;
-                        break;
-                    }
-                }
-
-                if (matchingAtt == null)
-                    continue;
-
-                var matchingAttExt = Path.GetExtension(matchingAtt.FilenameOriginal);
-
-                if (string.IsNullOrWhiteSpace(matchingAttExt))
-                    continue;
-
-                node.SetAttributeValue("src", $"data:image/{matchingAttExt};base64,{Convert.ToBase64String(matchingAtt.GetData())}");
-            }
-
-            mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
-        }
-
-        static void MakeHtmlSafe(MailMessage mm)
-        {
-            var p = new Processor();
-            p.Dom.OuterHtml = mm.BodyHtmlText;
-            mm.BodyHtmlText = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
         }
 
         async Task<Java.IO.File> CreateTempFile(string filename, byte[] bytes)

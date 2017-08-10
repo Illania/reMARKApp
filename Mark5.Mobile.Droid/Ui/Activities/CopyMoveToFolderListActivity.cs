@@ -15,12 +15,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CopyMoveToFolderListActivity : BaseAppCompatActivity
     {
-        public enum ModeType
-        {
-            Copy = 1,
-            Move = 2,
-        }
-
         public const string ModuleIntentKey = "ModuleIntent_79a3dba4-bdad-4b11-be42-af6acdf31b4e";
         public const string ModeIntentKey = "ModeIntent_418bec8d-f44d-41b4-bff0-e286dea3d705";
         public const string BusinessEntitiesIntentKey = "BusinessEntitiesIntent_d6047bae-dc5e-4c3e-a302-e33931531baa";
@@ -94,6 +88,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
+        }
+
+        public enum ModeType
+        {
+            Copy = 1,
+            Move = 2,
         }
     }
 }
