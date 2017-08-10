@@ -120,26 +120,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Options menu
 
-        static class MenuItemActions
-        {
-            public const int EditComment = 10;
-            public const int DeleteComment = 20;
-        }
-
-        public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
-        {
-            var position = recyclerView.GetChildAdapterPosition(view);
-            adapter.SelectedPosition = position;
-
-            var comment = adapter.GetSelectedItem();
-            var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
-
-            if (isEditable)
-                menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
-
-            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
-        }
-
         public override bool OnContextItemSelected(IMenuItem item)
         {
             var comment = adapter.GetSelectedItem();
@@ -159,50 +139,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
+        public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
+        {
+            var position = recyclerView.GetChildAdapterPosition(view);
+            adapter.SelectedPosition = position;
+
+            var comment = adapter.GetSelectedItem();
+            var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
+
+            if (isEditable)
+                menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
+
+            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
+        }
+
+        static class MenuItemActions
+        {
+            public const int EditComment = 10;
+            public const int DeleteComment = 20;
+        }
+
         #endregion
 
         #region Event handlers
-
-        async void AddCommentButton_Click(object sender, EventArgs e)
-        {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.adding_comment, Resource.String.please_wait);
-            var newCommentContent = addCommentEditText.Text;
-
-            try
-            {
-                Comment newComment;
-
-                switch (entity.ObjectType)
-                {
-                    case ObjectType.Document:
-                        var document = entity as Document;
-                        newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
-                        break;
-                    case ObjectType.Contact:
-                        var contact = entity as Contact;
-                        newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
-                        break;
-                    default:
-                        throw new ArgumentException("The input business entity does not have comments defined in the model");
-                }
-
-                adapter.AppendItem(newComment);
-                recyclerView.SmoothScrollToPosition(adapter.ItemCount);
-                addCommentEditText.Text = string.Empty;
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={entity?.Id}, commentContent={newCommentContent}] ", ex);
-
-                dismissAction();
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
-            finally
-            {
-                dismissAction();
-            }
-        }
 
         void DeleteComment(Comment comment)
         {
@@ -287,6 +246,47 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             addCommentButton.Enabled = !string.IsNullOrEmpty(addCommentEditText.Text);
         }
 
+        async void AddCommentButton_Click(object sender, EventArgs e)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.adding_comment, Resource.String.please_wait);
+            var newCommentContent = addCommentEditText.Text;
+
+            try
+            {
+                Comment newComment;
+
+                switch (entity.ObjectType)
+                {
+                    case ObjectType.Document:
+                        var document = entity as Document;
+                        newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
+                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                        break;
+                    case ObjectType.Contact:
+                        var contact = entity as Contact;
+                        newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
+                        break;
+                    default:
+                        throw new ArgumentException("The input business entity does not have comments defined in the model");
+                }
+
+                adapter.AppendItem(newComment);
+                recyclerView.SmoothScrollToPosition(adapter.ItemCount);
+                addCommentEditText.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={entity?.Id}, commentContent={newCommentContent}] ", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
+        }
+
         #endregion
 
         #region Retained State methods
@@ -330,9 +330,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentsListAdapter : RecyclerView.Adapter
         {
-            public List<Comment> Items { get; } = new List<Comment>();
-
             public override int ItemCount => Items.Count;
+
+            public List<Comment> Items { get; } = new List<Comment>();
 
             public int SelectedPosition { get; set; }
 
@@ -414,15 +414,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentViewHolder : RecyclerView.ViewHolder
         {
+            
+            public string Username { set => usernameTextView.Text = value; }
+            
+            public string Date { set => dateTextView.Text = value; }
+            
+            public string Content { set => contentTextView.Text = value; }
+
             readonly AppCompatTextView usernameTextView;
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView contentTextView;
-
-            public string Username { set => usernameTextView.Text = value; }
-
-            public string Date { set => dateTextView.Text = value; }
-
-            public string Content { set => contentTextView.Text = value; }
 
             public CommentViewHolder(View itemView)
                 : base(itemView)

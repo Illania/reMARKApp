@@ -34,11 +34,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
-
         public Folder Folder { get; set; }
 
         DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
+
+        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
+
+        readonly Handler searchHandler = new Handler();
 
         Action closeRequest;
 
@@ -58,8 +60,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
-
-        readonly Handler searchHandler = new Handler();
 
         AutoRefreshWorker autoRefreshWorker;
 
@@ -422,17 +422,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
-        static class MenuItemActions
+        public void ShowCategories(DocumentPreview documentPreview)
         {
-            public const int MarkAsRead = 10;
-            public const int MarkAsUnread = 11;
-            public const int CopyToWorktray = 20;
-            public const int CopyToFolder = 30;
-            public const int MoveToFolder = 31;
-            public const int SetPriority = 40;
-            public const int Categories = 50;
-            public const int DeleteFromFolder = 60;
-            public const int Delete = 61;
+            StartActivity(CategoriesListActivity.CreateIntent(Context, documentPreview: documentPreview));
         }
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -553,6 +545,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             actionMode = null;
         }
 
+        public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
+        {
+            CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={documentPreviews.Count}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.CopyToWorktray(documentPreviews.OfType<IBusinessEntity>().ToList());
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
         async void MarkAsRead()
         {
             CommonConfig.Logger.Info($"Attempting to mark as read [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
@@ -622,34 +637,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 documentPreview
             });
-        }
-
-        public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
-        {
-            CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={documentPreviews.Count}]...");
-
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
-
-            try
-            {
-                await Managers.CommonActionsManager.CopyToWorktray(documentPreviews.OfType<IBusinessEntity>().ToList());
-
-                dismissAction();
-                actionMode?.Finish();
-            }
-            catch (Exception ex)
-            {
-                dismissAction();
-
-                CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
-
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
-        }
-
-        public void ShowCategories(DocumentPreview documentPreview)
-        {
-            StartActivity(CategoriesListActivity.CreateIntent(Context, documentPreview:documentPreview));
         }
 
         async void SetPriority()
@@ -746,6 +733,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
+        }
+
+        static class MenuItemActions
+        {
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int CopyToWorktray = 20;
+            public const int CopyToFolder = 30;
+            public const int MoveToFolder = 31;
+            public const int SetPriority = 40;
+            public const int Categories = 50;
+            public const int DeleteFromFolder = 60;
+            public const int Delete = 61;
         }
 
         #endregion
@@ -998,29 +998,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class DocumentsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public static class ViewType
-            {
-                public const int DocumentView = 0;
-                public const int ExternalDocumentView = 1;
-            }
+            public override int ItemCount => Items.Count;
 
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
 
             public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
-            public override int ItemCount => Items.Count;
-
             public int SelectedItemCount => selectedDocumentsInView.Count;
 
             public bool EnableLoadMore { get; set; }
+
+            public event EventHandler<DocumentPreview> ItemClicked = delegate { };
+            public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
 
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
             readonly Context context;
             readonly RecyclerView recyclerView;
             readonly Action<int> loadMoreAction;
-
-            public event EventHandler<DocumentPreview> ItemClicked = delegate { };
-            public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
 
             bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
             bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
@@ -1271,6 +1265,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return string.Empty;
             }
+
+            public static class ViewType
+            {
+                public const int DocumentView = 0;
+                public const int ExternalDocumentView = 1;
+            }
         }
 
         class SwipeHelperCallback : ItemTouchHelper.Callback
@@ -1317,35 +1317,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 base.OnSelectedChanged(viewHolder, actionState);
 
                 refreshLayout.Enabled = actionState == ItemTouchHelper.ActionStateIdle;
-            }
-
-            public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
-            {
-                if (direction == ItemTouchHelper.Left)
-                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
-                else if (direction == ItemTouchHelper.Right)
-                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
-
-                ResetViewHolder(viewHolder, direction);
-            }
-
-            void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
-            {
-                var position = viewHolder.AdapterPosition;
-                var view = viewHolder.ItemView;
-
-                viewHolder.ItemView.TranslationX = 0;
-                viewHolder.ItemView.TranslationY = 0;
-
-                adapter.SetSwipedState(position, direction);
-                adapter.NotifyItemChanged(position);
-
-                viewHolder.ItemView.PostDelayed(() =>
-                    {
-                        adapter.ResetSwipedState();
-                        adapter.NotifyItemChanged(position);
-                    },
-                    400);
             }
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
@@ -1412,6 +1383,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+            public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                if (direction == ItemTouchHelper.Left)
+                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
+                else if (direction == ItemTouchHelper.Right)
+                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
+
+                ResetViewHolder(viewHolder, direction);
+            }
+
+            void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                var position = viewHolder.AdapterPosition;
+                var view = viewHolder.ItemView;
+
+                viewHolder.ItemView.TranslationX = 0;
+                viewHolder.ItemView.TranslationY = 0;
+
+                adapter.SetSwipedState(position, direction);
+                adapter.NotifyItemChanged(position);
+
+                viewHolder.ItemView.PostDelayed(() =>
+                    {
+                        adapter.ResetSwipedState();
+                        adapter.NotifyItemChanged(position);
+                    },
+                    400);
             }
         }
 

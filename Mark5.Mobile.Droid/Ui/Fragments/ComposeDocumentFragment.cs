@@ -317,35 +317,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Subviews event handlers
 
-        async void RecipientView_AddButtonClicked(object sender, EventArgs e)
-        {
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
-
-            if (choice < 0)
-                return;
-
-            focusedRecipientView = sender as RecipientsView;
-
-            switch (choice)
-            {
-                case 0:
-                    DoOpenRecentAddresses();
-                    break;
-                case 1:
-                    DoOpenContacts();
-                    break;
-                case 2:
-                    DoOpenShortcodes();
-                    break;
-                case 3:
-                    DoOpenPhonebook();
-                    break;
-            }
-
-            if (choice != 2)
-                focusedRecipientView.RequestEditorFocus();
-        }
-
         void DoOpenRecentAddresses()
         {
             StartActivityForResult(RecentAddressesListActivity.CreateIntent(Activity), RequestCodes.RecentAddressesRequestCode);
@@ -474,9 +445,66 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        
+        async void RecipientView_AddButtonClicked(object sender, EventArgs e)
+        {
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
+
+            if (choice < 0)
+                return;
+
+            focusedRecipientView = sender as RecipientsView;
+
+            switch (choice)
+            {
+                case 0:
+                    DoOpenRecentAddresses();
+                    break;
+                case 1:
+                    DoOpenContacts();
+                    break;
+                case 2:
+                    DoOpenShortcodes();
+                    break;
+                case 3:
+                    DoOpenPhonebook();
+                    break;
+            }
+
+            if (choice != 2)
+                focusedRecipientView.RequestEditorFocus();
+        }
+
         #endregion
 
         #region Actions
+
+        public void AskIfShouldSave()
+        {
+            if (PreviousDocumentDirection == DocumentDirection.Draft)
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
+            else
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
+        }
+
+        public void DeleteAutoSavedDocumentAndClose()
+        {
+            AsyncHelpers.RunSync(async () =>
+            {
+                try
+                {
+                    autoSaveWorkingCopyWorker.Stop();
+                    await autoSaveWorkingCopyWorker.Finished();
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while deleting autosaved document", ex);
+                }
+            });
+
+            CloseRequest?.Invoke();
+        }
 
         void SendDocument(bool saveDraft = false)
         {
@@ -527,33 +555,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sendAction();
             else
                 Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
-        }
-
-        public void AskIfShouldSave()
-        {
-            if (PreviousDocumentDirection == DocumentDirection.Draft)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
-            else
-                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
-        }
-
-        public void DeleteAutoSavedDocumentAndClose()
-        {
-            AsyncHelpers.RunSync(async () =>
-            {
-                try
-                {
-                    autoSaveWorkingCopyWorker.Stop();
-                    await autoSaveWorkingCopyWorker.Finished();
-                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Error while deleting autosaved document", ex);
-                }
-            });
-
-            CloseRequest?.Invoke();
         }
 
         void HandleAddAttachment(Intent data)
@@ -644,11 +645,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Options menu related
 
-        static class MenuItemActions
-        {
-            public const int AddAttachment = 10;
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -706,9 +702,63 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return !lineView.LineSelectedIsAmbiguous;
         }
 
+        static class MenuItemActions
+        {
+            public const int AddAttachment = 10;
+        }
+
         #endregion
 
         #region Template methods
+
+        void ProcessTemplate(Template template)
+        {
+            var templateContent = template.Content;
+
+            var currentTime = DateTime.Now;
+            var dateString = currentTime.ToString("dd-MM-yyyy");
+            var timeString = currentTime.ToString("HH:mm");
+
+            var fromNameString = string.Empty;
+
+            if (previousDocumentPreview != null && previousDocumentPreview.Addresses != null)
+                fromNameString = previousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
+
+            if (template.ContentType == ContentType.Html)
+            {
+                templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
+                templateContent = templateContent.Replace("&lt;DATE&gt;", dateString);
+                templateContent = templateContent.Replace("&lt;TIME&gt;", timeString);
+            }
+            else
+            {
+                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
+                templateContent = templateContent.Replace("<DATE>", dateString);
+                templateContent = templateContent.Replace("<TIME>", timeString);
+            }
+
+            if (template.ContentType == ContentType.Html)
+            {
+                templateContent = templateContent.Replace("&lt;CUR&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
+            }
+            else
+            {
+                templateContent = templateContent.Replace("<CUR>", string.Empty);
+                templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
+                templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
+                templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
+            }
+
+            template.Content = templateContent;
+        }
+
+        void GetAllTemplates()
+        {
+            StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
+        }
 
         async Task AskIfShouldUseTemplates()
         {
@@ -757,11 +807,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             templateLoaded = true;
-        }
-
-        void GetAllTemplates()
-        {
-            StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
         }
 
         async Task GetLocalTemplate()
@@ -829,50 +874,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.SetSubject(template.Subject);
 
             lineView.SetLine(template.LineGuid);
-        }
-
-        void ProcessTemplate(Template template)
-        {
-            var templateContent = template.Content;
-
-            var currentTime = DateTime.Now;
-            var dateString = currentTime.ToString("dd-MM-yyyy");
-            var timeString = currentTime.ToString("HH:mm");
-
-            var fromNameString = string.Empty;
-
-            if (previousDocumentPreview != null && previousDocumentPreview.Addresses != null)
-                fromNameString = previousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
-
-            if (template.ContentType == ContentType.Html)
-            {
-                templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
-                templateContent = templateContent.Replace("&lt;DATE&gt;", dateString);
-                templateContent = templateContent.Replace("&lt;TIME&gt;", timeString);
-            }
-            else
-            {
-                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
-                templateContent = templateContent.Replace("<DATE>", dateString);
-                templateContent = templateContent.Replace("<TIME>", timeString);
-            }
-
-            if (template.ContentType == ContentType.Html)
-            {
-                templateContent = templateContent.Replace("&lt;CUR&gt;", string.Empty);
-                templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
-                templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
-                templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
-            }
-            else
-            {
-                templateContent = templateContent.Replace("<CUR>", string.Empty);
-                templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
-                templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
-                templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
-            }
-
-            template.Content = templateContent;
         }
 
         #endregion

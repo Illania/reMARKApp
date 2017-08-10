@@ -25,15 +25,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactFragment : RetainableStateFragment
     {
-        static class RequestCodes
-        {
-            public const int CommentsRequest = 1;
-            public const int CategoriesRequest = 2;
-        }
-
-        const int CardElevation = 0;
-        const float CardRadius = 2f;
-
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
         public int? ContactId { get; set; }
@@ -41,6 +32,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public Contact Contact { get; set; }
         public Action CloseRequest { get; set; }
         public Guid NotificationGuid { get; set; }
+
+        const int CardElevation = 0;
+        const float CardRadius = 2f;
 
         ProgressBar progress;
         RelativeLayout relativeLayout;
@@ -101,13 +95,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(ContactFragment)} [folder.id={FolderId ?? Folder?.Id}, contact.id={ContactId ?? ContactPreview?.Id}...");
         }
 
-        public override async void OnResume()
-        {
-            base.OnResume();
-
-            await RefreshData();
-        }
-
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (resultCode == (int)Result.Ok)
@@ -123,20 +110,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
         }
 
-        #region Options menu
-
-        static class MenuItemActions
+        public override async void OnResume()
         {
-            public const int CopyToWorktray = 10;
-            public const int CopyToFolder = 20;
-            public const int MoveToFolder = 21;
-            public const int Categories = 30;
-            public const int Comments = 40;
-            public const int Actions = 50;
-            public const int Links = 60;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
+            base.OnResume();
+
+            await RefreshData();
         }
+
+        #region Options menu
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
@@ -346,6 +327,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 10;
+            public const int CopyToFolder = 20;
+            public const int MoveToFolder = 21;
+            public const int Categories = 30;
+            public const int Comments = 40;
+            public const int Actions = 50;
+            public const int Links = 60;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
+        }
+
         #endregion
 
         #region Card preparation
@@ -480,36 +474,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Refresh methods
 
-        async Task RefreshData()
-        {
-            try
-            {
-                if (NotificationGuid != default(Guid))
-                    await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
-
-                if (ContactId.HasValue && ContactPreview == null && Contact == null)
-                {
-                    var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder?.Id, ContactId.Value);
-                    ContactPreview = container.ContactPreview;
-                    Contact = container.Contact;
-                }
-
-                if (ContactPreview != null && Contact == null)
-                    Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder?.Id, ContactPreview.Id);
-
-                RefreshView();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}]", ex);
-
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
-                if (CloseRequest != null)
-                    CloseRequest();
-            }
-        }
-
         void RefreshView()
         {
             RefreshTitle();
@@ -582,6 +546,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (subview.Visibility == ViewStates.Visible)
                         cardView.Visibility = ViewStates.Visible;
                 }
+            }
+        }
+
+        async Task RefreshData()
+        {
+            try
+            {
+                if (NotificationGuid != default(Guid))
+                    await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
+
+                if (ContactId.HasValue && ContactPreview == null && Contact == null)
+                {
+                    var container = await Managers.ContactsManager.GetContactWithPreviewAsync(FolderId ?? Folder?.Id, ContactId.Value);
+                    ContactPreview = container.ContactPreview;
+                    Contact = container.Contact;
+                }
+
+                if (ContactPreview != null && Contact == null)
+                    Contact = await Managers.ContactsManager.GetContactAsync(FolderId ?? Folder?.Id, ContactPreview.Id);
+
+                RefreshView();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Downloading contact failed [folder.name={Folder?.Name}, folder.id={FolderId ?? Folder?.Id}, contactId={ContactId ?? ContactPreview?.Id}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                if (CloseRequest != null)
+                    CloseRequest();
             }
         }
 
@@ -669,6 +663,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(physicalAddress[selectedItem]));
         }
 
+        void PhysicalAddressClicked(object sender, PhysicalAddress e)
+        {
+            Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(e));
+        }
+
+        void ContactClicked(object sender, ContactPreview cp)
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+            var ft = fragmentManager.BeginTransaction();
+
+            var cf = new ContactFragment
+            {
+                ContactPreview = cp,
+                Folder = Folder
+            };
+            ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
+            ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+            ft.AddToBackStack(null);
+            ft.Commit();
+        }
+
         async void AddressClicked(object sender, CommunicationAddress e)
         {
             if (e.Type == CommunicationAddressType.Email)
@@ -707,27 +722,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (e.Type == CommunicationAddressType.Phone)
                 Integration.DialNumber(Context, AddressFormatter.FormatCommunicationAddress(e));
-        }
-
-        void PhysicalAddressClicked(object sender, PhysicalAddress e)
-        {
-            Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(e));
-        }
-
-        void ContactClicked(object sender, ContactPreview cp)
-        {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
-            var ft = fragmentManager.BeginTransaction();
-
-            var cf = new ContactFragment
-            {
-                ContactPreview = cp,
-                Folder = Folder
-            };
-            ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
-            ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
-            ft.AddToBackStack(null);
-            ft.Commit();
         }
 
         #endregion
@@ -802,5 +796,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        static class RequestCodes
+        {
+            public const int CommentsRequest = 1;
+            public const int CategoriesRequest = 2;
+        }
     }
 }

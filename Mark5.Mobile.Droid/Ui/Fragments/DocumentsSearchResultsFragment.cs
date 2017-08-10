@@ -218,15 +218,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public static class ViewType
-            {
-                public const int DocumentView = 0;
-                public const int ExternalDocumentView = 1;
-            }
+            public override int ItemCount => Items.Count;
 
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
-
-            public override int ItemCount => Items.Count;
 
             readonly Context context;
             readonly RecyclerView recyclerView;
@@ -313,6 +307,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeInserted(count, items.Count);
             }
 
+            public int GetPosition(int documentPreviewId)
+            {
+                var position = -1;
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == documentPreviewId)
+                    {
+                        position = i;
+                        break;
+                    }
+
+                return position;
+            }
+
             string ISectionedAdapter.GetSectionName(int position)
             {
                 var vh = recyclerView.FindViewHolderForAdapterPosition(position);
@@ -326,17 +333,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return string.Empty;
             }
 
-            public int GetPosition(int documentPreviewId)
+            public static class ViewType
             {
-                var position = -1;
-                for (var i = 0; i < Items.Count; i++)
-                    if (Items[i].Id == documentPreviewId)
-                    {
-                        position = i;
-                        break;
-                    }
-
-                return position;
+                public const int DocumentView = 0;
+                public const int ExternalDocumentView = 1;
             }
         }
 

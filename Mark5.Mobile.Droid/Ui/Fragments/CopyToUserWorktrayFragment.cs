@@ -242,6 +242,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
+        static bool MatchesQuery(SystemUser su, string query)
+        {
+            if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+
+            return false;
+        }
+
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
@@ -283,20 +297,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
-            return false;
-        }
-
-        static bool MatchesQuery(SystemUser su, string query)
-        {
-            if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
             return false;
         }
 

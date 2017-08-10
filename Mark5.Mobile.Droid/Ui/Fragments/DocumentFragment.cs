@@ -28,12 +28,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentFragment : RetainableStateFragment
     {
-        static class RequestCodes
-        {
-            public static int CommentsRequest = 1;
-            public static int CategoriesRequest = 2;
-        }
-
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public Guid FailedDocumentToUploadGuid { get; set; }
@@ -220,25 +214,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
         }
 
-        static class MenuItemActions
-        {
-            public const int GoToPrevious = 5;
-            public const int GoToNext = 6;
-            public const int MarkAsRead = 10;
-            public const int MarkAsUnread = 11;
-            public const int CopyToNew = 20;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int SetPriority = 50;
-            public const int Categories = 60;
-            public const int Comments = 70;
-            public const int Actions = 80;
-            public const int Links = 90;
-            public const int DeleteFromFolder = 100;
-            public const int Delete = 101;
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             if (DocumentPreview == null)
@@ -413,6 +388,177 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new DocumentFragmentState
+            {
+                FolderId = FolderId,
+                Folder = Folder,
+                DocumentId = DocumentId,
+                DocumentPreview = DocumentPreview
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            if (restoredState is DocumentFragmentState dfs)
+            {
+                FolderId = dfs.FolderId;
+                Folder = dfs.Folder;
+                DocumentId = dfs.DocumentId;
+                DocumentPreview = dfs.DocumentPreview;
+            }
+        }
+
+        public override string GenerateTag()
+        {
+            return $"{nameof(DocumentFragment)} [DocumentId={DocumentPreview?.Id ?? Document?.Id ?? DocumentId}]";
+        }
+
+        void RefreshView()
+        {
+            var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;
+            if (activateButtons)
+            {
+                button1.Enabled = true;
+                button2.Enabled = true;
+                button3.Enabled = true;
+                button1.Alpha = 1f;
+                button2.Alpha = 1f;
+                button3.Alpha = 1f;
+            }
+            else
+            {
+                button1.Enabled = false;
+                button2.Enabled = false;
+                button3.Enabled = false;
+                button1.Alpha = .5f;
+                button2.Alpha = .5f;
+                button3.Alpha = .5f;
+            }
+
+            progress.Visibility = ViewStates.Gone;
+            relativeLayout.Visibility = ViewStates.Visible;
+
+            for (var i = 0; i < linearLayout.ChildCount; i++)
+            {
+                if (linearLayout.GetChildAt(i) is DocumentView dv)
+                {
+                    dv.DocumentPreview = DocumentPreview;
+                    dv.Document = Document;
+                    dv.RefreshView();
+
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
+                    {
+                        d.Visibility = dv.Visibility;
+                        i++;
+                    }
+                }
+            }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
+
+            Activity?.InvalidateOptionsMenu();
+        }
+
+        void RefreshView<T>() where T : DocumentView
+        {
+            progress.Visibility = ViewStates.Gone;
+            relativeLayout.Visibility = ViewStates.Visible;
+
+            for (var i = 0; i < linearLayout.ChildCount; i++)
+            {
+                if (linearLayout.GetChildAt(i) is T dv)
+                {
+                    dv.DocumentPreview = DocumentPreview;
+                    dv.Document = Document;
+                    dv.RefreshView();
+
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
+                    {
+                        d.Visibility = dv.Visibility;
+                        i++;
+                    }
+                }
+            }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
+
+            Activity?.InvalidateOptionsMenu();
+        }
+
+        void MarkAsReadIfNecessary()
+        {
+            setReadStatusCancellationTokenSource?.Cancel();
+            setReadStatusCancellationTokenSource = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                var d = Document;
+                var dp = DocumentPreview;
+                var token = setReadStatusCancellationTokenSource.Token;
+
+                try
+                {
+                    if (dp == null || d == null)
+                        return;
+
+                    if (dp.IsReadByCurrent)
+                        return;
+
+                    var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
+                    if (delaySeconds < 0)
+                        return;
+
+                    await Task.Delay(delaySeconds * 1000);
+
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+
+                    Activity?.RunOnUiThread(() =>
+                    {
+                        if (token.IsCancellationRequested)
+                            return;
+
+                        if (!IsAdded || IsDetached || IsRemoving)
+                            return;
+
+                        if (dp == null)
+                            return;
+
+                        RefreshView<RecipentsView>();
+                        CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
+                    });
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
+                }
+            });
+        }
+
+        void UpdateCategories(List<Category> categories)
+        {
+            DocumentPreview?.Categories.Clear();
+            DocumentPreview?.Categories.AddRange(categories);
+        }
+
+        void UpdateComments(List<Comment> comments)
+        {
+            if (Document != null)
+            {
+                Document.Comments.Clear();
+                Document.Comments.AddRange(comments);
+            }
+
+            if (DocumentPreview != null)
+                DocumentPreview.CommentsCount = comments.Count;
         }
 
         async void MarkAsRead()
@@ -773,175 +919,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void RefreshView()
+        static class MenuItemActions
         {
-            var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;
-            if (activateButtons)
-            {
-                button1.Enabled = true;
-                button2.Enabled = true;
-                button3.Enabled = true;
-                button1.Alpha = 1f;
-                button2.Alpha = 1f;
-                button3.Alpha = 1f;
-            }
-            else
-            {
-                button1.Enabled = false;
-                button2.Enabled = false;
-                button3.Enabled = false;
-                button1.Alpha = .5f;
-                button2.Alpha = .5f;
-                button3.Alpha = .5f;
-            }
-
-            progress.Visibility = ViewStates.Gone;
-            relativeLayout.Visibility = ViewStates.Visible;
-
-            for (var i = 0; i < linearLayout.ChildCount; i++)
-            {
-                if (linearLayout.GetChildAt(i) is DocumentView dv)
-                {
-                    dv.DocumentPreview = DocumentPreview;
-                    dv.Document = Document;
-                    dv.RefreshView();
-
-                    if (linearLayout.GetChildAt(i + 1) is Divider d)
-                    {
-                        d.Visibility = dv.Visibility;
-                        i++;
-                    }
-                }
-            }
-
-            linearLayout.Invalidate();
-            linearLayout.RequestLayout();
-
-            Activity?.InvalidateOptionsMenu();
+            public const int GoToPrevious = 5;
+            public const int GoToNext = 6;
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int CopyToNew = 20;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int Comments = 70;
+            public const int Actions = 80;
+            public const int Links = 90;
+            public const int DeleteFromFolder = 100;
+            public const int Delete = 101;
         }
 
-        void RefreshView<T>() where T : DocumentView
+        static class RequestCodes
         {
-            progress.Visibility = ViewStates.Gone;
-            relativeLayout.Visibility = ViewStates.Visible;
-
-            for (var i = 0; i < linearLayout.ChildCount; i++)
-            {
-                if (linearLayout.GetChildAt(i) is T dv)
-                {
-                    dv.DocumentPreview = DocumentPreview;
-                    dv.Document = Document;
-                    dv.RefreshView();
-
-                    if (linearLayout.GetChildAt(i + 1) is Divider d)
-                    {
-                        d.Visibility = dv.Visibility;
-                        i++;
-                    }
-                }
-            }
-
-            linearLayout.Invalidate();
-            linearLayout.RequestLayout();
-
-            Activity?.InvalidateOptionsMenu();
-        }
-
-        void MarkAsReadIfNecessary()
-        {
-            setReadStatusCancellationTokenSource?.Cancel();
-            setReadStatusCancellationTokenSource = new CancellationTokenSource();
-
-            Task.Run(async () =>
-            {
-                var d = Document;
-                var dp = DocumentPreview;
-                var token = setReadStatusCancellationTokenSource.Token;
-
-                try
-                {
-                    if (dp == null || d == null)
-                        return;
-
-                    if (dp.IsReadByCurrent)
-                        return;
-
-                    var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
-                    if (delaySeconds < 0)
-                        return;
-
-                    await Task.Delay(delaySeconds * 1000);
-
-                    if (token.IsCancellationRequested)
-                        return;
-
-                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
-
-                    Activity?.RunOnUiThread(() =>
-                    {
-                        if (token.IsCancellationRequested)
-                            return;
-
-                        if (!IsAdded || IsDetached || IsRemoving)
-                            return;
-
-                        if (dp == null)
-                            return;
-
-                        RefreshView<RecipentsView>();
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
-                    });
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
-                }
-            });
-        }
-
-        void UpdateCategories(List<Category> categories)
-        {
-            DocumentPreview?.Categories.Clear();
-            DocumentPreview?.Categories.AddRange(categories);
-        }
-
-        void UpdateComments(List<Comment> comments)
-        {
-            if (Document != null)
-            {
-                Document.Comments.Clear();
-                Document.Comments.AddRange(comments);
-            }
-
-            if (DocumentPreview != null)
-                DocumentPreview.CommentsCount = comments.Count;
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new DocumentFragmentState
-            {
-                FolderId = FolderId,
-                Folder = Folder,
-                DocumentId = DocumentId,
-                DocumentPreview = DocumentPreview
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is DocumentFragmentState dfs)
-            {
-                FolderId = dfs.FolderId;
-                Folder = dfs.Folder;
-                DocumentId = dfs.DocumentId;
-                DocumentPreview = dfs.DocumentPreview;
-            }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentFragment)} [DocumentId={DocumentPreview?.Id ?? Document?.Id ?? DocumentId}]";
+            public static int CommentsRequest = 1;
+            public static int CategoriesRequest = 2;
         }
 
         class DocumentFragmentState : IRetainableState

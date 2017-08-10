@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid
     {
         public List<Category> Categories => adapter.Items;
 
+        readonly Handler searchHandler = new Handler();
+
         BusinessEntityPreview businessEntityPreview;
         Action closeRequest;
 
@@ -30,8 +32,6 @@ namespace Mark5.Mobile.Droid
 
         CategoriesListAdapter adapter;
         CategoriesListAdapter searchAdapter;
-
-        readonly Handler searchHandler = new Handler();
 
         public CategoriesListFragment(BusinessEntityPreview businessEntityPreview, Action closeRequest)
         {
@@ -145,6 +145,16 @@ namespace Mark5.Mobile.Droid
 
         #region Filtering
 
+        static bool MatchesQuery(Category c, string query)
+        {
+            if (c.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (c.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+
+            return false;
+        }
+
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
@@ -186,16 +196,6 @@ namespace Mark5.Mobile.Droid
 
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
-            return false;
-        }
-
-        static bool MatchesQuery(Category c, string query)
-        {
-            if (c.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (c.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
             return false;
         }
 
