@@ -1015,7 +1015,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     : base(section)
                 {
                     Content = content;
-                    this.shouldStartEditing = shouldStartEditing;
+                    this.shouldStartEditing = false; //TODO it's for trsting
                 }
 
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Delete;
