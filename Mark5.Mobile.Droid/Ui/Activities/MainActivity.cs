@@ -230,7 +230,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
             CommonConfig.Logger.Info($"Switching to {menuItem.TitleFormatted}...");
-
             drawerToggle.RunWhenIdle(() =>
                 {
                     if (lastSelectedItem != menuItem)
@@ -239,7 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                             stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
                         if (SupportFragmentManager.BackStackEntryCount > 0)
-                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) AndroidApp.PopBackStackFlags.Inclusive);
+                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) Android.App.PopBackStackFlags.Inclusive);
 
                         stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 

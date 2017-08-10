@@ -12,12 +12,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CopyMoveToFolderListFragment : FoldersListFragment
     {
-        public enum ActionType
-        {
-            Copy,
-            Move,
-        };
-
         protected override bool LoadRemoteFromCache => true;
 
         List<IBusinessEntity> businessEntities;
@@ -218,5 +212,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        public enum ActionType
+        {
+            Copy,
+            Move,
+        };
     }
 }

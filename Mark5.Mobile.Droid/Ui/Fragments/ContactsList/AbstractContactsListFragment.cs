@@ -26,13 +26,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public abstract class AbstractContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        static class RequestCodes
-        {
-            public const int SaveOfflineRequest = 1;
-        }
-
         public Folder Folder { get; set; }
+
+        protected ContactsListAdapter CurrentAdapter => (ContactsListAdapter)recyclerView.GetAdapter();
+
         protected Action CloseRequest;
+        protected ActionMode ActionMode;
+
+        readonly Handler searchHandler = new Handler();
 
         bool refreshing;
 
@@ -41,17 +42,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         ContactsListAdapter adapter;
         ContactsListAdapter searchAdapter;
-        protected ActionMode ActionMode;
         SearchView searchView;
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
-        protected ContactsListAdapter CurrentAdapter => (ContactsListAdapter)recyclerView.GetAdapter();
-
         CancellationTokenSource cts;
-
-        readonly Handler searchHandler = new Handler();
 
         #region Fragment overrides
 
@@ -329,16 +325,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
-        static class MenuItemActions
-        {
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int Categories = 50;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
-        }
-
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
         {
             return true;
@@ -513,9 +499,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Categories = 50;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
+        }
+
         #endregion
 
         #region Filtering
+
+        static bool MatchesQuery(ContactPreview cp, string query)
+        {
+            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+
+            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
+                return true;
+
+            return false;
+        }
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
@@ -567,44 +586,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
         {
             return false;
-        }
-
-        static bool MatchesQuery(ContactPreview cp, string query)
-        {
-            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
-                return true;
-
-            return false;
-        }
-
-        #endregion
-
-        #region State
-
-        class ContactsListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-
-            public List<ContactPreview> ContactPreviews { get; set; }
-
-            public List<ContactPreview> SelectedContactPreviews { get; set; }
-
-            public bool RefreshInProgress { get; set; }
         }
 
         #endregion
@@ -698,11 +679,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class ContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
+            public override int ItemCount => Items.Count;
+
             public List<ContactPreview> Items { get; } = new List<ContactPreview>(1000);
 
             public List<ContactPreview> SelectedItems => selectedContactsInView.Values.ToList();
-
-            public override int ItemCount => Items.Count;
 
             public int SelectedItemCount => selectedContactsInView.Count;
 
@@ -907,5 +888,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        #region State
+
+        class ContactsListFragmentState : IRetainableState
+        {
+            public Folder Folder { get; set; }
+
+            public List<ContactPreview> ContactPreviews { get; set; }
+
+            public List<ContactPreview> SelectedContactPreviews { get; set; }
+
+            public bool RefreshInProgress { get; set; }
+        }
+
+        #endregion
+
+        static class RequestCodes
+        {
+            public const int SaveOfflineRequest = 1;
+        }
+
     }
 }
