@@ -436,11 +436,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshAllOnAppear()
         {
-            contactId = contactPreview.Id;
-            contactPreview = null;
             var ds = tableView?.Source as DataSource;
             ds?.Clear();
-            refreshDataOnAppear = true;
+
+            if (SplitViewController == null)
+            {
+                contactId = contactPreview.Id;
+                contactPreview = null;
+                refreshDataOnAppear = true;
+            }
+            else
+            {
+                RefreshData();
+            }
+
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
