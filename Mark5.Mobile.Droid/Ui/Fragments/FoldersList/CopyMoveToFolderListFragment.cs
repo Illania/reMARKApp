@@ -18,11 +18,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Move,
         };
 
-        protected override bool LoadRemoteFromCache => true;
-
         public List<IBusinessEntity> BusinessEntities { get; set; }
         public Folder FromFolder { get; set; }
         public ActionType Type { get; set; }
+
+        public CopyMoveToFolderListFragment()
+        {
+            HideFab = true;
+            LoadRemoteFromCache = true;
+        }
 
         protected override void SetSections()
         {

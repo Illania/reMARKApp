@@ -111,6 +111,13 @@
 
     #region Contacts
 
+    public enum ContactCreationModeFlag
+    {
+        None = 0,
+        New = 1,
+        Edit = 2,
+    }
+
     public enum CommunicationAddressType
     {
         None = 0,

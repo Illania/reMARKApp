@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Folder RemoteFolder { get; set; }
         protected bool HideSearch;
+        protected bool HideFab;
+        protected bool LoadRemoteFromCache;
 
         protected View Container;
         protected FolderListAdapter Adapter;
@@ -43,8 +45,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         FloatingActionButton fab;
         List<int> recoveredSelectedItemsPosition;
-
-        protected virtual bool LoadRemoteFromCache { get; }
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
@@ -135,16 +135,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             fab = ((View)Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            if (RemoteFolder?.Module == ModuleType.Documents)
-            {
-                fab.SetImageResource(Resource.Drawable.action_new);
-                fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
-                fab.Visibility = ViewStates.Visible;
-            }
-            else
+            if (HideFab)
             {
                 fab.Visibility = ViewStates.Gone;
                 fab = null;
+            }
+            else
+            {
+                if (RemoteFolder?.Module == ModuleType.Documents)
+                {
+                    fab.SetImageResource(Resource.Drawable.action_new);
+                    fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
+                    fab.Visibility = ViewStates.Visible;
+                }
+                if (RemoteFolder?.Module == ModuleType.Contacts
+                    && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
+                {
+                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
+                    fab.Visibility = ViewStates.Visible;
+                }
             }
 
             SetSections();
@@ -209,6 +219,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None));
+        }
+
+        async void CreateContact()
+        {
+            var values = new List<ContactType> { ContactType.Company, ContactType.Department, ContactType.Person };
+            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
+            if (index >= 0)
+            {
+                var intent = new Intent(Context, typeof(AddEditContactActivity));
+                intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
+                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
+                StartActivity(intent);
+            }
         }
 
         #endregion

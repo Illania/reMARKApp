@@ -1,0 +1,173 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Android.Animation;
+using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
+using Android.Support.V7.Widget;
+using Android.Views;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
+
+namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
+{
+    public abstract class AbstractMultipleRowsView<T> : AddEditContactView
+    {
+        LinearLayoutCompat topLayout;
+        LinearLayoutCompat contentLayout;
+
+        AppCompatEditText titleEditText;
+        AppCompatTextView titleTextView;
+        AppCompatImageButton addButton;
+
+        protected List<Row> Rows = new List<Row>();
+
+        protected AbstractMultipleRowsView(Context context, int titleResourceId) : base(context)
+        {
+            topLayout = new LinearLayoutCompat(context)
+            {
+                Orientation = Horizontal,
+                LayoutTransition = new LayoutTransition()
+            };
+            AddView(topLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            contentLayout = new LinearLayoutCompat(context)
+            {
+                Orientation = Vertical,
+                LayoutTransition = new LayoutTransition()
+            };
+            AddView(contentLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            titleEditText = new AppCompatEditText(context)
+            {
+                KeyListener = null,
+            };
+            titleEditText.SetHint(titleResourceId);
+
+            titleEditText.Focusable = false;
+            titleEditText.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            titleEditText.Click += AddButton_Click;
+            var hintEditTextLp = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
+            {
+                Gravity = (int)GravityFlags.CenterVertical,
+            };
+
+            topLayout.AddView(titleEditText, hintEditTextLp);
+
+            titleTextView = new AppCompatTextView(context);
+            titleTextView.SetText(titleResourceId);
+            var titleTextViewLp = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
+            {
+                Gravity = (int)GravityFlags.CenterVertical,
+                RightMargin = DistanceNormal,
+            };
+            titleTextView.Visibility = ViewStates.Gone;
+            titleTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            titleTextView.SetPadding(titleEditText.PaddingLeft, titleEditText.PaddingTop, titleEditText.PaddingRight, titleEditText.PaddingBottom);
+            topLayout.AddView(titleTextView, titleTextViewLp);
+
+            addButton = GetButton(context, true);
+            addButton.Click += AddButton_Click;
+            topLayout.AddView(addButton);
+        }
+
+        virtual protected void AddRow(T content = default(T))
+        {
+            titleEditText.Visibility = ViewStates.Gone;
+            titleTextView.Visibility = ViewStates.Visible;
+
+            var row = GetNewRow();
+            row.SetContent(content);
+            row.DeleteClicked += Row_DeleteClicked;
+
+            Rows.Add(row);
+            contentLayout.AddView(row.Layout);
+        }
+
+        virtual protected void RemoveRow(Row row)
+        {
+            contentLayout.RemoveView(row.Layout);
+            row.DeleteClicked -= Row_DeleteClicked;
+            Rows.Remove(row);
+
+            if (!Rows.Any())
+            {
+                titleEditText.Visibility = ViewStates.Visible;
+                titleTextView.Visibility = ViewStates.Gone;
+                addButton.Visibility = ViewStates.Visible;
+            }
+        }
+
+        protected void Clear()
+        {
+            Rows.ToList().ForEach(RemoveRow);
+        }
+
+        abstract protected void AddButton_Click(object sender, EventArgs e);
+
+        abstract protected void Row_DeleteClicked(object sender, EventArgs e);
+
+        abstract protected Row GetNewRow();
+
+        #region Utilities
+
+        static public AppCompatImageButton GetButton(Context context, bool addButton = true)
+        {
+            var button = new AppCompatImageButton(context);
+
+            button.SetImageResource(addButton ? Resource.Drawable.add : Resource.Drawable.remove);
+            button.SetColorFilter(addButton ? new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)) : new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
+
+            var addButtonLp = new LayoutParams(Conversion.ConvertDpToPixels(24), Conversion.ConvertDpToPixels(24))
+            {
+                TopMargin = addButton ? 0 : DistanceSmall,
+                LeftMargin = DistanceNormal,
+                Gravity = addButton ? (int)GravityFlags.CenterVertical : (int)GravityFlags.Top,
+            };
+            button.LayoutParameters = addButtonLp;
+            return button;
+        }
+
+        #endregion
+
+        abstract protected class Row
+        {
+            public event EventHandler DeleteClicked = delegate { };
+
+            public LinearLayoutCompat Layout { get => LinearLayout; }
+
+            readonly AppCompatImageButton deleteButton;
+
+            protected readonly LinearLayoutCompat LinearLayout;
+            protected readonly Context Context;
+            protected readonly AddEditContactView ParentView;
+
+            protected T Content;
+
+            protected Row(Context context, AddEditContactView parentView)
+            {
+                ParentView = parentView;
+                Context = context;
+                LinearLayout = new LinearLayoutCompat(context)
+                {
+                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                };
+
+                deleteButton = GetButton(context, false);
+                deleteButton.Click += (sender, e) => DeleteClicked(this, EventArgs.Empty);
+                LinearLayout.AddView(deleteButton);
+            }
+
+            public void SetContent(T content)
+            {
+                Content = content;
+                UpdateRow();
+            }
+
+            public T GetContent() => Content;
+
+            public abstract void UpdateRow();
+        }
+    }
+}

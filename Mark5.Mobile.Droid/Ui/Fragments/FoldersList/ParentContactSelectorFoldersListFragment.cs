@@ -4,11 +4,15 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickerShortcodesFolderListFragment : FoldersListFragment
+    public class ParentContactSelectorFoldersListFragment : FoldersListFragment
     {
-        public PickerShortcodesFolderListFragment()
+        ContactType childrenType;
+
+        public ParentContactSelectorFoldersListFragment(ContactType childrenType)
         {
-            RemoteFolder = Folder.RootForModule(ModuleType.Shortcodes);
+            this.childrenType = childrenType;
+
+            RemoteFolder = Folder.RootForModule(ModuleType.Contacts);
             HideSearch = true;
             HideFab = true;
             LoadRemoteFromCache = true;
@@ -17,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected override void Adapter_ItemClicked(object sender, int position)
         {
             var folder = CurrentAdapter.GetItemAtPosition(position);
-            Activity.StartActivityForResult(PickerShortcodesListActivity.Create(Context, folder), PickerShortcodesFolderListActivity.ShortcodesRequestCode);
+            Activity.StartActivityForResult(ParentContactSelectorActivity.Create(Context, folder, childrenType), ParentContactSelectorFoldersListActivity.ContactRequestCode);
         }
 
         protected override void Adapter_ItemLongClicked(object sender, int position)
@@ -27,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new PickerShortcodesFolderListFragment
+            return new ParentContactSelectorFoldersListFragment(childrenType)
             {
                 RemoteFolder = folder,
             };
