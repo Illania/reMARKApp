@@ -7,10 +7,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerContactFolderListFragment : FoldersListFragment
     {
-        public PickerContactFolderListFragment(Folder remoteFolder = null, bool? hideSearch = null)
+        public PickerContactFolderListFragment() { }
+
+        public PickerContactFolderListFragment(Folder remoteFolder, bool? hideSearch = null)
         {
-            if (remoteFolder != null)
-                RemoteFolder = remoteFolder;
+            RemoteFolder = remoteFolder;
+
             if (hideSearch != null)
                 HideSearch = hideSearch.Value;
         }

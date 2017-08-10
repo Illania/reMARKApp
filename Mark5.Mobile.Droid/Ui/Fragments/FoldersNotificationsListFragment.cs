@@ -24,6 +24,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         TabLayout tabLayout;
         ViewPager pager;
 
+        public FoldersNotificationsListFragment() { }
+
         public FoldersNotificationsListFragment(Folder remoteFolder = null)
         {
             if(remoteFolder != null)

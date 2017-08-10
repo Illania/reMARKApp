@@ -48,10 +48,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
-        public FoldersListFragment(Folder remoteFolder = null, bool? hideSearch = null)
+        public FoldersListFragment() { }
+
+        public FoldersListFragment(Folder remoteFolder, bool? hideSearch = null)
         {
-            if (remoteFolder != null)
-                RemoteFolder = remoteFolder;
+            RemoteFolder = remoteFolder;
+
             if (hideSearch != null)
                 HideSearch = hideSearch.Value;
         }

@@ -18,14 +18,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Folder fromFolder;
         ActionType type;
 
-        public CopyMoveToFolderListFragment(Folder remoteFolder = null, List<IBusinessEntity> businessEntities = null, Folder fromFolder = null, ActionType? actionType = null)
+        public CopyMoveToFolderListFragment() { }
+
+        public CopyMoveToFolderListFragment(Folder remoteFolder, List<IBusinessEntity> businessEntities, Folder fromFolder = null, ActionType? actionType = null)
         {
             if (remoteFolder != null)
                 RemoteFolder = remoteFolder;
+            
             if (businessEntities != null)
                 this.businessEntities = businessEntities;
+            
             if (fromFolder != null)
                 this.fromFolder = fromFolder;
+            
             if (actionType != null)
                 type = (ActionType)actionType;
         }

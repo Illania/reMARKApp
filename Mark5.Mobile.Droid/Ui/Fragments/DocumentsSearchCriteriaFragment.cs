@@ -112,8 +112,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activit).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity) Activit).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
         }
@@ -236,7 +236,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void ReplaceFragment(Fragment f, string tag)
         {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
 
             fragmentManager.BeginTransaction()
                            .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
