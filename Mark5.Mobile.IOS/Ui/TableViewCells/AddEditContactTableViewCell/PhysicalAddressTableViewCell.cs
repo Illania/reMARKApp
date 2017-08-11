@@ -212,11 +212,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             UpdatePrefix();
         }
 
-        public override void StartEditing()
-        {
-            addressTextField.BecomeFirstResponder();
-        }
-
         #region Event handlers
 
         void ZipTextField_EditingDidEnd(object sender, EventArgs e)

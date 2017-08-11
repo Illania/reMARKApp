@@ -707,7 +707,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var addresses = Contact.CommunicationAddresses.Where(c => c.Type == CommunicationAddressType.Email);
 
                     foreach (var address in addresses)
-                        Rows.Add(new EmailAddressRow(this, address, false));
+                        Rows.Add(new EmailAddressRow(this, address));
 
                     Rows.Add(new EmailAddressesHeaderRow(this));
                 }
@@ -718,7 +718,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     ca.Type = CommunicationAddressType.Email;
 
                     Contact.CommunicationAddresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new EmailAddressRow(this, ca, true));
+                    Rows.Insert(Rows.Count - 1, new EmailAddressRow(this, ca));
                     TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
@@ -760,7 +760,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var addresses = Contact.CommunicationAddresses.Where(c => c.Type == type);
 
                     foreach (var address in addresses)
-                        Rows.Add(new PhoneNumberRow(this, address, false));
+                        Rows.Add(new PhoneNumberRow(this, address));
 
                     Rows.Add(new PhoneNumbersHeaderRow(this, type));
                 }
@@ -771,7 +771,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     ca.Type = type;
 
                     Contact.CommunicationAddresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new PhoneNumberRow(this, ca, true));
+                    Rows.Insert(Rows.Count - 1, new PhoneNumberRow(this, ca));
                     TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
@@ -808,7 +808,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void InitializeRows()
                 {
                     foreach (var address in Contact.PhysicalAddresses)
-                        Rows.Add(new PhysicalAddressRow(this, address, false));
+                        Rows.Add(new PhysicalAddressRow(this, address));
 
                     Rows.Add(new PhysicalAddressesHeaderRow(this));
                 }
@@ -817,7 +817,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ca = new PhysicalAddress();
                     Contact.PhysicalAddresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new PhysicalAddressRow(this, ca, true));
+                    Rows.Insert(Rows.Count - 1, new PhysicalAddressRow(this, ca));
                     TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
@@ -1032,13 +1032,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 public T Content { get; set; }
 
-                bool shouldStartEditing;
-
-                protected MultiContentRow(MultiSection section, T content, bool shouldStartEditing)
+                protected MultiContentRow(MultiSection section, T content)
                     : base(section)
                 {
                     Content = content;
-                    this.shouldStartEditing = false; //TODO it's for trsting
                 }
 
                 public override UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.Delete;
@@ -1046,17 +1043,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void OnCommit(NSIndexPath indexPath)
                 {
                     ((MultiSection)Section).DeleteRow(indexPath, this);
-                }
-
-                protected void StartEditing()
-                {
-                    if (shouldStartEditing)
-                    {
-                        TableView.EndEditing(true);
-                        ((MultiRowContentTableViewCell)Cell)?.StartEditing();
-                    }
-
-                    shouldStartEditing = false;
                 }
             }
 
@@ -1465,8 +1451,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             class PhysicalAddressRow : MultiContentRow<PhysicalAddress>
             {
-                public PhysicalAddressRow(PhysicalAddressesSection section, PhysicalAddress address, bool shouldStartEditing)
-                    : base(section, address, shouldStartEditing)
+                public PhysicalAddressRow(PhysicalAddressesSection section, PhysicalAddress address)
+                    : base(section, address)
                 {
                 }
 
@@ -1484,7 +1470,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = (PhysicalAddressTableViewCell)Cell;
                     cell.BindContent(Content);
-                    StartEditing();
                 }
             }
 
@@ -1504,8 +1489,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             class EmailAddressRow : MultiContentRow<CommunicationAddress>
             {
-                public EmailAddressRow(EmailAddressesSection section, CommunicationAddress address, bool shouldStartEditing)
-                    : base(section, address, shouldStartEditing)
+                public EmailAddressRow(EmailAddressesSection section, CommunicationAddress address)
+                    : base(section, address)
                 {
                 }
 
@@ -1530,7 +1515,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = (EmailAddressTableViewCell)Cell;
                     cell.BindContent(Content);
-                    StartEditing();
                 }
 
                 void Cell_SelectedAsPrimary(object sender, EventArgs e)
@@ -1580,8 +1564,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             class PhoneNumberRow : MultiContentRow<CommunicationAddress>
             {
-                public PhoneNumberRow(PhoneNumbersSection section, CommunicationAddress address, bool shouldStartEditing)
-                    : base(section, address, shouldStartEditing)
+                public PhoneNumberRow(PhoneNumbersSection section, CommunicationAddress address)
+                    : base(section, address)
                 {
                 }
 
@@ -1606,7 +1590,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = (PhoneNumberTableViewCell)Cell;
                     cell.BindContent(Content);
-                    StartEditing();
                 }
 
                 void Cell_SelectedAsPrimary(object sender, EventArgs e)

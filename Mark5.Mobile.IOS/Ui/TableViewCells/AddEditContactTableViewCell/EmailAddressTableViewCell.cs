@@ -122,11 +122,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             addressTextField.Text = ca.Address ?? string.Empty;
         }
 
-        public override void StartEditing()
-        {
-            addressTextField.BecomeFirstResponder();
-        }
-
         #region EventHandlers
 
         void PreferrableSwitch_ValueChanged(object sender, EventArgs e)

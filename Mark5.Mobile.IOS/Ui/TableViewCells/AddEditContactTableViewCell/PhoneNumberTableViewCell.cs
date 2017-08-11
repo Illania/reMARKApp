@@ -215,11 +215,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             UpdatePrefix(false);
         }
 
-        public override void StartEditing()
-        {
-            numberTextField.BecomeFirstResponder();
-        }
-
         #region Event handlers
 
         void PreferrableSwitch_ValueChanged(object sender, EventArgs e)
