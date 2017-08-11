@@ -438,11 +438,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var ds = tableView?.Source as DataSource;
             ds?.Clear();
+            contactId = contactPreview.Id;
+            contactPreview = null;
 
             if (SplitViewController == null)
             {
-                contactId = contactPreview.Id;
-                contactPreview = null;
                 refreshDataOnAppear = true;
             }
             else

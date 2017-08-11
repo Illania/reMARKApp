@@ -202,6 +202,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             areaTextField.Text = pa.Area ?? string.Empty;
             cityTextField.Text = pa.City ?? string.Empty;
 
+            address.Country = address.Country ?? countrySource.CountryByPrefix(0);
+
+            countrySource.SelectCountryByFaxPrefix(countryPicker, address.Country.FaxPrefix);
+
             UpdatePrefix();
         }
 
@@ -234,9 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         void UpdatePrefix()
         {
-            address.Country = address.Country ?? countrySource.CountryByPrefix(0);
-
-            countryTextField.Text = $"+{address.Country.FaxPrefix}";
+            countryTextField.Text = address.Country.FaxPrefix == 0 ? Localization.GetString("country") : address.Country.Name;
             countryTextField.SizeToFit();
             var width = countryTextField.IntrinsicContentSize.Width;
             countryWidthConstraint.Constant = width + 5.0f;
