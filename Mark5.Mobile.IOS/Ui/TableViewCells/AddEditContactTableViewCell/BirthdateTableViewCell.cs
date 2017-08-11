@@ -73,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             RefreshDate();
         }
 
-        public override void StartEditing()
+        public void StartEditing()
         {
             dateTextField.BecomeFirstResponder();
         }
