@@ -107,6 +107,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("number"),
+                AutocapitalizationType = UITextAutocapitalizationType.None,
+                AutocorrectionType = UITextAutocorrectionType.No,
             };
             numberTextField.EditingChanged += NumberTextField_EditingChanged;
             ContentView.Add(numberTextField);
