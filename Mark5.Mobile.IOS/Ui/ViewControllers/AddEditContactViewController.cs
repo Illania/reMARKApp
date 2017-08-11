@@ -420,6 +420,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 row.UnbindCell();
             }
 
+            public override void CellDisplayingEnded(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+            {
+                var row = RowAtIndexPath(indexPath);
+                row.UnbindCell();
+            }
+
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 return sections[(int)section].Rows.Count;
@@ -870,6 +876,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Initialize();
                     RefreshRow();
                     SetErrorState(error, false);
+                }
+
+                public void UnbindCell()
+                {
+                    Cell = null;
                 }
 
                 public void UnbindCell()
