@@ -9,7 +9,5 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             : base(style, reuseIdentifier)
         {
         }
-
-        abstract public void StartEditing();
     }
 }
