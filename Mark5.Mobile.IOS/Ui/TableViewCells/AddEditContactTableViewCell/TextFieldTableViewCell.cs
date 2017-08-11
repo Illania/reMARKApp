@@ -48,6 +48,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             textField.Text = content;
         }
 
+        public void SetAutocapitalizationType(UITextAutocapitalizationType type)
+        {
+            textField.AutocapitalizationType = type;
+        }
+
+        public void SetAutocorrectionType(UITextAutocorrectionType type)
+        {
+            textField.AutocorrectionType = type;
+        }
+
         public override void Reset()
         {
             ContentEdited = delegate { };
