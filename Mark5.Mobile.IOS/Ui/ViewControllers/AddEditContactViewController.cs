@@ -411,8 +411,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
             {
-                var row = RowAtIndexPath(indexPath);
-                row.OnDisplayed(indexPath);
                 cellHeights[indexPath] = cell.Frame.Size.Height;
             }
 
@@ -889,7 +887,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public virtual void OnClicked(NSIndexPath indexPath) { }
                 public virtual void OnCommit(NSIndexPath indexPath) { }
-                public virtual void OnDisplayed(NSIndexPath indexPath) { }
             }
 
             abstract class TextFieldRow : AbstractRow

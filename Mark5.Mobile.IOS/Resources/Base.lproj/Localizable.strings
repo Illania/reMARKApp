@@ -381,5 +381,6 @@
 "wrong_username_title" = "Wrong username";
 "yes" = "Yes";
 "yesterday" = "Yesterday";
-"zip" = "Zip";"youre_offline_title" = "You are offline";
+"zip" = "Zip";
+"youre_offline_title" = "You are offline";
 "youre_offline_message" = "This action cannot be performed offline";

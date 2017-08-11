@@ -29,6 +29,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("address"),
+                AutocapitalizationType = UITextAutocapitalizationType.None,
+                AutocorrectionType = UITextAutocorrectionType.No,
             };
             addressTextField.EditingChanged += AddressTextField_EditingChanged;
             ContentView.Add(addressTextField);

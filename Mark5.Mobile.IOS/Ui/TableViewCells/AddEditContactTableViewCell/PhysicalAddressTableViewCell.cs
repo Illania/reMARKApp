@@ -62,6 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("address"),
+                AutocorrectionType = UITextAutocorrectionType.No,
             };
             addressTextField.EditingDidEnd += AddressTextField_EditingDidEnd;
             ContentView.Add(addressTextField);
@@ -113,6 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("area"),
+                AutocorrectionType = UITextAutocorrectionType.No,
             };
             areaTextField.EditingDidEnd += AreaTextField_EditingDidEnd;
             ContentView.Add(areaTextField);
@@ -178,6 +180,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 Placeholder = Localization.GetString("city"),
+                AutocorrectionType = UITextAutocorrectionType.No,
             };
             cityTextField.EditingDidEnd += CityTextField_EditingDidEnd;
             ContentView.Add(cityTextField);
