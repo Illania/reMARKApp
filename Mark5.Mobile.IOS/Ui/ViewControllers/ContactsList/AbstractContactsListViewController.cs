@@ -213,36 +213,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void UnsubscribeFromMessages()
         {
-            if (categoriesChangedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityCategoriesChangedMessage>(categoriesChangedToken);
-                categoriesChangedToken = null;
-            }
-
-            if (removedFromFolderToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityRemovedFromFolderMessage>(removedFromFolderToken);
-                removedFromFolderToken = null;
-            }
-
-            if (movedFromFolderToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityMovedFromFolderMessage>(movedFromFolderToken);
-                movedFromFolderToken = null;
-            }
-
-            if (deletedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityDeletedMessage>(deletedToken);
-                deletedToken = null;
-            }
-
-            if (contactChangedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(contactChangedToken);
-                contactChangedToken = null;
-            }
-
+            categoriesChangedToken?.Dispose();
+            removedFromFolderToken?.Dispose();
+            movedFromFolderToken?.Dispose();
+            deletedToken?.Dispose();
+            contactChangedToken?.Dispose();
         }
 
         void InitializeNavigationBarTitle()
