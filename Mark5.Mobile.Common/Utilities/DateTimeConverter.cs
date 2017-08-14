@@ -4,6 +4,8 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class DateTimeConverter
     {
+        public static long ServerDefaultTimestamp = -6847804800000;
+
         public static bool UseServerTimezone = true;
 
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -20,7 +22,7 @@ namespace Mark5.Mobile.Common.Utilities
                 return -1;
 
             var elapsed = dateTime - epoch;
-            return (long) elapsed.TotalMilliseconds;
+            return (long)elapsed.TotalMilliseconds;
         }
 
         public static DateTime ConvertUtcToUserTime(this DateTime dateTime)

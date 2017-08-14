@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
 
         public override void RefreshView()
         {
-            if (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1)
+            if (Contact?.BirthDateTimestamp == DateTimeConverter.ServerDefaultTimestamp || Contact?.BirthDateTimestamp == -1)
             {
                 Visibility = ViewStates.Gone;
             }

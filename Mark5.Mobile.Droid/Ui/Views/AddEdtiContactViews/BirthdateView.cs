@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         public override void RefreshView()
         {
-            if (Contact.BirthDateTimestamp != -6847804800000 && Contact.BirthDateTimestamp != -1)
+            if (Contact.BirthDateTimestamp != DateTimeConverter.ServerDefaultTimestamp && Contact.BirthDateTimestamp != -1)
                 Content = Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds()
                         .FormatUserTimestampAsLongDateString(Context);
         }
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
         protected override async void ContentClicked(object sender, EventArgs e)
         {
             long userTimestamp = -1;
-            if (Contact.BirthDateTimestamp != -6847804800000 && Contact.BirthDateTimestamp != -1)
+            if (Contact.BirthDateTimestamp != DateTimeConverter.ServerDefaultTimestamp && Contact.BirthDateTimestamp != -1)
                 userTimestamp = Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
 
             var newTimestamp = await Dialogs.ShowDatePicker(Context, userTimestamp, addRemoveDateChoice: true);

@@ -1295,7 +1295,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class ExtraSection : AbstractSection
             {
-                public override bool Empty => string.IsNullOrWhiteSpace(ContactPreview?.Description) && string.IsNullOrWhiteSpace(ContactPreview?.ShortId) && (!Contact?.ResponsibleUsers?.Any() ?? true) && (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1) && string.IsNullOrWhiteSpace(Contact?.WebPageAddress) && string.IsNullOrWhiteSpace(Contact?.Vat) && string.IsNullOrWhiteSpace(Contact?.Ledger) && string.IsNullOrWhiteSpace(Contact?.Account);
+                public override bool Empty => string.IsNullOrWhiteSpace(ContactPreview?.Description) && string.IsNullOrWhiteSpace(ContactPreview?.ShortId) && (!Contact?.ResponsibleUsers?.Any() ?? true) && (Contact?.BirthDateTimestamp == DateTimeConverter.ServerDefaultTimestamp || Contact?.BirthDateTimestamp == -1) && string.IsNullOrWhiteSpace(Contact?.WebPageAddress) && string.IsNullOrWhiteSpace(Contact?.Vat) && string.IsNullOrWhiteSpace(Contact?.Ledger) && string.IsNullOrWhiteSpace(Contact?.Account);
 
                 public override void InitializeRows()
                 {
@@ -1305,7 +1305,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Rows.Add(new ShortIdRow(ContactPreview, Contact));
                     if (!(!Contact?.ResponsibleUsers?.Any() ?? true))
                         Rows.Add(new ResponsibleUsersRow(ContactPreview, Contact));
-                    if (!(Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1))
+                    if (!(Contact?.BirthDateTimestamp == DateTimeConverter.ServerDefaultTimestamp || Contact?.BirthDateTimestamp == -1))
                         Rows.Add(new BirthdateRow(ContactPreview, Contact));
                     if (!string.IsNullOrWhiteSpace(Contact?.WebPageAddress))
                         Rows.Add(new WebPageRow(ContactPreview, Contact));

@@ -80,7 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         void RefreshDate()
         {
-            if (contact.BirthDateTimestamp != -6847804800000 && contact.BirthDateTimestamp != -1)
+            if (contact.BirthDateTimestamp != DateTimeConverter.ServerDefaultTimestamp && contact.BirthDateTimestamp != -1)
             {
                 var date = contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
                 var components = new NSDateComponents
