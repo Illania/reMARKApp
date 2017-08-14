@@ -857,6 +857,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 bool error;
 
+                protected bool ErrorState { get => error; }
+
                 protected AbstractRow(AbstractSection section)
                 {
                     Section = section;
@@ -1514,7 +1516,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void RefreshRow()
                 {
                     var cell = (EmailAddressTableViewCell)Cell;
-                    cell.BindContent(Content);
+                    cell.BindContent(Content, ErrorState);
                 }
 
                 void Cell_SelectedAsPrimary(object sender, EventArgs e)
@@ -1589,7 +1591,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void RefreshRow()
                 {
                     var cell = (PhoneNumberTableViewCell)Cell;
-                    cell.BindContent(Content);
+                    cell.BindContent(Content, ErrorState);
                 }
 
                 void Cell_SelectedAsPrimary(object sender, EventArgs e)

@@ -112,9 +112,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             AddressChanged = delegate { };
         }
 
-        public void BindContent(CommunicationAddress ca)
+        public void BindContent(CommunicationAddress ca, bool errorState = false)
         {
-            SetErrorState(false);
+            SetErrorState(errorState, false);
             address = ca;
 
             preferrableSwitch.SetState(ca.IsPrimary, true);
