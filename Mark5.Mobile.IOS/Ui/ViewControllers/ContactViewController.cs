@@ -792,7 +792,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if ((folderId != null || folder != null) && contactId != null)
                 {
-                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folder == null ? folderId.Value : folder.Id, contactId.Value);
+                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folder?.Id ?? folderId, contactId.Value);
+
                     this.contactPreview = swp.ContactPreview;
                     contact = swp.Contact;
                 }
