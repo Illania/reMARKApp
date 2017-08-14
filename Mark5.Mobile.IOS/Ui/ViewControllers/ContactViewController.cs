@@ -819,7 +819,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (this.contactPreview.Type == ContactType.Person)
                 {
                     nameLabel.Text = this.contactPreview.Name;
-                    nameSubLabel.Text = string.Join("@", new string[] { contact.Position, this.contactPreview.CompanyName }.Where(s => !string.IsNullOrEmpty(s)));
+                    if (!string.IsNullOrEmpty(this.contactPreview.CompanyName) && !string.IsNullOrEmpty(contact.Position))
+                    {
+                        nameSubLabel.Text = $"{contact.Position}@{this.contactPreview.CompanyName}";
+                    }
+                    else
+                    {
+                        string subtitle = string.Empty;
+                        subtitle += contact.Position;
+                        subtitle += this.contactPreview.CompanyName;
+
+                        nameSubLabel.Text = subtitle;
+                    }
+
                 }
                 else if (this.contactPreview.Type == ContactType.Department)
                 {
