@@ -535,18 +535,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var listString = new List<string> { };
 
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
             {
                 listString.Add(Localization.GetString("edit_contact"));
             }
 
-            var editAllowed = ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed;
+            var createAllowed = ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed;
 
-            if (editAllowed && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
+            if (createAllowed && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
             {
                 listString.Add(Localization.GetString("add_person"));
             }
-            if (editAllowed && contactPreview.Type == ContactType.Company)
+            if (createAllowed && contactPreview.Type == ContactType.Company)
             {
                 listString.Add(Localization.GetString("add_department"));
             }
