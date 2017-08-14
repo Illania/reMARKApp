@@ -191,9 +191,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             });
         }
 
-        public void BindContent(PhysicalAddress pa)
+        public void BindContent(PhysicalAddress pa, bool errorState = false)
         {
-            SetErrorState(false);
+            SetErrorState(errorState, false);
 
             address = pa;
 
