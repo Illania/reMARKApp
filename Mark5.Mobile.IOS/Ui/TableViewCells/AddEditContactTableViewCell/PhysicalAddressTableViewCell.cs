@@ -27,8 +27,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         readonly UIPickerView countryPicker;
         readonly Source countrySource;
 
-        readonly NSLayoutConstraint countryWidthConstraint;
-
         public PhysicalAddressTableViewCell()
           : base(UITableViewCellStyle.Default, Key)
         {
@@ -94,7 +92,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             ContentView.Add(zipTextField);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 55f),
+                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 95f),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
@@ -146,13 +144,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             };
             countryTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(countryTextField);
-            countryWidthConstraint = NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0.0f);
             ContentView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-                countryWidthConstraint,
+                NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 65.0f),
             });
 
             chevronButton = GetChevron();
@@ -236,10 +233,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         void UpdatePrefix()
         {
-            countryTextField.Text = address.Country.FaxPrefix == 0 ? Localization.GetString("country") : address.Country.Name;
-            countryTextField.SizeToFit();
-            var width = countryTextField.IntrinsicContentSize.Width;
-            countryWidthConstraint.Constant = width + 5.0f;
+            countryTextField.Text = address.Country.Name.StartsWith("[", StringComparison.Ordinal) ? Localization.GetString("country") : address.Country.CCode;
         }
 
         #endregion
@@ -264,8 +258,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             public string GetTitle(UIPickerView picker, nint row, nint component)
             {
                 var ci = countries[row];
-
-                return $"{ci.Name} (+{ci.FaxPrefix})";
+                var title = ci.Name;
+                if (!string.IsNullOrEmpty(ci.CCode3))
+                {
+                    title += $" ({ci.CCode})";
+                }
+                return title;
             }
 
             public void SelectCountryByFaxPrefix(UIPickerView picker, int faxPrefix)
