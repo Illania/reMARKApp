@@ -815,7 +815,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested)
                     return;
 
-                if (this.contactPreview.Type == ContactType.Person || this.contactPreview.Type == ContactType.Department)
+                if (this.contactPreview.Type == ContactType.Person)
+                {
+                    nameLabel.Text = this.contactPreview.Name;
+                    if (string.IsNullOrEmpty(contact.Position))
+                        nameSubLabel.Text = this.contactPreview.CompanyName;
+                    else
+                        nameSubLabel.Text = $"{contact.Position}@{this.contactPreview.CompanyName}";
+                }
+                else if (this.contactPreview.Type == ContactType.Department)
                 {
                     nameLabel.Text = this.contactPreview.Name;
                     nameSubLabel.Text = this.contactPreview.CompanyName;
