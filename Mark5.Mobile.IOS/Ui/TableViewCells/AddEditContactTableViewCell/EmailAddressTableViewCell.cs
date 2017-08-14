@@ -17,8 +17,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         readonly UISwitch preferrableSwitch;
         readonly UILabel preferrableLabel;
 
-        public event EventHandler SelectedAsPrimary = delegate { };
-        public event EventHandler AddressChanged = delegate { };
+        public Action SelectedAsPrimaryAction;
+        public Action AddressChangedAction;
 
         public EmailAddressTableViewCell() : base(UITableViewCellStyle.Default, Key)
         {
@@ -108,8 +108,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public override void Reset()
         {
-            SelectedAsPrimary = delegate { };
-            AddressChanged = delegate { };
+            SelectedAsPrimaryAction = null;
+            AddressChangedAction = null;
         }
 
         public void BindContent(CommunicationAddress ca, bool errorState = false)
@@ -127,13 +127,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         void PreferrableSwitch_ValueChanged(object sender, EventArgs e)
         {
             address.IsPrimary = preferrableSwitch.On;
-            SelectedAsPrimary(this, EventArgs.Empty);
+            SelectedAsPrimaryAction?.Invoke();
         }
 
         void AddressTextField_EditingChanged(object sender, EventArgs e)
         {
             address.Address = addressTextField.Text;
-            AddressChanged(this, EventArgs.Empty);
+            AddressChangedAction?.Invoke();
         }
 
         void DescriptionTextField_EditingChanged(object sender, EventArgs e)

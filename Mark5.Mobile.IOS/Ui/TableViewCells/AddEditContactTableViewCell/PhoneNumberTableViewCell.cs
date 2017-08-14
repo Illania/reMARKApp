@@ -31,8 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         CountryInfo selectedCountry;
 
-        public event EventHandler SelectedAsPrimary = delegate { };
-        public event EventHandler AddressChanged = delegate { };
+        public Action SelectedAsPrimaryAction;
+        public Action AddressChangedAction;
 
         public PhoneNumberTableViewCell()
           : base(UITableViewCellStyle.Default, Key)
@@ -186,8 +186,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         public override void Reset()
         {
-            SelectedAsPrimary = delegate { };
-            AddressChanged = delegate { };
+            SelectedAsPrimaryAction = null;
+            AddressChangedAction = null;
         }
 
         public void BindContent(CommunicationAddress ca, bool errorState = false)
@@ -220,7 +220,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         void PreferrableSwitch_ValueChanged(object sender, EventArgs e)
         {
             address.IsPrimary = preferrableSwitch.On;
-            SelectedAsPrimary(this, EventArgs.Empty);
+            SelectedAsPrimaryAction?.Invoke();
         }
 
         void DescriptionTextField_EditingChanged(object sender, EventArgs e)
@@ -252,7 +252,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
         {
             var prefixString = selectedCountry != null ? selectedCountry.FaxPrefix.ToString() : "0";
             address.Address = string.Join("|", prefixString, "", numberTextField.Text);
-            AddressChanged(this, EventArgs.Empty);
+            AddressChangedAction?.Invoke();
         }
 
         #endregion

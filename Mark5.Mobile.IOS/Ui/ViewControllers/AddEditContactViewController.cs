@@ -930,10 +930,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tfc.SetAutocorrectionType(autocorrectionType);
                     tfc.SetAutocapitalizationType(autocapitalizationType);
                     tfc.SetPlaceholder(placeholder);
-                    tfc.ContentEdited += ContentEdited;
+                    tfc.ContentEdited = ContentEdited;
                 }
 
-                protected abstract void ContentEdited(object sender, string e);
+                protected abstract void ContentEdited(string e);
             }
 
 
@@ -967,13 +967,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tfc.SetAutocapitalizationType(autocapitalizationType);
                     tfc.SetMultiline(isMultiline);
                     tfc.SetTitle(title);
-                    tfc.ContentEdited += ContentEdited;
-                    tfc.NumberOfLinesChanged += NumberOfLinesChanged;
+                    tfc.ContentEditedAction = ContentEdited;
+                    tfc.NumbersOfLineChangedAction = NumberOfLinesChanged;
                 }
 
-                protected abstract void ContentEdited(object sender, string e);
+                protected abstract void ContentEdited(string e);
 
-                void NumberOfLinesChanged(object sender, EventArgs e)
+                void NumberOfLinesChanged()
                 {
                     if (isMultiline)
                     {
@@ -1062,7 +1062,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return !string.IsNullOrWhiteSpace(Contact.FirstName);
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     Contact.FirstName = e;
                     SetErrorState(false);
@@ -1078,7 +1078,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e) => Contact.Patronymic = e;
+                protected override void ContentEdited(string e) => Contact.Patronymic = e;
 
                 public override void RefreshRow() => ((TextFieldTableViewCell)Cell).SetContent(Contact.Patronymic);
             }
@@ -1095,7 +1095,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return !string.IsNullOrWhiteSpace(Contact.LastName);
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     Contact.LastName = e;
                     SetErrorState(false);
@@ -1117,7 +1117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return !string.IsNullOrWhiteSpace(ContactPreview.Name);
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     ContactPreview.Name = e;
                     SetErrorState(false);
@@ -1273,7 +1273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     ((TitledTextViewTableViewCell)Cell).SetContent(ContactPreview.Description);
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     ContactPreview.Description = e;
                 }
@@ -1286,7 +1286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     Contact.Account = e;
                     SetErrorState(false);
@@ -1302,7 +1302,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     Contact.Ledger = e;
                     SetErrorState(false);
@@ -1318,7 +1318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     Contact.Vat = e;
                     SetErrorState(false);
@@ -1334,7 +1334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     Contact.Position = e;
                     SetErrorState(false);
@@ -1350,7 +1350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     ContactPreview.ShortId = e;
                     SetErrorState(false);
@@ -1366,7 +1366,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                protected override void ContentEdited(object sender, string e)
+                protected override void ContentEdited(string e)
                 {
                     Contact.WebPageAddress = e;
                     SetErrorState(false);
@@ -1509,8 +1509,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = (EmailAddressTableViewCell)Cell;
                     cell.Reset();
-                    cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
-                    cell.AddressChanged += Cell_AddressChanged;
+                    cell.SelectedAsPrimaryAction = Cell_SelectedAsPrimary;
+                    cell.AddressChangedAction = Cell_AddressChanged;
                 }
 
                 public override void RefreshRow()
@@ -1519,12 +1519,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cell.BindContent(Content, ErrorState);
                 }
 
-                void Cell_SelectedAsPrimary(object sender, EventArgs e)
+                void Cell_SelectedAsPrimary()
                 {
                     ((EmailAddressesSection)Section).DisablePrimaryOnOtherRows(this);
                 }
 
-                void Cell_AddressChanged(object sender, EventArgs e)
+                void Cell_AddressChanged()
                 {
                     if (Validator.IsEmailValid(Content.Address))
                         SetErrorState(false);
@@ -1584,8 +1584,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = (PhoneNumberTableViewCell)Cell;
                     cell.Reset();
-                    cell.SelectedAsPrimary += Cell_SelectedAsPrimary;
-                    cell.AddressChanged += Cell_AddressChanged;
+                    cell.SelectedAsPrimaryAction = Cell_SelectedAsPrimary;
+                    cell.AddressChangedAction = Cell_AddressChanged;
                 }
 
                 public override void RefreshRow()
@@ -1594,12 +1594,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cell.BindContent(Content, ErrorState);
                 }
 
-                void Cell_SelectedAsPrimary(object sender, EventArgs e)
+                void Cell_SelectedAsPrimary()
                 {
                     ((PhoneNumbersSection)Section).DisablePrimaryOnOtherRows(this);
                 }
 
-                void Cell_AddressChanged(object sender, EventArgs e)
+                void Cell_AddressChanged()
                 {
                     if (!string.IsNullOrWhiteSpace(Content.Address))
                         SetErrorState(false);

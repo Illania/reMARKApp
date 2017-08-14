@@ -9,7 +9,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
     {
         public static readonly NSString Key = new NSString("TextFieldTableViewCell");
 
-        public event EventHandler<string> ContentEdited = delegate { };
+        public Action<string> ContentEdited;
 
         readonly UITextField textField;
 
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 Font = Theme.DefaultFont,
                 BorderStyle = UITextBorderStyle.None
             };
-            textField.EditingChanged += (object sender, EventArgs e) => ContentEdited(this, textField.Text);
+            textField.EditingChanged += TextField_EditingChanged;
             textField.AutocorrectionType = UITextAutocorrectionType.No;
 
             ContentView.AddSubview(textField);
@@ -36,6 +36,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
                 NSLayoutConstraint.Create(textField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(textField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
             });
+        }
+
+        void TextField_EditingChanged(object sender, EventArgs e)
+        {
+            ContentEdited?.Invoke(textField.Text);
         }
 
         public void SetPlaceholder(string placeholder)
