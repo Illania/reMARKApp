@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
-            UnsubscribeToMessages();
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -211,7 +211,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleAction);
         }
 
-        void UnsubscribeToMessages()
+        void UnsubscribeFromMessages()
         {
             if (categoriesChangedToken != null)
             {
