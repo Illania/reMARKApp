@@ -2,6 +2,7 @@
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
@@ -24,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             titleLabel = new UILabel
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.WithRelativeSize(1),
             };
             ContentView.AddSubview(titleLabel);
             ContentView.AddConstraints(new[]
