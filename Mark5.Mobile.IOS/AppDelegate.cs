@@ -70,9 +70,6 @@ namespace Mark5.Mobile.IOS
 
                 Window.RootViewController = vc;
 
-                UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
-                UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
-
                 startupTime.Stop();
 
                 CommonConfig.Logger.Info($"Total startup time: {startupTime.ElapsedMilliseconds}ms");
