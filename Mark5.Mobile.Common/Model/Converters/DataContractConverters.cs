@@ -733,7 +733,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Account = c.Account,
                 Vat = c.Vat,
                 BirthDate = c.BirthDateTimestamp == -1
-                             ? default(DateTime)
+                             ? default(DateTime).AddYears(1) //Used because in one version of the service the birthdate is ignored if equal to default(DateTime)
                              : c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 Ledger = c.Ledger,
                 PrimaryPerson = c.PrimaryPerson?.Convert(),
