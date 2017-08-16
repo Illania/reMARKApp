@@ -398,7 +398,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (e.AttachmentDescription != null)
                 {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Local);
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
 
                     if (string.IsNullOrWhiteSpace(path))
                     {
@@ -411,19 +411,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             return;
                         }
 
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Remote);
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
                     }
                 }
 
                 if (e.FileDescription != null)
                     path = e.FileDescription.Path;
 
-
-                if (string.IsNullOrWhiteSpace(path))
-                    throw new Exception("Unable to opent attachment");
-
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(path))
+                        throw new Exception("Unable to opent attachment");
+
                     var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 
