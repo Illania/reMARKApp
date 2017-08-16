@@ -417,7 +417,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void CellDisplayingEnded(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
             {
                 var row = RowAtIndexPath(indexPath);
-                row.UnbindCell();
+                row?.UnbindCell();
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
