@@ -184,7 +184,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Patronymic = c.Patronymic,
                 LastName = c.LastName,
                 Account = c.Account,
-                BirthDateTimestamp = c.BirthDate.ConvertDateTimeToTimestampMilliseconds(),
+                BirthDateTimestamp = c.BirthDate == DateTimeConverter.ServerDefaultDateTime ? -1 : c.BirthDate.ConvertDateTimeToTimestampMilliseconds(),
                 Ledger = c.Ledger,
                 Vat = c.Vat,
                 WebPageAddress = c.WebPageAddress,
@@ -732,7 +732,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 WebPageAddress = c.WebPageAddress,
                 Account = c.Account,
                 Vat = c.Vat,
-                BirthDate = (c.BirthDateTimestamp == -1 || c.BirthDateTimestamp == DateTimeConverter.ServerDefaultTimestamp) ? default(DateTime) : c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                BirthDate = c.BirthDateTimestamp == -1 ? DateTimeConverter.ServerDefaultDateTimeUtc : c.BirthDateTimestamp
+                             .ConvertTimestampMillisecondsToDateTime(),
                 Ledger = c.Ledger,
                 PrimaryPerson = c.PrimaryPerson?.Convert(),
                 Children = c.Children.Select(ch => ch.Convert()).ToList(),

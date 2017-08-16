@@ -4,12 +4,13 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class DateTimeConverter
     {
-        public static long ServerDefaultTimestamp = -6847804800000;
-
         public static bool UseServerTimezone = true;
 
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         static readonly int LocalUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
+
+        public static DateTime ServerDefaultDateTime = new DateTime(1753, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
+        public static DateTime ServerDefaultDateTimeUtc = new DateTime(1753, 1, 1, 0, 0, 0, DateTimeKind.Local).ToUniversalTime();
 
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
@@ -35,6 +36,18 @@ namespace Mark5.Mobile.Common.Utilities
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
             return dt.AddHours(UseServerTimezone ? -ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : -LocalUtcOffset);
+        }
+
+        public static DateTime ConvertUtcToServerTime(this DateTime dateTime)
+        {
+            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
+            return dt.AddHours(ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours);
+        }
+
+        public static DateTime ConvertServerTimeToUtc(this DateTime dateTime)
+        {
+            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+            return dt.AddHours(-ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours);
         }
     }
 }

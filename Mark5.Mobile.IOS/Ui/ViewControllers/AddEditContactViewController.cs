@@ -661,7 +661,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void InitializeRows()
                 {
-                    if (Contact.BirthDateTimestamp != DateTimeConverter.ServerDefaultTimestamp && Contact.BirthDateTimestamp != -1)
+                    if (Contact.BirthDateTimestamp != -1)
                     {
                         var row = new BirthdateRow(this, false);
                         Rows.Add(row);

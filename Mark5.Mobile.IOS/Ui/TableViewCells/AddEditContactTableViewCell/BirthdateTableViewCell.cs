@@ -80,7 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         void RefreshDate()
         {
-            if (contact.BirthDateTimestamp != DateTimeConverter.ServerDefaultTimestamp && contact.BirthDateTimestamp != -1)
+            if (contact.BirthDateTimestamp != -1)
             {
                 var date = contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
                 var components = new NSDateComponents
@@ -109,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
             var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
             var birthdate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 12, 00, 00, DateTimeKind.Utc);
 
-            contact.BirthDateTimestamp = birthdate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            contact.BirthDateTimestamp = birthdate.ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
             RefreshDate();
             dateTextField.ResignFirstResponder();
         }
