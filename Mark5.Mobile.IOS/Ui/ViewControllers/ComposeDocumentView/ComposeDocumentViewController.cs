@@ -755,7 +755,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (e.AttachmentDescription != null)
                 {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Local);
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
 
                     if (string.IsNullOrWhiteSpace(path))
                     {
@@ -767,7 +767,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                             return;
                         }
 
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Remote);
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
                     }
                 }
 
@@ -775,7 +775,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     path = e.FileDescription.Path;
 
                 if (string.IsNullOrWhiteSpace(path))
-                    throw new Exception("Unable to open attachment");
+                    throw new Exception("Unable to open attachment.");
 
                 var url = NSUrl.FromFilename(path);
 
@@ -792,12 +792,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     if (!previewSuccessful)
                     {
-                        CommonConfig.Logger.Info($"Failed to present preview for attachment. Presenting open with instead [documentId={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
+                        CommonConfig.Logger.Info($"Failed to present preview for attachment. Presenting open with instead [documentId={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
 
                         var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
                         if (!openInSuccessful)
                         {
-                            CommonConfig.Logger.Warning($"Failed to present open in view - there is no app that can open this type of attachment installed [documentId={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
+                            CommonConfig.Logger.Warning($"Failed to present open in view - there is no app that can open this type of attachment installed [documentId={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
 
                             await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
@@ -806,7 +806,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(this, ex);
