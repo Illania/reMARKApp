@@ -16,16 +16,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
         public override void RefreshView()
         {
-            if (Contact.BirthDateTimestamp != DateTimeConverter.ServerDefaultTimestamp && Contact.BirthDateTimestamp != -1)
-                Content = Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds()
+            if (Contact.BirthDateTimestamp != -1)
+                Content = Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds()
                         .FormatUserTimestampAsLongDateString(Context);
         }
 
         protected override async void ContentClicked(object sender, EventArgs e)
         {
             long userTimestamp = -1;
-            if (Contact.BirthDateTimestamp != DateTimeConverter.ServerDefaultTimestamp && Contact.BirthDateTimestamp != -1)
-                userTimestamp = Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
+            if (Contact.BirthDateTimestamp != -1)
+                userTimestamp = Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime().ConvertDateTimeToTimestampMilliseconds();
 
             var newTimestamp = await Dialogs.ShowDatePicker(Context, userTimestamp, addRemoveDateChoice: true);
 
@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
 
             if (newTimestamp != -1)
             {
-                var utcTimestamp = newTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+                var utcTimestamp = newTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertServerTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                 Contact.BirthDateTimestamp = utcTimestamp;
             }
 
