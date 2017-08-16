@@ -9,9 +9,6 @@ namespace Mark5.Mobile.Common.Utilities
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         static readonly int LocalUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
 
-        public static DateTime ServerDefaultDateTime = new DateTime(1753, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
-        public static DateTime ServerDefaultDateTimeUtc = new DateTime(1753, 1, 1, 0, 0, 0, DateTimeKind.Local).ToUniversalTime();
-
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
             return epoch.AddMilliseconds(timestamp);
