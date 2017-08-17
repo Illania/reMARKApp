@@ -416,7 +416,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void CellDisplayingEnded(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
             {
-                if (!tableView.IndexPathsForVisibleRows.Contains(indexPath))
+                if (indexPath != null && !tableView.IndexPathsForVisibleRows.Contains(indexPath))
                 {
                     var row = RowAtIndexPath(indexPath);
                     row?.UnbindCell();
