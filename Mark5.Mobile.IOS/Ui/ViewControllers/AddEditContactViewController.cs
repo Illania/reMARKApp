@@ -207,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ParentContactPreview = selectedParent;
                 dataSource.UpdateParentContact(ParentContactPreview);
-                ((DataSource.ParentRow)sender).RefreshRow();
+                ((DataSource.ParentRow)sender).ReloadRow();
             }
 
             DismissViewController(true, null);
@@ -232,7 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact.ResponsibleUserIds.Add(su.Id);
                 });
 
-                ((DataSource.ResponsibleUsersRow)sender).RefreshRow();
+                ((DataSource.ResponsibleUsersRow)sender).ReloadRow();
             }
 
             DismissViewController(true, null);
@@ -416,8 +416,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void CellDisplayingEnded(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
             {
-                var row = RowAtIndexPath(indexPath);
-                row?.UnbindCell();
+                if (!tableView.IndexPathsForVisibleRows.Contains(indexPath))
+                {
+                    var row = RowAtIndexPath(indexPath);
+                    row?.UnbindCell();
+                }
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -879,7 +882,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Cell = null;
                 }
 
-                protected void ReloadRow()
+                public void ReloadRow()
                 {
                     if (Cell == null)
                         return;
@@ -1195,8 +1198,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         cell.RemoveChevron();
                     }
-
-                    ReloadRow();
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
@@ -1210,7 +1211,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void OnCommit(NSIndexPath indexPath)
                 {
                     DataSource.UpdateParentContact(null);
-                    RefreshRow();
+                    ReloadRow();
                 }
             }
 
@@ -1243,8 +1244,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         cell.SetContent(string.Join(", ", Contact.ResponsibleUsers.Values));
                     else
                         cell.SetTitle(Localization.GetString("responsible_users"));
-
-                    ReloadRow();
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
@@ -1257,7 +1256,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact.ResponsibleUsers.Clear();
                     Contact.ResponsibleUserIds.Clear();
 
-                    RefreshRow();
+                    ReloadRow();
                 }
             }
 
