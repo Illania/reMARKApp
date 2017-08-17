@@ -5,6 +5,7 @@ using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 

@@ -198,7 +198,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mark5Application.cs" />
     <Compile Include="PlatformConfig.cs" />
-    <Compile Include="ServerConfig.cs" />
     <Compile Include="Model\PushNotification.cs" />
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Service\PushNotificationInstanceIdService.cs" />
