@@ -46,12 +46,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 cf.CloseRequest = CloseRequest;
 
-                if (Intent.HasExtra(FolderIdIntentKey))
-                    cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
-
-                if (Intent.HasExtra(FolderIntentKey))
-                    cf.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
-
                 if (Intent.HasExtra(ContactIdIntentKey))
                     cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
 

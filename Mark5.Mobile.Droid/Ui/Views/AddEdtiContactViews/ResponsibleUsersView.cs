@@ -46,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
             }
 
             Contact.ResponsibleUsers.Clear();
+            Contact.ResponsibleUserIds.Clear();
             selectedUsers.ForEach(kvp =>
             {
                 Contact.ResponsibleUsers.Add(kvp.Key, kvp.Value);
