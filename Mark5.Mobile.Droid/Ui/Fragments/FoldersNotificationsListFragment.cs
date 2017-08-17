@@ -66,8 +66,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     break;
             }
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersNotificationsRetainableState)}");
         }
@@ -83,8 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var srs = restoredState as FoldersNotificationsRetainableState;
-            if (srs != null)
+            if (restoredState is FoldersNotificationsRetainableState srs)
             {
                 RemoteFolder = srs.Folder;
                 pager.CurrentItem = srs.SelectedTab;

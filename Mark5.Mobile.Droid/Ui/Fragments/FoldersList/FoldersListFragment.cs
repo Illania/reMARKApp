@@ -162,6 +162,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RestoreSelection();
         }
 
+        public override void OnUserVisibilityHintChanged()
+        {
+            if (!UserVisibleHint && menu != null && RecyclerView.GetAdapter() == SearchAdapter)
+            {
+                menu?.FindItem(10)?.SetVisible(true);
+
+                SearchHandler.RemoveCallbacksAndMessages(null);
+                SearchAdapter.Clear();
+                RecyclerView.SwapAdapter(Adapter, true);
+                RefreshLayout.Enabled = true;
+                SearchEnabled = false;
+            }
+        }
+
         public override void OnPause()
         {
             base.OnPause();
