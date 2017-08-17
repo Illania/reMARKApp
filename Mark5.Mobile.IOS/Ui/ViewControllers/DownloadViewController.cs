@@ -554,7 +554,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void OnProgress(ProgressInfo pi)
             {
-                CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
+                if (pi.Preparing || pi.LeftItemsCount % 10 == 0)
+                    CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
 
                 if (!pi.Preparing && pi.LeftItemsCount == pi.TotalItemsCount)
                     sw.Start();
@@ -699,6 +700,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             try
             {
+                ActivityIndicator.Show();
+                
                 CommonConfig.Logger.Info($"Starting download of folder {folder.Name} [folder.id={folder.Id}, folder.module={folder.Module}]");
 
                 onStartedAction();
@@ -817,6 +820,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Unexpected exception when downloading a folder. [folder.id={folder.Id}, folder.name={folder.Name}, folder.module={folder.Module}]", ex);
 
                 onException(ex);
+            }
+            finally
+            {
+                ActivityIndicator.Hide();    
             }
         }
     }

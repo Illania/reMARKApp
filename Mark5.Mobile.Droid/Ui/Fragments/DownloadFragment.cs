@@ -167,7 +167,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             void OnProgress(ProgressInfo pi)
             {
-                CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
+                if (pi.Preparing || pi.LeftItemsCount % 10 == 0)
+                    CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
 
                 if (!pi.Preparing && pi.LeftItemsCount == pi.TotalItemsCount)
                     sw.Start();
@@ -240,7 +241,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     finishedLayout.Visibility = ViewStates.Gone;
 
                     Dialogs.ShowErrorDialog(Activity, ex);
- 
+
                     downloadRunning = false;
                 });
             }
