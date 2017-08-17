@@ -554,7 +554,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void OnProgress(ProgressInfo pi)
             {
-                CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
+                if (pi.Preparing || pi.LeftItemsCount % 10 == 0)
+                    CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
 
                 if (!pi.Preparing && pi.LeftItemsCount == pi.TotalItemsCount)
                     sw.Start();
@@ -699,6 +700,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             try
             {
+                ActivityIndicator.Show();
+                
                 CommonConfig.Logger.Info($"Starting download of folder {folder.Name} [folder.id={folder.Id}, folder.module={folder.Module}]");
 
                 onStartedAction();
@@ -717,7 +720,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         var result = await Managers.ContactsManager.GetContactPreviewsAsync(folder, startRowId, SourceType.Remote);
 
                         result.ForEach(cp => queue.Enqueue(cp.Id));
-                        startRowId = result.Last().RowId;
+                        startRowId = result.LastOrDefault()?.RowId ?? -1;
                         lastBatchCount = result.Count;
 
                         result.Clear();
@@ -728,7 +731,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         var result = await Managers.ShortcodesManager.GetShortcodePreviewsAsync(folder, startRowId, SourceType.Remote);
 
                         result.ForEach(cp => queue.Enqueue(cp.Id));
-                        startRowId = result.Last().RowId;
+                        startRowId = result.LastOrDefault()?.RowId ?? -1;
                         lastBatchCount = result.Count;
 
                         result.Clear();
@@ -740,7 +743,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var totalItemsCount = queue.Count;
                 var leftItemsCount = queue.Count;
-                var failedItemsCount = 0;
+                var failedItems = new List<int>();
 
                 if (ct.IsCancellationRequested)
                 {
@@ -750,7 +753,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info($"Folder {folder.Name} prepared to download. {totalItemsCount} items to download. [folder.id={folder.Id}, folder.module={folder.Module}]");
 
-                onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
+                onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
 
                 do
                 {
@@ -794,21 +797,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error($"Item with ID {item} failed to download. [folder.id={folder.Id}, folder.name={folder.Name}, folder.module={folder.Module}]", ex);
-                        failedItemsCount++;
+                        failedItems.Add(item);
                     }
 
-                    onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
+                    onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
                 } while (!ct.IsCancellationRequested);
 
                 if (ct.IsCancellationRequested)
                     onCancelled();
                 else
                 {
-                    CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItemsCount} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
+                    CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItems.Count} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
+                    CommonConfig.Logger.Warning($"Following items failed to download: {string.Join(", ", failedItems)}. [folder.id={folder.Id}]");
 
                     await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
-                    onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItemsCount));
+                    onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItems.Count));
                 }
             }
             catch (Exception ex)
@@ -816,6 +820,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Unexpected exception when downloading a folder. [folder.id={folder.Id}, folder.name={folder.Name}, folder.module={folder.Module}]", ex);
 
                 onException(ex);
+            }
+            finally
+            {
+                ActivityIndicator.Hide();    
             }
         }
     }

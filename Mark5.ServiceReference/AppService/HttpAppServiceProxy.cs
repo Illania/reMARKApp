@@ -41,7 +41,7 @@ namespace Mark5.ServiceReference.AppService
 
                 using (var c = new HttpClient(httpClientHandler())
                 {
-                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
+                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds),
                 })
                 {
                     var req = CreateRequest(soapAction, parameters);
@@ -99,10 +99,7 @@ namespace Mark5.ServiceReference.AppService
 
             var content = new StringContent(sw.ToString());
             content.Headers.Add("SOAPAction", soapAction);
-            content.Headers.ContentType = new MediaTypeHeaderValue("text/xml")
-            {
-                CharSet = "utf-8"
-            };
+            content.Headers.ContentType = new MediaTypeHeaderValue("text/xml") { CharSet = "utf-8" };
             req.Content = content;
 
             return req;
@@ -141,7 +138,7 @@ namespace Mark5.ServiceReference.AppService
                     }))
                 {
                     var result = dcs.ReadObject(r);
-                    return (R) result;
+                    return (R)result;
                 }
             }
 
@@ -176,7 +173,7 @@ namespace Mark5.ServiceReference.AppService
                     }))
                 {
                     var result = dcs.ReadObject(r);
-                    faultDetail = (AppServiceFaultDetail) result;
+                    faultDetail = (AppServiceFaultDetail)result;
                 }
 
                 throw new HttpAppServiceException(res.StatusCode, faultString, faultDetail);

@@ -18,12 +18,7 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 httpsConn.HostnameVerifier = new InsecureHostnameVerifier();
                 var sslContext = SSLContext.GetInstance("TLS");
-                sslContext.Init(null,
-                    new ITrustManager[]
-                    {
-                        new InsecureTrustManager()
-                    },
-                    null);
+                sslContext.Init(null, new ITrustManager[] { new InsecureTrustManager() }, null);
                 httpsConn.SSLSocketFactory = sslContext.SocketFactory;
             }
 
@@ -32,26 +27,14 @@ namespace Mark5.Mobile.Droid.Utilities
 
         class InsecureHostnameVerifier : Java.Lang.Object, IHostnameVerifier
         {
-            public bool Verify(string hostname, ISSLSession session)
-            {
-                return true;
-            }
+            public bool Verify(string hostname, ISSLSession session) => true;
         }
 
         class InsecureTrustManager : Java.Lang.Object, IX509TrustManager
         {
-            public void CheckClientTrusted(X509Certificate[] chain, string authType)
-            {
-            }
-
-            public void CheckServerTrusted(X509Certificate[] chain, string authType)
-            {
-            }
-
-            public X509Certificate[] GetAcceptedIssuers()
-            {
-                return null;
-            }
+            public void CheckClientTrusted(X509Certificate[] chain, string authType) { }
+            public void CheckServerTrusted(X509Certificate[] chain, string authType) { }
+            public X509Certificate[] GetAcceptedIssuers() => null;
         }
     }
 }
