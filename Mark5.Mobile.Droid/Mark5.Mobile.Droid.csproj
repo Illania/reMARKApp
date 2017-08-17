@@ -424,6 +424,7 @@
     <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
     <Compile Include="Model\HubMessages\ContactPreviewChanged.cs" />
+    <Compile Include="Config.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

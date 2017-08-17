@@ -47,12 +47,13 @@ namespace Mark5.Mobile.IOS
                 var isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("MARK5 initialized");
 
-                BITHockeyManager.SharedHockeyManager.Configure(PlatformConfig.HockeyId);
+                BITHockeyManager.SharedHockeyManager.Configure(Config.HockeyId);
 #if DEBUG
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
 #else
-                BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus =
-                PlatformConfig.Preferences.EnableReporting ? BITCrashManagerStatus.AutoSend : BITCrashManagerStatus.Disabled;
+                BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = PlatformConfig.Preferences.EnableReporting
+                    ? BITCrashManagerStatus.AutoSend
+                    : BITCrashManagerStatus.Disabled;
 #endif
                 BITHockeyManager.SharedHockeyManager.StartManager();
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
@@ -292,7 +293,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.Logger = new ConsoleAndFileLogger();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
-                CommonConfig.HttpClientHandler = () => new NativeMessageHandler();
+                CommonConfig.HttpClientHandler = () => new NativeMessageHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
                 CommonConfig.OnStartTransmission = ActivityIndicator.Show;
                 CommonConfig.OnStopTransmission = ActivityIndicator.Hide;
                 CommonConfig.MessengerHub = new TinyMessengerHub();

@@ -1,8 +1,6 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Net.Security;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.IOS.Utilities;
 using ModernHttpClient;
 
 namespace Mark5.Mobile.IOS.Utilities
@@ -16,7 +14,7 @@ namespace Mark5.Mobile.IOS.Utilities
             CommonConfig.Logger.Warning("**** ENABLING CUSTOM SSL VALIDATION CALLBACK ****");
 
             ServicePointManager.ServerCertificateValidationCallback = remoteCertificateValidationCallback;
-            CommonConfig.HttpClientHandler = () => { return new InsecureNativeMessageHandler(); };
+            CommonConfig.HttpClientHandler = () => new InsecureNativeMessageHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
         }
 
         public void DisableSelfSignedCertificates()
@@ -24,7 +22,7 @@ namespace Mark5.Mobile.IOS.Utilities
             CommonConfig.Logger.Info("Using standard SSL validation callback");
 
             ServicePointManager.ServerCertificateValidationCallback = null;
-            CommonConfig.HttpClientHandler = () => { return new NativeMessageHandler(); };
+            CommonConfig.HttpClientHandler = () => new NativeMessageHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
         }
     }
 }
