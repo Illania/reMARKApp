@@ -22,6 +22,50 @@ namespace Mark5.Mobile.Droid.Ui.Common
     {
         #region Awaitable dialogs
 
+        public static Task<bool> ShowCustomViewDialogAsync(Context context, int titleId, View customView)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.CustomView(customView, true);
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
+        public static Task<bool> ShowCustomViewDialogWithValidityAsync(Context context, int titleId, View customView, Func<bool> isContentValid)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.CustomView(customView, true);
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.AutoDismiss(false);
+            builder.OnPositive(new SingleButtonCallback(md =>
+            {
+                if (isContentValid())
+                {
+                    tcs.SetResult(true);
+                    md.Dismiss();
+                }
+            }));
+
+            builder.OnNegative(new SingleButtonCallback(md =>
+            {
+                tcs.SetResult(false);
+                md.Dismiss();
+            }));
+
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var tcs = new TaskCompletionSource<bool>();
@@ -202,7 +246,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1)
+        public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1, bool addRemoveDateChoice = false)
         {
             var tcs = new TaskCompletionSource<long>();
             var datePicker = new DatePicker(context);
@@ -218,6 +262,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds()); }));
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(initialTimestamp)));
+            if (addRemoveDateChoice)
+            {
+                builder.NeutralText(Resource.String.remove);
+                builder.OnNeutral(new SingleButtonCallback(() => tcs.SetResult(0)));
+            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -453,16 +502,22 @@ namespace Mark5.Mobile.Droid.Ui.Common
         class SingleButtonCallback : Java.Lang.Object, MaterialDialog.ISingleButtonCallback
         {
             readonly Action action;
+            readonly Action<MaterialDialog> actionWithDialog;
 
             public SingleButtonCallback(Action action)
             {
                 this.action = action;
             }
 
+            public SingleButtonCallback(Action<MaterialDialog> action)
+            {
+                this.actionWithDialog = action;
+            }
+
             public void OnClick(MaterialDialog p0, DialogAction p1)
             {
-                if (action != null)
-                    action();
+                action?.Invoke();
+                actionWithDialog?.Invoke(p0);
             }
         }
 

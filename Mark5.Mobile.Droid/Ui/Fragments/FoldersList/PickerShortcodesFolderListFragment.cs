@@ -10,6 +10,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             RemoteFolder = Folder.RootForModule(ModuleType.Shortcodes);
             HideSearch = true;
+            HideFab = true;
+            LoadRemoteFromCache = true;
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)

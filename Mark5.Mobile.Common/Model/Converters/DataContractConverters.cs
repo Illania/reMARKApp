@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         public static T ConvertEnum<T>(this Enum obj) where T : struct
         {
-            return (T) Enum.Parse(typeof(T), obj.ToString());
+            return (T)Enum.Parse(typeof(T), obj.ToString());
         }
 
         #endregion
@@ -184,7 +184,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Patronymic = c.Patronymic,
                 LastName = c.LastName,
                 Account = c.Account,
-                BirthDateTimestamp = c.BirthDate.ConvertDateTimeToTimestampMilliseconds(),
+                BirthDateTimestamp = c.BirthDate.Year < 1850 ? -1 : c.BirthDate.ConvertDateTimeToTimestampMilliseconds(),
                 Ledger = c.Ledger,
                 Vat = c.Vat,
                 WebPageAddress = c.WebPageAddress,
@@ -732,9 +732,11 @@ namespace Mark5.Mobile.Common.Model.Converters
                 WebPageAddress = c.WebPageAddress,
                 Account = c.Account,
                 Vat = c.Vat,
-                BirthDate = c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                BirthDate = c.BirthDateTimestamp == -1
+                             ? default(DateTime).AddYears(1) //Used because in one version of the service the birthdate is ignored if equal to default(DateTime)
+                             : c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 Ledger = c.Ledger,
-                PrimaryPerson = c.PrimaryPerson.Convert(),
+                PrimaryPerson = c.PrimaryPerson?.Convert(),
                 Children = c.Children.Select(ch => ch.Convert()).ToList(),
                 ResponsibleUsers = c.ResponsibleUsers,
                 ResponsibleUserIds = c.ResponsibleUserIds,
@@ -758,7 +760,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Description = cp.Description,
                 Type = cp.Type.ConvertEnum<DataContract.ContactType>(),
                 Categories = cp.Categories.Select(ca => ca.Convert()).ToList(),
-                PrimaryAddress = cp.PrimaryAddress.Convert(),
+                PrimaryAddress = cp.PrimaryAddress?.Convert(),
                 CommentsCount = cp.CommentsCount
             };
         }
@@ -859,12 +861,12 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             return new DataContract.PhysicalAddress
             {
-                Type = pa.Type.Convert(),
-                Country = pa.Country.Convert(),
-                Street = pa.Street,
-                ZipCode = pa.ZipCode,
-                Area = pa.Area,
-                City = pa.City
+                Type = pa.Type?.Convert(),
+                Country = pa.Country?.Convert(),
+                Street = pa.Street ?? string.Empty,
+                ZipCode = pa.ZipCode ?? string.Empty,
+                Area = pa.Area ?? string.Empty,
+                City = pa.City ?? string.Empty,
             };
         }
 

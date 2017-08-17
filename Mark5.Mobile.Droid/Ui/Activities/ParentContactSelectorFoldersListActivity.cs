@@ -1,0 +1,76 @@
+﻿
+using Android.App;
+using Android.Content;
+using Android.Content.PM;
+using Android.OS;
+using Android.Support.V7.Widget;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
+
+namespace Mark5.Mobile.Droid.Ui.Activities
+{
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+    public class ParentContactSelectorFoldersListActivity : BaseAppCompatActivity
+    {
+        public const string ChildrenTypeIntentKey = "ChildrenTypeKey_09ed9796-4e13-42ff-8848-df5ca3731c25";
+        public const string ParentContactResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
+
+        public const int ContactRequestCode = 123;
+
+        Toolbar toolbar;
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            CommonConfig.Logger.Info($"Creating {nameof(PickerContactFolderListActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+
+            SetContentView(Resource.Layout.base_layout);
+
+            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            SetSupportActionBar(toolbar);
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
+            if (savedInstanceState == null)
+            {
+                var childrenType = (ContactType)Intent.Extras.GetInt(ChildrenTypeIntentKey);
+
+                var ft = SupportFragmentManager.BeginTransaction();
+                var pcflf = new ParentContactSelectorFoldersListFragment(childrenType);
+
+                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                ft.Commit();
+
+                CommonConfig.Logger.Info($"Created {nameof(PickerContactFolderListActivity)}");
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"Restored {nameof(PickerContactFolderListActivity)}");
+            }
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            if (requestCode == ContactRequestCode && resultCode == Result.Ok && data.HasExtra(ParentContactSelectorActivity.ParentContactResultKey))
+            {
+                var parentContactString = data.GetStringExtra(ParentContactSelectorActivity.ParentContactResultKey);
+
+                var resultIntent = new Intent();
+                resultIntent.PutExtra(ParentContactResultKey, parentContactString);
+                SetResult(Result.Ok, resultIntent);
+                Finish();
+            }
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
+        }
+    }
+}

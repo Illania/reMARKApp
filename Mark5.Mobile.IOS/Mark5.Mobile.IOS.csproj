@@ -255,7 +255,7 @@
 		<Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\PickerContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFolderListViewController %28copy%29.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\PickerShortcodesFolderListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
@@ -268,6 +268,23 @@
 		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.designer.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\DisclosureIndicatorTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowHeaderTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\AddEditContactTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextViewTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
+		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />
+		<Compile Include="Ui\ViewControllers\ContactsList\ParentContactSelectorListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
+		<Compile Include="Model\HubMessages\ContactChangedMessage.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowContentTableViewCell.cs" />
+		<Compile Include="Model\HubMessages\ChildrenContactAddedMessage.cs" />
+		<Compile Include="Config.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -307,23 +324,23 @@
 		<Reference Include="HockeySDK.iOSBindings">
 		  <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
 		</Reference>
-		<Reference Include="SQLitePCLRaw.core">
-		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.provider.sqlite3">
-		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_green">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_v2">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
-		</Reference>
 		<Reference Include="HtmlAgilityPack">
 		  <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\netstandard1.6\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 		<Reference Include="SQLite-net">
 		  <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.core">
+		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.provider.sqlite3">
+		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_green">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_v2">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -544,6 +561,8 @@
 		<BundleResource Include="Resources\icons\download%403x.png" />
 		<BundleResource Include="Resources\icons\warning%402x.png" />
 		<BundleResource Include="Resources\icons\warning%403x.png" />
+		<BundleResource Include="Resources\icons\add_contact%402x.png" />
+		<BundleResource Include="Resources\icons\add_contact%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
@@ -554,6 +573,8 @@
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
 	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
+	  <Folder Include="Ui\TableViewCells\AddEditContactTableViewCell\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+	<Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
 </Project>

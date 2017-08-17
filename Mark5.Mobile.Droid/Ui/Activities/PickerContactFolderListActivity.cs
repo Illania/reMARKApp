@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         public const string RecipientResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
 
-        public const int ContactRequestCode = 123;
+        public const int ContactRequestCode = 321;
 
         Toolbar toolbar;
 

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Runtime;
+using Android.Support.V7.App;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Utilities;
@@ -12,7 +13,6 @@ using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
 using TinyMessenger;
 using Xamarin.Android.Net;
-using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid
 {
@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "document_work"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.Logger = new SimpleLogger();
                     CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
-                    CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
+                    CommonConfig.HttpClientHandler = () => new AndroidClientHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
                     CommonConfig.MessengerHub = new TinyMessengerHub();
                     CommonConfig.Phonebook = new Phonebook();
                     CommonConfig.Reachability = new Reachability();

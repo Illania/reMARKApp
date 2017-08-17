@@ -165,26 +165,26 @@
     <Reference Include="HockeySDK">
       <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\MonoAndroid403\HockeySDK.dll</HintPath>
     </Reference>
-    <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.7\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.7\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.7\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.7\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
-    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\netstandard1.6\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="SQLite-net">
       <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.8\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.8\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.8\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -192,7 +192,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mark5Application.cs" />
     <Compile Include="PlatformConfig.cs" />
-    <Compile Include="ServerConfig.cs" />
     <Compile Include="Model\PushNotification.cs" />
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Service\PushNotificationInstanceIdService.cs" />
@@ -387,6 +386,38 @@
     <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
     <Compile Include="Model\FileDescription.cs" />
     <Compile Include="Utilities\Extensions\ViewGroupExtensions.cs" />
+    <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
+    <Compile Include="Ui\Activities\AddEditContactActivity.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractPhoneNumberView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AccountView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\BirthdateView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\EmailsView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\FaxView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\LedgerView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\MobileView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\ParentContactView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\PersonNameView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\PhoneView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\PhysicalAddressesView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\PositionView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\ResponsibleUsersView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\ShortIdView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\TelexView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\VatView.cs" />
+    <Compile Include="Ui\Views\AddEdtiContactViews\WebpageView.cs" />
+    <Compile Include="Ui\Activities\ParentContactSelectorActivity.cs" />
+    <Compile Include="Ui\Activities\ParentContactSelectorFoldersListActivity.cs" />
+    <Compile Include="Ui\Fragments\AbstractUserSelectionFragment.cs" />
+    <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
+    <Compile Include="Model\HubMessages\ContactPreviewChanged.cs" />
+    <Compile Include="Config.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -685,6 +716,23 @@
     <AndroidResource Include="Resources\drawable\icon_download_done.xml" />
     <AndroidResource Include="Resources\drawable\icon_download_download.xml" />
     <AndroidResource Include="Resources\drawable\icon_download_warning.xml" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_add_contact.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\remove.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_add_contact.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\remove.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_add_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\remove.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_add_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\remove.png" />
+    <AndroidResource Include="Resources\layout\countries_dropdown.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
@@ -732,4 +780,5 @@
   <Import Project="..\packages\Xamarin.Android.Support.Design.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.Design.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.v7.CardView.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.CardView.25.3.1\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets')" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
 </Project>

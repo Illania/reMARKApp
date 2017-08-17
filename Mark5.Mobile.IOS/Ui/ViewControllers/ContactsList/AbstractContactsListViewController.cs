@@ -13,6 +13,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using ObjCRuntime;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
@@ -38,6 +39,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         bool refreshing;
 
         CancellationTokenSource cts;
+
+        protected UIBarButtonItem LeftButton;
+        protected UIBarButtonItem RightButton;
+
+        TinyMessageSubscriptionToken contactChangedToken;
+        TinyMessageSubscriptionToken categoriesChangedToken;
+        TinyMessageSubscriptionToken removedFromFolderToken;
+        TinyMessageSubscriptionToken movedFromFolderToken;
+        TinyMessageSubscriptionToken deletedToken;
 
         protected AbstractContactsListViewController(bool disableRowActions)
         {
@@ -121,6 +131,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
+            UnsubscribeFromMessages();
+
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
@@ -129,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Initialization
 
-        void InitializeNavigationBar()
+        protected virtual void InitializeNavigationBar()
         {
             ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -192,10 +204,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void SubscribeToMessages()
         {
-            CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
-            CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
+            categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
+            removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
+            movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleAction);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            categoriesChangedToken?.Dispose();
+            removedFromFolderToken?.Dispose();
+            movedFromFolderToken?.Dispose();
+            deletedToken?.Dispose();
+            contactChangedToken?.Dispose();
         }
 
         void InitializeNavigationBarTitle()
@@ -206,7 +228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             UIView.AnimationsEnabled = true;
         }
 
-        void InitializeHandlers()
+        protected virtual void InitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked += ExitEditItem_Clicked;
@@ -218,7 +240,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        void DeinitializeHandlers()
+        protected virtual void DeinitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked -= ExitEditItem_Clicked;
@@ -234,7 +256,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Actions
 
-        public virtual void ContactSelected(UITableView tableView, ContactPreview contactPreview)
+        public virtual void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
         {
         }
 
@@ -255,6 +277,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         void StartEditing()
         {
             TableView.SetEditing(true, true);
+
+            LeftButton = NavigationItem.LeftBarButtonItem;
+            RightButton = NavigationItem.RightBarButtonItem;
+
             NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(EditItem, true);
 
@@ -279,8 +305,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(null, true);
-            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+            NavigationItem.SetRightBarButtonItem(RightButton, true);
+            NavigationItem.SetLeftBarButtonItem(LeftButton, true);
 
             SearchController.SearchBar.UserInteractionEnabled = true;
             SearchController.SearchBar.Alpha = 1f;
@@ -689,6 +715,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Messages handlers
 
+        void HandleAction(ContactChangedMessage m)
+        {
+            UpdateContactFromList(m.ContactPreview);
+        }
+
         void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
         {
             RemoveContactsFromList(m.EntitiesId);
@@ -749,6 +780,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 if (ids.Select(id => vc.IsShowingContactWithId(id)).Any(v => v))
                     vc.ClearData();
             }
+        }
+
+        void UpdateContactFromList(ContactPreview cp)
+        {
+            if (SearchController.Active)
+                SearchResultsDataSource.UpdateItem(cp);
+
+            var ds = (DataSource)TableView.Source;
+            ds.UpdateItem(cp);
         }
 
         #endregion
@@ -876,7 +916,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     return;
 
                 var cp = contactPreviewsInView[indexPath.Section][indexPath.Row];
-                viewController.ContactSelected(tableView, cp);
+                viewController.ContactSelected(tableView, cp, indexPath);
             }
 
             public void AppendItems(List<ContactPreview> contactPreviews)
@@ -922,6 +962,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 }
 
                 tableView.EndUpdates();
+            }
+
+            public void UpdateItem(ContactPreview cp)
+            {
+                var indexPath = FindItemIndexPath(cp);
+                if (indexPath != null)
+                {
+                    contactPreviewsInView[indexPath.Section][indexPath.Row] = cp;
+                    tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
             }
 
             public void Reset()
