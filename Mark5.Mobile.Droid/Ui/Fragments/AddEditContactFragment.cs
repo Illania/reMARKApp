@@ -19,6 +19,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -73,6 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.SetImageResource(Resource.Drawable.action_save_contact);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
             fab.Enabled = true;
+            fab.Size = FloatingActionButton.SizeNormal;
             fab.Visibility = ViewStates.Visible;
 
             subviews.Clear();
@@ -101,6 +103,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             secondaryLinearLayout.Orientation = LinearLayoutCompat.Vertical;
             secondaryLinearLayout.Visibility = ViewStates.Gone;
             secondaryLinearLayout.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+
+            var bottomMargin = ((CoordinatorLayout.LayoutParams)fab.LayoutParameters).BottomMargin;
+            var fabHeight = Conversion.ConvertDpToPixels(56);
+            linearLayout.SetPadding(linearLayout.PaddingLeft, linearLayout.PaddingTop, linearLayout.PaddingRight, fabHeight + bottomMargin * 2);
 
             switch (ContactType)
             {
