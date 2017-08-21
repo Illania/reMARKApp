@@ -28,6 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
         static readonly NSString script3 = new NSString("document.addEventListener(\"DOMContentLoaded\", function () {window.webkit.messageHandlers.sizeNotification.postMessage({domLoaded:true});});");
         static readonly NSString script4 = new NSString("var observer = new MutationObserver(function(mutations) { window.webkit.messageHandlers.mutation.postMessage({mutated:true}); }); observer.observe(document.querySelector('#editable-one'), { attributes: true, childList: true, characterData: true, subtree: true });");
+        static readonly NSString script5 = new NSString("document.addEventListener(\"keypress\", function(e) {  if(e.which == 13) { window.webkit.messageHandlers.keypress.postMessage({keypressed:true}); } })");
 
         UIButton expandButton;
 
@@ -91,14 +92,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
             var wkscript4 = new WKUserScript(script4, WKUserScriptInjectionTime.AtDocumentEnd, true);
+            var wkscript5 = new WKUserScript(script5, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
             userContentController.AddUserScript(wkscript3);
             userContentController.AddUserScript(wkscript4);
+            userContentController.AddUserScript(wkscript5);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
             userContentController.AddScriptMessageHandler(this, "mutation");
+            userContentController.AddScriptMessageHandler(this, "keypress");
 
             var configuration = new WKWebViewConfiguration
             {
@@ -190,12 +194,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
+            var wkscript5 = new WKUserScript(script5, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
             userContentController.AddUserScript(wkscript3);
+            userContentController.AddUserScript(wkscript5);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
+            userContentController.AddScriptMessageHandler(this, "keypress");
 
             var configuration = new WKWebViewConfiguration
             {
@@ -272,6 +279,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
 
             tapLocation = default(CGPoint);
+        }
+
+        void ScrollForEnterPressed()
+        {
+            var co = externalScrollView.ContentOffset;
+            co.Y += 20;
+            externalScrollView.SetContentOffset(co, true);
         }
 
         #endregion
@@ -661,11 +675,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var resizedNumber = responseDict["resized"] as NSNumber;
             var mutatedNumber = responseDict["mutated"] as NSNumber;
             var domLoadedNumber = responseDict["domLoaded"] as NSNumber;
+            var keypressedNumber = responseDict["keypressed"] as NSNumber;
 
             var justLoaded = justLoadedNumber != null && justLoadedNumber.BoolValue;
             var resized = resizedNumber != null && resizedNumber.BoolValue;
             var mutated = mutatedNumber != null && mutatedNumber.BoolValue;
             var domLoaded = domLoadedNumber != null && domLoadedNumber.BoolValue;
+            var keyPressed = keypressedNumber != null && keypressedNumber.BoolValue;
 
             Action<WKWebView, NSLayoutConstraint> resizeAction = null;
             resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)),
@@ -693,7 +709,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                           resizeAction(wv, nslc);
                                                       }
                                                   });
-
+            if (keyPressed)
+            {
+                ScrollForEnterPressed();
+            }
             if (domLoaded)
             {
                 if (userContentController == newContentWebView.Configuration.UserContentController)
