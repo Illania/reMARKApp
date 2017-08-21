@@ -2,7 +2,7 @@
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 {
     public class MultiRowHeaderTableViewCell : AddEditTableViewCell
     {

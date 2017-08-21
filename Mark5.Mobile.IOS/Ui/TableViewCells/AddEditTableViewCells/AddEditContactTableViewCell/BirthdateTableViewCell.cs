@@ -8,7 +8,7 @@ using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 {
     public class BirthdateTableViewCell : MultiRowContentTableViewCell
     {

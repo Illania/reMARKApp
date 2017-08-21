@@ -8,9 +8,9 @@ using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 {
-    public class PhysicalAddressTableViewCell : MultiRowContentTableViewCell
+    public class PhysicalAddressTableViewCell : AddEditTableViewCell
     {
         public static readonly NSString Key = new NSString("PhysicalAddressTableViewCell");
 
