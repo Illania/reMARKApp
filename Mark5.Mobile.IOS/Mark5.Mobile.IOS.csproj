@@ -285,6 +285,8 @@
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowHeaderTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowContentTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\DisclosureIndicatorTableViewCell.cs" />
+		<Compile Include="Ui\ViewControllers\AddEditShortcodeViewController.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\AddressTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
