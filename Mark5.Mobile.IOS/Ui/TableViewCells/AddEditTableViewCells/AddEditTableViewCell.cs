@@ -4,7 +4,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public abstract class AddEditContactTableViewCell : UITableViewCell
+    public abstract class AddEditTableViewCell : UITableViewCell
     {
         protected float HorizontalMargin = 8f;
         protected float VerticalMargin = 4f;
@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 
         float separatorMeasure = 0.5f;
 
-        protected AddEditContactTableViewCell(UITableViewCellStyle style, string reuseIdentifier)
+        protected AddEditTableViewCell(UITableViewCellStyle style, string reuseIdentifier)
             : base(style, reuseIdentifier)
         {
         }

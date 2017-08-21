@@ -7,7 +7,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class TitledTextViewTableViewCell : AddEditContactTableViewCell, IUITextViewDelegate
+    public class TitledTextViewTableViewCell : AddEditTableViewCell, IUITextViewDelegate
     {
         public static readonly NSString Key = new NSString("TitledTextFieldTableViewCell");
 

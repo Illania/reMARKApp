@@ -268,23 +268,23 @@
 		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TextFieldTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\DisclosureIndicatorTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowHeaderTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\AddEditContactTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\TitledTextViewTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\ParentContactSelectorListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
 		<Compile Include="Model\HubMessages\ContactChangedMessage.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowContentTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\ChildrenContactAddedMessage.cs" />
 		<Compile Include="Config.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\TextFieldTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\TitledTextViewTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowHeaderTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowContentTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\DisclosureIndicatorTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -573,7 +573,9 @@
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
 	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
-	  <Folder Include="Ui\TableViewCells\AddEditContactTableViewCell\" />
+	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
+	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
+	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />

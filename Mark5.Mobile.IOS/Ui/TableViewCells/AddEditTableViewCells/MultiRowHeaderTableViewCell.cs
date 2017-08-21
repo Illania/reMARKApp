@@ -4,7 +4,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell
 {
-    public class MultiRowHeaderTableViewCell : AddEditContactTableViewCell
+    public class MultiRowHeaderTableViewCell : AddEditTableViewCell
     {
         public static readonly NSString Key = new NSString("MultiRowHeaderTableViewCell");
 
