@@ -187,13 +187,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ShortcodeSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<ShortcodePreview> Items { get; } = new List<ShortcodePreview>(1000);
-
             public override int ItemCount => Items.Count;
 
-            readonly Dictionary<int, ShortcodePreview> selectedShortcodesInView = new Dictionary<int, ShortcodePreview>();
-
             public event EventHandler<ShortcodePreview> ItemClicked = delegate { };
+
+            public List<ShortcodePreview> Items { get; } = new List<ShortcodePreview>(1000);
+
+            readonly Dictionary<int, ShortcodePreview> selectedShortcodesInView = new Dictionary<int, ShortcodePreview>();
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {

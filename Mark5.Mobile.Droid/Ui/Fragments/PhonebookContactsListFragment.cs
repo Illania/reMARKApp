@@ -130,8 +130,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PhonebookContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<Recipient> Items { get; } = new List<Recipient>();
             public override int ItemCount => Items.Count;
+            public List<Recipient> Items { get; } = new List<Recipient>();
 
             public event EventHandler<Recipient> ItemClicked = delegate { };
 

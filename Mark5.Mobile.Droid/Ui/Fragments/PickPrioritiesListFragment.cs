@@ -65,18 +65,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void RefreshData()
-        {
-            var priorities = new List<Priority>
-            {
-                Priority.Urgent,
-                Priority.Normal,
-                Priority.Low
-            };
-            adapter.SetSelectedPriorities(selectedPriorities);
-            adapter.SetItems(priorities);
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -93,6 +81,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        public void RefreshData()
+        {
+            var priorities = new List<Priority>
+            {
+                Priority.Urgent,
+                Priority.Normal,
+                Priority.Low
+            };
+            adapter.SetSelectedPriorities(selectedPriorities);
+            adapter.SetItems(priorities);
         }
 
         void CloseFragment()
@@ -133,9 +133,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PrioritiesListViewAdapter : RecyclerView.Adapter
         {
-            public List<Priority> SelectedPriorities { get; } = new List<Priority>(3);
-
             public override int ItemCount => Items.Count;
+
+            public List<Priority> SelectedPriorities { get; } = new List<Priority>(3);
 
             public List<Priority> Items { get; } = new List<Priority>(3);
 

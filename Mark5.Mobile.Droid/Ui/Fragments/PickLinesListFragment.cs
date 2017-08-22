@@ -65,13 +65,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void RefreshData()
-        {
-            var availableLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
-            adapter.SetSelectedLinesGuid(selectedLinesGuid);
-            adapter.SetItems(availableLines);
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -88,6 +81,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        public void RefreshData()
+        {
+            var availableLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            adapter.SetSelectedLinesGuid(selectedLinesGuid);
+            adapter.SetItems(availableLines);
         }
 
         void CloseFragment()
@@ -128,9 +128,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class LinesListViewAdapter : RecyclerView.Adapter
         {
-            public List<Guid> SelectedLinesGuid { get; } = new List<Guid>(10);
-
             public override int ItemCount => Items.Count;
+
+            public List<Guid> SelectedLinesGuid { get; } = new List<Guid>(10);
 
             public List<Line> Items { get; } = new List<Line>(10);
 

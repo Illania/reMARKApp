@@ -248,6 +248,16 @@ namespace Mark5.Mobile.Droid
 
         #region Filtering
 
+        static bool MatchesQuery(Category c, string query)
+        {
+            if (c.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (c.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+
+            return false;
+        }
+
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
@@ -289,16 +299,6 @@ namespace Mark5.Mobile.Droid
 
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
-            return false;
-        }
-
-        static bool MatchesQuery(Category c, string query)
-        {
-            if (c.Name.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (c.Description.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
             return false;
         }
 
@@ -350,13 +350,13 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            readonly Dictionary<int, Category> selectedCategoriesInView;
-
             public override int ItemCount => Items.Count;
 
             public List<Category> Items { get; } = new List<Category>();
 
             public event EventHandler<Category> ItemClicked = delegate { };
+
+            readonly Dictionary<int, Category> selectedCategoriesInView;
 
             public CategoriesListAdapter(Dictionary<int, Category> selectedCategoriesInView)
             {

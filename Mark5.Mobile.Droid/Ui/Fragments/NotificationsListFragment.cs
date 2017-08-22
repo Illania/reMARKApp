@@ -114,11 +114,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Options menu
 
-        static class MenuItemActions
-        {
-            public const int MarkAllAsRead = 10;
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Add(Menu.None, MenuItemActions.MarkAllAsRead, MenuItemActions.MarkAllAsRead, Resource.String.mark_all_as_read);
@@ -138,6 +133,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        static class MenuItemActions
+        {
+            public const int MarkAllAsRead = 10;
         }
 
         #endregion
@@ -266,13 +266,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationsAdapter : RecyclerView.Adapter
         {
-            public List<Notification> Items { get; } = new List<Notification>(200);
-
             public override int ItemCount => Items.Count;
 
-            readonly Context context;
+            public List<Notification> Items { get; } = new List<Notification>(200);
 
             public event EventHandler<Notification> ItemClicked = delegate { };
+
+            readonly Context context;
 
             public NotificationsAdapter(Context context)
             {

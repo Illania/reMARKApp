@@ -70,6 +70,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new ObjectLinksFragmentState
+            {
+                BusinessEntity = businessEntity,
+                ObjectLinks = objectLinks
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            var oafs = restoredState as ObjectLinksFragmentState;
+            if (oafs != null)
+            {
+                businessEntity = oafs.BusinessEntity;
+                objectLinks = oafs.ObjectLinks;
+            }
+        }
+
+        public override string GenerateTag()
+        {
+            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
+        }
+
         async Task RefreshData()
         {
             try
@@ -168,30 +192,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     StartActivity(ShortcodeActivity.CreateIntent(Activity, shortcodeId: ol.ToObjectId));
                 }
             }
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ObjectLinksFragmentState
-            {
-                BusinessEntity = businessEntity,
-                ObjectLinks = objectLinks
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var oafs = restoredState as ObjectLinksFragmentState;
-            if (oafs != null)
-            {
-                businessEntity = oafs.BusinessEntity;
-                objectLinks = oafs.ObjectLinks;
-            }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
         }
 
         class ObjectLinksFragmentState : IRetainableState

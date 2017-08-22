@@ -1,6 +1,5 @@
 using System;
 using Android.OS;
-using Android.Support.V4.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 

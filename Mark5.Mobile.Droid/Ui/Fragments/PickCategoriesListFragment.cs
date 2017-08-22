@@ -20,11 +20,11 @@ namespace Mark5.Mobile.Droid
 {
     public class PickCategoriesListFragment : RetainableStateFragment
     {
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
+
         ObjectType objectType;
         int[] preselectedCategoryIds;
         Action<List<Category>> closeRequest;
-
-        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -216,13 +216,13 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter
         {
-            readonly Dictionary<int, Category> selectedCategoriesInView;
-
             public override int ItemCount => Items.Count;
 
             public List<Category> Items { get; } = new List<Category>(200);
 
             public event EventHandler<Category> ItemClicked = delegate { };
+
+            readonly Dictionary<int, Category> selectedCategoriesInView;
 
             public CategoriesListAdapter(Dictionary<int, Category> selectedCategoriesInView)
             {

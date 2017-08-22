@@ -68,6 +68,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new ObjectActionsFragmentState
+            {
+                BusinessEntity = businessEntity,
+                ObjectActions = objectActions
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            var oafs = restoredState as ObjectActionsFragmentState;
+            if (oafs != null)
+            {
+                businessEntity = oafs.BusinessEntity;
+                objectActions = oafs.ObjectActions;
+            }
+        }
+
+        public override string GenerateTag()
+        {
+            return $"{nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
+        }
+
         async Task RefreshData()
         {
             try
@@ -102,30 +126,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ObjectActionsFragmentState
-            {
-                BusinessEntity = businessEntity,
-                ObjectActions = objectActions
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var oafs = restoredState as ObjectActionsFragmentState;
-            if (oafs != null)
-            {
-                businessEntity = oafs.BusinessEntity;
-                objectActions = oafs.ObjectActions;
-            }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
         }
 
         class ObjectActionsFragmentState : IRetainableState

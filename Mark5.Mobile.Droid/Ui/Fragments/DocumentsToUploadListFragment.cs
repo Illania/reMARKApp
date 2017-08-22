@@ -257,13 +257,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class DocumentsToUploadListAdapter : RecyclerView.Adapter
         {
+            public override int ItemCount => itemsInView.Count;
+            public int SelectedItemCount => selectedItemsInView.Count;
+
             public List<(Guid Guid, DocumentPreview DocumentPreview)> Items => itemsInView.ToList();
             public List<(Guid Guid, DocumentPreview DocumentPreview)> SelectedItems => selectedItemsInView.ToList();
             public HashSet<Guid> PendingGuids => pendingGuids.ToHashSet();
             public HashSet<Guid> FailedGuids => failedGuids.ToHashSet();
-
-            public override int ItemCount => itemsInView.Count;
-            public int SelectedItemCount => selectedItemsInView.Count;
 
             List<(Guid Guid, DocumentPreview DocumentPreview)> itemsInView = new List<(Guid, DocumentPreview)>(25);
             List<(Guid Guid, DocumentPreview DocumentPreview)> selectedItemsInView = new List<(Guid, DocumentPreview)>(25);

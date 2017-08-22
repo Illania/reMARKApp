@@ -137,32 +137,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void RefreshViews()
-        {
-            subviews.ForEach(c =>
-            {
-                c.Criteria = searchCriteria;
-                c.Refresh();
-            });
-        }
-
-        async void Reset()
-        {
-            searchCriteria = new SearchShortcodesCriteria();
-            containerLinearLayout.RequestFocus();
-            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
-            RefreshViews();
-
-            try
-            {
-                await Managers.SearchManager.SaveLastSearchShortcodesCrtieriaAsync(searchCriteria);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
-            }
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -188,6 +162,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
 
+        public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
+        {
+            var parent = containerLinearLayout?.Parent?.Parent?.Parent?.Parent?.Parent as CoordinatorLayout;
+
+            if (parent == null)
+                return;
+
+            var distance = parent.Bottom - v.Bottom;
+            var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
+
+            v.Visibility = distance > bottomMargin * 2 ? ViewStates.Invisible : ViewStates.Visible;
+        }
+
+        void RefreshViews()
+        {
+            subviews.ForEach(c =>
+            {
+                c.Criteria = searchCriteria;
+                c.Refresh();
+            });
+        }
+
+        async void Reset()
+        {
+            searchCriteria = new SearchShortcodesCriteria();
+            containerLinearLayout.RequestFocus();
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            RefreshViews();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchShortcodesCrtieriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
+        }
+
         void HandleSearchButtonClicked()
         {
             GetCriteria();
@@ -204,19 +217,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
 
             return searchCriteria;
-        }
-
-        public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
-        {
-            var parent = containerLinearLayout?.Parent?.Parent?.Parent?.Parent?.Parent as CoordinatorLayout;
-
-            if (parent == null)
-                return;
-
-            var distance = parent.Bottom - v.Bottom;
-            var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
-
-            v.Visibility = distance > bottomMargin * 2 ? ViewStates.Invisible : ViewStates.Visible;
         }
 
         #region Retained State

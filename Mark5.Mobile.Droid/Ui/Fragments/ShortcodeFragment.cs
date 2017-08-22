@@ -88,18 +88,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Options menu
 
-        static class MenuItemActions
-        {
-            public const int CreateNewDocument = 20;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int Actions = 70;
-            public const int Links = 80;
-            public const int Delete = 90;
-            public const int DeleteFromFolder = 100;
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             if (ShortcodePreview == null)
@@ -298,7 +286,49 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        static class MenuItemActions
+        {
+            public const int CreateNewDocument = 20;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Actions = 70;
+            public const int Links = 80;
+            public const int Delete = 90;
+            public const int DeleteFromFolder = 100;
+        }
+
         #endregion
+
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new ShortcodeFragmentState
+            {
+                FolderId = FolderId,
+                Folder = Folder,
+                ShortcodeId = ShortcodeId,
+                ShortcodePreview = ShortcodePreview,
+                Shortcode = Shortcode
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            var sfs = restoredState as ShortcodeFragmentState;
+            if (sfs != null)
+            {
+                FolderId = sfs.FolderId;
+                Folder = sfs.Folder;
+                ShortcodeId = sfs.ShortcodeId;
+                ShortcodePreview = sfs.ShortcodePreview;
+                Shortcode = sfs.Shortcode;
+            }
+        }
+
+        public override string GenerateTag()
+        {
+            return $"{nameof(ShortcodeFragment)} [ShortcodeId={ShortcodePreview?.Id ?? Shortcode?.Id ?? ShortcodeId}]";
+        }
 
         void AddressesView_DocumentAddressClicked(object sender, DocumentAddress e)
         {
@@ -370,36 +400,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.RequestLayout();
 
             Activity.InvalidateOptionsMenu();
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ShortcodeFragmentState
-            {
-                FolderId = FolderId,
-                Folder = Folder,
-                ShortcodeId = ShortcodeId,
-                ShortcodePreview = ShortcodePreview,
-                Shortcode = Shortcode
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var sfs = restoredState as ShortcodeFragmentState;
-            if (sfs != null)
-            {
-                FolderId = sfs.FolderId;
-                Folder = sfs.Folder;
-                ShortcodeId = sfs.ShortcodeId;
-                ShortcodePreview = sfs.ShortcodePreview;
-                Shortcode = sfs.Shortcode;
-            }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ShortcodeFragment)} [ShortcodeId={ShortcodePreview?.Id ?? Shortcode?.Id ?? ShortcodeId}]";
         }
 
         class ShortcodeFragmentState : IRetainableState
