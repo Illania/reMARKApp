@@ -28,6 +28,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentFragment : RetainableStateFragment
     {
+        public const string FolderIdBundleKey = "FolderId_7215e56b-5ec3-436d-b4e3-900449cb1ad0";
+        public const string FolderBundleKey = "Folder_592db8d9-d212-4476-ac83-fd4bb11cc8d9";
+        public const string DocumentPreviewBundleKey = "DocumentPreview_83a5daa4-7ede-453b-9b19-07362f644ad1";
+        public const string DocumentIdBundleKey = "DocumentId_e9409d8a-9212-4483-b819-ff5ac3487c87";
+        public const string CloseRequestBundleKey = "CloseRequest_d45a15b4-dadb-40ae-aab1-c565e9446bd0";
+        public const string NotificationGuidBundleKey = "NotificationGuid_fb411b05-9d4b-46db-aa81-7348bf069a38";
+
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public Guid FailedDocumentToUploadGuid { get; set; }
@@ -36,7 +43,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public int? DocumentId { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
-        public Action CloseRequest { get; set; }
         public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
@@ -48,9 +54,48 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CancellationTokenSource setReadStatusCancellationTokenSource;
 
+        public static DocumentFragment NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null)
+        {
+            DocumentFragment fragment = new DocumentFragment();
+            Bundle bundle = new Bundle();
+
+            if (folder != null)
+                bundle.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            if (folderId != null)
+                bundle.PutInt(FolderIdBundleKey, folderId.Value);
+
+            if (dp != null)
+                bundle.PutString(DocumentPreviewBundleKey, Serializer.Serialize(dp));
+
+            if (docId != null)
+                bundle.PutInt(DocumentIdBundleKey, docId.Value);
+
+            if (notificationGuid != null)
+                bundle.PutString(NotificationGuidBundleKey, Serializer.Serialize(notificationGuid));
+
+            fragment.Arguments = bundle;
+            return fragment;
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
+
+            if (Arguments.ContainsKey(FolderBundleKey))
+                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
+            if (Arguments.ContainsKey(FolderIdBundleKey))
+                FolderId = Arguments.GetInt(FolderIdBundleKey);
+
+            if (Arguments.ContainsKey(DocumentPreviewBundleKey))
+                DocumentPreview = Serializer.Deserialize<DocumentPreview>(Arguments.GetString(DocumentPreviewBundleKey));
+
+            if (Arguments.ContainsKey(DocumentIdBundleKey))
+                DocumentId = Arguments.GetInt(DocumentIdBundleKey);
+
+            if (Arguments.ContainsKey(NotificationGuidBundleKey))
+                NotificationGuid = Serializer.Deserialize<Guid>(Arguments.GetString(NotificationGuidBundleKey));
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_buttons_and_progress, container, false);
 
@@ -748,7 +793,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                CloseRequest?.Invoke();
+                Activity.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -915,7 +960,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                CloseRequest?.Invoke();
+                Activity.OnBackPressed();
             }
         }
 

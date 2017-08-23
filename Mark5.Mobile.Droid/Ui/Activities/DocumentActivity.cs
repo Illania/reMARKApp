@@ -83,8 +83,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
-                df.CloseRequest = OnBackPressed;
-
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
                 ft.Commit();

@@ -47,8 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public int? PreviousDocumentId { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
 
-        public Action CloseRequest { get; set; }
-
         bool restoreWorkingCopy;
         
         DocumentCreationModeFlag documentCreationModeFlag = DocumentCreationModeFlag.New;
@@ -283,7 +281,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                CloseRequest?.Invoke();
+                Activity.OnBackPressed();
             }
         }
 
@@ -503,7 +501,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             });
 
-            CloseRequest?.Invoke();
+            Activity.OnBackPressed();
         }
 
         void SendDocument(bool saveDraft = false)

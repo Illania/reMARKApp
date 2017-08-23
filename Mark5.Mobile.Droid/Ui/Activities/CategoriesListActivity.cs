@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid
             {
                 var bep = Serializer.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = new CategoriesListFragment(bep, OnBackPressed);
+                clf = new CategoriesListFragment(bep);
 
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.Commit();

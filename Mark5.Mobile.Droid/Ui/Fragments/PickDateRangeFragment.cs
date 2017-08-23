@@ -1,6 +1,6 @@
 using System;
+using System.Threading.Tasks;
 using Android.Animation;
-using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -18,6 +18,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickDateRangeFragment : RetainableStateFragment
     {
+        public Task<long[]> Task => tcs.Task;
+
         DocumentPickDateHeaderView dateHeaderView;
 
         CalendarView fromCalendarView;
@@ -26,14 +28,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         long fromTimestamp;
         long toTimestamp;
         bool startWithToDate;
-        Action<long, long> closeRequest;
 
-        public PickDateRangeFragment(long fromTimestamp, long toTimestamp, bool startWithToDate, Action<long, long> closeRequest)
+        readonly TaskCompletionSource<long[]> tcs = new TaskCompletionSource<long[]>();
+
+        public PickDateRangeFragment(long fromTimestamp, long toTimestamp, bool startWithToDate)
         {
             this.fromTimestamp = fromTimestamp;
             this.toTimestamp = toTimestamp;
             this.startWithToDate = startWithToDate;
-            this.closeRequest = closeRequest;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -212,8 +214,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (closeRequest != null)
-                closeRequest(fromTimestamp, toTimestamp);
+            tcs.SetResult(new long[]{fromTimestamp,toTimestamp});
+            
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 

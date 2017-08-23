@@ -13,10 +13,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
         }
 
-        protected override void ClickAction()
+        protected override async void ClickAction()
         {
-            var pllf = new PickCountryFragment(UpdateCountryCode);
+            var pllf = new PickCountryFragment();
             ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
+            UpdateCountryCode(await pllf.Task);
         }
 
         void UpdateCountryCode(int p)

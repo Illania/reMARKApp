@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -7,6 +9,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid
 {
@@ -44,14 +47,13 @@ namespace Mark5.Mobile.Droid
                 var ot = (ObjectType) Intent.Extras.GetInt(ObjectTypeIntentKey);
                 var pci = Intent.Extras.GetIntArray(PreselectedCategoryIdsIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
-                var pclf = new PickCategoriesListFragment(ot, pci, categories => 
+                var pclf = new PickCategoriesListFragment(ot, pci, new CategoriesCloseRequest(categories => 
                 {
                     var intent = new Intent();
                     intent.PutExtra(CategoriesResultKey, Serializer.Serialize(categories));
                     SetResult(Result.Ok, intent);
                     OnBackPressed();
-                });
-
+                }));
                 ft.Replace(Resource.Id.fragment_container, pclf, pclf.GenerateTag());
                 ft.Commit();
 

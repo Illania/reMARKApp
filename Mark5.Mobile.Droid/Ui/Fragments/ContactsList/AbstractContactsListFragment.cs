@@ -30,7 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected ContactsListAdapter CurrentAdapter => (ContactsListAdapter)recyclerView.GetAdapter();
 
-        protected Action CloseRequest;
         protected ActionMode ActionMode;
 
         readonly Handler searchHandler = new Handler();
@@ -301,8 +300,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     Dialogs.ShowErrorDialog(Activity, ex);
 
-                    if (CloseRequest != null && adapter.ItemCount < 1)
-                        CloseRequest();
+                    if (adapter.ItemCount < 1)
+                        Activity.OnBackPressed();
                 },
                 startRowId,
                 cts.Token,

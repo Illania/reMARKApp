@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -15,16 +16,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickLinesListFragment : RetainableStateFragment
     {
+        public Task<List<Guid>> Task => tcs.Task;
+
         RecyclerView recyclerView;
         LinesListViewAdapter adapter;
 
         List<Guid> selectedLinesGuid;
-        Action<List<Guid>> closeRequest;
 
-        public PickLinesListFragment(List<Guid> selectedLinesGuid, Action<List<Guid>> closeRequest)
+        TaskCompletionSource<List<Guid>> tcs = new TaskCompletionSource<List<Guid>>();
+
+        public PickLinesListFragment(List<Guid> selectedLinesGuid)
         {
             this.selectedLinesGuid = selectedLinesGuid;
-            this.closeRequest = closeRequest;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -92,8 +95,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (closeRequest != null)
-                closeRequest(adapter.SelectedLinesGuid);
+            tcs.SetResult(adapter.SelectedLinesGuid);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 

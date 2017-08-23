@@ -29,7 +29,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public int? ShortcodeId { get; set; }
         public ShortcodePreview ShortcodePreview { get; set; }
         public Shortcode Shortcode { get; set; }
-        public Action CloseRequest { get; set; }
         public Guid NotificationGuid { get; set; }
 
         ProgressBar progress;
@@ -273,8 +272,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                if (CloseRequest != null)
-                    CloseRequest();
+                Activity.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -373,8 +371,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                Activity.OnBackPressed();
             }
         }
 

@@ -90,8 +90,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
                     cdf.PreconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
 
-                cdf.CloseRequest = OnBackPressed;
-
                 cdfFragmentTag = cdf.GenerateTag();
 
                 var ft = SupportFragmentManager.BeginTransaction();

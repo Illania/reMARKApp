@@ -7,10 +7,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesListFragment : AbstractShortcodesListFragment
     {
-        public ShortcodesListFragment(Folder folder, Action closeRequest)
+        public ShortcodesListFragment(Folder folder)
         {
             Folder = folder;
-            CloseRequest = closeRequest;
         }
 
         #region Adapter callbacks

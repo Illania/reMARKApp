@@ -91,8 +91,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
-                df.CloseRequest = OnBackPressed;
-
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
                 ft.Commit();
@@ -141,12 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (previousId == null)
                 return;
 
-            var df = new DocumentFragment
-            {
-                Folder = folder,
-                DocumentId = previousId,
-                CloseRequest = OnBackPressed,
-            };
+            var df = DocumentFragment.NewInstance(folder, docId: previousId);
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
@@ -160,12 +153,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (nextId == null)
                 return;
 
-            var df = new DocumentFragment
-            {
-                Folder = folder,
-                DocumentId = nextId,
-                CloseRequest = OnBackPressed,
-            };
+            var df = DocumentFragment.NewInstance(folder, docId: nextId);
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Android.Graphics;
 using Android.Graphics.Drawables;
@@ -13,10 +14,11 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
-namespace Mark5.Mobile.Droid
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickCategoriesListFragment : RetainableStateFragment
     {
@@ -32,11 +34,11 @@ namespace Mark5.Mobile.Droid
 
         readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
 
-        public PickCategoriesListFragment(ObjectType objectType, int[] preselectedCategoryIds, Action<List<Category>> closeRequest)
+        public PickCategoriesListFragment(ObjectType objectType, int[] preselectedCategoryIds, CategoriesCloseRequest categoriesCloseRequest)
         {
             this.objectType = objectType;
             this.preselectedCategoryIds = preselectedCategoryIds;
-            this.closeRequest = closeRequest;
+            closeRequest = categoriesCloseRequest.CloseRequest;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -342,7 +344,17 @@ namespace Mark5.Mobile.Droid
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
-
         #endregion
+
+    }
+        //Used to add the closerequest in a bundle to the fragment.
+        public class CategoriesCloseRequest : Java.Lang.Object
+        {
+            public Action<List<Category>> CloseRequest { get; set; }
+
+            public CategoriesCloseRequest(Action<List<Category>> closeRequest)
+            {
+                CloseRequest = closeRequest;
+            }
     }
 }

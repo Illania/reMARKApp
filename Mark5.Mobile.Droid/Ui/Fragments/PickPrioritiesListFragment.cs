@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -15,16 +16,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickPrioritiesListFragment : RetainableStateFragment
     {
+        public Task<List<Priority>> Task => tcs.Task;
+
         RecyclerView recyclerView;
         PrioritiesListViewAdapter adapter;
 
         List<Priority> selectedPriorities;
-        Action<List<Priority>> closeRequest;
 
-        public PickPrioritiesListFragment(List<Priority> selectedPriorities, Action<List<Priority>> closeRequest)
+        TaskCompletionSource<List<Priority>> tcs = new TaskCompletionSource<List<Priority>>();
+
+        public PickPrioritiesListFragment(List<Priority> selectedPriorities)
         {
             this.selectedPriorities = selectedPriorities;
-            this.closeRequest = closeRequest;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -97,8 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (closeRequest != null)
-                closeRequest(adapter.SelectedPriorities);
+            tcs.SetResult(adapter.SelectedPriorities);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 

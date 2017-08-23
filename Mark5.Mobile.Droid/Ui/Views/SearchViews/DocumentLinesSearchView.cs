@@ -14,10 +14,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
         }
 
-        protected override void ClickAction()
+        protected override async void ClickAction()
         {
-            var pllf = new PickLinesListFragment(selectedLineGuids, UpdateLines);
+            var pllf = new PickLinesListFragment(selectedLineGuids);
             ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
+            UpdateLines(await pllf.Task);
         }
 
         void UpdateLines(List<Guid> lineGuids)

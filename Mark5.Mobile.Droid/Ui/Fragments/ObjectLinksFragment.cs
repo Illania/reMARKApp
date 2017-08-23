@@ -22,8 +22,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectLinksFragment : RetainableStateFragment
     {
-        public Action CloseRequest { get; set; }
-
         IBusinessEntity businessEntity;
 
         List<ObjectLink> objectLinks;
@@ -111,9 +109,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Downloading object actions failed [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
-                if (CloseRequest != null)
-                    CloseRequest();
             }
         }
 

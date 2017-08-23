@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    dlf = new DocumentsSearchResultsFragment(criteria, OnBackPressed);
+                    dlf = new DocumentsSearchResultsFragment(criteria);
                     ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
                     ft.Commit();
                 }
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var csrf = new ContactsSearchResultsFragment(criteria, OnBackPressed);
+                    var csrf = new ContactsSearchResultsFragment(criteria);
                     ft.Replace(Resource.Id.fragment_container, csrf, csrf.GenerateTag());
                     ft.Commit();
                 }
@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var ssrf = new ShortcodesSearchResultsFragment(criteria, OnBackPressed);
+                    var ssrf = new ShortcodesSearchResultsFragment(criteria);
                     ft.Replace(Resource.Id.fragment_container, ssrf, ssrf.GenerateTag());
                     ft.Commit();
                 }

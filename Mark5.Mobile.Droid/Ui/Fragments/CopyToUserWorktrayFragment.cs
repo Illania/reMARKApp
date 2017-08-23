@@ -20,7 +20,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         List<IBusinessEntity> businessEntities;
-        Action closeRequest;
 
         CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
 
@@ -35,10 +34,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-        public CopyToUserWorktrayFragment(List<IBusinessEntity> be, Action closeRequest)
+        public CopyToUserWorktrayFragment(List<IBusinessEntity> be)
         {
             businessEntities = be;
-            this.closeRequest = closeRequest;
         }
 
         #region Fragment overrides
@@ -77,8 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await Managers.CommonActionsManager.CopyToUserWorktray(businessEntities, selectedSystemUsers.Values.ToList());
 
-                    if (closeRequest != null)
-                        closeRequest();
+                    Activity.OnBackPressed();
                 }
                 catch (Exception ex)
                 {

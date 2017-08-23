@@ -42,8 +42,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-        Action closeRequest;
-
         bool refreshing;
 
         IMenu menu;
@@ -63,10 +61,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AutoRefreshWorker autoRefreshWorker;
 
-        public DocumentsListFragment(Folder folder, Action closeRequest)
+        public DocumentsListFragment(Folder folder)
         {
             Folder = folder;
-            this.closeRequest = closeRequest;
         }
 
         #region Fragment overrides
@@ -354,8 +351,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (closeRequest != null)
-                    closeRequest();
+                Activity.OnBackPressed();
             }
             finally
             {

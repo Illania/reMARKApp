@@ -8,10 +8,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsListFragment : AbstractContactsListFragment
     {
-        public ContactsListFragment(Folder folder, Action closeRequest)
+        public ContactsListFragment(Folder folder)
         {
             Folder = folder;
-            CloseRequest = closeRequest;
         }
 
         #region Adapter callbacks

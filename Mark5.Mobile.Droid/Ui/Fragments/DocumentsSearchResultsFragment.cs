@@ -34,10 +34,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool shouldNotifyAdapter;
 
-        public DocumentsSearchResultsFragment(SearchDocumentsCriteria criteria, Action closeRequest)
+        public DocumentsSearchResultsFragment(SearchDocumentsCriteria criteria)
         {
             this.criteria = criteria;
-            this.closeRequest = closeRequest;
         }
 
         #region Fragment overrides
@@ -149,8 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (documentPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_documents);
-                    if (closeRequest != null)
-                        closeRequest();
+                    Activity.OnBackPressed();
                     return;
                 }
 
@@ -165,8 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (closeRequest != null)
-                    closeRequest();
+                Activity.OnBackPressed();
             }
             finally
             {

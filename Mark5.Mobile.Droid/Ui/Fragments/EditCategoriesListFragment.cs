@@ -26,7 +26,6 @@ namespace Mark5.Mobile.Droid
         CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
 
         BusinessEntityPreview businessEntityPreview;
-        Action closeRequest;
         
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -39,10 +38,9 @@ namespace Mark5.Mobile.Droid
 
         readonly Handler searchHandler = new Handler();
 
-        public EditCategoriesListFragment(BusinessEntityPreview businessEntityPreview, Action closeRequest)
+        public EditCategoriesListFragment(BusinessEntityPreview businessEntityPreview)
         {
             this.businessEntityPreview = businessEntityPreview;
-            this.closeRequest = closeRequest;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -138,8 +136,7 @@ namespace Mark5.Mobile.Droid
                 }
 
                 dismissAction();
-                if (closeRequest != null)
-                    closeRequest();
+                Activity.OnBackPressed();
             }
             catch (Exception ex)
             {

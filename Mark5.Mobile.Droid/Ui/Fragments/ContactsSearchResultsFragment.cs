@@ -24,16 +24,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ContactsSearchResultsFragment : RetainableStateFragment
     {
         SearchContactsCriteria criteria;
-        Action closeRequest;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ContactSearchResultsAdapter adapter;
 
-        public ContactsSearchResultsFragment(SearchContactsCriteria criteria, Action closeRequest)
+        public ContactsSearchResultsFragment(SearchContactsCriteria criteria)
         {
             this.criteria = criteria;
-            this.closeRequest = closeRequest;
         }
 
         #region Fragment overrides
@@ -139,8 +137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (contactPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_contacts);
-                    if (closeRequest != null)
-                        closeRequest();
+                    Activity.OnBackPressed();
                     return;
                 }
 
@@ -155,8 +152,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (closeRequest != null)
-                    closeRequest();
+                Activity.OnBackPressed();
             }
             finally
             {

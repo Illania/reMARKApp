@@ -72,7 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
                 else
                 {
-                    dlf = new DocumentsListFragment(folder, OnBackPressed);
+                    dlf = new DocumentsListFragment(folder);
                     dlfFragmentTag = dlf.GenerateTag();
                     ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                 }

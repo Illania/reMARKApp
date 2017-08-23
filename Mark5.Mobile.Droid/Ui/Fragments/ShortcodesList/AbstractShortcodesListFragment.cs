@@ -301,8 +301,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     Dialogs.ShowErrorDialog(Activity, ex);
 
-                    if (CloseRequest != null && adapter.ItemCount < 1)
-                        CloseRequest();
+                    if (adapter.ItemCount < 1)
+                        Activity.OnBackPressed();
                 },
                 startRowId,
                 cts.Token);

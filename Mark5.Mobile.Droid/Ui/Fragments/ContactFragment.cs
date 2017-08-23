@@ -30,7 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public int? ContactId { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public Contact Contact { get; set; }
-        public Action CloseRequest { get; set; }
         public Guid NotificationGuid { get; set; }
 
         const int CardElevation = 0;
@@ -315,7 +314,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                CloseRequest?.Invoke();
+                Activity.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -574,8 +573,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                Activity.OnBackPressed();
             }
         }
 

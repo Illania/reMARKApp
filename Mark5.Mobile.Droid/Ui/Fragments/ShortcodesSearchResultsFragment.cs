@@ -19,16 +19,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ShortcodesSearchResultsFragment : RetainableStateFragment
     {
         SearchShortcodesCriteria criteria;
-        Action closeRequest;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ShortcodeSearchResultsAdapter adapter;
 
-        public ShortcodesSearchResultsFragment(SearchShortcodesCriteria criteria, Action closeRequest)
+        public ShortcodesSearchResultsFragment(SearchShortcodesCriteria criteria)
         {
             this.criteria = criteria;
-            this.closeRequest = closeRequest;
         }
 
         #region Fragment overrides
@@ -134,8 +132,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (shortcodePreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_shortcodes);
-                    if (closeRequest != null)
-                        closeRequest();
+                    Activity.OnBackPressed();
                     return;
                 }
 
@@ -150,8 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (closeRequest != null)
-                    closeRequest();
+                Activity.OnBackPressed();
             }
             finally
             {

@@ -98,10 +98,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateText();
         }
 
-        void OpenDateRangeFragment(bool startWithTo)
+        async void OpenDateRangeFragment(bool startWithTo)
         {
-            var f = new PickDateRangeFragment(fromTimestamp, toTimestamp, startWithTo, UpdateTimestamps);
+            var f = new PickDateRangeFragment(fromTimestamp, toTimestamp, startWithTo);
             parentFragment.ReplaceFragment(f, f.GenerateTag());
+
+            //Get fromTimestamp and toTimestamp from PickDateRangeFragment in array.
+            long[] fragmentResult = await f.Task;
+            UpdateTimestamps(fragmentResult[0], fragmentResult[1]);
         }
 
         void UpdateTimestamps(long fromTimestamp, long toTimestamp)

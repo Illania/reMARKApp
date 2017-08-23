@@ -188,15 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var s = state;
                 var fd = state.FragmentStates[position];
 
-                var df = new DocumentFragment
-                {
-                    FolderId = s.FolderId,
-                    Folder = s.Folder,
-                    DocumentId = fd.DocumentId,
-                    DocumentPreview = fd.DocumentPreview,
-                    NotificationGuid = fd.NotificationGuid,
-                    CloseRequest = s.CloseRequest
-                };
+                var df = DocumentFragment.NewInstance(s.Folder, s.FolderId, fd.DocumentPreview, fd.DocumentId, fd.NotificationGuid);
 
                 return df;
             }

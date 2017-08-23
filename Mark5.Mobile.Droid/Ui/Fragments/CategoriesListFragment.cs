@@ -25,7 +25,6 @@ namespace Mark5.Mobile.Droid
         readonly Handler searchHandler = new Handler();
 
         BusinessEntityPreview businessEntityPreview;
-        Action closeRequest;
 
         RecyclerView recyclerView;
         SearchView searchView;
@@ -33,10 +32,9 @@ namespace Mark5.Mobile.Droid
         CategoriesListAdapter adapter;
         CategoriesListAdapter searchAdapter;
 
-        public CategoriesListFragment(BusinessEntityPreview businessEntityPreview, Action closeRequest)
+        public CategoriesListFragment(BusinessEntityPreview businessEntityPreview)
         {
             this.businessEntityPreview = businessEntityPreview;
-            this.closeRequest = closeRequest;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -112,7 +110,7 @@ namespace Mark5.Mobile.Droid
         {
             if (item.ItemId == 10)
             {
-                var clf = new EditCategoriesListFragment(businessEntityPreview, closeRequest);
+                var clf = new EditCategoriesListFragment(businessEntityPreview);
 
                 var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);
