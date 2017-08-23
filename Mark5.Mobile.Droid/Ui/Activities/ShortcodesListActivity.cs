@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                slf = new ShortcodesListFragment(folder);
+                slf = ShortcodesListFragment.NewInstance(folder);
                 ft.Replace(Resource.Id.fragment_container, slf, slf.GenerateTag());
                 ft.Commit();
 

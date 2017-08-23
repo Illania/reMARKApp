@@ -6,13 +6,17 @@ using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using System;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FoldersNotificationsListFragment : RetainableStateFragment
     {
+        public const string RemoteFolderBundleKey = "RemoteFolder_403cbd64-83e9-4e13-8809-0868debb55b9";
+
         static readonly int[] tabTitles =
         {
             Resource.String.folders,
@@ -32,8 +36,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 this.remoteFolder = remoteFolder;    
         }
 
+        public static ValueTuple<FoldersNotificationsListFragment,string> NewInstance(Folder remoteFolder)
+        {
+            var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
+
+            var args = new Bundle();
+            args.PutString(RemoteFolderBundleKey,Serializer.Serialize(remoteFolder));
+
+            var fragment = new FoldersNotificationsListFragment();
+            fragment.Arguments = args;
+            //new ValueTuple
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(RemoteFolderBundleKey))
+                remoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
+            
             CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsRetainableState)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.pager, container, false);
@@ -101,7 +121,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
+            throw new NotImplementedException();
         }
 
         class FoldersNotificationsRetainableState : IRetainableState
@@ -128,7 +148,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 switch (position)
                 {
                     case 0:
-                        return FoldersListFragment.NewInstance(folder);
+                        //Item1 is the fragment
+                        return FoldersListFragment.NewInstance(folder).Item1;
                     case 1:
                         return new NotificationsListFragment(folder.Module.ObjectTypes());
                     default:

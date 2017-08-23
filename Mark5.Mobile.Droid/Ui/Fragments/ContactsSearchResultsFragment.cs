@@ -23,21 +23,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsSearchResultsFragment : RetainableStateFragment
     {
+        public const string CriteriaBundleKey = "Criteria_cc2b48a4-affd-48a8-bb0c-4a6cec17975a";
+
         SearchContactsCriteria criteria;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ContactSearchResultsAdapter adapter;
 
-        public ContactsSearchResultsFragment(SearchContactsCriteria criteria)
+        public static ContactsSearchResultsFragment NewInstance(SearchContactsCriteria criteria)
         {
-            this.criteria = criteria;
+            var args = new Bundle();
+            args.PutString(CriteriaBundleKey,Serializer.Serialize(criteria));
+
+            var fragment = new ContactsSearchResultsFragment();
+            fragment.Arguments = args;
+
+            return fragment;
         }
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(CriteriaBundleKey))
+                criteria = Serializer.Deserialize<SearchContactsCriteria>(Arguments.GetString(CriteriaBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);

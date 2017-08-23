@@ -1,5 +1,6 @@
 ﻿using System;
 using Android.Content;
+using Android.OS;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -11,9 +12,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerShortcodesListFragment : AbstractShortcodesListFragment
     {
-        public PickerShortcodesListFragment(Folder folder)
+        public static PickerShortcodesListFragment NewInstance(Folder folder)
         {
-            Folder = folder;
+            var args = new Bundle();
+            args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            var fragment = new PickerShortcodesListFragment();
+            fragment.Arguments = args;
+
+            return fragment;
         }
 
         #region Adapter callbacks

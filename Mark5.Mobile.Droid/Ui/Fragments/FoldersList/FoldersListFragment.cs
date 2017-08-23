@@ -51,18 +51,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
-        public static FoldersListFragment NewInstance(Folder remoteFolder, bool? hideSearch = null)
+        public static ValueTuple<FoldersListFragment,string> NewInstance(Folder remoteFolder, bool? hideSearch = null)
         {
+            var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
+
             var args = new Bundle();
             args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
 
             if (hideSearch != null)
                 args.PutBoolean(HideSearchBundleKey, hideSearch.Value);
-
+            
             var fragment = new FoldersListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         #region Overrides
@@ -272,9 +274,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.SetSections(AvailableSections);
         }
 
-        protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
+        protected virtual ValueTuple<RetainableStateFragment,string> GetFolderFragment(Folder folder)
         {
-            return FoldersListFragment.NewInstance(folder, HideSearch);
+            return NewInstance(folder, HideSearch);
         }
 
         void RefreshLocal()
@@ -288,8 +290,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void NavigateToFolder(Folder folder)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
-            var foldersListFragment = GetFolderFragment(folder);
-            var tag = foldersListFragment.GenerateTag();
+            (var foldersListFragment, var tag) = GetFolderFragment(folder);
 
             fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, foldersListFragment, tag).AddToBackStack(tag).Commit();
         }
@@ -778,11 +779,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Retained Fragment methods
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(FoldersListFragment)} [FolderId={RemoteFolder.Id}, ModuleType={RemoteFolder.Module}]";
-        }
-
         public override IRetainableState OnRetainInstanceState()
         {
             CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count}]");
@@ -806,6 +802,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Info($"Restored state state: [folderName={RemoteFolder.Name}, folderId={RemoteFolder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
             }
+        }
+
+        public override string GenerateTag()
+        {
+            throw new NotImplementedException();
         }
 
         protected class FolderListFragmentState : IRetainableState

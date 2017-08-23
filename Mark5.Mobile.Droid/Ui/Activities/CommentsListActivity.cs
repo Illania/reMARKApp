@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var businessEntity = Serializer.Deserialize<BusinessEntity>(Intent.Extras.GetString(EntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                cf = new CommentsListFragment(businessEntity);
+                cf = CommentsListFragment.NewInstance(businessEntity);
                 ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
                 ft.Commit();
 

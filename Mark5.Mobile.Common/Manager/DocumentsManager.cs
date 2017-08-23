@@ -598,6 +598,7 @@ namespace Mark5.Mobile.Common.Manager
                 if (doc != null)
                     docs.Add((guid, doc));
             }
+
             return docs;
         }
 

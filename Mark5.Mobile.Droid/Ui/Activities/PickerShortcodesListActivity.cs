@@ -47,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                var pcflf = new PickerShortcodesListFragment(folder);
+                var pcflf = PickerShortcodesListFragment.NewInstance(folder);
                 ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
                 ft.Commit();
 

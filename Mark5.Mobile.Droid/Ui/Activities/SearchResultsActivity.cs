@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var csrf = new ContactsSearchResultsFragment(criteria);
+                    var csrf = ContactsSearchResultsFragment.NewInstance(criteria);
                     ft.Replace(Resource.Id.fragment_container, csrf, csrf.GenerateTag());
                     ft.Commit();
                 }

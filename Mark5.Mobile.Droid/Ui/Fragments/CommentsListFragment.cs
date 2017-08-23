@@ -19,6 +19,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CommentsListFragment : RetainableStateFragment
     {
+        public const string BusinessEntityBundleKey = "BusinessEntity_d475f087-b641-494d-b56b-152e945b0823";
+
         const int SecondsToEdit = 60;
 
         public List<Comment> Comments => adapter.Items;
@@ -31,13 +33,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         AppCompatEditText addCommentEditText;
         AppCompatImageButton addCommentButton;
 
-        public CommentsListFragment(BusinessEntity be)
+        public static CommentsListFragment NewInstance(BusinessEntity be)
         {
-            entity = be;
+            var args = new Bundle();
+            args.PutString(BusinessEntityBundleKey,Serializer.Serialize(be));
+
+            var fragment = new CommentsListFragment();
+            fragment.Arguments = args;
+
+            return fragment;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(BusinessEntityBundleKey))
+                entity = Serializer.Deserialize<BusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_comments, container, false);

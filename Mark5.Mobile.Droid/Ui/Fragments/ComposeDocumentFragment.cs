@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.OS;
 using Android.Provider;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
@@ -29,23 +30,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
-        static class RequestCodes
-        {
-            public const int AttachmentRequestCode = 111;
-            public const int RecentAddressesRequestCode = 222;
-            public const int ContactsRequestCode = 333;
-            public const int ShortcodesRequestCode = 444;
-            public const int PhonebookRequestCode = 555;
-            public const int TemplatePreviewRequestCode = 666;
-        }
-
-        const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
-
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
+
+        public const string RestoreWorkingCopyBundleKey = "RestoreWorkingCopy_a6c252fc-09b9-44a9-941f-ea3785c0864d";
+        public const string DocumentCreationModeFlagBundleKey = "DocumentCreationModeFlag_b181c281-54bd-4c21-a476-a69ea0f83872";
+        public const string CopyToNewOptionBundleKey = "CopyToNewOption_e3d9e971-7873-497c-9239-838e14286d2e";
+
+        const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
+        const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
 
         bool restoreWorkingCopy;
         
@@ -82,15 +77,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Worker autoSaveWorkingCopyWorker;
 
-        public ComposeDocumentFragment(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption copyToNewOption, bool restoreWorkingCopy)
+        public static ComposeDocumentFragment NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption copyToNewOption, bool restoreWorkingCopy)
         {
-            this.documentCreationModeFlag = documentCreationModeFlag;
-            this.copyToNewOption = copyToNewOption;
-            this.restoreWorkingCopy = restoreWorkingCopy;
+            var args = new Bundle();
+            args.PutString(DocumentCreationModeFlagBundleKey, Serializer.Serialize(documentCreationModeFlag));
+            args.PutString(CopyToNewOptionBundleKey, Serializer.Serialize(copyToNewOption));
+            args.PutBoolean(RestoreWorkingCopyBundleKey, restoreWorkingCopy);
+
+            var fragment = new ComposeDocumentFragment();
+            fragment.Arguments = args;
+
+            return fragment;
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(DocumentCreationModeFlagBundleKey))
+                documentCreationModeFlag = Serializer.Deserialize<DocumentCreationModeFlag>(Arguments.GetString(DocumentCreationModeFlagBundleKey));
+
+            if (Arguments.ContainsKey(CopyToNewOptionBundleKey))
+                copyToNewOption = Serializer.Deserialize<CopyToNewOption>(Arguments.GetString(CopyToNewOptionBundleKey));
+
+            if (Arguments.ContainsKey(RestoreWorkingCopyBundleKey))
+                restoreWorkingCopy = Arguments.GetBoolean(RestoreWorkingCopyBundleKey);
+
+
             CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}]");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -311,6 +322,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
 
             await AskIfShouldUseTemplates();
+        }
+
+        static class RequestCodes
+        {
+            public const int AttachmentRequestCode = 111;
+            public const int RecentAddressesRequestCode = 222;
+            public const int ContactsRequestCode = 333;
+            public const int ShortcodesRequestCode = 444;
+            public const int PhonebookRequestCode = 555;
+            public const int TemplatePreviewRequestCode = 666;
         }
 
         #region Subviews event handlers

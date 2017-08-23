@@ -346,16 +346,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     Restore(fm);
             }
 
+
             void Create(FragmentManager fm)
             {
                 RetainableStateFragment f = null;
+                string tag;
 
                 if (ModuleType == ModuleType.Documents)
-                    f = new FoldersNotificationsListFragment(Folder.RootForModule(ModuleType));
-                else if (ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
-                    f = FoldersListFragment.NewInstance(Folder.RootForModule(ModuleType));
-
-                var tag = f.GenerateTag();
+                    (f, tag) = FoldersNotificationsListFragment.NewInstance(Folder.RootForModule(ModuleType));
+                else //(ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
+                    (f, tag) = FoldersListFragment.NewInstance(Folder.RootForModule(ModuleType));
+                
                 var ft = fm.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, f, tag);
