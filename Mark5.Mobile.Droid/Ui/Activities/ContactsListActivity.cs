@@ -51,10 +51,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = ContactsListFragment.NewInstance(folder);
-                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                (clf, tag) = ContactsListFragment.NewInstance(folder);
+
+                ft.Replace(Resource.Id.fragment_container, clf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactsListActivity)}");

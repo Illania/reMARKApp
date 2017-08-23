@@ -12,15 +12,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
 
-        public static ContactsListFragment NewInstance(Folder folder)
+        public static (ContactsListFragment fragment, string tag) NewInstance(Folder folder)
         {
+            var tag = $"{nameof(ContactsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
+
             var args = new Bundle();
             args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
             var fragment = new ContactsListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         #region MyRegion

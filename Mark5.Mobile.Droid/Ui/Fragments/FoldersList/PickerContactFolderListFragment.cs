@@ -9,8 +9,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerContactFolderListFragment : FoldersListFragment
     {
-        public static new PickerContactFolderListFragment NewInstance(Folder remoteFolder, bool? hideSearch = null)
+        public static new (PickerContactFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null)
         {
+            var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
+
             var args = new Bundle();
             args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
 
@@ -20,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragment = new PickerContactFolderListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment,tag);
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
@@ -34,9 +36,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             //Nothing to do here
         }
 
-        protected override RetainableStateFragment GetFolderFragment(Folder folder)
+        protected override (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
-            return PickerContactFolderListFragment.NewInstance(folder);
+            return NewInstance(folder);
         }
     }
 }

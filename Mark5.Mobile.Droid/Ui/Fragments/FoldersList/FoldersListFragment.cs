@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
-        public static ValueTuple<FoldersListFragment,string> NewInstance(Folder remoteFolder, bool? hideSearch = null)
+        public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null)
         {
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 
@@ -274,7 +274,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.SetSections(AvailableSections);
         }
 
-        protected virtual ValueTuple<RetainableStateFragment,string> GetFolderFragment(Folder folder)
+        protected virtual (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
             return NewInstance(folder, HideSearch);
         }
@@ -290,7 +290,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void NavigateToFolder(Folder folder)
         {
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
-            (var foldersListFragment, var tag) = GetFolderFragment(folder);
+            var (foldersListFragment, tag) = GetFolderFragment(folder);
 
             fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, foldersListFragment, tag).AddToBackStack(tag).Commit();
         }

@@ -40,8 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var pcflf = PickerShortcodesFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Shortcodes),true);
-                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                var (pcflf,tag) = PickerShortcodesFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Shortcodes),true);
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PickerShortcodesFolderListActivity)}");

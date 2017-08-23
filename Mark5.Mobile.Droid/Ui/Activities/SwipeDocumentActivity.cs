@@ -188,7 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var s = state;
                 var fd = state.FragmentStates[position];
 
-                var df = DocumentFragment.NewInstance(s.Folder, s.FolderId, fd.DocumentPreview, fd.DocumentId, fd.NotificationGuid);
+                var df = DocumentFragment.NewInstance(s.Folder, s.FolderId, fd.DocumentPreview, fd.DocumentId, fd.NotificationGuid).fragment;
 
                 return df;
             }

@@ -40,8 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var pcflf = PickerContactFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Contacts),true);
-                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                var (pcflf,tag) = PickerContactFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Contacts),true);
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PickerContactFolderListActivity)}");

@@ -25,14 +25,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Folder fromFolder;
         ActionType actionType;
 
-        public static CopyMoveToFolderListFragment NewInstance(Folder remoteFolder, List<IBusinessEntity> businessEntities, Folder fromfolder = null, ActionType? actionType = null)
+        public static (CopyMoveToFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, List<IBusinessEntity> businessEntities, Folder fromFolder = null, ActionType? actionType = null)
         {
+            var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]" + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={businessEntities.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id ?? -1}]";
+
             var args = new Bundle();
             args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
             args.PutString(BusinessEntitiesBundleKey, Serializer.Serialize(businessEntities));
 
-            if (fromfolder != null)
-                args.PutString(FromFolderBundleKey, Serializer.Serialize(fromfolder));
+            if (fromFolder != null)
+                args.PutString(FromFolderBundleKey, Serializer.Serialize(fromFolder));
 
             if (actionType != null)
                 args.PutString(ActionTypeBundleKey, Serializer.Serialize(actionType.Value));
@@ -40,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragment = new CopyMoveToFolderListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment,tag);
         }
 
         #region Fragment overrides
@@ -84,15 +86,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.SetSections(AvailableSections);
         }
 
-        protected override RetainableStateFragment GetFolderFragment(Folder folder)
+        protected override (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
-            return new CopyMoveToFolderListFragment
-            {
-                businessEntities = businessEntities,
-                fromFolder = fromFolder,
-                RemoteFolder = folder,
-                actionType = actionType
-            };
+            return NewInstance(folder, businessEntities, fromFolder, actionType);
+
         }
 
         protected override async void Adapter_ItemClicked(object sender, int position)

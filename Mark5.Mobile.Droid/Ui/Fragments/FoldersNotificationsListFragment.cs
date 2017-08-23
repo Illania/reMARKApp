@@ -28,15 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         TabLayout tabLayout;
         ViewPager pager;
 
-        public FoldersNotificationsListFragment() { }
-
-        public FoldersNotificationsListFragment(Folder remoteFolder = null)
-        {
-            if(remoteFolder != null)
-                this.remoteFolder = remoteFolder;    
-        }
-
-        public static ValueTuple<FoldersNotificationsListFragment,string> NewInstance(Folder remoteFolder)
+        public static (FoldersNotificationsListFragment fragment, string tag) NewInstance(Folder remoteFolder)
         {
             var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 
@@ -45,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var fragment = new FoldersNotificationsListFragment();
             fragment.Arguments = args;
-            //new ValueTuple
+           
             return (fragment, tag);
         }
 
@@ -149,7 +141,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     case 0:
                         //Item1 is the fragment
-                        return FoldersListFragment.NewInstance(folder).Item1;
+                        return FoldersListFragment.NewInstance(folder).fragment;
                     case 1:
                         return new NotificationsListFragment(folder.Module.ObjectTypes());
                     default:

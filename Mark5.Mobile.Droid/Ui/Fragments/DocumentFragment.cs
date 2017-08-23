@@ -54,8 +54,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CancellationTokenSource setReadStatusCancellationTokenSource;
 
-        public static DocumentFragment NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null)
+        public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null)
         {
+            var tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? docId}]";
             var fragment = new DocumentFragment();
             var args = new Bundle();
 
@@ -75,7 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 args.PutString(NotificationGuidBundleKey, Serializer.Serialize(notificationGuid));
 
             fragment.Arguments = args;
-            return fragment;
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

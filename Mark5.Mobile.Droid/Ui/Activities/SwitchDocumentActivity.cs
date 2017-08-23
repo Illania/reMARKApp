@@ -139,11 +139,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (previousId == null)
                 return;
 
-            var df = DocumentFragment.NewInstance(folder, docId: previousId);
+            var (df,tag) = DocumentFragment.NewInstance(folder, docId: previousId);
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
-            ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+            ft.Replace(Resource.Id.fragment_container, df, tag);
             ft.Commit();
         }
 
@@ -153,11 +153,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (nextId == null)
                 return;
 
-            var df = DocumentFragment.NewInstance(folder, docId: nextId);
+            var (df,tag) = DocumentFragment.NewInstance(folder, docId: nextId);
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
-            ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+            ft.Replace(Resource.Id.fragment_container, df, tag);
             ft.Commit();
         }
 
