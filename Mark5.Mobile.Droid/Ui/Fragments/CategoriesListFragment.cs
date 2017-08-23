@@ -13,6 +13,7 @@ using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -20,6 +21,8 @@ namespace Mark5.Mobile.Droid
 {
     public class CategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        public const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_8938f3ae-6cb4-48c1-9c19-34cf533bcaed";
+
         public List<Category> Categories => adapter.Items;
 
         readonly Handler searchHandler = new Handler();
@@ -32,14 +35,22 @@ namespace Mark5.Mobile.Droid
         CategoriesListAdapter adapter;
         CategoriesListAdapter searchAdapter;
 
-        public CategoriesListFragment(BusinessEntityPreview businessEntityPreview)
+        public static CategoriesListFragment NewInstance(BusinessEntityPreview businessEntity)
         {
-            this.businessEntityPreview = businessEntityPreview;
+            var args = new Bundle();
+            args.PutString(BusinessEntityPreviewBundleKey,Serializer.Serialize(businessEntity));
+
+            var fragment = new CategoriesListFragment();
+            fragment.Arguments = args;
+
+            return fragment;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
+
+            businessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 

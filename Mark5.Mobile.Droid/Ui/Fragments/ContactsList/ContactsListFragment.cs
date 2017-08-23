@@ -1,5 +1,7 @@
 ﻿using System;
 using Android.Content;
+using Android.OS;
+using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -8,10 +10,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsListFragment : AbstractContactsListFragment
     {
-        public ContactsListFragment(Folder folder)
+        public const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
+
+        public static ContactsListFragment NewInstance(Folder folder)
         {
-            Folder = folder;
+            var args = new Bundle();
+            args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            var fragment = new ContactsListFragment();
+            fragment.Arguments = args;
+
+            return fragment;
         }
+
+        #region MyRegion
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
+            if (Arguments.ContainsKey(FolderBundleKey))
+                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
+            return base.OnCreateView(inflater, container, savedInstanceState);
+        }
+
+        #endregion
 
         #region Adapter callbacks
 

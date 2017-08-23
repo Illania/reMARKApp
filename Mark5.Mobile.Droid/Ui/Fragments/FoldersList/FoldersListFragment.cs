@@ -28,6 +28,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         protected virtual bool LoadRemoteFromCache { get; }
 
+        public const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
+        public const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
+
         protected Folder RemoteFolder;
         protected bool HideSearch;
 
@@ -48,20 +51,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
-        public FoldersListFragment() { }
-
-        public FoldersListFragment(Folder remoteFolder, bool? hideSearch = null)
+        public static FoldersListFragment NewInstance(Folder remoteFolder, bool? hideSearch = null)
         {
-            RemoteFolder = remoteFolder;
+            var args = new Bundle();
+            args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
 
             if (hideSearch != null)
-                HideSearch = hideSearch.Value;
+                args.PutBoolean(HideSearchBundleKey, hideSearch.Value);
+
+            var fragment = new FoldersListFragment();
+            fragment.Arguments = args;
+
+            return fragment;
         }
 
         #region Overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(RemoteFolderBundleKey))
+               RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
+
+            if (Arguments.ContainsKey(HideSearchBundleKey))
+                HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
+              
             Container = container;
 
             CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
@@ -261,7 +274,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual RetainableStateFragment GetFolderFragment(Folder folder)
         {
-            return new FoldersListFragment(folder, HideSearch);
+            return FoldersListFragment.NewInstance(folder, HideSearch);
         }
 
         void RefreshLocal()

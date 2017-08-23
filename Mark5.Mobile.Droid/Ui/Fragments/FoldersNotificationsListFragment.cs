@@ -128,7 +128,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 switch (position)
                 {
                     case 0:
-                        return new FoldersListFragment(folder);
+                        return FoldersListFragment.NewInstance(folder);
                     case 1:
                         return new NotificationsListFragment(folder.Module.ObjectTypes());
                     default:

@@ -56,25 +56,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static DocumentFragment NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null)
         {
-            DocumentFragment fragment = new DocumentFragment();
-            Bundle bundle = new Bundle();
+            var fragment = new DocumentFragment();
+            var args = new Bundle();
 
             if (folder != null)
-                bundle.PutString(FolderBundleKey, Serializer.Serialize(folder));
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
             if (folderId != null)
-                bundle.PutInt(FolderIdBundleKey, folderId.Value);
+                args.PutInt(FolderIdBundleKey, folderId.Value);
 
             if (dp != null)
-                bundle.PutString(DocumentPreviewBundleKey, Serializer.Serialize(dp));
+                args.PutString(DocumentPreviewBundleKey, Serializer.Serialize(dp));
 
             if (docId != null)
-                bundle.PutInt(DocumentIdBundleKey, docId.Value);
+                args.PutInt(DocumentIdBundleKey, docId.Value);
 
             if (notificationGuid != null)
-                bundle.PutString(NotificationGuidBundleKey, Serializer.Serialize(notificationGuid));
+                args.PutString(NotificationGuidBundleKey, Serializer.Serialize(notificationGuid));
 
-            fragment.Arguments = bundle;
+            fragment.Arguments = args;
             return fragment;
         }
 

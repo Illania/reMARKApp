@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = new ContactsListFragment(folder);
+                clf = ContactsListFragment.NewInstance(folder);
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.Commit();
 
