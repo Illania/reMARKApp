@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -19,6 +20,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        public const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
+
         List<IBusinessEntity> businessEntities;
 
         CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
@@ -34,15 +37,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-        public CopyToUserWorktrayFragment(List<IBusinessEntity> be)
+        public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<IBusinessEntity> be)
         {
-            businessEntities = be;
+            var tag = $"{nameof(CopyToUserWorktrayFragment)}]";
+
+            var fragment = new CopyToUserWorktrayFragment();
+
+            var args = new Bundle();
+            if (be != null)
+                args.PutString(BusinessEntitiesBundleKey, Serializer.Serialize(be));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(BusinessEntitiesBundleKey))
+                businessEntities = Serializer.Deserialize<List<IBusinessEntity>>(Arguments.GetString(BusinessEntitiesBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);

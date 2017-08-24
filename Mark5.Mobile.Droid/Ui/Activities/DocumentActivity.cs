@@ -63,28 +63,35 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var df = new DocumentFragment();
+                Guid? failedDocumentToUploadGuid = null;
+                int? folderId = null;
+                Folder folder = null;
+                int? documentId = null;
+                DocumentPreview documentPreview = null;
+                Guid? notificationGuid = null;
 
                 if (Intent.HasExtra(FailedDocumentToUploadGuidIntentKey))
-                    df.FailedDocumentToUploadGuid = Guid.Parse(Intent.Extras.GetString(FailedDocumentToUploadGuidIntentKey));
+                    failedDocumentToUploadGuid = Guid.Parse(Intent.Extras.GetString(FailedDocumentToUploadGuidIntentKey));
 
                 if (Intent.HasExtra(FolderIdIntentKey))
-                    df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+                    folderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    df.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(DocumentIdIntentKey))
-                    df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
+                    documentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    df.DocumentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    documentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+
+                var (df, tag) = DocumentFragment.NewInstance(folder, folderId, documentPreview, documentId, notificationGuid, failedDocumentToUploadGuid);
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, df, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");

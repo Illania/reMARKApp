@@ -66,14 +66,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 if (folder.Local && folder.Id == Folder.LocalRootForModule(ModuleType.Documents).SubFolders[0].Id)
                 {
-                    odlf = new DocumentsToUploadListFragment(OnBackPressed);
-                    dtuFragmentTag = odlf.GenerateTag();
+                    (odlf, dtuFragmentTag) = DocumentsToUploadListFragment.NewInstance();
                     ft.Replace(Resource.Id.fragment_container, odlf, dtuFragmentTag);
                 }
                 else
                 {
-                    dlf = new DocumentsListFragment(folder);
-                    dlfFragmentTag = dlf.GenerateTag();
+                    (dlf, dlfFragmentTag) = DocumentsListFragment.NewInstance(folder);
                     ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                 }
                 ft.Commit();

@@ -46,8 +46,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var be = Serializer.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new CopyToUserWorktrayFragment(be);
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                var (dlf, tag) = CopyToUserWorktrayFragment.NewInstance(be);
+                ft.Replace(Resource.Id.fragment_container, dlf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayActivity)}");

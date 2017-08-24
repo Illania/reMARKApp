@@ -49,8 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (moduleType == ModuleType.Documents)
                 {
-                    var f = new DocumentSearchCriteriaFragment();
-                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    var (f, tag) = DocumentSearchCriteriaFragment.NewInstance();
+                    ft.Replace(Resource.Id.fragment_container, f, tag);
                     ft.Commit();
                 }
                 if (moduleType == ModuleType.Contacts)

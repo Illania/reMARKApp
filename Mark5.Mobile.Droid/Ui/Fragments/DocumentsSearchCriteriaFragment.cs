@@ -34,6 +34,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AbstractSearchView<SearchDocumentsCriteria>> subviews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
 
+        public static (DocumentSearchCriteriaFragment Fragment, string tag) NewInstance()
+        {
+            var tag = $"{nameof(DocumentSearchCriteriaFragment)}";
+            var fragment = new DocumentSearchCriteriaFragment();
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");

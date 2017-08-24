@@ -25,8 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentsSearchResultsFragment : RetainableStateFragment
     {
-        public SearchDocumentsCriteria criteria;
-        public Action closeRequest;
+        public const string SearchDocumentsCriteriaBundleKey = "SearchDocumentsCriteria_273f369b-8818-4944-9dfc-5193a7bd542a";
+
+        SearchDocumentsCriteria criteria;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -34,15 +35,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool shouldNotifyAdapter;
 
-        public DocumentsSearchResultsFragment(SearchDocumentsCriteria criteria)
+        public static (DocumentsSearchResultsFragment fragment, string var) NewInstance(SearchDocumentsCriteria criteria)
         {
-            this.criteria = criteria;
+            var tag = $"{nameof(DocumentsSearchResultsFragment)}]";
+            var fragment = new DocumentsSearchResultsFragment();
+            var args = new Bundle();
+
+            if (criteria != null)
+                args.PutString(SearchDocumentsCriteriaBundleKey, Serializer.Serialize(criteria));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(SearchDocumentsCriteriaBundleKey))
+                criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Arguments.GetString(SearchDocumentsCriteriaBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);

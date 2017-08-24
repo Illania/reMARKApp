@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
 
+        public const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
+
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         readonly Handler searchHandler = new Handler();
@@ -61,15 +63,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AutoRefreshWorker autoRefreshWorker;
 
-        public DocumentsListFragment(Folder folder)
+        public static (DocumentsListFragment fragment, string tag) NewInstance(Folder folder)
         {
-            Folder = folder;
+            var tag = $"{nameof(DocumentsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
+
+            var fragment = new DocumentsListFragment();
+            var args = new Bundle();
+
+            if (folder != null)
+                args.PutString(FolderBundleKey,Serializer.Serialize(folder));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(FolderBundleKey))
+                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);

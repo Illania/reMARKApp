@@ -26,13 +26,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactFragment : RetainableStateFragment
     {
-
         public const string FolderIdBundleKey = "FolderId_da4826eb-eb7a-4ceb-bd12-9c735bef1552";
         public const string FolderBundleKey = "Folder_40876832-91a3-46d7-a57e-6d850847c2a5";
         public const string ContactIdBundleKey = "ContactId_ce2b58e8-9ff1-41db-a276-d53772786628";
         public const string ContactPreviewBundleKey = "ContactPreview_477643e8-4815-4d91-bb28-7f96b764112b";
         public const string NotificationGuidBundleKey = "NotificationGuid_f57ec6a8-4d34-4ae5-936a-1316a73d252f";
-
 
         const int CardElevation = 0;
         const float CardRadius = 2f;
@@ -60,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AppCompatTextView descriptionCardTitle;
 
-        public static (ContactFragment fragment, string tag) NewInstance(int? folderId, Folder folder, int? contactId, ContactPreview contactPreview, Guid? notificationGuid)
+        public static (ContactFragment fragment, string tag) NewInstance(int? folderId = null, Folder folder = null, int? contactId = null, ContactPreview contactPreview = null, Guid? notificationGuid = null)
         {
             //old tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contact?.Id ?? contactId}]";
             var tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contactId}]";
@@ -724,13 +722,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
 
-            var cf = new ContactFragment
-            {
-                contactPreview = cp,
-                folder = folder
-            };
+            var (cf,tag) = NewInstance(folder: folder, contactPreview: cp);
             ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
-            ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+            ft.Replace(Resource.Id.fragment_container, cf, tag);
             ft.AddToBackStack(null);
             ft.Commit();
         }

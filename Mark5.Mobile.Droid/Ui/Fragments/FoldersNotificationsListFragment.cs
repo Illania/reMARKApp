@@ -28,6 +28,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         TabLayout tabLayout;
         ViewPager pager;
 
+        public static FoldersNotificationsListFragment NewInstance()
+        {
+            return new FoldersNotificationsListFragment();
+        }
+
         public static (FoldersNotificationsListFragment fragment, string tag) NewInstance(Folder remoteFolder)
         {
             var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";

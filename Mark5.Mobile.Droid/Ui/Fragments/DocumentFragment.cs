@@ -34,16 +34,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public const string DocumentIdBundleKey = "DocumentId_e9409d8a-9212-4483-b819-ff5ac3487c87";
         public const string CloseRequestBundleKey = "CloseRequest_d45a15b4-dadb-40ae-aab1-c565e9446bd0";
         public const string NotificationGuidBundleKey = "NotificationGuid_fb411b05-9d4b-46db-aa81-7348bf069a38";
+        public const string FailedDocumentToUploadGuidBundleKey = "FailedDocumentToUploadGuid_7bf6c332-083d-4f2b-950e-d3bdc3992e2b";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
-        public Guid FailedDocumentToUploadGuid { get; set; }
-        public int? FolderId { get; set; }
-        public Folder Folder { get; set; }
-        public int? DocumentId { get; set; }
-        public DocumentPreview DocumentPreview { get; set; }
-        public Document Document { get; set; }
-        public Guid NotificationGuid { get; set; }
+        Guid FailedDocumentToUploadGuid;
+        int? FolderId;
+        Folder Folder;
+        int? DocumentId;
+        DocumentPreview DocumentPreview;
+        Document Document;
+        Guid NotificationGuid;
 
         ProgressBar progress;
         RelativeLayout relativeLayout;
@@ -54,9 +55,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CancellationTokenSource setReadStatusCancellationTokenSource;
 
-        public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null)
+        public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
         {
+            //old tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? Document?.Id ?? docId}]"; -> Document only changed in this fragment after instantiation.
             var tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? docId}]";
+
             var fragment = new DocumentFragment();
             var args = new Bundle();
 
@@ -75,14 +78,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (notificationGuid != null)
                 args.PutString(NotificationGuidBundleKey, Serializer.Serialize(notificationGuid));
 
+            if (failDocToUploadGuid != null)
+                args.PutString(FailedDocumentToUploadGuidBundleKey, Serializer.Serialize(failDocToUploadGuid));
+
             fragment.Arguments = args;
             return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
-
             if (Arguments.ContainsKey(FolderBundleKey))
                 Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
 
@@ -97,6 +101,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(NotificationGuidBundleKey))
                 NotificationGuid = Serializer.Deserialize<Guid>(Arguments.GetString(NotificationGuidBundleKey));
+
+            if (Arguments.ContainsKey(FailedDocumentToUploadGuidBundleKey))
+                FailedDocumentToUploadGuid = Serializer.Deserialize<Guid>(Arguments.GetString(FailedDocumentToUploadGuidBundleKey));
+
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_buttons_and_progress, container, false);
 

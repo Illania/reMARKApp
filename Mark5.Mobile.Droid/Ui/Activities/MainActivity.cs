@@ -381,9 +381,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     RetainableStateFragment f = null;
 
                     if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
-                        f = new FoldersNotificationsListFragment();
+                        f = FoldersNotificationsListFragment.NewInstance();
                     else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
-                        f = FoldersListFragment.NewInstance().fragment;
+                        f = FoldersListFragment.NewInstance();
 
                     f.SetInitialSavedState(state);
 

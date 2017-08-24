@@ -23,17 +23,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         bool refreshing;
 
-        Action closeRequest;
-
         RecyclerView recyclerView;
         DocumentsToUploadListAdapter adapter;
         ActionMode actionMode;
 
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
 
-        public DocumentsToUploadListFragment(Action closeRequest)
+        public static (DocumentsToUploadListFragment fragment, string var) NewInstance()
         {
-            this.closeRequest = closeRequest;
+            var tag = $"{nameof(DocumentsToUploadListFragment)}]";
+            var fragment = new DocumentsToUploadListFragment();
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -125,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                closeRequest?.Invoke();
+                Activity.OnBackPressed();
             }
             finally
             {

@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
 
         DocumentsSearchResultsFragment dlf;
+        string dlfFragmentTag;
 
         TinyMessageSubscriptionToken readStatusToken;
 
@@ -67,8 +68,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    dlf = new DocumentsSearchResultsFragment(criteria);
-                    ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                    (dlf, dlfFragmentTag) = DocumentsSearchResultsFragment.NewInstance(criteria);
+                    ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                     ft.Commit();
                 }
 

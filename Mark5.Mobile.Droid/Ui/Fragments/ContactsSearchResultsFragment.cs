@@ -36,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(ContactsSearchResultsFragment)}]";
 
             var args = new Bundle();
+
             if (criteria != null)
                 args.PutString(CriteriaBundleKey,Serializer.Serialize(criteria));
 
