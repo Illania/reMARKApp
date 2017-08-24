@@ -24,6 +24,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         PhonebookContactsListAdapter adapter;
 
+        public static (PhonebookContactsListFragment fragment, string tag) NewInstance()
+        {
+            var tag = $"{nameof(PhonebookContactsListFragment)}";
+            var fragment = new PhonebookContactsListFragment();
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(PhonebookContactsListFragment)}");

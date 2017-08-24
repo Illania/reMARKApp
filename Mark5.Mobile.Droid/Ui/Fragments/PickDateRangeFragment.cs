@@ -20,6 +20,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Task<long[]> Task => tcs.Task;
 
+        public const string FromTimestampBundleKey = "FromTimestamp_f9118547-848d-48fd-a9a8-b2d721494ef8";
+        public const string ToTimestampBundleKey = "ToTimestamp_680c200a-8617-412f-aec6-8c0c059db839";
+        public const string StartWithToDateBundleKey = "StartWithToDate_3ce7c7d1-0d5d-4821-8b17-cbc0a04889cf";
+
         DocumentPickDateHeaderView dateHeaderView;
 
         CalendarView fromCalendarView;
@@ -31,11 +35,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly TaskCompletionSource<long[]> tcs = new TaskCompletionSource<long[]>();
 
-        public PickDateRangeFragment(long fromTimestamp, long toTimestamp, bool startWithToDate)
+        public static (PickDateRangeFragment fragment, string tag) NewInstance(long? fromTimestamp, long? toTimestamp, bool? startWithToDate)
         {
-            this.fromTimestamp = fromTimestamp;
-            this.toTimestamp = toTimestamp;
-            this.startWithToDate = startWithToDate;
+            var tag = $"{nameof(PickDateRangeFragment)}";
+            var fragment = new PickDateRangeFragment();
+
+            var args = new Bundle();
+
+            if (fromTimestamp != null)
+                args.PutLong(FromTimestampBundleKey, fromTimestamp.Value);
+
+            if (toTimestamp != null)
+                args.PutLong(ToTimestampBundleKey, toTimestamp.Value);
+
+            if (startWithToDate != null)
+                args.PutBoolean(StartWithToDateBundleKey, startWithToDate.Value);
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

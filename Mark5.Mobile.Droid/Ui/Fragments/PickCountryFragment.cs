@@ -21,6 +21,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
 
+        public static (PickCountryFragment fragment, string tag) NewInstance()
+        {
+            var tag = $"{nameof(PickLinesListFragment)}";
+            var fragment = new PickCountryFragment();
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(PickCountryFragment)}]");

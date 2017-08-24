@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Android.Graphics;
 using Android.Graphics.Drawables;
@@ -22,11 +21,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickCategoriesListFragment : RetainableStateFragment
     {
+        public Task<List<Category>> Task => tcs.Task;
+
         CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
+
+        public const string ObjectTypeBundleKey = "ObjectType_cae47797-624e-48a2-a472-1758023b0e40";
+        public const string PreselectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
 
         ObjectType objectType;
         int[] preselectedCategoryIds;
-        Action<List<Category>> closeRequest;
+
+        readonly TaskCompletionSource<List<Category>> tcs = new TaskCompletionSource<List<Category>>();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -34,15 +39,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
 
-        public PickCategoriesListFragment(ObjectType objectType, int[] preselectedCategoryIds, CategoriesCloseRequest categoriesCloseRequest)
+        public static (PickCategoriesListFragment fragment, string tag) NewInstance(ObjectType objectType, int[] preselectedCategoryIds)
         {
-            this.objectType = objectType;
-            this.preselectedCategoryIds = preselectedCategoryIds;
-            closeRequest = categoriesCloseRequest.CloseRequest;
+            var tag = $"{nameof(PickCategoriesListFragment)} [objectType={objectType}]";
+
+            var fragment = new PickCategoriesListFragment();
+            var args = new Bundle();
+
+            args.PutString(ObjectTypeBundleKey, Serializer.Serialize(objectType));
+
+            if (preselectedCategoryIds != null)
+                args.PutIntArray(PreselectedCategoryIdsBundleKey, preselectedCategoryIds);
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(ObjectTypeBundleKey))
+                objectType = Serializer.Deserialize<ObjectType>(ObjectTypeBundleKey);
+
+            if (Arguments.ContainsKey(PreselectedCategoryIdsBundleKey))
+                preselectedCategoryIds = Arguments.GetIntArray(PreselectedCategoryIdsBundleKey);
+
             CommonConfig.Logger.Info($"Creating {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -109,8 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (closeRequest != null)
-                closeRequest(selectedCategories.Values.ToList());
+            tcs.SetResult(selectedCategories.Values.ToList());
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 

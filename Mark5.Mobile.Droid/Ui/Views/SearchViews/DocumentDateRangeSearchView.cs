@@ -100,8 +100,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         async void OpenDateRangeFragment(bool startWithTo)
         {
-            var f = new PickDateRangeFragment(fromTimestamp, toTimestamp, startWithTo);
-            parentFragment.ReplaceFragment(f, f.GenerateTag());
+            var (f, tag) = PickDateRangeFragment.NewInstance(fromTimestamp, toTimestamp, startWithTo);
+            parentFragment.ReplaceFragment(f, tag);
 
             //Get fromTimestamp and toTimestamp from PickDateRangeFragment in array.
             long[] fragmentResult = await f.Task;

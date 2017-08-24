@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid
             return new Intent(context, typeof(PickCategoriesListActivity));
         }
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -47,17 +47,13 @@ namespace Mark5.Mobile.Droid
                 var ot = (ObjectType) Intent.Extras.GetInt(ObjectTypeIntentKey);
                 var pci = Intent.Extras.GetIntArray(PreselectedCategoryIdsIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
-                var pclf = new PickCategoriesListFragment(ot, pci, new CategoriesCloseRequest(categories => 
-                {
-                    var intent = new Intent();
-                    intent.PutExtra(CategoriesResultKey, Serializer.Serialize(categories));
-                    SetResult(Result.Ok, intent);
-                    OnBackPressed();
-                }));
-                ft.Replace(Resource.Id.fragment_container, pclf, pclf.GenerateTag());
+                var (pclf, tag) = PickCategoriesListFragment.NewInstance(ot, pci);
+                ft.Replace(Resource.Id.fragment_container, pclf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListActivity)}");
+
+                SetResult(await pclf.Task);
             }
             else
             {
@@ -70,6 +66,14 @@ namespace Mark5.Mobile.Droid
             base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
+        }
+
+        void SetResult(List<Category> categories) 
+        {
+            var intent = new Intent();
+            intent.PutExtra(CategoriesResultKey, Serializer.Serialize(categories));
+            SetResult(Result.Ok, intent);
+            OnBackPressed();
         }
     }
 }

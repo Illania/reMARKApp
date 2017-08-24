@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -12,6 +11,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectLinksFragment : RetainableStateFragment
     {
+        public const string BusinessEntityBundleKey = "BusinessEntity_0dd3cb9b-f178-4b02-b7d3-e1bb3428c913";
+
         IBusinessEntity businessEntity;
 
         List<ObjectLink> objectLinks;
@@ -30,13 +32,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
-        public ObjectLinksFragment(IBusinessEntity businessEntity)
+        public static (ObjectLinksFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
         {
-            this.businessEntity = businessEntity;
+            var tag = $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
+
+            var fragment = new ObjectLinksFragment();
+            var args = new Bundle();
+
+            if (businessEntity != null)
+                args.PutString(BusinessEntityBundleKey, Serializer.Serialize(businessEntity));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(BusinessEntityBundleKey))
+                businessEntity = Serializer.Deserialize<IBusinessEntity>(BusinessEntityBundleKey);
+            
             CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);

@@ -23,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class NotificationsListFragment : RetainableStateFragment
     {
+        public const string ObjectTypesBundleKey = "ObjectTypes_0df8f79a-884b-4d2b-93ce-8141f1111cc5";
+
         ObjectType[] objectTypes;
 
         SwipeRefreshLayout refreshLayout;
@@ -40,10 +42,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             this.objectTypes = objectTypes;
         }
 
+        public static (NotificationsListFragment fragment, string tag) NewInstance(ObjectType[] objectTypes)
+        {
+            var tag = $"{nameof(NotificationsListFragment)}]";
+
+            var fragment = new NotificationsListFragment();
+            var args = new Bundle();
+
+            if (objectTypes != null)
+                args.PutString(ObjectTypesBundleKey, Serializer.Serialize(objectTypes));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(ObjectTypesBundleKey))
+                objectTypes = Serializer.Deserialize<ObjectType[]>(Arguments.GetString(ObjectTypesBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(NotificationsListFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);

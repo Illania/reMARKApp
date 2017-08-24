@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -20,6 +21,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectActionsFragment : RetainableStateFragment
     {
+        public const string BusinessEntityBundleKey = "BusinessEntity_4330331f-58a2-458e-839a-48ace9b11c38";
+
         IBusinessEntity businessEntity;
 
         List<ObjectAction> objectActions;
@@ -28,13 +31,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
-        public ObjectActionsFragment(IBusinessEntity businessEntity)
+        public static (ObjectActionsFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
         {
-            this.businessEntity = businessEntity;
+            var tag = $"{nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
+
+            var fragment = new ObjectActionsFragment();
+            var args = new Bundle();
+
+            if (businessEntity != null)
+                args.PutString(BusinessEntityBundleKey, Serializer.Serialize(businessEntity));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(BusinessEntityBundleKey))
+                businessEntity = Serializer.Deserialize<IBusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);

@@ -12,6 +12,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -24,6 +25,8 @@ namespace Mark5.Mobile.Droid
     public class EditCategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
+
+        public const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_730da2d5-20b7-487f-b118-0053ced930af";
 
         BusinessEntityPreview businessEntityPreview;
         
@@ -38,13 +41,26 @@ namespace Mark5.Mobile.Droid
 
         readonly Handler searchHandler = new Handler();
 
-        public EditCategoriesListFragment(BusinessEntityPreview businessEntityPreview)
+        public static (EditCategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntityPreview)
         {
-            this.businessEntityPreview = businessEntityPreview;
+            var tag = $"{nameof(EditCategoriesListFragment)} [businessEntity.id={businessEntityPreview.Id}, businessEntity.objectType={businessEntityPreview.ObjectType}]";
+
+            var fragment = new EditCategoriesListFragment();
+            var args = new Bundle();
+
+            if (businessEntityPreview != null)
+                args.PutString(BusinessEntityPreviewBundleKey, Serializer.Serialize(businessEntityPreview));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(BusinessEntityPreviewBundleKey))
+                businessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(EditCategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);

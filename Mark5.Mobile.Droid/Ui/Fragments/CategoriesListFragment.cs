@@ -127,11 +127,11 @@ namespace Mark5.Mobile.Droid
         {
             if (item.ItemId == 10)
             {
-                var eclf = new EditCategoriesListFragment(businessEntityPreview);
+                var (eclf, tag) = EditCategoriesListFragment.NewInstance(businessEntityPreview);
 
                 var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);
-                ft.Replace(Resource.Id.fragment_container, eclf, eclf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, eclf, tag);
                 ft.AddToBackStack(null);
                 ft.Commit();
                 return true;

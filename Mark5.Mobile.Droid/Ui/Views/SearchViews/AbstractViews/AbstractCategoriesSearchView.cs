@@ -17,11 +17,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             objectType = type;
         }
 
-        protected override void ClickAction()
+        protected override async void ClickAction()
         {
-            var pclf = new PickCategoriesListFragment(objectType, selectedCategoryIds.ToArray(), new CategoriesCloseRequest(UpdateCategories));
-
-            ParentFragment.ReplaceFragment(pclf, pclf.GenerateTag());
+            var (pclf, tag) = PickCategoriesListFragment.NewInstance(objectType, selectedCategoryIds.ToArray());
+            ParentFragment.ReplaceFragment(pclf, tag);
+            UpdateCategories(await pclf.Task);
         }
 
         protected void UpdateCategories(List<Category> categories)

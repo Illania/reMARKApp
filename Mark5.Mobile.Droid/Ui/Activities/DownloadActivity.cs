@@ -17,6 +17,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string FolderIntentKey = "FolderIntent_07bbbc0a-5453-4557-881f-2599cfb99a9e";
 
         DownloadFragment df;
+        string dfFragmentTag;
 
         public static Intent CreateIntent(Context context, Folder folder)
         {
@@ -45,8 +46,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                df = new DownloadFragment(folder);
-                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+                (df, dfFragmentTag) = DownloadFragment.NewInstance(folder);
+                ft.Replace(Resource.Id.fragment_container, df, dfFragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DownloadActivity)}");
