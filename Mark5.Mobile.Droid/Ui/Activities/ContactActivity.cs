@@ -58,25 +58,30 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var cf = new ContactFragment();
+                int? folderId = null;
+                Folder folder = null;
+                int? contactId = null;
+                ContactPreview contactPreview = null;
+                Guid? notificationGuid = null;
 
                 if (Intent.HasExtra(FolderIdIntentKey))
-                    cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+                    folderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    cf.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(ContactIdIntentKey))
-                    cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
+                    contactId = Intent.Extras.GetInt(ContactIdIntentKey);
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
-                    cf.ContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
+                    contactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    cf.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
+                var (cf, tag) = ContactFragment.NewInstance(folderId, folder, contactId, contactPreview, notificationGuid);
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, cf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");

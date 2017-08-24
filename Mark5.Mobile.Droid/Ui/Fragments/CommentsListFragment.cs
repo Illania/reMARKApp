@@ -33,15 +33,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         AppCompatEditText addCommentEditText;
         AppCompatImageButton addCommentButton;
 
-        public static CommentsListFragment NewInstance(BusinessEntity be)
+        public static (CommentsListFragment Fragments, string tag) NewInstance(BusinessEntity be)
         {
+            var tag = $"{nameof(CommentsListFragment)} [businessEntity.Id={be.Id}]";
+                
             var args = new Bundle();
-            args.PutString(BusinessEntityBundleKey,Serializer.Serialize(be));
+            if (be != null)
+                args.PutString(BusinessEntityBundleKey,Serializer.Serialize(be));
 
             var fragment = new CommentsListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

@@ -49,10 +49,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var businessEntity = Serializer.Deserialize<BusinessEntity>(Intent.Extras.GetString(EntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                cf = CommentsListFragment.NewInstance(businessEntity);
-                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+                (cf, tag) = CommentsListFragment.NewInstance(businessEntity);
+                ft.Replace(Resource.Id.fragment_container, cf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CommentsListActivity)}");

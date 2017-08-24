@@ -35,15 +35,18 @@ namespace Mark5.Mobile.Droid
         CategoriesListAdapter adapter;
         CategoriesListAdapter searchAdapter;
 
-        public static CategoriesListFragment NewInstance(BusinessEntityPreview businessEntity)
+        public static (CategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
         {
+            var tag = $"{nameof(CategoriesListFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
+
             var args = new Bundle();
-            args.PutString(BusinessEntityPreviewBundleKey,Serializer.Serialize(businessEntity));
+            if(businessEntity != null)
+                args.PutString(BusinessEntityPreviewBundleKey,Serializer.Serialize(businessEntity));
 
             var fragment = new CategoriesListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -124,11 +127,11 @@ namespace Mark5.Mobile.Droid
         {
             if (item.ItemId == 10)
             {
-                var clf = new EditCategoriesListFragment(businessEntityPreview);
+                var eclf = new EditCategoriesListFragment(businessEntityPreview);
 
                 var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);
-                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, eclf, eclf.GenerateTag());
                 ft.AddToBackStack(null);
                 ft.Commit();
                 return true;

@@ -50,10 +50,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                slf = ShortcodesListFragment.NewInstance(folder);
-                ft.Replace(Resource.Id.fragment_container, slf, slf.GenerateTag());
+                (slf, tag) = ShortcodesListFragment.NewInstance(folder);
+                ft.Replace(Resource.Id.fragment_container, slf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ShortcodesListActivity)}");

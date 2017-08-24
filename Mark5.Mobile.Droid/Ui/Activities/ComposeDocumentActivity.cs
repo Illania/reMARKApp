@@ -74,23 +74,30 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                cdf = ComposeDocumentFragment.NewInstance((DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey),
-                                                          (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey),
-                                                          Intent.Extras.GetBoolean(RestoreWorkingCopyIntentKey));
+                DocumentDirection? previousDocumentDirection = null;
+                int? previousDocumentFolderId = null;
+                int? previousDocumentId = null;
+                Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null;
 
                 if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
-                    cdf.PreviousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
+                    previousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
                 
                 if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
-                    cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
+                    previousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
 
                 if (Intent.HasExtra(PreviousDocumentIdIntentKey))
-                    cdf.PreviousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
+                    previousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
 
                 if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
-                    cdf.PreconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
+                    preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
 
-                cdfFragmentTag = cdf.GenerateTag();
+                (cdf, cdfFragmentTag) = ComposeDocumentFragment.NewInstance((DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey),
+                                                                            (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey),
+                                                                            Intent.Extras.GetBoolean(RestoreWorkingCopyIntentKey),
+                                                                            previousDocumentDirection,
+                                                                            previousDocumentFolderId,
+                                                                            previousDocumentId,
+                                                                            preconfiguredEmailAddresses);
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);

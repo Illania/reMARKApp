@@ -12,15 +12,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerShortcodesListFragment : AbstractShortcodesListFragment
     {
-        public static PickerShortcodesListFragment NewInstance(Folder folder)
+        public static (PickerShortcodesListFragment fragment, string tag) NewInstance(Folder folder)
         {
+            var tag = $"{nameof(AbstractShortcodesListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
+
             var args = new Bundle();
-            args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
             var fragment = new PickerShortcodesListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         #region Adapter callbacks

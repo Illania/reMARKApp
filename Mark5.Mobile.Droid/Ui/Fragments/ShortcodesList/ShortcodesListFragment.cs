@@ -9,15 +9,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesListFragment : AbstractShortcodesListFragment
     {
-        public static ShortcodesListFragment NewInstance(Folder folder)
+        public static (ShortcodesListFragment fragment, string tag) NewInstance(Folder folder)
         {
+            var tag = $"{nameof(AbstractShortcodesListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
+
             var args = new Bundle();
-            args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
             var fragment = new ShortcodesListFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         #region Adapter callbacks

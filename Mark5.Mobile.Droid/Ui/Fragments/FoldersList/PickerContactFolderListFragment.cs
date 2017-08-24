@@ -14,7 +14,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 
             var args = new Bundle();
-            args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
+            if(remoteFolder != null)
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
 
             if (hideSearch != null)
                 args.PutBoolean(HideSearchBundleKey, hideSearch.Value);

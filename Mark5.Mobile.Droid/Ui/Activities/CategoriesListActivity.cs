@@ -49,11 +49,12 @@ namespace Mark5.Mobile.Droid
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var bep = Serializer.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = CategoriesListFragment.NewInstance(bep);
+                (clf, tag) = CategoriesListFragment.NewInstance(bep);
 
-                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, clf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CategoriesListActivity)}");

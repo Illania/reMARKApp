@@ -1,6 +1,4 @@
-﻿using System;
-using Android.Content;
-using Android.OS;
+﻿using Android.OS;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;

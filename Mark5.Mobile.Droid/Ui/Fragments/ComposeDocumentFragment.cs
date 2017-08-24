@@ -30,17 +30,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
-        public DocumentDirection PreviousDocumentDirection { get; set; }
-        public int? PreviousDocumentFolderId { get; set; }
-        public int? PreviousDocumentId { get; set; }
-        public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
-
         public const string RestoreWorkingCopyBundleKey = "RestoreWorkingCopy_a6c252fc-09b9-44a9-941f-ea3785c0864d";
         public const string DocumentCreationModeFlagBundleKey = "DocumentCreationModeFlag_b181c281-54bd-4c21-a476-a69ea0f83872";
         public const string CopyToNewOptionBundleKey = "CopyToNewOption_e3d9e971-7873-497c-9239-838e14286d2e";
+        public const string PreviousDocumentDirectionBundleKey = "PreviousDocumentDirection_4a80d080-aaf2-497a-a1b2-b18d62e3d817";
+        public const string PreviousDocumentFolderIdBundleKey = "PreviousDocumentFolderId_def12a0b-0156-4189-9c67-e41ed7c944a5";
+        public const string PreviousDocumentIdBundleKey = "PreviousDocumentId_b8e521b8-8a8a-42ce-9d67-99b61abdafd2";
+        public const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
+
+        DocumentDirection previousDocumentDirection;
+        int? previousDocumentFolderId;
+        int? previousDocumentId;
+        Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses;
 
         bool restoreWorkingCopy;
         
@@ -77,17 +81,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Worker autoSaveWorkingCopyWorker;
 
-        public static ComposeDocumentFragment NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption copyToNewOption, bool restoreWorkingCopy)
+        public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
+                                                                                 DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
+                                                                                 Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses)
         {
-            var args = new Bundle();
-            args.PutString(DocumentCreationModeFlagBundleKey, Serializer.Serialize(documentCreationModeFlag));
-            args.PutString(CopyToNewOptionBundleKey, Serializer.Serialize(copyToNewOption));
-            args.PutBoolean(RestoreWorkingCopyBundleKey, restoreWorkingCopy);
+            var tag = $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]";
 
+            var args = new Bundle();
+            if (documentCreationModeFlag != DocumentCreationModeFlag.None)
+                args.PutString(DocumentCreationModeFlagBundleKey, Serializer.Serialize(documentCreationModeFlag));
+
+            if(copyToNewOption != null)
+                args.PutString(CopyToNewOptionBundleKey, Serializer.Serialize(copyToNewOption.Value));
+
+            if(restoreWorkingCopy != null)
+                args.PutBoolean(RestoreWorkingCopyBundleKey, restoreWorkingCopy.Value);
+
+            if (previousDocumentDirection != null)
+                args.PutString(PreviousDocumentDirectionBundleKey, Serializer.Serialize(previousDocumentDirection.Value));
+
+            if (previousDocumentFolderId != null)
+                args.PutInt(PreviousDocumentFolderIdBundleKey, previousDocumentFolderId.Value);
+
+            if (previousDocumentId != null)
+                args.PutInt(PreviousDocumentIdBundleKey, previousDocumentId.Value);
+
+            if (preconfiguredEmailAddresses != null)
+                args.PutString(PreconfiguredEmailAddressesBundleKey, Serializer.Serialize(preconfiguredEmailAddresses));
+            
             var fragment = new ComposeDocumentFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -102,7 +127,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 restoreWorkingCopy = Arguments.GetBoolean(RestoreWorkingCopyBundleKey);
 
 
-            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}]");
+            CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -247,9 +272,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     documentCreationModeFlag = wc.DocumentCreationModeFlag;
                     copyToNewOption = wc.CopyToNewOption;
-                    PreviousDocumentFolderId = wc.PreviousDocumentFolderId;
-                    PreviousDocumentId = wc.PreviousDocumentId;
-                    PreviousDocumentDirection = wc.PreviousDocumentDirection;
+                    previousDocumentFolderId = wc.PreviousDocumentFolderId;
+                    previousDocumentId = wc.PreviousDocumentId;
+                    previousDocumentDirection = wc.PreviousDocumentDirection;
                     documentPreview = wc.DocumentPreview;
                     document = wc.Document;
                 }
@@ -261,20 +286,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Forward && copyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value);
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value);
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
                 }
                 else if (documentCreationModeFlag == DocumentCreationModeFlag.Edit &&
-                         PreviousDocumentDirection == DocumentDirection.Draft &&
+                         previousDocumentDirection == DocumentDirection.Draft &&
                          copyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value);
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value);
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
 
-                    document.Id = PreviousDocumentId.Value;
-                    documentPreview.Id = PreviousDocumentId.Value;
+                    document.Id = previousDocumentId.Value;
+                    documentPreview.Id = previousDocumentId.Value;
                 }
 
                 await ShowDocument();
@@ -305,10 +330,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subView.CopyToNewOption = copyToNewOption;
                 subView.Document = document;
                 subView.DocumentPreview = documentPreview;
-                subView.PreviousDocumentDirection = PreviousDocumentDirection;
+                subView.PreviousDocumentDirection = previousDocumentDirection;
                 subView.PreviousDocument = previousDocument;
                 subView.PreviousDocumentPreview = previousDocumentPreview;
-                subView.PreconfiguredEmailAddresses = PreconfiguredEmailAddresses;
+                subView.PreconfiguredEmailAddresses = preconfiguredEmailAddresses;
 
                 await subView.RefreshView();
             }
@@ -433,7 +458,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Failed to view attachment [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
+                    CommonConfig.Logger.Error($"Failed to view attachment [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
                     dismissAction();
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
@@ -458,7 +483,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Failed to remove attachment [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
+                    CommonConfig.Logger.Error($"Failed to remove attachment [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
                     await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(Resource.String.error_removing_local_attachment)));
                 }
             }
@@ -500,7 +525,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void AskIfShouldSave()
         {
-            if (PreviousDocumentDirection == DocumentDirection.Draft)
+            if (previousDocumentDirection == DocumentDirection.Draft)
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
             else
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
@@ -548,9 +573,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         DocumentCreationModeFlag = documentCreationModeFlag,
                         CopyToNewOption = copyToNewOption,
-                        PreviousDocumentFolderId = PreviousDocumentFolderId,
-                        PreviousDocumentId = PreviousDocumentId,
-                        PreviousDocumentDirection = PreviousDocumentDirection,
+                        PreviousDocumentFolderId = previousDocumentFolderId,
+                        PreviousDocumentId = previousDocumentId,
+                        PreviousDocumentDirection = previousDocumentDirection,
                         DocumentPreview = documentPreview,
                         Document = document
                     });
@@ -562,7 +587,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (t.IsFaulted)
                     {
-                        CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}]", t.Exception.InnerException);
+                        CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", t.Exception.InnerException);
                         await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
                     }
                     else
@@ -645,9 +670,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     DocumentCreationModeFlag = documentCreationModeFlag,
                     CopyToNewOption = copyToNewOption,
-                    PreviousDocumentFolderId = PreviousDocumentFolderId,
-                    PreviousDocumentId = PreviousDocumentId,
-                    PreviousDocumentDirection = PreviousDocumentDirection,
+                    PreviousDocumentFolderId = previousDocumentFolderId,
+                    PreviousDocumentId = previousDocumentId,
+                    PreviousDocumentDirection = previousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document
                 });
@@ -849,7 +874,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while getting default template [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}]", ex);
+                CommonConfig.Logger.Error($"Error while getting default template [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -872,7 +897,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}]", ex);
+                CommonConfig.Logger.Error($"Error while getting template [template.Id={templatePreview?.Id}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -907,12 +932,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CopyToNewOptions = copyToNewOption,
                 DocumentPreview = documentPreview,
                 Document = document,
-                PreviousDocumentDirection = PreviousDocumentDirection,
-                PreviousDocumentFolderId = PreviousDocumentFolderId,
-                PreviousDocumentId = PreviousDocumentId,
+                PreviousDocumentDirection = previousDocumentDirection,
+                PreviousDocumentFolderId = previousDocumentFolderId,
+                PreviousDocumentId = previousDocumentId,
                 PreviousDocumentPreview = previousDocumentPreview,
                 PreviousDocument = previousDocument,
-                PreconfiguredEmailAddresses = PreconfiguredEmailAddresses,
+                PreconfiguredEmailAddresses = preconfiguredEmailAddresses,
                 DocumentLoaded = documentLoaded,
                 TemplateLoaded = templateLoaded,
                 ToState = toView.GetState(),
@@ -934,12 +959,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 copyToNewOption = cfs.CopyToNewOptions;
                 documentPreview = cfs.DocumentPreview;
                 document = cfs.Document;
-                PreviousDocumentDirection = cfs.PreviousDocumentDirection;
-                PreviousDocumentFolderId = cfs.PreviousDocumentFolderId;
-                PreviousDocumentId = cfs.PreviousDocumentId;
+                previousDocumentDirection = cfs.PreviousDocumentDirection;
+                previousDocumentFolderId = cfs.PreviousDocumentFolderId;
+                previousDocumentId = cfs.PreviousDocumentId;
                 previousDocumentPreview = cfs.PreviousDocumentPreview;
                 previousDocument = cfs.PreviousDocument;
-                PreconfiguredEmailAddresses = cfs.PreconfiguredEmailAddresses;
+                preconfiguredEmailAddresses = cfs.PreconfiguredEmailAddresses;
                 documentLoaded = cfs.DocumentLoaded;
                 templateLoaded = cfs.TemplateLoaded;
                 toView.State = cfs.ToState;
@@ -955,7 +980,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={PreviousDocumentFolderId}, previousDocumentId={PreviousDocumentId}]";
+            return $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]";
         }
 
         class ComposeDocumentFragmentState : IRetainableState
