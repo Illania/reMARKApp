@@ -23,11 +23,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback, ISharedPreferencesOnSharedPreferenceChangeListener
     {
-        static class RequestCodes
-        {
-            public const int NotificationRingtoneRequest = 1;
-        }
-
         public override Fragment CallbackFragment => this;
 
         public PreferenceFragment() { }
@@ -36,6 +31,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (args != null)
                 Arguments = args;
+        }
+
+        public static (PreferenceFragment fragment, string tag) NewInstance()
+        {
+            var tag = $"{nameof(PreferenceFragment)}";
+            var fragment = new PreferenceFragment();
+
+            return (fragment, tag);
         }
 
         public override void OnResume()
@@ -254,6 +257,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ft.AddToBackStack(pref.Key);
             ft.Commit();
             return true;
+        }
+
+        static class RequestCodes
+        {
+            public const int NotificationRingtoneRequest = 1;
         }
     }
 }

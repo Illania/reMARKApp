@@ -15,9 +15,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         protected override async void ClickAction()
         {
-            var pllf = new PickPrioritiesListFragment(selectedPriorities);
-            ParentFragment.ReplaceFragment(pllf, pllf.GenerateTag());
-            UpdatePriorities(await pllf.Task);
+            var (pplf, tag) = PickPrioritiesListFragment.NewInstance(selectedPriorities);
+            ParentFragment.ReplaceFragment(pplf, tag);
+            UpdatePriorities(await pplf.Task);
         }
 
         void UpdatePriorities(List<Priority> priorities)

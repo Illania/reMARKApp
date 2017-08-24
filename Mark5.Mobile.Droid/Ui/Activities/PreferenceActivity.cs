@@ -37,8 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var paf = new PreferenceFragment();
-                ft.Replace(Resource.Id.fragment_container, paf, nameof(PreferenceFragment));
+                var (paf, tag) = PreferenceFragment.NewInstance();
+                ft.Replace(Resource.Id.fragment_container, paf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PreferenceFragment)}");

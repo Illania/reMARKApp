@@ -9,6 +9,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -18,6 +19,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Task<List<Guid>> Task => tcs.Task;
 
+        public const string SelectedLinesGuidBundleKey = "SelectedLinesGuid_4e3da19f-f5e8-4aa8-ac6e-6ff12711b2b9";
+
         RecyclerView recyclerView;
         LinesListViewAdapter adapter;
 
@@ -25,13 +28,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         TaskCompletionSource<List<Guid>> tcs = new TaskCompletionSource<List<Guid>>();
 
-        public PickLinesListFragment(List<Guid> selectedLinesGuid)
+        public static (PickLinesListFragment fragment, string tag) NewInstance(List<Guid> selectedLinesGuid)
         {
-            this.selectedLinesGuid = selectedLinesGuid;
+            var tag = $"{nameof(PickLinesListFragment)}";
+
+            var fragment = new PickLinesListFragment();
+            var args = new Bundle();
+
+            if (selectedLinesGuid != null)
+                args.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(selectedLinesGuid));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(SelectedLinesGuidBundleKey))
+                selectedLinesGuid = Serializer.Deserialize<List<Guid>>(Arguments.GetString(SelectedLinesGuidBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(PickLinesListFragment)}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);

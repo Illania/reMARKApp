@@ -24,6 +24,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         RecentAddressesListAdapter adapter;
 
+        public static (RecentAddressesListFragment fragment, string tag) NewInstance()
+        {
+            var tag = $"{nameof(RecentAddressesListFragment)}";
+            var fragment = new RecentAddressesListFragment();
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(RecentAddressesListFragment)}");

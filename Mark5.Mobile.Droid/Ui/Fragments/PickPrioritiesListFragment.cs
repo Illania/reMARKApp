@@ -8,6 +8,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -18,6 +19,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Task<List<Priority>> Task => tcs.Task;
 
+        public const string SelectedPrioritiesBundleKey = "SeletedPriorities_040c0b28-9f4e-4d89-b376-e81b94a8f26c";
+
         RecyclerView recyclerView;
         PrioritiesListViewAdapter adapter;
 
@@ -25,13 +28,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         TaskCompletionSource<List<Priority>> tcs = new TaskCompletionSource<List<Priority>>();
 
-        public PickPrioritiesListFragment(List<Priority> selectedPriorities)
+        public static (PickPrioritiesListFragment Fragments, string tag) NewInstance(List<Priority> selectedPriorities)
         {
-            this.selectedPriorities = selectedPriorities;
+            var tag = $"{nameof(PickPrioritiesListFragment)}";
+
+            var fragment = new PickPrioritiesListFragment();
+            var args = new Bundle();
+
+            if (selectedPriorities != null)
+                args.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(selectedPriorities));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(SelectedPrioritiesBundleKey))
+                selectedPriorities = Serializer.Deserialize<List<Priority>>(Arguments.GetString(SelectedPrioritiesBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(PickPrioritiesListFragment)}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -123,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override string GenerateTag()
         {
-            return $"{nameof(PickLinesListFragment)}";
+            return $"{nameof(PickPrioritiesListFragment)}";
         }
 
         class PickLinesListFragmentState : IRetainableState
