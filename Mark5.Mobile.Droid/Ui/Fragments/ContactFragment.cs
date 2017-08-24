@@ -90,6 +90,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(FolderIdBundleKey))
+                folderId = Arguments.GetInt(FolderIdBundleKey);
+
+            if (Arguments.ContainsKey(FolderBundleKey))
+                folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
+            if (Arguments.ContainsKey(ContactIdBundleKey))
+                contactId = Arguments.GetInt(ContactIdBundleKey);
+
+            if (Arguments.ContainsKey(ContactPreviewBundleKey))
+                contactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ContactPreviewBundleKey));
+
+            if (Arguments.ContainsKey(NotificationGuidBundleKey))
+                notificationGuid = Serializer.Deserialize<Guid>(Arguments.GetString(NotificationGuidBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={folderId ?? folder?.Id}, contact.id={contactId ?? contactPreview?.Id}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_contact, container, false);

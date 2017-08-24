@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
-        public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null)
+        public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder = null, bool? hideSearch = null)
         {
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 

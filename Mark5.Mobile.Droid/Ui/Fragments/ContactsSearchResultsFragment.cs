@@ -31,15 +31,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         ContactSearchResultsAdapter adapter;
 
-        public static ContactsSearchResultsFragment NewInstance(SearchContactsCriteria criteria)
+        public static (ContactsSearchResultsFragment fragment, string tag) NewInstance(SearchContactsCriteria criteria)
         {
+            var tag = $"{nameof(ContactsSearchResultsFragment)}]";
+
             var args = new Bundle();
-            args.PutString(CriteriaBundleKey,Serializer.Serialize(criteria));
+            if (criteria != null)
+                args.PutString(CriteriaBundleKey,Serializer.Serialize(criteria));
 
             var fragment = new ContactsSearchResultsFragment();
             fragment.Arguments = args;
 
-            return fragment;
+            return (fragment, tag);
         }
 
         #region Fragment overrides

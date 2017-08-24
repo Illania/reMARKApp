@@ -383,7 +383,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
                         f = new FoldersNotificationsListFragment();
                     else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
-                        f = new FoldersListFragment();
+                        f = FoldersListFragment.NewInstance().fragment;
 
                     f.SetInitialSavedState(state);
 
