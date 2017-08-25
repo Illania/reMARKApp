@@ -271,6 +271,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var sectionsToInsert = new List<AbstractSection> {
                     new GeneralSection(this),
+                    new AddressSection(this, DocumentAddressType.To),
+                    new AddressSection(this, DocumentAddressType.Cc),
+                    new AddressSection(this, DocumentAddressType.Bcc),
                 };
 
                 foreach (var section in sectionsToInsert)
@@ -472,7 +475,48 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     Rows.Add(new NameRow(this));
                     Rows.Add(new DescriptionRow(this));
+                }
+            }
 
+            class AddressSection : MultiSection
+            {
+                DocumentAddressType addressType;
+
+                public AddressSection(DataSource dataSource, DocumentAddressType type)
+                    : base(dataSource)
+                {
+                    this.addressType = type;
+                }
+
+                public override void InitializeRows()
+                {
+                    var addresses = Shortcode.Addresses.Where(c => c.AddressType == addressType);
+
+                    foreach (var address in addresses)
+                        Rows.Add(new AddressRow(this, address));
+
+                    Rows.Add(new AddressHeaderRow(this, addressType));
+                }
+
+                public override void AddNewRow(NSIndexPath indexPath)
+                {
+                    var ca = new DocumentAddress();
+                    ca.Type = CommunicationAddressType.Email;
+                    ca.AddressType = addressType;
+
+                    Shortcode.Addresses.Add(ca);
+                    Rows.Insert(Rows.Count - 1, new AddressRow(this, ca));
+                    TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
+
+                public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
+                {
+                    var pnRow = row as AddressRow;
+                    var ca = pnRow.Content;
+                    Shortcode.Addresses.Remove(ca);
+                    Rows.Remove(row);
+                    TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView.EndEditing(true);
                 }
             }
 
@@ -709,6 +753,77 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected override void ContentEdited(string e)
                 {
                     ShortcodePreview.Description = e;
+                }
+            }
+
+            class AddressHeaderRow : MultiHeaderRow
+            {
+                readonly DocumentAddressType addressType;
+
+                public AddressHeaderRow(AddressSection section, DocumentAddressType addressType)
+                            : base(section)
+                {
+                    this.addressType = addressType;
+                }
+
+                protected override void Initialize()
+                {
+                    var cell = (MultiRowHeaderTableViewCell)Cell;
+                    string titleString;
+                    switch (addressType)
+                    {
+                        case DocumentAddressType.To:
+                            titleString = Localization.GetString("to");
+                            break;
+                        case DocumentAddressType.Cc:
+                            titleString = Localization.GetString("cc");
+                            break;
+                        case DocumentAddressType.Bcc:
+                            titleString = Localization.GetString("bcc");
+                            break;
+                        default:
+                            throw new ArgumentException("The type is not yet supported!");
+                    }
+
+                    cell.SetTitle(titleString);
+                }
+            }
+
+            class AddressRow : MultiContentRow<DocumentAddress>
+            {
+                public AddressRow(AddressSection section, DocumentAddress address)
+                    : base(section, address)
+                {
+                }
+
+                public override bool IsRowValid()
+                {
+                    return !string.IsNullOrWhiteSpace(Content.Address);
+                }
+
+                public override string Key => AddressTableViewCell.Key;
+
+                public override AddEditTableViewCell CreateCell() => new AddressTableViewCell();
+
+                protected override void Initialize()
+                {
+                    var cell = (AddressTableViewCell)Cell;
+                    cell.Reset();
+                    cell.AddressChangedAction = Cell_AddressChanged;
+                }
+
+                //TODO should be full address and not only the address
+
+                public override void RefreshRow()
+                {
+                    var cell = (AddressTableViewCell)Cell;
+                    cell.BindContent(Content, ErrorState);
+                }
+
+                void Cell_AddressChanged()
+                {
+                    if (!string.IsNullOrWhiteSpace(Content.Address))
+                        SetErrorState(false);
                 }
             }
             #endregion
