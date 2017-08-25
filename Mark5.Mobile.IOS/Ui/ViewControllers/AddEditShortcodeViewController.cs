@@ -773,13 +773,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     switch (addressType)
                     {
                         case DocumentAddressType.To:
-                            titleString = Localization.GetString("to");
+                            titleString = Localization.GetString("add_to");
                             break;
                         case DocumentAddressType.Cc:
-                            titleString = Localization.GetString("cc");
+                            titleString = Localization.GetString("add_cc");
                             break;
                         case DocumentAddressType.Bcc:
-                            titleString = Localization.GetString("bcc");
+                            titleString = Localization.GetString("add_bcc");
                             break;
                         default:
                             throw new ArgumentException("The type is not yet supported!");
