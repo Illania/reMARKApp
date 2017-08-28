@@ -43,6 +43,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeView();
+        }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -58,7 +65,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeNavigationBar();
-            InitializeView();
             InitializeNavigationBarTitle();
             InitializeHandlers();
         }
@@ -77,6 +83,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
+
+            if (composeButton != null && shortcode != null && shortcodePreview != null)
+                composeButton.Enabled = true;
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -297,19 +306,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void ComposeButton_Clicked(object sender, EventArgs e)
+        async void ComposeButton_Clicked(object sender, EventArgs e)
         {
-            var vc = new ComposeDocumentViewController
+            var choices = new List<string> { Localization.GetString("compose_email") };
+
+            if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed)
             {
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+                choices.Add(Localization.GetString("edit"));
+            }
+
+            var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, choices.ToArray(), composeButton);
+
+            if (choiceIndex == 0)
+            {
+                var vc = new ComposeDocumentViewController
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
                 {
                     { DocumentAddressType.To, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.FullAddress).ToArray() },
                     { DocumentAddressType.Cc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.FullAddress).ToArray() },
                     { DocumentAddressType.Bcc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.FullAddress).ToArray() }
                 }
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else if (choiceIndex == 1)
+            {
+                var vc = new AddEditShortcodeViewController
+                {
+                    CreationModeFlag = ShortcodeCreationModeFlag.Edit,
+                    Shortcode = shortcode,
+                    ShortcodePreview = shortcodePreview,
+                };
+                PresentViewController(new NavigationController(vc), true, null);
+            }
+
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)

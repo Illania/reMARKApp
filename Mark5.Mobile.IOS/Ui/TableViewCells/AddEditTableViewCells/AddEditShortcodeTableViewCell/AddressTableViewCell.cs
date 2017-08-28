@@ -53,7 +53,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                Placeholder = Localization.GetString("name"), //TODO CHECK
+                Placeholder = Localization.GetString("name"),
             };
             nameTextField.EditingChanged += NameTextField_EditingChanged;
             ContentView.Add(nameTextField);
@@ -70,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultLightFont.WithRelativeSize(-2),
-                TextColor = Theme.Gray,
+                TextColor = Theme.LightGray,
             };
             typeLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             typeLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);

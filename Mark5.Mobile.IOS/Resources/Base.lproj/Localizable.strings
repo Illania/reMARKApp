@@ -48,6 +48,7 @@
 "close" = "Close";
 "comments" = "Comments";
 "company" = "Company";
+"compose_email" = "Compose email";
 "company_department" = "Company/Department";
 "confirm" = "Confirm";
 "confirm_copy_to_folder" = "Copy";

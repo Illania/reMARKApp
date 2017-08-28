@@ -121,9 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 saveButton.Clicked += SaveButton_Clicked;
 
             if (dataSource != null)
-            {
                 dataSource.ViewIsActivated += DataSource_ViewIsActivated;
-            }
         }
 
         void DeInitializeHandlers()
@@ -135,9 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 saveButton.Clicked -= SaveButton_Clicked;
 
             if (dataSource != null)
-            {
                 dataSource.ViewIsActivated -= DataSource_ViewIsActivated;
-            }
         }
 
         void SubscribeToKeyboardEvents()
@@ -192,7 +188,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (!dataSource.IsFormCorrect())
                 return;
-
         }
 
 
