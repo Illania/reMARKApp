@@ -214,6 +214,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
             }
 
+            if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
+                AddEmails(PreconfiguredEmailAddresses[AddressType]);
+
             return Task.CompletedTask;
         }
 
