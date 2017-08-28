@@ -43,6 +43,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeView();
+        }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -58,7 +65,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeNavigationBar();
-            InitializeView();
             InitializeNavigationBarTitle();
             InitializeHandlers();
         }
