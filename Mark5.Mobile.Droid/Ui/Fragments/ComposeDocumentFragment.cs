@@ -685,12 +685,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool IsFormValid()
         {
             var recipientAdded = false;
-            foreach (var recipientView in new List<RecipientsView>
-            {
-                toView,
-                ccView,
-                bccView
-            })
+            foreach (var recipientView in new RecipientsView[] {toView,ccView,bccView})
                 recipientAdded |= !recipientView.Empty;
 
             if (!recipientAdded)
