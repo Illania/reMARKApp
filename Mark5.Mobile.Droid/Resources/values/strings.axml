@@ -5,7 +5,7 @@
 	<string name="add_attachment">Add attachment</string>
 	<string name="add_comment_hint">Insert new comment</string>
 	<string name="add_favorites">Add to favourites</string>
-	<string name="add_offline">Enable offline mode</string>
+	<string name="add_offline">Enable sync</string>
 	<string name="adding_comment">Adding comment</string>
 	<string-array name="attachment_clicked_options">
 		<item>Open attachment</item>
@@ -76,6 +76,7 @@
 	<string name="dont_close_app">Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!</string>
 	<string name="download">Download</string>
 	<string name="download_finished">Download completed!\nYou can now continue working.</string>
+	<string name="download_finished_empty">The folder you were trying to download\nwas empty.</string>
 	<string name="download_in_progress_cancel_to_go_back">Download is in progress, Cancel the download to go back.</string>
 	<string name="download_in_progress_warning">If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?</string>
 	<string name="downloading_percentage">Downloading %1$d%%...</string>
@@ -192,6 +193,7 @@
 	<string name="log_in_failed_title">Log in failed</string>
 	<string name="logging_in">Logging in</string>
 	<string name="low_priority_document">This email has low priority</string>
+    <string name="make_online">Go online</string>
 	<string name="map">Map</string>
 	<string name="mark5_server_reachability">MARK5 Server:</string>
 	<string name="mark5_service_reachability">MARK5 App Service:</string>
@@ -232,6 +234,7 @@
 	<string name="notification_token_missing_content">The notification token was not set. Please try again later.</string>
 	<string name="notification_token_missing_title">Missing notifications token</string>
 	<string name="notifications">Notifications</string>
+	<string name="offline">Offline</string>
 	<string name="ok">OK</string>
 	<string name="on">on</string>
 	<string name="open_drawer">Open navigation drawer</string>
@@ -264,7 +267,7 @@
 	<string name="related_contacts">Related</string>
 	<string name="remove">Remove</string>
 	<string name="remove_favorites">Remove from favourites</string>
-	<string name="remove_offline">Disable offline mode</string>
+	<string name="remove_offline">Disable sync</string>
 	<string name="reply">Reply</string>
 	<string name="reply_all">Reply all</string>
 	<string name="reply_to">Reply to:</string>

@@ -486,7 +486,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Unsubscribe = 40;
             public const int EnableOffline = 50;
             public const int DisableOffline = 60;
-            public const int SaveOffline = 70;
+            public const int MakeOnline = 70;
+            public const int SaveOffline = 80;
         }
 
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -530,6 +531,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
                 }
 
+                if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1 && AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(selectedFolders[0])))
+                    menu.Add(Menu.None, MenuItemActions.MakeOnline, MenuItemActions.MakeOnline, Resource.String.make_online).SetShowAsAction(ShowAsAction.Never);
+
                 if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1)
                     menu.Add(Menu.None, MenuItemActions.SaveOffline, MenuItemActions.SaveOffline, Resource.String.save_offline).SetShowAsAction(ShowAsAction.Never);
 
@@ -568,6 +572,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     break;
                 case MenuItemActions.Unsubscribe:
                     SetFoldersSubscriptionToSelection(false);
+                    break;
+                case MenuItemActions.MakeOnline:
+                    MakeFolderOnline();
                     break;
                 case MenuItemActions.SaveOffline:
                     SaveFolderOffline();
@@ -700,6 +707,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         }
                     },
                     TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        void MakeFolderOnline()
+        {
+            var selectedFolder = CurrentAdapter.GetSelectedItems().FirstOrDefault();
+            if (selectedFolder == null)
+                return;
+
+            Task.Run(async () =>
+            {
+                await Managers.FoldersManager.RemoveSavedFolderInfo(selectedFolder);
+            }).ContinueWith((t) =>
+            {
+                if (t.IsFaulted)
+                {
+                    CommonConfig.Logger.Error($"Error while making folder online.", t.Exception.InnerException);
+                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
+                }
+                else
+                {
+                    actionMode.Finish();
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void SaveFolderOffline()
@@ -906,15 +936,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     else
                     {
-                        var isFolderAvailableOffline = AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(folder));
-
-                        var subtitleStrings = new List<string>();
+                        var subtitleString = string.Empty;
                         if (folder.Subscribed)
-                            subtitleStrings.Add("Notifications On");
-                        if (isFolderAvailableOffline)
-                            subtitleStrings.Add("Available Offline");
+                            subtitleString += context.GetString(Resource.String.notifications);
+                        if (AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(folder)))
+                        {
+                            if (subtitleString.Length > 0)
+                                subtitleString += ", ";
+                            subtitleString += context.GetString(Resource.String.offline);
+                        }
 
-                        fh.FolderNameSubTitle.Text = string.Join(", ", subtitleStrings);
+                        fh.FolderNameSubTitle.Text = subtitleString;
                     }
 
                     fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;

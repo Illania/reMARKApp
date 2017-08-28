@@ -93,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
                     cdf.PreconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
 
-                cdf.CloseRequest = OnBackPressed;
+                cdf.CloseRequest = base.OnBackPressed;
 
                 cdfFragmentTag = cdf.GenerateTag();
 
@@ -117,9 +117,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnSaveInstanceState(outState);
         }
 
-        public override bool OnOptionsItemSelected(Android.Views.IMenuItem item)
+        public override void OnBackPressed()
         {
-            return base.OnOptionsItemSelected(item);
+            cdf?.AskIfShouldSave();
         }
 
         public override void Finish()
