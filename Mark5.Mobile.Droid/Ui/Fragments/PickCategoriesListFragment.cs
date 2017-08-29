@@ -46,7 +46,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragment = new PickCategoriesListFragment();
             var args = new Bundle();
 
-            args.PutString(ObjectTypeBundleKey, Serializer.Serialize(objectType));
+            if (objectType != null)
+                args.PutString(ObjectTypeBundleKey, Serializer.Serialize(objectType));
 
             if (preselectedCategoryIds != null)
                 args.PutIntArray(PreselectedCategoryIdsBundleKey, preselectedCategoryIds);

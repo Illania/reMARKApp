@@ -40,6 +40,7 @@ namespace Mark5.Mobile.Droid
             var tag = $"{nameof(CategoriesListFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
 
             var args = new Bundle();
+
             if(businessEntity != null)
                 args.PutString(BusinessEntityPreviewBundleKey,Serializer.Serialize(businessEntity));
 

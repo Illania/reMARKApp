@@ -88,6 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]";
 
             var args = new Bundle();
+
             if (documentCreationModeFlag != DocumentCreationModeFlag.None)
                 args.PutString(DocumentCreationModeFlagBundleKey, Serializer.Serialize(documentCreationModeFlag));
 
@@ -126,6 +127,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Arguments.ContainsKey(RestoreWorkingCopyBundleKey))
                 restoreWorkingCopy = Arguments.GetBoolean(RestoreWorkingCopyBundleKey);
 
+            if (Arguments.ContainsKey(PreviousDocumentDirectionBundleKey))
+                previousDocumentDirection = Serializer.Deserialize<DocumentDirection>(Arguments.GetString(PreviousDocumentDirectionBundleKey));
+
+            if (Arguments.ContainsKey(PreviousDocumentFolderIdBundleKey))
+                previousDocumentFolderId = Arguments.GetInt(PreviousDocumentFolderIdBundleKey);
+
+            if (Arguments.ContainsKey(PreviousDocumentIdBundleKey))
+                previousDocumentId = Arguments.GetInt(PreviousDocumentIdBundleKey);
+
+            if (Arguments.ContainsKey(PreconfiguredEmailAddressesBundleKey))
+                preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Arguments.GetString(PreconfiguredEmailAddressesBundleKey));
 
             CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]");
 

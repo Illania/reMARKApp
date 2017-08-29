@@ -38,6 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(CommentsListFragment)} [businessEntity.Id={be.Id}]";
                 
             var args = new Bundle();
+
             if (be != null)
                 args.PutString(BusinessEntityBundleKey,Serializer.Serialize(be));
 

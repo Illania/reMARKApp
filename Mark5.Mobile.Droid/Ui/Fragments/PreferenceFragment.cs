@@ -25,14 +25,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public override Fragment CallbackFragment => this;
 
-        public PreferenceFragment() { }
-
-        public PreferenceFragment(Bundle args = null)
-        {
-            if (args != null)
-                Arguments = args;
-        }
-
         public static (PreferenceFragment fragment, string tag) NewInstance()
         {
             var tag = $"{nameof(PreferenceFragment)}";

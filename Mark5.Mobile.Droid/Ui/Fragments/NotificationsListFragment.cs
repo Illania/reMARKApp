@@ -35,13 +35,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Func<Notification, bool> unreadFilter = (n) => !n.IsRead;
 
-        public NotificationsListFragment() { }
-
-        public NotificationsListFragment(ObjectType[] objectTypes)
-        {
-            this.objectTypes = objectTypes;
-        }
-
         public static (NotificationsListFragment fragment, string tag) NewInstance(ObjectType[] objectTypes)
         {
             var tag = $"{nameof(NotificationsListFragment)}]";

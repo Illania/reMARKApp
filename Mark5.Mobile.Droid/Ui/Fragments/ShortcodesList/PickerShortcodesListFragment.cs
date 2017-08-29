@@ -17,6 +17,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(AbstractShortcodesListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
 
             var args = new Bundle();
+
             if (folder != null)
                 args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
