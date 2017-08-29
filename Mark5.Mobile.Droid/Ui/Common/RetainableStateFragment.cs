@@ -100,11 +100,13 @@ namespace Mark5.Mobile.Droid.Ui.Common
             retainedFragment = null;
         }
 
+        //TODO Remove this?
         string SafeGenerateTag()
         {
             try
             {
-                return GenerateTag();
+                return "";
+                //return GenerateTag();
             }
             catch (Exception ex)
             {
@@ -113,8 +115,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 return null;
             }
         }
-
-        public abstract string GenerateTag();
 
         public interface IRetainableState
         {

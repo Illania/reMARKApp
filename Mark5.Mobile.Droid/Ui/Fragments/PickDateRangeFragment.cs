@@ -260,11 +260,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickDateRangeFragment)}";
-        }
-
         class PickDateRangeFragmentState : IRetainableState
         {
             public long FromTimestamp { get; set; }

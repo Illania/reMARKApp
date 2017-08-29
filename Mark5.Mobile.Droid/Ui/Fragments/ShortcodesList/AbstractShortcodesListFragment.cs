@@ -231,11 +231,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(AbstractShortcodesListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
-        }
-
         #endregion
 
         #region Refreshing

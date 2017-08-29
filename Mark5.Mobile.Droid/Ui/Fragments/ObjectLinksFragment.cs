@@ -102,11 +102,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
-        }
-
         async Task RefreshData()
         {
             try

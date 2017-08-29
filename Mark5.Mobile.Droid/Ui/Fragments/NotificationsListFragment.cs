@@ -180,11 +180,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(NotificationsListFragment)}]";
-        }
-
         #endregion
 
         #region Refreshing

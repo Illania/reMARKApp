@@ -990,11 +990,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]";
-        }
-
         class ComposeDocumentFragmentState : IRetainableState
         {
             public DocumentCreationModeFlag DocumentCreationModeFlag { get; set; }

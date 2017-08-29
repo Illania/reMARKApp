@@ -343,11 +343,6 @@ namespace Mark5.Mobile.Droid
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(EditCategoriesListFragment)} [businessEntity.id={businessEntityPreview.Id}, businessEntity.objectType={businessEntityPreview.ObjectType}]";
-        }
-
         class AvailableCategoriesListFragmentState : IRetainableState
         {
             public BusinessEntityPreview BusinessEntityPreview { get; set; }

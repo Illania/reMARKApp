@@ -126,15 +126,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.Finish();
         }
 
-        #region Retainable state
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(PhonebookContactsListFragment)}";
-        }
-
-        #endregion
-
         class PhonebookContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
             public override int ItemCount => Items.Count;

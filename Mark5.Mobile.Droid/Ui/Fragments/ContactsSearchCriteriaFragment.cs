@@ -288,11 +288,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 searchCriteria = df.Criteria;
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(ContactsSearchCriteriaFragment)}";
-        }
-
         class ContactSearchCriteriaFragmentState : IRetainableState
         {
             public SearchContactsCriteria Criteria { get; set; }

@@ -183,11 +183,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(CopyToUserWorktrayFragment)}]";
-        }
-
         #endregion
 
         #region Local methods

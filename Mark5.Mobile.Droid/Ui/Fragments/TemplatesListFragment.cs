@@ -221,8 +221,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag() => $"{nameof(TemplatesListFragment)}";
-
         class TemplateListFragmentState : IRetainableState
         {
             public List<TemplatePreview> TemplatePreviews { get; set; }

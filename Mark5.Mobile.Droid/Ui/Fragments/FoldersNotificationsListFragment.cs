@@ -118,11 +118,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            throw new NotImplementedException();
-        }
-
         class FoldersNotificationsRetainableState : IRetainableState
         {
             public Folder Folder { get; set; }

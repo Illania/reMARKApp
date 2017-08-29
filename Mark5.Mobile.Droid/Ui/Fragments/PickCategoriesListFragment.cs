@@ -219,11 +219,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickCategoriesListFragment)} [objectType={objectType}]";
-        }
-
         class AvailableCategoriesListFragmentState : IRetainableState
         {
             public Dictionary<int, Category> SelectedCategories { get; set; }

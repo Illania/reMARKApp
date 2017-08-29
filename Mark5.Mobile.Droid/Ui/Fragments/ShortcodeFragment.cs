@@ -371,11 +371,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(ShortcodeFragment)} [ShortcodeId={shortcodePreview?.Id ?? shortcode?.Id ?? shortcodeId}]";
-        }
-
         void AddressesView_DocumentAddressClicked(object sender, DocumentAddress e)
         {
             if (e.Type == CommunicationAddressType.Email)

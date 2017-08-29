@@ -244,11 +244,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 searchCriteria = df.Criteria;
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(ShortcodesSearchCriteriaFragment)}";
-        }
-
         class ShortcodeSearchCriteriaFragmentState : IRetainableState
         {
             public SearchShortcodesCriteria Criteria { get; set; }

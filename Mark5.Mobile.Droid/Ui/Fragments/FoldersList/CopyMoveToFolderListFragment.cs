@@ -206,11 +206,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Retained Fragment methods
 
-        public override string GenerateTag()
-        {
-            return base.GenerateTag() + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={businessEntities.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id ?? -1}]";
-        }
-
         public override IRetainableState OnRetainInstanceState()
         {
             var baseState = base.OnRetainInstanceState() as FolderListFragmentState;

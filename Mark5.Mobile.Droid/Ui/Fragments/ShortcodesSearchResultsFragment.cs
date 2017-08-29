@@ -125,12 +125,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 adapter.AppendItems(dlfs.ShortcodePreviews);
             }
         }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ShortcodesSearchResultsFragment)}]";
-        }
-
         #endregion
 
         #region Refreshing

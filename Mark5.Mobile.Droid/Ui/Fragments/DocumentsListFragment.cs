@@ -269,11 +269,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
-        }
-
         #endregion
 
         #region Actions

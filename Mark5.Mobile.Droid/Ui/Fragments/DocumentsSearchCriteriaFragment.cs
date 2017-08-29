@@ -315,11 +315,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 searchCriteria = df.Criteria;
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentSearchCriteriaFragment)}";
-        }
-
         class DocumentSearchCriteriaFragmentState : IRetainableState
         {
             public SearchDocumentsCriteria Criteria { get; set; }

@@ -110,11 +110,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Retainable State
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(RecentAddressesListFragment)}";
-        }
-
         public override IRetainableState OnRetainInstanceState()
         {
             CommonConfig.Logger.Info("Retaining state");

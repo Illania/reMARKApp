@@ -234,11 +234,6 @@ namespace Mark5.Mobile.Droid
                 businessEntityPreview = clfs.BusinessEntityPreview;
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview.Id}, businessEntity.objectType={businessEntityPreview.ObjectType}]";
-        }
-
         class CategoriesListFragmentState : IRetainableState
         {
             public BusinessEntityPreview BusinessEntityPreview { get; set; }

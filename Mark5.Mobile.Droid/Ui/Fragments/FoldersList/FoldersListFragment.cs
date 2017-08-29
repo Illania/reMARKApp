@@ -814,11 +814,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            throw new NotImplementedException();
-        }
-
         protected class FolderListFragmentState : IRetainableState
         {
             public Folder Folder { get; set; }

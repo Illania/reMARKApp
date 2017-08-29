@@ -78,15 +78,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 
-        #region Retained State
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickLinesListFragment)}";
-        }
-
-        #endregion
-
         class CountriesListViewAdapter : RecyclerView.Adapter
         {
             public override int ItemCount => Items.Count;

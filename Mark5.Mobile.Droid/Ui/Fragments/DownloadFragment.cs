@@ -139,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 wakelock = null;
 
                 var pm = (PowerManager)Context.GetSystemService(Context.PowerService);
-                wakelock = pm.NewWakeLock(WakeLockFlags.ScreenDim, GenerateTag());
+                wakelock = pm.NewWakeLock(WakeLockFlags.ScreenDim, $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]");
                 wakelock.Acquire();
 
                 Activity.RunOnUiThread(() =>
@@ -275,11 +275,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         void CloseButton_Click(object sender, EventArgs e) => Activity?.Finish();
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]";
-        }
 
         async Task Download(Folder folder,
                             Action onStartedAction,

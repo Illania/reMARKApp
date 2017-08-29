@@ -818,11 +818,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contact?.Id ?? contactId}]";
-        }
-
         #endregion
 
         #region State

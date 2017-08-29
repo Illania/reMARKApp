@@ -468,11 +468,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentFragment)} [DocumentId={DocumentPreview?.Id ?? Document?.Id ?? DocumentId}]";
-        }
-
         void RefreshView()
         {
             var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;

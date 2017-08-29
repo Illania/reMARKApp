@@ -247,15 +247,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region RetainableStateFragment overrides
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentsToUploadListFragment)}]";
-        }
-
-        #endregion
-
         protected class DocumentsToUploadListAdapter : RecyclerView.Adapter
         {
             public override int ItemCount => itemsInView.Count;

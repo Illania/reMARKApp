@@ -137,11 +137,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 selectedPriorities = clfs.SelectedPriorities;
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickPrioritiesListFragment)}";
-        }
-
         class PickLinesListFragmentState : IRetainableState
         {
             public List<Priority> SelectedPriorities { get; set; }

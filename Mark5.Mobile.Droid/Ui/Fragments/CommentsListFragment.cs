@@ -328,11 +328,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(CommentsListFragment)} [businessEntity.Id={entity.Id}]";
-        }
-
         class CommentsFragmentState : IRetainableState
         {
             public BusinessEntity Entity { get; set; }

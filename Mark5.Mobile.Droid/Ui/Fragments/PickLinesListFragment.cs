@@ -132,11 +132,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 selectedLinesGuid = clfs.SelectedLinesGuid;
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickLinesListFragment)}";
-        }
-
         class PickLinesListFragmentState : IRetainableState
         {
             public List<Guid> SelectedLinesGuid { get; set; }
