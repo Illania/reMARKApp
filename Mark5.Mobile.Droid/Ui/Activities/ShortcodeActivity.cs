@@ -59,25 +59,31 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var sf = new ShortcodeFragment();
+                int? folderId = null;
+                Folder folder = null;
+                int? shortcodeId = null;
+                ShortcodePreview shortcodePreview = null;
+                Guid? notificationGuid = null;
 
                 if (Intent.HasExtra(FolderIdIntentKey))
-                    sf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+                    folderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    sf.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(ShortcodeIdIntentKey))
-                    sf.ShortcodeId = Intent.Extras.GetInt(ShortcodeIdIntentKey);
+                    shortcodeId = Intent.Extras.GetInt(ShortcodeIdIntentKey);
 
                 if (Intent.HasExtra(ShortcodePreviewIntentKey))
-                    sf.ShortcodePreview = Serializer.Deserialize<ShortcodePreview>(Intent.Extras.GetString(ShortcodePreviewIntentKey));
+                    shortcodePreview = Serializer.Deserialize<ShortcodePreview>(Intent.Extras.GetString(ShortcodePreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    sf.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+
+                var (sf, tag) = ShortcodeFragment.NewInstance(folderId, folder, shortcodeId, shortcodePreview, notificationGuid);
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, sf, sf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, sf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ShortcodeActivity)}");

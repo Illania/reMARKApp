@@ -39,8 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var tlf = new TemplatesListFragment();
-                ft.Replace(Resource.Id.fragment_container, tlf, tlf.GenerateTag());
+                var (tlf,tag) = TemplatesListFragment.NewInstance();
+                ft.Replace(Resource.Id.fragment_container, tlf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(TemplatesListActivity)}");

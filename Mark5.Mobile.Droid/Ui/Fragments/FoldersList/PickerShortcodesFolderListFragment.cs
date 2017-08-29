@@ -13,6 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 
             var args = new Bundle();
+
             if (remoteFolder != null)
                 args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
 

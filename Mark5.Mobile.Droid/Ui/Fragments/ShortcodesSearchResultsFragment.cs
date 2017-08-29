@@ -11,6 +11,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -18,21 +19,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesSearchResultsFragment : RetainableStateFragment
     {
+        public const string SearchShortcodesCriteriaBundleKey = "SearchShortcodesCriteria_ffe59102-9ddc-49d4-9172-bb119548ea77";
+
         SearchShortcodesCriteria criteria;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ShortcodeSearchResultsAdapter adapter;
 
-        public ShortcodesSearchResultsFragment(SearchShortcodesCriteria criteria)
+        public static (ShortcodesSearchResultsFragment Fragments, string tag) NewInstance(SearchShortcodesCriteria criteria)
         {
-            this.criteria = criteria;
+            var tag = $"{nameof(ShortcodesSearchResultsFragment)}]";
+
+            var fragment = new ShortcodesSearchResultsFragment();
+            var args = new Bundle();
+
+            if (criteria != null)
+                args.PutString(SearchShortcodesCriteriaBundleKey, Serializer.Serialize(criteria));
+
+            fragment.Arguments = args;
+
+            return (fragment, tag);
         }
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(SearchShortcodesCriteriaBundleKey))
+                criteria = Serializer.Deserialize<SearchShortcodesCriteria>(Arguments.GetString(SearchShortcodesCriteriaBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);

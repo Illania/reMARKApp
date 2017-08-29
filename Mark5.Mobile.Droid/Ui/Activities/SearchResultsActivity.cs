@@ -88,8 +88,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var ssrf = new ShortcodesSearchResultsFragment(criteria);
-                    ft.Replace(Resource.Id.fragment_container, ssrf, ssrf.GenerateTag());
+                    var (ssrf, tag) = ShortcodesSearchResultsFragment.NewInstance(criteria);
+                    ft.Replace(Resource.Id.fragment_container, ssrf, tag);
                     ft.Commit();
                 }
 

@@ -30,8 +30,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]" + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={businessEntities.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id ?? -1}]";
 
             var args = new Bundle();
-            args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
-            args.PutString(BusinessEntitiesBundleKey, Serializer.Serialize(businessEntities));
+
+            if (remoteFolder != null)
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
+
+            if (businessEntities != null)
+                args.PutString(BusinessEntitiesBundleKey, Serializer.Serialize(businessEntities));
 
             if (fromFolder != null)
                 args.PutString(FromFolderBundleKey, Serializer.Serialize(fromFolder));

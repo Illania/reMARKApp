@@ -30,6 +30,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
+        public static (TemplatesListFragment Fragments, string tag) NewInstance()
+        {
+            var tag = $"{nameof(TemplatesListFragment)}";
+            var fragment = new TemplatesListFragment();
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(TemplatesListFragment)}");

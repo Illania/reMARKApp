@@ -62,8 +62,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (moduleType == ModuleType.Shortcodes)
                 {
-                    var f = new ShortcodesSearchCriteriaFragment();
-                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    var (f,tag) = ShortcodesSearchCriteriaFragment.NewInstance();
+                    ft.Replace(Resource.Id.fragment_container, f, tag);
                     ft.Commit();
                 }
 
