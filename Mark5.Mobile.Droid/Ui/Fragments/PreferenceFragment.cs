@@ -27,8 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PreferenceFragment fragment, string tag) NewInstance()
         {
-            var tag = $"{nameof(PreferenceFragment)}";
             var fragment = new PreferenceFragment();
+            var tag = $"{nameof(PreferenceFragment)}";
 
             return (fragment, tag);
         }

@@ -42,10 +42,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodeFragment Fragments, string tag) NewInstance(int? folderId, Folder folder, int? shortcodeId, ShortcodePreview shortcodePreview, Guid? notificationGuid)
         {
-            //old tag = $"{nameof(ShortcodeFragment)} [ShortcodeId={shortcodePreview?.Id ?? shortcode?.Id ?? shortcodeId}]";
-            var tag = $"{nameof(ShortcodeFragment)} [ShortcodeId={shortcodePreview?.Id ?? shortcodeId}]";
-
-            var fragment = new ShortcodeFragment();
             var args = new Bundle();
 
             if (folderId != null)
@@ -63,7 +59,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (notificationGuid != null)
                 args.PutString(NotificationGuidBundleKey, Serializer.Serialize(notificationGuid));
 
+            var fragment = new ShortcodeFragment();
             fragment.Arguments = args;
+
+            //old tag = $"{nameof(ShortcodeFragment)} [ShortcodeId={shortcodePreview?.Id ?? shortcode?.Id ?? shortcodeId}]";
+            var tag = $"{nameof(ShortcodeFragment)} [ShortcodeId={shortcodePreview?.Id ?? shortcodeId}]";
 
             return (fragment, tag);
         }

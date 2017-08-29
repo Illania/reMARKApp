@@ -32,8 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (TemplatesListFragment Fragments, string tag) NewInstance()
         {
-            var tag = $"{nameof(TemplatesListFragment)}";
             var fragment = new TemplatesListFragment();
+            var tag = $"{nameof(TemplatesListFragment)}";
 
             return (fragment, tag);
         }

@@ -37,15 +37,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (NotificationsListFragment fragment, string tag) NewInstance(ObjectType[] objectTypes)
         {
-            var tag = $"{nameof(NotificationsListFragment)}]";
-
-            var fragment = new NotificationsListFragment();
             var args = new Bundle();
 
             if (objectTypes != null)
                 args.PutString(ObjectTypesBundleKey, Serializer.Serialize(objectTypes));
 
+            var fragment = new NotificationsListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(NotificationsListFragment)}]";
 
             return (fragment, tag);
         }

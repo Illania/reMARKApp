@@ -37,8 +37,6 @@ namespace Mark5.Mobile.Droid
 
         public static (CategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
         {
-            var tag = $"{nameof(CategoriesListFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
-
             var args = new Bundle();
 
             if(businessEntity != null)
@@ -46,6 +44,8 @@ namespace Mark5.Mobile.Droid
 
             var fragment = new CategoriesListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(CategoriesListFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
 
             return (fragment, tag);
         }

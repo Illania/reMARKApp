@@ -37,14 +37,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentsSearchResultsFragment fragment, string var) NewInstance(SearchDocumentsCriteria criteria)
         {
-            var tag = $"{nameof(DocumentsSearchResultsFragment)}]";
-            var fragment = new DocumentsSearchResultsFragment();
             var args = new Bundle();
 
             if (criteria != null)
                 args.PutString(SearchDocumentsCriteriaBundleKey, Serializer.Serialize(criteria));
 
+            var fragment = new DocumentsSearchResultsFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(DocumentsSearchResultsFragment)}]";
 
             return (fragment, tag);
         }

@@ -27,8 +27,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (CopyMoveToFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, List<IBusinessEntity> businessEntities, Folder fromFolder = null, ActionType? actionType = null)
         {
-            var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]" + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={businessEntities.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id ?? -1}]";
-
             var args = new Bundle();
 
             if (remoteFolder != null)
@@ -45,6 +43,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var fragment = new CopyMoveToFolderListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]" + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={businessEntities.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id ?? -1}]";
 
             return (fragment,tag);
         }

@@ -26,8 +26,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PhonebookContactsListFragment fragment, string tag) NewInstance()
         {
-            var tag = $"{nameof(PhonebookContactsListFragment)}";
             var fragment = new PhonebookContactsListFragment();
+            var tag = $"{nameof(PhonebookContactsListFragment)}";
 
             return (fragment, tag);
         }

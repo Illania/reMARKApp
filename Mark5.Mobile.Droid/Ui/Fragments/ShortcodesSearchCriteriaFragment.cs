@@ -34,8 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodesSearchCriteriaFragment Fragment, string tag) NewInstance()
         {
-            var tag = $"{nameof(ShortcodesSearchCriteriaFragment)}";
             var fragment = new ShortcodesSearchCriteriaFragment();
+            var tag = $"{nameof(ShortcodesSearchCriteriaFragment)}";
 
             return (fragment, tag);
         }

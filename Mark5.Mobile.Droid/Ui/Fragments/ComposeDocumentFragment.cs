@@ -85,8 +85,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses)
         {
-            var tag = $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]";
-
             var args = new Bundle();
 
             if (documentCreationModeFlag != DocumentCreationModeFlag.None)
@@ -112,6 +110,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             
             var fragment = new ComposeDocumentFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]";
 
             return (fragment, tag);
         }

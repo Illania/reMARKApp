@@ -35,13 +35,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (FoldersNotificationsListFragment fragment, string tag) NewInstance(Folder remoteFolder)
         {
-            var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
-
             var args = new Bundle();
-            args.PutString(RemoteFolderBundleKey,Serializer.Serialize(remoteFolder));
+
+            if (remoteFolder != null)
+                args.PutString(RemoteFolderBundleKey,Serializer.Serialize(remoteFolder));
 
             var fragment = new FoldersNotificationsListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
            
             return (fragment, tag);
         }

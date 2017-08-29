@@ -31,8 +31,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentsToUploadListFragment fragment, string var) NewInstance()
         {
-            var tag = $"{nameof(DocumentsToUploadListFragment)}]";
             var fragment = new DocumentsToUploadListFragment();
+            var tag = $"{nameof(DocumentsToUploadListFragment)}]";
 
             return (fragment, tag);
         }

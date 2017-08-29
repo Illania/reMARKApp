@@ -39,14 +39,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<IBusinessEntity> be)
         {
-            var tag = $"{nameof(CopyToUserWorktrayFragment)}]";
-            var fragment = new CopyToUserWorktrayFragment();
             var args = new Bundle();
 
             if (be != null)
                 args.PutString(BusinessEntitiesBundleKey, Serializer.Serialize(be));
 
+            var fragment = new CopyToUserWorktrayFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(CopyToUserWorktrayFragment)}]";
 
             return (fragment, tag);
         }

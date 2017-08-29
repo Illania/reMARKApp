@@ -60,9 +60,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ContactFragment fragment, string tag) NewInstance(int? folderId = null, Folder folder = null, int? contactId = null, ContactPreview contactPreview = null, Guid? notificationGuid = null)
         {
-            //old tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contact?.Id ?? contactId}]";
-            var tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contactId}]";
-
             var args = new Bundle();
 
             if (folderId != null)
@@ -82,6 +79,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var fragment = new ContactFragment();
             fragment.Arguments = args;
+
+            //old tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contact?.Id ?? contactId}]";
+            var tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contactId}]";
 
             return (fragment, tag);
         }

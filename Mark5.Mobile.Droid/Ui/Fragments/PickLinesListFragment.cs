@@ -30,15 +30,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PickLinesListFragment fragment, string tag) NewInstance(List<Guid> selectedLinesGuid)
         {
-            var tag = $"{nameof(PickLinesListFragment)}";
-
-            var fragment = new PickLinesListFragment();
             var args = new Bundle();
 
             if (selectedLinesGuid != null)
                 args.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(selectedLinesGuid));
 
+            var fragment = new PickLinesListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(PickLinesListFragment)}";
 
             return (fragment, tag);
         }

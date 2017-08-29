@@ -11,8 +11,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public static (ShortcodesListFragment fragment, string tag) NewInstance(Folder folder)
         {
-            var tag = $"{nameof(AbstractShortcodesListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
-
             var args = new Bundle();
 
             if (folder != null)
@@ -20,6 +18,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var fragment = new ShortcodesListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(AbstractShortcodesListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
 
             return (fragment, tag);
         }

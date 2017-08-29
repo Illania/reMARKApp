@@ -33,15 +33,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ObjectActionsFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
         {
-            var tag = $"{nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
-
-            var fragment = new ObjectActionsFragment();
             var args = new Bundle();
 
             if (businessEntity != null)
                 args.PutString(BusinessEntityBundleKey, Serializer.Serialize(businessEntity));
 
+            var fragment = new ObjectActionsFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
 
             return (fragment, tag);
         }

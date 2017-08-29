@@ -57,10 +57,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
         {
-            //old tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? Document?.Id ?? docId}]"; -> Document only changed in this fragment after instantiation.
-            var tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? docId}]";
-
-            var fragment = new DocumentFragment();
             var args = new Bundle();
 
             if (folder != null)
@@ -81,7 +77,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (failDocToUploadGuid != null)
                 args.PutString(FailedDocumentToUploadGuidBundleKey, Serializer.Serialize(failDocToUploadGuid));
 
+            var fragment = new DocumentFragment();
             fragment.Arguments = args;
+
+            //old tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? Document?.Id ?? docId}]"; -> Document only changed in this fragment after instantiation.
+            var tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? docId}]";
+
             return (fragment, tag);
         }
 

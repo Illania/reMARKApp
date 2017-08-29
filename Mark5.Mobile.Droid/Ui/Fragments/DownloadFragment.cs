@@ -43,14 +43,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DownloadFragment fragment, string var) NewInstance(Folder folder)
         {
-            var tag = $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]";
-            var fragment = new DownloadFragment();
             var args = new Bundle();
 
             if (folder != null)
                 args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
+            var fragment = new DownloadFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]";
 
             return (fragment, tag);
         }

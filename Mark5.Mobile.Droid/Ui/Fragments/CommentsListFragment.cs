@@ -35,8 +35,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (CommentsListFragment Fragments, string tag) NewInstance(BusinessEntity be)
         {
-            var tag = $"{nameof(CommentsListFragment)} [businessEntity.Id={be.Id}]";
-                
             var args = new Bundle();
 
             if (be != null)
@@ -44,6 +42,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var fragment = new CommentsListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(CommentsListFragment)} [businessEntity.Id={be.Id}]";
 
             return (fragment, tag);
         }

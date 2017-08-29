@@ -30,15 +30,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PickPrioritiesListFragment Fragments, string tag) NewInstance(List<Priority> selectedPriorities)
         {
-            var tag = $"{nameof(PickPrioritiesListFragment)}";
-
-            var fragment = new PickPrioritiesListFragment();
             var args = new Bundle();
 
             if (selectedPriorities != null)
                 args.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(selectedPriorities));
 
+            var fragment = new PickPrioritiesListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(PickPrioritiesListFragment)}";
 
             return (fragment, tag);
         }

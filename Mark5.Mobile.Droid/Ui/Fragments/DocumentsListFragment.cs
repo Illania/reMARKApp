@@ -65,15 +65,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentsListFragment fragment, string tag) NewInstance(Folder folder)
         {
-            var tag = $"{nameof(DocumentsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
-
-            var fragment = new DocumentsListFragment();
             var args = new Bundle();
 
             if (folder != null)
                 args.PutString(FolderBundleKey,Serializer.Serialize(folder));
 
+            var fragment = new DocumentsListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(DocumentsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
 
             return (fragment, tag);
         }

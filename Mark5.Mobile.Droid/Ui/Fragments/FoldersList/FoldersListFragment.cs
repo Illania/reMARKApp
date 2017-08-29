@@ -58,8 +58,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null)
         {
-            var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
-
             var args = new Bundle();
 
             if (remoteFolder != null)
@@ -70,6 +68,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             
             var fragment = new FoldersListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 
             return (fragment, tag);
         }

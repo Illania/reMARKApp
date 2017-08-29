@@ -43,15 +43,15 @@ namespace Mark5.Mobile.Droid
 
         public static (EditCategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntityPreview)
         {
-            var tag = $"{nameof(EditCategoriesListFragment)} [businessEntity.id={businessEntityPreview.Id}, businessEntity.objectType={businessEntityPreview.ObjectType}]";
-
-            var fragment = new EditCategoriesListFragment();
             var args = new Bundle();
 
             if (businessEntityPreview != null)
                 args.PutString(BusinessEntityPreviewBundleKey, Serializer.Serialize(businessEntityPreview));
 
+            var fragment = new EditCategoriesListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(EditCategoriesListFragment)} [businessEntity.id={businessEntityPreview.Id}, businessEntity.objectType={businessEntityPreview.ObjectType}]";
 
             return (fragment, tag);
         }

@@ -26,8 +26,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (RecentAddressesListFragment fragment, string tag) NewInstance()
         {
-            var tag = $"{nameof(RecentAddressesListFragment)}";
             var fragment = new RecentAddressesListFragment();
+            var tag = $"{nameof(RecentAddressesListFragment)}";
 
             return (fragment, tag);
         }

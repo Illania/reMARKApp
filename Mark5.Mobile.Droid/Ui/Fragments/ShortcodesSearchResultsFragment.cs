@@ -29,15 +29,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodesSearchResultsFragment Fragments, string tag) NewInstance(SearchShortcodesCriteria criteria)
         {
-            var tag = $"{nameof(ShortcodesSearchResultsFragment)}]";
-
-            var fragment = new ShortcodesSearchResultsFragment();
             var args = new Bundle();
 
             if (criteria != null)
                 args.PutString(SearchShortcodesCriteriaBundleKey, Serializer.Serialize(criteria));
 
+            var fragment = new ShortcodesSearchResultsFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(ShortcodesSearchResultsFragment)}]";
 
             return (fragment, tag);
         }

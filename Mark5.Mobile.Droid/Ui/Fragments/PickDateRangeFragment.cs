@@ -37,9 +37,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PickDateRangeFragment fragment, string tag) NewInstance(long? fromTimestamp, long? toTimestamp, bool? startWithToDate)
         {
-            var tag = $"{nameof(PickDateRangeFragment)}";
-            var fragment = new PickDateRangeFragment();
-
             var args = new Bundle();
 
             if (fromTimestamp != null)
@@ -51,7 +48,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (startWithToDate != null)
                 args.PutBoolean(StartWithToDateBundleKey, startWithToDate.Value);
 
+            var fragment = new PickDateRangeFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(PickDateRangeFragment)}";
 
             return (fragment, tag);
         }

@@ -41,9 +41,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PickCategoriesListFragment fragment, string tag) NewInstance(ObjectType objectType, int[] preselectedCategoryIds)
         {
-            var tag = $"{nameof(PickCategoriesListFragment)} [objectType={objectType}]";
-
-            var fragment = new PickCategoriesListFragment();
             var args = new Bundle();
 
             if (objectType != null)
@@ -52,7 +49,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (preselectedCategoryIds != null)
                 args.PutIntArray(PreselectedCategoryIdsBundleKey, preselectedCategoryIds);
 
+            var fragment = new PickCategoriesListFragment();
             fragment.Arguments = args;
+
+            var tag = $"{nameof(PickCategoriesListFragment)} [objectType={objectType}]";
 
             return (fragment, tag);
         }

@@ -36,8 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentSearchCriteriaFragment Fragment, string tag) NewInstance()
         {
-            var tag = $"{nameof(DocumentSearchCriteriaFragment)}";
             var fragment = new DocumentSearchCriteriaFragment();
+            var tag = $"{nameof(DocumentSearchCriteriaFragment)}";
 
             return (fragment, tag);
         }
