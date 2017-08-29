@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Task<List<Category>> Task => tcs.Task;
 
-        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter)recyclerView.GetAdapter();
 
         public const string ObjectTypeBundleKey = "ObjectType_cae47797-624e-48a2-a472-1758023b0e40";
         public const string PreselectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
@@ -42,9 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (PickCategoriesListFragment fragment, string tag) NewInstance(ObjectType objectType, int[] preselectedCategoryIds)
         {
             var args = new Bundle();
-
-            if (objectType != null)
-                args.PutString(ObjectTypeBundleKey, Serializer.Serialize(objectType));
+            args.PutString(ObjectTypeBundleKey, Serializer.Serialize(objectType));
 
             if (preselectedCategoryIds != null)
                 args.PutIntArray(PreselectedCategoryIdsBundleKey, preselectedCategoryIds);
@@ -90,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
         }
@@ -132,7 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void CloseFragment()
         {
             tcs.SetResult(selectedCategories.Values.ToList());
-            ((AppCompatActivity) Activity).OnBackPressed();
+            ((AppCompatActivity)Activity).OnBackPressed();
         }
 
         #region Refresh methods
@@ -368,14 +366,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
 
     }
-        //Used to add the closerequest in a bundle to the fragment.
-        public class CategoriesCloseRequest : Java.Lang.Object
-        {
-            public Action<List<Category>> CloseRequest { get; set; }
+    //Used to add the closerequest in a bundle to the fragment.
+    public class CategoriesCloseRequest : Java.Lang.Object
+    {
+        public Action<List<Category>> CloseRequest { get; set; }
 
-            public CategoriesCloseRequest(Action<List<Category>> closeRequest)
-            {
-                CloseRequest = closeRequest;
-            }
+        public CategoriesCloseRequest(Action<List<Category>> closeRequest)
+        {
+            CloseRequest = closeRequest;
+        }
     }
 }

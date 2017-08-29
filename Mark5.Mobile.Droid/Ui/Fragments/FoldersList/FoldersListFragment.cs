@@ -78,11 +78,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(RemoteFolderBundleKey))
-               RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
-
-            if (Arguments.ContainsKey(HideSearchBundleKey))
-                HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
+            if (Arguments != null)
+            {
+                if (Arguments.ContainsKey(RemoteFolderBundleKey))
+                    RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
+                
+                if (Arguments.ContainsKey(HideSearchBundleKey))
+                    HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
+            }
               
             Container = container;
 

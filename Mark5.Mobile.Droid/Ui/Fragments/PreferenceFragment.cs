@@ -244,7 +244,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             args.PutString(ArgPreferenceRoot, pref.Key);
             var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
-            ft.Replace(Resource.Id.fragment_container, new PreferenceFragment(args));
+            ft.Replace(Resource.Id.fragment_container, new PreferenceFragment
+            {
+                Arguments = args
+            });
             
             ft.AddToBackStack(pref.Key);
             ft.Commit();
