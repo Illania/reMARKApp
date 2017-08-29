@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
 
             if (be != null)
-                args.PutString(BusinessEntityBundleKey,Serializer.Serialize(be));
+                args.PutString(BusinessEntityBundleKey, Serializer.Serialize(be));
 
             var fragment = new CommentsListFragment();
             fragment.Arguments = args;
@@ -96,8 +96,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.comments);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.comments);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]");
         }
@@ -178,82 +178,83 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Event handlers
 
-        void DeleteComment(Comment comment)
+        async void DeleteComment(Comment comment)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
+            Task t;
 
-            Task.Run(async () =>
-                {
-                    switch (entity.ObjectType)
-                    {
-                        case ObjectType.Document:
-                            var document = entity as Document;
-                            await Managers.DocumentsManager.DeleteComment(document, comment);
-                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
-                            break;
-                        case ObjectType.Contact:
-                            var contact = entity as Contact;
-                            await Managers.ContactsManager.DeleteComment(contact, comment);
-                            break;
-                        default:
-                            throw new ArgumentException("The input business entity does not have comments defined in the model");
-                    }
-                })
-                .ContinueWith(async t =>
-                    {
-                        dismissAction();
+            switch (entity.ObjectType)
+            {
+                case ObjectType.Document:
+                    var document = entity as Document;
+                    t = Managers.DocumentsManager.DeleteComment(document, comment);
+                    await t;
+                    CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                    break;
 
-                        if (t.IsFaulted)
-                        {
-                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                        }
-                        else
-                        {
-                            adapter.RemoveItem(comment);
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+                case ObjectType.Contact:
+                    var contact = entity as Contact;
+                    t = Managers.ContactsManager.DeleteComment(contact, comment);
+                    await t;
+                    break;
+
+                default:
+                    throw new ArgumentException("The input business entity does not have comments defined in the model");
+            }
+
+            dismissAction();
+
+            if (t.IsFaulted)
+            {
+                CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+            }
+            else
+            {
+                adapter.RemoveItem(comment);
+            }
+
         }
 
-        void EditComment(Comment comment, string newContent)
+        async void EditComment(Comment comment, string newContent)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.editing_comment, Resource.String.please_wait);
             var newComment = comment.ShallowCopy();
             newComment.Content = newContent;
 
-            Task.Run(async () =>
-                {
-                    switch (entity.ObjectType)
-                    {
-                        case ObjectType.Document:
-                            var document = entity as Document;
-                            await Managers.DocumentsManager.EditComment(document, newComment);
-                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
-                            break;
-                        case ObjectType.Contact:
-                            var contact = entity as Contact;
-                            await Managers.ContactsManager.EditComment(contact, newComment);
-                            break;
-                        default:
-                            throw new ArgumentException("The input business entity does not have comments defined in the model");
-                    }
-                })
-                .ContinueWith(async t =>
-                    {
-                        dismissAction();
+            Task<bool> t;
 
-                        if (t.IsFaulted)
-                        {
-                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                        }
-                        else
-                        {
-                            adapter.EditItem(newComment);
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+            switch (entity.ObjectType)
+            {
+                case ObjectType.Document:
+                    var document = entity as Document;
+                    t = Managers.DocumentsManager.EditComment(document, newComment);
+                    await t;
+                    CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
+                    break;
+
+                case ObjectType.Contact:
+                    var contact = entity as Contact;
+                    t = Managers.ContactsManager.EditComment(contact, newComment);
+                    await t;
+                    break;
+
+                default:
+                    throw new ArgumentException("The input business entity does not have comments defined in the model");
+            }
+
+            dismissAction();
+
+            if (t.IsFaulted)
+            {
+                CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+            }
+            else
+            {
+                adapter.EditItem(newComment);
+            }
+
         }
 
         void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -424,11 +425,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentViewHolder : RecyclerView.ViewHolder
         {
-            
+
             public string Username { set => usernameTextView.Text = value; }
-            
             public string Date { set => dateTextView.Text = value; }
-            
             public string Content { set => contentTextView.Text = value; }
 
             readonly AppCompatTextView usernameTextView;

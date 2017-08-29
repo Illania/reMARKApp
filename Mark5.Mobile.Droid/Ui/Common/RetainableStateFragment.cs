@@ -105,7 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             try
             {
-                return "";
+                return "NotAnEmptyTag";
                 //return GenerateTag();
             }
             catch (Exception ex)
