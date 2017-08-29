@@ -542,56 +542,53 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.InvalidateOptionsMenu();
         }
 
-        void MarkAsReadIfNecessary()
+        async void MarkAsReadIfNecessary()
         {
             setReadStatusCancellationTokenSource?.Cancel();
             setReadStatusCancellationTokenSource = new CancellationTokenSource();
 
-            Task.Run(async () =>
+            var d = Document;
+            var dp = DocumentPreview;
+            var token = setReadStatusCancellationTokenSource.Token;
+
+            try
             {
-                var d = Document;
-                var dp = DocumentPreview;
-                var token = setReadStatusCancellationTokenSource.Token;
+                if (dp == null || d == null)
+                    return;
 
-                try
+                if (dp.IsReadByCurrent)
+                    return;
+
+                var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
+                if (delaySeconds < 0)
+                    return;
+
+                await Task.Delay(delaySeconds * 1000);
+
+                if (token.IsCancellationRequested)
+                    return;
+
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+
+                Activity?.RunOnUiThread(() =>
                 {
-                    if (dp == null || d == null)
-                        return;
-
-                    if (dp.IsReadByCurrent)
-                        return;
-
-                    var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
-                    if (delaySeconds < 0)
-                        return;
-
-                    await Task.Delay(delaySeconds * 1000);
-
                     if (token.IsCancellationRequested)
                         return;
 
-                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+                    if (!IsAdded || IsDetached || IsRemoving)
+                        return;
 
-                    Activity?.RunOnUiThread(() =>
-                    {
-                        if (token.IsCancellationRequested)
-                            return;
+                    if (dp == null)
+                        return;
 
-                        if (!IsAdded || IsDetached || IsRemoving)
-                            return;
-
-                        if (dp == null)
-                            return;
-
-                        RefreshView<RecipentsView>();
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
-                    });
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
-                }
-            });
+                    RefreshView<RecipentsView>();
+                    CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
+                });
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
+            }
         }
 
         void UpdateCategories(List<Category> categories)
