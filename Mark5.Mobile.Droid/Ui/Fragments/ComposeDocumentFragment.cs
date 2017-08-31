@@ -564,47 +564,43 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SendDocument(bool saveDraft = false)
         {
-            Action sendAction = () =>
+            Action sendAction = async () =>
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
-                Task.Run(async () =>
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
+
+                documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
+
+                if (autoSaveWorkingCopyWorker != null)
                 {
-                    foreach (var subView in subViews)
-                        await subView.UpdateDocument();
+                    autoSaveWorkingCopyWorker.Stop();
+                    await autoSaveWorkingCopyWorker.Finished();
+                }
 
-                    documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
-
-                    if (autoSaveWorkingCopyWorker != null)
-                    {
-                        autoSaveWorkingCopyWorker.Stop();
-                        await autoSaveWorkingCopyWorker.Finished();
-                    }
-
-                    await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
-                    {
-                        DocumentCreationModeFlag = documentCreationModeFlag,
-                        CopyToNewOption = copyToNewOption,
-                        PreviousDocumentFolderId = previousDocumentFolderId,
-                        PreviousDocumentId = previousDocumentId,
-                        PreviousDocumentDirection = previousDocumentDirection,
-                        DocumentPreview = documentPreview,
-                        Document = document
-                    });
-                    await Managers.DocumentsManager.QueueWorkingCopyToUpload();
-                })
-                .ContinueWith(async t =>
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
-                    dismissAction();
+                    DocumentCreationModeFlag = documentCreationModeFlag,
+                    CopyToNewOption = copyToNewOption,
+                    PreviousDocumentFolderId = previousDocumentFolderId,
+                    PreviousDocumentId = previousDocumentId,
+                    PreviousDocumentDirection = previousDocumentDirection,
+                    DocumentPreview = documentPreview,
+                    Document = document
+                });
+                var t = Managers.DocumentsManager.QueueWorkingCopyToUpload();
+                await t;
 
-                    if (t.IsFaulted)
-                    {
-                        CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", t.Exception.InnerException);
-                        await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                    }
-                    else
-                        Activity?.Finish();
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                dismissAction();
+
+                if (t.IsFaulted)
+                {
+                    CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", t.Exception.InnerException);
+                    await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                }
+                else
+                    Activity?.Finish();
             };
 
             if (new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid))
