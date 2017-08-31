@@ -62,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnCreatePreferences(Bundle savedInstanceState, string rootKey)
+        public override async void OnCreatePreferences(Bundle savedInstanceState, string rootKey)
         {
             SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
 
@@ -70,42 +70,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (versionPreference != null)
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
 
-            Task.Run(() => { return AuthenticatorFactory.Create().GetConnectionInfoAsync(); })
-                .ContinueWith(t =>
-                    {
-                        var ci = t.Result;
+            Task<ConnectionInfo> t = AuthenticatorFactory.Create().GetConnectionInfoAsync();
 
-                        var usernamePreference = FindPreference(GetString(Resource.String.pref_key_account_username));
-                        if (usernamePreference != null)
-                            usernamePreference.Summary = ci.Username;
+            var ci = await t;
 
-                        var hostnamePreference = FindPreference(GetString(Resource.String.pref_key_account_hostname));
-                        if (hostnamePreference != null)
-                            hostnamePreference.Summary = ci.Hostname;
+            var usernamePreference = FindPreference(GetString(Resource.String.pref_key_account_username));
+            if (usernamePreference != null)
+                usernamePreference.Summary = ci.Username;
 
-                        var portPreference = FindPreference(GetString(Resource.String.pref_key_account_port));
-                        if (portPreference != null)
-                            portPreference.Summary = ci.Port.ToString();
+            var hostnamePreference = FindPreference(GetString(Resource.String.pref_key_account_hostname));
+            if (hostnamePreference != null)
+                hostnamePreference.Summary = ci.Hostname;
 
-                        var sslPreference = FindPreference(GetString(Resource.String.pref_key_account_ssl));
-                        if (sslPreference != null)
-                            switch (ci.SslMode)
-                            {
-                                case SslMode.On:
-                                    sslPreference.Summary = GetString(Resource.String.ssl_on);
-                                    break;
-                                case SslMode.AllowSelfSigned:
-                                    sslPreference.Summary = GetString(Resource.String.ssl_self_signed);
-                                    break;
-                                default:
-                                    var summary = new SpannableString(GetString(Resource.String.ssl_off));
-                                    summary.SetSpan(new StyleSpan(TypefaceStyle.Bold), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
-                                    summary.SetSpan(new ForegroundColorSpan(new Color(ContextCompat.GetColor(Context, Resource.Color.brown))), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
-                                    sslPreference.SummaryFormatted = summary;
-                                    break;
-                            }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+            var portPreference = FindPreference(GetString(Resource.String.pref_key_account_port));
+            if (portPreference != null)
+                portPreference.Summary = ci.Port.ToString();
+
+            var sslPreference = FindPreference(GetString(Resource.String.pref_key_account_ssl));
+            if (sslPreference != null)
+                switch (ci.SslMode)
+                {
+                    case SslMode.On:
+                        sslPreference.Summary = GetString(Resource.String.ssl_on);
+                        break;
+                    case SslMode.AllowSelfSigned:
+                        sslPreference.Summary = GetString(Resource.String.ssl_self_signed);
+                        break;
+                    default:
+                        var summary = new SpannableString(GetString(Resource.String.ssl_off));
+                        summary.SetSpan(new StyleSpan(TypefaceStyle.Bold), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
+                        summary.SetSpan(new ForegroundColorSpan(new Color(ContextCompat.GetColor(Context, Resource.Color.brown))), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
+                        sslPreference.SummaryFormatted = summary;
+                        break;
+                }
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)

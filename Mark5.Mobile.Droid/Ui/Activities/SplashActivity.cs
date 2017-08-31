@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Created {nameof(SplashActivity)}");
         }
 
-        protected override void OnStart()
+        protected override async void OnStart()
         {
             base.OnStart();
 
@@ -53,100 +53,96 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
 #endif
 
-            Task.Run(async () =>
-                {
-                    var authenticator = AuthenticatorFactory.Create();
-                    if (!await authenticator.IsAuthenticatedAsync())
-                    {
-                        CommonConfig.Logger.Info($"Writing required file system storage version...");
+            bool userAuthenticated;
 
-                        await FileSystemStorageUpdater.WriteRequiredStorageVersion();
+            var authenticator = AuthenticatorFactory.Create();
+            if (!await authenticator.IsAuthenticatedAsync())
+            {
+                CommonConfig.Logger.Info($"Writing required file system storage version...");
 
-                        CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
+                await FileSystemStorageUpdater.WriteRequiredStorageVersion();
 
-                        return false;
-                    }
+                CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
 
-                    CommonConfig.Logger.Info("Updating file system storage...");
+                userAuthenticated = false;
+            }
 
-                    var updated = await FileSystemStorageUpdater.UpdateStorage();
+            CommonConfig.Logger.Info("Updating file system storage...");
 
-                    CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
+            var updated = await FileSystemStorageUpdater.UpdateStorage();
 
-                    CommonConfig.Logger.Info($"User is authenticated - initializing...");
+            CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
 
-                    var ci = await authenticator.GetConnectionInfoAsync();
+            CommonConfig.Logger.Info($"User is authenticated - initializing...");
 
-                    CommonConfig.Logger.Info($"Current connection info: {ci}");
-                    CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
+            var ci = await authenticator.GetConnectionInfoAsync();
 
-                    switch (ci.SslMode)
-                    {
-                        case SslMode.AllowSelfSigned:
-                            PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                            break;
-                        default:
-                            PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                            break;
-                    }
+            CommonConfig.Logger.Info($"Current connection info: {ci}");
+            CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
 
-                    CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+            switch (ci.SslMode)
+            {
+                case SslMode.AllowSelfSigned:
+                    PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                    break;
+                default:
+                    PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                    break;
+            }
 
-                    Managers.Initialize(ci);
-                    Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                    Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+            CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
 
-                    if (PlatformConfig.Preferences.ClearCache)
-                    {
-                        CommonConfig.Logger.Info("Clearing cache...");
+            Managers.Initialize(ci);
+            Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+            Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+            Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+            Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                        await DatabaseUtils.ResetDatabases();
-                        PlatformConfig.Preferences.ClearCache = false;
+            if (PlatformConfig.Preferences.ClearCache)
+            {
+                CommonConfig.Logger.Info("Clearing cache...");
 
-                        CommonConfig.Logger.Info("Cleared cache");
-                    }
+                await DatabaseUtils.ResetDatabases();
+                PlatformConfig.Preferences.ClearCache = false;
 
-                    if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
-                    {
-                        CommonConfig.Logger.Info("Cleaning up cache....");
+                CommonConfig.Logger.Info("Cleared cache");
+            }
 
-                        await Managers.CleanUpManager.CleanUp();
+            if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
+            {
+                CommonConfig.Logger.Info("Cleaning up cache....");
 
-                        CommonConfig.Logger.Info("Cleaned up cache");
-                    }
+                await Managers.CleanUpManager.CleanUp();
 
-                    CommonConfig.Logger.Info($"Refreshing reachability status...");
-                    await CommonConfig.Reachability.Refresh();
+                CommonConfig.Logger.Info("Cleaned up cache");
+            }
 
-                    CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
-                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
+            CommonConfig.Logger.Info($"Refreshing reachability status...");
+            await CommonConfig.Reachability.Refresh();
 
-                    CommonConfig.Logger.Info("Retrieving system settings...");
+            CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
+            PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
-                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+            CommonConfig.Logger.Info("Retrieving system settings...");
 
-                    LocalNotificationsListener.Initialize();
+            ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                    DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+            LocalNotificationsListener.Initialize();
 
-                    CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
+            DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
-                    return true;
-                })
-                .ContinueWith(t =>
-                    {
-                        Services.DocumentsUploadService?.Start();
-                        Services.DocumentPreviewsDownloadService?.Start();
-                        Services.DocumentsDownloadService?.Start();
+            CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
-                        if (t.Result)
-                    StartActivity(MainActivity.CreateIntent(this));
-                        else
-                            ShowLoginButton();
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+            userAuthenticated = true;
+
+            Services.DocumentsUploadService?.Start();
+            Services.DocumentPreviewsDownloadService?.Start();
+            Services.DocumentsDownloadService?.Start();
+
+            if (userAuthenticated)
+                StartActivity(MainActivity.CreateIntent(this));
+            else
+                ShowLoginButton();
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
         }
