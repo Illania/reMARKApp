@@ -123,7 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        void StartButton_Click(object sender, EventArgs e)
+        async void StartButton_Click(object sender, EventArgs e)
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
@@ -174,16 +174,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                    if (pi.Preparing)
-                    {
-                        progressBar.Indeterminate = true;
-                        progressStatus.Text = GetString(Resource.String.preparing);
-                    }
-                    else
-                    {
-                        progressBar.Indeterminate = false;
-                        progressBar.Max = pi.TotalItemsCount;
-                        progressBar.SetProgress(pi.TotalItemsCount - pi.LeftItemsCount, true);
+                if (pi.Preparing)
+                {
+                    progressBar.Indeterminate = true;
+                    progressStatus.Text = GetString(Resource.String.preparing);
+                }
+                else
+                {
+                    progressBar.Indeterminate = false;
+                    progressBar.Max = pi.TotalItemsCount;
+                    progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
 
                         progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
 
@@ -260,7 +260,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            Task.Run(async () => await Download(folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
+            await Download(folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token);
         }
 
         async void CancelButton_Click(object sender, EventArgs e)

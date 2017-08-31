@@ -613,56 +613,53 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
         }
 
-        void HandleAddAttachment(Intent data)
+        async void HandleAddAttachment(Intent data)
         {
             var attachmentTooBig = false;
             IFile file = null;
             Stream stream = null;
 
-            Task.Run(async () =>
+            var uri = data.Data;
+            stream = Activity.ContentResolver.OpenInputStream(uri);
+
+            Task<IFile> t;
+            string filename;
+
+            if (uri.Scheme == "file")
+                filename = uri.LastPathSegment;
+            else
             {
-                var uri = data.Data;
-                stream = Activity.ContentResolver.OpenInputStream(uri);
-
-                string filename;
-
-                if (uri.Scheme == "file")
-                    filename = uri.LastPathSegment;
-                else
+                using (var cursor = Activity.ContentResolver.Query(uri, null, null, null, null))
                 {
-                    using (var cursor = Activity.ContentResolver.Query(uri, null, null, null, null))
-                    {
-                        var nameIndex = cursor.GetColumnIndex(OpenableColumns.DisplayName);
-                        cursor.MoveToFirst();
-                        filename = cursor.GetString(nameIndex);
-                    }
+                    var nameIndex = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+                    cursor.MoveToFirst();
+                    filename = cursor.GetString(nameIndex);
                 }
+            }
 
-                file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
-                var size = new Java.IO.File(file.Path).Length();
+            t = Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+            file = await t;
+            var size = new Java.IO.File(file.Path).Length();
 
-                if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
-                {
-                    attachmentTooBig = true;
-                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(filename);
-                    throw new Exception();
-                }
-            })
-            .ContinueWith(async t =>
+            if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
             {
-                stream?.Dispose();
+                attachmentTooBig = true;
+                await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(filename);
+                throw new Exception();
+            }
 
-                if (t.IsFaulted)
-                {
-                    CommonConfig.Logger.Error($"Failed to save attachment", t.Exception.InnerException);
-                    var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
-                    await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
-                }
-                else
-                {
-                    attachmentsView.AddFileDescription(new FileDescription(file));
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            stream?.Dispose();
+
+            if (t.IsFaulted)
+            {
+                CommonConfig.Logger.Error($"Failed to save attachment", t.Exception.InnerException);
+                var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
+                await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
+            }
+            else
+            {
+                attachmentsView.AddFileDescription(new FileDescription(file));
+            }
         }
 
         async Task SaveWorkingCopy()

@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(PhonebookContactsListFragment)}");
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
 
