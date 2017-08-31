@@ -28,10 +28,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public const string ObjectTypeBundleKey = "ObjectType_cae47797-624e-48a2-a472-1758023b0e40";
         public const string PreselectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
 
+        readonly TaskCompletionSource<List<Category>> tcs = new TaskCompletionSource<List<Category>>();
+
         ObjectType objectType;
         int[] preselectedCategoryIds;
-
-        readonly TaskCompletionSource<List<Category>> tcs = new TaskCompletionSource<List<Category>>();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;

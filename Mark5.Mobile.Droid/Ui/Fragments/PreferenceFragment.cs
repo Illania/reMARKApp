@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (versionPreference != null)
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
 
-            Task<ConnectionInfo> t = AuthenticatorFactory.Create().GetConnectionInfoAsync();
+            var t = AuthenticatorFactory.Create().GetConnectionInfoAsync();
 
             var ci = await t;
 

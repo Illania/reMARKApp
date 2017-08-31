@@ -213,7 +213,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 adapter.RemoveItem(comment);
             }
-
         }
 
         async void EditComment(Comment comment, string newContent)
@@ -254,7 +253,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 adapter.EditItem(newComment);
             }
-
         }
 
         void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)

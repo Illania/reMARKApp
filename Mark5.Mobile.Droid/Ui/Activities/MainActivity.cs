@@ -98,8 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
 
-                Task<SystemSettings> t;
-                t = Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                var t = Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
                 var ss = await t;
 
                 navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";       

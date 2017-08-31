@@ -174,16 +174,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
-                if (pi.Preparing)
-                {
-                    progressBar.Indeterminate = true;
-                    progressStatus.Text = GetString(Resource.String.preparing);
-                }
-                else
-                {
-                    progressBar.Indeterminate = false;
-                    progressBar.Max = pi.TotalItemsCount;
-                    progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
+	                if (pi.Preparing)
+	                {
+	                    progressBar.Indeterminate = true;
+	                    progressStatus.Text = GetString(Resource.String.preparing);
+	                }
+	                else
+	                {
+	                    progressBar.Indeterminate = false;
+	                    progressBar.Max = pi.TotalItemsCount;
+	                    progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
 
                         progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
 
