@@ -308,8 +308,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void ComposeButton_Clicked(object sender, EventArgs e)
         {
-            var choices = new List<string> { Localization.GetString("compose_email") };
+            var choices = new List<string> { };
 
+            if (shortcode?.Addresses.Any() ?? false)
+            {
+                choices.Add(Localization.GetString("compose_email"));
+            }
             if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed)
             {
                 choices.Add(Localization.GetString("edit"));
@@ -317,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, choices.ToArray(), composeButton);
 
-            if (choiceIndex == 0)
+            if (choices[choiceIndex] == Localization.GetString("compose_email"))
             {
                 var vc = new ComposeDocumentViewController
                 {
@@ -331,7 +335,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }
-            else if (choiceIndex == 1)
+            else if (choices[choiceIndex] == Localization.GetString("edit"))
             {
                 var vc = new AddEditShortcodeViewController
                 {
@@ -341,7 +345,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 };
                 PresentViewController(new NavigationController(vc), true, null);
             }
-
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
@@ -445,13 +448,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
                 var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
 
+                //TODO there could be also non-email addresses (like fax). Should we show them? If so we need to remove the add to new email icon
+
                 if (token.IsCancellationRequested)
                     return;
 
                 InitializeNavigationBarTitle();
 
                 if (composeButton != null)
-                    composeButton.Enabled = shortcode?.Addresses?.Any() ?? false;
+                    composeButton.Enabled = (shortcode?.Addresses?.Any() ?? false)
+                        || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed;
 
                 if (fileToButton != null)
                     fileToButton.Enabled = true;

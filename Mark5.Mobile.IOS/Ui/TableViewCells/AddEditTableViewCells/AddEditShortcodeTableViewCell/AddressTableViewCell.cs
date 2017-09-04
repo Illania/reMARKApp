@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             SetErrorState(errorState, false);
             address = ca;
 
-            addressTextField.Text = ca.FullAddress ?? string.Empty;
+            addressTextField.Text = ca.Address ?? string.Empty;
             nameTextField.Text = ca.Name ?? string.Empty;
 
             switch (address.AddressType)
@@ -114,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
         void AddressTextField_EditingChanged(object sender, EventArgs e)
         {
-            address.FullAddress = addressTextField.Text;
+            address.Address = addressTextField.Text;
             AddressChangedAction?.Invoke();
         }
 

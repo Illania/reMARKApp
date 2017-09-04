@@ -494,7 +494,7 @@ namespace Mark5.ServiceReference.AppService
                 ct.ThrowIfCancellationRequested();
 
                 var result = await Task.Factory.FromAsync(beginMethod, endMethod, parameters, null);
-                ((ICommunicationObject) client).Close();
+                ((ICommunicationObject)client).Close();
                 success = true;
                 return result;
             }
@@ -502,13 +502,13 @@ namespace Mark5.ServiceReference.AppService
             {
                 try
                 {
-                    ((ICommunicationObject) client)?.Close();
+                    ((ICommunicationObject)client)?.Close();
                 }
                 catch
                 {
                     try
                     {
-                        ((ICommunicationObject) client)?.Abort();
+                        ((ICommunicationObject)client)?.Abort();
                     }
                     catch
                     {
@@ -522,7 +522,7 @@ namespace Mark5.ServiceReference.AppService
                 if (!success)
                     try
                     {
-                        ((ICommunicationObject) client)?.Abort();
+                        ((ICommunicationObject)client)?.Abort();
                     }
                     catch
                     {
@@ -530,6 +530,11 @@ namespace Mark5.ServiceReference.AppService
                     }
                 throw new WcfAppServiceException(ex);
             }
+        }
+
+        public Task<CreateOrUpdateShortcodeResult> CreateOrUpdateShortcodeAsync(CreateOrUpdateShortcodeParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            throw new NotImplementedException(); //TODO shouldn't be used, but we should implement it
         }
 
         #endregion

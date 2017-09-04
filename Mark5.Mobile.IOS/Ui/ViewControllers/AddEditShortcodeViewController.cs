@@ -6,6 +6,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell;
 using Mark5.Mobile.IOS.Utilities;
@@ -197,11 +198,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView.EndEditing(true);
                 //await Managers.ShortcodesManager.(Contact, ContactPreview, parentId);
 
-                if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
-                    //CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
+                //if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
+                //CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
 
-                    dismissAction();
-                DismissViewController(true, null);
+                dismissAction();
+                //DismissViewController(true, null);
             }
             catch (Exception ex)
             {
@@ -409,9 +410,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var valid = true;
                 foreach (var section in sections)
                 {
-                    valid &= section.IsSectionValid();
+                    if (!section.IsSectionValid())
+                        return false;
                 }
                 return valid;
+            }
+
+            public int IndexForSection(AbstractSection section)
+            {
+                return sections.FindIndex(s => s == section);
             }
 
             AbstractRow RowAtIndexPath(NSIndexPath indexPath)
@@ -452,10 +459,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public bool IsSectionValid()
                 {
                     var valid = true;
-                    foreach (var row in Rows)
+
+                    for (int i = 0; i < Rows.Count; i++)
                     {
+                        var row = Rows[i];
                         var isRowValid = row.IsRowValid();
                         row.SetErrorState(!isRowValid);
+
+                        if (valid && !isRowValid)
+                        {
+                            var sectionIndex = DataSource.IndexForSection(this);
+                            var indexPath = NSIndexPath.FromRowSection(i, sectionIndex);
+                            TableView.ScrollToRow(indexPath, UITableViewScrollPosition.Middle, true);
+                        }
 
                         valid &= isRowValid;
                     }
@@ -500,12 +516,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public AddressSection(DataSource dataSource, DocumentAddressType type)
                     : base(dataSource)
                 {
-                    this.addressType = type;
+                    addressType = type;
                 }
 
                 public override void InitializeRows()
                 {
-                    var addresses = Shortcode.Addresses.Where(c => c.AddressType == addressType);
+                    var addresses = Shortcode.Addresses.Where(c => c.AddressType == addressType
+                                                              && c.Type == CommunicationAddressType.Email);
 
                     foreach (var address in addresses)
                         Rows.Add(new AddressRow(this, address));
@@ -813,7 +830,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override bool IsRowValid()
                 {
-                    return !string.IsNullOrWhiteSpace(Content.Address);
+                    return Validator.IsEmailValid(Content.Address);
                 }
 
                 public override string Key => AddressTableViewCell.Key;
@@ -827,8 +844,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cell.AddressChangedAction = Cell_AddressChanged;
                 }
 
-                //TODO should be full address and not only the address
-
                 public override void RefreshRow()
                 {
                     var cell = (AddressTableViewCell)Cell;
@@ -837,7 +852,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 void Cell_AddressChanged()
                 {
-                    if (!string.IsNullOrWhiteSpace(Content.Address))
+                    if (Validator.IsEmailValid(Content.Address))
                         SetErrorState(false);
                 }
             }
