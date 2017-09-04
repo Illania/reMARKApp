@@ -462,6 +462,18 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "FullAddress", Order = 0)]
         public string FullAddress { get; set; }
+
+        [DataMember(Name = "Attention", Order = 1)]
+        public string Attention { get; set; }
+
+        [DataMember(Name = "ObjectId", Order = 1)]
+        public int ObjectId { get; set; } = -1;
+
+        [DataMember(Name = "ObjectType", Order = 1)]
+        public ObjectType ObjectType { get; set; }
+
+        [DataMember(Name = "Id", Order = 1)]
+        public int Id { get; set; } = -1;
     }
 
     [DataContract(Name = "AttachmentDescription", Namespace = "com.nordic-it.appservice.v3")]
@@ -935,6 +947,29 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Shortcode", Order = 0)]
         public Shortcode Shortcode { get; set; }
+    }
+
+    [DataContract(Name = "CreateOrUpdateShortcodeParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class CreateOrUpdateShortcodeParameters : AbstractParameters
+    {
+        [DataMember(Name = "Shortcode", Order = 0)]
+        public Shortcode Shortcode { get; set; }
+
+        [DataMember(Name = "ShortcodePreview", Order = 0)]
+        public ShortcodePreview ShortcodePreview { get; set; }
+    }
+
+    [DataContract(Name = "CreateOrUpdateShortcodeResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class CreateOrUpdateShortcodeResult
+    {
+        [DataMember(Name = "Updated", Order = 0)]
+        public bool Updated { get; set; }
+
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; } = -1;
+
+        [DataMember(Name = "Guid", Order = 0)]
+        public Guid Guid { get; set; }
     }
 
     [DataContract(Name = "ShortcodePreview", Namespace = "com.nordic-it.appservice.v3")]

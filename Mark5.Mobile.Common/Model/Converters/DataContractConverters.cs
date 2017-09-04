@@ -282,11 +282,15 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             return new DocumentAddress
             {
+                Id = da.Id,
                 Name = da.Name,
                 Type = da.Type.ConvertEnum<CommunicationAddressType>(),
                 AddressType = da.AddressType.ConvertEnum<DocumentAddressType>(),
                 Address = da.Address,
-                FullAddress = da.FullAddress
+                FullAddress = da.FullAddress,
+                Attention = da.Attention,
+                ObjectId = da.ObjectId,
+                ObjectType = da.ObjectType.ConvertEnum<ObjectType>()
             };
         }
 
@@ -946,11 +950,15 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             return new DataContract.DocumentAddress
             {
+                Id = da.Id,
                 Name = da.Name,
                 Type = da.Type.ConvertEnum<DataContract.CommunicationAddressType>(),
                 AddressType = da.AddressType.ConvertEnum<DataContract.DocumentAddressType>(),
                 Address = da.Address,
-                FullAddress = da.FullAddress
+                FullAddress = da.FullAddress,
+                Attention = da.Attention,
+                ObjectId = da.ObjectId,
+                ObjectType = da.ObjectType.ConvertEnum<DataContract.ObjectType>()
             };
         }
 
