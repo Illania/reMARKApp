@@ -59,6 +59,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetShortcodeResult> GetShortcodeAsync(GetShortcodeParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<CreateOrUpdateShortcodeResult> CreateOrUpdateShortcodeAsync(CreateOrUpdateShortcodeParameters parameters, CancellationToken ct = default(CancellationToken));
+
         #endregion
 
         #region Calendar module

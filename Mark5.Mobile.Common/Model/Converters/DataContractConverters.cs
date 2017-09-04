@@ -971,6 +971,28 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static DataContract.Shortcode Convert(this Shortcode s)
+        {
+            return new DataContract.Shortcode
+            {
+                Id = s.Id,
+                Guid = s.Guid,
+                Addresses = s.Addresses.Select(a => a.Convert()).ToList(),
+            };
+        }
+
+        public static DataContract.ShortcodePreview Convert(this ShortcodePreview sp)
+        {
+            return new DataContract.ShortcodePreview
+            {
+                Id = sp.Id,
+                Guid = sp.Guid,
+                Name = sp.Name,
+                Description = sp.Description,
+                AddressCount = sp.AddressCount,
+            };
+        }
+
         #endregion
     }
 }
