@@ -188,8 +188,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (!dataSource.IsFormCorrect())
                 return;
-        }
 
+            var contentString = CreationModeFlag == ShortcodeCreationModeFlag.New ? Localization.GetString("adding_shortcode___") : Localization.GetString("editing_shortcode___");
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(contentString);
+
+            try
+            {
+                tableView.EndEditing(true);
+                //await Managers.ShortcodesManager.(Contact, ContactPreview, parentId);
+
+                if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
+                    //CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
+
+                    dismissAction();
+                DismissViewController(true, null);
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+                CommonConfig.Logger.Error($"Error while sending/editing shortcode [creationMode = {CreationModeFlag}, shortcodeId = {Shortcode?.Id}]", ex);
+            }
+        }
 
         #endregion
 

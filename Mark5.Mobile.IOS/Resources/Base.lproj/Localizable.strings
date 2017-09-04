@@ -17,6 +17,7 @@
 "add_birthdate" = "add birthdate";
 "adding_contact___" = "Adding contact...";
 "adding_comment___" = "Adding comment...";
+"adding_shortcode___" = "Adding shortcode...";
 "address" = "Address";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
@@ -124,6 +125,7 @@
 "edit" = "Edit";
 "edit_contact" = "Edit contact";
 "editing_contact___" = "Editing contact...";
+"editing_shortcode___" = "Editing shortcode...";
 "edit_message" = "Edit message";
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "editing_comment___" = "Editing comment...";
