@@ -466,6 +466,9 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Attention", Order = 1)]
         public string Attention { get; set; }
 
+        [DataMember(Name = "FullAttention", Order = 1)]
+        public string FullAttention { get; set; }
+
         [DataMember(Name = "ObjectId", Order = 1)]
         public int ObjectId { get; set; } = -1;
 

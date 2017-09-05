@@ -289,6 +289,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Address = da.Address,
                 FullAddress = da.FullAddress,
                 Attention = da.Attention,
+                FullAttention = da.FullAttention,
                 ObjectId = da.ObjectId,
                 ObjectType = da.ObjectType.ConvertEnum<ObjectType>()
             };
@@ -957,6 +958,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Address = da.Address,
                 FullAddress = da.FullAddress,
                 Attention = da.Attention,
+                FullAttention = da.FullAttention,
                 ObjectId = da.ObjectId,
                 ObjectType = da.ObjectType.ConvertEnum<DataContract.ObjectType>()
             };

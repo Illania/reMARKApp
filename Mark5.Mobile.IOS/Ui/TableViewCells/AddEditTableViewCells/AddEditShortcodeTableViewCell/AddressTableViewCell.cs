@@ -15,6 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
         readonly UITextField addressTextField;
         readonly UITextField nameTextField;
+        readonly UITextField attentionTextField;
         readonly UILabel typeLabel;
 
         public Action AddressChangedAction;
@@ -63,7 +64,32 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
                 NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, 0f),
+            });
+
+            var horizontalSeparator2 = GetHorizontalSeparator();
+            ContentView.AddSubview(horizontalSeparator2);
+            ContentView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Width, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Width, 1f, 0f),
+            });
+
+            attentionTextField = new UITextField
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Font = Theme.DefaultFont,
+                Placeholder = Localization.GetString("attention"),
+            };
+            attentionTextField.EditingChanged += AttentionTextField_EditingChanged; ;
+            ContentView.Add(attentionTextField);
+            ContentView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Width, 1f, 0f),
+                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, 0f),
             });
 
             typeLabel = new UILabel
@@ -95,6 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
             addressTextField.Text = ca.Address ?? string.Empty;
             nameTextField.Text = ca.Name ?? string.Empty;
+            attentionTextField.Text = ca.FullAttention ?? string.Empty;
 
             switch (address.AddressType)
             {
@@ -116,6 +143,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         {
             address.Address = addressTextField.Text;
             AddressChangedAction?.Invoke();
+        }
+
+        void AttentionTextField_EditingChanged(object sender, EventArgs e)
+        {
+            //No it is not error to get the attention value from the FullAttention property
+            //and save it in the Attention one. It actually makes a difference for linked addresses
+            address.Attention = attentionTextField.Text;
         }
 
         void NameTextField_EditingChanged(object sender, EventArgs e)

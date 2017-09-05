@@ -199,13 +199,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 tableView.EndEditing(true);
-                //await Managers.ShortcodesManager.(Contact, ContactPreview, parentId);
+                await Managers.ShortcodesManager.CreateOrUpdateShortcodeAsync(Shortcode, ShortcodePreview);
 
                 if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
                     CommonConfig.MessengerHub.Publish(new ShortcodeChangedMessage(this, ShortcodePreview));
 
                 dismissAction();
-                //DismissViewController(true, null);
+                DismissViewController(true, null);
             }
             catch (Exception ex)
             {
