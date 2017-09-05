@@ -287,6 +287,7 @@
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\DisclosureIndicatorTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditShortcodeViewController.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\AddressTableViewCell.cs" />
+		<Compile Include="Model\HubMessages\ShortcodeChangedMessage.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

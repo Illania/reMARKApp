@@ -15,6 +15,7 @@ using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -43,6 +44,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        TinyMessageSubscriptionToken shortcodeChangedToken;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -67,6 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeNavigationBarTitle();
             InitializeHandlers();
+            SubscribeToMessages();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -98,6 +102,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodeViewController)} received memory warning!");
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -217,6 +223,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
+        }
+
+        void SubscribeToMessages()
+        {
+            shortcodeChangedToken?.Dispose();
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<ShortcodeChangedMessage>(HandleShortcodeChanged, (arg) => arg.ShortcodePreview.Id == shortcodePreview?.Id);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            if (shortcodeChangedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<ShortcodeChangedMessage>(shortcodeChangedToken);
+                shortcodeChangedToken = null;
+            }
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -392,6 +413,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodeId = shortcodeId;
         }
 
+        void HandleShortcodeChanged(ShortcodeChangedMessage obj)
+        {
+            var ds = tableView?.Source as DataSource;
+            ds?.Clear();
+            shortcodeId = shortcodePreview.Id;
+            shortcodePreview = null;
+
+            if (SplitViewController == null)
+            {
+                refreshDataOnAppear = true;
+            }
+            else
+            {
+                RefreshData();
+            }
+        }
+
         public bool IsShowingShortcodeWithId(int shortcodeId)
         {
             return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
@@ -417,9 +455,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ds.StartRefresh();
 
-                if (folderId != null && shortcodeId != null)
+                if ((folderId != null || folder != null) && shortcodeId != null)
                 {
-                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId.Value, shortcodeId.Value);
+                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folder?.Id ?? folderId, shortcodeId.Value);
                     shortcodePreview = swp.ShortcodePreview;
                     shortcode = swp.Shortcode;
                 }

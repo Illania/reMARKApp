@@ -13,6 +13,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using ObjCRuntime;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
@@ -121,6 +122,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             CommonConfig.Logger.Warning($"{nameof(AbstractShortcodesListViewController)} received memory warning!");
 
+            UnsubscribeFromMessages();
+
             var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
@@ -193,11 +196,51 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             TableView.TableHeaderView = SearchController.SearchBar;
         }
 
+        TinyMessageSubscriptionToken removedFromFolderToken;
+        TinyMessageSubscriptionToken movedFromFolderToken;
+        TinyMessageSubscriptionToken deletedToken;
+        TinyMessageSubscriptionToken shortcodeChangedToken;
+
         void SubscribeToMessages()
         {
-            CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
+            removedFromFolderToken?.Dispose();
+            removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+
+            movedFromFolderToken?.Dispose();
+            movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+
+            deletedToken?.Dispose();
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
+
+            shortcodeChangedToken?.Dispose();
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<ShortcodeChangedMessage>(HandleShortcodeChanged);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            if (removedFromFolderToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityRemovedFromFolderMessage>(removedFromFolderToken);
+                removedFromFolderToken = null;
+            }
+
+            if (movedFromFolderToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityMovedFromFolderMessage>(movedFromFolderToken);
+                movedFromFolderToken = null;
+            }
+
+            if (deletedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityDeletedMessage>(deletedToken);
+                deletedToken = null;
+            }
+
+            if (shortcodeChangedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<ShortcodeChangedMessage>(shortcodeChangedToken);
+                shortcodeChangedToken = null;
+            }
         }
 
         void InitializeNavigationBarTitle()
@@ -681,6 +724,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RemoveShortcodesFromList(m.EntitiesId);
         }
 
+        void HandleShortcodeChanged(ShortcodeChangedMessage m)
+        {
+            UpdateShortcodeFromList(m.ShortcodePreview);
+        }
+
+        void UpdateShortcodeFromList(ShortcodePreview sp)
+        {
+            if (SearchController.Active)
+                SearchResultsDataSource.UpdateItem(sp);
+
+            var ds = (DataSource)TableView.Source;
+            ds.UpdateItem(sp);
+        }
+
         #endregion
 
         #region Utilities
@@ -827,6 +884,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                 var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
                 viewController.ShortcodeSelected(tableView, cp);
+            }
+
+            public void UpdateItem(ShortcodePreview sp)
+            {
+                var indexPath = FindItemIndexPath(sp);
+                if (indexPath != null)
+                {
+                    shortcodePreviewsInView[indexPath.Section][indexPath.Row] = sp;
+                    tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
             }
 
             public void AppendItems(List<ShortcodePreview> shortcodePreviews)

@@ -8,8 +8,12 @@
 "add_contact" = "Add contact";
 "add_phone" = "add phone";
 "add_mobile" = "add mobile";
+"add_empty" = "Add empty";
+
 "add_email" = "add email";
 "add_fax" = "add fax";
+"add_from_contact" = "Add from contact";
+
 "add_person" = "Add person";
 "add_department" = "Add department";
 "add_physical_address" = "add address";

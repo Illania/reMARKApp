@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -198,8 +201,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView.EndEditing(true);
                 //await Managers.ShortcodesManager.(Contact, ContactPreview, parentId);
 
-                //if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
-                //CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
+                if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
+                    CommonConfig.MessengerHub.Publish(new ShortcodeChangedMessage(this, ShortcodePreview));
 
                 dismissAction();
                 //DismissViewController(true, null);
@@ -210,6 +213,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Dialogs.ShowErrorDialogAsync(this, ex);
                 CommonConfig.Logger.Error($"Error while sending/editing shortcode [creationMode = {CreationModeFlag}, shortcodeId = {Shortcode?.Id}]", ex);
             }
+        }
+
+        async Task<DocumentAddress> ChooseAddress(UITableViewCell cell)
+        {
+            var strings = new[] { Localization.GetString("add_from_contact"),
+                Localization.GetString("add_empty"),
+            };
+
+            var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, strings, cell);
+
+            if (choiceIndex == 0)
+            {
+                var vc = new PickerContactsFolderListViewController();
+                PresentViewController(new NavigationController(vc), true, null);
+
+                var pa = await vc.Task;
+
+                DismissViewController(true, null);
+
+                if (pa != null)
+                    return new DocumentAddress
+                    {
+                        Address = pa.Address,
+                    };
+
+                //TODO should we put anything else in the documentAddress?
+
+            }
+            else if (choiceIndex == 1)
+            {
+                return new DocumentAddress();
+            }
+
+            return null;
         }
 
         #endregion
@@ -416,6 +453,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return valid;
             }
 
+            async Task<DocumentAddress> HeaderCellClicked(UITableViewCell cell)
+            {
+                return await ViewController.ChooseAddress(cell);
+            }
+
             public int IndexForSection(AbstractSection section)
             {
                 return sections.FindIndex(s => s == section);
@@ -466,6 +508,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         var isRowValid = row.IsRowValid();
                         row.SetErrorState(!isRowValid);
 
+                        //TODO decide what to do with the missing animation
+
                         if (valid && !isRowValid)
                         {
                             var sectionIndex = DataSource.IndexForSection(this);
@@ -491,7 +535,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public abstract void AddNewRow(NSIndexPath indexPath);
                 public abstract void DeleteRow(NSIndexPath indexPath, AbstractRow row);
             }
 
@@ -530,14 +573,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Rows.Add(new AddressHeaderRow(this, addressType));
                 }
 
-                public override void AddNewRow(NSIndexPath indexPath)
+                public void AddNewRow(NSIndexPath indexPath, DocumentAddress da)
                 {
-                    var ca = new DocumentAddress();
-                    ca.Type = CommunicationAddressType.Email;
-                    ca.AddressType = addressType;
+                    da.Type = CommunicationAddressType.Email;
+                    da.AddressType = addressType;
 
-                    Shortcode.Addresses.Add(ca);
-                    Rows.Insert(Rows.Count - 1, new AddressRow(this, ca));
+                    Shortcode.Addresses.Add(da);
+                    Rows.Insert(Rows.Count - 1, new AddressRow(this, da));
                     TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
@@ -549,6 +591,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Rows.Remove(row);
                     TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                     TableView.EndEditing(true);
+                }
+
+                public async void HeaderCellClicked(UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    var result = await DataSource.HeaderCellClicked(cell);
+                    if (result != null)
+                        AddNewRow(indexPath, result);
                 }
             }
 
@@ -718,15 +767,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void RefreshRow() { }
 
-                public override void OnClicked(NSIndexPath indexPath)
-                {
-                    ((MultiSection)Section).AddNewRow(indexPath);
-                }
-
-                public override void OnCommit(NSIndexPath indexPath)
-                {
-                    ((MultiSection)Section).AddNewRow(indexPath);
-                }
             }
 
             abstract class MultiContentRow<T> : AbstractRow where T : class
@@ -818,6 +858,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     cell.SetTitle(titleString);
+                }
+
+                public override void OnClicked(NSIndexPath indexPath)
+                {
+                    ((AddressSection)Section).HeaderCellClicked(Cell, indexPath);
+                }
+
+                public override void OnCommit(NSIndexPath indexPath)
+                {
+                    ((AddressSection)Section).HeaderCellClicked(Cell, indexPath);
                 }
             }
 
