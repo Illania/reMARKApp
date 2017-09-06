@@ -428,6 +428,11 @@
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AddEditShortcodeView.cs" />
     <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractMultipleRowsView.cs" />
     <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
