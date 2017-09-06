@@ -2,7 +2,7 @@
 using Android.Content;
 using Android.Text;
 
-namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
+namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
 {
     //To be used with deparment and companies
     public class NameView : AbstractSimpleFieldView

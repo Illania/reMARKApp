@@ -10,7 +10,7 @@ using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
-namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
+namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
 {
     public abstract class AbstractMultipleRowsView<T> : AddEditContactView
     {

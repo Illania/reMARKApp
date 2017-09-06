@@ -9,7 +9,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
-namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
+namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
 {
     public class PhysicalAddressesView : AbstractMultipleRowsView<PhysicalAddress>
     {

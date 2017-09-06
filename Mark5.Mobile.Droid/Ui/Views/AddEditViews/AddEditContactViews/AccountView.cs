@@ -1,7 +1,7 @@
 ﻿using Android.Content;
 using Android.Text;
 
-namespace Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews
+namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
 {
     public class AccountView : AbstractSimpleFieldView
     {
