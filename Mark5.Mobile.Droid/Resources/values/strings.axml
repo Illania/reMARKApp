@@ -143,6 +143,8 @@
 	<string name="edit_contact_create_company">Create company</string>
 	<string name="edit_contact_create_department">Create department</string>
 	<string name="edit_shortcode_name">Name</string>
+	<string name="edit_shortcode_attention">Attention</string>
+	<string name="edit_shortcode_address">Address</string>
 	<string name="edit_shortcode_description">Description</string>
 	<string name="parent_contact_selector_invalid_person_title">Cannot select person</string>
 	<string name="parent_contact_selector_invalid_department_title">Cannot select department</string>
