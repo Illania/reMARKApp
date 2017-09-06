@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             ContentView.Add(typeLabel);
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.CenterY, 1f, 0f),
+                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, nameTextField, NSLayoutAttribute.CenterY, 1f, 0f),
                 NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -InnerHorizontalMargin),
                 NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
             });
