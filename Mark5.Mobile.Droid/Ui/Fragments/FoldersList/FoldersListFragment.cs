@@ -155,6 +155,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
                     fab.Visibility = ViewStates.Visible;
                 }
+                if (RemoteFolder?.Module == ModuleType.Shortcodes
+                    && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
+                {
+                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetOnClickListener(new ActionOnClickListener(CreateShortcode));
+                    fab.Visibility = ViewStates.Visible;
+                }
             }
 
             SetSections();
@@ -246,6 +253,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
                 StartActivity(intent);
             }
+        }
+
+        void CreateShortcode()
+        {
+            var intent = new Intent(Context, typeof(AddEditShortcodeActivity));
+            intent.PutExtra(AddEditShortcodeActivity.ShortcodeCreationModeFlagIntentKey, (int)ShortcodeCreationModeFlag.New);
+            StartActivity(intent);
         }
 
         #endregion

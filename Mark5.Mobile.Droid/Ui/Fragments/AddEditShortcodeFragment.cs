@@ -236,10 +236,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Retainable State
 
-        //TODO to complete
         public override string GenerateTag()
         {
             return $"{nameof(AddEditShortcodeFragment)}";
+        }
+
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new AddEditShortcodeFragmentState
+            {
+                Shortcode = Shortcode,
+                ShortcodePreview = ShortcodePreview,
+                CreationModeFlag = CreationModeFlag,
+                RequestAddressType = requestAddressType,
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            if (restoredState is AddEditShortcodeFragmentState state)
+            {
+                Shortcode = state.Shortcode;
+                ShortcodePreview = state.ShortcodePreview;
+                CreationModeFlag = state.CreationModeFlag;
+                requestAddressType = state.RequestAddressType;
+            }
+        }
+
+        class AddEditShortcodeFragmentState : IRetainableState
+        {
+            public Shortcode Shortcode { get; set; }
+            public ShortcodePreview ShortcodePreview { get; set; }
+            public DocumentAddressType RequestAddressType { get; set; }
+            public ShortcodeCreationModeFlag CreationModeFlag { get; set; }
         }
 
         #endregion
