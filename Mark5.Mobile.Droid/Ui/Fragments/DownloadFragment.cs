@@ -142,19 +142,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 wakelock = pm.NewWakeLock(WakeLockFlags.ScreenDim, $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]");
                 wakelock.Acquire();
 
-                Activity.RunOnUiThread(() =>
-                {
-                    downloadRunning = true;
+                downloadRunning = true;
 
-                    progressStatus.Text = null;
-                    cancelButton.Enabled = true;
+                progressStatus.Text = null;
+                cancelButton.Enabled = true;
 
-                    progressLayout.Visibility = ViewStates.Visible;
-                    startLayout.Visibility = ViewStates.Gone;
-                    finishedLayout.Visibility = ViewStates.Gone;
+                progressLayout.Visibility = ViewStates.Visible;
+                startLayout.Visibility = ViewStates.Gone;
+                finishedLayout.Visibility = ViewStates.Gone;
 
-                    sw = new Stopwatch();
-                });
+                sw = new Stopwatch();           
             }
 
             void OnProgress(ProgressInfo pi)
@@ -172,27 +169,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (!pi.Preparing && sw.ElapsedMilliseconds > 3000)
                     timeLeft = sw.ElapsedMilliseconds / (pi.TotalItemsCount - pi.LeftItemsCount) * pi.LeftItemsCount / 1000 / 60;
 
-                Activity.RunOnUiThread(() =>
+                if (pi.Preparing)
                 {
-	                if (pi.Preparing)
-	                {
-	                    progressBar.Indeterminate = true;
-	                    progressStatus.Text = GetString(Resource.String.preparing);
-	                }
-	                else
-	                {
-	                    progressBar.Indeterminate = false;
-	                    progressBar.Max = pi.TotalItemsCount;
-	                    progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
+                    progressBar.Indeterminate = true;
+                    progressStatus.Text = GetString(Resource.String.preparing);
+                }
+                else
+                {
+                    progressBar.Indeterminate = false;
+                    progressBar.Max = pi.TotalItemsCount;
+                    progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
 
-                        progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
+                    progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
 
-                        if (timeLeft > 0)
-                            progressStatus.Text += "\n" + Resources.GetQuantityString(Resource.Plurals.time_remaining_minutes, (int)timeLeft, (int)timeLeft);
-                        else if (timeLeft > -1)
-                            progressStatus.Text += "\n" + GetString(Resource.String.time_remaining_minutes_zero);
-                    }
-                });
+                    if (timeLeft > 0)
+                        progressStatus.Text += "\n" + Resources.GetQuantityString(Resource.Plurals.time_remaining_minutes, (int)timeLeft, (int)timeLeft);
+                    else if (timeLeft > -1)
+                        progressStatus.Text += "\n" + GetString(Resource.String.time_remaining_minutes_zero);
+                }
             }
 
             void OnFinished(FinishedInfo fi)
@@ -205,14 +199,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sw.Stop();
                 sw = null;
 
-                Activity.RunOnUiThread(() =>
-                {
-                    finishedLayout.Visibility = ViewStates.Visible;
-                    startLayout.Visibility = ViewStates.Gone;
-                    progressLayout.Visibility = ViewStates.Gone;
+	            finishedLayout.Visibility = ViewStates.Visible;
+	            startLayout.Visibility = ViewStates.Gone;
+	            progressLayout.Visibility = ViewStates.Gone;
 
-                    downloadRunning = false;
-                });
+	            downloadRunning = false;
             }
 
             void OnException(Exception ex)
@@ -225,16 +216,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sw.Stop();
                 sw = null;
 
-                Activity.RunOnUiThread(() =>
-                {
-                    startLayout.Visibility = ViewStates.Visible;
-                    progressLayout.Visibility = ViewStates.Gone;
-                    finishedLayout.Visibility = ViewStates.Gone;
+	            startLayout.Visibility = ViewStates.Visible;
+	            progressLayout.Visibility = ViewStates.Gone;
+	            finishedLayout.Visibility = ViewStates.Gone;
 
-                    Dialogs.ShowErrorDialog(Activity, ex);
- 
-                    downloadRunning = false;
-                });
+	            Dialogs.ShowErrorDialog(Activity, ex);
+
+	            downloadRunning = false;
             }
 
             void OnCancelled()
@@ -247,14 +235,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sw.Stop();
                 sw = null;
 
-                Activity.RunOnUiThread(() =>
-                {
-                    startLayout.Visibility = ViewStates.Visible;
-                    progressLayout.Visibility = ViewStates.Gone;
-                    finishedLayout.Visibility = ViewStates.Gone;
+	            startLayout.Visibility = ViewStates.Visible;
+	            progressLayout.Visibility = ViewStates.Gone;
+	            finishedLayout.Visibility = ViewStates.Gone;
 
-                    downloadRunning = false;
-                });
+	            downloadRunning = false;
             }
 
             cts?.Cancel();

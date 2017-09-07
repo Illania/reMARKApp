@@ -569,21 +569,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+         
+                if (token.IsCancellationRequested)
+                    return;
 
-                Activity?.RunOnUiThread(() =>
-                {
-                    if (token.IsCancellationRequested)
-                        return;
+                if (!IsAdded || IsDetached || IsRemoving)
+                    return;
 
-                    if (!IsAdded || IsDetached || IsRemoving)
-                        return;
+                if (dp == null)
+                    return;
 
-                    if (dp == null)
-                        return;
-
-                    RefreshView<RecipentsView>();
-                    CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
-                });
+                RefreshView<RecipentsView>();
+                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));          
             }
             catch (Exception ex)
             {

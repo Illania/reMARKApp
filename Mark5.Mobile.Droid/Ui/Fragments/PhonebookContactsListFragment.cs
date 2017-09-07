@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(PhonebookContactsListFragment)}");
         }
 
-        public override async void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
 
@@ -93,10 +93,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Task.Run(() =>
               {
                   contacts = CommonConfig.Phonebook.GetPhonebookContacts();
-              }).ContinueWith(t =>
+              }).ContinueWith(async t =>
                {
-                   Activity.RunOnUiThread(async () =>
-                   {
                        if (t.IsFaulted)
                        {
                            var ex = t.Exception.InnerException;
@@ -114,8 +112,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                        {
                            adapter.SetItems(contacts.OrderBy(c => c.Name.SafeSubstring(0, 1)));
                        }
-                   });
-               });
+           
+            },TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void Adapter_ItemClicked(object sender, Recipient r)
