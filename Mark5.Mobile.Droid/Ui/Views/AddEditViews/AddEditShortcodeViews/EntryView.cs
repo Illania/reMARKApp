@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -13,11 +14,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
     public class EntryView : AbstractMultipleRowsView<DocumentAddress>
     {
         DocumentAddressType addressType;
+        Action<DocumentAddressType> onContactAddressRequest;
 
-        public EntryView(Context context, DocumentAddressType type)
-            : base(context, ResourceIdForType(type))
+        public EntryView(Context context, DocumentAddressType addressType, Action<DocumentAddressType> onContactAddressRequest)
+            : base(context, ResourceIdForType(addressType))
         {
-            addressType = type;
+            this.addressType = addressType;
+            this.onContactAddressRequest = onContactAddressRequest;
         }
 
         static int ResourceIdForType(DocumentAddressType type)
@@ -47,9 +50,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
             }
         }
 
-        protected override void AddButton_Click(object sender, EventArgs e)
+        protected async override void AddButton_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            var strings = new List<string> {Context.GetString(Resource.String.yes),
+                Context.GetString(Resource.String.no)}.ToArray();
+
+            var result = await Dialogs.ShowListDialog(Context, Resource.String.edit_shortcode_add_from_contact_question,
+                                                      strings, true);
+
+            if (result == 0)
+            {
+                onContactAddressRequest?.Invoke(addressType);
+            }
+            if (result == 1)
+            {
+                CreateDialog();
+            }
+        }
+
+        public void AddEntry(Recipient recipient)
+        {
+            var da = new DocumentAddress
+            {
+                Type = CommunicationAddressType.Email,
+                AddressType = addressType,
+                Address = recipient.Address, //TODO as in iOS, should we add more?
+            };
+
+            AddRow(da);
         }
 
         protected override Row GetNewRow()
@@ -102,12 +130,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
             attentionEditText.InputType = InputTypes.TextFlagCapSentences | InputTypes.ClassText;
             container.AddView(attentionEditText);
 
+            string oldAttention = string.Empty;
+
             if (row != null)
             {
                 da = row.GetContent();
                 emailEditText.Text = da.Address;
                 nameEditText.Text = da.Name;
-                attentionEditText.Text = da.FullAttention; //TODO we need to know if it gets modified
+                attentionEditText.Text = oldAttention = da.FullAttention;
             }
 
             Func<bool> isContentValid = () =>
@@ -130,8 +160,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
                 da.Type = CommunicationAddressType.Email;
                 da.AddressType = addressType;
                 da.Address = emailEditText.Text;
-                da.Attention = attentionEditText.Text;
                 da.Name = nameEditText.Text;
+
+                if (attentionEditText.Text != oldAttention)
+                    da.Attention = attentionEditText.Text;
 
                 if (row == null)
                 {

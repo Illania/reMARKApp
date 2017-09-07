@@ -400,7 +400,7 @@
     <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
-    <Compile Include="Model\HubMessages\ContactPreviewChanged.cs" />
+    <Compile Include="Model\HubMessages\ContactPreviewChangedMessage.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Ui\Activities\AddEditShortcodeActivity.cs" />
     <Compile Include="Ui\Fragments\AddEditShortcodeFragment.cs" />
@@ -433,6 +433,7 @@
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\NameView.cs" />
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\DescriptionView.cs" />
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
+    <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

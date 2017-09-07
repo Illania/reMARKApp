@@ -32,7 +32,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
-        public int? ContactId { get; set; }
         public ContactType ContactType { get; set; }
         public ContactCreationModeFlag CreationModeFlag { get; set; }
         public Action CloseRequest { get; set; }
@@ -58,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={ContactId ?? ContactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -135,19 +134,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             int resId = 0;
 
-            switch (ContactType)
+            if (CreationModeFlag == ContactCreationModeFlag.New)
             {
-                case ContactType.Person:
-                    resId = Resource.String.edit_contact_create_person;
-                    break;
-                case ContactType.Company:
-                    resId = Resource.String.edit_contact_create_company;
-                    break;
-                case ContactType.Department:
-                    resId = Resource.String.edit_contact_create_department;
-                    break;
-                default:
-                    throw new ArgumentException("Contact type needs to be defined");
+                switch (ContactType)
+                {
+                    case ContactType.Person:
+                        resId = Resource.String.edit_contact_create_person;
+                        break;
+                    case ContactType.Company:
+                        resId = Resource.String.edit_contact_create_company;
+                        break;
+                    case ContactType.Department:
+                        resId = Resource.String.edit_contact_create_department;
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
+            }
+            else if (CreationModeFlag == ContactCreationModeFlag.Edit)
+            {
+                switch (ContactType)
+                {
+                    case ContactType.Person:
+                        resId = Resource.String.edit_contact_edit_person;
+                        break;
+                    case ContactType.Company:
+                        resId = Resource.String.edit_contact_edit_company;
+                        break;
+                    case ContactType.Department:
+                        resId = Resource.String.edit_contact_edit_department;
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
             }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(resId);
@@ -230,7 +249,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={ContactId ?? ContactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...");
         }
 
@@ -357,7 +376,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
 
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                    CommonConfig.MessengerHub.Publish(new ContactPreviewChanged(this, ContactPreview));
+                    CommonConfig.MessengerHub.Publish(new ContactPreviewChangedMessage(this, ContactPreview));
 
                 CloseRequest?.Invoke();
             }
@@ -365,7 +384,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={ContactId ?? ContactPreview?.Id}, " +
+                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -389,7 +408,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = Contact,
                 ParentContactPreview = ParentContactPreview,
                 CreationModeFlag = CreationModeFlag,
-                ContactId = ContactId,
                 ContactType = ContactType,
                 SecondaryLayoutShown = secondaryLayoutShown,
                 ParentPreselected = ParentPreselected,
@@ -404,7 +422,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactPreview = state.ContactPreview;
                 ParentContactPreview = state.ParentContactPreview;
                 CreationModeFlag = state.CreationModeFlag;
-                ContactId = state.ContactId;
                 ContactType = state.ContactType;
                 secondaryLayoutShown = state.SecondaryLayoutShown;
                 ParentPreselected = ParentPreselected;

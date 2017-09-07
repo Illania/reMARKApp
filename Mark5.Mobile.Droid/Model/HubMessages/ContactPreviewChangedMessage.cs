@@ -3,11 +3,11 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Common.HubMessages
 {
-    public class ContactPreviewChanged : TinyMessageBase
+    public class ContactPreviewChangedMessage : TinyMessageBase
     {
         public ContactPreview ContactPreview { get; }
 
-        public ContactPreviewChanged(object sender, ContactPreview contactPreview)
+        public ContactPreviewChangedMessage(object sender, ContactPreview contactPreview)
             : base(sender)
         {
             ContactPreview = contactPreview;

@@ -16,7 +16,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class AddEditShortcodeActivity : BaseAppCompatActivity
     {
         public const string ShortcodeIntentKey = "Shortcode_83ff4007-8f2a-4a16-bb89-7e9bbc9db7bb";
-        public const string ShortcodeIdIntentKey = "ShortcodeId_46f1fd3c-c1a2-4372-9234-010fed29277a";
         public const string ShortcodePreviewIntentKey = "ShortcodePreview_eb091227-f038-4f33-89c9-49f5286df976";
         public const string ShortcodeCreationModeFlagIntentKey = "ShortcodeCreationModeFlag_2175a7c1-8b1b-4616-adaf-6f293bd16573";
 
@@ -41,9 +40,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var cf = new AddEditShortcodeFragment();
 
                 cf.CloseRequest = CloseRequest;
-
-                if (Intent.HasExtra(ShortcodeIdIntentKey))
-                    cf.ShortcodeId = Intent.Extras.GetInt(ShortcodeIdIntentKey);
 
                 if (Intent.HasExtra(ShortcodePreviewIntentKey))
                     cf.ShortcodePreview = Serializer.Deserialize<ShortcodePreview>(Intent.Extras.GetString(ShortcodePreviewIntentKey));
