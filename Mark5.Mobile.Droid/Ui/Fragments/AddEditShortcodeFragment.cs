@@ -110,6 +110,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Add(toView);
             subviews.Add(ccView);
             subviews.Add(bccView);
+
+            subviews.ForEach(linearLayout.AddView);
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
