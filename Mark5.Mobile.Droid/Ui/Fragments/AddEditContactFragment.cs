@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.SetImageResource(Resource.Drawable.action_save_contact);
+            fab.SetImageResource(Resource.Drawable.action_save);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
             fab.Enabled = true;
             fab.Size = FloatingActionButton.SizeNormal;

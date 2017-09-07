@@ -151,14 +151,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (RemoteFolder?.Module == ModuleType.Contacts
                     && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
                 {
-                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetImageResource(Resource.Drawable.action_add);
                     fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
                     fab.Visibility = ViewStates.Visible;
                 }
                 if (RemoteFolder?.Module == ModuleType.Shortcodes
                     && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
                 {
-                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetImageResource(Resource.Drawable.action_add);
                     fab.SetOnClickListener(new ActionOnClickListener(CreateShortcode));
                     fab.Visibility = ViewStates.Visible;
                 }
