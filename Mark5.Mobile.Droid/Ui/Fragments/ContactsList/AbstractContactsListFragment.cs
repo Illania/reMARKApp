@@ -280,7 +280,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
                 {
-                    adapter.AppendItems(cps);
+                    Activity.RunOnUiThread(() => adapter.AppendItems(cps));
                 },
                 () =>
                 {

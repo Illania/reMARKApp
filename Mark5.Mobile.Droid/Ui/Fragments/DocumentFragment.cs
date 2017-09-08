@@ -229,16 +229,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if ((Activity is SwipeDocumentActivity) && !UserVisibleHint)
                 return;
 
-            MarkAsReadIfNecessary();
+            await MarkAsReadIfNecessary();
         }
 
-        public override void OnUserVisibilityHintChanged()
+        public override async void OnUserVisibilityHintChanged()
         {
             base.OnUserVisibilityHintChanged();
 
             if (UserVisibleHint)
             {
-                MarkAsReadIfNecessary();
+                await MarkAsReadIfNecessary();
             }
             else
             {
@@ -542,7 +542,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.InvalidateOptionsMenu();
         }
 
-        async void MarkAsReadIfNecessary()
+        async Task MarkAsReadIfNecessary()
         {
             setReadStatusCancellationTokenSource?.Cancel();
             setReadStatusCancellationTokenSource = new CancellationTokenSource();
