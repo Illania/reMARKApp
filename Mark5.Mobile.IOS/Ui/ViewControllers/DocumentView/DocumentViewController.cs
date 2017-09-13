@@ -53,6 +53,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ToView toView;
         CcView ccView;
         BccView bccView;
+        ExtraFieldsView extraFieldsView;
         OriginatorView originatorView;
         SubjectView subjectView;
         DateReceivedView dateReceivedView;
@@ -298,6 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             viewsBeforeContent.Add(ccView = new CcView());
             viewsBeforeContent.Add(bccView = new BccView());
             viewsBeforeContent.Add(dateReceivedView = new DateReceivedView());
+            viewsBeforeContent.Add(extraFieldsView = new ExtraFieldsView());
             viewsBeforeContent.Add(priorityView = new PriorityView());
             viewsBeforeContent.Add(attachmentsListView = new AttachmentsView());
             viewsAfterContent.Add(referenceNumberView = new ReferenceNumberView());

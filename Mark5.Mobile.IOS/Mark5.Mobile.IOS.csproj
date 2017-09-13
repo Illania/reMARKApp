@@ -286,6 +286,7 @@
 		<Compile Include="Model\HubMessages\ChildrenContactAddedMessage.cs" />
 		<Compile Include="Config.cs" />
 		<Compile Include="Model\HubMessages\ContactPreviewCommentsCountChangedMessage.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
