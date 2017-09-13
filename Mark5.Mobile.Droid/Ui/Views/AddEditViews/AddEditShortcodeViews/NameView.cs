@@ -7,7 +7,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
     public class NameView : AbstractSimpleFieldView
     {
         public NameView(Context context)
-            : base(context, Resource.String.edit_shortcode_name, false, true, Resource.String.edit_shortcode_name_error)
+            : base(context, Resource.String.edit_shortcode_name, false, true,
+                   Resource.String.edit_shortcode_name_error, InputTypes.TextFlagNoSuggestions | InputTypes.ClassText)
         {
         }
 

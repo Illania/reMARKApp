@@ -52,20 +52,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
 
         protected async override void AddButton_Click(object sender, EventArgs e)
         {
-            var strings = new List<string> {Context.GetString(Resource.String.yes),
-                Context.GetString(Resource.String.no)}.ToArray();
-
-            var result = await Dialogs.ShowListDialog(Context, Resource.String.edit_shortcode_add_from_contact_question,
-                                                      strings, true);
+            var result = await Dialogs.ShowYesNoCancelDialogAsync(Context, Resource.String.edit_shortcode_add_from_contact_question);
 
             if (result == 0)
-            {
-                onContactAddressRequest?.Invoke(addressType);
-            }
-            if (result == 1)
-            {
                 CreateDialog();
-            }
+            if (result == 1)
+                onContactAddressRequest?.Invoke(addressType);
         }
 
         public void AddEntry(Recipient recipient)
@@ -74,9 +66,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
             {
                 Type = CommunicationAddressType.Email,
                 AddressType = addressType,
-                Address = recipient.Address, //TODO as in iOS, should we add more?
+                Address = recipient.Address,
             };
 
+            Shortcode.Addresses.Add(da);
             AddRow(da);
         }
 
@@ -118,7 +111,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
             };
             nameEditText.SetHint(Resource.String.edit_shortcode_name);
             nameEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-            nameEditText.InputType = InputTypes.TextFlagCapSentences | InputTypes.ClassText; //TODO check if correct
+            nameEditText.InputType = InputTypes.TextFlagNoSuggestions | InputTypes.ClassText;
             container.AddView(nameEditText);
 
             var attentionEditText = new AppCompatEditText(Context)
@@ -127,7 +120,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
             };
             attentionEditText.SetHint(Resource.String.edit_shortcode_attention);
             attentionEditText.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-            attentionEditText.InputType = InputTypes.TextFlagCapSentences | InputTypes.ClassText;
+            attentionEditText.InputType = InputTypes.TextFlagNoSuggestions | InputTypes.ClassText;
             container.AddView(attentionEditText);
 
             string oldAttention = string.Empty;
@@ -137,7 +130,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
                 da = row.GetContent();
                 emailEditText.Text = da.Address;
                 nameEditText.Text = da.Name;
-                attentionEditText.Text = oldAttention = da.FullAttention;
+                var attentionString = string.IsNullOrEmpty(da.FullAttention) ? da.Attention : da.FullAttention;
+                attentionEditText.Text = oldAttention = attentionString;
             }
 
             Func<bool> isContentValid = () =>
@@ -163,7 +157,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
                 da.Name = nameEditText.Text;
 
                 if (attentionEditText.Text != oldAttention)
-                    da.Attention = attentionEditText.Text;
+                    da.Attention = da.FullAttention = attentionEditText.Text;
 
                 if (row == null)
                 {
@@ -210,7 +204,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
 
             override public void UpdateRow()
             {
-                emailEditText.Text = Content.Address;
+                var firstLine = string.IsNullOrEmpty(Content.Name) ? Content.Address : $"{Content.Name} <{Content.Address}>";
+
+                var attentionString = string.IsNullOrEmpty(Content.FullAttention) ? Content.Attention : Content.FullAttention;
+
+                emailEditText.Text = string.IsNullOrEmpty(attentionString) ? firstLine : $"{firstLine}{Environment.NewLine}{attentionString}";
+
                 emailEditText.Error = !Validator.IsEmailValid(Content.Address) ? Context.GetString(Resource.String.edit_contact_invalid_email) : null;
             }
         }

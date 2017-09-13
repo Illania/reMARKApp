@@ -414,7 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (force || (ShortcodeId.HasValue && ShortcodePreview == null && Shortcode == null))
                 {
-                    var container = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(FolderId ?? Folder?.Id, ShortcodeId.Value);
+                    var container = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(FolderId ?? Folder?.Id, ShortcodeId ?? ShortcodePreview.Id);
                     ShortcodePreview = container.ShortcodePreview;
                     Shortcode = container.Shortcode;
                 }
@@ -430,8 +430,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
         }
 
@@ -444,8 +443,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as ShortcodeView;
-                if (dv != null)
+                if (linearLayout.GetChildAt(i) is ShortcodeView dv)
                 {
                     dv.ShortcodePreview = ShortcodePreview;
                     dv.Shortcode = Shortcode;
@@ -473,8 +471,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var sfs = restoredState as ShortcodeFragmentState;
-            if (sfs != null)
+            if (restoredState is ShortcodeFragmentState sfs)
             {
                 FolderId = sfs.FolderId;
                 Folder = sfs.Folder;

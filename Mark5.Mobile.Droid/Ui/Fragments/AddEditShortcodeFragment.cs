@@ -15,7 +15,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -142,7 +141,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshData()
         {
-            if (CreationModeFlag == ShortcodeCreationModeFlag.New)
+            if (CreationModeFlag == ShortcodeCreationModeFlag.New && Shortcode == null && ShortcodePreview == null)
             {
                 Shortcode = new Shortcode();
                 ShortcodePreview = new ShortcodePreview();
@@ -193,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing contact  [shortcode.id={ShortcodePreview?.Id}, " +
+                CommonConfig.Logger.Error($"Error while adding/editing shortcode  [shortcode.id={ShortcodePreview?.Id}, " +
                                      $" mode={CreationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);

@@ -179,6 +179,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.Visibility = ViewStates.Gone;
         }
 
+        //TODO need to remember about db updates
+
         protected void PrepareViewsForPerson()
         {
             personNameView = new PersonNameView(Context);

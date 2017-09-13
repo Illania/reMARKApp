@@ -67,6 +67,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                     AddressesLayout.AddView(av);
                 }
             }
+            else
+            {
+                Visibility = ViewStates.Gone;
+            }
         }
 
         class AddressView : LinearLayoutCompat
