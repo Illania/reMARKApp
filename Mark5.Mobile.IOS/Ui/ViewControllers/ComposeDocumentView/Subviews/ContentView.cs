@@ -332,7 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public async Task InsertLocalTemplate(string localTemplate)
         {
-            await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n\n\n" + localTemplate);
+            await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n" + localTemplate);
         }
 
         #endregion
