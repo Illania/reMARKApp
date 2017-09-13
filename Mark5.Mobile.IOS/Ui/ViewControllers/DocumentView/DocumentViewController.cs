@@ -10,6 +10,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -19,7 +20,6 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
-using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -325,14 +325,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
                 Enabled = false
             };
-
             commentsButton = new UIButton(UIButtonType.System)
             {
                 Frame = new CGRect(0f, 0f, 25f, 25f),
                 Enabled = false
             };
             commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-
             comments = new BadgeBarButtonItem(commentsButton)
             {
                 BadgeBackgroundColor = Theme.Brown,
@@ -419,8 +417,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             flag.Clicked += Flag_Clicked;
             fileTo.Clicked += FileTo_Clicked;
             replyActions.Clicked += ReplyActions_Clicked;
-            userActions.Clicked += UserActions_Clicked;
             commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+            userActions.Clicked += UserActions_Clicked;
 
             if (Modal)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
@@ -443,8 +441,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             flag.Clicked -= Flag_Clicked;
             fileTo.Clicked -= FileTo_Clicked;
             replyActions.Clicked -= ReplyActions_Clicked;
-            userActions.Clicked -= UserActions_Clicked;
             commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
+            userActions.Clicked -= UserActions_Clicked;
 
             if (Modal)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;

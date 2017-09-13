@@ -285,6 +285,7 @@
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowContentTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\ChildrenContactAddedMessage.cs" />
 		<Compile Include="Config.cs" />
+		<Compile Include="Model\HubMessages\ContactPreviewCommentsCountChangedMessage.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

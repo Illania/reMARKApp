@@ -47,6 +47,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIToolbar toolbar;
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
+        UIButton commentsButton;
+        BadgeBarButtonItem commentsBadgeButton;
         UIBarButtonItem actionsLinksButton;
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem editButtonItem;
@@ -290,6 +292,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
             fileToButton.Enabled = false;
 
+            commentsButton = new UIButton(UIButtonType.System)
+            {
+                Frame = new CGRect(0f, 0f, 25f, 25f),
+                Enabled = false
+            };
+            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
+            {
+                BadgeBackgroundColor = Theme.Brown,
+                Enabled = false
+            };
+
             actionsLinksButton = new UIBarButtonItem();
             actionsLinksButton.Image = UIImage.FromBundle(Path.Combine("icons", "actions.png"));
             actionsLinksButton.Enabled = false;
@@ -301,6 +315,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 assignCategoryButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                commentsBadgeButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 actionsLinksButton
             };
@@ -359,6 +375,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (fileToButton != null)
                 fileToButton.Clicked += FileToButton_Clicked;
 
+            if (commentsButton != null)
+                commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked += ActionsLinksButton_Clicked;
 
@@ -389,6 +408,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (fileToButton != null)
                 fileToButton.Clicked -= FileToButton_Clicked;
 
+            if (commentsButton != null)
+                commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
+            
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
 
@@ -647,6 +669,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
+        void CommentsButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var vc = new CommentsListViewController
+            {
+                Entity = contact
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         async void ActionsLinksButton_Clicked(object sender, EventArgs e)
         {
             var actionLinksListString = new string[]
@@ -860,6 +891,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
 
+                if (commentsBadgeButton != null)
+                {
+                    commentsBadgeButton.BadgeValue = contact?.Comments?.Count.ToString();
+                    commentsBadgeButton.Enabled = contact != null;
+                }
+
+                if (commentsButton != null)
+                    commentsButton.Enabled = contact != null;
+
                 if (actionsLinksButton != null)
                     actionsLinksButton.Enabled = true;
 
@@ -916,6 +956,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (fileToButton != null)
                 fileToButton.Enabled = false;
+
+            if (commentsBadgeButton != null)
+            {
+                commentsBadgeButton.SetBadgeValue("0", false);
+                commentsBadgeButton.Enabled = false;
+            }
+
+            if (commentsButton != null)
+                commentsButton.Enabled = false;
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Enabled = false;
