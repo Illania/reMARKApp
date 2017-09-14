@@ -238,8 +238,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Address = pa.Address,
                     };
 
-                //TODO should we put anything else in the documentAddress?
-
             }
             else if (choiceIndex == 1)
             {
