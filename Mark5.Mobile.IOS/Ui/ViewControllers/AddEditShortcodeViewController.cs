@@ -302,7 +302,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
-            public AddEditShortcodeViewController ViewController;
+            AddEditShortcodeViewController ViewController
+            {
+                get
+                {
+                    weakParentViewController.TryGetTarget(out AddEditShortcodeViewController controller);
+                    return controller;
+                }
+            }
+
+            WeakReference<AddEditShortcodeViewController> weakParentViewController;
+
             public UITableView TableView;
 
             public event EventHandler ViewIsActivated = delegate { };
@@ -313,7 +323,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public DataSource(AddEditShortcodeViewController viewController, UITableView tableView)
             {
-                ViewController = viewController;
+                weakParentViewController = new WeakReference<AddEditShortcodeViewController>(viewController);
                 TableView = tableView;
                 InitializeSections();
             }
@@ -435,7 +445,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 base.Dispose(disposing);
 
                 TableView = null;
-                ViewController = null;
 
                 sections = null;
             }
@@ -453,7 +462,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             async Task<DocumentAddress> HeaderCellClicked(UITableViewCell cell)
             {
-                return await ViewController.ChooseAddress(cell);
+                return ViewController == null ? null : await ViewController.ChooseAddress(cell);
             }
 
             public int IndexForSection(AbstractSection section)
