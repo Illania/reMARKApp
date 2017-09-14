@@ -205,14 +205,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (ParentFolder.Module == ModuleType.Contacts && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
                 CreateContactItem = new UIBarButtonItem();
-                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"));
+                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"));
                 NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
             }
 
             if (ParentFolder.Module == ModuleType.Shortcodes && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
             {
                 CreateShortcodeItem = new UIBarButtonItem();
-                CreateShortcodeItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"));
+                CreateShortcodeItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"));
                 NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
             }
 

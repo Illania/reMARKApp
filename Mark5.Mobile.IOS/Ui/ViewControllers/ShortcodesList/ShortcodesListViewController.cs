@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
             {
                 CreateShortcodeItem = new UIBarButtonItem();
-                CreateShortcodeItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png")); //TODO need to have a more general name
+                CreateShortcodeItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"));
                 NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
                 RightButton = CreateShortcodeItem;
             }

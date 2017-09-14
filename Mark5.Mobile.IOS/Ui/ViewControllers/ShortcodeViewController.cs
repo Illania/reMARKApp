@@ -482,11 +482,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 this.shortcode = shortcode;
 
                 var description = shortcodePreview?.Description;
-                var toAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-
-                //TODO there could be also non-email addresses (like fax). Should we show them? If so we need to remove the add to new email icon
+                var toAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Email).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc && da.Type == CommunicationAddressType.Email).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
 
                 if (token.IsCancellationRequested)
                     return;
