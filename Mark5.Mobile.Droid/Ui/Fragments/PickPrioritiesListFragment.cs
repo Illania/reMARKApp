@@ -19,16 +19,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Task<List<Priority>> Task => tcs.Task;
 
-        public const string SelectedPrioritiesBundleKey = "SeletedPriorities_040c0b28-9f4e-4d89-b376-e81b94a8f26c";
+        readonly TaskCompletionSource<List<Priority>> tcs = new TaskCompletionSource<List<Priority>>();
+
+        const string SelectedPrioritiesBundleKey = "SeletedPriorities_040c0b28-9f4e-4d89-b376-e81b94a8f26c";
 
         RecyclerView recyclerView;
         PrioritiesListViewAdapter adapter;
 
         List<Priority> selectedPriorities;
 
-        TaskCompletionSource<List<Priority>> tcs = new TaskCompletionSource<List<Priority>>();
-
-        public static (PickPrioritiesListFragment Fragments, string tag) NewInstance(List<Priority> selectedPriorities)
+        public static (PickPrioritiesListFragment fragment, string tag) NewInstance(List<Priority> selectedPriorities)
         {
             var args = new Bundle();
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +20,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
+        readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
+        
+        readonly Handler searchHandler = new Handler();
+
+        const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
 
         List<IBusinessEntity> businessEntities;
 
@@ -32,10 +36,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CopyToUserWorktrayAdapter adapter;
         CopyToUserWorktrayAdapter searchAdapter;
         AppCompatButton copyButton;
-
-        readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
-
-        readonly Handler searchHandler = new Handler();
 
         public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<IBusinessEntity> be)
         {
@@ -91,7 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await Managers.CommonActionsManager.CopyToUserWorktray(businessEntities, selectedSystemUsers.Values.ToList());
 
-                    Activity.OnBackPressed();
+                    Activity?.OnBackPressed();
                 }
                 catch (Exception ex)
                 {

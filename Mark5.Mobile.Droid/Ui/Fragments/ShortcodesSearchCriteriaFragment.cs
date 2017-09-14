@@ -213,7 +213,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             GetCriteria();
 
-            StartActivity(SearchResultsActivity.CreateIntent(Activity, ModuleType.Shortcodes, shortcodeCriteria: GetCriteria()));
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Shortcodes, shortcodeCriteria: GetCriteria()));
         }
 
         SearchShortcodesCriteria GetCriteria()

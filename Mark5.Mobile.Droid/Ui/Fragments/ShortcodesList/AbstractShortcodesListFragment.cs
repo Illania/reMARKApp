@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-        public const string FolderBundleKey = "BundleKey_002d532f-2acf-4ee2-9bb1-e9601e5bf83e";
+        const string FolderBundleKey = "BundleKey_002d532f-2acf-4ee2-9bb1-e9601e5bf83e";
 
         protected ActionMode ActionMode;
 
@@ -178,7 +178,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                StartActivity(SearchActivity.CreateIntent(Activity, ModuleType.Shortcodes));
+                StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Shortcodes));
                 return true;
             }
 
@@ -258,7 +258,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
                 if (result == 0)
                 {
-                    StartActivityForResult(DownloadActivity.CreateIntent(Activity, Folder), RequestCodes.SaveOfflineRequest);
+                    StartActivityForResult(DownloadActivity.CreateIntent(Context, Folder), RequestCodes.SaveOfflineRequest);
                     refreshLayout.Refreshing = false;
                     refreshing = false;
 
@@ -302,7 +302,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowErrorDialog(Activity, ex);
 
                     if (adapter.ItemCount < 1)
-                        Activity.OnBackPressed();
+                        Activity?.OnBackPressed();
                 },
                 startRowId,
                 cts.Token);
@@ -414,7 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 

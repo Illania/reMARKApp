@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsSearchResultsFragment : RetainableStateFragment
     {
-        public const string CriteriaBundleKey = "Criteria_cc2b48a4-affd-48a8-bb0c-4a6cec17975a";
+        const string CriteriaBundleKey = "Criteria_cc2b48a4-affd-48a8-bb0c-4a6cec17975a";
 
         SearchContactsCriteria criteria;
 
@@ -147,7 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (contactPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_contacts);
-                    Activity.OnBackPressed();
+                    Activity?.OnBackPressed();
                     return;
                 }
 
@@ -162,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
             finally
             {

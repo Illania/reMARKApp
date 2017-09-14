@@ -103,9 +103,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var (f, tag) = PickDateRangeFragment.NewInstance(fromTimestamp, toTimestamp, startWithTo);
             parentFragment.ReplaceFragment(f, tag);
 
-            //Get fromTimestamp and toTimestamp from PickDateRangeFragment in array.
-            long[] fragmentResult = await f.Task;
-            UpdateTimestamps(fragmentResult[0], fragmentResult[1]);
+            var (fromTimeStamp,toTimeStamp) = await f.Task;
+            UpdateTimestamps(fromTimestamp,toTimestamp);
         }
 
         void UpdateTimestamps(long fromTimestamp, long toTimestamp)

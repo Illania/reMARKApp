@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectActionsFragment : RetainableStateFragment
     {
-        public const string BusinessEntityBundleKey = "BusinessEntity_4330331f-58a2-458e-839a-48ace9b11c38";
+        const string BusinessEntityBundleKey = "BusinessEntity_4330331f-58a2-458e-839a-48ace9b11c38";
 
         IBusinessEntity businessEntity;
 

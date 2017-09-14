@@ -19,14 +19,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         public Task<List<Guid>> Task => tcs.Task;
 
-        public const string SelectedLinesGuidBundleKey = "SelectedLinesGuid_4e3da19f-f5e8-4aa8-ac6e-6ff12711b2b9";
+        readonly TaskCompletionSource<List<Guid>> tcs = new TaskCompletionSource<List<Guid>>();
+
+        const string SelectedLinesGuidBundleKey = "SelectedLinesGuid_4e3da19f-f5e8-4aa8-ac6e-6ff12711b2b9";
 
         RecyclerView recyclerView;
         LinesListViewAdapter adapter;
 
         List<Guid> selectedLinesGuid;
-
-        TaskCompletionSource<List<Guid>> tcs = new TaskCompletionSource<List<Guid>>();
 
         public static (PickLinesListFragment fragment, string tag) NewInstance(List<Guid> selectedLinesGuid)
         {

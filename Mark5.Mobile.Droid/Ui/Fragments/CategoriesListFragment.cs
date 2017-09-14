@@ -21,11 +21,11 @@ namespace Mark5.Mobile.Droid
 {
     public class CategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_8938f3ae-6cb4-48c1-9c19-34cf533bcaed";
-
         public List<Category> Categories => adapter.Items;
 
         readonly Handler searchHandler = new Handler();
+
+        const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_8938f3ae-6cb4-48c1-9c19-34cf533bcaed";
 
         BusinessEntityPreview businessEntityPreview;
 

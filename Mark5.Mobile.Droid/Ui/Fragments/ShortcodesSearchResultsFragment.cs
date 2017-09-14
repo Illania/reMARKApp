@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.OS;
@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesSearchResultsFragment : RetainableStateFragment
     {
-        public const string SearchShortcodesCriteriaBundleKey = "SearchShortcodesCriteria_ffe59102-9ddc-49d4-9172-bb119548ea77";
+        const string SearchShortcodesCriteriaBundleKey = "SearchShortcodesCriteria_ffe59102-9ddc-49d4-9172-bb119548ea77";
 
         SearchShortcodesCriteria criteria;
 
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         ShortcodeSearchResultsAdapter adapter;
 
-        public static (ShortcodesSearchResultsFragment Fragments, string tag) NewInstance(SearchShortcodesCriteria criteria)
+        public static (ShortcodesSearchResultsFragment fragment, string tag) NewInstance(SearchShortcodesCriteria criteria)
         {
             var args = new Bundle();
 
@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (shortcodePreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_shortcodes);
-                    Activity.OnBackPressed();
+                    Activity?.OnBackPressed();
                     return;
                 }
 
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
             finally
             {
@@ -173,7 +173,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
-            StartActivity(ShortcodeActivity.CreateIntent(Activity, shortcodePreview: shortcodePreview));
+            StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodePreview: shortcodePreview));
         }
 
         #endregion

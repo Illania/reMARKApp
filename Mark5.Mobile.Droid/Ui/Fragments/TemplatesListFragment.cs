@@ -22,15 +22,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class TemplatesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        readonly Handler searchHandler = new Handler();
+
         RecyclerView recyclerView;
         SearchView searchView;
 
         TemplatesListAdapter adapter;
         TemplatesListAdapter searchAdapter;
 
-        readonly Handler searchHandler = new Handler();
-
-        public static (TemplatesListFragment Fragments, string tag) NewInstance()
+        public static (TemplatesListFragment fragment, string tag) NewInstance()
         {
             var fragment = new TemplatesListFragment();
             var tag = $"{nameof(TemplatesListFragment)}";

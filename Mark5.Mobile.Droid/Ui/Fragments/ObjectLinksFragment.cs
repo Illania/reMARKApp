@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectLinksFragment : RetainableStateFragment
     {
-        public const string BusinessEntityBundleKey = "BusinessEntity_0dd3cb9b-f178-4b02-b7d3-e1bb3428c913";
+        const string BusinessEntityBundleKey = "BusinessEntity_0dd3cb9b-f178-4b02-b7d3-e1bb3428c913";
 
         IBusinessEntity businessEntity;
 
@@ -171,7 +171,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (ol.FromObjectType == ObjectType.Document)
                 {
-                    StartActivity(DocumentActivity.CreateIntent(Activity, documentId: ol.FromObjectId));
+                    StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.FromObjectId));
                 }
                 else if (ol.FromObjectType == ObjectType.Contact)
                 {
@@ -179,14 +179,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else if (ol.FromObjectType == ObjectType.Shortcode)
                 {
-                    StartActivity(ShortcodeActivity.CreateIntent(Activity, shortcodeId: ol.FromObjectId));
+                    StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.FromObjectId));
                 }
             }
             else
             {
                 if (ol.ToObjectType == ObjectType.Document)
                 {
-                    StartActivity(DocumentActivity.CreateIntent(Activity, documentId: ol.ToObjectId));
+                    StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.ToObjectId));
                 }
                 else if (ol.ToObjectType == ObjectType.Contact)
                 {
@@ -194,7 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else if (ol.ToObjectType == ObjectType.Shortcode)
                 {
-                    StartActivity(ShortcodeActivity.CreateIntent(Activity, shortcodeId: ol.ToObjectId));
+                    StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.ToObjectId));
                 }
             }
         }

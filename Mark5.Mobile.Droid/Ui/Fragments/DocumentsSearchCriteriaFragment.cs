@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Animation;
@@ -266,7 +266,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             GetCriteria();
 
-            StartActivity(SearchResultsActivity.CreateIntent(Activity, ModuleType.Documents, documentCriteria: GetCriteria()));
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Documents, documentCriteria: GetCriteria()));
         }
 
         SearchDocumentsCriteria GetCriteria()

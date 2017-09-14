@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DownloadFragment : RetainableStateFragment
     {
-        public const string FolderBundleKey = "Folder_3a0c4202-ba8e-457d-9db7-025692ad0b35";
+        const string FolderBundleKey = "Folder_3a0c4202-ba8e-457d-9db7-025692ad0b35";
 
         Folder folder;
 

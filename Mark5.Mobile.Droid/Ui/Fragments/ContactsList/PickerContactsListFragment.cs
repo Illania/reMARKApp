@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerContactsListFragment : AbstractContactsListFragment
     {
-        public const string FolderBundleKey = "Folder_a8708ff4-dadc-45d3-8dfc-8078ddd6035c";
+        const string FolderBundleKey = "Folder_a8708ff4-dadc-45d3-8dfc-8078ddd6035c";
 
         public static (PickerContactsListFragment fragment, string tag) NewInstance(Folder folder)
         {

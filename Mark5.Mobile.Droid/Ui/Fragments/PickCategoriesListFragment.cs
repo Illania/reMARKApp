@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,10 +25,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter)recyclerView.GetAdapter();
 
-        public const string ObjectTypeBundleKey = "ObjectType_cae47797-624e-48a2-a472-1758023b0e40";
-        public const string PreselectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
-
         readonly TaskCompletionSource<List<Category>> tcs = new TaskCompletionSource<List<Category>>();
+
+        readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
+
+        const string ObjectTypeBundleKey = "ObjectType_cae47797-624e-48a2-a472-1758023b0e40";
+        const string PreselectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
 
         ObjectType objectType;
         int[] preselectedCategoryIds;
@@ -36,8 +38,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         CategoriesListAdapter adapter;
-
-        readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
 
         public static (PickCategoriesListFragment fragment, string tag) NewInstance(ObjectType objectType, int[] preselectedCategoryIds)
         {

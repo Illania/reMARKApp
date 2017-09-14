@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentsSearchResultsFragment : RetainableStateFragment
     {
-        public const string SearchDocumentsCriteriaBundleKey = "SearchDocumentsCriteria_273f369b-8818-4944-9dfc-5193a7bd542a";
+        const string SearchDocumentsCriteriaBundleKey = "SearchDocumentsCriteria_273f369b-8818-4944-9dfc-5193a7bd542a";
 
         SearchDocumentsCriteria criteria;
 
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (documentPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_documents);
-                    Activity.OnBackPressed();
+                    Activity?.OnBackPressed();
                     return;
                 }
 
@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
             finally
             {
@@ -204,7 +204,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
-            StartActivity(DocumentActivity.CreateIntent(Activity, Serializer.Serialize(documentPreview)));
+            StartActivity(DocumentActivity.CreateIntent(Context, Serializer.Serialize(documentPreview)));
         }
 
         #endregion

@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class NotificationsListFragment : RetainableStateFragment
     {
-        public const string ObjectTypesBundleKey = "ObjectTypes_0df8f79a-884b-4d2b-93ce-8141f1111cc5";
+        const string ObjectTypesBundleKey = "ObjectTypes_0df8f79a-884b-4d2b-93ce-8141f1111cc5";
 
         ObjectType[] objectTypes;
 
@@ -226,15 +226,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (notification.ObjectType == ObjectType.Document)
             {
-                StartActivity(DocumentActivity.CreateIntent(Activity, folderId: notification.FolderId, documentId: notification.ObjectId));
+                StartActivity(DocumentActivity.CreateIntent(Context, folderId: notification.FolderId, documentId: notification.ObjectId));
             }
             if (notification.ObjectType == ObjectType.Contact)
             {
-                StartActivity(ContactActivity.CreateIntent(Activity, notification.FolderId, contactId: notification.ObjectId));
+                StartActivity(ContactActivity.CreateIntent(Context, notification.FolderId, contactId: notification.ObjectId));
             }
             if (notification.ObjectType == ObjectType.Shortcode)
             {
-                StartActivity(ShortcodeActivity.CreateIntent(Activity, notification.FolderId, shortcodeId: notification.ObjectId));
+                StartActivity(ShortcodeActivity.CreateIntent(Context, notification.FolderId, shortcodeId: notification.ObjectId));
             }
         }
 

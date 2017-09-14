@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ActionMode == null)
             {
-                StartActivity(ShortcodeActivity.CreateIntent(Activity, folder: Folder, shortcodePreview: shortcodePreview));
+                StartActivity(ShortcodeActivity.CreateIntent(Context, folder: Folder, shortcodePreview: shortcodePreview));
             }
             else
             {

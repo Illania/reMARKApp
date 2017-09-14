@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                StartActivity(SearchActivity.CreateIntent(Activity, ModuleType.Contacts));
+                StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Contacts));
                 return true;
             }
 
@@ -252,7 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
                 if (result == 0)
                 {
-                    StartActivityForResult(DownloadActivity.CreateIntent(Activity, Folder), RequestCodes.SaveOfflineRequest);
+                    StartActivityForResult(DownloadActivity.CreateIntent(Context, Folder), RequestCodes.SaveOfflineRequest);
                     refreshLayout.Refreshing = false;
                     refreshing = false;
 
@@ -296,7 +296,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowErrorDialog(Activity, ex);
 
                     if (adapter.ItemCount < 1)
-                        Activity.OnBackPressed();
+                        Activity?.OnBackPressed();
                 },
                 startRowId,
                 cts.Token,
@@ -359,21 +359,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 ActionMode?.Finish();
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(),Folder));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(),Folder));
                 ActionMode?.Finish();
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                StartActivity(CategoriesListActivity.CreateIntent(Activity,CurrentAdapter.SelectedItems.First()));
+                StartActivity(CategoriesListActivity.CreateIntent(Context,CurrentAdapter.SelectedItems.First()));
                 ActionMode?.Finish();
                 return true;
             }
@@ -431,7 +431,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 

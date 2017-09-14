@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,13 +30,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : RetainableStateFragment
     {
-        public const string RestoreWorkingCopyBundleKey = "RestoreWorkingCopy_a6c252fc-09b9-44a9-941f-ea3785c0864d";
-        public const string DocumentCreationModeFlagBundleKey = "DocumentCreationModeFlag_b181c281-54bd-4c21-a476-a69ea0f83872";
-        public const string CopyToNewOptionBundleKey = "CopyToNewOption_e3d9e971-7873-497c-9239-838e14286d2e";
-        public const string PreviousDocumentDirectionBundleKey = "PreviousDocumentDirection_4a80d080-aaf2-497a-a1b2-b18d62e3d817";
-        public const string PreviousDocumentFolderIdBundleKey = "PreviousDocumentFolderId_def12a0b-0156-4189-9c67-e41ed7c944a5";
-        public const string PreviousDocumentIdBundleKey = "PreviousDocumentId_b8e521b8-8a8a-42ce-9d67-99b61abdafd2";
-        public const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
+        readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>(10);
+        
+        const string RestoreWorkingCopyBundleKey = "RestoreWorkingCopy_a6c252fc-09b9-44a9-941f-ea3785c0864d";
+        const string DocumentCreationModeFlagBundleKey = "DocumentCreationModeFlag_b181c281-54bd-4c21-a476-a69ea0f83872";
+        const string CopyToNewOptionBundleKey = "CopyToNewOption_e3d9e971-7873-497c-9239-838e14286d2e";
+        const string PreviousDocumentDirectionBundleKey = "PreviousDocumentDirection_4a80d080-aaf2-497a-a1b2-b18d62e3d817";
+        const string PreviousDocumentFolderIdBundleKey = "PreviousDocumentFolderId_def12a0b-0156-4189-9c67-e41ed7c944a5";
+        const string PreviousDocumentIdBundleKey = "PreviousDocumentId_b8e521b8-8a8a-42ce-9d67-99b61abdafd2";
+        const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
@@ -72,8 +74,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SubjectView subjectView;
         AttachmentsView attachmentsView;
         ContentView contentView;
-
-        readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>(10);
 
         RecipientsView focusedRecipientView;
 
@@ -329,7 +329,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
         }
 
@@ -375,22 +375,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DoOpenRecentAddresses()
         {
-            StartActivityForResult(RecentAddressesListActivity.CreateIntent(Activity), RequestCodes.RecentAddressesRequestCode);
+            StartActivityForResult(RecentAddressesListActivity.CreateIntent(Context), RequestCodes.RecentAddressesRequestCode);
         }
 
         void DoOpenContacts()
         {
-            StartActivityForResult(PickerContactFolderListActivity.CreateIntent(Activity), RequestCodes.ContactsRequestCode);
+            StartActivityForResult(PickerContactFolderListActivity.CreateIntent(Context), RequestCodes.ContactsRequestCode);
         }
 
         void DoOpenShortcodes()
         {
-            StartActivityForResult(PickerShortcodesFolderListActivity.CreateIntent(Activity), RequestCodes.ShortcodesRequestCode);
+            StartActivityForResult(PickerShortcodesFolderListActivity.CreateIntent(Context), RequestCodes.ShortcodesRequestCode);
         }
 
         void DoOpenPhonebook()
         {
-            StartActivityForResult(PhonebookContactsListActivity.CreateIntent(Activity), RequestCodes.PhonebookRequestCode);
+            StartActivityForResult(PhonebookContactsListActivity.CreateIntent(Context), RequestCodes.PhonebookRequestCode);
         }
 
         void Subview_Edited(object sender, EventArgs e)
@@ -559,7 +559,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             });
 
-            Activity.OnBackPressed();
+            Activity?.OnBackPressed();
         }
 
         void SendDocument(bool saveDraft = false)

@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
 
         #region Activity lifecycle
-        protected override async void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -98,10 +98,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
 
-                var t = Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-                var ss = await t;
-
-                navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";       
+                Task.Run(async () =>
+                {
+			        return await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                })
+			    .ContinueWith(t =>
+			        {
+			            var ss = t.Result;
+			            navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+			        },TaskScheduler.FromCurrentSynchronizationContext());
+                    
 
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }

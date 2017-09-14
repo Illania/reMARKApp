@@ -26,7 +26,11 @@ namespace Mark5.Mobile.Droid
     {
         CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
 
-        public const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_730da2d5-20b7-487f-b118-0053ced930af";
+        readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
+        
+        readonly Handler searchHandler = new Handler();
+        
+        const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_730da2d5-20b7-487f-b118-0053ced930af";
 
         BusinessEntityPreview businessEntityPreview;
         
@@ -36,10 +40,6 @@ namespace Mark5.Mobile.Droid
         CategoriesListAdapter adapter;
         CategoriesListAdapter searchAdapter;
         AppCompatButton saveButton;
-
-        readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
-
-        readonly Handler searchHandler = new Handler();
 
         public static (EditCategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntityPreview)
         {
@@ -152,7 +152,7 @@ namespace Mark5.Mobile.Droid
                 }
 
                 dismissAction();
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {

@@ -15,13 +15,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FoldersNotificationsListFragment : RetainableStateFragment
     {
-        public const string RemoteFolderBundleKey = "RemoteFolder_403cbd64-83e9-4e13-8809-0868debb55b9";
-
         static readonly int[] tabTitles =
         {
             Resource.String.folders,
             Resource.String.notifications
         };
+       
+        const string RemoteFolderBundleKey = "RemoteFolder_403cbd64-83e9-4e13-8809-0868debb55b9";
 
         Folder remoteFolder;
 

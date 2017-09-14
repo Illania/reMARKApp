@@ -19,11 +19,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CommentsListFragment : RetainableStateFragment
     {
-        public const string BusinessEntityBundleKey = "BusinessEntity_d475f087-b641-494d-b56b-152e945b0823";
+        public List<Comment> Comments => adapter.Items;
+
+        const string BusinessEntityBundleKey = "BusinessEntity_d475f087-b641-494d-b56b-152e945b0823";
 
         const int SecondsToEdit = 60;
-
-        public List<Comment> Comments => adapter.Items;
 
         BusinessEntity entity;
 
@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         AppCompatEditText addCommentEditText;
         AppCompatImageButton addCommentButton;
 
-        public static (CommentsListFragment Fragments, string tag) NewInstance(BusinessEntity be)
+        public static (CommentsListFragment fragment, string tag) NewInstance(BusinessEntity be)
         {
             var args = new Bundle();
 

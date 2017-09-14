@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,13 +28,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentFragment : RetainableStateFragment
     {
-        public const string FolderIdBundleKey = "FolderId_7215e56b-5ec3-436d-b4e3-900449cb1ad0";
-        public const string FolderBundleKey = "Folder_592db8d9-d212-4476-ac83-fd4bb11cc8d9";
-        public const string DocumentPreviewBundleKey = "DocumentPreview_83a5daa4-7ede-453b-9b19-07362f644ad1";
-        public const string DocumentIdBundleKey = "DocumentId_e9409d8a-9212-4483-b819-ff5ac3487c87";
-        public const string CloseRequestBundleKey = "CloseRequest_d45a15b4-dadb-40ae-aab1-c565e9446bd0";
-        public const string NotificationGuidBundleKey = "NotificationGuid_fb411b05-9d4b-46db-aa81-7348bf069a38";
-        public const string FailedDocumentToUploadGuidBundleKey = "FailedDocumentToUploadGuid_7bf6c332-083d-4f2b-950e-d3bdc3992e2b";
+        const string FolderIdBundleKey = "FolderId_7215e56b-5ec3-436d-b4e3-900449cb1ad0";
+        const string FolderBundleKey = "Folder_592db8d9-d212-4476-ac83-fd4bb11cc8d9";
+        const string DocumentPreviewBundleKey = "DocumentPreview_83a5daa4-7ede-453b-9b19-07362f644ad1";
+        const string DocumentIdBundleKey = "DocumentId_e9409d8a-9212-4483-b819-ff5ac3487c87";
+        const string CloseRequestBundleKey = "CloseRequest_d45a15b4-dadb-40ae-aab1-c565e9446bd0";
+        const string NotificationGuidBundleKey = "NotificationGuid_fb411b05-9d4b-46db-aa81-7348bf069a38";
+        const string FailedDocumentToUploadGuidBundleKey = "FailedDocumentToUploadGuid_7bf6c332-083d-4f2b-950e-d3bdc3992e2b";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
@@ -372,7 +372,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, 
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, 
                                                                         (int)CopyMoveToFolderListActivity.ModeType.Copy, 
                                                                         ModuleType.Documents,
                                                                         new List<IBusinessEntity>
@@ -384,7 +384,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity,
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context,
                                                                         (int)CopyMoveToFolderListActivity.ModeType.Move,
                                                                         ModuleType.Documents,
                                                                         new List<IBusinessEntity>
@@ -415,13 +415,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Actions)
             {
-                StartActivity(ObjectActionsActivity.CreateIntent(Activity, DocumentPreview as IBusinessEntity));
+                StartActivity(ObjectActionsActivity.CreateIntent(Context, DocumentPreview as IBusinessEntity));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Links)
             {
-                StartActivity(ObjectLinksActivity.CreateIntent(Activity, DocumentPreview as IBusinessEntity));
+                StartActivity(ObjectLinksActivity.CreateIntent(Context, DocumentPreview as IBusinessEntity));
                 return true;
             }
 
@@ -687,7 +687,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,new List<IBusinessEntity> { DocumentPreview }));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,new List<IBusinessEntity> { DocumentPreview }));
             }
         }
 
@@ -793,7 +793,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -960,7 +960,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
         }
 

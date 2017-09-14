@@ -23,11 +23,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodeFragment : RetainableStateFragment
     {
-        public const string FolderIdBundleKey = "FolderId_20cd4171-75b6-4c2a-b82e-73b4491da5da";
-        public const string FolderBundleKey = "Folder_3c6faf65-a2e2-498f-8188-c731b373adb3";
-        public const string ShortcodeIdBundleKey = "ShortcodeId_07a8c9bf-3430-46fa-9f28-c66d68a11df7";
-        public const string ShortcodePreviewBundleKey = "ShortcodePreview_0e12da2b-686c-48c9-8292-b033fb0ab556";
-        public const string NotificationGuidBundleKey = "NotificationBundle_d137bb3f-17a4-4a2c-9076-cf0704236d14";
+        const string FolderIdBundleKey = "FolderId_20cd4171-75b6-4c2a-b82e-73b4491da5da";
+        const string FolderBundleKey = "Folder_3c6faf65-a2e2-498f-8188-c731b373adb3";
+        const string ShortcodeIdBundleKey = "ShortcodeId_07a8c9bf-3430-46fa-9f28-c66d68a11df7";
+        const string ShortcodePreviewBundleKey = "ShortcodePreview_0e12da2b-686c-48c9-8292-b033fb0ab556";
+        const string NotificationGuidBundleKey = "NotificationBundle_d137bb3f-17a4-4a2c-9076-cf0704236d14";
 
         int? folderId;
         Folder folder;
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
-        public static (ShortcodeFragment Fragments, string tag) NewInstance(int? folderId, Folder folder, int? shortcodeId, ShortcodePreview shortcodePreview, Guid? notificationGuid)
+        public static (ShortcodeFragment fragment, string tag) NewInstance(int? folderId, Folder folder, int? shortcodeId, ShortcodePreview shortcodePreview, Guid? notificationGuid)
         {
             var args = new Bundle();
 
@@ -62,7 +62,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragment = new ShortcodeFragment();
             fragment.Arguments = args;
 
-            //old tag = $"{nameof(ShortcodeFragment)} [ShortcodeId={shortcodePreview?.Id ?? shortcode?.Id ?? shortcodeId}]";
             var tag = $"{nameof(ShortcodeFragment)} [ShortcodeId={shortcodePreview?.Id ?? shortcodeId}]";
 
             return (fragment, tag);
@@ -183,27 +182,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes,
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes,
                                                                         new List<IBusinessEntity>{  shortcodePreview  }));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes,
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes,
 				                                                        new List<IBusinessEntity>{  shortcodePreview  }, folder));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Actions)
             {
-                StartActivity(ObjectActionsActivity.CreateIntent(Activity, shortcodePreview as IBusinessEntity));
+                StartActivity(ObjectActionsActivity.CreateIntent(Context, shortcodePreview as IBusinessEntity));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Links)
             {
-                StartActivity(ObjectLinksActivity.CreateIntent(Activity, shortcodePreview as IBusinessEntity));
+                StartActivity(ObjectLinksActivity.CreateIntent(Context, shortcodePreview as IBusinessEntity));
                 return true;
             }
 
@@ -253,7 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,new List<IBusinessEntity> { shortcodePreview }));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,new List<IBusinessEntity> { shortcodePreview }));
             }
         }
 
@@ -320,7 +319,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }));
 
                 dismissAction();
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -414,7 +413,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
         }
 

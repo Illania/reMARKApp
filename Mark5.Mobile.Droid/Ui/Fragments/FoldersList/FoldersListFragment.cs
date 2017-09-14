@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,8 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         protected virtual bool LoadRemoteFromCache { get; }
 
-        public const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
-        public const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
+        protected const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
+        protected const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
 
         protected Folder RemoteFolder;
         protected bool HideSearch;
@@ -215,7 +215,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                StartActivity(SearchActivity.CreateIntent(Activity, RemoteFolder.Module));
+                StartActivity(SearchActivity.CreateIntent(Context, RemoteFolder.Module));
                 return true;
             }
 
@@ -394,15 +394,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (folder.Module == ModuleType.Documents)
                 {
-                    StartActivity(DocumentsListActivity.CreateIntent(Activity, folder.ShallowCopy()));
+                    StartActivity(DocumentsListActivity.CreateIntent(Context, folder.ShallowCopy()));
                 }
                 if (folder.Module == ModuleType.Contacts)
                 {
-                    StartActivity(ContactsListActivity.CreateIntent(Activity, folder.ShallowCopy()));
+                    StartActivity(ContactsListActivity.CreateIntent(Context, folder.ShallowCopy()));
                 }
                 if (folder.Module == ModuleType.Shortcodes)
                 {
-                    StartActivity(ShortcodesListActivity.CreateIntent(Activity, folder.ShallowCopy()));
+                    StartActivity(ShortcodesListActivity.CreateIntent(Context, folder.ShallowCopy()));
                 }
             }
             else
@@ -686,7 +686,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (selectedFolder == null)
                 return;
 
-            StartActivity(DownloadActivity.CreateIntent(Activity, selectedFolder.ShallowCopy()));
+            StartActivity(DownloadActivity.CreateIntent(Context, selectedFolder.ShallowCopy()));
         }
 
         #endregion

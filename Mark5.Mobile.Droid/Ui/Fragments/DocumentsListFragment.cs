@@ -38,11 +38,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
 
-        public const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
+        readonly Handler searchHandler = new Handler();
+
+        const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
-
-        readonly Handler searchHandler = new Handler();
 
         bool refreshing;
 
@@ -224,7 +224,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                StartActivity(SearchActivity.CreateIntent(Activity, ModuleType.Documents));
+                StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Documents));
                 return true;
             }
 
@@ -361,7 +361,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                Activity.OnBackPressed();
+                Activity?.OnBackPressed();
             }
             finally
             {
@@ -397,7 +397,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    StartActivity(SwipeDocumentActivity.CreateIntent(Activity, Folder, documentPreview));
+                    StartActivity(SwipeDocumentActivity.CreateIntent(Context, Folder, documentPreview));
                 }
             }
             else
@@ -496,7 +496,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity,(int)CopyMoveToFolderListActivity.ModeType.Copy,ModuleType.Documents,
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context,(int)CopyMoveToFolderListActivity.ModeType.Copy,ModuleType.Documents,
                                                                         CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 actionMode?.Finish();
                 return true;
@@ -504,7 +504,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Activity, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
                                                                         CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), Folder));
                 actionMode?.Finish();
                 return true;
@@ -633,7 +633,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Activity,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 

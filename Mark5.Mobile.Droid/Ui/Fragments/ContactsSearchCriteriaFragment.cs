@@ -233,7 +233,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             GetCriteria();
 
-            StartActivity(SearchResultsActivity.CreateIntent(Activity, ModuleType.Contacts, GetCriteria()));
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Contacts, GetCriteria()));
         }
 
         SearchContactsCriteria GetCriteria()

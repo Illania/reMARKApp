@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid
             return new Intent(context, typeof(PickCategoriesListActivity));
         }
 
-        protected override async void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -53,7 +53,15 @@ namespace Mark5.Mobile.Droid
 
                 CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListActivity)}");
 
-                SetResult(await pclf.Task);
+                Task.Run(async () => 
+                    {
+	                    var categories = await pclf.Task;
+	                    return categories;
+                    })
+                    .ContinueWith(t =>
+	                {
+	                    SetResult(t.Result);
+	                });
             }
             else
             {

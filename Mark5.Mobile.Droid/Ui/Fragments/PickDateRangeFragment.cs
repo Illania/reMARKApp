@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Android.Animation;
 using Android.Graphics;
@@ -18,11 +18,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickDateRangeFragment : RetainableStateFragment
     {
-        public Task<long[]> Task => tcs.Task;
+        public Task<(long,long)> Task => tcs.Task;
 
-        public const string FromTimestampBundleKey = "FromTimestamp_f9118547-848d-48fd-a9a8-b2d721494ef8";
-        public const string ToTimestampBundleKey = "ToTimestamp_680c200a-8617-412f-aec6-8c0c059db839";
-        public const string StartWithToDateBundleKey = "StartWithToDate_3ce7c7d1-0d5d-4821-8b17-cbc0a04889cf";
+        readonly TaskCompletionSource<(long,long)> tcs = new TaskCompletionSource<(long,long)>();
+
+        const string FromTimestampBundleKey = "FromTimestamp_f9118547-848d-48fd-a9a8-b2d721494ef8";
+        const string ToTimestampBundleKey = "ToTimestamp_680c200a-8617-412f-aec6-8c0c059db839";
+        const string StartWithToDateBundleKey = "StartWithToDate_3ce7c7d1-0d5d-4821-8b17-cbc0a04889cf";
 
         DocumentPickDateHeaderView dateHeaderView;
 
@@ -32,8 +34,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         long fromTimestamp;
         long toTimestamp;
         bool startWithToDate;
-
-        readonly TaskCompletionSource<long[]> tcs = new TaskCompletionSource<long[]>();
 
         public static (PickDateRangeFragment fragment, string tag) NewInstance(long? fromTimestamp, long? toTimestamp, bool? startWithToDate)
         {
@@ -232,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            tcs.SetResult(new long[]{fromTimestamp,toTimestamp});
+            tcs.SetResult((fromTimestamp,toTimestamp));
             
             ((AppCompatActivity) Activity).OnBackPressed();
         }

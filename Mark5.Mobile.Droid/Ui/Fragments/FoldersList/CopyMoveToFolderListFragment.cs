@@ -15,9 +15,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CopyMoveToFolderListFragment : FoldersListFragment
     {
-        public const string BusinessEntitiesBundleKey = "BusinessEntities_cac3f9a0-dba6-486f-ab6f-2b691ae9f243";
-        public const string FromFolderBundleKey = "FromFolder_8dc816f4-08b8-428d-9cce-1c481c460df5";
-        public const string ActionTypeBundleKey = "ActionType_ed011f46-e180-462c-9d49-5dc047f3c324";
+        const string BusinessEntitiesBundleKey = "BusinessEntities_cac3f9a0-dba6-486f-ab6f-2b691ae9f243";
+        const string FromFolderBundleKey = "FromFolder_8dc816f4-08b8-428d-9cce-1c481c460df5";
+        const string ActionTypeBundleKey = "ActionType_ed011f46-e180-462c-9d49-5dc047f3c324";
 
         protected override bool LoadRemoteFromCache => true;
 
