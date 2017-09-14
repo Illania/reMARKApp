@@ -64,6 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIProgressView progressIndicator;
         UILabel progressLabel;
         UIButton cancelButton;
+        UILabel downloadedLabel;
         UIButton closeButton;
 
         Stopwatch sw;
@@ -459,10 +460,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 closeButton.CenterYAnchor.ConstraintEqualTo(downView.CenterYAnchor)
             });
 
-            var downloadedLabel = new UILabel
+            downloadedLabel = new UILabel
             {
                 TintColor = Theme.LightGray,
-                Text = Localization.GetString("download_complete"),
                 Lines = 2,
                 Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
                 TextAlignment = UITextAlignment.Center,
@@ -606,6 +606,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 InvokeOnMainThread(() =>
                 {
                     doneItem.Enabled = true;
+
+                    downloadedLabel.Text = fi.DownloadedItemsCount > 0 ? Localization.GetString("download_complete") : Localization.GetString("download_complete_empty");
 
                     UIView.AnimateNotify(.2d, 0d, UIViewAnimationOptions.CurveLinear, () =>
                     {
@@ -810,7 +812,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItems.Count} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
                     CommonConfig.Logger.Warning($"Following items failed to download: {string.Join(", ", failedItems)}. [folder.id={folder.Id}]");
 
-                    await Managers.FoldersManager.AddSavedFolderInfo(folder);
+                    if (totalItemsCount > 0)
+                        await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
                     onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItems.Count));
                 }

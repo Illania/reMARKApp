@@ -120,6 +120,7 @@
 "dont_close_app" = "Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!";
 "download" = "Download";
 "download_complete" = "Download completed!\nYou can now continue working.";
+"download_complete_empty" = "The folder you were trying to download was empty.";
 "download_contacts" = "Download contacts";
 "download_interrupt_warning" = "If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?";
 "download_shortcodes" = "Download shortcodes";
@@ -167,7 +168,7 @@
 "hide_original_message" = "Hide original message";
 "hostname" = "Hostname";
 "im" = "IM";
-"incorrect_email_addresses" = "There are email addresses who do not appear to be correct. Do you want to send anyway?";
+"incorrect_email_addresses" = "There are email addresses that seem to be incorrect. Do you want to send anyway?";
 "internal" = "Internal";
 "internet_access" = "Internet access: ";
 "last_name" = "Last name";

@@ -528,7 +528,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void AskIfShouldSave()
         {
             if (PreviousDocumentDirection == DocumentDirection.Draft)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(false), DeleteAutoSavedDocumentAndClose);
             else
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
         }
@@ -685,12 +685,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool IsFormValid()
         {
             var recipientAdded = false;
-            foreach (var recipientView in new List<RecipientsView>
-            {
-                toView,
-                ccView,
-                bccView
-            })
+            foreach (var recipientView in new RecipientsView[] {toView,ccView,bccView})
                 recipientAdded |= !recipientView.Empty;
 
             if (!recipientAdded)

@@ -377,6 +377,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                         extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
                         tableRowExtraField.AddView(extraFieldValue);
+                        extraFieldsTableRows.Add(tableRowExtraField);
                         extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
                     }
                 }

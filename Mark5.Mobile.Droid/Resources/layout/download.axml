@@ -151,7 +151,7 @@
                 android:textColor="@color/white"
                 style="@style/mark5colorbutton" />
             <android.support.v7.widget.AppCompatTextView
-                android:text="@string/download_finished"
+                android:id="@+id/downloaded"
                 android:textAppearance="@style/fontPrimaryLight"
                 android:gravity="center"
                 android:layout_width="wrap_content"

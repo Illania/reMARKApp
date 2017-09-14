@@ -358,7 +358,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
             attachmentsView.InitializeFileDescriptions(files.Select(f => new FileDescription(f)).ToArray());
 
-            sendButtonItem.Enabled = ValidateForm();
+            sendButtonItem.Enabled = IsFormValid();
 
             if (RestoreWorkingCopy)
                 return;
@@ -366,13 +366,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             await AskIfShouldUseTemplates();
         }
 
-        bool ValidateForm()
+        bool IsFormValid()
         {
             var recipientAdded = false;
             foreach (var recipientView in new RecipientsView[] { toView, ccView, bccView })
                 recipientAdded |= !recipientView.Empty;
 
-            return !recipientAdded || !lineView.LineSelectedIsAmbiguous;
+            return recipientAdded && !lineView.LineSelectedIsAmbiguous;
         }
 
         #region Keyboard Notifications
@@ -664,7 +664,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void Subview_Edited(object sender, EventArgs e)
         {
             Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
-            sendButtonItem.Enabled = ValidateForm();
+            sendButtonItem.Enabled = IsFormValid();
 
             if (sender is LineView
                 && PlatformConfig.Preferences.RemoveLine
@@ -708,7 +708,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return;
             }
 
-            sendButtonItem.Enabled = ValidateForm();
+            sendButtonItem.Enabled = IsFormValid();
         }
 
         void RecipientView_SearchRequested(object sender, string initialSearchString)

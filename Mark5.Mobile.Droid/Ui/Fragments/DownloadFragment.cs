@@ -56,10 +56,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         LinearLayout finishedLayout;
 
         AppCompatButton startButton;
-        AppCompatTextView lastDownloadedOnTextView;
+        AppCompatTextView lastDownloadedOn;
         ProgressBar progressBar;
         AppCompatTextView progressStatus;
         AppCompatButton cancelButton;
+        AppCompatTextView downloaded;
         AppCompatButton closeButton;
 
         Stopwatch sw;
@@ -78,10 +79,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finishedLayout = rootView.FindViewById<LinearLayout>(Resource.Id.finished_layout);
 
             startButton = rootView.FindViewById<AppCompatButton>(Resource.Id.start_button);
-            lastDownloadedOnTextView = rootView.FindViewById<AppCompatTextView>(Resource.Id.last_downloaded_on_text_view);
+            lastDownloadedOn = rootView.FindViewById<AppCompatTextView>(Resource.Id.last_downloaded_on_text_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress_bar);
             progressStatus = rootView.FindViewById<AppCompatTextView>(Resource.Id.progress_status);
             cancelButton = rootView.FindViewById<AppCompatButton>(Resource.Id.cancel_button);
+            downloaded = rootView.FindViewById<AppCompatTextView>(Resource.Id.downloaded);
             closeButton = rootView.FindViewById<AppCompatButton>(Resource.Id.close_button);
 
             startButton.Click += StartButton_Click;
@@ -107,9 +109,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(Folder);
             if (info != null)
-                lastDownloadedOnTextView.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString(Context);
+                lastDownloadedOn.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString(Context);
             else
-                lastDownloadedOnTextView.Text = null;
+                lastDownloadedOn.Text = null;
         }
 
         public override void OnDestroy()
@@ -192,7 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         progressBar.Indeterminate = false;
                         progressBar.Max = pi.TotalItemsCount;
-                        progressBar.SetProgress(pi.TotalItemsCount - pi.LeftItemsCount, true);
+                        progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
 
                         progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
 
@@ -216,6 +218,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity.RunOnUiThread(() =>
                 {
+                    downloaded.Text = fi.DownloadedItemsCount > 0
+                        ? GetString(Resource.String.download_finished)
+                        : GetString(Resource.String.download_finished_empty);
+                    
                     finishedLayout.Visibility = ViewStates.Visible;
                     startLayout.Visibility = ViewStates.Gone;
                     progressLayout.Visibility = ViewStates.Gone;
@@ -410,7 +416,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     foreach (var failedItem in failedItems)
                         CommonConfig.Logger.Warning("   - " + failedItem);
 
-                    await Managers.FoldersManager.AddSavedFolderInfo(folder);
+                    if (totalItemsCount > 0)
+                        await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
                     onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItems.Count));
                 }

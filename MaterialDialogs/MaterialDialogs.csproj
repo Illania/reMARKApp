@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{03F5EB27-28E4-4309-962C-628C73475478}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MaterialDialogs</RootNamespace>
+    <AssemblyName>MaterialDialogs</AssemblyName>
+    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidManagedSymbols>true</AndroidManagedSymbols>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="Xamarin.Android.Support.Annotations">
+      <HintPath>..\packages\Xamarin.Android.Support.Annotations.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Compat">
+      <HintPath>..\packages\Xamarin.Android.Support.Compat.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Compat.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Core.UI">
+      <HintPath>..\packages\Xamarin.Android.Support.Core.UI.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Core.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Core.Utils">
+      <HintPath>..\packages\Xamarin.Android.Support.Core.Utils.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Core.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Media.Compat">
+      <HintPath>..\packages\Xamarin.Android.Support.Media.Compat.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Media.Compat.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Fragment">
+      <HintPath>..\packages\Xamarin.Android.Support.Fragment.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Fragment.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.RecyclerView">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.RecyclerView.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Vector.Drawable">
+      <HintPath>..\packages\Xamarin.Android.Support.Vector.Drawable.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable">
+      <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.AppCompat">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DefaultRVAdapter.cs" />
+    <Compile Include="DialogAction.cs" />
+    <Compile Include="DialogBase.cs" />
+    <Compile Include="DialogInit.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="GravityEnum.cs" />
+    <Compile Include="IMDAdapter.cs" />
+    <Compile Include="MDButton.cs" />
+    <Compile Include="MDListeners.cs" />
+    <Compile Include="MDRootLayout.cs" />
+    <Compile Include="MDTintHelper.cs" />
+    <Compile Include="MaterialDialog.Builder.cs" />
+    <Compile Include="MaterialDialog.cs" />
+    <Compile Include="StackingBehavior.cs" />
+    <Compile Include="Theme.cs" />
+    <Compile Include="MaterialProgressBar\Animators.cs" />
+    <Compile Include="MaterialProgressBar\BaseDrawable.cs" />
+    <Compile Include="MaterialProgressBar\BaseIndeterminateProgressDrawable.cs" />
+    <Compile Include="MaterialProgressBar\BasePaintDrawable.cs" />
+    <Compile Include="MaterialProgressBar\BaseProgressDrawable.cs" />
+    <Compile Include="MaterialProgressBar\IIntrinsicPaddingDrawable.cs" />
+    <Compile Include="MaterialProgressBar\IShowBackgroundDrawable.cs" />
+    <Compile Include="MaterialProgressBar\ITintableDrawable.cs" />
+    <Compile Include="MaterialProgressBar\IndeterminateCircularProgressDrawable.cs" />
+    <Compile Include="MaterialProgressBar\IndeterminateHorizontalProgressDrawable.cs" />
+    <Compile Include="MaterialProgressBar\Interpolators.cs" />
+    <Compile Include="MaterialProgressBar\Internal\ObjectAnimatorCompat.cs" />
+    <Compile Include="MaterialProgressBar\Internal\ObjectAnimatorCompatLollipop.cs" />
+    <Compile Include="MaterialProgressBar\Internal\ThemeUtils.cs" />
+    <Compile Include="Utils\DialogUtils.cs" />
+    <Compile Include="Utils\RippleHelper.cs" />
+    <Compile Include="Utils\TypefaceHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AboutResources.txt" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\Strings.xml" />
+    <AndroidResource Include="Resources\anim\decelerate_cubic.xml" />
+    <AndroidResource Include="Resources\anim\popup_enter.xml" />
+    <AndroidResource Include="Resources\anim\popup_exit.xml" />
+    <AndroidResource Include="Resources\drawable\md_btn_selected.xml" />
+    <AndroidResource Include="Resources\drawable\md_btn_selected_dark.xml" />
+    <AndroidResource Include="Resources\drawable\md_btn_selector.xml" />
+    <AndroidResource Include="Resources\drawable\md_btn_selector_dark.xml" />
+    <AndroidResource Include="Resources\drawable\md_item_selected.xml" />
+    <AndroidResource Include="Resources\drawable\md_item_selected_dark.xml" />
+    <AndroidResource Include="Resources\drawable\md_nav_back.xml" />
+    <AndroidResource Include="Resources\drawable\md_selector.xml" />
+    <AndroidResource Include="Resources\drawable\md_selector_dark.xml" />
+    <AndroidResource Include="Resources\drawable\md_transparent.xml" />
+    <AndroidResource Include="Resources\drawable-v21\md_btn_selector_ripple.xml" />
+    <AndroidResource Include="Resources\drawable-v21\md_btn_selector_ripple_dark.xml" />
+    <AndroidResource Include="Resources\drawable-v21\md_btn_shape.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_basic.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_basic_check.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_custom.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_input.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_input_check.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_list.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_list_check.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_progress.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_progress_indeterminate.xml" />
+    <AndroidResource Include="Resources\layout\md_dialog_progress_indeterminate_horizontal.xml" />
+    <AndroidResource Include="Resources\layout\md_listitem.xml" />
+    <AndroidResource Include="Resources\layout\md_listitem_multichoice.xml" />
+    <AndroidResource Include="Resources\layout\md_listitem_singlechoice.xml" />
+    <AndroidResource Include="Resources\layout\md_stub_actionbuttons.xml" />
+    <AndroidResource Include="Resources\layout\md_stub_progress.xml" />
+    <AndroidResource Include="Resources\layout\md_stub_progress_indeterminate.xml" />
+    <AndroidResource Include="Resources\layout\md_stub_progress_indeterminate_horizontal.xml" />
+    <AndroidResource Include="Resources\layout\md_stub_titleframe.xml" />
+    <AndroidResource Include="Resources\layout\md_stub_titleframe_lesspadding.xml" />
+    <AndroidResource Include="Resources\layout-v14\md_stub_progress.xml" />
+    <AndroidResource Include="Resources\layout-v14\md_stub_progress_indeterminate.xml" />
+    <AndroidResource Include="Resources\layout-v14\md_stub_progress_indeterminate_horizontal.xml" />
+    <AndroidResource Include="Resources\values\attrs.xml" />
+    <AndroidResource Include="Resources\values\bool.xml" />
+    <AndroidResource Include="Resources\values\colors.xml" />
+    <AndroidResource Include="Resources\values\dimens.xml" />
+    <AndroidResource Include="Resources\values\styles.xml" />
+    <AndroidResource Include="Resources\values-sw600dp\bool.xml" />
+    <AndroidResource Include="Resources\values-sw600dp\dimens.xml" />
+    <AndroidResource Include="Resources\values-sw720dp\bool.xml" />
+    <AndroidResource Include="Resources\values-sw720dp\dimens.xml" />
+    <AndroidResource Include="Resources\values-sw720dp-land\dimens.xml" />
+    <AndroidResource Include="Resources\values-v11\styles.xml" />
+    <AndroidResource Include="Resources\values-v21\styles.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.UI.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.UI.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.UI.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.UI.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.Utils.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.Utils.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.Utils.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.Utils.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Media.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Media.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Media.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Media.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Fragment.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Fragment.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Fragment.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Fragment.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.RecyclerView.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.RecyclerView.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets')" />
+</Project>
