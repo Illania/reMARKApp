@@ -189,6 +189,15 @@ namespace Mark5.ServiceReference.AppService
             return result;
         }
 
+
+        public async Task<CreateOrUpdateShortcodeResult> CreateOrUpdateShortcodeAsync(CreateOrUpdateShortcodeParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            var c = GetClient();
+            var result = await InvokeAsync(c, c.BeginCreateOrUpdateShortcode, c.EndCreateOrUpdateShortcode, parameters, ct);
+            c = null;
+            return result;
+        }
+
         #endregion
 
         #region Calendar module
@@ -530,11 +539,6 @@ namespace Mark5.ServiceReference.AppService
                     }
                 throw new WcfAppServiceException(ex);
             }
-        }
-
-        public Task<CreateOrUpdateShortcodeResult> CreateOrUpdateShortcodeAsync(CreateOrUpdateShortcodeParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            throw new NotImplementedException(); //TODO shouldn't be used, but we should implement it
         }
 
         #endregion
