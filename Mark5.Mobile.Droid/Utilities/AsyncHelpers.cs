@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mark5.Mobile.Common.Utilities
+namespace Mark5.Mobile.Droid.Utilities
 {
     public static class AsyncHelpers
     {

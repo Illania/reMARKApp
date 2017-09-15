@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -578,17 +579,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             try
             {
-                var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
-                foreach (var subView in subViews)
-                    await subView.UpdateDocument();
-
-                documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
-
                 if (autoSaveWorkingCopyWorker != null)
                 {
                     autoSaveWorkingCopyWorker.Stop();
                     await autoSaveWorkingCopyWorker.Finished();
                 }
+
+                var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
+
+                documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
@@ -631,7 +632,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug("Saving working copy...");
 
-                InvokeOnMainThread(async () =>
+                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
                 {
                     var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
                     foreach (var subView in subViews)

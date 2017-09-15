@@ -418,6 +418,7 @@
     <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
     <Compile Include="Model\HubMessages\ContactPreviewChanged.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Utilities\AsyncHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

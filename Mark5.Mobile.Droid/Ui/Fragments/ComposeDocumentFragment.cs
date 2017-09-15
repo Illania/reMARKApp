@@ -23,7 +23,6 @@ using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
-using static Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews.ComposeDocumentView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -944,14 +943,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
             public bool DocumentLoaded { get; set; }
             public bool TemplateLoaded { get; set; }
-            public IComposeDocumentViewState ToState { get; set; }
-            public IComposeDocumentViewState CcState { get; set; }
-            public IComposeDocumentViewState BccState { get; set; }
-            public IComposeDocumentViewState PriorityState { get; set; }
-            public IComposeDocumentViewState LineState { get; set; }
-            public IComposeDocumentViewState SubjectState { get; set; }
-            public IComposeDocumentViewState AttachmentsState { get; set; }
-            public IComposeDocumentViewState ContentState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState ToState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState CcState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState BccState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState PriorityState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState LineState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState SubjectState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState AttachmentsState { get; set; }
+            public ComposeDocumentView.IComposeDocumentViewState ContentState { get; set; }
         }
 
         #endregion
