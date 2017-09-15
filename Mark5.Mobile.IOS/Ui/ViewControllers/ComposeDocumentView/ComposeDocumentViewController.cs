@@ -633,10 +633,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 InvokeOnMainThread(async () =>
                 {
-                    var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
+                    var subViews = stackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
                     foreach (var subView in subViews)
                         await subView.UpdateDocument();
                 });
+
+                await contentView.UpdateDocument();
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
