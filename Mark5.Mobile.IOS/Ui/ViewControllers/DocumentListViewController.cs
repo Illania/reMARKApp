@@ -1424,7 +1424,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-                                InvokeOnMainThread(async () => await work(first.Id));
+                            {
+                                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
+                                {
+                                    await work(first.Id);
+                                });
+                            }
                         }
                     });
                 }
@@ -1456,7 +1461,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
-            return new DocumentsListViewController ();
+            return new DocumentsListViewController();
         }
 
         #endregion
