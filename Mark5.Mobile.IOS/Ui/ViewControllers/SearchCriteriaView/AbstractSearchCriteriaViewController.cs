@@ -85,19 +85,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             };
             scrollView.AddSubview(StackView);
 
-            var const1 = NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f);
-            const1.Priority = 999f;
-            var const2 = NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.LessThanOrEqual, 1f, 500f);
-            const2.Priority = 1000f;
-
             scrollView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(StackView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
-                const1,
-                const2
+                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f)
             });
+
+            if (Integration.IsIPad())
+                scrollView.AddConstraint(NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 500f));
+            else
+                scrollView.AddConstraint(NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f));
 
             bottomView = new TouchTransparentView
             {
