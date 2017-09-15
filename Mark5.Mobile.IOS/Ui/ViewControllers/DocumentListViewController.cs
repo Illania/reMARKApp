@@ -885,13 +885,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task AutoRefreshData(int endId)
         {
-            InvokeOnMainThread(() => {
-                if (refreshing)
-                    return;
-                
-                refreshing = true;
-                refreshControl.Enabled = false;
-            });
+            if (refreshing)
+                return;
+
+            refreshing = true;
+
+            refreshControl.Enabled = false;
 
             try
             {
@@ -910,12 +909,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Services.DocumentsDownloadService.Notify();
 
-                    InvokeOnMainThread(() => {
-                        var ds = tableView.Source as DataSource;
-                        ds?.PrependItems(documents);
+                    var ds = tableView.Source as DataSource;
+                    ds?.PrependItems(documents);
 
-                        newDocumentsAvailableAction?.Invoke();
-                    });
+                    newDocumentsAvailableAction?.Invoke();
                 }
             }
             catch (Exception ex)
@@ -927,10 +924,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Debug($"Automatic refresh finished");
             }
 
-            InvokeOnMainThread(() => {
-                refreshControl.Enabled = true;
-                refreshing = false;
-            });
+            refreshControl.Enabled = true;
+            refreshing = false;
         }
 
         #endregion
@@ -1429,7 +1424,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-                                await work(first.Id);
+                            {
+                                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
+                                {
+                                    await work(first.Id);
+                                });
+                            }
                         }
                     });
                 }
@@ -1461,7 +1461,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
-            return new DocumentsListViewController ();
+            return new DocumentsListViewController();
         }
 
         #endregion

@@ -67,7 +67,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
             {
-                BeginInvokeOnMainThread(async () => {
+                BeginInvokeOnMainThread(async () =>
+                {
                     await RefreshData();
                 });
             });
