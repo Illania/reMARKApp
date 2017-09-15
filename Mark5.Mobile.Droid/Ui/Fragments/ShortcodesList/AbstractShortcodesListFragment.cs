@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-        const string FolderBundleKey = "BundleKey_002d532f-2acf-4ee2-9bb1-e9601e5bf83e";
+        protected const string FolderBundleKey = "BundleKey_002d532f-2acf-4ee2-9bb1-e9601e5bf83e";
 
         protected ActionMode ActionMode;
 

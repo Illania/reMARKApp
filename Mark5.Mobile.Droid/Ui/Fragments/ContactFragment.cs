@@ -80,7 +80,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragment = new ContactFragment();
             fragment.Arguments = args;
 
-            //old tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contact?.Id ?? contactId}]";
             var tag = $"{nameof(ContactFragment)} [contactId={contactPreview?.Id ?? contactId}]";
 
             return (fragment, tag);

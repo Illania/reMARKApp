@@ -80,7 +80,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragment = new DocumentFragment();
             fragment.Arguments = args;
 
-            //old tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? Document?.Id ?? docId}]"; -> Document only changed in this fragment after instantiation.
             var tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? docId}]";
 
             return (fragment, tag);

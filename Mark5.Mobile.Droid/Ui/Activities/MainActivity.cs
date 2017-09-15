@@ -17,6 +17,7 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -98,7 +99,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
 
-                Task.Run(async () =>
+                var ss = AsyncHelpers.RunSync(() => Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local));
+                navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+
+                /*Task.Run(async () =>
                 {
 			        return await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
                 })
@@ -106,9 +110,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 			        {
 			            var ss = t.Result;
 			            navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-			        },TaskScheduler.FromCurrentSynchronizationContext());
+			        },TaskScheduler.FromCurrentSynchronizationContext());*/
                     
-
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
             else
