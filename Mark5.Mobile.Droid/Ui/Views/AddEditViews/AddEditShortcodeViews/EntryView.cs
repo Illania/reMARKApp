@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
+using Android.Text.Style;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -205,10 +208,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
             override public void UpdateRow()
             {
                 var firstLine = string.IsNullOrEmpty(Content.Name) ? Content.Address : $"{Content.Name} <{Content.Address}>";
-
                 var attentionString = string.IsNullOrEmpty(Content.FullAttention) ? Content.Attention : Content.FullAttention;
 
-                emailEditText.Text = string.IsNullOrEmpty(attentionString) ? firstLine : $"{firstLine}{Environment.NewLine}{attentionString}";
+                if (string.IsNullOrEmpty(attentionString))
+                {
+                    emailEditText.Text = firstLine;
+                }
+                else
+                {
+                    var finalText = $"{firstLine}{Environment.NewLine}{attentionString}";
+                    var coloredText = new SpannableString(finalText);
+                    coloredText.SetSpan(new ForegroundColorSpan(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray))), firstLine.Length, finalText.Length, SpanTypes.ExclusiveExclusive);
+                    emailEditText.TextFormatted = coloredText;
+                }
 
                 emailEditText.Error = !Validator.IsEmailValid(Content.Address) ? Context.GetString(Resource.String.edit_contact_invalid_email) : null;
             }
