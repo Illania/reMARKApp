@@ -1,14 +1,23 @@
-﻿using Android.OS;
+using System.Collections.Generic;
+using System.Linq;
+using Android.Content;
+using Android.Support.Design.Widget;
 using Android.Views;
+using Android.OS;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsListFragment : AbstractContactsListFragment
     {
         const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
+
+        FloatingActionButton fab;
 
         public static (ContactsListFragment fragment, string tag) NewInstance(Folder folder)
         {
@@ -25,17 +34,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        #region MyRegion
-
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
         {
             if (Arguments.ContainsKey(FolderBundleKey))
                 Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+            
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
+            {
+                fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+                fab.SetImageResource(Resource.Drawable.action_add_contact);
+                fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
+                fab.Visibility = ViewStates.Visible;
+            }
 
             return base.OnCreateView(inflater, container, savedInstanceState);
         }
-
-        #endregion
 
         #region Adapter callbacks
 
@@ -70,5 +83,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        async void CreateContact()
+        {
+            var values = new List<ContactType> { ContactType.Company, ContactType.Department, ContactType.Person };
+
+            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(),true);
+
+            if (index >= 0)
+            {
+                var intent = new Intent(Context, typeof(AddEditContactActivity));
+                intent.PutExtra(AddEditContactActivity.ContactCreationModeFlagIntentKey, (int)ContactCreationModeFlag.New);
+                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
+                StartActivity(intent);
+            }
+        }
     }
 }

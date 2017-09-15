@@ -21,6 +21,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -604,6 +605,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var cp = searchAdapter.Items[position];
                 cp.Categories.Clear();
                 cp.Categories.AddRange(m.Categories);
+            }
+        }
+
+        public void UpdateContactPreview(ContactPreviewChanged m)
+        {
+            var position = adapter.GetPosition(m.ContactPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                adapter.Items[position] = m.ContactPreview;
+            }
+
+            position = searchAdapter.GetPosition(m.ContactPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                adapter.Items[position] = m.ContactPreview;
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using Android.OS;
+using Android.OS;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -8,7 +8,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerShortcodesFolderListFragment : FoldersListFragment
     {
-        public static new (PickerShortcodesFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null)
+        public static (PickerShortcodesFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null, bool? hideFab = null, bool? loadRemoteFromCache = null)
         {
             var args = new Bundle();
 
@@ -17,6 +17,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (hideSearch != null)
                 args.PutBoolean(HideSearchBundleKey, hideSearch.Value);
+
+            if (hideFab != null)
+                args.PutBoolean(HideFabBundleKey, hideFab.Value);
+
+            if (loadRemoteFromCache != null)
+                args.PutBoolean(LoadRemoteFromCacheBundleKey, loadRemoteFromCache.Value);
 
             var fragment = new PickerShortcodesFolderListFragment();
             fragment.Arguments = args;

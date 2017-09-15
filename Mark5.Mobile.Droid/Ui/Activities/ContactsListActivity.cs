@@ -8,6 +8,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
 
@@ -25,6 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityMovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
+        TinyMessageSubscriptionToken contactPreviewChangedToken;
 
         public static Intent CreateIntent(Context context, Folder folder)
         {
@@ -71,6 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(clf.UpdateMovedEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
             entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(clf.UpdateRemovedFromFolderEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
             entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(clf.UpdateRemovedEntities, m => clf != null && m.Sender != clf && m.ObjectType == ObjectType.Contact);
+            contactPreviewChangedToken = CommonConfig.MessengerHub.Subscribe<ContactPreviewChanged>(clf.UpdateContactPreview, m => clf != null && m.Sender != clf);
         }
 
         public override void Finish()
@@ -88,6 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityMovedFromFolderToken?.Dispose();
             entityRemovedFromFolderToken?.Dispose();
             entityRemovedToken?.Dispose();
+            contactPreviewChangedToken?.Dispose();
         }
     }
 }

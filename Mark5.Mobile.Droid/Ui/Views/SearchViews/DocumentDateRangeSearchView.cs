@@ -32,10 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var leftLayout = new LinearLayoutCompat(context)
             {
                 Orientation = Vertical,
-                LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent)
-                {
-                    Weight = 1.0f
-                }
+                LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
             };
             leftLayout.Click += From_Click;
             AddView(leftLayout);
@@ -69,10 +66,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var rightLayout = new LinearLayoutCompat(context)
             {
                 Orientation = Vertical,
-                LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.MatchParent)
-                {
-                    Weight = 1.0f
-                }
+                LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.MatchParent, 1)
             };
             rightLayout.Click += To_Click;
             AddView(rightLayout);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AFollestad.MaterialDialogs;
+using MaterialDialogs;
 using Android.App;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -21,6 +21,50 @@ namespace Mark5.Mobile.Droid.Ui.Common
     public static class Dialogs
     {
         #region Awaitable dialogs
+
+        public static Task<bool> ShowCustomViewDialogAsync(Context context, int titleId, View customView)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.CustomView(customView, true);
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
+        public static Task<bool> ShowCustomViewDialogWithValidityAsync(Context context, int titleId, View customView, Func<bool> isContentValid)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.CustomView(customView, true);
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.AutoDismiss(false);
+            builder.OnPositive(new SingleButtonCallback(md =>
+            {
+                if (isContentValid())
+                {
+                    tcs.SetResult(true);
+                    md.Dismiss();
+                }
+            }));
+
+            builder.OnNegative(new SingleButtonCallback(md =>
+            {
+                tcs.SetResult(false);
+                md.Dismiss();
+            }));
+
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
 
         public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
@@ -118,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
                         selectedIndex = i;
 
-                md.SelectedIndex = selectedIndex;
+                md.SetSelectedIndex(selectedIndex);
             }
 
             builder.Cancelable(false);
@@ -152,7 +196,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
 
-                md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
+                md.SetSelectedIndices(selectedIndexes.ToArray());
             }
 
             builder.Cancelable(false);
@@ -202,7 +246,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1)
+        public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1, bool addRemoveDateChoice = false)
         {
             var tcs = new TaskCompletionSource<long>();
             var datePicker = new DatePicker(context);
@@ -218,6 +262,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds()); }));
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(initialTimestamp)));
+            if (addRemoveDateChoice)
+            {
+                builder.NeutralText(Resource.String.remove);
+                builder.OnNeutral(new SingleButtonCallback(() => tcs.SetResult(0)));
+            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -311,7 +360,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
 
-                md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
+                md.SetSelectedIndices(selectedIndexes.ToArray());
             }
 
             builder.Cancelable(false);
@@ -453,16 +502,22 @@ namespace Mark5.Mobile.Droid.Ui.Common
         class SingleButtonCallback : Java.Lang.Object, MaterialDialog.ISingleButtonCallback
         {
             readonly Action action;
+            readonly Action<MaterialDialog> actionWithDialog;
 
             public SingleButtonCallback(Action action)
             {
                 this.action = action;
             }
 
+            public SingleButtonCallback(Action<MaterialDialog> action)
+            {
+                this.actionWithDialog = action;
+            }
+
             public void OnClick(MaterialDialog p0, DialogAction p1)
             {
-                if (action != null)
-                    action();
+                action?.Invoke();
+                actionWithDialog?.Invoke(p0);
             }
         }
 
@@ -475,7 +530,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public bool OnSelection(MaterialDialog p0, View p1, int p2, Java.Lang.ICharSequence p3)
+            public bool OnSelection(MaterialDialog p0, View p1, int p2, string p3)
             {
                 if (action != null)
                     action(p2);
@@ -492,10 +547,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public bool OnSelection(MaterialDialog p0, Java.Lang.Integer[] p1, Java.Lang.ICharSequence[] p2)
+            public bool OnSelection(MaterialDialog p0, int[] p1, string[] p2)
             {
                 if (action != null)
-                    action(p1.Select(i => i.IntValue()).ToArray());
+                    action(p1);
                 return true;
             }
         }
@@ -509,7 +564,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public void OnSelection(MaterialDialog p0, View p1, int p2, Java.Lang.ICharSequence p3)
+            public void OnSelection(MaterialDialog p0, View p1, int p2, string p3)
             {
                 if (action != null)
                     action(p2);

@@ -1,4 +1,4 @@
-﻿using Android.OS;
+using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
@@ -110,8 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var srs = restoredState as FoldersNotificationsRetainableState;
-            if (srs != null)
+            if (restoredState is FoldersNotificationsRetainableState srs)
             {
                 remoteFolder = srs.Folder;
                 pager.CurrentItem = srs.SelectedTab;

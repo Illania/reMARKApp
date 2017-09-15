@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -90,10 +90,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (documentCreationModeFlag != DocumentCreationModeFlag.None)
                 args.PutString(DocumentCreationModeFlagBundleKey, Serializer.Serialize(documentCreationModeFlag));
 
-            if(copyToNewOption != null)
+            if (copyToNewOption != null)
                 args.PutString(CopyToNewOptionBundleKey, Serializer.Serialize(copyToNewOption.Value));
 
-            if(restoreWorkingCopy != null)
+            if (restoreWorkingCopy != null)
                 args.PutBoolean(RestoreWorkingCopyBundleKey, restoreWorkingCopy.Value);
 
             if (previousDocumentDirection != null)
@@ -428,7 +428,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (e.AttachmentDescription != null)
                 {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Local);
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
 
                     if (string.IsNullOrWhiteSpace(path))
                     {
@@ -441,19 +441,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             return;
                         }
 
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, document, false, SourceType.Remote);
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
                     }
                 }
 
                 if (e.FileDescription != null)
                     path = e.FileDescription.Path;
 
-
-                if (string.IsNullOrWhiteSpace(path))
-                    throw new Exception("Unable to opent attachment");
-
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(path))
+                        throw new Exception("Unable to opent attachment");
+
                     var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 
@@ -734,12 +733,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool IsFormValid()
         {
             var recipientAdded = false;
-            foreach (var recipientView in new List<RecipientsView>
-            {
-                toView,
-                ccView,
-                bccView
-            })
+            foreach (var recipientView in new RecipientsView[] {toView,ccView,bccView})
                 recipientAdded |= !recipientView.Empty;
 
             if (!recipientAdded)

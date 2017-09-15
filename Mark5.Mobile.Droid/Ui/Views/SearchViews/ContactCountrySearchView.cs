@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Fragments;
 

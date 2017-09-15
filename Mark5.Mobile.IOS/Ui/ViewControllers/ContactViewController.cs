@@ -16,6 +16,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -46,11 +47,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIToolbar toolbar;
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
+        UIButton commentsButton;
+        BadgeBarButtonItem commentsBadgeButton;
         UIBarButtonItem actionsLinksButton;
         UIBarButtonItem doneButtonItem;
+        UIBarButtonItem editButtonItem;
         NSLayoutConstraint headerViewOffset;
 
         CancellationTokenSource cts;
+
+        TinyMessageSubscriptionToken contactChangedToken;
+        TinyMessageSubscriptionToken childrenAddedToken;
 
         public override void LoadView()
         {
@@ -75,6 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeHandlers();
+            SubscribeToMessages();
 
             if (headerViewOffset != null)
                 headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
@@ -95,6 +103,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
+
+            if (editButtonItem != null && contact != null && contactPreview != null)
+                editButtonItem.Enabled = true;
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -107,6 +118,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ContactViewController)} received memory warning!");
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -279,6 +292,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
             fileToButton.Enabled = false;
 
+            commentsButton = new UIButton(UIButtonType.System)
+            {
+                Frame = new CGRect(0f, 0f, 25f, 25f),
+                Enabled = false
+            };
+            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
+            {
+                BadgeBackgroundColor = Theme.Brown,
+                Enabled = false
+            };
+
             actionsLinksButton = new UIBarButtonItem();
             actionsLinksButton.Image = UIImage.FromBundle(Path.Combine("icons", "actions.png"));
             actionsLinksButton.Enabled = false;
@@ -290,6 +315,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 assignCategoryButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton,
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                commentsBadgeButton,
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 actionsLinksButton
             };
@@ -314,6 +341,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
+            else
+            {
+                if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
+                {
+                    editButtonItem = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle(Path.Combine("icons", "pencil")),
+                        Enabled = false
+                    };
+                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                }
+            }
         }
 
         void InitializeHandlers()
@@ -336,11 +375,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (fileToButton != null)
                 fileToButton.Clicked += FileToButton_Clicked;
 
+            if (commentsButton != null)
+                commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked += ActionsLinksButton_Clicked;
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
+
+            if (editButtonItem != null)
+                editButtonItem.Clicked += EditButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
@@ -363,11 +408,70 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (fileToButton != null)
                 fileToButton.Clicked -= FileToButton_Clicked;
 
+            if (commentsButton != null)
+                commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
+            
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
+
+            if (editButtonItem != null)
+                editButtonItem.Clicked -= EditButtonItem_Clicked;
+        }
+
+
+        void SubscribeToMessages()
+        {
+            contactChangedToken?.Dispose();
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage, (m) => contactPreview?.Id == m.ContactPreview.Id);
+
+            childrenAddedToken?.Dispose();
+            childrenAddedToken = CommonConfig.MessengerHub.Subscribe<ChildrenContactAddedMessage>(HandleChildrenAddedMessage, (m) => contactPreview?.Id == m.ParentContactPreview.Id);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            if (contactChangedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(contactChangedToken);
+                contactChangedToken = null;
+            }
+
+            if (childrenAddedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<ChildrenContactAddedMessage>(childrenAddedToken);
+                childrenAddedToken = null;
+            }
+        }
+
+        void HandleContactChangedMessage(ContactChangedMessage obj)
+        {
+            RefreshAllOnAppear();
+        }
+
+        void HandleChildrenAddedMessage(ChildrenContactAddedMessage obj)
+        {
+            RefreshAllOnAppear();
+        }
+
+        void RefreshAllOnAppear()
+        {
+            var ds = tableView?.Source as DataSource;
+            ds?.Clear();
+            contactId = contactPreview.Id;
+            contactPreview = null;
+
+            if (SplitViewController == null)
+            {
+                refreshDataOnAppear = true;
+            }
+            else
+            {
+                RefreshData();
+            }
+
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -403,7 +507,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
-            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
+            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
+                                          .Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
                 return;
 
@@ -446,6 +551,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
+        }
+
+        async void EditButtonItem_Clicked(object sender, EventArgs e)
+        {
+            var listString = new List<string> { };
+
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
+            {
+                listString.Add(Localization.GetString("edit_contact"));
+            }
+
+            var createAllowed = ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed;
+
+            if (createAllowed && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
+            {
+                listString.Add(Localization.GetString("add_person"));
+            }
+            if (createAllowed && contactPreview.Type == ContactType.Company)
+            {
+                listString.Add(Localization.GetString("add_department"));
+            }
+
+            var index = await Dialogs.ShowListDialogAsync(this, null, listString.ToArray(), editButtonItem);
+
+            if (index < 0)
+                return;
+
+            var selectedString = listString[index];
+
+            if (selectedString == Localization.GetString("edit_contact"))
+            {
+                var vc = new AddEditContactViewController
+                {
+                    ContactPreview = contactPreview,
+                    Contact = contact,
+                    CreationModeFlag = ContactCreationModeFlag.Edit,
+                };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else
+            {
+                var type = selectedString == Localization.GetString("add_person") ? ContactType.Person : ContactType.Department;
+                var vc = new AddEditContactViewController
+                {
+                    ContactType = type,
+                    ParentContactPreview = contactPreview,
+                    ParentPreselected = true,
+                    CreationModeFlag = ContactCreationModeFlag.New,
+                };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
         }
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
@@ -513,6 +669,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
+        void CommentsButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var vc = new CommentsListViewController
+            {
+                Entity = contact
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
         async void ActionsLinksButton_Clicked(object sender, EventArgs e)
         {
             var actionLinksListString = new string[]
@@ -554,9 +719,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                     PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
-	                {
-	                    { DocumentAddressType.To, new [] { ca.Address } }
-	                }
+                    {
+                        { DocumentAddressType.To, new [] { ca.Address } }
+                    }
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }
@@ -656,9 +821,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ds.StartRefresh();
 
-                if (folderId != null && contactId != null)
+                if ((folderId != null || folder != null) && contactId != null)
                 {
-                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId.Value, contactId.Value);
+                    var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folder?.Id ?? folderId, contactId.Value);
+
                     this.contactPreview = swp.ContactPreview;
                     contact = swp.Contact;
                 }
@@ -681,7 +847,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested)
                     return;
 
-                if (this.contactPreview.Type == ContactType.Person || this.contactPreview.Type == ContactType.Department)
+                if (this.contactPreview.Type == ContactType.Person)
+                {
+                    nameLabel.Text = this.contactPreview.Name;
+                    if (!string.IsNullOrEmpty(this.contactPreview.CompanyName) && !string.IsNullOrEmpty(contact.Position))
+                    {
+                        nameSubLabel.Text = $"{contact.Position} @ {this.contactPreview.CompanyName}";
+                    }
+                    else
+                    {
+                        string subtitle = string.Empty;
+                        subtitle += contact.Position;
+                        subtitle += this.contactPreview.CompanyName;
+
+                        nameSubLabel.Text = subtitle;
+                    }
+
+                }
+                else if (this.contactPreview.Type == ContactType.Department)
                 {
                     nameLabel.Text = this.contactPreview.Name;
                     nameSubLabel.Text = this.contactPreview.CompanyName;
@@ -708,10 +891,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
 
+                if (commentsBadgeButton != null)
+                {
+                    commentsBadgeButton.BadgeValue = contact?.Comments?.Count.ToString();
+                    commentsBadgeButton.Enabled = contact != null;
+                }
+
+                if (commentsButton != null)
+                    commentsButton.Enabled = contact != null;
+
                 if (actionsLinksButton != null)
                     actionsLinksButton.Enabled = true;
 
                 ds.EndRefresh(this.contactPreview, contact);
+
+                if (editButtonItem != null)
+                    editButtonItem.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -761,6 +956,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (fileToButton != null)
                 fileToButton.Enabled = false;
+
+            if (commentsBadgeButton != null)
+            {
+                commentsBadgeButton.SetBadgeValue("0", false);
+                commentsBadgeButton.Enabled = false;
+            }
+
+            if (commentsButton != null)
+                commentsButton.Enabled = false;
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Enabled = false;
@@ -1140,7 +1344,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public class ExtraSection : AbstractSection
             {
-                public override bool Empty => string.IsNullOrWhiteSpace(ContactPreview?.Description) && string.IsNullOrWhiteSpace(ContactPreview?.ShortId) && (!Contact?.ResponsibleUsers?.Any() ?? true) && (Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1) && string.IsNullOrWhiteSpace(Contact?.WebPageAddress) && string.IsNullOrWhiteSpace(Contact?.Vat) && string.IsNullOrWhiteSpace(Contact?.Ledger) && string.IsNullOrWhiteSpace(Contact?.Account);
+                public override bool Empty => string.IsNullOrWhiteSpace(ContactPreview?.Description)
+                                                    && string.IsNullOrWhiteSpace(ContactPreview?.ShortId) && (!Contact?.ResponsibleUsers?.Any() ?? true)
+                                                    && (Contact?.BirthDateTimestamp == -1)
+                                                    && string.IsNullOrWhiteSpace(Contact?.WebPageAddress) && string.IsNullOrWhiteSpace(Contact?.Vat) && string.IsNullOrWhiteSpace(Contact?.Ledger) && string.IsNullOrWhiteSpace(Contact?.Account);
 
                 public override void InitializeRows()
                 {
@@ -1150,7 +1357,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Rows.Add(new ShortIdRow(ContactPreview, Contact));
                     if (!(!Contact?.ResponsibleUsers?.Any() ?? true))
                         Rows.Add(new ResponsibleUsersRow(ContactPreview, Contact));
-                    if (!(Contact?.BirthDateTimestamp == -6847804800000 || Contact?.BirthDateTimestamp == -1))
+                    if (Contact?.BirthDateTimestamp != -1)
                         Rows.Add(new BirthdateRow(ContactPreview, Contact));
                     if (!string.IsNullOrWhiteSpace(Contact?.WebPageAddress))
                         Rows.Add(new WebPageRow(ContactPreview, Contact));
@@ -1438,7 +1645,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public override void Bind(UITableViewCell cell)
                 {
                     var cic = (ContactInfoTableViewCell)cell;
-                    cic.Initialize(Localization.GetString("birthdate").ToUpper(), Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsLongDateString());
+                    cic.Initialize(Localization.GetString("birthdate").ToUpper(),
+                                   Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime()
+                                   .ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsLongDateString());
                 }
             }
 

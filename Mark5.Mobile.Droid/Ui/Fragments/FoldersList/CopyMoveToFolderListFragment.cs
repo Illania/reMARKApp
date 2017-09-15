@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,13 +19,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string FromFolderBundleKey = "FromFolder_8dc816f4-08b8-428d-9cce-1c481c460df5";
         const string ActionTypeBundleKey = "ActionType_ed011f46-e180-462c-9d49-5dc047f3c324";
 
-        protected override bool LoadRemoteFromCache => true;
-
         List<IBusinessEntity> businessEntities;
         Folder fromFolder;
         ActionType actionType;
 
-        public static (CopyMoveToFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, List<IBusinessEntity> businessEntities, Folder fromFolder = null, ActionType? actionType = null)
+        public static (CopyMoveToFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, List<IBusinessEntity> businessEntities, Folder fromFolder = null, ActionType? actionType = null, bool? loadRemoteFromCache = null)
         {
             var args = new Bundle();
 
@@ -40,6 +38,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (actionType != null)
                 args.PutString(ActionTypeBundleKey, Serializer.Serialize(actionType.Value));
+
+            if (loadRemoteFromCache != null)
+                args.PutBoolean(LoadRemoteFromCacheBundleKey, loadRemoteFromCache.Value);
 
             var fragment = new CopyMoveToFolderListFragment();
             fragment.Arguments = args;
@@ -64,6 +65,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(ActionTypeBundleKey))
                 actionType = Serializer.Deserialize<ActionType>(Arguments.GetString(ActionTypeBundleKey));
+
+            if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
+                LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
 
             return base.OnCreateView(inflater, container, savedInstanceState);
         }

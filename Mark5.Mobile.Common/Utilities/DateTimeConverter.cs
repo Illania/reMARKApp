@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.Utilities
                 return -1;
 
             var elapsed = dateTime - epoch;
-            return (long) elapsed.TotalMilliseconds;
+            return (long)elapsed.TotalMilliseconds;
         }
 
         public static DateTime ConvertUtcToUserTime(this DateTime dateTime)
@@ -33,6 +33,18 @@ namespace Mark5.Mobile.Common.Utilities
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
             return dt.AddHours(UseServerTimezone ? -ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : -LocalUtcOffset);
+        }
+
+        public static DateTime ConvertUtcToServerTime(this DateTime dateTime)
+        {
+            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
+            return dt.AddHours(ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours);
+        }
+
+        public static DateTime ConvertServerTimeToUtc(this DateTime dateTime)
+        {
+            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+            return dt.AddHours(-ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours);
         }
     }
 }

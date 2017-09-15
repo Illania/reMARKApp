@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -201,6 +201,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ds.SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
+
+                ResetNotificationsBadge();
             }
             catch (Exception ex)
             {
@@ -213,6 +215,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             refreshControl.ValueChanged += RefreshControl_ValueChanged;
 
             refreshing = false;
+        }
+
+        void ResetNotificationsBadge()
+        {
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
         }
 
         public async void NotificationSelected(Notification notification, NSIndexPath row)

@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class PickerContactFolderListActivity : BaseAppCompatActivity
     {
         public const string RecipientResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
-        public const int ContactRequestCode = 123;
+        public const int ContactRequestCode = 321;
 
         Toolbar toolbar;
 
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var (pcflf,tag) = PickerContactFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Contacts),true);
+                var (pcflf,tag) = PickerContactFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Contacts),true,true,true);
                 ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 

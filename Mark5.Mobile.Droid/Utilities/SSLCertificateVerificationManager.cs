@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Utilities
             CommonConfig.Logger.Warning("**** ENABLING CUSTOM VALIDATION CALLBACK ****");
 
             ServicePointManager.ServerCertificateValidationCallback = remoteCertificateValidationCallback;
-            CommonConfig.HttpClientHandler = () => { return new InsecureAndroidClientHandler(); };
+            CommonConfig.HttpClientHandler = () => new InsecureAndroidClientHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
         }
 
         public void DisableSelfSignedCertificates()
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Utilities
             CommonConfig.Logger.Info("Disabling custom validation callback");
 
             ServicePointManager.ServerCertificateValidationCallback = null;
-            CommonConfig.HttpClientHandler = () => { return new AndroidClientHandler(); };
+            CommonConfig.HttpClientHandler = () => new AndroidClientHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
         }
     }
 }

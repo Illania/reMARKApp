@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -30,10 +30,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         LinearLayout finishedLayout;
 
         AppCompatButton startButton;
-        AppCompatTextView lastDownloadedOnTextView;
+        AppCompatTextView lastDownloadedOn;
         ProgressBar progressBar;
         AppCompatTextView progressStatus;
         AppCompatButton cancelButton;
+        AppCompatTextView downloaded;
         AppCompatButton closeButton;
 
         Stopwatch sw;
@@ -41,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         PowerManager.WakeLock wakelock;
         bool downloadRunning;
 
-        public static (DownloadFragment fragment, string var) NewInstance(Folder folder)
+        public static (DownloadFragment fragment, string tag) NewInstance(Folder folder)
         {
             var args = new Bundle();
 
@@ -70,10 +71,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             finishedLayout = rootView.FindViewById<LinearLayout>(Resource.Id.finished_layout);
 
             startButton = rootView.FindViewById<AppCompatButton>(Resource.Id.start_button);
-            lastDownloadedOnTextView = rootView.FindViewById<AppCompatTextView>(Resource.Id.last_downloaded_on_text_view);
+            lastDownloadedOn = rootView.FindViewById<AppCompatTextView>(Resource.Id.last_downloaded_on_text_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress_bar);
             progressStatus = rootView.FindViewById<AppCompatTextView>(Resource.Id.progress_status);
             cancelButton = rootView.FindViewById<AppCompatButton>(Resource.Id.cancel_button);
+            downloaded = rootView.FindViewById<AppCompatTextView>(Resource.Id.downloaded);
             closeButton = rootView.FindViewById<AppCompatButton>(Resource.Id.close_button);
 
             startButton.Click += StartButton_Click;
@@ -99,9 +101,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(folder);
             if (info != null)
-                lastDownloadedOnTextView.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString(Context);
+                lastDownloadedOn.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString(Context);
             else
-                lastDownloadedOnTextView.Text = null;
+                lastDownloadedOn.Text = null;
         }
 
         public override void OnDestroy()
@@ -142,21 +144,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 wakelock = pm.NewWakeLock(WakeLockFlags.ScreenDim, $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]");
                 wakelock.Acquire();
 
-                downloadRunning = true;
+                Activity.RunOnUiThread(() =>
+                {
+                    downloadRunning = true;
 
-                progressStatus.Text = null;
-                cancelButton.Enabled = true;
+                    progressStatus.Text = null;
+                    cancelButton.Enabled = true;
 
-                progressLayout.Visibility = ViewStates.Visible;
-                startLayout.Visibility = ViewStates.Gone;
-                finishedLayout.Visibility = ViewStates.Gone;
+                    progressLayout.Visibility = ViewStates.Visible;
+                    startLayout.Visibility = ViewStates.Gone;
+                    finishedLayout.Visibility = ViewStates.Gone;
 
-                sw = new Stopwatch();           
+                    sw = new Stopwatch();
+                });
             }
 
             void OnProgress(ProgressInfo pi)
             {
-                CommonConfig.Logger.Info($"Downloading... [folder.Id={folder.Id}, folder.Module={folder.Module}, folder.Name={folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
+                if (pi.Preparing || pi.LeftItemsCount % 10 == 0)
+                    CommonConfig.Logger.Info($"Downloading... [folder.Id={folder.Id}, folder.Module={folder.Module}, folder.Name={folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
 
                 if (!pi.Preparing && pi.LeftItemsCount == pi.TotalItemsCount)
                     sw.Start();
@@ -169,24 +175,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (!pi.Preparing && sw.ElapsedMilliseconds > 3000)
                     timeLeft = sw.ElapsedMilliseconds / (pi.TotalItemsCount - pi.LeftItemsCount) * pi.LeftItemsCount / 1000 / 60;
 
-                if (pi.Preparing)
+                Activity.RunOnUiThread(() =>
                 {
-                    progressBar.Indeterminate = true;
-                    progressStatus.Text = GetString(Resource.String.preparing);
-                }
-                else
-                {
-                    progressBar.Indeterminate = false;
-                    progressBar.Max = pi.TotalItemsCount;
-                    progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
+                    if (pi.Preparing)
+                    {
+                        progressBar.Indeterminate = true;
+                        progressStatus.Text = GetString(Resource.String.preparing);
+                    }
+                    else
+                    {
+                        progressBar.Indeterminate = false;
+                        progressBar.Max = pi.TotalItemsCount;
+                        progressBar.Progress = pi.TotalItemsCount - pi.LeftItemsCount;
 
-                    progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
+                        progressStatus.Text = GetString(Resource.String.downloading_percentage, (int)((1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount)) * 100));
 
-                    if (timeLeft > 0)
-                        progressStatus.Text += "\n" + Resources.GetQuantityString(Resource.Plurals.time_remaining_minutes, (int)timeLeft, (int)timeLeft);
-                    else if (timeLeft > -1)
-                        progressStatus.Text += "\n" + GetString(Resource.String.time_remaining_minutes_zero);
-                }
+                        if (timeLeft > 0)
+                            progressStatus.Text += "\n" + Resources.GetQuantityString(Resource.Plurals.time_remaining_minutes, (int)timeLeft, (int)timeLeft);
+                        else if (timeLeft > -1)
+                            progressStatus.Text += "\n" + GetString(Resource.String.time_remaining_minutes_zero);
+                    }
+                });
             }
 
             void OnFinished(FinishedInfo fi)
@@ -199,11 +208,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sw.Stop();
                 sw = null;
 
-	            finishedLayout.Visibility = ViewStates.Visible;
-	            startLayout.Visibility = ViewStates.Gone;
-	            progressLayout.Visibility = ViewStates.Gone;
+                Activity.RunOnUiThread(() =>
+                {
+                    downloaded.Text = fi.DownloadedItemsCount > 0
+                        ? GetString(Resource.String.download_finished)
+                        : GetString(Resource.String.download_finished_empty);
+                    
+                    finishedLayout.Visibility = ViewStates.Visible;
+                    startLayout.Visibility = ViewStates.Gone;
+                    progressLayout.Visibility = ViewStates.Gone;
 
-	            downloadRunning = false;
+                    downloadRunning = false;
+                });
             }
 
             void OnException(Exception ex)
@@ -216,13 +232,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sw.Stop();
                 sw = null;
 
-	            startLayout.Visibility = ViewStates.Visible;
-	            progressLayout.Visibility = ViewStates.Gone;
-	            finishedLayout.Visibility = ViewStates.Gone;
+                Activity.RunOnUiThread(() =>
+                {
+                    startLayout.Visibility = ViewStates.Visible;
+                    progressLayout.Visibility = ViewStates.Gone;
+                    finishedLayout.Visibility = ViewStates.Gone;
 
-	            Dialogs.ShowErrorDialog(Activity, ex);
+                    Dialogs.ShowErrorDialog(Activity, ex);
 
-	            downloadRunning = false;
+                    downloadRunning = false;
+                });
             }
 
             void OnCancelled()
@@ -235,11 +254,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sw.Stop();
                 sw = null;
 
-	            startLayout.Visibility = ViewStates.Visible;
-	            progressLayout.Visibility = ViewStates.Gone;
-	            finishedLayout.Visibility = ViewStates.Gone;
+                Activity.RunOnUiThread(() =>
+                {
+                    startLayout.Visibility = ViewStates.Visible;
+                    progressLayout.Visibility = ViewStates.Gone;
+                    finishedLayout.Visibility = ViewStates.Gone;
 
-	            downloadRunning = false;
+                    downloadRunning = false;
+                });
             }
 
             cts?.Cancel();
@@ -289,7 +311,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var result = await Managers.ContactsManager.GetContactPreviewsAsync(folder, startRowId, SourceType.Remote);
 
                         result.ForEach(cp => queue.Enqueue(cp.Id));
-                        startRowId = result.Last().RowId;
+                        startRowId = result.LastOrDefault()?.RowId ?? -1;
                         lastBatchCount = result.Count;
 
                         result.Clear();
@@ -300,7 +322,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var result = await Managers.ShortcodesManager.GetShortcodePreviewsAsync(folder, startRowId, SourceType.Remote);
 
                         result.ForEach(cp => queue.Enqueue(cp.Id));
-                        startRowId = result.Last().RowId;
+                        startRowId = result.LastOrDefault()?.RowId ?? -1;
                         lastBatchCount = result.Count;
 
                         result.Clear();
@@ -312,7 +334,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var totalItemsCount = queue.Count;
                 var leftItemsCount = queue.Count;
-                var failedItemsCount = 0;
+                var failedItems = new List<int>();
 
                 if (ct.IsCancellationRequested)
                 {
@@ -322,7 +344,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Info($"Folder {folder.Name} prepared to download. {totalItemsCount} items to download. [folder.id={folder.Id}, folder.module={folder.Module}]");
 
-                onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
+                onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
 
                 do
                 {
@@ -366,21 +388,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error($"Item with ID {item} failed to download. [folder.id={folder.Id}, folder.name={folder.Name}, folder.module={folder.Module}]", ex);
-                        failedItemsCount++;
+                        failedItems.Add(item);
                     }
 
-                    onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItemsCount));
+                    onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
                 } while (!ct.IsCancellationRequested);
 
                 if (ct.IsCancellationRequested)
                     onCancelled();
                 else
                 {
-                    CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItemsCount} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
+                    CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItems.Count} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
+                    CommonConfig.Logger.Warning($"Following items failed to download: [folder.id={folder.Id}]");
+                    foreach (var failedItem in failedItems)
+                        CommonConfig.Logger.Warning("   - " + failedItem);
 
-                    await Managers.FoldersManager.AddSavedFolderInfo(folder);
+                    if (totalItemsCount > 0)
+                        await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
-                    onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItemsCount));
+                    onFinishedAction(new FinishedInfo(totalItemsCount - leftItemsCount, failedItems.Count));
                 }
             }
             catch (Exception ex)

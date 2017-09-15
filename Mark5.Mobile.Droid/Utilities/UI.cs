@@ -19,5 +19,20 @@ namespace Mark5.Mobile.Droid.Utilities
                     throw new ArgumentException("The input priority should not be shown to the user");
             }
         }
+
+        public static int ContactTypeResourceId(ContactType type)
+        {
+            switch (type)
+            {
+                case ContactType.Person:
+                    return Resource.String.person;
+                case ContactType.Company:
+                    return Resource.String.company;
+                case ContactType.Department:
+                    return Resource.String.department;
+                default:
+                    throw new ArgumentException("Input type not valid");
+            }
+        }
     }
 }

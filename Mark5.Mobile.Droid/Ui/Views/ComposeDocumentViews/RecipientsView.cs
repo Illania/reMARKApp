@@ -176,6 +176,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                     SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
             }
+            
+            if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
+                AddEmails(PreconfiguredEmailAddresses[AddressType]);
 
             return Task.CompletedTask;
         }
