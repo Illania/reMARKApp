@@ -233,7 +233,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void CloseFragment()
         {
             tcs.SetResult((fromTimestamp,toTimestamp));
-            
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 

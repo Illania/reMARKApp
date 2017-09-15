@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (PickCountryFragment fragment, string tag) NewInstance()
         {
             var fragment = new PickCountryFragment();
-            var tag = $"{nameof(PickLinesListFragment)}";
+            var tag = $"{nameof(PickCountryFragment)}";
 
             return (fragment, tag);
         }

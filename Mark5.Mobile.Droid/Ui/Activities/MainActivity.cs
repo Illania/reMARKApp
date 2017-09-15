@@ -101,17 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ss = AsyncHelpers.RunSync(() => Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local));
                 navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-
-                /*Task.Run(async () =>
-                {
-			        return await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-                })
-			    .ContinueWith(t =>
-			        {
-			            var ss = t.Result;
-			            navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-			        },TaskScheduler.FromCurrentSynchronizationContext());*/
-                    
+ 
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
             else

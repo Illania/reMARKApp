@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -98,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateText();
         }
 
-        async void OpenDateRangeFragment(bool startWithTo)
+        async Task OpenDateRangeFragment(bool startWithTo)
         {
             var (f, tag) = PickDateRangeFragment.NewInstance(fromTimestamp, toTimestamp, startWithTo);
             parentFragment.ReplaceFragment(f, tag);
@@ -116,14 +117,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateCriteria();
         }
 
-        void From_Click(object sender, EventArgs e)
+        async void From_Click(object sender, EventArgs e)
         {
-            OpenDateRangeFragment(false);
+            await OpenDateRangeFragment(false);
         }
 
-        void To_Click(object sender, EventArgs e)
+        async void To_Click(object sender, EventArgs e)
         {
-            OpenDateRangeFragment(true);
+            await OpenDateRangeFragment(true);
         }
 
         void UpdateText()
