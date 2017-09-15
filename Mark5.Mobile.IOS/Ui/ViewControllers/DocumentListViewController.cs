@@ -885,12 +885,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task AutoRefreshData(int endId)
         {
-            if (refreshing)
-                return;
-
-            refreshing = true;
-
-            refreshControl.Enabled = false;
+            InvokeOnMainThread(() => {
+                if (refreshing)
+                    return;
+                
+                refreshing = true;
+                refreshControl.Enabled = false;
+            });
 
             try
             {
@@ -909,10 +910,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Services.DocumentsDownloadService.Notify();
 
-                    var ds = tableView.Source as DataSource;
-                    ds?.PrependItems(documents);
+                    InvokeOnMainThread(() => {
+                        var ds = tableView.Source as DataSource;
+                        ds?.PrependItems(documents);
 
-                    newDocumentsAvailableAction?.Invoke();
+                        newDocumentsAvailableAction?.Invoke();
+                    });
                 }
             }
             catch (Exception ex)
@@ -924,8 +927,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Debug($"Automatic refresh finished");
             }
 
-            refreshControl.Enabled = true;
-            refreshing = false;
+            InvokeOnMainThread(() => {
+                refreshControl.Enabled = true;
+                refreshing = false;
+            });
         }
 
         #endregion
@@ -1424,7 +1429,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             var first = firstOrDefaultItem();
                             if (first != null)
-                                InvokeOnMainThread(async () => await work(first.Id));
+                                await work(first.Id);
                         }
                     });
                 }

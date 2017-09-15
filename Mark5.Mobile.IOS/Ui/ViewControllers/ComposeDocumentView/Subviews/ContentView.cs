@@ -753,12 +753,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             public override void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
             {
-                BeginInvokeOnMainThread(async () =>
-                {
+                BeginInvokeOnMainThread(async () => {
                     await webView.EvaluateJavaScriptAsync("");
-
-                    if (DidFinishNavigationAction != null)
-                        DidFinishNavigationAction();
+                    DidFinishNavigationAction?.Invoke();
                 });
             }
         }
