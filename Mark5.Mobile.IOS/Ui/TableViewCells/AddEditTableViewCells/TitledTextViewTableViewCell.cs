@@ -26,7 +26,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.WithRelativeSize(1),
+                UserInteractionEnabled = true,
             };
+            titleLabel.AddGestureRecognizer(new UITapGestureRecognizer(HandlTitleTap));
             ContentView.AddSubview(titleLabel);
             ContentView.AddConstraints(new[]
             {
@@ -49,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             textView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             ContentView.AddSubview(textView);
             ContentView.AddConstraints(new[]
-            {
+                        {
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
@@ -79,6 +81,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             {
                 NumbersOfLineChangedAction?.Invoke();
             }
+        }
+
+        void HandlTitleTap()
+        {
+            textView.BecomeFirstResponder();
         }
 
         public void SetTitle(string title)

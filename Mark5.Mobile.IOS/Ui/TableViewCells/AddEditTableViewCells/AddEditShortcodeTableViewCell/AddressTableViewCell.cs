@@ -96,15 +96,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultLightFont.WithRelativeSize(-2),
-                TextColor = Theme.LightGray,
+                TextColor = Theme.White,
+                BackgroundColor = Theme.DarkGray,
+                TextAlignment = UITextAlignment.Center,
             };
+            typeLabel.Layer.CornerRadius = 10;
+            typeLabel.Layer.MasksToBounds = true;
             typeLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             typeLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             ContentView.Add(typeLabel);
             ContentView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, nameTextField, NSLayoutAttribute.CenterY, 1f, 0f),
-                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -InnerHorizontalMargin),
+                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 38f),
+                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -2f),
                 NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
             });
         }
@@ -126,15 +131,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             switch (address.AddressType)
             {
                 case DocumentAddressType.To:
-                    typeLabel.Text = Localization.GetString("to");
+                    typeLabel.Text = Localization.GetString("to").ToUpper();
                     break;
                 case DocumentAddressType.Cc:
-                    typeLabel.Text = Localization.GetString("cc");
+                    typeLabel.Text = Localization.GetString("cc").ToUpper();
                     break;
                 case DocumentAddressType.Bcc:
-                    typeLabel.Text = Localization.GetString("bcc");
+                    typeLabel.Text = Localization.GetString("bcc").ToUpper();
                     break;
             }
+            typeLabel.SizeToFit();
         }
 
         #region EventHandlers

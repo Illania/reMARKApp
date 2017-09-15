@@ -3,9 +3,9 @@
 "attention" = "Attention";
 "area" = "Area";
 "add" = "Add";
-"add_to" = "add To";
-"add_cc" = "add Cc";
-"add_bcc" = "add Bcc";
+"add_to" = "add to";
+"add_cc" = "add cc";
+"add_bcc" = "add bcc";
 "add_contact" = "Add contact";
 "add_phone" = "add phone";
 "add_mobile" = "add mobile";
