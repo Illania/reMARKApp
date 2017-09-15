@@ -2,11 +2,24 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Android.App;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
     public static class AsyncHelpers
     {
+        public static Task RunOnUiThreadAsync(Activity activity, Func<Task> f)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            activity.RunOnUiThread(async () => {
+                await f();
+                tcs.SetResult(true);
+            });
+
+            return tcs.Task;
+        }
+
         public static void RunSync(Func<Task> task)
         {
             var oldContext = SynchronizationContext.Current;

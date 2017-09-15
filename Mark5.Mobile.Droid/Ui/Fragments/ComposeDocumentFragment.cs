@@ -610,7 +610,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug("Saving working copy...");
 
-                Activity.RunOnUiThread(async () =>
+                await AsyncHelpers.RunOnUiThreadAsync(Activity, async () =>
                 {
                     foreach (var subView in subViews)
                         await subView.UpdateDocument();
