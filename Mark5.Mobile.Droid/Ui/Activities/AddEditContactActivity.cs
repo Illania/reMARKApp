@@ -25,8 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Context context, Contact contact = null, int? contactId = null, ContactPreview contactPreview = null, ContactCreationModeFlag? contactCreationModeFlag = null,
-                                   ContactPreview parentContactPreview = null, ContactType? contactType = null, Folder folder = null, int? folderId = null)
+        public static Intent CreateIntent(Context context, Contact contact = null, int? contactId = null, ContactPreview contactPreview = null, int? contactCreationModeFlag = null,
+                                   ContactPreview parentContactPreview = null, int? contactType = null, Folder folder = null, int? folderId = null)
         {
             var intent = new Intent(context, typeof(AddEditContactActivity));
 
@@ -40,13 +40,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 intent.PutExtra(ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
 
             if (contactCreationModeFlag != null)
-                intent.PutExtra(ContactCreationModeFlagIntentKey, Serializer.Serialize(contactCreationModeFlag));
+                intent.PutExtra(ContactCreationModeFlagIntentKey, contactCreationModeFlag.Value);
 
             if (parentContactPreview != null)
                 intent.PutExtra(ParentContactPreviewIntentKey, Serializer.Serialize(parentContactPreview));
 
             if (contactType != null)
-                intent.PutExtra(ContactTypeIntentKey, Serializer.Serialize(contactType));
+                intent.PutExtra(ContactTypeIntentKey, contactType.Value);
 
             if (folder != null)
                 intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
@@ -73,33 +73,39 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var cf = new AddEditContactFragment();
-
-                cf.CloseRequest = CloseRequest;
+                int? contactId = null;
+                ContactPreview contactPreview = null;
+                ContactPreview parentContactPreview = null;
+                bool? parentPreselected = null;
+                Contact contact = null;
+                ContactCreationModeFlag? creationModeFlag = null;
+                ContactType? contactType = null;
 
                 if (Intent.HasExtra(ContactIdIntentKey))
-                    cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
+                    contactId = Intent.Extras.GetInt(ContactIdIntentKey);
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
-                    cf.ContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
+                    contactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
 
                 if (Intent.HasExtra(ParentContactPreviewIntentKey))
                 {
-                    cf.ParentContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ParentContactPreviewIntentKey));
-                    cf.ParentPreselected = true;
+                    parentContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ParentContactPreviewIntentKey));
+                    parentPreselected = true;
                 }
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
-                    cf.Contact = Serializer.Deserialize<Contact>(Intent.Extras.GetString(ContactIntentKey));
+                    contact = Serializer.Deserialize<Contact>(Intent.Extras.GetString(ContactIntentKey));
 
                 if (Intent.HasExtra(ContactCreationModeFlagIntentKey))
-                    cf.CreationModeFlag = (ContactCreationModeFlag)Intent.Extras.GetInt(ContactCreationModeFlagIntentKey);
+                    creationModeFlag = (ContactCreationModeFlag)Intent.Extras.GetInt(ContactCreationModeFlagIntentKey);
 
                 if (Intent.HasExtra(ContactTypeIntentKey))
-                    cf.ContactType = (ContactType)Intent.Extras.GetInt(ContactTypeIntentKey);
+                    contactType = (ContactType)Intent.Extras.GetInt(ContactTypeIntentKey);
+
+                var (cf, tag) = AddEditContactFragment.NewInstance(contact, contactPreview, contactId, contactType, creationModeFlag, parentContactPreview, parentPreselected);
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, cf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(AddEditContactActivity)}");
@@ -110,7 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        void CloseRequest()
+        public override void OnBackPressed()
         {
             var intent = new Intent();
             SetResult(Result.Ok, intent);

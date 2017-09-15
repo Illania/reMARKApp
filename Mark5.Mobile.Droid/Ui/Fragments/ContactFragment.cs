@@ -423,24 +423,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_children_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
             if (index >= 0)
-            {
-                var intent = new Intent(Context, typeof(AddEditContactActivity));
-                intent.PutExtra(AddEditContactActivity.ContactCreationModeFlagIntentKey, (int)ContactCreationModeFlag.New);
-                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
-                intent.PutExtra(AddEditContactActivity.ParentContactPreviewIntentKey, Serializer.Serialize(contactPreview));
-                StartActivityForResult(intent, RequestCodes.ChildrenRequest);
-            }
+                StartActivityForResult(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.New, 
+                                                                           contactType: (int)values[index], parentContactPreview: contactPreview), RequestCodes.ChildrenRequest);
+            
         }
 
         void EditContact()
         {
-            var intent = new Intent(Context, typeof(AddEditContactActivity));
-            intent.PutExtra(AddEditContactActivity.ContactCreationModeFlagIntentKey, (int)ContactCreationModeFlag.Edit);
-            intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)contactPreview.Type);
-            intent.PutExtra(AddEditContactActivity.ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
-            intent.PutExtra(AddEditContactActivity.ContactIntentKey, Serializer.Serialize(contact));
-
-            StartActivityForResult(intent, RequestCodes.EditRequest);
+            StartActivityForResult(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.Edit, contactType: (int)contactPreview.Type, 
+                                                                       contactPreview: contactPreview, contact: contact), RequestCodes.EditRequest);
         }
 
         static class MenuItemActions

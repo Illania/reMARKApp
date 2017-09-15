@@ -91,12 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(),true);
 
             if (index >= 0)
-            {
-                var intent = new Intent(Context, typeof(AddEditContactActivity));
-                intent.PutExtra(AddEditContactActivity.ContactCreationModeFlagIntentKey, (int)ContactCreationModeFlag.New);
-                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
-                StartActivity(intent);
-            }
+                StartActivity(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.New, contactType: (int)values[index]));
         }
     }
 }
