@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AngleSharp.Dom.Html;
 using AngleSharp.Html;
 using AngleSharp.Parser.Html;
 using CoreFoundation;
@@ -321,8 +322,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override async Task UpdateDocument()
         {
-            Document.HtmlBody = await RetrieveCombinedText();
-            DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
+            (Document.HtmlBody, DocumentPreview.Preview) = await RetreiveContentAndPreview();
         }
 
         public async Task InsertTemplate(Template template)
@@ -508,30 +508,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             return string.Empty;
         }
 
-        async Task<string> RetrieveCombinedText()
+        async Task<(string content, string preview)> RetreiveContentAndPreview()
         {
-            var newContentString = (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
-            var newContentProcessedString = await ProcessRetrievedContent(new HtmlParser(), newContentString, NewEditableContentClass);
+            var htmlParser = new HtmlParser();
+
+            var newContentString = await AsyncHelpers.InvokeOnMainThreadAsync(this,
+                                                                              async () => (await newContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString());
+            var newContentParsed = await htmlParser.ParseAsync(newContentString);
+            var newContentProcessedString = ProcessRetrievedContent(newContentParsed, NewEditableContentClass);
 
             await LoadOldContent();
 
-            var oldContentString = (await oldContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString();
-            var oldContentProcessed = await ProcessRetrievedContent(new HtmlParser(), oldContentString, OldEditableContentClass);
+            var oldContentString = await AsyncHelpers.InvokeOnMainThreadAsync(this,
+                                                                              async () => (await oldContentWebView.EvaluateJavaScriptAsync(GetWebContentJs) as NSString).ToString());
+            var oldContentParsed = await htmlParser.ParseAsync(oldContentString);
+            var oldContentProcessed = ProcessRetrievedContent(oldContentParsed, OldEditableContentClass);
 
             if (!string.IsNullOrEmpty(oldContentProcessed))
             {
-                var htmlParser = new HtmlParser();
-                var newContentParsed = await htmlParser.ParseAsync(newContentProcessedString);
-                var oldContentParsed = await htmlParser.ParseAsync(oldContentProcessed);
-                var oldContentInDiv = newContentParsed.CreateElement("div");
-                oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
-                newContentParsed.Body.Append(oldContentInDiv);
+                var newContentProcessedParsed = await htmlParser.ParseAsync(newContentProcessedString);
+                var oldContentProcessedParsed = await htmlParser.ParseAsync(oldContentProcessed);
+                var oldContentInDiv = newContentProcessedParsed.CreateElement("div");
+                oldContentInDiv.InnerHtml = oldContentProcessedParsed.Body.InnerHtml;
+                newContentProcessedParsed.Body.Append(oldContentInDiv);
                 var textWriter = new StringWriter();
-                newContentParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-                return textWriter.ToString();
+                newContentProcessedParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                var content = textWriter.ToString();
+                var preview = GetPreview(newContentProcessedParsed);
+                return (content, preview);
             }
 
-            return newContentProcessedString;
+            return (newContentProcessedString, GetPreview(newContentParsed));
         }
 
         async Task SetWebContentPart(string parentElementClass, ContentType contentType, string content)
@@ -587,10 +594,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
         }
 
-        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content, string elementClass)
+        static string ProcessRetrievedContent(IHtmlDocument currentHtmlDocument, string elementClass)
         {
-            var currentHtmlDocument = await htmlParser.ParseAsync(content);
-
             var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
             foreach (var matchingElement in matchingElements)
                 matchingElement.Attributes.RemoveNamedItem("contenteditable");
@@ -608,11 +613,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             return inlineResult.Html;
         }
 
-        static async Task<string> GetPreview(string htmlText)
+        static string GetPreview(IHtmlDocument contentParsed)
         {
-            var htmlParser = new HtmlParser();
-            var newContentParsed = await htmlParser.ParseAsync(htmlText);
-            var textContent = newContentParsed.Body.TextContent;
+            var textContent = contentParsed.Body.TextContent;
             return textContent.SafeSubstring(0, 300).Trim();
         }
 

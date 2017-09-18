@@ -10,9 +10,23 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            obj.BeginInvokeOnMainThread(async () => {
+            obj.BeginInvokeOnMainThread(async () =>
+            {
                 await f();
                 tcs.SetResult(true);
+            });
+
+            return tcs.Task;
+        }
+
+        public static Task<T> InvokeOnMainThreadAsync<T>(NSObject obj, Func<Task<T>> f)
+        {
+            var tcs = new TaskCompletionSource<T>();
+
+            obj.BeginInvokeOnMainThread(async () =>
+            {
+                var result = await f();
+                tcs.SetResult(result);
             });
 
             return tcs.Task;
