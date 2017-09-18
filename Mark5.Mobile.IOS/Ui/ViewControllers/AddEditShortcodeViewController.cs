@@ -515,8 +515,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         var isRowValid = row.IsRowValid();
                         row.SetErrorState(!isRowValid);
 
-                        //TODO decide what to do with the missing animation
-
                         if (valid && !isRowValid)
                         {
                             var sectionIndex = DataSource.IndexForSection(this);
