@@ -428,6 +428,7 @@
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\DescriptionView.cs" />
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
     <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
+    <Compile Include="Utilities\AsyncHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

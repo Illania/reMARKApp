@@ -54,7 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         NSLayoutConstraint oldContentZeroHeightConstraint;
         NSLayoutConstraint oldContentHeightConstraint;
 
-        SemaphoreSlim newContentLoadingSemaphore = new SemaphoreSlim(0);
+        SemaphoreSlim newContentLoadingSemaphore = new SemaphoreSlim(0, 1);
         const string NewEditableContentClass = "new_content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
         const string OldEditableContentClass = "old_content_cc4ee2cb-e18c-423a-adb2-d106a29dcbc3";
 
@@ -684,31 +684,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var keyPressed = keypressedNumber != null && keypressedNumber.BoolValue;
 
             Action<WKWebView, NSLayoutConstraint> resizeAction = null;
-            resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)),
-                () =>
+            resizeAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(150)), () =>
+            {
+                if (wv.IsLoading)
                 {
-                    if (wv.IsLoading)
-                    {
-                        resizeAction(wv, nslc);
-                    }
-                    else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
-                    {
-                        nslc.Constant = wv.ScrollView.ContentSize.Height;
-                        SetNeedsLayout();
-                    }
-                });
+                    resizeAction(wv, nslc);
+                }
+                else if (Math.Abs(nslc.Constant - wv.ScrollView.ContentSize.Height) > 10) //Condition to avoid loop on size increase
+                {
+                    nslc.Constant = wv.ScrollView.ContentSize.Height;
+                    SetNeedsLayout();
+                }
+            });
 
             Action<WKWebView, NSLayoutConstraint> stopLoadingAction = null;
-            stopLoadingAction = (wv, nslc) =>
-            DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)),
-                                                  () =>
-                                                  {
-                                                      if (wv.IsLoading)
-                                                      {
-                                                          wv.StopLoading();
-                                                          resizeAction(wv, nslc);
-                                                      }
-                                                  });
+            stopLoadingAction = (wv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)), () =>
+            {
+                if (wv.IsLoading)
+                {
+                    wv.StopLoading();
+                    resizeAction(wv, nslc);
+                }
+            });
             if (keyPressed)
             {
                 ScrollForEnterPressed();
@@ -756,9 +753,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 BeginInvokeOnMainThread(async () =>
                 {
                     await webView.EvaluateJavaScriptAsync("");
-
-                    if (DidFinishNavigationAction != null)
-                        DidFinishNavigationAction();
+                    DidFinishNavigationAction?.Invoke();
                 });
             }
         }
