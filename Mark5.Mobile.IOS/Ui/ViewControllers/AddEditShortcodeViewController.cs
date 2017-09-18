@@ -221,7 +221,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("add_empty"),
             };
 
-            var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, strings, cell);
+            var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, strings, tableView, cell);
 
             if (choiceIndex == 0)
             {
