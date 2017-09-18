@@ -8,6 +8,11 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         public static Task InvokeOnMainThreadAsync(NSObject obj, Func<Task> f)
         {
+            if (NSThread.IsMain)
+            {
+                return f();
+            }
+
             var tcs = new TaskCompletionSource<bool>();
 
             obj.BeginInvokeOnMainThread(async () =>
@@ -21,6 +26,11 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static Task<T> InvokeOnMainThreadAsync<T>(NSObject obj, Func<Task<T>> f)
         {
+            if (NSThread.IsMain)
+            {
+                return f();
+            }
+
             var tcs = new TaskCompletionSource<T>();
 
             obj.BeginInvokeOnMainThread(async () =>

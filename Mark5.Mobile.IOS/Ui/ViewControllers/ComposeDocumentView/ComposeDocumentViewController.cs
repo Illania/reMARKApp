@@ -632,14 +632,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug("Saving working copy...");
 
-                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
-                {
-                    var subViews = stackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
-                    foreach (var subView in subViews)
-                        await subView.UpdateDocument();
-                });
+                ComposeDocumentSubView[] subViews = null;
 
-                await contentView.UpdateDocument();
+                InvokeOnMainThread(() => subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray());
+
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
