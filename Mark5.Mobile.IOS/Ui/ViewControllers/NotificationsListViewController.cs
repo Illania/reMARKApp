@@ -77,7 +77,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
 
             newNotificationsMessageToken?.Dispose();
-            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg => InvokeOnMainThread(async () => await RefreshData()));
+            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg =>
+            {
+                BeginInvokeOnMainThread(async () =>
+                {
+                    await RefreshData();
+                });
+            });
 
             var ds = (DataSource)tableView.Source;
             await RefreshData();
