@@ -24,11 +24,11 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Common.Service;
+using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -378,12 +378,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-	                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                    StartActivity(ComposeDocumentActivity.CreateIntent(Context,
                                                                        DocumentCreationModeFlag.Edit,
-	                                                                   CopyToNewOption.None,
-	                                                                   previousDocumentDirection: documentPreview.Direction,
-	                                                                   previousDocumentFolderId: Folder.Id,
-	                                                                   previousDocumentId: documentPreview.Id));
+                                                                       CopyToNewOption.None,
+                                                                       previousDocumentDirection: documentPreview.Direction,
+                                                                       previousDocumentFolderId: Folder.Id,
+                                                                       previousDocumentId: documentPreview.Id));
                 }
                 else
                 {
@@ -904,9 +904,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void UpdateCategories(DocumentPreviewCategoriesChangedMessage m)
+        public void UpdateCategories(EntityCategoriesChangedMessage m)
         {
-            var position = adapter.GetPosition(m.DocumentPreviewId);
+            var position = adapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifyAdapter = true;
@@ -915,7 +915,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dp.Categories.AddRange(m.Categories);
             }
 
-            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            position = searchAdapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifySearchAdapter = true;
@@ -925,9 +925,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void UpdateCommentsCount(DocumentPreviewCommentCountChangedMessage m)
+        public void UpdateCommentsCount(EntityPreviewCommentCountChangedMessage m)
         {
-            var position = adapter.GetPosition(m.DocumentPreviewId);
+            var position = adapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifyAdapter = true;
@@ -935,7 +935,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dp.CommentsCount = m.CommentsCount;
             }
 
-            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            position = searchAdapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifySearchAdapter = true;

@@ -16,6 +16,7 @@ using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using PCLStorage;
+using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -194,6 +195,8 @@ namespace Mark5.Mobile.Common.Manager
                 }
                 await documentsDataAccess.SetDocumentReadStatusAsync(documentPreview, document);
 
+                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, documentPreview.Id, documentPreview.IsReadByCurrent, documentPreview.IsReadByAnyone));
+
                 return;
             }
 
@@ -221,6 +224,7 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     dp.IsReadByCurrent = isRead;
                     dp.IsReadByAnyone = dp.IsReadByAnyone || isRead;
+                    CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
                 }
 
                 await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews);
@@ -251,6 +255,8 @@ namespace Mark5.Mobile.Common.Manager
                 documentPreviews.ForEach(dp => dp.Priority = priority);
 
                 await documentsDataAccess.SetDocumentPreviewsPriorityAsync(documentPreviews, priority);
+
+                documentPreviews.ForEach(dp => CommonConfig.MessengerHub.Publish(new DocumentPreviewPriorityChangedMessage(this, dp.Id, priority)));
 
                 return;
             }
@@ -435,6 +441,8 @@ namespace Mark5.Mobile.Common.Manager
 
                 await documentsDataAccess.SetCategoriesAsync(documentPreview, categories);
 
+                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Document, documentPreview.Id, documentPreview.Categories));
+
                 return;
             }
 
@@ -464,6 +472,8 @@ namespace Mark5.Mobile.Common.Manager
                 document.Comments.Add(comment);
 
                 await documentsDataAccess.AddCommentAsync(document, comment);
+
+                CommonConfig.MessengerHub.Publish(new EntityPreviewCommentCountChangedMessage(this, ObjectType.Document, document.Id, document.Comments.Count));
 
                 return comment;
             }
@@ -525,6 +535,8 @@ namespace Mark5.Mobile.Common.Manager
 
                 document.Comments.Remove(comment);
                 await documentsDataAccess.DeleteCommentAsync(document, comment);
+
+                CommonConfig.MessengerHub.Publish(new EntityPreviewCommentCountChangedMessage(this, ObjectType.Document, document.Id, document.Comments.Count));
 
                 return;
             }

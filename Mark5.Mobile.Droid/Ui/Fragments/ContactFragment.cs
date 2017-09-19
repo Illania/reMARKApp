@@ -16,7 +16,6 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
@@ -349,11 +348,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { ContactPreview }, Folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Contact,
-                    Folder.Id,
-                    new List<int> { ContactPreview.Id }));
-
                 dismissAction();
             }
             catch (Exception ex)
@@ -382,13 +376,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     ContactPreview
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
-                    ObjectType.Contact,
-                    new List<int>
-                    {
-                        ContactPreview.Id
-                    }));
 
                 dismissAction();
                 CloseRequest?.Invoke();

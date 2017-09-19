@@ -15,7 +15,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -120,7 +119,6 @@ namespace Mark5.Mobile.Droid
                     case ObjectType.Document:
                         var documentPreview = BusinessEntityPreview as DocumentPreview;
                         await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories.Values.ToList());
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCategoriesChangedMessage(this, documentPreview.Id, documentPreview.Categories));
                         break;
                     case ObjectType.Contact:
                         var contactPreview = BusinessEntityPreview as ContactPreview;

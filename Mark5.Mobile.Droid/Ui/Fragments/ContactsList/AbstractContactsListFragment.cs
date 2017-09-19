@@ -18,11 +18,10 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -635,9 +634,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Messenger hub related
 
-        public void UpdateCategories(ContactPreviewCategoriesChangedMessage m)
+        public void UpdateCategories(EntityCategoriesChangedMessage m)
         {
-            var position = adapter.GetPosition(m.ContactPreviewId);
+            var position = adapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifyAdapter = true;
@@ -646,7 +645,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 cp.Categories.AddRange(m.Categories);
             }
 
-            position = searchAdapter.GetPosition(m.ContactPreviewId);
+            position = searchAdapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifySearchAdapter = true;
@@ -656,20 +655,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void UpdateContactPreview(ContactPreviewChanged m)
+        public void UpdateContactPreview(EntityPreviewChangedMessage m)
         {
-            var position = adapter.GetPosition(m.ContactPreview.Id);
+            var position = adapter.GetPosition(m.EntityPreview.Id);
             if (position >= 0)
             {
                 shouldNotifyAdapter = true;
-                adapter.Items[position] = m.ContactPreview;
+                adapter.Items[position] = (ContactPreview)m.EntityPreview;
             }
 
-            position = searchAdapter.GetPosition(m.ContactPreview.Id);
+            position = searchAdapter.GetPosition(m.EntityPreview.Id);
             if (position >= 0)
             {
                 shouldNotifySearchAdapter = true;
-                adapter.Items[position] = m.ContactPreview;
+                adapter.Items[position] = (ContactPreview)m.EntityPreview;
             }
         }
 

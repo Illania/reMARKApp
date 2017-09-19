@@ -17,7 +17,6 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -355,9 +354,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
 
                 dismissAction();
-
-                if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                    CommonConfig.MessengerHub.Publish(new ContactPreviewChanged(this, ContactPreview));
 
                 CloseRequest?.Invoke();
             }

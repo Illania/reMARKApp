@@ -174,6 +174,9 @@ namespace Mark5.Mobile.Common.Manager
                 contactPreview.Id = result.Id;
                 contactPreview.Guid = result.Guid;
 
+                if (result.Updated)
+                    CommonConfig.MessengerHub.Publish(new EntityPreviewChangedMessage(this, contactPreview));
+
                 return result.Updated;
             }
 

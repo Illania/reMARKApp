@@ -4,8 +4,8 @@ using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                slf = (ShortcodesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                slf = (ShortcodesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodesListActivity)}");
             }
 

@@ -7,6 +7,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -140,6 +141,9 @@ namespace Mark5.Mobile.Common.Manager
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), fromFolder);
+
+                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
+
                 return;
             }
 
@@ -236,6 +240,10 @@ namespace Mark5.Mobile.Common.Manager
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
                     await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), folder);
+
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, businessEntities.First().ObjectType, folder.Id,
+                                                                                     businessEntities.Select(b => b.Id).ToList()));
+
                 return;
             }
 
@@ -283,6 +291,10 @@ namespace Mark5.Mobile.Common.Manager
                 var tasks = businessEntities.OfType<CalendarTask>();
                 if (tasks.Any())
                     await calendarDataAccess.DeleteAsync(tasks.ToList());
+
+                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                                                                           businessEntities.First().ObjectType, businessEntities.Select(b => b.Id).ToList()));
+
                 return;
             }
 
