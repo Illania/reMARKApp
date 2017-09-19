@@ -1,20 +1,19 @@
-﻿using System.Collections.Generic;
-using Mark5.Mobile.Common.Model;
+﻿using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Model.HubMessages
 {
-    public class DocumentPreviewCategoriesChangedMessage : TinyMessageBase
+    public class DocumentPreviewPriorityChangedMessage : TinyMessageBase
     {
         public int DocumentPreviewId { get; }
 
-        public List<Category> Categories { get; }
+        public Priority Priority { get; }
 
-        public DocumentPreviewCategoriesChangedMessage(object sender, int documentPreviewId, List<Category> categories)
+        public DocumentPreviewPriorityChangedMessage(object sender, int documentPreviewId, Priority priority)
             : base(sender)
         {
             DocumentPreviewId = documentPreviewId;
-            Categories = categories;
+            Priority = priority;
         }
     }
 }
