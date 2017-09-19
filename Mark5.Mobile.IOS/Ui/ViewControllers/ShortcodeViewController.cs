@@ -716,7 +716,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             UITableViewCell GetInitializedDocumentAddressCell(DocumentAddress documentAddress)
             {
-                if (string.IsNullOrWhiteSpace(documentAddress.Name))
+                if (string.IsNullOrWhiteSpace(documentAddress.FullAttention))
                 {
                     var compactCell = tableView.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell ?? DocumentAddressesCompactTableViewCell.Create();
                     compactCell.Initialize(documentAddress);
