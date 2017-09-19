@@ -8,8 +8,8 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -410,7 +410,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (commentsButton != null)
                 commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
-            
+
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
 
@@ -425,33 +425,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             contactChangedToken?.Dispose();
-            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage, (m) => contactPreview?.Id == m.ContactPreview.Id);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleContactChangedMessage, (m) => m.ObjectType == ObjectType.Contact && contactPreview?.Id == m.EntityId);
 
             childrenAddedToken?.Dispose();
-            childrenAddedToken = CommonConfig.MessengerHub.Subscribe<ChildrenContactAddedMessage>(HandleChildrenAddedMessage, (m) => contactPreview?.Id == m.ParentContactPreview.Id);
+            childrenAddedToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleContactChangedMessage, (m) => m.ObjectType == ObjectType.Contact && contactPreview?.Id == m.EntityId);
         }
 
         void UnsubscribeFromMessages()
         {
             if (contactChangedToken != null)
             {
-                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(contactChangedToken);
+                CommonConfig.MessengerHub.Unsubscribe<EntityChangedMessage>(contactChangedToken);
                 contactChangedToken = null;
             }
 
             if (childrenAddedToken != null)
             {
-                CommonConfig.MessengerHub.Unsubscribe<ChildrenContactAddedMessage>(childrenAddedToken);
+                CommonConfig.MessengerHub.Unsubscribe<EntityChangedMessage>(childrenAddedToken);
                 childrenAddedToken = null;
             }
         }
 
-        void HandleContactChangedMessage(ContactChangedMessage obj)
-        {
-            RefreshAllOnAppear();
-        }
-
-        void HandleChildrenAddedMessage(ChildrenContactAddedMessage obj)
+        void HandleContactChangedMessage(EntityChangedMessage m)
         {
             RefreshAllOnAppear();
         }
@@ -1035,13 +1030,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     contact
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
-                    ObjectType.Contact,
-                    new List<int>
-                    {
-                        contact.Id
-                    }));
 
                 dismissAction();
 

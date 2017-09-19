@@ -9,9 +9,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -229,11 +229,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Document);
-            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
         }
 
         void UnsubscribeFromMessages()
@@ -946,12 +946,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-        void CommentsCountChangedHandler(DocumentPreviewCommentsCountChangedMessage message)
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
                 var ds = tableView.Source as DataSource;
-                var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
 
                 if (index >= 0)
                 {
@@ -1092,7 +1092,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RemoveDocumentsFromList(m.EntitiesId);
         }
 
-        void HandleDeleted(EntityDeletedMessage m)
+        void HandleDeleted(EntityRemovedMessage m)
         {
             RemoveDocumentsFromList(m.EntitiesId);
         }

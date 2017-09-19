@@ -9,7 +9,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -496,14 +495,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     },
                     folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Shortcode,
-                    folder.Id,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
-
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
@@ -537,13 +528,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     shortcode
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
-                    ObjectType.Shortcode,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
 
                 dismissAction();
 

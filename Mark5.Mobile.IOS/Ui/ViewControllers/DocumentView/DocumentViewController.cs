@@ -11,7 +11,6 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
@@ -1287,11 +1286,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { document }, folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Document,
-                    folder.Id,
-                    new List<int> { document.Id }));
-
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
@@ -1325,13 +1319,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     document
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
-                    ObjectType.Document,
-                    new List<int>
-                    {
-                        document.Id
-                    }));
 
                 dismissAction();
 
@@ -1396,7 +1383,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (coder.DecodeBool("modal"))
                 return null;
-            
+
             return new DocumentViewController();
         }
 

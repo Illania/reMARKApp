@@ -177,6 +177,9 @@ namespace Mark5.Mobile.Common.Manager
                 if (result.Updated)
                     CommonConfig.MessengerHub.Publish(new EntityPreviewChangedMessage(this, contactPreview));
 
+                if (parentObjectId > 0)
+                    CommonConfig.MessengerHub.Publish(new EntityChangedMessage(this, ObjectType.Contact, parentObjectId));
+
                 return result.Updated;
             }
 

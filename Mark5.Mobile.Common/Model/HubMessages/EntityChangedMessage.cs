@@ -4,12 +4,15 @@ namespace Mark5.Mobile.Common.Model.HubMessages
 {
     public class EntityChangedMessage : TinyMessageBase
     {
-        public BusinessEntity Entity { get; }
+        public ObjectType ObjectType { get; }
 
-        public EntityChangedMessage(object sender, BusinessEntity entity)
+        public int EntityId { get; }
+
+        public EntityChangedMessage(object sender, ObjectType objectType, int entityId)
             : base(sender)
         {
-            Entity = entity;
+            ObjectType = objectType;
+            EntityId = entityId;
         }
     }
 }

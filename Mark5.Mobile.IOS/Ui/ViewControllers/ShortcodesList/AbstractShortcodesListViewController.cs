@@ -8,7 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
 
-            ReachabilityBar.Attach(View, TableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            ReachabilityBar.Attach(View, TableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -86,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             CommonConfig.Logger.Info($"{nameof(AbstractShortcodesListViewController)} appeared");
 
-            var ds = (DataSource) TableView.Source;
+            var ds = (DataSource)TableView.Source;
             if (ds.Empty)
                 RefreshData();
         }
@@ -106,10 +106,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (ShortcodeViewController) nc.ViewControllers[0];
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
                 vc.ClearData();
             }
         }
@@ -194,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
             CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
+            CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
         }
 
         void InitializeNavigationBarTitle()
@@ -263,10 +263,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (ShortcodeViewController) nc.ViewControllers[0];
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
                 vc.ClearData();
             }
         }
@@ -294,7 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
             var rows = TableView.IndexPathsForSelectedRows.ToArray();
-            var selectedShortcodes = rows.Select(ip => ((DataSource) TableView.Source).FindItemAtIndexPath(ip)).ToList();
+            var selectedShortcodes = rows.Select(ip => ((DataSource)TableView.Source).FindItemAtIndexPath(ip)).ToList();
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
                 UIAlertActionStyle.Default,
@@ -330,7 +330,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => ExitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             ExitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -388,7 +388,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (forceClear)
             {
-                var ds = (DataSource) TableView.Source;
+                var ds = (DataSource)TableView.Source;
                 ds.Reset();
             }
 
@@ -399,7 +399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 {
                     InvokeOnMainThread(() =>
                     {
-                        var ds = (DataSource) TableView.Source;
+                        var ds = (DataSource)TableView.Source;
                         ds.AppendItems(sps);
                     });
                 },
@@ -469,7 +469,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (ct.IsCancellationRequested)
                 return;
 
-            var ds = (DataSource) TableView.Source;
+            var ds = (DataSource)TableView.Source;
             var filteredShortcodes = ds.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
 
             if (ct.IsCancellationRequested)
@@ -669,7 +669,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RemoveShortcodesFromList(m.EntitiesId);
         }
 
-        void HandleDeleted(EntityDeletedMessage m)
+        void HandleDeleted(EntityRemovedMessage m)
         {
             RemoveShortcodesFromList(m.EntitiesId);
         }
@@ -683,12 +683,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (SearchController.Active)
                 SearchResultsDataSource.RemoveItems(ids.ToList());
 
-            var ds = (DataSource) TableView.Source;
+            var ds = (DataSource)TableView.Source;
             ds.RemoveItems(ids.ToList());
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
-                var vc = (ShortcodeViewController) nc.ViewControllers[0];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
                 if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v))
                     vc.ClearData();
             }
@@ -757,7 +757,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 if (!shortcodePreviewsInView.SelectMany(v => v).Any())
                     return 1;
 
-                return shortcodePreviewsInView[(int) section].Count;
+                return shortcodePreviewsInView[(int)section].Count;
             }
 
             public override string[] SectionIndexTitles(UITableView tableView)
