@@ -33,7 +33,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             this.fromFolder = fromFolder;
         }
 
-        protected override void InitializeNavigationBarTitle()
+        // TODO
+        /*protected override void InitializeNavigationBarTitle()
         {
             Func<string> getTitle = () =>
             {
@@ -64,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 NavigationItem.Prompt = getTitle();
             }
             UIView.AnimationsEnabled = true;
-        }
+        }*/
 
         protected override void InitializeNavigationBar()
         {

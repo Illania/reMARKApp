@@ -27,15 +27,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void LoadView()
         {
             base.LoadView();
-
-            AutomaticallyAdjustsScrollViewInsets = false;
-
+            
             segmentedControl = new UISegmentedControl(new[]
             {
                 Localization.GetString("folders"),
                 Localization.GetString("notifications")
-            });
-            segmentedControl.Frame = new CGRect(0f, 0f, 0f, 26f);
+            })
+            {
+                Frame = new CGRect(0f, 0f, 0f, 26f),
+                TintColor = Theme.DarkBlue,
+                SelectedSegment = 0
+            };
             segmentedControl.SetTitleTextAttributes(new UITextAttributes
             {
                 Font = Theme.DefaultFont.WithRelativeSize(-3f),
@@ -46,14 +48,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Font = Theme.DefaultFont.WithRelativeSize(-3f),
                 TextColor = Theme.White
             }, UIControlState.Selected);
-            segmentedControl.TintColor = Theme.DarkBlue;
-            segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
 
-            UIView.AnimationsEnabled = false;
-            NavigationItem.Prompt = GetTitleForModule(moduleType);
+            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Always;
+            NavigationItem.Title = GetTitleForModule(moduleType);
             NavigationItem.TitleView = segmentedControl;
-            UIView.AnimationsEnabled = true;
 
             viewControllers = new UIViewController[]
             {
@@ -68,8 +68,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RestorationIdentifier = nameof(FoldersNotificationsListViewController);
             RestorationClass = Class;
-
-            ExtendedLayoutIncludesOpaqueBars = true;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -89,35 +87,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
             else
                 NavigationItem.SetRightBarButtonItem(null, false);
+            NavigationItem.SearchController = vc.NavigationItem.SearchController;
             vc.DidMoveToParentViewController(this);
             currentViewController = vc;
-
-            AdjustScrollViewInsets();
-        }
-
-        public override void ViewDidAppear(bool animated)
-        {
-            base.ViewDidAppear(animated);
-
-            AdjustScrollViewInsets();
-        }
-
-        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
-        {
-            base.ViewWillTransitionToSize(toSize, coordinator);
-
-            coordinator.AnimateAlongsideTransition(ctx => { }, ctx => AdjustScrollViewInsets());
-        }
-
-        void AdjustScrollViewInsets()
-        {
-            var scrollView = currentViewController?.View?.Subviews[0] as UIScrollView;
-            if (scrollView == null)
-                return;
-
-            scrollView.ContentInset = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            scrollView.ScrollIndicatorInsets = new UIEdgeInsets(ParentViewController.TopLayoutGuide.Length + NavigationController.NavigationBar.Frame.Height, 0f, ParentViewController.BottomLayoutGuide.Length, 0f);
-            scrollView.LayoutIfNeeded();
         }
 
         [Export("segmentedControlHasChangedValue:")]
@@ -139,10 +111,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
             else
                 NavigationItem.SetRightBarButtonItem(null, false);
+            NavigationItem.SearchController = vc.NavigationItem.SearchController;
             vc.DidMoveToParentViewController(this);
             currentViewController.DidMoveToParentViewController(null);
             currentViewController = vc;
-            AdjustScrollViewInsets();
         }
 
         static string GetTitleForModule(ModuleType moduleType)

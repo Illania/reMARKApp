@@ -49,15 +49,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RestorationIdentifier = nameof(NotificationsListViewController);
             RestorationClass = Class;
-
-            ExtendedLayoutIncludesOpaqueBars = true;
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
             InitializeHandlers();
 
             if (tableView?.IndexPathForSelectedRow != null)
@@ -93,11 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            if (newNotificationsMessageToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
-                newNotificationsMessageToken = null;
-            }
+            newNotificationsMessageToken?.Dispose();
 
             DeinitializeHandlers();
         }
@@ -115,6 +108,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
+            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            NavigationItem.Title = Localization.GetString("notifications");
+
             markAsReadItem = new UIBarButtonItem();
             markAsReadItem.Image = UIImage.FromBundle(Path.Combine("icons", "markasread.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             markAsReadItem.Enabled = false;
@@ -123,32 +120,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
+            refreshControl = new UIRefreshControl();
 
             tableView = new UITableView();
-            tableView.ClipsToBounds = false;
+            tableView.InsetsContentViewsToSafeArea = true;
             tableView.Source = new DataSource(this, tableView, Localization.GetString("no_notifications"));
+            tableView.RefreshControl = refreshControl;
             tableView.AllowsSelection = true;
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 60f;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-
-            refreshControl = new UIRefreshControl();
-            refreshControl.BackgroundColor = UIColor.White;
-            tableView.AddSubview(refreshControl);
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            NavigationItem.Title = Localization.GetString("notifications");
+            View = tableView;
         }
 
         void InitializeHandlers()

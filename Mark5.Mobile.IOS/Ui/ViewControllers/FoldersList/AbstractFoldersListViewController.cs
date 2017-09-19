@@ -75,18 +75,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             InitializeSearchBar();
         }
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            ExtendedLayoutIncludesOpaqueBars = true;
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
             InitializeHandlers();
 
             if (TableView?.IndexPathForSelectedRow != null)
@@ -116,7 +108,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.ViewWillDisappear(animated);
 
-            ClearNavigationBarTitle();
             DeinitializeHandlers();
 
             if (NavigationController != null && NavigationController.NavigationBarHidden)
@@ -144,45 +135,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #region Initialize/deinitialize
 
-        protected virtual void InitializeNavigationBarTitle()
+        protected virtual void InitializeNavigationBar()
         {
-            Func<string> getTitle = () =>
-            {
+            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
+            if (IsRootOfFoldersList)
                 switch (ParentFolder.Module)
                 {
                     case ModuleType.Documents:
-                        return Localization.GetString("documents");
+                        NavigationItem.Title = Localization.GetString("documents");
+                        break;
                     case ModuleType.Contacts:
-                        return Localization.GetString("contacts");
+                        NavigationItem.Title = Localization.GetString("contacts");
+                        break;
                     case ModuleType.Shortcodes:
-                        return Localization.GetString("shortcodes");
+                        NavigationItem.Title = Localization.GetString("shortcodes");
+                        break;
                     default:
-                        return " ";
+                        NavigationItem.Title = " ";
+                        break;
                 }
-            };
-
-            UIView.AnimationsEnabled = false;
-            if (IsRootOfFoldersList)
-            {
-                NavigationItem.Title = getTitle();
-                NavigationItem.Prompt = " ";
-            }
             else
-            {
                 NavigationItem.Title = ParentFolder.Name;
-                NavigationItem.Prompt = getTitle();
-            }
-            UIView.AnimationsEnabled = true;
-        }
 
-        protected virtual void ClearNavigationBarTitle()
-        {
-            if (IsRootOfFoldersList)
-                NavigationItem.Title = Localization.GetString("back");
-        }
-
-        protected virtual void InitializeNavigationBar()
-        {
             if (DisableNavigationBarActions)
                 return;
 
@@ -219,34 +195,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
+            RefreshControl = new UIRefreshControl();
 
             TableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            TableView.ClipsToBounds = false;
-            if (IsRootOfFoldersList)
-                TableView.Source = new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions);
-            else
-                TableView.Source = new DataSource(this, TableView, ParentFolder.Module, DisableRowActions);
+            TableView.InsetsContentViewsToSafeArea = true;
+            TableView.Source = IsRootOfFoldersList
+                ? new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource
+                : new DataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource;
+            TableView.RefreshControl = RefreshControl;
             TableView.AllowsSelectionDuringEditing = false;
-            TableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(TableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-
-            RefreshControl = new UIRefreshControl();
-            RefreshControl.BackgroundColor = UIColor.White;
-            TableView.AddSubview(RefreshControl);
+            View = TableView;
         }
 
         protected virtual void InitializeSearchBar()
         {
-            DefinesPresentationContext = true;
-
             SearchResultsController = new UITableViewController();
             SearchResultsDataSource = new SearchDataSource(this, SearchResultsController.TableView);
             SearchResultsController.TableView.Source = SearchResultsDataSource;
@@ -260,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             };
             SearchController.SearchBar.Placeholder = Localization.GetString("filter");
 
-            TableView.TableHeaderView = SearchController.SearchBar;
+            NavigationItem.SearchController = SearchController;
         }
 
         protected virtual void InitializeHandlers()
