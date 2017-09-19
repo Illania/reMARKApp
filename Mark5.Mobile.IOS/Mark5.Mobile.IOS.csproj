@@ -84,12 +84,6 @@
 		<Compile Include="PlatformConfig.cs" />
 		<Compile Include="Model\PushNotification.cs" />
 		<Compile Include="Model\Exceptions\MailViewerException.cs" />
-		<Compile Include="Model\HubMessages\DocumentPreviewCommentsCountChangedMessage.cs" />
-		<Compile Include="Model\HubMessages\EntityCategoriesChangedMessage.cs" />
-		<Compile Include="Model\HubMessages\EntityDeletedMessage.cs" />
-		<Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
-		<Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
-		<Compile Include="Model\HubMessages\NewNotificationsMessage.cs" />
 		<Compile Include="Service\ReachabilityProvider.cs" />
 		<Compile Include="Service\ReachabilityReceiver.cs" />
 		<Compile Include="Service\Reachability.cs" />
@@ -281,11 +275,8 @@
 		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\ParentContactSelectorListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
-		<Compile Include="Model\HubMessages\ContactChangedMessage.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditContactTableViewCell\MultiRowContentTableViewCell.cs" />
-		<Compile Include="Model\HubMessages\ChildrenContactAddedMessage.cs" />
 		<Compile Include="Config.cs" />
-		<Compile Include="Model\HubMessages\ContactPreviewCommentsCountChangedMessage.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
 	</ItemGroup>
