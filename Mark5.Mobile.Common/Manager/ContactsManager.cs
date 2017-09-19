@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -227,6 +228,8 @@ namespace Mark5.Mobile.Common.Manager
                 contactPreview.Categories.AddRange(categories);
 
                 await contactsDataAccess.SetCategoriesAsync(contactPreview, categories);
+
+                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Contact, contactPreview.Id, contactPreview.Categories));
 
                 return;
             }

@@ -65,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (IsBeingDismissed)
                 return;
 
-            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(m =>
             {
                 BeginInvokeOnMainThread(async () =>
                 {
