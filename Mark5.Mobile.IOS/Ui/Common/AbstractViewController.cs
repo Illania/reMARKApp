@@ -9,7 +9,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void LoadView()
         {
             base.LoadView();
-
             View.BackgroundColor = UIColor.White;
         }
     }

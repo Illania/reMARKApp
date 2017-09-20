@@ -68,6 +68,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            NavigationItem.SearchController = searchController;
             
             RestorationIdentifier = nameof(DocumentsListViewController);
             RestorationClass = Class;
@@ -155,8 +159,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
             NavigationItem.Title = Folder.Name;
 
             composeDocumentItem = new UIBarButtonItem();
@@ -191,6 +193,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeSearchBar()
         {
+            DefinesPresentationContext = true;
+
             searchResultsController = new UITableViewController();
             searchResultsDataSource = new DataSource(this, searchResultsController.TableView, null, Localization.GetString("no_matching_documents"), PlatformConfig.Preferences.CompactDocumentsList);
             searchResultsController.TableView.Source = searchResultsDataSource;
@@ -203,8 +207,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SearchResultsUpdater = this
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
-
-            NavigationItem.SearchController = searchController;
         }
 
         void SubscribeToMessages()

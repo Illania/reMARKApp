@@ -27,5 +27,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             ModalPresentationStyle = Integration.IsIPad() ? iPadStyle : iPhoneStyle;
         }
+
+        public override void LoadView()
+        {
+            base.LoadView();
+            View.BackgroundColor = Theme.White;
+        }
     }
 }

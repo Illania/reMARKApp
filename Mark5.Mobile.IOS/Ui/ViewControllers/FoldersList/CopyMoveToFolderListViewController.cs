@@ -33,10 +33,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             this.fromFolder = fromFolder;
         }
 
-        // TODO
-        /*protected override void InitializeNavigationBarTitle()
+        protected override void InitializeNavigationBar()
         {
-            Func<string> getTitle = () =>
+            string GetTitle()
             {
                 switch (ParentFolder.Module)
                 {
@@ -53,22 +52,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             };
 
-            UIView.AnimationsEnabled = false;
             if (IsRootOfFoldersList)
             {
-                NavigationItem.Title = fromFolder == null ? Localization.GetString("copy_to_folder") : Localization.GetString("move_to_folder");
-                NavigationItem.Prompt = getTitle();
+                NavigationItem.Title = GetTitle();
+                NavigationItem.Prompt = fromFolder == null ? Localization.GetString("copy_to_folder") : Localization.GetString("move_to_folder");
             }
             else
             {
-                NavigationItem.Title = ParentFolder.Name;
-                NavigationItem.Prompt = getTitle();
+                NavigationItem.Title = GetTitle();
+                NavigationItem.Prompt = ParentFolder.Name;
             }
-            UIView.AnimationsEnabled = true;
-        }*/
 
-        protected override void InitializeNavigationBar()
-        {
             if (IsRootOfFoldersList)
             {
                 cancelModeItem = new UIBarButtonItem();

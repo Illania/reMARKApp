@@ -34,20 +34,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("notifications")
             })
             {
-                Frame = new CGRect(0f, 0f, 0f, 26f),
-                TintColor = Theme.DarkBlue,
+                Frame = new CGRect(0f, 0f, 0f, 24f),
                 SelectedSegment = 0
             };
-            segmentedControl.SetTitleTextAttributes(new UITextAttributes
-            {
-                Font = Theme.DefaultFont.WithRelativeSize(-3f),
-                TextColor = Theme.White
-            }, UIControlState.Normal);
-            segmentedControl.SetTitleTextAttributes(new UITextAttributes
-            {
-                Font = Theme.DefaultFont.WithRelativeSize(-3f),
-                TextColor = Theme.White
-            }, UIControlState.Selected);
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
 
             NavigationController.NavigationBar.PrefersLargeTitles = true;
@@ -65,6 +54,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             RestorationIdentifier = nameof(FoldersNotificationsListViewController);
             RestorationClass = Class;

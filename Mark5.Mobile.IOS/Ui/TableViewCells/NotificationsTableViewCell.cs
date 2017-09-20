@@ -13,6 +13,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public partial class NotificationsTableViewCell : UITableViewCell
     {
+        public const float Height = 60f;
+
         public static readonly UINib Nib = UINib.FromName("NotificationsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("NotificationsTableViewCell");
 

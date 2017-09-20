@@ -45,39 +45,33 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             window.TintColor = TintColor;
 
-            UINavigationBar.Appearance.Translucent = false;
-            UINavigationBar.Appearance.TintColor = LightGray;
-            UINavigationBar.Appearance.BarTintColor = DarkerBlue;
+            UINavigationBar.Appearance.TintColor = DarkerBlue;
             UINavigationBar.Appearance.TitleTextAttributes = new UIStringAttributes
             {
-                ForegroundColor = LightGray,
-                Font = DefaultFont.WithRelativeSize(1f)
+                ForegroundColor = DarkerBlue,
+                Font = DefaultBoldFont.WithRelativeSize(1f)
             };
             UINavigationBar.Appearance.LargeTitleTextAttributes = new UIStringAttributes
             {
-                ForegroundColor = LightGray,
-                Font = DefaultFont.WithRelativeSize(10f)
+                ForegroundColor = DarkerBlue,
+                Font = DefaultBoldFont.WithRelativeSize(12f)
             };
 
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                TextColor = LightGray,
+                TextColor = DarkerBlue,
                 Font = DefaultFont
             }, UIControlState.Normal);
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                TextColor = LightGray,
+                TextColor = DarkerBlue,
                 Font = DefaultFont
             }, UIControlState.Highlighted);
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                TextColor = DarkBlue,
+                TextColor = DarkGray,
                 Font = DefaultFont
             }, UIControlState.Disabled);
-
-            UIToolbar.Appearance.BarTintColor = LightGray;
-
-            UITabBar.Appearance.BarTintColor = LightGray;
 
             UITabBarItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
@@ -87,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UISegmentedControl.Appearance.TintColor = DarkerBlue;
             UISegmentedControl.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont
+                Font = DefaultFont.WithRelativeSize(-3f)
             }, UIControlState.Normal);
 
             UISwitch.Appearance.OnTintColor = DarkBlue;

@@ -14,9 +14,15 @@ namespace Mark5.Mobile.IOS.Utilities
     public static class Integration
     {
 
-        #region iOS version
+        #region General
 
         public static bool IsRunningAtLeast(int major) => UIDevice.CurrentDevice.CheckSystemVersion(major, 0);
+
+        public static void ClearNotificationBadge()
+        {
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+        }
 
         #endregion
 

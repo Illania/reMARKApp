@@ -288,6 +288,7 @@
 		<Compile Include="Model\HubMessages\ContactPreviewCommentsCountChangedMessage.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
+		<Compile Include="Ui\Common\AbstractTableViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

@@ -110,6 +110,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            NavigationItem.SearchController = null;
+
             RestorationIdentifier = nameof(DocumentViewController);
             RestorationClass = Class;
         }
@@ -161,9 +164,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitNavigationBar()
         {
-            NavigationController.NavigationBar.PrefersLargeTitles = false;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-
             if (Modal)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
@@ -596,7 +596,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 RefreshView();
 
-                mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
+                if (NavigationController != null)
+                    mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
 
                 EndRefreshing();
 
@@ -613,7 +614,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (Modal)
                     DismissViewController(true, null);
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
         }
 
