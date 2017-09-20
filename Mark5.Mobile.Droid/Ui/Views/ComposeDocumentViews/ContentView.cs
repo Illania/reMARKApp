@@ -201,59 +201,62 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         async Task<string> GetBodyWithHeader(string content, ContentType contentType)
         {
-            if (contentType == ContentType.Html)
-            {
-                var htmlHeader = GetHtmlHeader();
+            return await Task.Run(async () =>
+           {
+               if (contentType == ContentType.Html)
+               {
+                   var htmlHeader = GetHtmlHeader();
 
-                var htmlParser = new HtmlParser();
-                var htmlDocument = await htmlParser.ParseAsync(content);
-                var body = htmlDocument.Body;
-                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
-                body.InsertBefore(parsedHeader.Body, body.FirstChild);
+                   var htmlParser = new HtmlParser();
+                   var htmlDocument = await htmlParser.ParseAsync(content);
+                   var body = htmlDocument.Body;
+                   var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+                   body.InsertBefore(parsedHeader.Body, body.FirstChild);
 
-                var ce = htmlDocument.CreateElement("div");
-                ce.ClassName = OldEditableContentClass;
-                ce.Id = "editable-one";
-                ce.SetAttribute("contentEditable", "true");
-                ce.SetAttribute("style", "outline: 0px solid transparent");
+                   var ce = htmlDocument.CreateElement("div");
+                   ce.ClassName = OldEditableContentClass;
+                   ce.Id = "editable-one";
+                   ce.SetAttribute("contentEditable", "true");
+                   ce.SetAttribute("style", "outline: 0px solid transparent");
 
-                ce.InnerHtml = body.InnerHtml;
-                body.InnerHtml = ce.OuterHtml;
+                   ce.InnerHtml = body.InnerHtml;
+                   body.InnerHtml = ce.OuterHtml;
 
-                var textWriter = new StringWriter();
-                htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                   var textWriter = new StringWriter();
+                   htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
-                return textWriter.ToString();
-            }
+                   return textWriter.ToString();
+               }
 
-            if (contentType == ContentType.PlainText)
-            {
-                var htmlHeader = GetHtmlHeader();
+               if (contentType == ContentType.PlainText)
+               {
+                   var htmlHeader = GetHtmlHeader();
 
-                var htmlParser = new HtmlParser();
-                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+                   var htmlParser = new HtmlParser();
+                   var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
 
-                var contentHtml = parsedHeader.CreateElement("pre");
-                contentHtml.TextContent = content;
+                   var contentHtml = parsedHeader.CreateElement("pre");
+                   contentHtml.TextContent = content;
 
-                parsedHeader.Body.Append(contentHtml);
+                   parsedHeader.Body.Append(contentHtml);
 
-                var ce = parsedHeader.CreateElement("div");
-                ce.ClassName = OldEditableContentClass;
-                ce.Id = "editable-one";
-                ce.SetAttribute("contentEditable", "true");
-                ce.SetAttribute("style", "outline: 0px solid transparent");
+                   var ce = parsedHeader.CreateElement("div");
+                   ce.ClassName = OldEditableContentClass;
+                   ce.Id = "editable-one";
+                   ce.SetAttribute("contentEditable", "true");
+                   ce.SetAttribute("style", "outline: 0px solid transparent");
 
-                ce.InnerHtml = parsedHeader.Body.InnerHtml;
-                parsedHeader.Body.InnerHtml = ce.OuterHtml;
+                   ce.InnerHtml = parsedHeader.Body.InnerHtml;
+                   parsedHeader.Body.InnerHtml = ce.OuterHtml;
 
-                var textWriter = new StringWriter();
-                parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                   var textWriter = new StringWriter();
+                   parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
-                return textWriter.ToString();
-            }
+                   return textWriter.ToString();
+               }
 
-            return "";
+               return "";
+           });
         }
 
         string GetHtmlHeader()
