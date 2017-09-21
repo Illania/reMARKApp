@@ -223,13 +223,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public override Task UpdateDocument()
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
-            foreach (var email in GetEmails())
-                DocumentPreview.Addresses.Add(new DocumentAddress
-                {
-                    Address = email,
-                    AddressType = AddressType,
-                    Type = CommunicationAddressType.Email
-                });
+            InvokeOnMainThread(() =>
+            {
+                foreach (var email in GetEmails())
+                    DocumentPreview.Addresses.Add(new DocumentAddress
+                    {
+                        Address = email,
+                        AddressType = AddressType,
+                        Type = CommunicationAddressType.Email
+                    });
+            });
 
             return Task.CompletedTask;
         }

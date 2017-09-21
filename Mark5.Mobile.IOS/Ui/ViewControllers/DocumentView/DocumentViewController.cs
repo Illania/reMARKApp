@@ -619,7 +619,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 RefreshView();
 
-                mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
+                //If the user goes back to the document list view the navigation controller becomes null
+                if (NavigationController != null)
+                    mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
 
                 EndRefreshing();
 
@@ -636,7 +638,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (Modal)
                     DismissViewController(true, null);
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
         }
 
