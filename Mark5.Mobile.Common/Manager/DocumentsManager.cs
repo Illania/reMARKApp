@@ -441,7 +441,7 @@ namespace Mark5.Mobile.Common.Manager
 
                 await documentsDataAccess.SetCategoriesAsync(documentPreview, categories);
 
-                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Document, documentPreview.Id, documentPreview.Categories));
+                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Document, documentPreview.Id, documentPreview.Categories.ToList()));
 
                 return;
             }

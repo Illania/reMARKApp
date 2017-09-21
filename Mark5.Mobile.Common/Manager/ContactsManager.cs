@@ -235,7 +235,7 @@ namespace Mark5.Mobile.Common.Manager
 
                 await contactsDataAccess.SetCategoriesAsync(contactPreview, categories);
 
-                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Contact, contactPreview.Id, contactPreview.Categories));
+                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Contact, contactPreview.Id, contactPreview.Categories.ToList()));
 
                 return;
             }
