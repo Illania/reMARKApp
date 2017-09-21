@@ -90,7 +90,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
             {
-                Activity.RunOnUiThread(async () => { await RefreshData(); });
+                Activity.RunOnUiThread(async () =>
+                {
+                    await RefreshData();
+                });
             });
         }
 

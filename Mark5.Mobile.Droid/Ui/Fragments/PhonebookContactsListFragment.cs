@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,8 +69,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.phonebook);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.phonebook);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(PhonebookContactsListFragment)}");
         }
@@ -95,25 +95,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                   contacts = CommonConfig.Phonebook.GetPhonebookContacts();
               }).ContinueWith(async t =>
                {
-                       if (t.IsFaulted)
-                       {
-                           var ex = t.Exception.InnerException;
-                           CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
-                           await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                       }
+                   if (t.IsFaulted)
+                   {
+                       var ex = t.Exception.InnerException;
+                       CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
+                       await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                   }
 
-                       if (contacts == null)
-                       {
-                           await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.phonebook_contacts_no_access_title,
-                                                                Resource.String.phonebook_contacts_no_access_content);
-                           Activity?.Finish();
-                       }
-                       else
-                       {
-                           adapter.SetItems(contacts.OrderBy(c => c.Name.SafeSubstring(0, 1)));
-                       }
-           
-            },TaskScheduler.FromCurrentSynchronizationContext());
+                   if (contacts == null)
+                   {
+                       await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.phonebook_contacts_no_access_title,
+                                                            Resource.String.phonebook_contacts_no_access_content);
+                       Activity?.Finish();
+                   }
+                   else
+                   {
+                       adapter.SetItems(contacts.OrderBy(c => c.Name.SafeSubstring(0, 1)));
+                   }
+               }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void Adapter_ItemClicked(object sender, Recipient r)

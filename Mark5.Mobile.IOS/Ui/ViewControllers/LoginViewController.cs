@@ -125,49 +125,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             string backgroundFileName;
 
             var screenSize = Integration.GetScreenSizeInPixels();
-            if (screenSize == Integration.IPhone6PlusScreenSize || screenSize == Integration.IPhone6PlusZoomScreenSize)
+            if (screenSize == Integration.IPhoneRetina55Resolution || screenSize == Integration.IPhoneRetina55ZoomResolution)
             {
-                // iPhone 6 Plus
                 logoFileName = Path.Combine("startscreens", "start-screen-logo-retinahd55.png");
                 backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retinahd55.png");
             }
-            else if (screenSize == Integration.IPhone6ScreenSize || screenSize == Integration.IPhone6ZoomScreenSize)
+            else if (screenSize == Integration.IPhoneRetina47Resolution || screenSize == Integration.IPhoneRetina47ZoomResolution)
             {
-                // iPhone 6
                 logoFileName = Path.Combine("startscreens", "start-screen-logo-retinahd47.png");
                 backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retinahd47.png");
             }
-            else if (screenSize == Integration.IPhone5ScreenSize)
+            else if (screenSize == Integration.IPhoneRetina40Resolution)
             {
-                //iPhone 5, iPhone 5s, iPod Touch 5G
                 logoFileName = Path.Combine("startscreens", "start-screen-logo-retina4.png");
                 backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retina4.png");
             }
-            else if (screenSize == Integration.IPhone4SScreenSize)
-            {
-                //iPhone 4S
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-retina35.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retina35.png");
-            }
-            else if (screenSize == Integration.IPadScreenSize)
-            {
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-ipad-portrait.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-ipad-portrait.png");
-            }
-            else if (screenSize == Integration.IPadRetinaScreenSize)
+            else if (screenSize == Integration.IPadProRetina105ProScreenSize || screenSize == Integration.IPadProRetina129ProScreenSize)
             {
                 logoFileName = Path.Combine("startscreens", "start-screen-logo-ipadretina-portrait.png");
                 backgroundFileName = Path.Combine("startscreens", "start-screen-bg-ipadretina-portrait.png");
             }
-            else if (screenSize == Integration.IPadProScreenSize)
+            else if (screenSize == Integration.IPadRetina79ScreenSize || screenSize == Integration.IPadRetina97ScreenSize)
             {
                 logoFileName = Path.Combine("startscreens", "start-screen-logo-ipadretina-portrait.png");
                 backgroundFileName = Path.Combine("startscreens", "start-screen-bg-ipadretina-portrait.png");
             }
             else
             {
-                // unknown devices
-
                 CommonConfig.Logger.Error($"Unknown device detected. [screenSize={screenSize}]");
 
                 logoFileName = Path.Combine("startscreens", "start-screen-logo-retinahd47.png");
