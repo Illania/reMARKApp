@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Contact contact;
         ContactPreview contactPreview;
-        int? contactid;
+        int? contactId;
         ContactType contactType;
         ContactCreationModeFlag creationModeFlag;
         ContactPreview parentContactPreview;
@@ -70,19 +70,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 args.PutString(ContactPreviewBundleKey, Serializer.Serialize(contactPreview));
             
             if (contactId != null)
-                args.PutString(ContactIdBundleKey, Serializer.Serialize(contactId));
+                args.PutInt(ContactIdBundleKey, contactId.Value);
             
             if (contactType != null)
-                args.PutString(ContactTypeBundleKey, Serializer.Serialize(contactType));
+                args.PutInt(ContactTypeBundleKey, (int)contactType);
 
             if (creationModeFlag != null)
-                args.PutString(CreationModeFlagBundleKey, Serializer.Serialize(creationModeFlag));
+                args.PutInt(CreationModeFlagBundleKey, (int)creationModeFlag);
 
             if (parentContactPreview != null)
                 args.PutString(ContactPreviewBundleKey, Serializer.Serialize(parentContactPreview));
 
             if (parentPreselected != null)
-                args.PutString(ParentPreselectedBundleKey, Serializer.Serialize(parentPreselected));
+                args.PutBoolean(ParentPreselectedBundleKey, parentPreselected.Value);
 
             var fragment = new AddEditContactFragment();
             fragment.Arguments = args;
@@ -94,8 +94,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            //TODO: Get arguments
-            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={contactid ?? contactPreview?.Id}, " +
+            if (Arguments.ContainsKey(ContactBundleKey))
+                contact = Serializer.Deserialize<Contact>(Arguments.GetString(ContactBundleKey));
+
+            if (Arguments.ContainsKey(ContactPreviewBundleKey))
+                contactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ContactPreviewBundleKey));
+
+            if (Arguments.ContainsKey(ContactIdBundleKey))
+                contactId = Arguments.GetInt(ContactIdBundleKey);
+
+            if (Arguments.ContainsKey(ContactTypeBundleKey))
+                contactType = (ContactType)Arguments.GetInt(ContactTypeBundleKey);
+
+            if (Arguments.ContainsKey(CreationModeFlagBundleKey))
+                creationModeFlag = (ContactCreationModeFlag)Arguments.GetInt(CreationModeFlagBundleKey);
+
+            if (Arguments.ContainsKey(ParentContactPreviewBundleKey))
+                parentContactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ParentContactPreviewBundleKey));
+
+            if (Arguments.ContainsKey(ParentPreselectedBundleKey))
+                parentPreselected = Arguments.GetBoolean(ParentPreselectedBundleKey);
+
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={contactId ?? contactPreview?.Id}, " +
                                      $"type={contactType}, mode={creationModeFlag}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -267,7 +287,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={contactid ?? contactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={contactId ?? contactPreview?.Id}, " +
                                      $"type={contactType}, mode={creationModeFlag}]...");
         }
 
@@ -348,9 +368,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void OnParentContactRequest()
         {
-            var i = new Intent(Activity, typeof(ParentContactSelectorFoldersListActivity));
-            i.PutExtra(ParentContactSelectorFoldersListActivity.ChildrenTypeIntentKey, (int)contactPreview.Type);
-            StartActivityForResult(i, RequestCodes.ParentContactRequestCode);
+            StartActivityForResult(ParentContactSelectorFoldersListActivity.CreateIntent(Context, contactPreview.Type), RequestCodes.ParentContactRequestCode);
         }
 
         void OnParentContactRemoved()
@@ -402,7 +420,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={contactid ?? contactPreview?.Id}, " +
+                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={contactId ?? contactPreview?.Id}, " +
                                      $"type={contactType}, mode={creationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -421,7 +439,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = contact,
                 ParentContactPreview = parentContactPreview,
                 CreationModeFlag = creationModeFlag,
-                ContactId = contactid,
+                ContactId = contactId,
                 ContactType = contactType,
                 SecondaryLayoutShown = secondaryLayoutShown,
                 ParentPreselected = parentPreselected,
@@ -436,10 +454,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 contactPreview = state.ContactPreview;
                 parentContactPreview = state.ParentContactPreview;
                 creationModeFlag = state.CreationModeFlag;
-                contactid = state.ContactId;
+                contactId = state.ContactId;
                 contactType = state.ContactType;
                 secondaryLayoutShown = state.SecondaryLayoutShown;
-                parentPreselected = parentPreselected;
+                parentPreselected = state.ParentPreselected;
             }
         }
 

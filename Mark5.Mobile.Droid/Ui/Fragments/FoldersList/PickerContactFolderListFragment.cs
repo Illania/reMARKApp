@@ -9,7 +9,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerContactFolderListFragment : FoldersListFragment
     {
-        public static new (PickerContactFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null, bool? hideFab = null, bool? loadRemoteFromCache = null)
+        public static (PickerContactFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null, bool? hideFab = null, bool? loadRemoteFromCache = null)
         {
             var args = new Bundle();
 

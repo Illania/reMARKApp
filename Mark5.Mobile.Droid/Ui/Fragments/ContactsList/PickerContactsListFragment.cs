@@ -2,7 +2,6 @@
 using System.Linq;
 using Android.Content;
 using Android.OS;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -14,8 +13,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerContactsListFragment : AbstractContactsListFragment
     {
-        const string FolderBundleKey = "Folder_a8708ff4-dadc-45d3-8dfc-8078ddd6035c";
-
         public static (PickerContactsListFragment fragment, string tag) NewInstance(Folder folder)
         {
             var args = new Bundle();
@@ -30,18 +27,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return (fragment, tag);
         }
-
-        #region Fragment overrides
-
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            if (Arguments.ContainsKey(FolderBundleKey))
-                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
-            
-            return base.OnCreateView(inflater, container, savedInstanceState);
-        }
-
-        #endregion
 
         #region Adapter callbacks
 

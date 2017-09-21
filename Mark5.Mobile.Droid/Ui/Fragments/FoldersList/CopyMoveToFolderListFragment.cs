@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 args.PutString(FromFolderBundleKey, Serializer.Serialize(fromFolder));
 
             if (actionType != null)
-                args.PutString(ActionTypeBundleKey, Serializer.Serialize(actionType.Value));
+                args.PutInt(ActionTypeBundleKey, (int)actionType);
 
             if (loadRemoteFromCache != null)
                 args.PutBoolean(LoadRemoteFromCacheBundleKey, loadRemoteFromCache.Value);
@@ -54,9 +54,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(RemoteFolderBundleKey))
-                RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
-
             if (Arguments.ContainsKey(BusinessEntitiesBundleKey))
                 businessEntities = Serializer.Deserialize<List<IBusinessEntity>>(Arguments.GetString(BusinessEntitiesBundleKey));
 
@@ -64,16 +61,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 fromFolder = Serializer.Deserialize<Folder>(Arguments.GetString(FromFolderBundleKey));
 
             if (Arguments.ContainsKey(ActionTypeBundleKey))
-                actionType = Serializer.Deserialize<ActionType>(Arguments.GetString(ActionTypeBundleKey));
-
-            if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
-                LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
+                actionType = (ActionType)Arguments.GetInt(ActionTypeBundleKey);
 
             return base.OnCreateView(inflater, container, savedInstanceState);
         }
 
         #endregion
-
 
         protected override void SetSections()
         {
@@ -250,8 +243,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public enum ActionType
         {
-            Copy,
-            Move,
+            Copy = 0,
+            Move = 1,
         };
     }
 }

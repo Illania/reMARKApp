@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Android.Content;
 using Android.Support.Design.Widget;
 using Android.Views;
 using Android.OS;
@@ -15,8 +14,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsListFragment : AbstractContactsListFragment
     {
-        const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
-
         FloatingActionButton fab;
 
         public static (ContactsListFragment fragment, string tag) NewInstance(Folder folder)
@@ -34,11 +31,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(FolderBundleKey))
-                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
-            
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
                 fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);

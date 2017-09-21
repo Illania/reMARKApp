@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
+using Android.OS;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -13,7 +14,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ParentContactSelectorFragment : AbstractContactsListFragment
     {
-        public ContactType ChildrenType { get; set; }
+        ContactType childrenType;
+
+        const string ChildrenTypeBundleKey = "ChildrenTypeBundleKey_986c3788-3b4a-445c-8dcd-50f98c738f76";
+
+        public static (ParentContactSelectorFragment fragment, string tag) NewInstance(ContactType childrenType, Folder folder)
+        {
+            var args = new Bundle();
+
+            if (childrenType != ContactType.None)
+                args.PutInt(ChildrenTypeBundleKey, (int)childrenType);
+
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            ParentContactSelectorFragment fragment = new ParentContactSelectorFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(AddEditContactFragment)}";
+
+            return (fragment, tag);
+        }
+
+        public override Android.Views.View OnCreateView(Android.Views.LayoutInflater inflater, Android.Views.ViewGroup container, Bundle savedInstanceState)
+        {
+            if (Arguments.ContainsKey(ChildrenTypeBundleKey))
+                childrenType = (ContactType)Arguments.GetInt(ChildrenTypeBundleKey);
+
+            return base.OnCreateView(inflater, container, savedInstanceState);
+        }
 
         #region Adapter callbacks
 
@@ -23,14 +52,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (contactPreview.Type == ContactType.Person)
             {
-                var contentResource = ChildrenType == ContactType.Person ? Resource.String.parent_contact_selector_invalid_person_content : Resource.String.parent_contact_selector_invalid_department_content;
+                var contentResource = childrenType == ContactType.Person ? Resource.String.parent_contact_selector_invalid_person_content : Resource.String.parent_contact_selector_invalid_department_content;
 
                 await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_person_title, contentResource);
                 return;
             }
             if (contactPreview.Type == ContactType.Department)
             {
-                if (ChildrenType == ContactType.Company || ChildrenType == ContactType.Department)
+                if (childrenType == ContactType.Company || childrenType == ContactType.Department)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.parent_contact_selector_invalid_department_title, Resource.String.parent_contact_selector_invalid_department_content);
                     return;
@@ -40,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else if (contactPreview.Type == ContactType.Company)
             {
-                if (ChildrenType == ContactType.Department)
+                if (childrenType == ContactType.Department)
                 {
                     selectedContactPreview = contactPreview;
                 }
