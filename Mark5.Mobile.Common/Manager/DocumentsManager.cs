@@ -665,6 +665,22 @@ namespace Mark5.Mobile.Common.Manager
                 documentPreview.Guid = result.Guid;
                 documentPreview.ReferenceNumber = result.ReferenceNumber;
 
+                if (precedingDocumentId > 0 && (flag == DocumentCreationModeFlag.Reply || flag == DocumentCreationModeFlag.ReplyAll))
+                {
+                    try
+                    {
+                        var container = await documentsDataAccess.GetDocumentWithPreviewAsync(precedingDocumentId);
+                        var previousDocument = container.Document;
+                        var previousDocumentPreview = container.DocumentPreview;
+
+                        await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Error while setting previous document as read", ex);
+                    }
+                }
+
                 return;
             }
 
