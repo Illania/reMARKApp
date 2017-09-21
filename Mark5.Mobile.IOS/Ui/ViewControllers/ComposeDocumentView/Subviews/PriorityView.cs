@@ -51,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             selectedPriorityLabel = new UILabel
             {
-                Text = UI.PriorityString(selectedPriority),
+                Text = UI.PrettyPriorityString(selectedPriority),
                 Font = Theme.DefaultFont,
                 Opaque = false,
                 Lines = 1,
@@ -112,9 +112,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             var priorityStrings = new[]
             {
-                UI.PriorityString(Priority.Urgent),
-                UI.PriorityString(Priority.Normal),
-                UI.PriorityString(Priority.Low)
+                UI.PrettyPriorityString(Priority.Urgent),
+                UI.PrettyPriorityString(Priority.Normal),
+                UI.PrettyPriorityString(Priority.Low)
             };
 
             if (!weakViewController.TryGetTarget(out UIViewController viewController))
@@ -144,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             selectedPriorityLabel.TextColor = UIColor.DarkTextColor;
 
             selectedPriority = priority;
-            selectedPriorityLabel.Text = UI.PriorityString(priority);
+            selectedPriorityLabel.Text = UI.PrettyPriorityString(priority);
 
             Edited(this, EventArgs.Empty);
         }

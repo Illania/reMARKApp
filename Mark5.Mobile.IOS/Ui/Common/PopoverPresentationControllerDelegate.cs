@@ -1,48 +1,51 @@
 ﻿using UIKit;
+using System;
+using Mark5.Mobile.Common.Utilities.Extensions;
+using CoreGraphics;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class PopoverPresentationControllerDelegate : UIPopoverPresentationControllerDelegate
     {
-        readonly UIBarButtonItem barButtonItem;
-        readonly UIView sourceView;
-        readonly UITableView tableView;
-        readonly UITableViewCell cell;
+        readonly WeakReference<UIBarButtonItem> barButtonItemWeakReference;
+        readonly WeakReference<UIView> sourceViewWeakReference;
+        readonly WeakReference<UITableView> tableViewWeakReference;
+        readonly WeakReference<UITableViewCell> cellWeakReference;
 
         public PopoverPresentationControllerDelegate(UIBarButtonItem barButtonItem)
         {
-            this.barButtonItem = barButtonItem;
+            barButtonItemWeakReference = new WeakReference<UIBarButtonItem>(barButtonItem);
         }
 
         public PopoverPresentationControllerDelegate(UIView sourceView)
         {
-            this.sourceView = sourceView;
+            sourceViewWeakReference = new WeakReference<UIView>(sourceView);
         }
 
         public PopoverPresentationControllerDelegate(UITableView tableView, UITableViewCell cell)
         {
-            this.tableView = tableView;
-            this.cell = cell;
+            tableViewWeakReference = new WeakReference<UITableView>(tableView);
+            cellWeakReference = new WeakReference<UITableViewCell>(cell);
         }
 
         public override void PrepareForPopoverPresentation(UIPopoverPresentationController popoverPresentationController)
         {
-            if (barButtonItem != null)
-                popoverPresentationController.BarButtonItem = barButtonItem;
+            if (barButtonItemWeakReference != null)
+                popoverPresentationController.BarButtonItem = barButtonItemWeakReference.Unwrap();
 
-            if (sourceView != null)
+            if (sourceViewWeakReference != null)
             {
-                popoverPresentationController.SourceView = sourceView;
-                popoverPresentationController.SourceRect = sourceView.Frame;
+                popoverPresentationController.SourceView = sourceViewWeakReference.Unwrap();
+                popoverPresentationController.SourceRect = sourceViewWeakReference.Unwrap()?.Frame ?? CGRect.Empty;
             }
 
-            if (tableView != null && cell != null)
+            if (tableViewWeakReference != null && cellWeakReference != null)
             {
-                var indexPath = tableView.IndexPathForCell(cell);
-                var rect = tableView.RectForRowAtIndexPath(indexPath);
+                var indexPath = tableViewWeakReference.Unwrap()?.IndexPathForCell(cellWeakReference.Unwrap());
+                var rect = tableViewWeakReference.Unwrap()?.RectForRowAtIndexPath(indexPath);
 
-                popoverPresentationController.SourceView = tableView;
-                popoverPresentationController.SourceRect = rect;
+                popoverPresentationController.SourceView = tableViewWeakReference.Unwrap();
+                popoverPresentationController.SourceRect = rect ?? CGRect.Empty;
             }
         }
     }

@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected UIBarButtonItem ComposeDocumentItem;
         protected UIBarButtonItem CreateContactItem;
 
-        WeakReference<UISearchController> searchControllerWeakReference;
+        UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
@@ -109,8 +109,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                if (NavigationItem.SearchController == null)
-                    NavigationItem.SearchController = searchControllerWeakReference.Unwrap();
+                var ni = (ParentViewController as UIViewController)?.NavigationItem ?? NavigationItem;
+                if (ni.SearchController == null)
+                    ni.SearchController = searchController;
             });
         }
 
@@ -123,7 +124,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (NavigationController != null && NavigationController.NavigationBarHidden)
                 NavigationController.SetNavigationBarHidden(false, true);
 
-            var searchController = searchControllerWeakReference.Unwrap();
             if (searchController != null && searchController.Active)
                 searchController.Active = false;
         }
@@ -140,6 +140,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
+        }
+
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            (TableView.DataSource as DataSource)?.Reset();
+            (TableView.DataSource as GrouppedDataSource)?.Reset();
+            searchController = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -228,6 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 ? new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource
                 : new DataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource;
             TableView.RefreshControl = RefreshControl;
+            TableView.EstimatedRowHeight = FoldersTableViewCell.Height;
         }
 
         protected virtual void InitializeSearchBar()
@@ -238,7 +248,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView);
             searchResultsController.TableView.Source = searchResultsDataSource;
 
-            var searchController = new UISearchController(searchResultsController)
+            searchController = new UISearchController(searchResultsController)
             {
                 HidesNavigationBarDuringPresentation = true,
                 DimsBackgroundDuringPresentation = true,
@@ -246,8 +256,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 SearchResultsUpdater = this
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
-
-            searchControllerWeakReference = new WeakReference<UISearchController>(searchController);
         }
 
         protected virtual void InitializeHandlers()
@@ -345,7 +353,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     await Dialogs.ShowErrorDialogAsync(this, ex);
                 }
 
-                var searchController = searchControllerWeakReference.Unwrap();
                 if (searchController != null)
                 {
                     searchController.SearchBar.UserInteractionEnabled = true;
@@ -357,7 +364,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 EditModeItem.Title = Localization.GetString("done");
                 TableView.SetEditing(true, true);
 
-                var searchController = searchControllerWeakReference.Unwrap();
                 if (searchController != null)
                 {
                     searchController.SearchBar.UserInteractionEnabled = false;
@@ -542,7 +548,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #endregion
 
-        #region Row actions handlers
+        #region Actions
 
         public async void AddToFavorites(Folder folder)
         {
@@ -788,6 +794,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
+                var tableViewController = searchController?.SearchResultsController as UITableViewController;
+                var dataSource = tableViewController?.TableView?.DataSource as SearchDataSource;
+                dataSource?.Reset();
+
                 await Task.Delay(500);
 
                 if (cancellationToken.IsCancellationRequested)
@@ -801,9 +811,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                var tableViewController = searchControllerWeakReference.Unwrap()?.SearchResultsController as UITableViewController;
-                var dataSource = tableViewController?.TableView?.DataSource as SearchDataSource;
-                dataSource?.Reset();
+                dataSource?.SetFolders(resultList);
             }
             catch (Exception ex)
             {
@@ -845,8 +853,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             readonly ModuleType module;
             readonly bool disableRowActions;
 
-            bool loading;
-            readonly List<Folder> foldersInView;
+            bool loading = true;
+            readonly List<Folder> foldersInView = new List<Folder>();
 
             public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module, bool disableRowActions)
             {
@@ -854,9 +862,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 tableViewWeakReference = new WeakReference<UITableView>(tableView);
                 this.module = module;
                 this.disableRowActions = disableRowActions;
-
-                loading = true;
-                foldersInView = new List<Folder>();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -1166,11 +1171,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return cell;
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return FoldersTableViewCell.Height;
-            }
-
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading[section])
@@ -1455,16 +1455,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             readonly WeakReference<AbstractFoldersListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
-            bool loading;
-            readonly List<Folder> foldersInView;
+            bool loading = true;
+            readonly List<Folder> foldersInView = new List<Folder>();
 
             public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = new WeakReference<AbstractFoldersListViewController>(viewController);
                 tableViewWeakReference = new WeakReference<UITableView>(tableView);
-
-                loading = true;
-                foldersInView = new List<Folder>();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)

@@ -10,7 +10,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     public class PickerShortcodesFolderListViewController : AbstractFoldersListViewController
     {
         readonly TaskCompletionSource<Shortcode> tcs = new TaskCompletionSource<Shortcode>();
-
         public Task<Shortcode> Task => tcs.Task;
 
         UIBarButtonItem cancelModeItem;

@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshing;
 
         Func<Notification, bool> unreadFilter = (n) => !n.IsRead;
-        
+
         TinyMessageSubscriptionToken newNotificationsMessageToken;
 
         public NotificationsListViewController(ObjectType[] objectTypes)
@@ -85,6 +85,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             RefreshData();
+
+            NSOperationQueue.MainQueue.AddOperation(() =>
+            {
+                var ni = (ParentViewController as UIViewController)?.NavigationItem ?? NavigationItem;
+                ni.SearchController = null;
+            });
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -104,6 +110,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
+        }
+
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            Reset();
         }
 
         protected override void Dispose(bool disposing)
@@ -134,8 +147,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             RefreshControl = new UIRefreshControl();
 
-            TableView.DataSource = this;
-            TableView.Delegate = this;
             TableView.RefreshControl = RefreshControl;
             TableView.EstimatedRowHeight = NotificationsTableViewCell.Height;
         }
@@ -288,7 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return Items.Count;
         }
 
-        public void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
+        void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
         {
             loading = false;
 
@@ -302,7 +313,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
         }
 
-        public void Reset()
+        void Reset()
         {
             loading = true;
 

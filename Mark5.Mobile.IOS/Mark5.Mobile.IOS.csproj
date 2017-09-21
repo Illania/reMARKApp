@@ -245,8 +245,8 @@
 		<Compile Include="Utilities\Extensions\ObjectExtensions.cs" />
 		<Compile Include="Utilities\Extensions\StringExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
-		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
-		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+		<Compile Include="Utilities\Extensions\UITextViewExtensions.cs" />
+		<Compile Include="Utilities\Extensions\UIViewExtensions.cs" />
 		<Compile Include="Ui\ViewControllers\DownloadViewController.cs" />
 		<Compile Include="Utilities\ActivityIndicator.cs" />
 		<Compile Include="Ui\ViewControllers\RecentAddressesListViewController.cs" />

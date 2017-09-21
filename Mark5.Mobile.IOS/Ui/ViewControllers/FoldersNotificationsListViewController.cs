@@ -79,9 +79,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
             else
                 NavigationItem.SetRightBarButtonItem(null, false);
-            NavigationItem.SearchController = vc.NavigationItem.SearchController;
             vc.DidMoveToParentViewController(this);
             currentViewController = vc;
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            NSOperationQueue.MainQueue.AddOperation(() =>
+            {
+                if (NavigationItem.SearchController == null)
+                    NavigationItem.SearchController = currentViewController?.NavigationItem?.SearchController;
+            });
         }
 
         [Export("segmentedControlHasChangedValue:")]
@@ -103,7 +113,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
             else
                 NavigationItem.SetRightBarButtonItem(null, false);
-            NavigationItem.SearchController = vc.NavigationItem.SearchController;
             vc.DidMoveToParentViewController(this);
             currentViewController.DidMoveToParentViewController(null);
             currentViewController = vc;

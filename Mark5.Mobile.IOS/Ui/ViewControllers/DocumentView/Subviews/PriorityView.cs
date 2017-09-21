@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         public override void RefreshView()
         {
             if (DocumentPreview != null)
-                TextView.Text = UI.PriorityString(DocumentPreview.Priority);
+                TextView.Text = UI.PrettyPriorityString(DocumentPreview.Priority);
         }
 
         public override void UpdateVisibility()

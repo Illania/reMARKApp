@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public static string PriorityString(Priority priority)
+        public static string PrettyPriorityString(Priority priority)
         {
             switch (priority)
             {

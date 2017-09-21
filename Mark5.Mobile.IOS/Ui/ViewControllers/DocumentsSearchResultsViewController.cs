@@ -360,7 +360,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Priority.Normal,
                 Priority.Urgent
             };
-            var priorityStrings = priorities.Select(p => UI.PriorityString(p));
+            var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
             var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), barButtonItem);
 
             if (result < 0)
@@ -379,7 +379,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Priority.Normal,
                 Priority.Urgent
             };
-            var priorityStrings = priorities.Select(p => UI.PriorityString(p));
+            var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
             var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), tv, cell);
 
             if (result < 0)

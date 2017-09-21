@@ -9,10 +9,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public class ParentContactSelectorFolderListView : AbstractFoldersListViewController
     {
-        ContactType childrenType;
+        readonly ContactType childrenType;
 
         readonly TaskCompletionSource<ContactPreview> tcs = new TaskCompletionSource<ContactPreview>();
-
         public Task<ContactPreview> Task => tcs.Task;
 
         UIBarButtonItem cancelModeItem;
