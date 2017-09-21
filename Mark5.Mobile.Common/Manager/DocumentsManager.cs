@@ -9,14 +9,14 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
-using DataContract = Mark5.ServiceReference.DataContract;
 using PCLStorage;
-using Mark5.Mobile.Common.Model.HubMessages;
+using DataContract = Mark5.ServiceReference.DataContract;
 
 namespace Mark5.Mobile.Common.Manager
 {

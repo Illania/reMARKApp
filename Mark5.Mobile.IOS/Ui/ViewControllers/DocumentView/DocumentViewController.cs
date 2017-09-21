@@ -10,6 +10,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -17,6 +18,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 using WebKit;
 
@@ -90,6 +92,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
 
+        TinyMessageSubscriptionToken commentsCountChangedToken;
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -101,6 +105,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitSubViews();
             InitToolbar();
             InitBackgroundView();
+            SubscribeToMessages();
         }
 
         public override void ViewDidLoad()
@@ -167,6 +172,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(DocumentViewController)} received memory warning!");
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -451,6 +458,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
                 editDocumentButtonItem.Clicked -= EditDocumentButtonItem_Clicked;
             }
+        }
+
+        void SubscribeToMessages()
+        {
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            commentsCountChangedToken?.Dispose();
         }
 
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
@@ -1329,6 +1346,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error($"Error while deleting document [documentId={document.Id}]", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        #endregion
+
+        #region Messages handlers
+
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
+        {
+            if (message.EntityId == document?.Id)
+            {
+                BeginInvokeOnMainThread(() => comments.SetBadgeValue(document.Comments.Count().ToString(), false));
             }
         }
 
