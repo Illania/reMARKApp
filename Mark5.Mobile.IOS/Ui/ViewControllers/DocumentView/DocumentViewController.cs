@@ -85,8 +85,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
         GetNextDocumentPreviewDelegate GetNextDocumentPreview { get; set; }
 
-        public event EventHandler<ReadStatusUpdatedEventArgs> ReadStatusUpdated;
-
         CancellationTokenSource readStatusCts;
         CancellationTokenSource loadCts;
 
@@ -711,8 +709,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         readByView.RefreshView();
                         readByView.UpdateVisibility();
-
-                        ReadStatusUpdated?.Invoke(this, new ReadStatusUpdatedEventArgs(dp));
                     });
                 }
                 catch (Exception ex)
@@ -1140,8 +1136,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
 
                 readByView.RefreshView();
-
-                ReadStatusUpdated?.Invoke(this, new ReadStatusUpdatedEventArgs(documentPreview));
 
                 dismissAction();
             }

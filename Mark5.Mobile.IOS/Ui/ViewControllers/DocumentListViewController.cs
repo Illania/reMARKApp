@@ -47,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshing;
 
+        TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
         TinyMessageSubscriptionToken removedFromFolderToken;
@@ -229,6 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
+            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
@@ -238,6 +240,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void UnsubscribeFromMessages()
         {
+            readStatusChangedToken?.Dispose();
             commentsCountChangedToken?.Dispose();
             categoriesChangedToken?.Dispose();
             removedFromFolderToken?.Dispose();
@@ -299,8 +302,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 vc.HidesBottomBarWhenPushed = false;
 
                 vc.ClearData();
-                vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
 
                 if (!searchController.Active)
                 {
@@ -320,8 +321,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ds = (DataSource)tableView.Source;
 
                 var vc = new DocumentViewController();
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-                vc.OnComplete = () => vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
                 if (!searchController.Active)
                     vc.SetData(Folder, documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
                 else
@@ -932,17 +931,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Events
 
-        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
+        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
-                var selectedRow = tableView.IndexPathForSelectedRow;
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
 
-                (tableView.Source as DataSource).UpdateDocumentPreview(e.DocumentPreview);
-                tableView.ReloadData();
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.IsReadByCurrent = message.IsReadByCurrent;
+                    documentPreview.IsReadByAnyone = message.IsReadByAnyone;
 
-                if (selectedRow != null)
-                    tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new NSIndexPath[]
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
             });
         }
 
@@ -1375,19 +1387,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 viewController = null;
                 documentsTableView = null;
                 Items = null;
-            }
-
-            public void UpdateDocumentPreview(DocumentPreview documentPreview)
-            {
-                var documentRow = Items.IndexOf(d => d.Id == documentPreview.Id);
-                if (documentRow < 0)
-                    return;
-
-                documentsTableView.ReloadRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(documentRow, 0)
-                    },
-                    UITableViewRowAnimation.Fade);
             }
         }
 
