@@ -1,13 +1,11 @@
 using System;
 using System.Linq;
 using System.Text;
-using AudioToolbox;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers;
 using PCLStorage;
 using UIKit;
 
@@ -15,44 +13,37 @@ namespace Mark5.Mobile.IOS.Utilities
 {
     public static class Integration
     {
+
+        #region iOS version
+
+        public static bool IsRunningAtLeast(int major) => UIDevice.CurrentDevice.CheckSystemVersion(major, 0);
+
+        #endregion
+
         #region iPhone/iPad recognition
 
-        const float IPhonePlusMaxBounds = 736f;
+        public static bool IsIPhone() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
 
-        public static bool IsIPhone()
-        {
-            return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
-        }
-
-        public static bool IsIPhonePlus()
-        {
-            return IsIPhone() && Math.Abs(Math.Max(UIScreen.MainScreen.Bounds.Width, UIScreen.MainScreen.Bounds.Height) - IPhonePlusMaxBounds) < 0.01f;
-        }
-
-        public static bool IsIPad()
-        {
-            return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
-        }
+        public static bool IsIPad() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
 
         #endregion
 
         #region Screen size
 
-        public static readonly CGSize IPhone4SScreenSize = new CGSize(640f, 960f);
-        public static readonly CGSize IPhone5ScreenSize = new CGSize(640f, 1136f);
-        public static readonly CGSize IPhone6ScreenSize = new CGSize(750f, 1334f);
-        public static readonly CGSize IPhone6ZoomScreenSize = new CGSize(640f, 1136f);
-        public static readonly CGSize IPhone6PlusScreenSize = new CGSize(1242f, 2208f);
-        public static readonly CGSize IPhone6PlusZoomScreenSize = new CGSize(1125f, 2001f);
-        public static readonly CGSize IPadScreenSize = new CGSize(768f, 1024f);
-        public static readonly CGSize IPadRetinaScreenSize = new CGSize(1536f, 2048f);
-        public static readonly CGSize IPadProScreenSize = new CGSize(2048f, 2732f);
+        public static readonly CGSize IPhoneRetina40Resolution = new CGSize(640f, 1136f);
+        public static readonly CGSize IPhoneRetina47Resolution = new CGSize(750f, 1334f);
+        public static readonly CGSize IPhoneRetina47ZoomResolution = new CGSize(640f, 1136f);
+        public static readonly CGSize IPhoneRetina55Resolution = new CGSize(1242f, 2208f);
+        public static readonly CGSize IPhoneRetina55ZoomResolution = new CGSize(1125f, 2001f);
+        public static readonly CGSize IPadRetina79ScreenSize = new CGSize(1536f, 2048f);
+        public static readonly CGSize IPadRetina97ScreenSize = new CGSize(1536f, 2048f);
+        public static readonly CGSize IPadProRetina105ProScreenSize = new CGSize(1668f, 2224f);
+        public static readonly CGSize IPadProRetina129ProScreenSize = new CGSize(2048f, 2732f);
 
         public static CGSize GetScreenSizeInPixels()
         {
             var bounds = UIScreen.MainScreen.Bounds;
             var scale = UIScreen.MainScreen.Scale;
-
             return new CGSize(bounds.Width * scale, bounds.Height * scale);
         }
 
@@ -76,13 +67,11 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void ClearData()
         {
-            NSError _error;
-
             var localStorage = FileSystem.Current.LocalStorage;
             var dataFolder = PortablePath.Combine(localStorage.Path, "v2");
             var cacheFolder = PortablePath.Combine(localStorage.Path, "Caches", "v2");
 
-            NSFileManager.DefaultManager.Remove(dataFolder, out _error);
+            NSFileManager.DefaultManager.Remove(dataFolder, out NSError _error);
             NSFileManager.DefaultManager.Remove(cacheFolder, out _error);
 
             var domain = NSBundle.MainBundle.BundleIdentifier;

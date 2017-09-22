@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AFollestad.MaterialDialogs;
+using MaterialDialogs;
 using Android.App;
 using Android.Content;
 using Android.Support.V7.Widget;
@@ -162,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
                         selectedIndex = i;
 
-                md.SelectedIndex = selectedIndex;
+                md.SetSelectedIndex(selectedIndex);
             }
 
             builder.Cancelable(false);
@@ -196,7 +196,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
 
-                md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
+                md.SetSelectedIndices(selectedIndexes.ToArray());
             }
 
             builder.Cancelable(false);
@@ -360,7 +360,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
                         selectedIndexes.Add(i);
 
-                md.SetSelectedIndices(selectedIndexes.Select(i => new Java.Lang.Integer(i)).ToArray());
+                md.SetSelectedIndices(selectedIndexes.ToArray());
             }
 
             builder.Cancelable(false);
@@ -530,7 +530,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public bool OnSelection(MaterialDialog p0, View p1, int p2, Java.Lang.ICharSequence p3)
+            public bool OnSelection(MaterialDialog p0, View p1, int p2, string p3)
             {
                 if (action != null)
                     action(p2);
@@ -547,10 +547,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public bool OnSelection(MaterialDialog p0, Java.Lang.Integer[] p1, Java.Lang.ICharSequence[] p2)
+            public bool OnSelection(MaterialDialog p0, int[] p1, string[] p2)
             {
                 if (action != null)
-                    action(p1.Select(i => i.IntValue()).ToArray());
+                    action(p1);
                 return true;
             }
         }
@@ -564,7 +564,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public void OnSelection(MaterialDialog p0, View p1, int p2, Java.Lang.ICharSequence p3)
+            public void OnSelection(MaterialDialog p0, View p1, int p2, string p3)
             {
                 if (action != null)
                     action(p2);

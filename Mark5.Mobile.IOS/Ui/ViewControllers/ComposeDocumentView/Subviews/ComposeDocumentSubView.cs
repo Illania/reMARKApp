@@ -51,8 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         protected void HandleScrollToView(object sender, EventArgs e)
         {
-            var parentScrollView = Superview.Superview as UIScrollView;
-            if (parentScrollView != null)
+            if (Superview.Superview is UIScrollView parentScrollView)
             {
                 var frame = Frame;
                 frame.Height -= 2 * VerticalMargin;

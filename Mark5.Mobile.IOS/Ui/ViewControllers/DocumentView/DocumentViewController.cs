@@ -10,6 +10,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -19,7 +20,6 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
-using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -53,6 +53,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         ToView toView;
         CcView ccView;
         BccView bccView;
+        ExtraFieldsView extraFieldsView;
         OriginatorView originatorView;
         SubjectView subjectView;
         DateReceivedView dateReceivedView;
@@ -298,6 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             viewsBeforeContent.Add(ccView = new CcView());
             viewsBeforeContent.Add(bccView = new BccView());
             viewsBeforeContent.Add(dateReceivedView = new DateReceivedView());
+            viewsBeforeContent.Add(extraFieldsView = new ExtraFieldsView());
             viewsBeforeContent.Add(priorityView = new PriorityView());
             viewsBeforeContent.Add(attachmentsListView = new AttachmentsView());
             viewsAfterContent.Add(referenceNumberView = new ReferenceNumberView());
@@ -325,14 +327,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
                 Enabled = false
             };
-
             commentsButton = new UIButton(UIButtonType.System)
             {
                 Frame = new CGRect(0f, 0f, 25f, 25f),
                 Enabled = false
             };
             commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-
             comments = new BadgeBarButtonItem(commentsButton)
             {
                 BadgeBackgroundColor = Theme.Brown,
@@ -419,8 +419,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             flag.Clicked += Flag_Clicked;
             fileTo.Clicked += FileTo_Clicked;
             replyActions.Clicked += ReplyActions_Clicked;
-            userActions.Clicked += UserActions_Clicked;
             commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+            userActions.Clicked += UserActions_Clicked;
 
             if (Modal)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
@@ -443,8 +443,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             flag.Clicked -= Flag_Clicked;
             fileTo.Clicked -= FileTo_Clicked;
             replyActions.Clicked -= ReplyActions_Clicked;
-            userActions.Clicked -= UserActions_Clicked;
             commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
+            userActions.Clicked -= UserActions_Clicked;
 
             if (Modal)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
@@ -620,7 +620,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 RefreshView();
 
-                mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
+                //If the user goes back to the document list view the navigation controller becomes null
+                if (NavigationController != null)
+                    mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
 
                 EndRefreshing();
 
@@ -637,7 +639,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (Modal)
                     DismissViewController(true, null);
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
         }
 
@@ -1396,7 +1398,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (coder.DecodeBool("modal"))
                 return null;
-            
+
             return new DocumentViewController();
         }
 
