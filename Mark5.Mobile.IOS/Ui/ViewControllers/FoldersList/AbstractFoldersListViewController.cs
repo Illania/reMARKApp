@@ -990,6 +990,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return;
 
                 v.TextLabel.TextColor = Theme.DarkerBlue;
+                v.TextLabel.SizeToFit();
             }
 
             public override bool ShouldIndentWhileEditing(UITableView tableView, NSIndexPath indexPath)

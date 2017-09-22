@@ -111,7 +111,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidLoad();
 
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
-            NavigationItem.SearchController = null;
 
             RestorationIdentifier = nameof(DocumentViewController);
             RestorationClass = Class;
@@ -202,13 +201,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             mainScrollView = new UIScrollView
             {
-                BackgroundColor = UIColor.White,
+                BackgroundColor = Theme.White,
                 ShowsVerticalScrollIndicator = true,
                 ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true,
                 ScrollsToTop = true,
-                ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never,
                 UserInteractionEnabled = true,
+                ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             View.AddSubview(mainScrollView);
@@ -216,7 +215,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f)
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
             });
 
             stackViewBeforeContent = new UIStackView
@@ -228,7 +228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             mainScrollView.AddSubview(stackViewBeforeContent);
-            View.AddConstraints(new[]
+            mainScrollView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
@@ -254,7 +254,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             mainScrollView.AddSubview(stackViewAfterContent);
-            View.AddConstraints(new[]
+            mainScrollView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
@@ -346,12 +346,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(toolbar);
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toolbar, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
                 NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
             });
+
+            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, 45f, 0f);
         }
 
         void InitBackgroundView()

@@ -794,7 +794,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 if (!contactPreviewsInView.SelectMany(v => v).Any())
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(Localization.GetString("folder_empty"));
+                    emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
