@@ -6,45 +6,47 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Service
 {
-    [BroadcastReceiver()]
-    [IntentFilter(new[] { "android.intent.action.PHONE_STATE" })]
     public class CallStateBroadcastReceiver : BroadcastReceiver
     {
-        IContactsManager contactsManager;
+        bool registered;
 
-        public CallStateBroadcastReceiver(IContactsManager contactsManager)
+        public void Register()
         {
-            this.contactsManager = contactsManager;
+            if (registered)
+                return;
+
+            registered = true;
+
+            var intentFilter = new IntentFilter();
+            intentFilter.AddAction(TelephonyManager.ActionPhoneStateChanged);
+            Application.Context.RegisterReceiver(this, intentFilter);
         }
+
+        public void Unregister()
+        {
+            if (!registered)
+                return;
+
+            registered = false;
+
+            Application.Context.UnregisterReceiver(this);
+        }
+
 
         public override void OnReceive(Context context, Intent intent)
         {
-            var tm = (TelephonyManager)context.GetSystemService(Context.TelephonyService);
-            var callListener = new IncomingCallListener(contactsManager);
-            tm.Listen(callListener, PhoneStateListenerFlags.CallState); 
-        }
-    }
+            var state = intent.GetStringExtra(TelephonyManager.ExtraState);
 
-    class IncomingCallListener : PhoneStateListener
-    {
-        IContactsManager contactsManager;
-
-        public IncomingCallListener(IContactsManager contactsManager)
-        {
-            this.contactsManager = contactsManager;    
-        }
-
-        public override void OnCallStateChanged(CallState state, string incomingNumber)
-        {
-            base.OnCallStateChanged(state, incomingNumber);
-
-            if(state == CallState.Ringing)
+            if (state == TelephonyManager.ExtraStateRinging)
             {
-                var contactPhoneNumber = contactsManager.GetContactPreviewsAsync(Folder.RootForModule(ModuleType.Contacts), sourceType: SourceType.Local).Result
-                                                        .Find(cp => cp.PrimaryAddress.Type.Equals(CommunicationAddressType.Phone) && cp.PrimaryAddressString.Equals(incomingNumber)).PrimaryAddress.Address;
-                if (contactPhoneNumber != null)
+                var incomingNumber = intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber);
+                var contact = Managers.ContactsManager.GetContactPreviewsAsync(Folder.RootForModule(ModuleType.Contacts), sourceType: SourceType.Local).Result
+                                      .Find(cp => cp.PrimaryAddress.Type.Equals(CommunicationAddressType.Phone) && cp.PrimaryAddressString.Equals(incomingNumber));
+
+                if (contact != null)
+                {
                     
-                    
+                }
             }
 
 
