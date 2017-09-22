@@ -14,18 +14,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public PopoverPresentationControllerDelegate(UIBarButtonItem barButtonItem)
         {
-            barButtonItemWeakReference = new WeakReference<UIBarButtonItem>(barButtonItem);
+            barButtonItemWeakReference = barButtonItem.Wrap();
         }
 
         public PopoverPresentationControllerDelegate(UIView sourceView)
         {
-            sourceViewWeakReference = new WeakReference<UIView>(sourceView);
+            sourceViewWeakReference = sourceView.Wrap();
         }
 
         public PopoverPresentationControllerDelegate(UITableView tableView, UITableViewCell cell)
         {
-            tableViewWeakReference = new WeakReference<UITableView>(tableView);
-            cellWeakReference = new WeakReference<UITableViewCell>(cell);
+            tableViewWeakReference = tableView.Wrap();
+            cellWeakReference = cell.Wrap();
         }
 
         public override void PrepareForPopoverPresentation(UIPopoverPresentationController popoverPresentationController)

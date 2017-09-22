@@ -20,16 +20,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RestorationClass = Class;
         }
 
-        public override void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
+        public override void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
-            if (tableView == SearchResultsController.TableView)
-            {
-                var ds = (DataSource) tableView.Source;
-                var indexPath = ds.FindItemIndexPath(shortcodePreview);
-                if (indexPath != null)
-                    tableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
-            }
-
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController) SplitViewController.ViewControllers[1];

@@ -89,8 +89,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                if (NavigationItem.SearchController == null)
-                    NavigationItem.SearchController = currentViewController?.NavigationItem?.SearchController;
+                var ni = NavigationItem;
+
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
+
+                if (ni.SearchController == null)
+                    ni.SearchController = currentViewController?.NavigationItem?.SearchController;
             });
         }
 

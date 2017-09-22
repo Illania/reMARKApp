@@ -109,7 +109,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                var ni = (ParentViewController as UIViewController)?.NavigationItem ?? NavigationItem;
+                var ni = NavigationItem;
+
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
+
                 if (ni.SearchController == null)
                     ni.SearchController = searchController;
             });
@@ -146,8 +150,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.Recycle();
 
-            (TableView.DataSource as DataSource)?.Reset();
-            (TableView.DataSource as GrouppedDataSource)?.Reset();
+            (TableView.Source as DataSource)?.Reset();
+            (TableView.Source as GrouppedDataSource)?.Reset();
             searchController = null;
         }
 
@@ -771,7 +775,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 
-                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.DataSource;
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
                 ((SearchDataSource)dataSource).Reset();
             }
             else
@@ -795,7 +799,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 var tableViewController = searchController?.SearchResultsController as UITableViewController;
-                var dataSource = tableViewController?.TableView?.DataSource as SearchDataSource;
+                var dataSource = tableViewController?.TableView?.Source as SearchDataSource;
                 dataSource?.Reset();
 
                 await Task.Delay(500);
@@ -858,8 +862,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module, bool disableRowActions)
             {
-                viewControllerWeakReference = new WeakReference<AbstractFoldersListViewController>(viewController);
-                tableViewWeakReference = new WeakReference<UITableView>(tableView);
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
                 this.module = module;
                 this.disableRowActions = disableRowActions;
             }
@@ -1109,8 +1113,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public GrouppedDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module, bool disableRowActions)
             {
-                viewControllerWeakReference = new WeakReference<AbstractFoldersListViewController>(viewController);
-                tableViewWeakReference = new WeakReference<UITableView>(tableView);
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
 
                 this.module = module;
                 this.disableRowActions = disableRowActions;
@@ -1460,8 +1464,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView)
             {
-                viewControllerWeakReference = new WeakReference<AbstractFoldersListViewController>(viewController);
-                tableViewWeakReference = new WeakReference<UITableView>(tableView);
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)

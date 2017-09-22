@@ -21,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
-        public async override void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
+        protected async override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_contact___"));
 

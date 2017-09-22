@@ -89,15 +89,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         #region UITableViewCell overrides
 
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-
-            LeadingConstraint.Constant = Editing ? 0f : -6f;
-
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
-        }
-
         public override void SetSelected(bool selected, bool animated)
         {
             base.SetSelected(selected, animated);

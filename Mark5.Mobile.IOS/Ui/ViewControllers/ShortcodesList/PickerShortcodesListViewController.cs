@@ -5,6 +5,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
+using Foundation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
@@ -19,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
         }
 
-        public async override void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
+        public async override void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_shortcode___"));
 

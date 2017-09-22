@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
-        public async override void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
+        protected async override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
             ContactPreview selectedContactPreview = null;
 
@@ -92,8 +92,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 tcs.SetResult(selectedContactPreview);
                 NavigationController.PopViewController(true);
             }
-
-            tableView.DeselectRow(indexPath, true);
         }
 
         string DisplayText(ContactPreview cp)

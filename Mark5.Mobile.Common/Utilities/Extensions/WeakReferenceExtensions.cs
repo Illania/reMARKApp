@@ -14,5 +14,13 @@ namespace Mark5.Mobile.Common.Utilities.Extensions
 
             return null;
         }
+
+        public static WeakReference<T> Wrap<T>(this T t) where T : class
+        {
+            if (t == null)
+                return null;
+
+            return new WeakReference<T>(t);
+        }
     }
 }

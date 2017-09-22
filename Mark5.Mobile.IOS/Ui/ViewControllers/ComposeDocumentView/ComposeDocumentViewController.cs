@@ -18,6 +18,7 @@ using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
 using Photos;
 using UIKit;
+using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
@@ -1078,12 +1079,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         class ImagePickerControllerDelegate : UIImagePickerControllerDelegate
         {
-            readonly WeakReference<ComposeDocumentViewController> vcWeak;
+            readonly WeakReference<ComposeDocumentViewController> viewControllerWeakReference;
             readonly Action<string, NSData> handler;
 
             public ImagePickerControllerDelegate(ComposeDocumentViewController vc, Action<string, NSData> handler)
             {
-                vcWeak = new WeakReference<ComposeDocumentViewController>(vc);
+                viewControllerWeakReference = vc.Wrap();
                 this.handler = handler;
             }
 
@@ -1125,7 +1126,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     CommonConfig.Logger.Error("Could not pick media", ex);
 
-                    if (vcWeak.TryGetTarget(out ComposeDocumentViewController vc))
+                    var vc = viewControllerWeakReference.Unwrap();
+                    if (vc != null)
                         Dialogs.ShowErrorDialog(vc, ex);
 
                     picker.DismissViewController(true, null);

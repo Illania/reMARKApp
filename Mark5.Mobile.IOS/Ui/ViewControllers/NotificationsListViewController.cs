@@ -12,6 +12,7 @@ using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
+using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -88,7 +89,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                var ni = (ParentViewController as UIViewController)?.NavigationItem ?? NavigationItem;
+                var ni = NavigationItem;
+
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
+
                 ni.SearchController = null;
             });
         }
@@ -106,7 +111,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(NotificationsListViewController)} received memory warning!");
 
-            Reset();
+            ((DataSource)TableView.DataSource).Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -116,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            Reset();
+            ((DataSource)TableView.DataSource).Reset();
         }
 
         protected override void Dispose(bool disposing)
@@ -147,6 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             RefreshControl = new UIRefreshControl();
 
+            TableView.Source = new DataSource(this, TableView);
             TableView.RefreshControl = RefreshControl;
             TableView.EstimatedRowHeight = NotificationsTableViewCell.Height;
         }
@@ -206,7 +212,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
-                SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
+                ((DataSource)TableView.DataSource).SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
 
@@ -244,8 +250,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PresentDocumentViewController(int documentId, Guid notificationGuid)
         {
-            var vc = new DocumentViewController();
-            vc.Modal = true;
+            var vc = new DocumentViewController
+            {
+                Modal = true
+            };
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId, notificationGuid);
 
@@ -256,69 +264,82 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region DataSource
 
-        public List<Notification> Items { get; private set; } = new List<Notification>();
-        bool loading = true;
-
-        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        class DataSource : UITableViewSource
         {
-            if (loading)
-                return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
 
-            if (Items.Count < 1)
+            readonly WeakReference<NotificationsListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
+
+            public List<Notification> Items { get; private set; } = new List<Notification>();
+            bool loading = true;
+
+            public DataSource(NotificationsListViewController viewController, UITableView tableView)
             {
-                var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                emptyCell.Initialize(Localization.GetString("no_notifications"));
-                return emptyCell;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
-            var n = Items[indexPath.Row];
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
 
-            var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
-            cell.Initialize(n);
+                if (Items.Count < 1)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    emptyCell.Initialize(Localization.GetString("no_notifications"));
+                    return emptyCell;
+                }
 
-            return cell;
-        }
+                var n = Items[indexPath.Row];
 
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        {
-            if (TableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
-                return;
+                var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
+                cell.Initialize(n);
 
-            var n = Items[indexPath.Row];
-            NotificationSelected(n, indexPath);
-        }
+                return cell;
+            }
 
-        public override nint RowsInSection(UITableView tableview, nint section)
-        {
-            if (loading)
-                return 1;
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (tableViewWeakReference.Unwrap()?.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
 
-            if (Items.Count < 1)
-                return 1;
+                var n = Items[indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.NotificationSelected(n, indexPath);
+            }
 
-            return Items.Count;
-        }
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (loading)
+                    return 1;
 
-        void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
-        {
-            loading = false;
+                if (Items.Count < 1)
+                    return 1;
 
-            Items.Clear();
+                return Items.Count;
+            }
 
-            if (filter == null)
-                Items.AddRange(notifications);
-            else
-                Items.AddRange(notifications.Where(filter).ToList());
+            public void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
+            {
+                loading = false;
 
-            TableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-        }
+                Items.Clear();
 
-        void Reset()
-        {
-            loading = true;
+                if (filter == null)
+                    Items.AddRange(notifications);
+                else
+                    Items.AddRange(notifications.Where(filter).ToList());
 
-            Items.Clear();
-            TableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+
+                Items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
         }
 
         #endregion

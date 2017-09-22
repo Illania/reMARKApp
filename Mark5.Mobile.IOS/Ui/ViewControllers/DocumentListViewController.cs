@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -20,7 +21,6 @@ using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using TinyMessenger;
 using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -48,8 +48,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         TinyMessageSubscriptionToken removedFromFolderToken;
         TinyMessageSubscriptionToken movedFromFolderToken;
         TinyMessageSubscriptionToken deletedToken;
-
-        Selector longPressedSelector = new Selector("longPressed:");
 
         bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
 
@@ -109,7 +107,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                var ni = (ParentViewController as UIViewController)?.NavigationItem ?? NavigationItem;
+                var ni = NavigationItem;
+
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
+
                 if (ni.SearchController == null)
                     ni.SearchController = searchController;
             });
@@ -161,7 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            ((DataSource)TableView.DataSource).Reset();
+            ((DataSource)TableView.Source)?.Reset();
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
             UnsubscribeFromMessages();
             searchController = null;
@@ -201,7 +203,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.RefreshControl = RefreshControl;
             TableView.AllowsMultipleSelectionDuringEditing = true;
 
-            TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(DocumentLongPressed));
+            TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(DocumentPreviewLongPressed));
         }
 
         void InitializeSearchBar()
@@ -451,11 +453,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region List handlers
 
-        public void DocumentSelected(DocumentPreview documentPreview)
+        void DocumentSelected(DocumentPreview documentPreview)
         {
-            if (TableView.Editing)
-                return;
-
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
@@ -501,7 +500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        public void DocumentLongPressed(UILongPressGestureRecognizer recognizer)
+        void DocumentPreviewLongPressed(UILongPressGestureRecognizer recognizer)
         {
             if (TableView.Editing)
                 return;
@@ -852,7 +851,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 
-                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.DataSource;
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
                 ((DataSource)dataSource).Reset();
             }
             else
@@ -874,7 +873,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async void DoSearchDocuments(string searchText, CancellationToken ct)
         {
             var tableViewController = searchController?.SearchResultsController as UITableViewController;
-            var dataSource = tableViewController?.TableView?.DataSource as DataSource;
+            var dataSource = tableViewController?.TableView?.Source as DataSource;
             dataSource?.Reset();
 
             await Task.Delay(500);
@@ -1037,11 +1036,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (searchController.Active)
                 {
                     var tableViewController = searchController?.SearchResultsController as UITableViewController;
-                    var dataSource = tableViewController?.TableView?.DataSource as DataSource;
-                    dataSource?.RemoveItems(ids.ToList());
+                    var dataSource = tableViewController?.TableView?.Source as DataSource;
+                    dataSource?.RemoveItems(ids);
                 }
 
-                ((DataSource)TableView.Source).RemoveItems(ids.ToList());
+                ((DataSource)TableView.Source).RemoveItems(ids);
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                 {
@@ -1141,8 +1140,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public DataSource(DocumentsListViewController viewController, UITableView tableView)
             {
-                viewControllerWeakReference = new WeakReference<DocumentsListViewController>(viewController);
-                tableViewWeakReference = new WeakReference<UITableView>(tableView);
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -1210,25 +1209,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var documentPreview = Items[indexPath.Row];
 
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("more"),
-                    (a, ip) =>
-                    {
-                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview);
-                    });
-                moreAction.BackgroundColor = Theme.DarkerBlue;
-                actions.Add(moreAction);
-
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("copy_to_worktray_ml"),
-                    (a, ip) =>
-                    {
-                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
-                    });
-                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
-                actions.Add(copyToWorktrayAction);
-
                 if (documentPreview.IsReadByCurrent)
                 {
                     var markAsUnreadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
@@ -1254,11 +1234,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     actions.Add(markAsReadAction);
                 }
 
+                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                    Localization.GetString("copy_to_worktray_ml"),
+                    (a, ip) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
+                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                    });
+                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
+                actions.Add(copyToWorktrayAction);
+
+                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                    Localization.GetString("more"),
+                    (a, ip) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview);
+                    });
+                moreAction.BackgroundColor = Theme.DarkerBlue;
+                actions.Add(moreAction);
+
                 return actions.ToArray();
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (tableView.Editing)
+                    return;
+
                 var dp = Items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.DocumentSelected(dp);
             }

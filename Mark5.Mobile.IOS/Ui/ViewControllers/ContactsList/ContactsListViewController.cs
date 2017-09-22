@@ -86,13 +86,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             }
         }
 
-        public override void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
+        protected override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
-            if (tableView == SearchResultsController.TableView)
-            {
-                tableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
-            }
-
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];

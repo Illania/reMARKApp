@@ -8,17 +8,17 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using ObjCRuntime;
 using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
-    public abstract class AbstractContactsListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public abstract class AbstractContactsListViewController : AbstractTableViewController, IPrimaryViewController, IUISearchResultsUpdating
     {
         protected readonly bool DisableRowActions;
 
@@ -26,22 +26,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         protected UIBarButtonItem ExitEditItem;
         protected UIBarButtonItem EditItem;
-
-        protected UIRefreshControl RefreshControl;
-        protected UITableView TableView;
-        protected UISearchController SearchController;
-        protected UITableViewController SearchResultsController;
-        protected DataSource SearchResultsDataSource;
-
-        protected CancellationTokenSource searchCancellationTokenSource;
-        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+        protected UIBarButtonItem LeftButton;
+        protected UIBarButtonItem RightButton;
 
         bool refreshing;
 
-        CancellationTokenSource cts;
+        UISearchController searchController;
+        CancellationTokenSource searchCancellationTokenSource;
+        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
-        protected UIBarButtonItem LeftButton;
-        protected UIBarButtonItem RightButton;
+        CancellationTokenSource cts;
 
         TinyMessageSubscriptionToken contactChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
@@ -70,14 +64,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             base.ViewDidLoad();
 
-            ExtendedLayoutIncludesOpaqueBars = true;
+            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
             InitializeHandlers();
 
             if (TableView?.IndexPathForSelectedRow != null)
@@ -99,6 +93,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             var ds = (DataSource)TableView.Source;
             if (ds.Empty)
                 RefreshData();
+
+            NSOperationQueue.MainQueue.AddOperation(() =>
+            {
+                var ni = NavigationItem;
+
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
+
+                if (ni.SearchController == null)
+                    ni.SearchController = searchController;
+            });
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -108,6 +113,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             DeinitializeHandlers();
 
             cts?.Cancel();
+
+            if (searchController != null && searchController.Active)
+                searchController.Active = false;
         }
 
         public override void WillMoveToParentViewController(UIViewController parent)
@@ -128,79 +136,98 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             CommonConfig.Logger.Warning($"{nameof(ContactsListViewController)} received memory warning!");
 
-            var ds = TableView?.Source as DataSource;
-            ds?.Reset();
-
+            ((DataSource)TableView.Source).Reset();
             UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            ((DataSource)TableView.Source)?.Reset();
+            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            UnsubscribeFromMessages();
+            searchController = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         #endregion
 
-        #region Initialization
+        #region Initialize/deinitialize
 
         protected virtual void InitializeNavigationBar()
         {
+            NavigationItem.Title = Folder.Name;
+
             ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
         }
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
+            RefreshControl = new UIRefreshControl();
 
-            TableView = new UITableView
-            {
-                ClipsToBounds = false,
-                AllowsSelectionDuringEditing = false,
-                AllowsMultipleSelectionDuringEditing = true,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), DisableRowActions);
-            View.AddSubview(TableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
+            TableView.Source = new DataSource(this, TableView, DisableRowActions);
+            TableView.RefreshControl = RefreshControl;
+            TableView.EstimatedRowHeight = ContactsTableViewCell.Height;
+            TableView.AllowsMultipleSelectionDuringEditing = true;
 
-            var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))
-            {
-                MinimumPressDuration = 1f,
-                Delegate = this
-            };
-            TableView.AddGestureRecognizer(longPressRecognizer);
-
-            RefreshControl = new UIRefreshControl
-            {
-                BackgroundColor = UIColor.White
-            };
-            TableView.AddSubview(RefreshControl);
+            TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(ContactPreviewLongPressed));
         }
 
         void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
 
-            SearchResultsController = new UITableViewController();
-            SearchResultsDataSource = new DataSource(this, SearchResultsController.TableView, Localization.GetString("no_matching_contacts"), DisableRowActions);
-            SearchResultsController.TableView.Source = SearchResultsDataSource;
+            var searchResultsController = new UITableViewController();
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions);
+            searchResultsController.TableView.Source = searchResultsDataSource;
 
-            SearchController = new UISearchController(SearchResultsController)
+            searchController = new UISearchController(searchResultsController)
             {
                 HidesNavigationBarDuringPresentation = true,
                 DimsBackgroundDuringPresentation = true,
                 ObscuresBackgroundDuringPresentation = true,
                 SearchResultsUpdater = this
             };
-            SearchController.SearchBar.Placeholder = Localization.GetString("filter");
-
-            TableView.TableHeaderView = SearchController.SearchBar;
+            searchController.SearchBar.Placeholder = Localization.GetString("filter");
         }
+
+        protected virtual void InitializeHandlers()
+        {
+            if (ExitEditItem != null)
+                ExitEditItem.Clicked += ExitEditItem_Clicked;
+
+            if (EditItem != null)
+                EditItem.Clicked += EditItem_Clicked;
+
+            RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+        }
+
+        protected virtual void DeinitializeHandlers()
+        {
+            if (ExitEditItem != null)
+                ExitEditItem.Clicked -= ExitEditItem_Clicked;
+
+            if (EditItem != null)
+                EditItem.Clicked -= EditItem_Clicked;
+
+            RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
+        }
+
+        #endregion
+
+        #region Subscribe/unsubscribe
 
         void SubscribeToMessages()
         {
@@ -220,97 +247,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             contactChangedToken?.Dispose();
         }
 
-        void InitializeNavigationBarTitle()
-        {
-            UIView.AnimationsEnabled = false;
-            NavigationItem.Title = Folder.Name;
-            NavigationItem.Prompt = null;
-            UIView.AnimationsEnabled = true;
-        }
-
-        protected virtual void InitializeHandlers()
-        {
-            if (ExitEditItem != null)
-                ExitEditItem.Clicked += ExitEditItem_Clicked;
-
-            if (EditItem != null)
-                EditItem.Clicked += EditItem_Clicked;
-
-            if (RefreshControl != null)
-                RefreshControl.ValueChanged += RefreshControl_ValueChanged;
-        }
-
-        protected virtual void DeinitializeHandlers()
-        {
-            if (ExitEditItem != null)
-                ExitEditItem.Clicked -= ExitEditItem_Clicked;
-
-            if (EditItem != null)
-                EditItem.Clicked -= EditItem_Clicked;
-
-            if (RefreshControl != null)
-                RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
-        }
-
         #endregion
 
-        #region Actions
+        #region NavigationBar handlers
 
-        public virtual void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
-        {
-        }
-
-        [Export("longPressed:")]
-        public void LongPressed(UILongPressGestureRecognizer recognizer)
-        {
-            if (TableView.Editing)
-                return;
-
-            StartEditing();
-
-            var point = recognizer.LocationInView(TableView);
-            var indexPath = TableView.IndexPathForRowAtPoint(point);
-
-            TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
-        }
-
-        void StartEditing()
-        {
-            TableView.SetEditing(true, true);
-
-            LeftButton = NavigationItem.LeftBarButtonItem;
-            RightButton = NavigationItem.RightBarButtonItem;
-
-            NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
-            NavigationItem.SetLeftBarButtonItem(EditItem, true);
-
-            SearchController.SearchBar.UserInteractionEnabled = false;
-            SearchController.SearchBar.Alpha = .5f;
-
-            if (SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                nc.PopToRootViewController(false);
-
-                var vc = (ContactViewController)nc.ViewControllers[0];
-                vc.ClearData();
-            }
-        }
-
-        void ExitEditItem_Clicked(object sender, EventArgs e)
-        {
-            EndEditing();
-        }
-
-        void EndEditing()
-        {
-            TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(RightButton, true);
-            NavigationItem.SetLeftBarButtonItem(LeftButton, true);
-
-            SearchController.SearchBar.UserInteractionEnabled = true;
-            SearchController.SearchBar.Alpha = 1f;
-        }
+        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
 
         void EditItem_Clicked(object sender, EventArgs e)
         {
@@ -366,10 +307,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e)
-        {
-            RefreshData(forceClear: true);
-        }
+        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
 
         async void RefreshData(int startRowId = -1, bool forceClear = false)
         {
@@ -413,10 +351,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             cts = new CancellationTokenSource();
 
             if (forceClear)
-            {
-                var ds = (DataSource)TableView.Source;
-                ds.Reset();
-            }
+                ((DataSource)TableView.Source).Reset();
 
             var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
 
@@ -458,216 +393,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #endregion
 
-        #region Searching
+        #region List handlers
 
-        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
+        protected virtual void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
-            var searchText = searchController.SearchBar.Text;
-
-            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
-            {
-                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
-                searchCancellationTokenSourceList.Clear();
-                SearchResultsDataSource.Reset();
-            }
-            else
-            {
-                if (searchCancellationTokenSource != null)
-                {
-                    searchCancellationTokenSource.Cancel();
-                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
-                    searchCancellationTokenSource = null;
-                }
-
-                searchCancellationTokenSource = new CancellationTokenSource();
-                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
-
-                DoSearchContacts(searchText, searchCancellationTokenSource.Token);
-            }
         }
 
-        async void DoSearchContacts(string searchText, CancellationToken ct)
+        protected void ContactPreviewLongPressed(UILongPressGestureRecognizer recognizer)
         {
-            SearchResultsDataSource.Reset();
-
-            await Task.Delay(500);
-
-            if (ct.IsCancellationRequested)
+            if (TableView.Editing)
                 return;
 
-            var ds = (DataSource)TableView.Source;
-            var filteredContacts = ds.Items.Where(cp => MatchesQuery(cp, searchText)).ToList();
+            StartEditing();
 
-            if (ct.IsCancellationRequested)
-                return;
+            var point = recognizer.LocationInView(TableView);
+            var indexPath = TableView.IndexPathForRowAtPoint(point);
 
-            SearchResultsDataSource.AppendItems(filteredContacts);
-        }
-
-        static bool MatchesQuery(ContactPreview cp, string query)
-        {
-            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
-                return true;
-
-            return false;
+            TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
         #endregion
 
         #region Actions
 
-        void RemoveFromFolder(ContactPreview selectedContact)
-        {
-            RemoveFromFolder(new List<ContactPreview>
-            {
-                selectedContact
-            });
-        }
-
-        async void RemoveFromFolder(List<ContactPreview> selectedContacts)
-        {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contacts"));
-
-            if (!result)
-            {
-                EndEditing();
-                return;
-            }
-
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
-
-            try
-            {
-                CommonConfig.Logger.Info($"Attempting to remove contacts from folder [folderId={Folder.Id}]");
-
-                await Managers.CommonActionsManager.RemoveFromFolder(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
-
-                RemoveContactsFromList(selectedContacts.Select(s => s.Id));
-                EndEditing();
-
-                dismissAction();
-            }
-            catch (Exception ex)
-            {
-                EndEditing();
-                dismissAction();
-
-                CommonConfig.Logger.Error($"Error while removing contacts from folder [folderId={Folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
-        }
-
-        void Delete(ContactPreview selectedContact)
-        {
-            Delete(new List<ContactPreview>
-            {
-                selectedContact
-            });
-        }
-
-        async void Delete(List<ContactPreview> selectedContacts)
-        {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contacts"));
-
-            if (!result)
-            {
-                EndEditing();
-                return;
-            }
-
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
-
-            try
-            {
-                CommonConfig.Logger.Info($"Attempting to delete contacts");
-
-                await Managers.CommonActionsManager.Delete(selectedContacts.Cast<IBusinessEntity>().ToList());
-
-                RemoveContactsFromList(selectedContacts.Select(s => s.Id));
-                EndEditing();
-
-                dismissAction();
-            }
-            catch (Exception ex)
-            {
-                EndEditing();
-                dismissAction();
-
-                CommonConfig.Logger.Error($"Error while deleting contacts", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
-        }
-
-        void CopyToWorktray(ContactPreview selectedContact)
-        {
-            CopyToWorktray(new List<ContactPreview>
-            {
-                selectedContact
-            });
-        }
-
-        void CopyToWorktray(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyToWorktrayViewController
-            {
-                BusinessEntities = selectedContacts.Cast<IBusinessEntity>().ToList()
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void CopyToFolder(ContactPreview selecteContact)
-        {
-            CopyToFolder(new List<ContactPreview>
-            {
-                selecteContact
-            });
-        }
-
-        void CopyToFolder(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList());
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void ShowCategories(ContactPreview selectedContact)
-        {
-            var vc = new CategoriesListViewController
-            {
-                BusinessEntityPreview = selectedContact
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void MoveToFolder(ContactPreview selectedContact)
-        {
-            MoveToFolder(new List<ContactPreview>
-            {
-                selectedContact
-            });
-        }
-
-        void MoveToFolder(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void DoShowMoreActionSheet(NSIndexPath indexPath, ContactPreview selectedContact)
+        void ShowMoreActionSheet(NSIndexPath indexPath, ContactPreview selectedContact)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
@@ -711,29 +460,208 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             PresentViewController(eas, true, null);
         }
 
+        void RemoveFromFolder(ContactPreview selectedContact) =>
+            RemoveFromFolder(new List<ContactPreview> { selectedContact });
+
+        async void RemoveFromFolder(List<ContactPreview> selectedContacts)
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contacts"));
+
+            if (!result)
+            {
+                EndEditing();
+                return;
+            }
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to remove contacts from folder [folderId={Folder.Id}]");
+
+                await Managers.CommonActionsManager.RemoveFromFolder(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
+
+                RemoveContactsFromList(selectedContacts.Select(s => s.Id));
+                EndEditing();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                EndEditing();
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while removing contacts from folder [folderId={Folder.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        void Delete(ContactPreview selectedContact) =>
+            Delete(new List<ContactPreview> { selectedContact });
+
+        async void Delete(List<ContactPreview> selectedContacts)
+        {
+            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contacts"));
+
+            if (!result)
+            {
+                EndEditing();
+                return;
+            }
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete contacts");
+
+                await Managers.CommonActionsManager.Delete(selectedContacts.Cast<IBusinessEntity>().ToList());
+
+                RemoveContactsFromList(selectedContacts.Select(s => s.Id));
+                EndEditing();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                EndEditing();
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting contacts", ex);
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
+        }
+
+        void CopyToWorktray(ContactPreview selectedContact) =>
+            CopyToWorktray(new List<ContactPreview> { selectedContact });
+
+        void CopyToWorktray(List<ContactPreview> selectedContacts)
+        {
+            var vc = new CopyToWorktrayViewController
+            {
+                BusinessEntities = selectedContacts.Cast<IBusinessEntity>().ToList()
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        void CopyToFolder(ContactPreview selecteContact) =>
+            CopyToFolder(new List<ContactPreview> { selecteContact });
+
+        void CopyToFolder(List<ContactPreview> selectedContacts)
+        {
+            var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList());
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        void ShowCategories(ContactPreview selectedContact)
+        {
+            var vc = new CategoriesListViewController
+            {
+                BusinessEntityPreview = selectedContact
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        void MoveToFolder(ContactPreview selectedContact)
+        {
+            MoveToFolder(new List<ContactPreview>
+            {
+                selectedContact
+            });
+        }
+
+        void MoveToFolder(List<ContactPreview> selectedContacts)
+        {
+            var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        #endregion
+
+        #region Searching
+
+        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
+        {
+            var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
+                ((DataSource)dataSource).Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
+                {
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
+
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                DoSearchContacts(searchText, searchCancellationTokenSource.Token);
+            }
+        }
+
+        async void DoSearchContacts(string searchText, CancellationToken ct)
+        {
+            var tableViewController = searchController?.SearchResultsController as UITableViewController;
+            var dataSource = tableViewController?.TableView?.Source as DataSource;
+            dataSource?.Reset();
+
+            await Task.Delay(500);
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            var ds = (DataSource)TableView.Source;
+            var filteredContacts = ds.Items.Where(cp => MatchesQuery(cp, searchText)).ToList();
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            dataSource?.AppendItems(filteredContacts);
+        }
+
+        static bool MatchesQuery(ContactPreview cp, string query)
+        {
+            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+
+            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
+                return true;
+
+            return false;
+        }
+
         #endregion
 
         #region Messages handlers
 
-        void HandleAction(ContactChangedMessage m)
-        {
-            UpdateContactFromList(m.ContactPreview);
-        }
+        void HandleAction(ContactChangedMessage m) => UpdateContactOnList(m.ContactPreview);
 
-        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
-        {
-            RemoveContactsFromList(m.EntitiesId);
-        }
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveContactsFromList(m.EntitiesId);
 
-        void HandleMovedFromFolder(EntityMovedFromFolderMessage m)
-        {
-            RemoveContactsFromList(m.EntitiesId);
-        }
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveContactsFromList(m.EntitiesId);
 
-        void HandleDeleted(EntityDeletedMessage m)
-        {
-            RemoveContactsFromList(m.EntitiesId);
-        }
+        void HandleDeleted(EntityDeletedMessage m) => RemoveContactsFromList(m.EntitiesId);
 
         void HandleCategoriesChanged(EntityCategoriesChangedMessage message)
         {
@@ -766,52 +694,94 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Utilities
 
-        void RemoveContactsFromList(IEnumerable<int> ids)
+        void StartEditing()
         {
-            if (SearchController.Active)
-                SearchResultsDataSource.RemoveItems(ids.ToList());
+            TableView.SetEditing(true, true);
 
-            var ds = (DataSource)TableView.Source;
-            ds.RemoveItems(ids.ToList());
+            LeftButton = NavigationItem.LeftBarButtonItem;
+            RightButton = NavigationItem.RightBarButtonItem;
+
+            NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
+            NavigationItem.SetLeftBarButtonItem(EditItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = false;
+            searchController.SearchBar.Alpha = .5f;
+
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
                 var vc = (ContactViewController)nc.ViewControllers[0];
-                if (ids.Select(id => vc.IsShowingContactWithId(id)).Any(v => v))
-                    vc.ClearData();
+                vc.ClearData();
             }
         }
 
-        void UpdateContactFromList(ContactPreview cp)
+        void EndEditing()
         {
-            if (SearchController.Active)
-                SearchResultsDataSource.UpdateItem(cp);
+            TableView.SetEditing(false, true);
+            NavigationItem.SetRightBarButtonItem(RightButton, true);
+            NavigationItem.SetLeftBarButtonItem(LeftButton, true);
 
-            var ds = (DataSource)TableView.Source;
-            ds.UpdateItem(cp);
+            searchController.SearchBar.UserInteractionEnabled = true;
+            searchController.SearchBar.Alpha = 1f;
+        }
+
+        void UpdateContactOnList(ContactPreview cp)
+        {
+            if (searchController.Active)
+            {
+                var tableViewController = searchController?.SearchResultsController as UITableViewController;
+                var dataSource = tableViewController?.TableView?.Source as DataSource;
+                dataSource?.UpdateItem(cp);
+            }
+
+            ((DataSource)TableView.Source).UpdateItem(cp);
+        }
+
+        void RemoveContactsFromList(IEnumerable<int> ids)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                if (searchController.Active)
+                {
+                    var tableViewController = searchController?.SearchResultsController as UITableViewController;
+                    var dataSource = tableViewController?.TableView?.Source as DataSource;
+                    dataSource?.RemoveItems(ids);
+                }
+
+                ((DataSource)TableView.Source).RemoveItems(ids);
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                    var vc = (ContactViewController)nc.ViewControllers[0];
+                    if (ids.Select(id => vc.IsShowingContactWithId(id)).Any(v => v))
+                        vc.ClearData();
+                }
+            });
         }
 
         #endregion
 
-        protected class DataSource : UITableViewSource, IDisposable
+        #region DataSource
+
+        protected class DataSource : UITableViewSource
         {
-            public bool Empty { get { return !contactPreviewsInView.SelectMany(v => v).Any(); } }
+            public bool Empty => !contactPreviewsInView.SelectMany(v => v).Any();
+            public IEnumerable<ContactPreview> Items => contactPreviewsInView.SelectMany(i => i);
 
-            public IEnumerable<ContactPreview> Items { get { return contactPreviewsInView.SelectMany(i => i); } }
-
-            AbstractContactsListViewController viewController;
-            UITableView tableView;
-            readonly string emptyText;
+            readonly WeakReference<AbstractContactsListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
+            readonly bool disableRowActions;
 
             bool loading = true;
-            bool disableRowActions;
-            List<List<ContactPreview>> contactPreviewsInView = new List<List<ContactPreview>>(25);
+            readonly List<List<ContactPreview>> contactPreviewsInView = new List<List<ContactPreview>>(25);
 
-            public DataSource(AbstractContactsListViewController viewController, UITableView tableView, string emptyText, bool disableRowActions)
+            public DataSource(AbstractContactsListViewController viewController, UITableView tableView, bool disableRowActions)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
                 this.disableRowActions = disableRowActions;
             }
 
@@ -823,7 +793,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 if (!contactPreviewsInView.SelectMany(v => v).Any())
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    emptyCell.Initialize(Localization.GetString("folder_empty"));
                     return emptyCell;
                 }
 
@@ -857,10 +827,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 return contactPreviewsInView[(int)section].Count;
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView)
-            {
-                return contactPreviewsInView.SelectMany(i => i).Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper()).Distinct().ToArray();
-            }
+            public override string[] SectionIndexTitles(UITableView tableView) => contactPreviewsInView.SelectMany(i => i)
+                                                                                                       .Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
+                                                                                                       .Distinct()
+                                                                                                       .ToArray();
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
@@ -877,15 +847,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 return -1;
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return ContactsTableViewCell.Height;
-            }
-
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return !disableRowActions;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions;
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -893,19 +855,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 var contactPreview = contactPreviewsInView[indexPath.Section][indexPath.Row];
 
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, contactPreview); });
-                moreAction.BackgroundColor = Theme.DarkerBlue;
-                actions.Add(moreAction);
-
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("copy_to_worktray_ml"),
-                    (a, ip) =>
-                    {
-                        viewController.CopyToWorktray(contactPreview);
-                        viewController.EndEditing();
-                    });
+                                                                       Localization.GetString("copy_to_worktray_ml"),
+                                                                       (a, ip) =>
+                {
+                    viewControllerWeakReference.Unwrap()?.CopyToWorktray(contactPreview);
+                    viewControllerWeakReference.Unwrap()?.EndEditing();
+                });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
+
+                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                                             Localization.GetString("more"),
+                                                             (a, ip) =>
+                {
+                    viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, contactPreview);
+                });
+                moreAction.BackgroundColor = Theme.DarkerBlue;
+                actions.Add(moreAction);
 
                 return actions.ToArray();
             }
@@ -916,10 +883,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     return;
 
                 var cp = contactPreviewsInView[indexPath.Section][indexPath.Row];
-                viewController.ContactSelected(tableView, cp, indexPath);
+                viewControllerWeakReference.Unwrap()?.ContactSelected(tableView, indexPath, cp);
             }
 
-            public void AppendItems(List<ContactPreview> contactPreviews)
+            public void AppendItems(IEnumerable<ContactPreview> contactPreviews)
             {
                 loading = false;
 
@@ -927,17 +894,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 var isInputListPopulated = contactPreviews.Any();
 
                 if (isInputListPopulated)
-                    contactPreviewsInView.Add(contactPreviews);
+                    contactPreviewsInView.Add(contactPreviews.ToList());
 
                 if (count == 0)
-                    tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 else if (isInputListPopulated)
-                    tableView.InsertSections(NSIndexSet.FromIndex(contactPreviewsInView.Count - 1), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(contactPreviewsInView.Count - 1), UITableViewRowAnimation.Fade);
             }
 
-            public void RemoveItems(List<int> contactsId)
+            public void RemoveItems(IEnumerable<int> contactsId)
             {
-                tableView.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
 
                 var indexPaths = contactsId.Select(id => FindItemIndexPath(id)).Where(idx => idx != null).OrderByDescending(idx => idx.Section).ThenByDescending(idx => idx.Row).ToList();
                 foreach (var indexPath in indexPaths)
@@ -947,21 +914,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     {
                         contactPreviewsInView.RemoveAt(indexPath.Section);
                         if (contactPreviewsInView.Count == 0)
-                            tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                            tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                         else
-                            tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
+                            tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
                     }
                     else
-                    {
-                        tableView.DeleteRows(new NSIndexPath[]
-                            {
-                                indexPath
-                            },
-                            UITableViewRowAnimation.Automatic);
-                    }
+                        tableViewWeakReference.Unwrap()?.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                tableView.EndUpdates();
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public void UpdateItem(ContactPreview cp)
@@ -970,7 +931,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 if (indexPath != null)
                 {
                     contactPreviewsInView[indexPath.Section][indexPath.Row] = cp;
-                    tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    tableViewWeakReference.Unwrap()?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
             }
 
@@ -982,19 +943,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 contactPreviewsInView.Clear();
 
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
 
                 if (count > 1)
-                    tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
 
-                tableView.EndUpdates();
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
-            public NSIndexPath FindItemIndexPath(ContactPreview cp)
-            {
-                return FindItemIndexPath(cp.Id);
-            }
+            public NSIndexPath FindItemIndexPath(ContactPreview cp) => FindItemIndexPath(cp.Id);
 
             public NSIndexPath FindItemIndexPath(int id)
             {
@@ -1010,15 +968,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             {
                 return contactPreviewsInView[indexPath.Section][indexPath.Row];
             }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                contactPreviewsInView = null;
-            }
         }
+
+        #endregion
+
     }
 }

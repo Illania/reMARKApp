@@ -51,12 +51,5 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SenderLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
             SubjectLabel.Text = string.IsNullOrWhiteSpace(data.DocumentPreview.Subject) ? Localization.GetString("no_subject") : data.DocumentPreview.Subject;
         }
-
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
-        }
     }
 }
