@@ -426,6 +426,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Service\CallStateBroadcastReceiver.cs" />
     <Compile Include="Service\IncomingCallService.cs" />
+    <Compile Include="Service\CallActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
