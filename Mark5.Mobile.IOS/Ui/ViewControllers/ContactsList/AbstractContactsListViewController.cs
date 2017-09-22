@@ -177,9 +177,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             RefreshControl = new UIRefreshControl();
 
-            TableView.Source = new DataSource(this, TableView, DisableRowActions);
+            TableView.Source = new DataSource(this, TableView, DisableRowActions, Localization.GetString("folder_empty"));
             TableView.RefreshControl = RefreshControl;
-            TableView.EstimatedRowHeight = ContactsTableViewCell.Height;
             TableView.AllowsMultipleSelectionDuringEditing = true;
 
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(ContactPreviewLongPressed));
@@ -190,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions);
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions, Localization.GetString("no_matching_contacts"));
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -774,15 +773,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             readonly WeakReference<AbstractContactsListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly bool disableRowActions;
+            readonly string emptyText;
 
             bool loading = true;
             readonly List<List<ContactPreview>> contactPreviewsInView = new List<List<ContactPreview>>(25);
 
-            public DataSource(AbstractContactsListViewController viewController, UITableView tableView, bool disableRowActions)
+            public DataSource(AbstractContactsListViewController viewController, UITableView tableView, bool disableRowActions, string emptyText)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
                 this.disableRowActions = disableRowActions;
+                this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -804,6 +805,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 return cell;
             }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ContactsTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {

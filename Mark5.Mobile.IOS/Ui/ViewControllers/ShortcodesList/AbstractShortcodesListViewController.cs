@@ -171,9 +171,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             RefreshControl = new UIRefreshControl();
 
-            TableView.Source = new DataSource(this, TableView, DisableRowActions);
+            TableView.Source = new DataSource(this, TableView, DisableRowActions, Localization.GetString("folder_empty"));
             TableView.RefreshControl = RefreshControl;
-            TableView.EstimatedRowHeight = ShortcodesTableViewCell.Height;
             TableView.AllowsMultipleSelectionDuringEditing = true;
 
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(ShortcodePreviewLongPressed));
@@ -184,7 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions);
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions, Localization.GetString("no_matching_shortcodes"));
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -687,15 +686,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             readonly WeakReference<AbstractShortcodesListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly bool disableRowActions;
+            readonly string emptyText;
 
             bool loading = true;
             readonly List<List<ShortcodePreview>> shortcodePreviewsInView = new List<List<ShortcodePreview>>(25);
 
-            public DataSource(AbstractShortcodesListViewController viewController, UITableView tableView, bool disableRowActions)
+            public DataSource(AbstractShortcodesListViewController viewController, UITableView tableView, bool disableRowActions, string emptyText)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
                 this.disableRowActions = disableRowActions;
+                this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -706,7 +707,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 if (!shortcodePreviewsInView.SelectMany(v => v).Any())
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(Localization.GetString("folder_empty"));
+                    emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
@@ -717,6 +718,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                 return cell;
             }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ShortcodesTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {

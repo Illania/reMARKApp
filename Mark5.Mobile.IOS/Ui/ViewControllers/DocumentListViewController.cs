@@ -199,7 +199,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             RefreshControl = new UIRefreshControl();
 
-            TableView.Source = new DataSource(this, TableView);
+            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"));
             TableView.RefreshControl = RefreshControl;
             TableView.AllowsMultipleSelectionDuringEditing = true;
 
@@ -211,7 +211,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView);
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_documents"));
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -1135,13 +1135,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             readonly WeakReference<DocumentsListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
+            readonly string emptyText;
 
             bool loading = true;
 
-            public DataSource(DocumentsListViewController viewController, UITableView tableView)
+            public DataSource(DocumentsListViewController viewController, UITableView tableView, string emptyText)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
+                this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -1152,7 +1154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (Items.Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(Localization.GetString("folder_empty"));
+                    emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
@@ -1182,6 +1184,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (Items.Count > 0 && Items[indexPath.Row]?.Direction == DocumentDirection.External)
+                    return ExternalDocumentsTableViewCell.Height;
+
+                return CompactList ? DocumentsCompactTableViewCell.Height : DocumentsTableViewCell.Height;
+            }
+
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading)
@@ -1191,14 +1201,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return 1;
 
                 return Items.Count;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (Items.Count > 0 && Items[indexPath.Row]?.Direction == DocumentDirection.External)
-                    return ExternalDocumentsTableViewCell.Height;
-
-                return CompactList ? DocumentsCompactTableViewCell.Height : DocumentsTableViewCell.Height;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => true;
