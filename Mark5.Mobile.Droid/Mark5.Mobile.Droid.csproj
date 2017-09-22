@@ -429,7 +429,6 @@
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
     <Folder Include="Model\HubMessages\" />
-    <Folder Include="Ui\Activities\Activities\" />
     <Folder Include="Utilities\Extensions\" />
   </ItemGroup>
   <ItemGroup>

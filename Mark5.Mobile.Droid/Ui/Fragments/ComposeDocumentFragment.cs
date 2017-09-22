@@ -136,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     linearLayout.AddView(new Divider(Context));
             }
 
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).GetFAB();
             fab.SetImageResource(Resource.Drawable.action_send);
             fab.SetOnClickListener(new ActionOnClickListener(() => SendDocument()));
             fab.Enabled = false;
@@ -684,7 +684,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool IsFormValid()
         {
             var recipientAdded = false;
-            foreach (var recipientView in new RecipientsView[] {toView,ccView,bccView})
+            foreach (var recipientView in new RecipientsView[] { toView, ccView, bccView })
                 recipientAdded |= !recipientView.Empty;
 
             if (!recipientAdded)

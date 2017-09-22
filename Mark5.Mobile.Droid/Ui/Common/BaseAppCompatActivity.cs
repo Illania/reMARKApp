@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
             }
 
-            var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
+            var fab = GetFAB();
             if (fab != null)
             {
                 if (fab.LayoutParameters is CoordinatorLayout.LayoutParams lp)
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
 
-            var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
+            var fab = GetFAB();
             if (fab?.LayoutParameters is CoordinatorLayout.LayoutParams lp)
             {
                 lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
@@ -123,6 +123,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
+        }
+
+        public FloatingActionButton GetFAB()
+        {
+            return FindViewById<FloatingActionButton>(Resource.Id.fab);
         }
     }
 }
