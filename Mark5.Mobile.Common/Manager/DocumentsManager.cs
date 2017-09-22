@@ -665,6 +665,25 @@ namespace Mark5.Mobile.Common.Manager
                 documentPreview.Guid = result.Guid;
                 documentPreview.ReferenceNumber = result.ReferenceNumber;
 
+                if (precedingDocumentId > 0)
+                {
+                    try
+                    {
+                        var previousDocumentPreview = await documentsDataAccess.GetDocumentPreviewAsync(precedingDocumentId);
+
+                        if (previousDocumentPreview.Direction == DocumentDirection.Draft)
+                        {
+                            await documentsDataAccess.DeleteAsync(new List<DocumentPreview> { previousDocumentPreview });
+
+                            CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Document, new List<int> { previousDocumentPreview.Id }));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Error while deleting draft", ex);
+                    }
+                }
+
                 return;
             }
 

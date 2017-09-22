@@ -93,6 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         TinyMessageSubscriptionToken commentsCountChangedToken;
+        TinyMessageSubscriptionToken draftSentToken;
 
         #region UIViewController overrides
 
@@ -463,11 +464,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
+            draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(DraftSentHandler);
+
         }
 
         void UnsubscribeFromMessages()
         {
             commentsCountChangedToken?.Dispose();
+            draftSentToken?.Dispose();
         }
 
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
@@ -1358,6 +1362,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (message.EntityId == document?.Id)
             {
                 BeginInvokeOnMainThread(() => comments.SetBadgeValue(document.Comments.Count().ToString(), false));
+            }
+        }
+
+        void DraftSentHandler(DraftSentMessage message)
+        {
+            if (message.DocumentId == document?.Id)
+            {
+                BeginInvokeOnMainThread(() =>
+                {
+                    if (Modal)
+                        DismissViewController(true, null);
+                    else
+                        NavigationController?.PopViewController(true);
+                });
             }
         }
 
