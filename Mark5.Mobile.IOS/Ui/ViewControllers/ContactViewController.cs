@@ -433,17 +433,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void UnsubscribeFromMessages()
         {
-            if (contactChangedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityChangedMessage>(contactChangedToken);
-                contactChangedToken = null;
-            }
-
-            if (childrenAddedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityChangedMessage>(childrenAddedToken);
-                childrenAddedToken = null;
-            }
+            contactChangedToken?.Dispose();
+            childrenAddedToken?.Dispose();
         }
 
         void HandleContactChangedMessage(EntityChangedMessage m)
