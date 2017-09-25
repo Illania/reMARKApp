@@ -713,15 +713,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return string.Empty;
             }
 
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
-            {
-                var v = headerView as UITableViewHeaderFooterView;
-                if (v == null)
-                    return;
-
-                v.TextLabel.TextColor = Theme.DarkerBlue;
-            }
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)

@@ -8,6 +8,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public partial class ObjectLinksTableViewCell : UITableViewCell
     {
+        public const float Height = 72f;
+
         public static readonly UINib Nib = UINib.FromName("ObjectLinksTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ObjectLinksTableViewCell");
 

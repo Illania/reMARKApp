@@ -983,16 +983,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return string.Empty;
             }
 
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
-            {
-                var v = headerView as UITableViewHeaderFooterView;
-                if (v == null)
-                    return;
-
-                v.TextLabel.TextColor = Theme.DarkerBlue;
-                v.TextLabel.SizeToFit();
-            }
-
             public override bool ShouldIndentWhileEditing(UITableView tableView, NSIndexPath indexPath)
             {
                 return false;

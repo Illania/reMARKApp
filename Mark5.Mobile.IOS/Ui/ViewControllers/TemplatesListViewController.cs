@@ -337,15 +337,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return section == 0 ? Localization.GetString("private") : Localization.GetString("public");
             }
 
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
-            {
-                var v = headerView as UITableViewHeaderFooterView;
-                if (v == null)
-                    return;
-
-                v.TextLabel.TextColor = Theme.DarkerBlue;
-            }
-
             public void SetItems(List<TemplatePreview> templatePreviews)
             {
                 loading = false;

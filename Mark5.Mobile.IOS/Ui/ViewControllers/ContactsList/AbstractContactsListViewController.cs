@@ -942,16 +942,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             {
                 loading = true;
 
-                var count = contactPreviewsInView.Count;
-
                 contactPreviewsInView.Clear();
 
+                var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
+
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
+                if (sectionsCount > 1)
+                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-
-                if (count > 1)
-                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
-
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 

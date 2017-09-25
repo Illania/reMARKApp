@@ -11,6 +11,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public partial class ObjectActionsTableViewCell : UITableViewCell
     {
+        public const float Height = 72f;
+
         public static readonly UINib Nib = UINib.FromName("ObjectActionsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("ObjectActionsTableViewCell");
 
