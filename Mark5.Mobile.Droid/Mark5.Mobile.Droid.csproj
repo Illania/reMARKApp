@@ -228,7 +228,6 @@
     <Compile Include="Ui\Activities\MainActivity.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
-    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />

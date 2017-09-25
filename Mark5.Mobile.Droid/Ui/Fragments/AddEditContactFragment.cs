@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
-            fab = ((BaseAppCompatActivity)Activity).Fab
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_save_contact);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
             fab.Enabled = true;
