@@ -665,24 +665,7 @@ namespace Mark5.Mobile.Common.Manager
                 documentPreview.Guid = result.Guid;
                 documentPreview.ReferenceNumber = result.ReferenceNumber;
 
-                if (precedingDocumentId > 0)
-                {
-                    try
-                    {
-                        var previousDocumentPreview = await documentsDataAccess.GetDocumentPreviewAsync(precedingDocumentId);
-
-                        if (previousDocumentPreview.Direction == DocumentDirection.Draft)
-                        {
-                            await documentsDataAccess.DeleteAsync(new List<DocumentPreview> { previousDocumentPreview });
-
-                            CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Document, new List<int> { previousDocumentPreview.Id }));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        CommonConfig.Logger.Error("Error while deleting draft", ex);
-                    }
-                }
+                await ExecutePostSendActionsAsync(document, documentPreview, flag, precedingDocumentId, precedingDocumentFolderId);
 
                 return;
             }
@@ -691,6 +674,28 @@ namespace Mark5.Mobile.Common.Manager
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
 
             throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        async Task ExecutePostSendActionsAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId)
+        {
+            if (precedingDocumentId > 0)
+            {
+                try
+                {
+                    var previousDocumentPreview = await documentsDataAccess.GetDocumentPreviewAsync(precedingDocumentId);
+
+                    if (previousDocumentPreview.Direction == DocumentDirection.Draft)
+                    {
+                        await documentsDataAccess.DeleteAsync(new List<DocumentPreview> { previousDocumentPreview });
+
+                        CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Document, new List<int> { previousDocumentPreview.Id }));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while deleting draft", ex);
+                }
+            }
         }
 
         internal async Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto)
