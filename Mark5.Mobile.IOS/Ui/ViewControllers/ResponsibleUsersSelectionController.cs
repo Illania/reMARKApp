@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -201,12 +202,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
+                cell.TextLabel.Font = Theme.DefaultFont;
                 cell.DetailTextLabel.Text = su.Username;
+                cell.DetailTextLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
                 cell.Accessory = SelectedItems.Contains(su) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
                 cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
                 return cell;
             }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
 
             public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
             {
@@ -230,11 +235,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override nint NumberOfSections(UITableView tableView)
             {
                 return 1;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return 44f;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)

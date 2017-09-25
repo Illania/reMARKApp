@@ -72,6 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
+        NSObject didEnterBackgroundNotification;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -86,9 +88,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            UIApplication.Notifications.ObserveDidEnterBackground(DidEnterBackgroundNotification);
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
-            ExtendedLayoutIncludesOpaqueBars = false;
+            didEnterBackgroundNotification = UIApplication.Notifications.ObserveDidEnterBackground(DidEnterBackgroundNotification);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -97,8 +101,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBarTitle();
             InitializeHandlers();
-
-            ReachabilityBar.Attach(View, null, (float)NavigationController.BottomLayoutGuide.Length);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -136,6 +138,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
+        }
+
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            didEnterBackgroundNotification?.Dispose();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         void DidEnterBackgroundNotification(object sender, NSNotificationEventArgs e)
@@ -231,7 +248,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             lastDownloadedLabel = new UILabel
             {
                 TintColor = Theme.LightGray,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -304,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var warningInfoLabel = new UILabel
             {
                 TextColor = Theme.LightGray,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 Text = Localization.GetString("dont_close_app"),
                 Lines = 6,
@@ -362,7 +379,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             progressLabel = new UILabel
             {
                 TintColor = Theme.DarkBlue,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
@@ -464,7 +481,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 TintColor = Theme.LightGray,
                 Lines = 2,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -703,7 +720,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 ActivityIndicator.Show();
-                
+
                 CommonConfig.Logger.Info($"Starting download of folder {folder.Name} [folder.id={folder.Id}, folder.module={folder.Module}]");
 
                 onStartedAction();
@@ -826,7 +843,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             finally
             {
-                ActivityIndicator.Hide();    
+                ActivityIndicator.Hide();
             }
         }
     }

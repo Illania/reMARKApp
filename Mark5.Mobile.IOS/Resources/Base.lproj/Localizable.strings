@@ -119,6 +119,7 @@
 "downloading_attachment___" = "Downloading attachment...";
 "downloading_percentage___" = "Downloading {0}%...";
 "edit" = "Edit";
+"edit_categories" = "Edit categories";
 "edit_contact" = "Edit contact";
 "editing_contact___" = "Editing contact...";
 "edit_message" = "Edit message";
@@ -272,6 +273,7 @@
 "reply_all" = "Reply all";
 "reply_to" = "Reply to";
 "report" = "Report";
+"resend" = "Resend";
 "reset" = "Reset";
 "responsible_users" = "Responsible users";
 "restart_required_content" = "You need to restart MARK5, for this setting to take effect.";

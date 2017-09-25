@@ -14,13 +14,12 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class SelectCategoriesListViewController : AbstractTableViewController
+    public class EditCategoriesListViewController : AbstractTableViewController
     {
-        public ModuleType Module { get; set; }
-        public List<int> PreselectedItemIds { get; set; }
+        public BusinessEntityPreview BusinessEntityPreview { get; set; }
 
-        readonly TaskCompletionSource<List<int>> tcs = new TaskCompletionSource<List<int>>();
-        public Task<List<int>> Task => tcs.Task;
+        readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        public Task<bool> Task => tcs.Task;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
@@ -53,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(SelectCategoriesListViewController)} appeared");
+            CommonConfig.Logger.Info($"{nameof(EditCategoriesListViewController)} appeared");
 
             if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
@@ -68,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(SelectCategoriesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning($"{nameof(EditCategoriesListViewController)} received memory warning!");
 
             ((DataSource)TableView.Source).Reset();
 
@@ -93,7 +92,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            Title = Localization.GetString("categories");
+            Title = Localization.GetString("edit_categories");
 
             cancelItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             NavigationItem.SetLeftBarButtonItem(cancelItem, false);
@@ -134,62 +133,90 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             try
             {
-                CommonConfig.Logger.Info($"Refreshing list of available categories... [module={Module}");
+                CommonConfig.Logger.Info($"Refreshing list of available categories");
 
-                if (Module == ModuleType.Documents)
+                if (BusinessEntityPreview.ObjectType == ObjectType.Document)
                 {
                     var availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
                     ((DataSource)TableView.Source).SetItems(availableCategories);
                 }
 
-                if (Module == ModuleType.Contacts)
+                if (BusinessEntityPreview.ObjectType == ObjectType.Contact)
                 {
                     var availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
                     ((DataSource)TableView.Source).SetItems(availableCategories);
                 }
 
-                if (PreselectedItemIds != null)
-                    ((DataSource)TableView.Source).SelectedItemIds = PreselectedItemIds;
+                if (BusinessEntityPreview is DocumentPreview dp)
+                    ((DataSource)TableView.Source).SelectedItems = dp.Categories;
+
+                if (BusinessEntityPreview is ContactPreview cp)
+                    ((DataSource)TableView.Source).SelectedItems = cp.Categories;
 
                 doneItem.Enabled = true;
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while retrieving available categories! [module={Module}]", ex);
+                CommonConfig.Logger.Error($"Error while retrieving available categories [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
         }
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(null);
+            tcs.SetResult(false);
             DismissViewController(true, null);
         }
 
-        void DoneItem_Clicked(object sender, EventArgs e)
+        async void DoneItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(((DataSource)TableView.Source).SelectedItemIds);
-            DismissViewController(true, null);
+            CommonConfig.Logger.Info($"Updateing categories... [entity={BusinessEntityPreview}]");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_categories___"));
+
+            try
+            {
+                var categories = ((DataSource)TableView.Source).SelectedItems;
+
+                if (BusinessEntityPreview is DocumentPreview dp)
+                    await Managers.DocumentsManager.SetCategoriesAsync(dp, categories);
+
+                if (BusinessEntityPreview is ContactPreview cp)
+                    await Managers.ContactsManager.SetCategoriesAsync(cp, categories);
+
+                dismissAction();
+
+                tcs.SetResult(true);
+                DismissViewController(true, null);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while updating categories [entity={BusinessEntityPreview}]", ex);
+
+                dismissAction();
+
+                await Dialogs.ShowErrorDialogAsync(this, ex);
+            }
         }
 
         class DataSource : UITableViewSource
         {
             public bool Empty => !categoriesInView.Any();
 
-            public List<int> SelectedItemIds
+            public List<Category> SelectedItems
             {
                 get
                 {
                     var tableView = tableViewWeakReference.Unwrap();
 
                     if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
-                        return new List<int>();
+                        return new List<Category>();
 
-                    return tableView.IndexPathsForSelectedRows.Select(ip => categoriesInView[ip.Row].Id).ToList();
+                    return tableView.IndexPathsForSelectedRows.Select(ip => categoriesInView[ip.Row]).ToList();
                 }
                 set
                 {
-                    var selectedIds = value.ToHashSet();
+                    var selectedIds = value.Select(c => c.Id).ToHashSet();
                     for (var i = 0; i < categoriesInView.Count; i++)
                         if (selectedIds.Contains(categoriesInView[i].Id))
                         {

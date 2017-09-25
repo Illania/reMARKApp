@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -37,7 +38,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
@@ -46,8 +48,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
-
-            ReachabilityBar.Attach(View, TableView, (float)NavigationController.BottomLayoutGuide.Length);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -240,9 +240,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ownCell = tableView.DequeueReusableCell("default") ?? new UITableViewCell(UITableViewCellStyle.Default, "default");
                     ownCell.TextLabel.Text = Localization.GetString("own_worktray");
+                    ownCell.TextLabel.Font = Theme.DefaultFont;
                     ownCell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
-                    ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+                    ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
+                        ? UITableViewCellAccessory.Checkmark
+                        : UITableViewCellAccessory.None;
 
                     return ownCell;
                 }
@@ -261,10 +264,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
+                cell.TextLabel.Font = Theme.DefaultFont;
                 cell.DetailTextLabel.Text = su.Username;
+                cell.DetailTextLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
                 cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
-                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
+                    ? UITableViewCellAccessory.Checkmark
+                    : UITableViewCellAccessory.None;
 
                 return cell;
             }
@@ -283,12 +290,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return systemUsersInView.Count;
             }
 
-            public override nint NumberOfSections(UITableView tableView)
-            {
-                return 2;
-            }
+            public override nint NumberOfSections(UITableView tableView) => 2;
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 44f;
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {

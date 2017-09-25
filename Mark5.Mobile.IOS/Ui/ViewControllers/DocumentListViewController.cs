@@ -18,7 +18,6 @@ using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
-using ObjCRuntime;
 using TinyMessenger;
 using UIKit;
 
@@ -67,7 +66,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             RestorationIdentifier = nameof(DocumentsListViewController);
@@ -749,13 +749,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToFolder(DocumentPreview selectedDocument)
-        {
-            CopyToFolder(new List<DocumentPreview>
-            {
-                selectedDocument
-            });
-        }
+        void CopyToFolder(DocumentPreview selectedDocument) =>
+            CopyToFolder(new List<DocumentPreview>{selectedDocument});
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
         {
@@ -763,13 +758,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MoveToFolder(DocumentPreview selectedDocument)
-        {
-            MoveToFolder(new List<DocumentPreview>
-            {
-                selectedDocument
-            });
-        }
+        void MoveToFolder(DocumentPreview selectedDocument) =>
+            MoveToFolder(new List<DocumentPreview> { selectedDocument });
 
         void MoveToFolder(List<DocumentPreview> selectedDocument)
         {
@@ -780,13 +770,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToWorktray(DocumentPreview selectedDocument)
-        {
-            CopyToWorktray(new List<DocumentPreview>
-            {
-                selectedDocument
-            });
-        }
+        void CopyToWorktray(DocumentPreview selectedDocument) =>
+            CopyToWorktray(new List<DocumentPreview> { selectedDocument });
 
         void CopyToWorktray(List<DocumentPreview> selectedDocuments)
         {
@@ -880,8 +865,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (ct.IsCancellationRequested)
                 return;
-
-            var filteredDocuments = dataSource?.Items.Where(dp => MatchesQuery(dp, searchText)).ToList();
+            
+            var ds = (DataSource)TableView.Source;
+            var filteredDocuments = ds.Items.Where(dp => MatchesQuery(dp, searchText)).ToList();
 
             if (ct.IsCancellationRequested)
                 return;
@@ -924,30 +910,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Messages handlers
 
-        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
-
-        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
-
-        void HandleDeleted(EntityDeletedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
-
-        #endregion
-
-        #region Event handlers
-
-        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
-        {
-            BeginInvokeOnMainThread(() =>
-            {
-                var selectedRow = TableView.IndexPathForSelectedRow;
-
-                ((DataSource)TableView.Source).UpdateItem(e.DocumentPreview.Id);
-                TableView.ReloadData();
-
-                if (selectedRow != null)
-                    TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
-            });
-        }
-
         void CommentsCountChangedHandler(DocumentPreviewCommentsCountChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
@@ -988,6 +950,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (selectedRow != null)
                         TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
                 }
+            });
+        }
+
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+
+        void HandleDeleted(EntityDeletedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+
+        #endregion
+
+        #region Event handlers
+
+        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var selectedRow = TableView.IndexPathForSelectedRow;
+
+                ((DataSource)TableView.Source).UpdateItem(e.DocumentPreview.Id);
+                TableView.ReloadData();
+
+                if (selectedRow != null)
+                    TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
             });
         }
 
@@ -1129,7 +1115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
 
             public bool Empty => Items.Count < 1;
-            public List<DocumentPreview> Items { get; private set; } = new List<DocumentPreview>(1000);
+            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
             public bool LoadMoreEnabled { get; set; }
             public bool CompactList { get; set; }
 

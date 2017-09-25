@@ -1,5 +1,4 @@
-﻿using System;
-using CoreGraphics;
+﻿using CoreGraphics;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common

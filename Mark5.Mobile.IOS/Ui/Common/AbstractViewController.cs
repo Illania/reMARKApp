@@ -1,5 +1,4 @@
 ﻿using UIKit;
-using System;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {

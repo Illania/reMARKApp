@@ -47,7 +47,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             RestorationIdentifier = nameof(NotificationsListViewController);
@@ -111,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(NotificationsListViewController)} received memory warning!");
 
-            ((DataSource)TableView.DataSource).Reset();
+            ((DataSource)TableView.Source).Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -121,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            ((DataSource)TableView.DataSource).Reset();
+            ((DataSource)TableView.Source).Reset();
         }
 
         protected override void Dispose(bool disposing)
@@ -212,7 +213,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
-                ((DataSource)TableView.DataSource).SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
+                ((DataSource)TableView.Source).SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
 
@@ -270,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly WeakReference<NotificationsListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
-            public List<Notification> Items { get; private set; } = new List<Notification>();
+            public List<Notification> Items { get; } = new List<Notification>();
             bool loading = true;
 
             public DataSource(NotificationsListViewController viewController, UITableView tableView)

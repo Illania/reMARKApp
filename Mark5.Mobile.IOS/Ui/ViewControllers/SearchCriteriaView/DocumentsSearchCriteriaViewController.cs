@@ -1134,15 +1134,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 if (recognizer.View == categoriesView)
                 {
-                    var vc = new SelectCategoriesListViewController(ModuleType.Documents, Criteria.CategoryIds);
+                    var vc = new SelectCategoriesListViewController
+                    {
+                        Module = ModuleType.Documents,
+                        PreselectedItemIds = Criteria.CategoryIds
+                    };
                     parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
 
                     var result = await vc.Task;
-
                     if (result == null)
                         return;
 
-                    Criteria.CategoryIds = result.Select(c => c.Id).ToList();
+                    Criteria.CategoryIds = result;
                 }
 
                 if (recognizer.View == priorityView)

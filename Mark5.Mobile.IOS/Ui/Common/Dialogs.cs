@@ -49,10 +49,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content)
-        {
-            return ShowConfirmDialogAsync(vc, title, content, Localization.GetString("ok"));
-        }
+        public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content) =>
+            ShowConfirmDialogAsync(vc, title, content, Localization.GetString("ok"));
 
         public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content, string confirmationText)
         {
@@ -106,8 +104,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             for (var i = 0; i < listStrings.Length; i++)
             {
-                var ab = i; //Can't use i, because it's the variable, not the value, that's captured in the lambda)
-                actionSheet.AddAction(UIAlertAction.Create(listStrings[i], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));
+                var ab = i;
+                actionSheet.AddAction(UIAlertAction.Create(listStrings[ab], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));
             }
 
             actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));

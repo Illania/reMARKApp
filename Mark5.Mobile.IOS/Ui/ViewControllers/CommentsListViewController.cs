@@ -67,8 +67,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
 
             InitializeHandlers();
-
-            ReachabilityBar.Attach(View, commentsTableView, (float)(NavigationController.BottomLayoutGuide.Length + commentEditView.Frame.Height));
         }
 
         public override void ViewDidAppear(bool animated)
@@ -500,7 +498,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
             UITableView tableView;
             CommentsListViewController viewController;
@@ -509,7 +507,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public bool Empty => !Items.Any();
 
-            public List<Comment> Items { get; private set; } = new List<Comment>();
+            public List<Comment> Items { get; } = new List<Comment>();
 
             public DataSource(CommentsListViewController viewController, UITableView tableView, string emptyText)
             {
@@ -630,14 +628,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         },
                         UITableViewRowAnimation.Fade);
                 }
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                tableView = null;
-                Items = null;
             }
         }
     }

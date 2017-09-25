@@ -114,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == AppVersionKey)
             {
-                var cell = tableView.DequeueReusableCell("value1cell") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1cell");
+                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";

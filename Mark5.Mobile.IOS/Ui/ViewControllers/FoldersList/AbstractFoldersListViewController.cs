@@ -11,11 +11,11 @@ using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
@@ -75,7 +75,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.ViewDidLoad();
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 

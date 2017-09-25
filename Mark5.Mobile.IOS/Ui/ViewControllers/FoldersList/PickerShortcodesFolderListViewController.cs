@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         readonly TaskCompletionSource<Shortcode> tcs = new TaskCompletionSource<Shortcode>();
         public Task<Shortcode> Task => tcs.Task;
 
-        UIBarButtonItem cancelModeItem;
+        UIBarButtonItem cancelItem;
 
         public PickerShortcodesFolderListViewController()
             : base(ModuleType.Shortcodes, true, true, true)
@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected async override void FolderSelected(Folder folder)
         {
-            var vc = new PickerShortcodesListViewController()
+            var vc = new PickerShortcodesListViewController
             {
                 Folder = folder,
             };
@@ -40,10 +40,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected override void InitializeNavigationBar()
         {
             if (IsRootOfFoldersList)
+                switch (ParentFolder.Module)
+                {
+                    case ModuleType.Documents:
+                        NavigationItem.Title = Localization.GetString("documents");
+                        break;
+                    case ModuleType.Contacts:
+                        NavigationItem.Title = Localization.GetString("contacts");
+                        break;
+                    case ModuleType.Shortcodes:
+                        NavigationItem.Title = Localization.GetString("shortcodes");
+                        break;
+                    default:
+                        NavigationItem.Title = " ";
+                        break;
+                }
+            else
+                NavigationItem.Title = ParentFolder.Name;
+
+            if (IsRootOfFoldersList)
             {
-                cancelModeItem = new UIBarButtonItem();
-                cancelModeItem.Title = Localization.GetString("cancel");
-                NavigationItem.SetLeftBarButtonItem(cancelModeItem, false);
+                cancelItem = new UIBarButtonItem
+                {
+                    Title = Localization.GetString("cancel")
+                };
+                NavigationItem.SetLeftBarButtonItem(cancelItem, false);
             }
         }
 
@@ -51,19 +72,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.InitializeHandlers();
 
-            if (cancelModeItem != null)
-                cancelModeItem.Clicked += CancelModeItem_Clicked;
+            if (cancelItem != null)
+                cancelItem.Clicked += CancelItem_Clicked;
         }
 
         protected override void DeinitializeHandlers()
         {
             base.DeinitializeHandlers();
 
-            if (cancelModeItem != null)
-                cancelModeItem.Clicked -= CancelModeItem_Clicked;
+            if (cancelItem != null)
+                cancelItem.Clicked -= CancelItem_Clicked;
         }
 
-        void CancelModeItem_Clicked(object sender, EventArgs e)
+        void CancelItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
         }

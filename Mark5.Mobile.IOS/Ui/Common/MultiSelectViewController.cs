@@ -116,21 +116,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell("cell");
-
-            if (cell == null)
-            {
-                cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-            }
+            var cell = tableView.DequeueReusableCell("default") ?? new UITableViewCell(UITableViewCellStyle.Default, "default");
 
             var d = data[indexPath.Row];
 
             cell.TextLabel.Text = description(d);
+            cell.TextLabel.Font = Theme.DefaultFont;
             cell.Accessory = selectedItems.Contains(d) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+            cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
             return cell;
         }
+
+        public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 44f;
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {

@@ -64,7 +64,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             base.ViewDidLoad();
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
@@ -561,13 +562,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MoveToFolder(ContactPreview selectedContact)
-        {
-            MoveToFolder(new List<ContactPreview>
-            {
-                selectedContact
-            });
-        }
+        void MoveToFolder(ContactPreview selectedContact) =>
+            MoveToFolder(new List<ContactPreview>{selectedContact});
 
         void MoveToFolder(List<ContactPreview> selectedContacts)
         {

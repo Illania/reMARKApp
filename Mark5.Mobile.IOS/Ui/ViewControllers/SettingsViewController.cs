@@ -14,8 +14,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class SettingsViewController : AppSettingsViewController, ISettingsDelegate
     {
-        const string Value1CellId = "Value1CellId";
-
         const string UseServerTimezoneKey = "UseServerTimezone";
         const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
@@ -53,14 +51,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             TableView.InsetsContentViewsToSafeArea = true;
 
             RefreshHiddenSettings();
-
-            ReachabilityBar.Attach(View.Superview, TableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
@@ -131,7 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UsernameKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
+                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = Managers.ActiveConnectionInfo?.Username;
@@ -143,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == ServerAddressKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
+                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
 
                 var ci = Managers.ActiveConnectionInfo;
 
@@ -155,7 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == SslEnabledKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
+                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
 
                 var sslOff = Managers.ActiveConnectionInfo?.SslMode != SslMode.Off;
 
@@ -168,7 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == VersionKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
+                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = string.Format("{0} ({1})", NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"], NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]);

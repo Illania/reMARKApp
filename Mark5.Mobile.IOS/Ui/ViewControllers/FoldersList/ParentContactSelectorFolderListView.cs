@@ -45,6 +45,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected override void InitializeNavigationBar()
         {
             if (IsRootOfFoldersList)
+                switch (ParentFolder.Module)
+                {
+                    case ModuleType.Documents:
+                        NavigationItem.Title = Localization.GetString("documents");
+                        break;
+                    case ModuleType.Contacts:
+                        NavigationItem.Title = Localization.GetString("contacts");
+                        break;
+                    case ModuleType.Shortcodes:
+                        NavigationItem.Title = Localization.GetString("shortcodes");
+                        break;
+                    default:
+                        NavigationItem.Title = " ";
+                        break;
+                }
+            else
+                NavigationItem.Title = ParentFolder.Name;
+            
+            if (IsRootOfFoldersList)
             {
                 cancelModeItem = new UIBarButtonItem();
                 cancelModeItem.Title = Localization.GetString("cancel");

@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         UIBarButtonItem cancelModeItem;
 
         public CopyMoveToFolderListViewController(List<IBusinessEntity> businessEntities, Folder fromFolder = null)
-            : base(businessEntities.FirstOrDefault().ModuleType, true, true, true)
+            : base(fromFolder.Module, true, true, true)
         {
             this.businessEntities = businessEntities;
             this.fromFolder = fromFolder;

@@ -448,7 +448,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    var picker = new DocumentMenuViewController(new[]
+                    var picker = new UIDocumentMenuViewController(new[]
                         {
                             "public.content",
                             "public.data",

@@ -8,6 +8,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public partial class CategoriesTableViewCell : UITableViewCell
     {
+        public const float Height = 44f;
+
         public static readonly NSString Key = new NSString("CategoriesTableViewCell");
         public static readonly UINib Nib = UINib.FromName("CategoriesTableViewCell", NSBundle.MainBundle);
 
@@ -22,7 +24,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static CategoriesTableViewCell Create()
         {
-            return (CategoriesTableViewCell)Nib.Instantiate(null, null)[0];
+            var cell = (CategoriesTableViewCell)Nib.Instantiate(null, null)[0];
+            cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+            return cell;
         }
 
         #region UITableViewCell overrides

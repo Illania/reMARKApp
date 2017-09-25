@@ -566,11 +566,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
             public bool Empty => Items.Count < 1;
 
-            public List<DocumentPreview> Items { get; private set; } = new List<DocumentPreview>(1000);
+            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
 
             DocumentsSearchResultsViewController viewController;
             UITableView documentsTableView;
@@ -775,15 +775,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 Items.Clear();
                 documentsTableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                documentsTableView = null;
-                Items = null;
             }
 
             public void UpdateDocumentPreview(DocumentPreview documentPreview)

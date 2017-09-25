@@ -37,7 +37,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
@@ -46,8 +47,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
-
-            ReachabilityBar.Attach(View, TableView, (float)NavigationController.BottomLayoutGuide.Length);
         }
 
         public override async void ViewDidAppear(bool animated)
