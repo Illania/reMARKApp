@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
-                var fab = ((BaseAppCompatActivity)Activity).GetFAB();
+                var fab = ((BaseAppCompatActivity)Activity).Fab;
 
                 if (ContactPreview.Type == ContactType.Company || ContactPreview.Type == ContactType.Department)
                 {

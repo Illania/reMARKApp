@@ -134,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            fab = ((BaseAppCompatActivity)Activity).GetFAB();
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             if (HideFab || RemoteFolder?.Module == ModuleType.Shortcodes)
             {
                 fab.Visibility = ViewStates.Gone;

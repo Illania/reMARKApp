@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
-                fab = ((BaseAppCompatActivity)Activity).GetFAB();
+                fab = ((BaseAppCompatActivity)Activity).Fab;
                 fab.SetImageResource(Resource.Drawable.action_add_contact);
                 fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
                 fab.Visibility = ViewStates.Visible;
