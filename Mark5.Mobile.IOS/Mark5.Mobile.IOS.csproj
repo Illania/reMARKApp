@@ -279,6 +279,7 @@
 		<Compile Include="Config.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
+		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -562,6 +563,7 @@
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
 	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
 	  <Folder Include="Ui\TableViewCells\AddEditContactTableViewCell\" />
+	  <Folder Include="Model\HubMessages\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
