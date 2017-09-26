@@ -151,7 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             autoRefreshWorker?.Stop();
             autoRefreshWorker = null;
 
-            ((DataSource)TableView.Source).Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             UnsubscribeFromMessages();
 
@@ -377,7 +377,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 if (forceClear)
-                    ((DataSource)TableView.Source).Reset();
+                    ((DataSource)TableView.Source)?.Reset();
 
                 var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
                 ((DataSource)TableView.Source).LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
@@ -837,7 +837,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 searchCancellationTokenSourceList.Clear();
 
                 var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
-                ((DataSource)dataSource).Reset();
+                ((DataSource)dataSource)?.Reset();
             }
             else
             {

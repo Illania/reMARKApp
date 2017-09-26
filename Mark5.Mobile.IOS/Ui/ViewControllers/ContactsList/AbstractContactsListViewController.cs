@@ -137,7 +137,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             CommonConfig.Logger.Warning($"{nameof(ContactsListViewController)} received memory warning!");
 
-            ((DataSource)TableView.Source).Reset();
+            ((DataSource)TableView.Source)?.Reset();
             UnsubscribeFromMessages();
 
             GC.Collect();
@@ -351,7 +351,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             cts = new CancellationTokenSource();
 
             if (forceClear)
-                ((DataSource)TableView.Source).Reset();
+                ((DataSource)TableView.Source)?.Reset();
 
             var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
 
@@ -585,7 +585,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 searchCancellationTokenSourceList.Clear();
 
                 var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
-                ((DataSource)dataSource).Reset();
+                ((DataSource)dataSource)?.Reset();
             }
             else
             {

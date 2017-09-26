@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -776,7 +776,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 searchCancellationTokenSourceList.Clear();
 
                 var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
-                ((SearchDataSource)dataSource).Reset();
+                ((SearchDataSource)dataSource)?.Reset();
             }
             else
             {
@@ -1131,7 +1131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foldersInView[section].Clear();
                 foldersInView[section].AddRange(folders);
                 loading[section] = false;
-                tableViewWeakReference?.Unwrap().ReloadSections(NSIndexSet.FromIndex(section), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(section), UITableViewRowAnimation.Fade);
             }
 
             public List<Folder> GetFolders(nint section)
@@ -1141,13 +1141,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public void Reload()
             {
-                tableViewWeakReference?.Unwrap().BeginUpdates();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
                 if (module == ModuleType.Documents)
-                    tableViewWeakReference?.Unwrap().ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.None);
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.None);
 
-                tableViewWeakReference?.Unwrap().ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.None);
-                tableViewWeakReference?.Unwrap().ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.None);
-                tableViewWeakReference?.Unwrap().EndUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.None);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.None);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public void Reset()
@@ -1158,13 +1158,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 foreach (var kv in foldersInView)
                     kv.Value.Clear();
 
-                tableViewWeakReference?.Unwrap().BeginUpdates();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
                 if (module == ModuleType.Documents)
-                    tableViewWeakReference?.Unwrap().ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Fade);
 
-                tableViewWeakReference?.Unwrap().ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Fade);
-                tableViewWeakReference?.Unwrap().ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Fade);
-                tableViewWeakReference?.Unwrap().EndUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Favorites), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Folders), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public Folder[] GetFolders(int folderId)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -112,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning($"{nameof(NotificationsListViewController)} received memory warning!");
 
-            ((DataSource)TableView.Source).Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -122,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            ((DataSource)TableView.Source).Reset();
+            ((DataSource)TableView.Source)?.Reset();
         }
 
         protected override void Dispose(bool disposing)

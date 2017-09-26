@@ -133,7 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             CommonConfig.Logger.Warning($"{nameof(AbstractShortcodesListViewController)} received memory warning!");
 
-            ((DataSource)TableView.Source).Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -564,7 +564,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 searchCancellationTokenSourceList.Clear();
 
                 var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
-                ((DataSource)dataSource).Reset();
+                ((DataSource)dataSource)?.Reset();
             }
             else
             {

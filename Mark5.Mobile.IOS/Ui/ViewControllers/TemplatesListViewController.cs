@@ -193,7 +193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 searchCancellationTokenSourceList.Clear();
 
                 var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
-                ((SearchDataSource)dataSource).Reset();
+                ((SearchDataSource)dataSource)?.Reset();
             }
             else
             {
