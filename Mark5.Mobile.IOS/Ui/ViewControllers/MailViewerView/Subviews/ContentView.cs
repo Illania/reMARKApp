@@ -4,6 +4,9 @@ using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
 
@@ -12,35 +15,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
     public class ContentView : MailViewerSubview, IWKNavigationDelegate, IWKScriptMessageHandler
     {
         static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
-
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
-
         static readonly NSString script3 = new NSString("document.addEventListener(\"DOMContentLoaded\", function () {window.webkit.messageHandlers.sizeNotification.postMessage({domLoaded:true});});");
 
+        readonly WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference;
+
+        UIActivityIndicatorView spinner;
         WKWebView webView;
         NSLayoutConstraint webViewHeightConstraint;
 
-        Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
-
-        UIActivityIndicatorView spinner;
-
-        public ContentView(Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
+        public ContentView(MailViewerViewController mailViewerViewController)
         {
-            this.navigationActionDelegate = navigationActionDelegate;
+            mailViewerViewControllerWeakReference = mailViewerViewController.Wrap();
         }
 
         void CreateWebView()
         {
-            if (spinner != null)
-            {
-                spinner.RemoveFromSuperview();
-            }
-
+            spinner?.RemoveFromSuperview();
             spinner = null;
 
-            spinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
-            spinner.TranslatesAutoresizingMaskIntoConstraints = false;
-            spinner.HidesWhenStopped = true;
+            spinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                HidesWhenStopped = true
+            };
             ContainerView.AddSubview(spinner);
             ContainerView.AddConstraints(new[]
             {
@@ -58,11 +56,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             webView = null;
 
-            var preferences = new WKPreferences();
-            preferences.MinimumFontSize = 12f;
-            preferences.JavaScriptCanOpenWindowsAutomatically = false;
-            preferences.JavaScriptEnabled = true;
-
+            var preferences = new WKPreferences
+            {
+                MinimumFontSize = 12f,
+                JavaScriptCanOpenWindowsAutomatically = false,
+                JavaScriptEnabled = true
+            };
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
@@ -74,19 +73,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
-            var configuration = new WKWebViewConfiguration();
-            configuration.UserContentController = userContentController;
-            configuration.Preferences = preferences;
-            configuration.SuppressesIncrementalRendering = true;
-            configuration.AllowsInlineMediaPlayback = false;
-
-            webView = new WKWebView(CGRect.Empty, configuration);
-            webView.NavigationDelegate = this;
-            webView.Opaque = false;
-            webView.BackgroundColor = UIColor.White;
+            var configuration = new WKWebViewConfiguration
+            {
+                UserContentController = userContentController,
+                Preferences = preferences,
+                SuppressesIncrementalRendering = true,
+                AllowsInlineMediaPlayback = false
+            };
+            webView = new WKWebView(CGRect.Empty, configuration)
+            {
+                BackgroundColor = Theme.White,
+                NavigationDelegate = this,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             webView.ScrollView.Bounces = false;
             webView.ScrollView.BouncesZoom = false;
-            webView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(webView);
             ContainerView.AddConstraints(new[]
             {
@@ -102,16 +103,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         #region IWKNavigationDelegate
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
-        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
+        public void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
         {
-            decisionHandler(navigationActionDelegate(navigationAction));
+            if (navigationAction.NavigationType == WKNavigationType.LinkActivated
+                || navigationAction.NavigationType == WKNavigationType.BackForward
+                || navigationAction.NavigationType == WKNavigationType.FormSubmitted
+                || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
+            {
+                if (navigationAction.Request.Url.Scheme == "mailto")
+                {
+                    var address = navigationAction.Request.Url.ResourceSpecifier;
+                    mailViewerViewControllerWeakReference.Unwrap()?.OpenComposeDocumentView(new string[] { address });
+                }
+                else
+                    Integration.OpenLink(navigationAction.Request.Url);
+
+                decisionHandler(WKNavigationActionPolicy.Cancel);
+            }
+            else if (navigationAction.NavigationType == WKNavigationType.Reload)
+                decisionHandler(WKNavigationActionPolicy.Cancel);
+            else
+                decisionHandler(WKNavigationActionPolicy.Allow);
         }
 
         #endregion
 
         #region IWKScriptMessageHandler
 
-        [Export("userContentController:didReceiveScriptMessage:")]
         public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
             var responseDict = message.Body as NSDictionary;
@@ -127,33 +145,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var domLoaded = domLoadedNumber != null && domLoadedNumber.BoolValue;
 
             Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> resizeAction = null;
-            resizeAction = (wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
-                () =>
+            resizeAction = (wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
+            {
+                if (wv.IsLoading)
                 {
-                    if (wv.IsLoading)
-                    {
-                        resizeAction(wv, sv, nslc);
-                    }
-                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
-                    {
-                        sv.RemoveFromSuperview();
+                    resizeAction(wv, sv, nslc);
+                }
+                else if (nslc.Constant != wv.ScrollView.ContentSize.Height)
+                {
+                    sv.RemoveFromSuperview();
 
-                        nslc.Constant = wv.ScrollView.ContentSize.Height;
-                        SetNeedsLayout();
-                    }
-                });
+                    nslc.Constant = wv.ScrollView.ContentSize.Height;
+                    SetNeedsLayout();
+                }
+            });
 
             Action<WKWebView, UIActivityIndicatorView, NSLayoutConstraint> stopLoadingAction = null;
-            stopLoadingAction = (wv, sv, nslc) =>
-            DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)),
-                                                  () =>
-                                                  {
-                                                      if (wv.IsLoading)
-                                                      {
-                                                          wv.StopLoading();
-                                                          resizeAction(wv, sv, nslc);
-                                                      }
-                                                  });
+            stopLoadingAction = (wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)), () =>
+             {
+                 if (wv.IsLoading)
+                 {
+                     wv.StopLoading();
+                     resizeAction(wv, sv, nslc);
+                 }
+             });
 
             if (domLoaded)
             {
@@ -175,7 +190,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 return;
 
             CreateWebView();
-
             SetContent(MailMessage.BodyPlainText, MailMessage.BodyHtmlText);
         }
 
@@ -258,5 +272,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         }
 
         #endregion
+
     }
 }

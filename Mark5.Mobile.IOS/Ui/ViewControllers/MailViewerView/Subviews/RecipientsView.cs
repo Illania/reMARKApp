@@ -27,12 +27,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         {
             this.type = type;
 
-            var titleLabel = new UILabel();
-            titleLabel.Text = GetTitle() + ":";
-            titleLabel.Font = Theme.DefaultFont;
-            titleLabel.TextColor = UIColor.LightGray;
-            titleLabel.Opaque = false;
-            titleLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            var titleLabel = new UILabel()
+            {
+                Text = GetTitle() + ":",
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkGray,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             titleLabel.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -50,15 +51,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            textView = new UITextView(CGRect.Empty, textContainer);
-            textView.Font = Theme.DefaultFont;
-            textView.Opaque = false;
-            textView.TextContainer.LineFragmentPadding = 0f;
-            textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.ClipsToBounds = false;
-            textView.ScrollEnabled = false;
-            textView.TranslatesAutoresizingMaskIntoConstraints = false;
+            textView = new UITextView(CGRect.Empty, textContainer)
+            {
+                Font = Theme.DefaultFont,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             textView.TextContainer.MaximumNumberOfLines = 1;
+            textView.TextContainer.LineFragmentPadding = 0f;
             textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]

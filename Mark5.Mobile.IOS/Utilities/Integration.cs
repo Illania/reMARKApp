@@ -29,7 +29,6 @@ namespace Mark5.Mobile.IOS.Utilities
         #region iPhone/iPad recognition
 
         public static bool IsIPhone() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
-
         public static bool IsIPad() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
 
         #endregion
@@ -61,14 +60,14 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber) dict.FreeSize).LongValue;
+            return ((NSNumber)dict.FreeSize).LongValue;
         }
 
         public static long GetTotalDiskSpace()
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber) dict.Size).LongValue;
+            return ((NSNumber)dict.Size).LongValue;
         }
 
         public static void ClearData()
@@ -88,16 +87,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Apple apps
 
-        public static void OpenLink(NSUrl url, Action failureCompletionHandler)
+        public static void OpenLink(NSUrl url, Action failureCompletionHandler = null)
         {
             var options = new UIApplicationOpenUrlOptions();
-            UIApplication.SharedApplication.OpenUrl(url,
-                options,
-                (result) =>
-                {
-                    if (!result)
-                        failureCompletionHandler();
-                });
+            UIApplication.SharedApplication.OpenUrl(url, options, (result) =>
+            {
+                if (!result)
+                    failureCompletionHandler?.Invoke();
+            });
         }
 
         #endregion

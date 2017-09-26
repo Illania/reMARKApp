@@ -10,18 +10,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         public SubjectView()
         {
-            textView = new UITextView();
-            textView.Font = Theme.DefaultFont.WithRelativeSize(4f);
-            textView.Editable = false;
-            textView.Opaque = false;
-            textView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            textView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            textView.SpellCheckingType = UITextSpellCheckingType.Yes;
+            textView = new UITextView
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(4f),
+                Editable = false,
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                SpellCheckingType = UITextSpellCheckingType.Yes,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             textView.TextContainer.LineFragmentPadding = 0f;
-            textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.ClipsToBounds = false;
-            textView.ScrollEnabled = false;
-            textView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
             {
