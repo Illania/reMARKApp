@@ -140,6 +140,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             RefreshView();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -463,31 +472,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 await stream.WriteAsync(bytes, 0, bytes.Length);
 
             return cacheFile;
-        }
-
-        class DocumentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
-        {
-            readonly WeakReference<UIViewController> parentControllerWeakReference;
-
-            public DocumentInteractionControllerDelegate(UIViewController parentController)
-            {
-                parentControllerWeakReference = parentController.Wrap();
-            }
-
-            public override UIViewController ViewControllerForPreview(UIDocumentInteractionController controller)
-            {
-                return parentControllerWeakReference.Unwrap();
-            }
-
-            public override UIView ViewForPreview(UIDocumentInteractionController controller)
-            {
-                return parentControllerWeakReference.Unwrap()?.View;
-            }
-
-            public override CGRect RectangleForPreview(UIDocumentInteractionController controller)
-            {
-                return parentControllerWeakReference.Unwrap()?.View.Frame ?? CGRect.Empty;
-            }
         }
     }
 }

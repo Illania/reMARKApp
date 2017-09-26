@@ -105,7 +105,6 @@
 		<Compile Include="Ui\Common\MultiSelectViewController.cs" />
 		<Compile Include="Ui\Common\NavigationController.cs" />
 		<Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
-		<Compile Include="Ui\Common\ReachabilityBar.cs" />
 		<Compile Include="Ui\Common\SeparatorSubView.cs" />
 		<Compile Include="Ui\Common\Theme.cs" />
 		<Compile Include="Ui\Common\TouchTransparentView.cs" />

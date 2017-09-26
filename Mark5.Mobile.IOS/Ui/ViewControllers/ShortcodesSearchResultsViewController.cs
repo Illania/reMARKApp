@@ -57,8 +57,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (tableView?.IndexPathsForSelectedRows?.Length > 0)
                 foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
                     tableView.DeselectRow(selectedIndexPath, true);
-
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
         }
 
         public override void ViewDidAppear(bool animated)
