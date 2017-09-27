@@ -312,7 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void DeleteComment(Comment comment, UITableView tableView, NSIndexPath indexPath)
+        void DeleteComment(Comment comment)
         {
             tableView.Editing = false;
 
@@ -467,7 +467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
                                                                    Localization.GetString("delete"),
-                                                                   (a, ip) => viewControllerWeakReference.Unwrap()?.DeleteComment(comment, tableView, indexPath));
+                                                                   (a, ip) => viewControllerWeakReference.Unwrap()?.DeleteComment(comment));
                     deleteAction.BackgroundColor = Theme.DarkerBlue;
                     actions.Add(deleteAction);
                 }
