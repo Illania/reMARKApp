@@ -16,7 +16,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class RecentAddressesListViewController : AbstractViewController
     {
         readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
-
         public Task<Recipient> Task => tcs.Task;
 
         UIBarButtonItem exitEditItem;

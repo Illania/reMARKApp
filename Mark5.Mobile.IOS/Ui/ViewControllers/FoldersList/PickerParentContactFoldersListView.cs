@@ -7,22 +7,22 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-    public class ParentContactSelectorFolderListView : AbstractFoldersListViewController
+    public class PickerParentContactFoldersListView : AbstractFoldersListViewController
     {
-        readonly ContactType childrenType;
-
         readonly TaskCompletionSource<ContactPreview> tcs = new TaskCompletionSource<ContactPreview>();
         public Task<ContactPreview> Task => tcs.Task;
 
+        readonly ContactType childrenType;
+        
         UIBarButtonItem cancelModeItem;
 
-        public ParentContactSelectorFolderListView(ContactType type)
+        public PickerParentContactFoldersListView(ContactType type)
             : base(ModuleType.Contacts, true, true, true)
         {
             childrenType = type;
         }
 
-        protected ParentContactSelectorFolderListView(Folder folder, ContactType type)
+        protected PickerParentContactFoldersListView(Folder folder, ContactType type)
             : base(folder, true, true, true)
         {
             childrenType = type;
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected async override void FolderSelected(Folder folder)
         {
-            var vc = new ParentContactSelectorListViewController()
+            var vc = new PickerParentContactListViewController()
             {
                 Folder = folder,
                 ChildrenType = childrenType,
@@ -96,7 +96,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.FolderExpand(folder);
 
-            var vc = new ParentContactSelectorFolderListView(folder, childrenType);
+            var vc = new PickerParentContactFoldersListView(folder, childrenType);
             NavigationController.PushViewController(vc, true);
 
             var result = await vc.Task;

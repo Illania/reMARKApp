@@ -9,6 +9,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class MultiSelectViewController<T> : UITableViewController
     {
+        readonly TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
+        public Task<T[]> Task => tcs.Task;
+
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
@@ -19,10 +22,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
         IEqualityComparer<T> equalityComparer;
 
         HashSet<T> selectedItems;
-
-        TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
-
-        public Task<T[]> Task => tcs.Task;
 
         public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
             : base(UITableViewStyle.Grouped)

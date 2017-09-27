@@ -7,19 +7,19 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-    public class PickerShortcodesFolderListViewController : AbstractFoldersListViewController
+    public class PickerShortcodesFoldersListViewController : AbstractFoldersListViewController
     {
         readonly TaskCompletionSource<Shortcode> tcs = new TaskCompletionSource<Shortcode>();
         public Task<Shortcode> Task => tcs.Task;
 
         UIBarButtonItem cancelItem;
 
-        public PickerShortcodesFolderListViewController()
+        public PickerShortcodesFoldersListViewController()
             : base(ModuleType.Shortcodes, true, true, true)
         {
         }
 
-        protected PickerShortcodesFolderListViewController(Folder folder)
+        protected PickerShortcodesFoldersListViewController(Folder folder)
             : base(folder, true, true, true)
         {
         }
@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.FolderExpand(folder);
 
-            var vc = new PickerShortcodesFolderListViewController(folder);
+            var vc = new PickerShortcodesFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);
 
             var result = await vc.Task;

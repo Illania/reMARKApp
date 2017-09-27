@@ -199,7 +199,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void DataSource_ParentRowClicked(object sender, EventArgs e)
         {
-            var vc = new ParentContactSelectorFolderListView(ContactPreview.Type);
+            var vc = new PickerParentContactFoldersListView(ContactPreview.Type);
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
 
             var selectedParent = await vc.Task;

@@ -16,16 +16,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ResponsibleUsersSelectionController : AbstractViewController
     {
+        public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
+        public Task<List<SystemUser>> Task => tcs.Task;
+
         public List<int> PreselectedSystemUsersId { get; set; }
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
         UITableView tableView;
-
-        public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
-
-        public Task<List<SystemUser>> Task => tcs.Task;
 
         public override void LoadView()
         {

@@ -11,15 +11,14 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
-    public class ParentContactSelectorListViewController : AbstractContactsListViewController
+    public class PickerParentContactListViewController : AbstractContactsListViewController
     {
         readonly TaskCompletionSource<ContactPreview> tcs = new TaskCompletionSource<ContactPreview>();
-
         public Task<ContactPreview> Task => tcs.Task;
 
         public ContactType ChildrenType { get; set; }
 
-        public ParentContactSelectorListViewController()
+        public PickerParentContactListViewController()
             : base(true)
         {
         }

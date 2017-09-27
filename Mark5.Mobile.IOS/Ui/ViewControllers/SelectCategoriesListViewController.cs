@@ -16,11 +16,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class SelectCategoriesListViewController : AbstractTableViewController
     {
-        public ModuleType Module { get; set; }
-        public List<int> PreselectedItemIds { get; set; }
-
         readonly TaskCompletionSource<List<int>> tcs = new TaskCompletionSource<List<int>>();
         public Task<List<int>> Task => tcs.Task;
+        
+        public ModuleType Module { get; set; }
+        public List<int> PreselectedItemIds { get; set; }
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;

@@ -3,23 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Utilities.Extensions;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class TemplatesListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
-        public Task<TemplatePreview> ResultTask => tcs.Task;
+        public Task<TemplatePreview> Task => tcs.Task;
         readonly TaskCompletionSource<TemplatePreview> tcs = new TaskCompletionSource<TemplatePreview>();
 
         UIBarButtonItem cancelItem;
@@ -218,7 +217,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var searchDataSource = tableViewController?.TableView?.Source as SearchDataSource;
             searchDataSource?.Reset();
 
-            await Task.Delay(500);
+            await System.Threading.Tasks.Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;

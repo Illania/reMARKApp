@@ -16,8 +16,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class PhonebookContactsListViewController : AbstractViewController, IUISearchResultsUpdating
     {
         readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
-
-        public Task<Recipient> ReturnTask => tcs.Task;
+        public Task<Recipient> Task => tcs.Task;
 
         UIBarButtonItem exitEditItem;
         UITableView tableView;
@@ -166,7 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             List<Recipient> contacts = null;
 
-            Task.Run(() =>
+            System.Threading.Tasks.Task.Run(() =>
               {
                   contacts = CommonConfig.Phonebook.GetPhonebookContacts();
               }).ContinueWith(t =>
@@ -189,7 +188,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                    }
                    else
                    {
-                       var ds = (DataSource) tableView.Source;
+                       var ds = (DataSource)tableView.Source;
                        ds.SetItems(contacts.OrderBy(c => c.Name).ToList());
                    }
                });
@@ -249,7 +248,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             searchResultsDataSource.Reset();
 
-            await Task.Delay(500);
+            await System.Threading.Tasks.Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
