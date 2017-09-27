@@ -91,6 +91,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.Recycle();
 
             commentTextView.Delegate = null;
+            commentViewBottomConstraint = null;
+            commentTextViewHeightConstraint = null;
 
             ((DataSource)tableView.Source)?.Reset();
         }
