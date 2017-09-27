@@ -425,6 +425,7 @@
     <Compile Include="Model\HubMessages\ContactPreviewChanged.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
+    <Compile Include="Utilities\Analytics.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
