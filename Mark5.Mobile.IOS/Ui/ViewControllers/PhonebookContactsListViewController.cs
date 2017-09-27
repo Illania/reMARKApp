@@ -54,7 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(PhonebookContactsListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             var ds = (DataSource) tableView.Source;
             if (ds.Empty)
@@ -72,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(PhonebookContactsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             var ds = tableView?.Source as DataSource;
             ds?.Reset();

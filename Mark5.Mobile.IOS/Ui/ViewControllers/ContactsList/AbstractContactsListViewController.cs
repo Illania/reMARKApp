@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ContactsListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             var ds = (DataSource)TableView.Source;
             if (ds.Empty)
@@ -133,7 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ContactsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
             UnsubscribeFromMessages();

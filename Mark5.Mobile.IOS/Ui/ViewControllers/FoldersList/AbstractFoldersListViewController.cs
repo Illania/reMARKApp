@@ -98,7 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(AbstractFoldersListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             if (((TableView?.Source as GrouppedDataSource)?.Empty ?? false)
                 || ((TableView?.Source as DataSource)?.Empty ?? false))
@@ -133,13 +133,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(AbstractFoldersListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = TableView?.Source as DataSource;
-            ds?.Reset();
-
-            var gds = TableView?.Source as GrouppedDataSource;
-            gds?.Reset();
+            (TableView.Source as DataSource)?.Reset();
+            (TableView.Source as GrouppedDataSource)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();

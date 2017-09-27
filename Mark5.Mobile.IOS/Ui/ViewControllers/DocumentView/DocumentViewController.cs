@@ -127,7 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(DocumentViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             if (refreshDataOnAppear)
             {
@@ -151,7 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(DocumentViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             GC.Collect();
             base.DidReceiveMemoryWarning();

@@ -73,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             newNotificationsMessageToken?.Dispose();
             newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg =>
@@ -108,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(NotificationsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
 

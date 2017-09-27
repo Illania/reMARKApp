@@ -96,7 +96,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(LoginViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             StartLogoScaleAnimation();
         }

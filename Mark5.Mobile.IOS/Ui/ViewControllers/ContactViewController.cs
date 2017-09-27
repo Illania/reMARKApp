@@ -92,7 +92,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ContactViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
             tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
@@ -117,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ContactViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             UnsubscribeFromMessages();
 

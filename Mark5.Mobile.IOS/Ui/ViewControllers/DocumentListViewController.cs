@@ -145,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(DocumentsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             autoRefreshWorker?.Stop();
             autoRefreshWorker = null;

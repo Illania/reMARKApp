@@ -60,7 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ObjectLinksListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ObjectLinksListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
 

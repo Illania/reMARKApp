@@ -64,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(CommentsListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             if (((DataSource)tableView.Source).Empty)
                 RefreshView();
@@ -79,7 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(CommentsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)tableView.Source)?.Reset();
 

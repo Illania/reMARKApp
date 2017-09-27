@@ -113,7 +113,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
                 lastDownloadedLabel.Text = null;
 
-            CommonConfig.Logger.Info($"{nameof(DownloadViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -134,7 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(DownloadViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             GC.Collect();
             base.DidReceiveMemoryWarning();

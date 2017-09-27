@@ -110,7 +110,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{typeof(ComposeDocumentViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             await LoadDocument();
         }

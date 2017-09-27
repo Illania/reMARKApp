@@ -50,13 +50,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeHandlers();
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ResponsibleUsersSelectionController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             var ds = (DataSource)tableView.Source;
             if (ds.Empty)
@@ -72,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ResponsibleUsersSelectionController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             var ds = tableView?.Source as DataSource;
             ds?.Reset();

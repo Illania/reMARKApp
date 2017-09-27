@@ -73,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ShortcodeViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
             tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
@@ -94,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ShortcodeViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             GC.Collect();
             base.DidReceiveMemoryWarning();

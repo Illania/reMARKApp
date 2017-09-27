@@ -83,10 +83,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(AbstractShortcodesListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource)TableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 RefreshData();
 
             NSOperationQueue.MainQueue.AddOperation(() =>
@@ -129,7 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(AbstractShortcodesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
 
@@ -296,10 +295,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e)
-        {
-            RefreshData(forceClear: true);
-        }
+        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
 
         async void RefreshData(int startRowId = -1, bool forceClear = false)
         {
@@ -392,7 +388,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         public virtual void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
-
         }
 
         public void ShortcodePreviewLongPressed(UILongPressGestureRecognizer recognizer)

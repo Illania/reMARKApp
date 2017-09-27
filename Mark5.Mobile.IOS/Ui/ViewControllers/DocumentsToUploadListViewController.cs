@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(DocumentsToUploadListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
             await RefreshData();
         }
 
@@ -74,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(DocumentsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
 

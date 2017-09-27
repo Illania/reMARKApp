@@ -177,7 +177,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(MailViewerViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             GC.Collect();
             base.DidReceiveMemoryWarning();

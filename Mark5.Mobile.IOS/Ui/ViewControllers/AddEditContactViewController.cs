@@ -62,8 +62,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void ViewDidAppear(bool animated)
         {
-            CommonConfig.Logger.Info($"{nameof(AddEditContactViewController)} appeared");
-            base.ViewWillAppear(animated);
+            base.ViewDidAppear(animated);
+
+            CommonConfig.Logger.Info("Appeared");
+
             RefreshData();
         }
 
@@ -73,8 +75,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             DeInitializeHandlers();
             UnsubscribeFromKeyboardEvents();
-
-            CommonConfig.Logger.Info($"{nameof(AddEditContactViewController)} will disappear");
         }
 
         #endregion
