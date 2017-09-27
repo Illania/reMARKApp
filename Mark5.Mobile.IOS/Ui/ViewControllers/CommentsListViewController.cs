@@ -2,52 +2,43 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class CommentsListViewController : AbstractViewController
+    public class CommentsListViewController : AbstractViewController, IUITextViewDelegate
     {
-        const int CommentContentMaximumLinesNumber = 5;
-        const float CommentEditViewInnerMargin = 7f;
-        const int SecondsToEdit = 60;
+        const float MinCommentTextViewHeight = 38f;
+        const float MaxCommentTextViewHeight = 82f;
 
         public BusinessEntity Entity { get; set; }
 
         UIBarButtonItem doneButtonItem;
-        UITableView commentsTableView;
-        UIView commentEditView;
-        UIButton addComment;
-        UITextView commentContent;
-        NSLayoutConstraint commentEditViewBottomConstraint;
-        NSLayoutConstraint commentContentMaximumHeightConstraint;
 
-        NSObject didShowNotificationObserver;
-        NSObject willChangeFrameNotificationObserver;
-        NSObject willHideNotification;
+        UITableView tableView;
+        UIView commentView;
+        UIButton addCommentButton;
+        UITextView commentTextView;
 
-        public CommentsListViewController()
-        {
-            Title = Localization.GetString("comments");
-        }
+        NSLayoutConstraint commentViewBottomConstraint;
+        NSLayoutConstraint commentTextViewHeightConstraint;
 
-        #region UIViewControllers overrides
+        #region UIViewController overrides
 
         public override void LoadView()
         {
             base.LoadView();
 
             InitializeNavigationBar();
-            InitializeListView();
+            InitializeView();
             InitializeEditView();
         }
 
@@ -55,18 +46,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            ExtendedLayoutIncludesOpaqueBars = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
-            willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
-            willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
-
             InitializeHandlers();
+            UpdateCommentTextViewHeight();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -75,8 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"{nameof(CommentsListViewController)} appeared");
 
-            var ds = (DataSource)commentsTableView.Source;
-            if (ds.Empty)
+            if (((DataSource)tableView.Source).Empty)
                 RefreshView();
         }
 
@@ -84,114 +73,137 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
-            {
-                didShowNotificationObserver,
-                willChangeFrameNotificationObserver,
-                willHideNotification
-            });
-
             DeInitializeHandlers();
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning($"{nameof(CommentsListViewController)} received memory warning!");
+
+            ((DataSource)tableView.Source)?.Reset();
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            commentTextView.Delegate = null;
+
+            ((DataSource)tableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         #endregion
 
-        #region Init methods
+        #region Initialize/deinitialize
 
         void InitializeNavigationBar()
         {
+            Title = Localization.GetString("comments");
+
             doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
         }
 
-        void InitializeListView()
+        void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            commentsTableView = new UITableView();
-            commentsTableView.Source = new DataSource(this, commentsTableView, Localization.GetString("no_comments"));
-            commentsTableView.EstimatedRowHeight = CommentsTableViewCell.Height;
-            commentsTableView.RowHeight = UITableView.AutomaticDimension;
-            commentsTableView.ClipsToBounds = false;
-            commentsTableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
-            commentsTableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(commentsTableView);
+            tableView = new UITableView();
+            tableView.Source = new DataSource(this, tableView);
+            tableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.Interactive;
+            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(tableView);
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f)
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
             });
         }
 
         void InitializeEditView()
         {
-            commentEditView = new UIView();
-            commentEditView.BackgroundColor = UIColor.FromRGB(248f / 255f, 248f / 255f, 248f / 255f);
-            commentEditView.TranslatesAutoresizingMaskIntoConstraints = false;
-            commentEditView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            commentEditViewBottomConstraint = NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
-            View.AddSubview(commentEditView);
+            commentView = new UIView
+            {
+                Opaque = true,
+                BackgroundColor = Theme.White,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            commentView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            View.AddSubview(commentView);
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(commentEditView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(commentsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, 0f),
-                commentEditViewBottomConstraint
+                NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                commentViewBottomConstraint = NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
             });
 
-            var borderView = new UIView();
-            borderView.BackgroundColor = UIColor.LightGray;
-            borderView.TranslatesAutoresizingMaskIntoConstraints = false;
+            var borderView = new UIView
+            {
+                BackgroundColor = Theme.DarkGray,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             borderView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            commentEditView.AddSubview(borderView);
-            commentEditView.AddConstraints(new[]
+            commentView.AddSubview(borderView);
+            commentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
+                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, .75f)
             });
 
-            addComment = new UIButton(UIButtonType.System);
-            addComment.TitleLabel.Font = Theme.DefaultBoldFont;
-            addComment.SetTitle(Localization.GetString("add"), UIControlState.Normal);
-            addComment.Enabled = false;
-            addComment.Opaque = false;
-            addComment.TranslatesAutoresizingMaskIntoConstraints = false;
-            addComment.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            addComment.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            addComment.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            addComment.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            commentEditView.AddSubview(addComment);
-            commentEditView.AddConstraints(new[]
+            addCommentButton = new UIButton(UIButtonType.System)
             {
-                NSLayoutConstraint.Create(addComment, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Right, 1f, -CommentEditViewInnerMargin),
-                NSLayoutConstraint.Create(addComment, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.CenterY, 1f, 0f)
+                Enabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            addCommentButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            addCommentButton.SetTitle(Localization.GetString("add"), UIControlState.Normal);
+            addCommentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            addCommentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            addCommentButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            addCommentButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            commentView.AddSubview(addCommentButton);
+            commentView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, -7f),
+                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.CenterY, 1f, 0f)
             });
 
-            commentContent = new UITextView();
-            commentContent.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            commentContent.AutocorrectionType = UITextAutocorrectionType.Yes;
-            commentContent.ScrollEnabled = false;
-            commentContent.Font = Theme.DefaultFont;
-            commentContent.Layer.BorderColor = UIColor.Gray.ColorWithAlpha(0.5f).CGColor;
-            commentContent.Layer.BorderWidth = 1f;
-            commentContent.Layer.CornerRadius = 5f;
-            commentContent.ClipsToBounds = true;
-            commentContent.TranslatesAutoresizingMaskIntoConstraints = false;
-            commentEditView.AddSubview(commentContent);
-            commentContentMaximumHeightConstraint = NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Height, NSLayoutRelation.LessThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, commentContent.SizeThatFits(commentContent.Frame.Size).Height);
-            commentEditView.AddConstraints(new[]
+            commentTextView = new UITextView
             {
-                NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Top, 1f, CommentEditViewInnerMargin),
-                NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Left, 1f, CommentEditViewInnerMargin),
-                NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addComment, NSLayoutAttribute.Left, 1f, -CommentEditViewInnerMargin),
-                NSLayoutConstraint.Create(commentContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentEditView, NSLayoutAttribute.Bottom, 1f, -CommentEditViewInnerMargin),
-                commentContentMaximumHeightConstraint
+                Font = Theme.DefaultFont,
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                ScrollEnabled = false,
+                ClipsToBounds = true,
+                Delegate = this,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                InputAccessoryView = new KeyboardObserverInputAccessoryView()
+            };
+            commentTextView.Layer.BorderColor = Theme.DarkGray.CGColor;
+            commentTextView.Layer.BorderWidth = .75f;
+            commentTextView.Layer.CornerRadius = 5f;
+            commentView.AddSubview(commentTextView);
+            commentView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Top, 1f, 7f),
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 7f),
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addCommentButton, NSLayoutAttribute.Left, 1f, -7f),
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -7f),
+                commentTextViewHeightConstraint = NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f)
             });
-
-            View.AddGestureRecognizer(new UITapGestureRecognizer(() => commentContent.EndEditing(true)));
         }
 
         void InitializeHandlers()
@@ -199,11 +211,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
 
-            if (addComment != null)
-                addComment.TouchUpInside += AddComment_TouchUpInside;
+            if (addCommentButton != null)
+                addCommentButton.TouchUpInside += AddComment_TouchUpInside;
 
-            if (commentContent != null)
-                commentContent.Changed += CommentContent_Changed;
+            if (commentTextView.InputAccessoryView is KeyboardObserverInputAccessoryView keyboardObserverInputAccessoryView)
+                keyboardObserverInputAccessoryView.KeyboardChanged += KeyboardObserverInputAccessoryView_KeyboardChanged;
         }
 
         void DeInitializeHandlers()
@@ -211,11 +223,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
 
-            if (addComment != null)
-                addComment.TouchUpInside -= AddComment_TouchUpInside;
+            if (addCommentButton != null)
+                addCommentButton.TouchUpInside -= AddComment_TouchUpInside;
 
-            if (commentContent != null)
-                commentContent.Changed -= CommentContent_Changed;
+            if (commentTextView.InputAccessoryView is KeyboardObserverInputAccessoryView keyboardObserverInputAccessoryView)
+                keyboardObserverInputAccessoryView.KeyboardChanged -= KeyboardObserverInputAccessoryView_KeyboardChanged;
         }
 
         #endregion
@@ -227,64 +239,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (Entity == null)
                 return;
 
-            List<Comment> comments;
+            List<Comment> comments = null;
 
-            switch (Entity.ObjectType)
-            {
-                case ObjectType.Document:
-                    comments = (Entity as Document).Comments;
-                    break;
-                case ObjectType.Contact:
-                    comments = (Entity as Contact).Comments;
-                    break;
-                default:
-                    throw new ArgumentException("The input business entity does not have comments defined in the model");
-            }
+            if (Entity is Document d)
+                comments = d.Comments;
+            if (Entity is Contact c)
+                comments = c.Comments;
 
-            var ds = commentsTableView.Source as DataSource;
-            ds.RefreshData(comments);
+            ((DataSource)tableView.Source).SetItems(comments);
         }
 
         #endregion
 
         #region Event handlers
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
+        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         async void AddComment_TouchUpInside(object sender, EventArgs e)
         {
-            commentContent.EndEditing(true);
+            commentTextView.EndEditing(true);
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("adding_comment___"));
-            var newCommentContent = commentContent.Text;
+            var newCommentContent = commentTextView.Text;
 
             try
             {
-                Comment newComment;
+                Comment newComment = null;
 
-                switch (Entity.ObjectType)
-                {
-                    case ObjectType.Document:
-                        var document = Entity as Document;
-                        newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
-                        break;
-                    case ObjectType.Contact:
-                        var contact = Entity as Contact;
-                        newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
-                        CommonConfig.MessengerHub.Publish(new ContactPreviewCommentsCountChangedMessage(this, contact.Id, contact.Comments.Count));
-                        break;
-                    default:
-                        throw new ArgumentException("The input business entity does not have comments defined in the model");
-                }
+                if (Entity is Document d)
+                    newComment = await Managers.DocumentsManager.AddComment(d, newCommentContent);
+                if (Entity is Contact c)
+                    newComment = await Managers.ContactsManager.AddComment(c, newCommentContent);
 
-                var ds = commentsTableView.Source as DataSource;
-                ds.AddComment(newComment);
-                commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(ds.Items.Count - 1, 0), UITableViewScrollPosition.Middle, true);
-                commentContent.Text = string.Empty;
+                ((DataSource)tableView.Source).AddComment(newComment);
+                commentTextView.Text = null;
+
+                ScrollCommentsToBottom(true);
             }
             catch (Exception ex)
             {
@@ -299,231 +289,124 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void CommentContent_Changed(object sender, EventArgs e)
-        {
-            UpdateCommentContentHeight();
-            UpdateAddCommentEnabled();
-        }
-
         #endregion
 
         #region Actions
 
-        void DeleteComment(Comment comment)
+        void DeleteComment(Comment comment, UITableView tableView, NSIndexPath indexPath)
         {
-            commentsTableView.Editing = false;
+            tableView.Editing = false;
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_comment___"));
 
             Task.Run(async () =>
-                {
-                    switch (Entity.ObjectType)
-                    {
-                        case ObjectType.Document:
-                            var document = Entity as Document;
-                            await Managers.DocumentsManager.DeleteComment(document, comment);
-                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
-                            break;
-                        case ObjectType.Contact:
-                            var contact = Entity as Contact;
-                            await Managers.ContactsManager.DeleteComment(contact, comment);
-                            CommonConfig.MessengerHub.Publish(new ContactPreviewCommentsCountChangedMessage(this, contact.Id, contact.Comments.Count));
-                            break;
-                        default:
-                            throw new ArgumentException("The input business entity does not have comments defined in the model");
-                    }
-                })
-                .ContinueWith(async t =>
-                    {
-                        dismissAction();
-
-                        if (t.IsFaulted)
-                        {
-                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                            await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
-                        }
-                        else
-                        {
-                            (commentsTableView.Source as DataSource).RemoveComment(comment);
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
-        void StartEditComment(Comment comment, UITableView tableView, NSIndexPath indexPath)
-        {
-            tableView.Editing = false;
-
-            var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
-            if (!isEditable)
             {
-                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible"));
-                return;
-            }
+                if (Entity is Document d)
+                    await Managers.DocumentsManager.DeleteComment(d, comment);
+                if (Entity is Contact c)
+                    await Managers.ContactsManager.DeleteComment(c, comment);
+            }).ContinueWith(async t =>
+            {
+                dismissAction();
 
-            var alert = UIAlertController.Create(Localization.GetString("edit_message"), string.Empty, UIAlertControllerStyle.Alert);
-
-            if (alert.PopoverPresentationController != null)
-                alert.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
-
-            var cancelAction = UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null);
-            var confirmAction = UIAlertAction.Create(Localization.GetString("confirm"), UIAlertActionStyle.Default, obj => FinalizeEditComment(comment, alert.TextFields[0].Text));
-            alert.AddTextField(tf => tf.Text = comment.Content);
-            alert.AddAction(cancelAction);
-            alert.AddAction(confirmAction);
-
-            PresentViewController(alert, true, null);
-        }
-
-        void FinalizeEditComment(Comment oldComment, string newContent)
-        {
-            if (oldComment == null || newContent == null)
-                return;
-
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("editing_comment___"));
-            var newComment = oldComment.ShallowCopy();
-            newComment.Content = newContent;
-
-            Task.Run(async () =>
+                if (t.IsFaulted)
                 {
-                    bool result;
-
-                    switch (Entity.ObjectType)
-                    {
-                        case ObjectType.Document:
-                            var document = Entity as Document;
-                            result = await Managers.DocumentsManager.EditComment(document, newComment);
-                            break;
-                        case ObjectType.Contact:
-                            var contact = Entity as Contact;
-                            result = await Managers.ContactsManager.EditComment(contact, newComment);
-                            break;
-                        default:
-                            throw new ArgumentException("The input business entity does not have comments defined in the model");
-                    }
-
-                    return result;
-                })
-                .ContinueWith(async t =>
-                    {
-                        dismissAction();
-
-                        if (t.IsFaulted)
-                        {
-                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={oldComment.Id}, comment.Content={oldComment.Content}] ", t.Exception.InnerException);
-                            await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
-                        }
-                        else if (t.Result)
-                        {
-                            (commentsTableView.Source as DataSource).EditComment(newComment);
-                        }
-                        else
-                        {
-                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("error"), Localization.GetString("edit_not_possible"));
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+                    CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                    await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
+                }
+                else
+                    ((DataSource)tableView.Source).RemoveComment(comment);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         #endregion
 
-        #region Keyboard Related
+        #region Keyboard handling
 
-        void OnKeyboardDidShowNotification(NSNotification notification)
+        void KeyboardObserverInputAccessoryView_KeyboardChanged(object sender, CGRect frame)
         {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
-        }
+            var height = KeyboardObserverInputAccessoryView.GetVisibleKeyboardHeight(View, frame);
 
-        void OnKeyboardWillChangeFrameNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification);
-        }
+            commentViewBottomConstraint.Constant = -height;
+            commentView.SetNeedsLayout();
+            commentView.LayoutIfNeeded();
 
-        void OnKeyboardWillHideNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(0f, notification);
-        }
+            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, -commentViewBottomConstraint.Constant + commentView.Frame.Height, 0f);
 
-        void AdjustViewToKeyboard(float offset, NSNotification notification = null)
-        {
-            UpdateCommentContentHeight();
-
-            commentEditViewBottomConstraint.Constant = -offset;
-
-            if (notification != null)
-            {
-                var duration = UI.KeyboardAnimationDurationFromNotification(notification);
-                var options = UI.KeyboardAnimationOptionsFromNotification(notification);
-                UIView.AnimateNotify(duration, 0.0d, options, View.LayoutIfNeeded, null);
-            }
-            else
-            {
-                View.LayoutIfNeeded();
-            }
-
-            if (offset > 0f)
-                ScrollCommentsToTop(true);
+            if (height > 0f)
+                ScrollCommentsToBottom(true);
         }
 
         #endregion
 
         #region Utilities
 
-        void UpdateAddCommentEnabled()
+        string oldCommentTextViewText;
+
+        [Export("textViewDidChange:")]
+        public void Changed(UITextView textView)
         {
-            addComment.Enabled = !string.IsNullOrEmpty(commentContent.Text);
+            if (oldCommentTextViewText == textView.Text)
+                return;
+            oldCommentTextViewText = textView.Text;
+
+            UpdateAddCommentEnabled();
+            UpdateCommentTextViewHeight();
         }
 
-        void UpdateCommentContentHeight()
+        void UpdateAddCommentEnabled() => addCommentButton.Enabled = !string.IsNullOrEmpty(commentTextView.Text);
+
+        void UpdateCommentTextViewHeight()
         {
-            if (NavigationController != null)
-            {
-                var heightThatFits = commentContent.SizeThatFits(commentContent.Frame.Size).Height;
-                var targetHeight = Math.Min(heightThatFits, commentContent.Font.LineHeight * CommentContentMaximumLinesNumber);
-                targetHeight = Math.Min(targetHeight, commentEditView.Frame.Bottom - NavigationController.NavigationBar.Frame.Bottom - 2 * CommentEditViewInnerMargin);
-                if (targetHeight >= 0f)
-                {
-                    commentContentMaximumHeightConstraint.Constant = (nfloat)targetHeight;
-                    commentContent.ScrollEnabled = heightThatFits > targetHeight;
-                }
-            }
+            if (NavigationController == null)
+                return;
+
+            var requiredHeight = commentTextView.SizeThatFits(new CGSize(commentTextView.ContentSize.Width, nfloat.MaxValue)).Height;
+            var targetHeight = Math.Min(Math.Max(requiredHeight, MinCommentTextViewHeight), MaxCommentTextViewHeight);
+
+            commentTextViewHeightConstraint.Constant = (nfloat)targetHeight;
+            commentTextView.ScrollEnabled = requiredHeight > targetHeight;
+            commentTextView.LayoutIfNeeded();
+            commentTextView.ScrollRangeToVisible(commentTextView.SelectedRange);
+
+            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, -commentViewBottomConstraint.Constant + commentView.Frame.Height, 0f);
         }
 
-        void ScrollCommentsToTop(bool animated)
+        void ScrollCommentsToBottom(bool animated)
         {
-            var commentsCount = (commentsTableView.Source as DataSource).Items.Count;
-            if (commentsCount > 0)
-                commentsTableView.ScrollToRow(NSIndexPath.FromRowSection(0, 0), UITableViewScrollPosition.Top, animated);
+            if (!((DataSource)tableView.Source).Empty)
+                tableView.ScrollToRow(NSIndexPath.FromRowSection(((DataSource)tableView.Source).Items.Count - 1, 0), UITableViewScrollPosition.Bottom, animated);
         }
 
         #endregion
 
+        #region DataSource
+
         class DataSource : UITableViewSource
         {
-            UITableView tableView;
-            CommentsListViewController viewController;
-
-            readonly string emptyText;
-
             public bool Empty => !Items.Any();
-
             public List<Comment> Items { get; } = new List<Comment>();
 
-            public DataSource(CommentsListViewController viewController, UITableView tableView, string emptyText)
-            {
-                this.tableView = tableView;
-                this.viewController = viewController;
-                this.emptyText = emptyText;
-            }
+            readonly WeakReference<CommentsListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
-            #region Overrides
+            bool loading = true;
+
+            public DataSource(CommentsListViewController viewController, UITableView tableView)
+            {
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
+            }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+
                 if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    emptyCell.Initialize(Localization.GetString("no_comments"));
                     return emptyCell;
                 }
 
@@ -531,11 +414,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.Initialize(Items[indexPath.Row]);
                 return cell;
             }
-
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                return Empty ? 1 : Items.Count;
+                if (loading)
+                    return 1;
+
+                if (Items.Count < 1)
+                    return 1;
+
+                return Items.Count;
             }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => CommentsTableViewCell.Height;
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -544,53 +434,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id)
                 {
-                    var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("delete"), (a, ip) => viewController.DeleteComment(comment));
+                    var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
+                                                                   Localization.GetString("delete"),
+                                                                   (a, ip) => viewControllerWeakReference.Unwrap()?.DeleteComment(comment, tableView, indexPath));
                     deleteAction.BackgroundColor = Theme.DarkerBlue;
                     actions.Add(deleteAction);
-
-                    var isEditable = DateTime.Now.ToUniversalTime().Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
-
-                    if (isEditable)
-                    {
-                        var editAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, Localization.GetString("edit"), (a, ip) => viewController.StartEditComment(comment, tableView, indexPath));
-                        editAction.BackgroundColor = Theme.DarkBlue;
-                        actions.Add(editAction);
-                    }
                 }
 
                 return actions.ToArray();
             }
 
-            #endregion
-
-            public void RefreshData(List<Comment> newComments)
+            public void SetItems(List<Comment> newComments)
             {
-                if (newComments == null)
-                    return;
+                loading = false;
 
+                Items.Clear();
                 Items.AddRange(newComments);
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+
+                Items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void AddComment(Comment newComment)
             {
-                if (newComment == null)
-                    return;
-
                 Items.Add(newComment);
 
                 if (Items.Count == 1)
-                    tableView.ReloadRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(Items.Count - 1, 0)
-                        },
-                        UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.ReloadRows(new[] { NSIndexPath.FromRowSection(Items.Count - 1, 0) }, UITableViewRowAnimation.Fade);
                 else
-                    tableView.InsertRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(Items.Count - 1, 0)
-                        },
-                        UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.InsertRows(new[] { NSIndexPath.FromRowSection(Items.Count - 1, 0) }, UITableViewRowAnimation.Fade);
             }
 
             public void RemoveComment(Comment comment)
@@ -601,34 +479,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Items.RemoveAt(position);
 
                     if (Items.Count == 0)
-                        tableView.ReloadRows(new NSIndexPath[]
-                            {
-                                NSIndexPath.FromRowSection(position, 0)
-                            },
-                            UITableViewRowAnimation.Fade);
+                        tableViewWeakReference.Unwrap()?.ReloadRows(new[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
                     else
-                        tableView.DeleteRows(new NSIndexPath[]
-                            {
-                                NSIndexPath.FromRowSection(position, 0)
-                            },
-                            UITableViewRowAnimation.Fade);
-                }
-            }
-
-            public void EditComment(Comment editedContent)
-            {
-                var position = Items.FindIndex(c => c.Id == editedContent.Id);
-                if (position >= 0)
-                {
-                    Items[position].Content = editedContent.Content;
-
-                    tableView.ReloadRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(position, 0)
-                        },
-                        UITableViewRowAnimation.Fade);
+                        tableViewWeakReference.Unwrap()?.DeleteRows(new[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
                 }
             }
         }
+
+        #endregion
+
     }
 }

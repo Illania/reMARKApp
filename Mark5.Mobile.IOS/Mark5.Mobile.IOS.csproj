@@ -284,6 +284,7 @@
 		<Compile Include="Utilities\AsyncHelpers.cs" />
 		<Compile Include="Ui\Common\AbstractTableViewController.cs" />
 		<Compile Include="Ui\ViewControllers\EditCategoriesListViewController.cs" />
+		<Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

@@ -32,10 +32,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         UIBarButtonItem closeItem;
         UIBarButtonItem shareItem;
+
         UIScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
         ContentView contentView;
         UIStackView stackViewAfterContent;
+
         UIDocumentInteractionController attachmentInteractionController;
 
         MailMessage mailMessage;
@@ -173,9 +175,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             shareItem.Clicked -= ShareItem_Clicked;
         }
 
-        public override void Recycle()
+        public override void DidReceiveMemoryWarning()
         {
-            base.Recycle();
+            CommonConfig.Logger.Warning($"{nameof(MailViewerViewController)} received memory warning!");
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
         }
 
         protected override void Dispose(bool disposing)
