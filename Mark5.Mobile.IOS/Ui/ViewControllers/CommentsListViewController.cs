@@ -16,8 +16,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class CommentsListViewController : AbstractViewController, IUITextViewDelegate
     {
-        const float MinCommentTextViewHeight = 38f;
-        const float MaxCommentTextViewHeight = 82f;
+        const float MinCommentTextViewHeight = 38f; // 1 line
+        const float MaxCommentTextViewHeight = 125.5f; // 5 lines
 
         public BusinessEntity Entity { get; set; }
 
@@ -26,10 +26,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITableView tableView;
         UIView commentView;
         UIButton addCommentButton;
+        UIScrollView commentTextScrollView;
         UITextView commentTextView;
 
         NSLayoutConstraint commentViewBottomConstraint;
-        NSLayoutConstraint commentTextViewHeightConstraint;
+        NSLayoutConstraint commentTextScrollViewHeightConstraint;
 
         #region UIViewController overrides
 
@@ -92,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             commentTextView.Delegate = null;
             commentViewBottomConstraint = null;
-            commentTextViewHeightConstraint = null;
+            commentTextScrollViewHeightConstraint = null;
 
             ((DataSource)tableView.Source)?.Reset();
         }
@@ -183,6 +184,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.CenterY, 1f, 0f)
             });
 
+            commentTextScrollView = new UIScrollView
+            {
+                ScrollEnabled = false,
+                ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            commentTextScrollView.Layer.BorderColor = Theme.DarkGray.CGColor;
+            commentTextScrollView.Layer.BorderWidth = .75f;
+            commentTextScrollView.Layer.CornerRadius = 5f;
+            commentView.AddSubview(commentTextScrollView);
+            commentView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Top, 1f, 7f),
+                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 7f),
+                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addCommentButton, NSLayoutAttribute.Left, 1f, -7f),
+                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -7f),
+                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
+                commentTextScrollViewHeightConstraint = NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f)
+            });
+
             commentTextView = new UITextView
             {
                 Font = Theme.DefaultFont,
@@ -194,17 +215,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 InputAccessoryView = new KeyboardObserverInputAccessoryView()
             };
-            commentTextView.Layer.BorderColor = Theme.DarkGray.CGColor;
-            commentTextView.Layer.BorderWidth = .75f;
-            commentTextView.Layer.CornerRadius = 5f;
-            commentView.AddSubview(commentTextView);
-            commentView.AddConstraints(new[]
+            commentTextScrollView.AddSubview(commentTextView);
+            commentTextScrollView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Top, 1f, 7f),
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 7f),
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addCommentButton, NSLayoutAttribute.Left, 1f, -7f),
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -7f),
-                commentTextViewHeightConstraint = NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f)
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Width, 1f, 0f)
             });
         }
 
@@ -259,8 +277,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void AddComment_TouchUpInside(object sender, EventArgs e)
         {
-            commentTextView.EndEditing(true);
-
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("adding_comment___"));
             var newCommentContent = commentTextView.Text;
 
@@ -275,6 +291,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ((DataSource)tableView.Source).AddComment(newComment);
                 commentTextView.Text = null;
+                commentTextView.EndEditing(true);
 
                 ScrollCommentsToBottom(true);
             }
@@ -330,33 +347,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var height = KeyboardObserverInputAccessoryView.GetVisibleKeyboardHeight(View, frame);
 
             commentViewBottomConstraint.Constant = -height;
-            commentView.SetNeedsLayout();
             commentView.LayoutIfNeeded();
 
-            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, -commentViewBottomConstraint.Constant + commentView.Frame.Height, 0f);
+            AdjustSafeAreaInsets();
+        }
 
-            if (height > 0f)
-                ScrollCommentsToBottom(true);
+        #endregion
+
+        #region IUITextViewDelegate
+
+        [Export("textViewDidChange:")]
+        public void Changed(UITextView textView)
+        {
+            UpdateAddCommentEnabled();
+            UpdateCommentTextViewHeight();
+        }
+
+        [Export("textViewDidEndEditing:")]
+        public void EditingEnded(UITextView textView)
+        {
+            UpdateAddCommentEnabled();
+            UpdateCommentTextViewHeight();
         }
 
         #endregion
 
         #region Utilities
 
-        string oldCommentTextViewText;
-
-        [Export("textViewDidChange:")]
-        public void Changed(UITextView textView)
+        void UpdateAddCommentEnabled()
         {
-            if (oldCommentTextViewText == textView.Text)
-                return;
-            oldCommentTextViewText = textView.Text;
-
-            UpdateAddCommentEnabled();
-            UpdateCommentTextViewHeight();
+            addCommentButton.Enabled = !string.IsNullOrEmpty(commentTextView.Text);
         }
-
-        void UpdateAddCommentEnabled() => addCommentButton.Enabled = !string.IsNullOrEmpty(commentTextView.Text);
 
         void UpdateCommentTextViewHeight()
         {
@@ -366,18 +387,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var requiredHeight = commentTextView.SizeThatFits(new CGSize(commentTextView.ContentSize.Width, nfloat.MaxValue)).Height;
             var targetHeight = Math.Min(Math.Max(requiredHeight, MinCommentTextViewHeight), MaxCommentTextViewHeight);
 
-            commentTextViewHeightConstraint.Constant = (nfloat)targetHeight;
-            commentTextView.ScrollEnabled = requiredHeight > targetHeight;
-            commentTextView.LayoutIfNeeded();
-            commentTextView.ScrollRangeToVisible(commentTextView.SelectedRange);
+            commentTextScrollViewHeightConstraint.Constant = (nfloat)targetHeight;
+            commentTextScrollView.ScrollEnabled = requiredHeight > targetHeight;
 
-            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, -commentViewBottomConstraint.Constant + commentView.Frame.Height, 0f);
+            commentView.LayoutIfNeeded();
+
+            AdjustSafeAreaInsets();
+        }
+
+        void AdjustSafeAreaInsets()
+        {
+            var offset = -commentViewBottomConstraint.Constant + commentView.Frame.Height;
+            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, offset, 0f);
         }
 
         void ScrollCommentsToBottom(bool animated)
         {
             if (!((DataSource)tableView.Source).Empty)
-                tableView.ScrollToRow(NSIndexPath.FromRowSection(((DataSource)tableView.Source).Items.Count - 1, 0), UITableViewScrollPosition.Bottom, animated);
+                tableView.ScrollToRow(NSIndexPath.FromRowSection(((DataSource)tableView.Source).Items.Count - 1, 0),
+                                      UITableViewScrollPosition.Bottom,
+                                      animated);
         }
 
         #endregion
