@@ -8,13 +8,12 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
-using ObjCRuntime;
 using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -240,7 +239,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new DocumentViewController();
             vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
             vc.OnComplete = () => { vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated; };
-
             vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
             vc.SetRefreshDataOnAppear();
 
