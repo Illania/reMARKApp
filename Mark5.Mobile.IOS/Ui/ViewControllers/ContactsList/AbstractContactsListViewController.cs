@@ -149,6 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             ((DataSource)TableView.Source)?.Reset();
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
             UnsubscribeFromMessages();
+            searchController.SearchResultsUpdater = null;
             searchController = null;
         }
 

@@ -143,6 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             ((DataSource)TableView.Source)?.Reset();
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            searchController.SearchResultsUpdater = null;
             searchController = null;
         }
 

@@ -151,6 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             (TableView.Source as DataSource)?.Reset();
             (TableView.Source as GrouppedDataSource)?.Reset();
+            searchController.SearchResultsUpdater = null;
             searchController = null;
         }
 

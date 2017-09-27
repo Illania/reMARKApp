@@ -122,6 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DeinitializeHandlers();
 
             autoRefreshWorker?.Stop();
+            autoRefreshWorker?.Dispose();
             autoRefreshWorker = null;
 
             if (searchController != null && searchController.Active)
@@ -164,6 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ((DataSource)TableView.Source)?.Reset();
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
             UnsubscribeFromMessages();
+            searchController.SearchResultsUpdater = null;
             searchController = null;
         }
 
@@ -598,12 +600,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, UITableViewCell cell)
         {
-            var priorities = new List<Priority>
-            {
-                Priority.Low,
-                Priority.Normal,
-                Priority.Urgent
-            };
+            var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
             var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), tv, cell);
 
@@ -612,11 +609,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var priority = priorities[result];
 
-            await SetPriority(new List<DocumentPreview>
-                {
-                    selectedDocument
-                },
-                priority);
+            await SetPriority(new List<DocumentPreview> { selectedDocument }, priority);
         }
 
         async Task SetPriority(List<DocumentPreview> selectedDocuments, Priority priority)
@@ -644,13 +637,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void RemoveFromFolder(DocumentPreview selectedDocument)
-        {
-            RemoveFromFolder(new List<DocumentPreview>
-            {
-                selectedDocument
-            });
-        }
+        void RemoveFromFolder(DocumentPreview selectedDocument) =>
+            RemoveFromFolder(new List<DocumentPreview> { selectedDocument });
 
         async void RemoveFromFolder(List<DocumentPreview> selectedDocuments)
         {
@@ -684,13 +672,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void Delete(DocumentPreview selectedDocument)
-        {
-            Delete(new List<DocumentPreview>
-            {
-                selectedDocument
-            });
-        }
+        void Delete(DocumentPreview selectedDocument) =>
+            Delete(new List<DocumentPreview> { selectedDocument });
 
         async void Delete(List<DocumentPreview> selectedDocuments)
         {
@@ -748,7 +731,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         void CopyToFolder(DocumentPreview selectedDocument) =>
-            CopyToFolder(new List<DocumentPreview>{selectedDocument});
+            CopyToFolder(new List<DocumentPreview> { selectedDocument });
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
         {
@@ -863,7 +846,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (ct.IsCancellationRequested)
                 return;
-            
+
             var ds = (DataSource)TableView.Source;
             var filteredDocuments = ds.Items.Where(dp => MatchesQuery(dp, searchText)).ToList();
 
@@ -1004,13 +987,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void UpdatePriorityForDocument(IEnumerable<int> ids)
         {
-            if (SplitViewController != null && !SplitViewController.Collapsed)
+            BeginInvokeOnMainThread(() =>
             {
-                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                var vc = (DocumentViewController)nc.ViewControllers[0];
-                if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
-                    vc.UpdatePriority();
-            }
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                    var vc = (DocumentViewController)nc.ViewControllers[0];
+                    if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
+                        vc.UpdatePriority();
+                }
+            });
         }
 
         void RemoveDocumentsFromList(IEnumerable<int> ids)
