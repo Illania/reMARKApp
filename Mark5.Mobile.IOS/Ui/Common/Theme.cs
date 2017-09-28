@@ -49,12 +49,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UINavigationBar.Appearance.TitleTextAttributes = new UIStringAttributes
             {
                 ForegroundColor = DarkerBlue,
-                Font = DefaultBoldFont.WithRelativeSize(1f)
+                Font = DefaultFont.WithRelativeSize(1f)
             };
             UINavigationBar.Appearance.LargeTitleTextAttributes = new UIStringAttributes
             {
                 ForegroundColor = DarkerBlue,
-                Font = DefaultBoldFont.WithRelativeSize(12f)
+                Font = DefaultFont.WithRelativeSize(12f)
             };
 
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
