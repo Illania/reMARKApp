@@ -35,6 +35,8 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         }
     }
 
+    #region General Events
+
     public class OpenNotificationListEvent : AnalyticsEvent
     {
         public override string Name => "open_notification_list";
@@ -53,4 +55,18 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
             this.type = type;
         }
     }
+
+    #endregion
+
+    #region Documents
+
+    #endregion
+
+    #region Contacts
+
+    #endregion
+
+    #region Shortcodes
+
+    #endregion
 }
