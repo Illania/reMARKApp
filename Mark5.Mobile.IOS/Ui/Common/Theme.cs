@@ -1,3 +1,4 @@
+using CoreGraphics;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using WebKit;
@@ -57,14 +58,25 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Font = DefaultFont.WithRelativeSize(12f)
             };
 
+            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = Theme.LightGray;
+            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetBackgroundImage(SolidColorImage(Theme.DarkerBlue), UIBarMetrics.Default);
+            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TitleTextAttributes = new UIStringAttributes
+            {
+                ForegroundColor = LightGray,
+                Font = DefaultFont.WithRelativeSize(1f)
+            };
+            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).LargeTitleTextAttributes = new UIStringAttributes
+            {
+                ForegroundColor = LightGray,
+                Font = DefaultFont.WithRelativeSize(12f)
+            };
+
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                TextColor = DarkerBlue,
                 Font = DefaultFont
             }, UIControlState.Normal);
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                TextColor = DarkerBlue,
                 Font = DefaultFont
             }, UIControlState.Highlighted);
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
@@ -96,5 +108,21 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         #endregion
+
+        #region Utilities
+
+        static UIImage SolidColorImage(UIColor color)
+        {
+            var rect = new CGRect(0f, 0f, 1f, 1f);
+            UIGraphics.BeginImageContext(rect.Size);
+            color.SetFill();
+            UIGraphics.RectFill(rect);
+            var image = UIGraphics.GetImageFromCurrentImageContext();
+            UIGraphics.EndImageContext();
+            return image.CreateResizableImage(UIEdgeInsets.Zero, UIImageResizingMode.Stretch);
+        }
+
+        #endregion
+
     }
 }

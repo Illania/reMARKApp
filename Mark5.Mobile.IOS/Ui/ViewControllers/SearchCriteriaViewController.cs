@@ -22,6 +22,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             AutomaticallyAdjustsScrollViewInsets = true;
 
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+
             segmentedControl = new UISegmentedControl(new[]
             {
                 Localization.GetString("documents"),
@@ -44,11 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             segmentedControl.TintColor = Theme.DarkBlue;
             segmentedControl.SelectedSegment = 0;
             segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
-
-            UIView.AnimationsEnabled = false;
-            NavigationItem.Prompt = Localization.GetString("search");
             NavigationItem.TitleView = segmentedControl;
-            UIView.AnimationsEnabled = true;
 
             viewControllers = new UIViewController[]
             {

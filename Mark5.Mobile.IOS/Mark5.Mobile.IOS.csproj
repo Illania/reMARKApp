@@ -285,6 +285,7 @@
 		<Compile Include="Ui\Common\AbstractTableViewController.cs" />
 		<Compile Include="Ui\ViewControllers\EditCategoriesListViewController.cs" />
 		<Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
+		<Compile Include="Ui\Common\DarkNavigationController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
