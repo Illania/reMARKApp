@@ -1,23 +1,15 @@
-﻿using CoreGraphics;
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using Mark5.Mobile.IOS.Utilities.Extensions;
-using ObjCRuntime;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class FoldersNotificationsListViewController : AbstractViewController, IUIViewControllerRestoration
+    public class FoldersNotificationsListViewController : AbstractMultiViewController, IUIViewControllerRestoration
     {
         readonly ModuleType moduleType;
-
-        UISegmentedControl segmentedControl;
-        UIViewController[] viewControllers;
-
-        UIViewController currentViewController;
 
         public FoldersNotificationsListViewController(ModuleType moduleType)
         {
@@ -27,24 +19,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void LoadView()
         {
             base.LoadView();
-            
-            segmentedControl = new UISegmentedControl(new[]
-            {
-                Localization.GetString("folders"),
-                Localization.GetString("notifications")
-            })
-            {
-                Frame = new CGRect(0f, 0f, 0f, 24f),
-                SelectedSegment = 0
-            };
-            segmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Always;
             NavigationItem.Title = GetTitleForModule(moduleType);
-            NavigationItem.TitleView = segmentedControl;
 
-            viewControllers = new UIViewController[]
+            SegmentedControl.InsertSegment(Localization.GetString("folders"), 0, false);
+            SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
+
+            ViewControllers = new UIViewController[]
             {
                 new BrowseFoldersListViewController(moduleType),
                 new NotificationsListViewController(moduleType.ObjectTypes())
@@ -55,32 +36,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            NavigationController.NavigationBar.PrefersLargeTitles = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             RestorationIdentifier = nameof(FoldersNotificationsListViewController);
             RestorationClass = Class;
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-
-            var vc = viewControllers[segmentedControl.SelectedSegment];
-            vc.WillMoveToParentViewController(this);
-            AddChildViewController(vc);
-            vc.View.Frame = View.Bounds;
-            View.AddSubview(vc.View);
-            if (vc.NavigationItem.LeftBarButtonItems != null)
-                NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
-            else
-                NavigationItem.SetLeftBarButtonItem(null, false);
-            if (vc.NavigationItem.RightBarButtonItems != null)
-                NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
-            else
-                NavigationItem.SetRightBarButtonItem(null, false);
-            vc.DidMoveToParentViewController(this);
-            currentViewController = vc;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -95,32 +56,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     ni = ParentViewController?.NavigationItem;
 
                 if (ni.SearchController == null)
-                    ni.SearchController = currentViewController?.NavigationItem?.SearchController;
+                    ni.SearchController = CurrentViewController?.NavigationItem?.SearchController;
             });
-        }
-
-        [Export("segmentedControlHasChangedValue:")]
-        void SegmentedControlHasChangedValue(UISegmentedControl sender)
-        {
-            var vc = viewControllers[sender.SelectedSegment];
-            currentViewController.WillMoveToParentViewController(null);
-            vc.WillMoveToParentViewController(this);
-            currentViewController.RemoveFromParentViewController();
-            AddChildViewController(vc);
-            currentViewController.View.RemoveFromSuperview();
-            vc.View.Frame = View.Bounds;
-            View.AddSubview(vc.View);
-            if (vc.NavigationItem.LeftBarButtonItems != null)
-                NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
-            else
-                NavigationItem.SetLeftBarButtonItem(null, false);
-            if (vc.NavigationItem.RightBarButtonItems != null)
-                NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
-            else
-                NavigationItem.SetRightBarButtonItem(null, false);
-            vc.DidMoveToParentViewController(this);
-            currentViewController.DidMoveToParentViewController(null);
-            currentViewController = vc;
         }
 
         static string GetTitleForModule(ModuleType moduleType)
@@ -146,15 +83,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
             coder.Encode((int)moduleType, "moduleType");
-            coder.Encode(segmentedControl.SelectedSegment, "selectedSegment");
-            coder.Encode(viewControllers[0], "vc_0");
-            coder.Encode(viewControllers[1], "vc_1");
+            coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
+            coder.Encode(ViewControllers[0], "vc_0");
+            coder.Encode(ViewControllers[1], "vc_1");
         }
 
         public override void DecodeRestorableState(NSCoder coder)
         {
             base.DecodeRestorableState(coder);
-            segmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+            SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
         }
 
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]

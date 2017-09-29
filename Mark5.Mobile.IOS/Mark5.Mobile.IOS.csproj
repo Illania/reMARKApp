@@ -107,7 +107,6 @@
 		<Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
 		<Compile Include="Ui\Common\SeparatorSubView.cs" />
 		<Compile Include="Ui\Common\Theme.cs" />
-		<Compile Include="Ui\Common\TouchTransparentView.cs" />
 		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
@@ -286,6 +285,8 @@
 		<Compile Include="Ui\ViewControllers\EditCategoriesListViewController.cs" />
 		<Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
 		<Compile Include="Ui\Common\DarkNavigationController.cs" />
+		<Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
+		<Compile Include="Ui\Common\AbstractMultiViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

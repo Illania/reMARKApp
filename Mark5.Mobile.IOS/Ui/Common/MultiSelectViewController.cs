@@ -7,7 +7,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    public class MultiSelectViewController<T> : UITableViewController
+    public class MultiSelectViewController<T> : AbstractTableViewController
     {
         readonly TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
         public Task<T[]> Task => tcs.Task;
@@ -38,6 +38,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             Title = title;
 
@@ -92,6 +96,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             data = null;
             description = null;
             selectedItems = null;
+        }
+
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            TableView.DataSource = null;
+            TableView.Delegate = null;
         }
 
         void CancelItem_Clicked(object sender, EventArgs e)

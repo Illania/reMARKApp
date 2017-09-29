@@ -58,8 +58,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Font = DefaultFont.WithRelativeSize(12f)
             };
 
-            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = Theme.LightGray;
-            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetBackgroundImage(SolidColorImage(Theme.DarkerBlue), UIBarMetrics.Default);
+            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = LightGray;
+            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetBackgroundImage(SolidColorImage(DarkerBlue), UIBarMetrics.Default);
             UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TitleTextAttributes = new UIStringAttributes
             {
                 ForegroundColor = LightGray,
@@ -93,8 +93,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UISegmentedControl.Appearance.TintColor = DarkerBlue;
             UISegmentedControl.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont.WithRelativeSize(-3f)
+                Font = DefaultFont.WithRelativeSize(-4f)
             }, UIControlState.Normal);
+
+            UISegmentedControl.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = DarkBlue;
+            UISegmentedControl.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetTitleTextAttributes(new UITextAttributes
+            {
+                Font = DefaultFont.WithRelativeSize(-4f),
+                TextColor = White
+            }, UIControlState.Normal);
+            UISegmentedControl.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetTitleTextAttributes(new UITextAttributes
+            {
+                Font = DefaultFont.WithRelativeSize(-4f),
+                TextColor = White
+            }, UIControlState.Selected);
 
             UISwitch.Appearance.OnTintColor = DarkBlue;
 
@@ -115,7 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var rect = new CGRect(0f, 0f, 1f, 1f);
             UIGraphics.BeginImageContext(rect.Size);
-            color.SetFill();
+            color.ColorWithAlpha(0.99f).SetFill();
             UIGraphics.RectFill(rect);
             var image = UIGraphics.GetImageFromCurrentImageContext();
             UIGraphics.EndImageContext();

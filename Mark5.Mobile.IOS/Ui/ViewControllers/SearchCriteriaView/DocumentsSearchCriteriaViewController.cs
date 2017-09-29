@@ -8,6 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using UIKit;
@@ -43,6 +44,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             RestorationClass = Class;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         protected override async void ResetItem_Clicked(object sender, EventArgs e)
         {
             base.ResetItem_Clicked(sender, e);
@@ -62,10 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new DocumentsSearchResultsViewController
-            {
-                Criteria = criteria
-            }, true);
+            NavigationController.PushViewController(new DocumentsSearchResultsViewController { Criteria = criteria }, true);
         }
 
         protected override async Task SaveCriteria()
@@ -76,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+                CommonConfig.Logger.Error("Failed to save last search criteria", ex);
             }
         }
 
@@ -192,12 +198,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var directions = Criteria.Directions;
 
                 if (!directions.Any())
-                    directions.AddRange(new[]
-                    {
-                        DocumentDirection.Incoming,
-                        DocumentDirection.Outgoing,
-                        DocumentDirection.Draft
-                    });
+                    directions.AddRange(new[] { DocumentDirection.Incoming, DocumentDirection.Outgoing, DocumentDirection.Draft });
 
                 if (directions.Count > 2)
                 {
@@ -309,11 +310,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -493,11 +493,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 valueTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -944,7 +943,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class LineCategoriesPriorityNameView : AbstractDocumentsSearchView
         {
-            readonly UIViewController parentViewController;
+            readonly WeakReference<UIViewController> parentViewControllerWeakReference;
 
             readonly UIView lineView;
             readonly UILabel lineLabel;
@@ -958,7 +957,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             public LineCategoriesPriorityNameView(UIViewController parentViewController)
             {
-                this.parentViewController = parentViewController;
+                parentViewControllerWeakReference = parentViewController.Wrap();
 
                 lineView = new UIView
                 {
@@ -1124,8 +1123,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     var data = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.ToArray();
                     var preselected = data.Where(l => Criteria.LineGuids.Contains(l.Guid)).ToArray();
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController, Localization.GetString("search_lines"), data, preselected, l => l.Name, LambdaEqualityComparer<Line>.Create(l => l.Guid));
-
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewControllerWeakReference.Unwrap(),
+                                                                          Localization.GetString("search_lines"),
+                                                                          data,
+                                                                          preselected,
+                                                                          l => l.Name,
+                                                                          LambdaEqualityComparer<Line>.Create(l => l.Guid));
                     if (result == null)
                         return;
 
@@ -1139,7 +1142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         Module = ModuleType.Documents,
                         PreselectedItemIds = Criteria.CategoryIds
                     };
-                    parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    parentViewControllerWeakReference.Unwrap()?.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
 
                     var result = await vc.Task;
                     if (result == null)
@@ -1173,8 +1176,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         }
                     };
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewController, Localization.GetString("priority"), data, preselected, description, LambdaEqualityComparer<Priority>.Create(p => p));
-
+                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewControllerWeakReference.Unwrap(),
+                                                                          Localization.GetString("priority"),
+                                                                          data,
+                                                                          preselected,
+                                                                          description,
+                                                                          LambdaEqualityComparer<Priority>.Create(p => p));
                     if (result == null)
                         return;
 
@@ -1223,11 +1230,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 referenceTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1277,11 +1283,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 commentTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1331,11 +1336,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 attachmentNameTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -1509,11 +1513,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
