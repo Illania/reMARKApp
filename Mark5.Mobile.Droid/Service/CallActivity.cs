@@ -14,12 +14,14 @@ namespace Mark5.Mobile.Droid.Service
     {
         const string ContactPreviewIntentKey = "ContactPreview_47e5962f-767f-4edd-96ca-51b15cd0d9cf";
 
-        IncomingCallFragment icf;
+        IncomingCallFragmentOverlay icf;
         string icfTag;
 
         public static Intent CreateIntent(Context context, ContactPreview cp)
         {
             var intent = new Intent(context, typeof(CallActivity));
+            //intent.AddFlags(ActivityFlags.MultipleTask);
+            //intent.AddFlags(ActivityFlags.NewTask);
 
             if (cp != null)
                 intent.PutExtra(ContactPreviewIntentKey, Serializer.Serialize(cp));
@@ -40,7 +42,7 @@ namespace Mark5.Mobile.Droid.Service
             {
                 var cp = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                (icf, icfTag) = IncomingCallFragment.NewInstance(cp);
+                (icf, icfTag) = IncomingCallFragmentOverlay.NewInstance(cp);
                 ft.Replace(Resource.Id.fragment_container, icf, icfTag);
                 ft.Commit();
 
@@ -48,7 +50,7 @@ namespace Mark5.Mobile.Droid.Service
             }
             else
             {
-                icf = (IncomingCallFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                icf = (IncomingCallFragmentOverlay)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CallActivity)}");
             }
         }

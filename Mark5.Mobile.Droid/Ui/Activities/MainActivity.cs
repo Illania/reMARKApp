@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (permissionsAsked)
                 return;
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted))
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadPhoneState) != Permission.Granted))
             {
                 Action permissionRequestAction = () =>
                 {
@@ -138,7 +138,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     RequestPermissions(new string[]
                         {
                             Manifest.Permission.ReadExternalStorage,
-                            Manifest.Permission.ReadContacts
+                            Manifest.Permission.ReadContacts,
+                            Manifest.Permission.ReadPhoneState
                         },
                         769);
 #pragma warning restore XA0001 // Find issues with Android API usage
