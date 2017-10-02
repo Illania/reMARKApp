@@ -87,6 +87,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.LightContent;
+
             authenticator = AuthenticatorFactory.Create();
 
             InitializeHandlers();
@@ -107,14 +109,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
+            UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.Default;
+
             usernameTextField.ResignFirstResponder();
             passwordTextField.ResignFirstResponder();
             hostnameTextField.ResignFirstResponder();
             portTextField.ResignFirstResponder();
 
-            authenticator = null;
-
             DeinitializeHandlers();
+            
+            authenticator = null;
 
             didChangeFrameNotificationObserver?.Dispose();
         }
