@@ -146,9 +146,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             base.Recycle();
 
-            ((DataSource)TableView.Source)?.Reset();
-            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            ExitEditItem = null;
+            EditItem = null;
+            LeftButton = null;
+            RightButton = null;
+
             UnsubscribeFromMessages();
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
+            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            ((DataSource)TableView.Source)?.Reset();
+
             searchController.SearchResultsUpdater = null;
             searchController = null;
         }
@@ -331,7 +343,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 {
                     var vc = new DownloadViewController { Folder = Folder };
                     NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
-                    await vc.DidDisappear;
+                    await vc.Task;
                 }
                 if (result == -1)
                 {
@@ -562,7 +574,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         }
 
         void MoveToFolder(ContactPreview selectedContact) =>
-            MoveToFolder(new List<ContactPreview>{selectedContact});
+            MoveToFolder(new List<ContactPreview> { selectedContact });
 
         void MoveToFolder(List<ContactPreview> selectedContacts)
         {

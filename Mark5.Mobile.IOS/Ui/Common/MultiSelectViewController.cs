@@ -102,6 +102,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.Recycle();
 
+            cancelItem = null;
+            doneItem = null;
+
             TableView.DataSource = null;
             TableView.Delegate = null;
         }

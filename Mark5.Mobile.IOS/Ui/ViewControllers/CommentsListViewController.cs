@@ -91,7 +91,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
+            doneButtonItem = null;
+
+            tableView = null;
+            commentView = null;
+            commentTextScrollView = null;
             commentTextView.Delegate = null;
+            commentTextView = null;
+
             commentViewBottomConstraint = null;
             commentTextScrollViewHeightConstraint = null;
 

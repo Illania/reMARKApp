@@ -75,6 +75,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
+            doneItem = null;
+            editItem = null;
+
             ((DataSource)TableView.Source)?.Reset();
         }
 

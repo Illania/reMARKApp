@@ -89,8 +89,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            ((DataSource)TableView.Source)?.Reset();
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            ((DataSource)TableView.Source)?.Reset();
         }
 
         protected override void Dispose(bool disposing)

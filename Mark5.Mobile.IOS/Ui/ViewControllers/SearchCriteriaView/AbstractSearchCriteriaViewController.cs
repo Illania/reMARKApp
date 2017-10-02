@@ -170,6 +170,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         {
             base.Recycle();
 
+            closeItem = null;
+            resetItem = null;
+
+            scrollView = null;
+            StackView = null;
+            SearchButton = null;
+
             searchButtonBottomConstraint1 = null;
             searchButtonBottomConstraint2 = null;
         }

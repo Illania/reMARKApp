@@ -145,9 +145,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public override void Recycle()
         {
             base.Recycle();
+        
+            EditModeItem = null;
+            ComposeDocumentItem = null;
+            CreateContactItem = null;
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
 
             (TableView.Source as DataSource)?.Reset();
             (TableView.Source as GrouppedDataSource)?.Reset();
+
             searchController.SearchResultsUpdater = null;
             searchController = null;
         }

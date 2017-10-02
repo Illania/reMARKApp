@@ -120,6 +120,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
+            markAsReadItem = null;
+
             ((DataSource)TableView.Source)?.Reset();
         }
 

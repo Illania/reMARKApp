@@ -1,4 +1,5 @@
-﻿using UIKit;
+﻿using System;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -20,7 +21,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 || IsMovingFromParentViewController
                 || (NavigationController?.IsBeingDismissed ?? false)
                 || (NavigationController?.IsMovingFromParentViewController ?? false))
+            {
                 Recycle();
+#if DEBUG
+                GC.Collect();
+#endif
+            }
         }
 
         public virtual void Recycle()

@@ -50,7 +50,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Folder Folder { get; set; }
 
-        public Task DidDisappear { get => tcs.Task; }
+        readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        public Task Task => tcs.Task;
 
         UIBarButtonItem doneItem;
 
@@ -69,8 +70,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         Stopwatch sw;
         CancellationTokenSource cts;
-
-        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
         NSObject didEnterBackgroundNotification;
 
@@ -143,6 +142,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void Recycle()
         {
             base.Recycle();
+
+            doneItem = null;
+
+            startView = null;
+            progressView = null;
+            finishedView = null;
+
+            startButton = null;
+            lastDownloadedLabel = null;
+            progressPreparingIndicator = null;
+            progressIndicator = null;
+            progressLabel = null;
+            cancelButton = null;
+            downloadedLabel = null;
+            closeButton = null;
 
             didEnterBackgroundNotification?.Dispose();
         }

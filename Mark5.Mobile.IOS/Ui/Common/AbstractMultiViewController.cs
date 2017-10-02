@@ -56,6 +56,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             base.Recycle();
 
             SegmentedControl.RemoveTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
+            SegmentedControl = null;
+            ViewControllers = null;
+            CurrentViewController = null;
         }
 
         [Export("segmentedControlHasChangedValue:")]

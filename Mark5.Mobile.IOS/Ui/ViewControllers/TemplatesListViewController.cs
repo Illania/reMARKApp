@@ -99,7 +99,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
+            cancelItem = null;
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
             ((DataSource)TableView.Source)?.Reset();
+
             searchController.SearchResultsUpdater = null;
             searchController = null;
         }

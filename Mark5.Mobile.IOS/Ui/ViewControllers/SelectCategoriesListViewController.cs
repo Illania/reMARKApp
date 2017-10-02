@@ -80,6 +80,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
+            cancelItem = null;
+            doneItem = null;
+
             ((DataSource)TableView.Source)?.Reset();
         }
 

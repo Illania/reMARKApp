@@ -162,9 +162,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            ((DataSource)TableView.Source)?.Reset();
-            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            composeDocumentItem = null;
+            exitEditItem = null;
+            editItem = null;
+
             UnsubscribeFromMessages();
+
+            autoRefreshWorker?.Stop();
+            autoRefreshWorker = null;
+            newDocumentsAvailableAction = null;
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
+            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            ((DataSource)TableView.Source)?.Reset();
+
             searchController.SearchResultsUpdater = null;
             searchController = null;
         }
@@ -1312,8 +1327,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CancellationTokenSource cts;
 
-            readonly Func<int, Task> work;
-            readonly Func<DocumentPreview> firstOrDefaultItem;
+            Func<int, Task> work;
+            Func<DocumentPreview> firstOrDefaultItem;
             readonly int intervalMs;
 
             readonly object lockObj = new object();
@@ -1355,9 +1370,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void Stop()
             {
                 lock (lockObj)
-                {
                     cts?.Cancel();
-                }
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+
+                work = null;
+                firstOrDefaultItem = null;
             }
         }
 
