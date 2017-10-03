@@ -93,6 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             doneButtonItem = null;
 
+            ((DataSource)tableView.Source)?.Reset();
             tableView = null;
             commentView = null;
             commentTextScrollView = null;
@@ -101,8 +102,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             commentViewBottomConstraint = null;
             commentTextScrollViewHeightConstraint = null;
-
-            ((DataSource)tableView.Source)?.Reset();
         }
 
         protected override void Dispose(bool disposing)

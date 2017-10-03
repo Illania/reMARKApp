@@ -17,11 +17,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         protected UINavigationController Dummy { get; } = new UINavigationController(new UIViewController());
 
+        UIView searchButtonContainer;
         UIButton searchButton;
+        NSLayoutConstraint searchButtonBottomConstraint;
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            searchButtonContainer = new TouchTransparentView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            View.AddSubview(searchButtonContainer);
+            View.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 65f),
+                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 55f),
+                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
+                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, 2f)
+            });
 
             searchButton = new UIButton
             {
@@ -35,13 +50,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchButton.Layer.BorderColor = UIColor.FromRGB(167f / 255f, 167f / 255f, 170f / 255f).CGColor;
             searchButton.Layer.BorderWidth = 1f;
             searchButton.Layer.CornerRadius = 27.5f;
-            View.AddSubview(searchButton);
-            View.AddConstraints(new[]
+            searchButtonContainer.AddSubview(searchButton);
+            searchButtonContainer.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 55f),
                 NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 55f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, -8f)
+                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, searchButtonContainer, NSLayoutAttribute.CenterX, 1f, 0f),
+                searchButtonBottomConstraint = NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, searchButtonContainer, NSLayoutAttribute.Bottom, 1f, -10f)
             });
         }
 
@@ -66,6 +81,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
+        }
+
+        public void SetSearchButtonHidden(bool hidden, bool animated)
+        {
+            searchButtonBottomConstraint.Constant = hidden ? -10f : 0f;
+
+            if (animated)
+                UIView.AnimateNotify(.25d, 0d, UIViewAnimationOptions.BeginFromCurrentState | UIViewAnimationOptions.CurveEaseOut, searchButtonContainer.LayoutIfNeeded, null);
+            else
+                searchButtonContainer.LayoutIfNeeded();
         }
 
         void SearchButton_TouchUpInside(object sender, EventArgs e)

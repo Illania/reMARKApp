@@ -192,6 +192,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         async void CloseItem_Clicked(object sender, EventArgs e)
         {
             await SaveCriteria();
+
+            if (NavigationController != null)
+                NavigationController.ModalTransitionStyle = UIModalTransitionStyle.CoverVertical;
+            
             DismissViewController(true, null);
         }
 

@@ -285,6 +285,7 @@
 		<Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
 		<Compile Include="Ui\Common\AbstractMultiViewController.cs" />
 		<Compile Include="Utilities\UITableViewCellUtilities.cs" />
+		<Compile Include="Ui\Common\TouchTransparentView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

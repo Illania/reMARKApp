@@ -16,10 +16,12 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ShortcodeViewController : AbstractViewController, ISecondaryViewController, IUIViewControllerRestoration
+    public class ShortcodeViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
         public bool Modal { get; set; }
 
@@ -36,18 +38,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem composeButton;
         UIBarButtonItem doneButtonItem;
-
-        UITableView tableView;
-        UIToolbar toolbar;
         UIBarButtonItem fileToButton;
 
         CancellationTokenSource cts;
+
+        public ShortcodeViewController()
+            : base(UITableViewStyle.Grouped)
+        {
+        }
 
         public override void LoadView()
         {
             base.LoadView();
 
             InitializeView();
+            InitializeNavigationBar();
         }
 
         public override void ViewDidLoad()
@@ -56,17 +61,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RestorationIdentifier = nameof(ShortcodeViewController);
             RestorationClass = Class;
-
-            ExtendedLayoutIncludesOpaqueBars = true;
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBar();
-            InitializeNavigationBarTitle();
             InitializeHandlers();
+
+            NavigationController.ToolbarHidden = false;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -74,9 +77,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info("Appeared");
-
-            tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
 
             if (refreshDataOnAppear)
             {
@@ -90,6 +90,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeinitializeHandlers();
+
+            NavigationController.ToolbarHidden = true;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -100,23 +102,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        public override void Recycle()
         {
-            base.ViewWillTransitionToSize(toSize, coordinator);
+            base.Recycle();
 
-            coordinator.AnimateAlongsideTransition(ctx => { },
-                ctx =>
-                {
-                    if (tableView == null)
-                        return;
+            composeButton = null;
+            doneButtonItem = null;
+            fileToButton = null;
 
-                    tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                    tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                });
+            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            ((DataSource)TableView.Source)?.Clear();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         void InitializeNavigationBar()
         {
+            NavigationItem.Title = shortcodePreview?.Name;
+
             if (Modal)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
@@ -124,72 +133,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                composeButton = new UIBarButtonItem();
-                composeButton.Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"));
-                composeButton.Enabled = false;
+                composeButton = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "compose.png")),
+                    Enabled = false
+                };
                 NavigationItem.SetRightBarButtonItem(composeButton, false);
             }
         }
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = false;
+            TableView.Source = new DataSource(this, TableView);
+            TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed));
 
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped)
-            {
-                ClipsToBounds = false,
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                RowHeight = UITableView.AutomaticDimension,
-                EstimatedRowHeight = 60f
-            };
-            tableView.Source = new DataSource(this, tableView);
-            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed)
-            {
-                MinimumPressDuration = 1f
-            });
-            if (NavigationController != null)
-            {
-                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                tableView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            }
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-
-            fileToButton = new UIBarButtonItem();
-            fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
-            fileToButton.Enabled = false;
-
-            toolbar = new UIToolbar();
-            toolbar.BarStyle = UIBarStyle.Default;
-            toolbar.Items = new[]
+            ToolbarItems = new[]
             {
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                fileToButton,
+                fileToButton = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
+                    Enabled = false
+                },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
             };
-            toolbar.BarTintColor = Theme.Gray;
-            toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            View.AddSubview(toolbar);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
-            });
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            NavigationItem.Title = shortcodePreview?.Name;
         }
 
         void InitializeHandlers()
@@ -216,20 +183,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
         }
 
-        void RowLongPressed(UILongPressGestureRecognizer gr)
-        {
-            if (gr.State != UIGestureRecognizerState.Began)
-                return;
-
-            var location = gr.LocationInView(tableView);
-            var indexPath = tableView?.IndexPathForRowAtPoint(location);
-            var cell = tableView?.CellAt(indexPath);
-            var dataSource = tableView?.Source as DataSource;
-            var da = dataSource?.DocumentAddessAtRow(indexPath);
-            if (cell != null && da != null)
-                CopyToClipboard(tableView, cell, da.Address);
-        }
-
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
             var vc = new ComposeDocumentViewController
@@ -243,9 +196,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text)
+        void RowLongPressed(UILongPressGestureRecognizer gr)
         {
-            Integration.CopyToClipboard(this, tableView, cell, text);
+            if (gr.State != UIGestureRecognizerState.Began)
+                return;
+
+            var location = gr.LocationInView(TableView);
+            var indexPath = TableView?.IndexPathForRowAtPoint(location);
+            var cell = TableView?.CellAt(indexPath);
+            var dataSource = TableView?.Source as DataSource;
+            var da = dataSource?.DocumentAddessAtRow(indexPath);
+            if (cell != null && da != null)
+                Integration.CopyToClipboard(this, TableView, cell, da.Address);
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -318,10 +280,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
+        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         public void SetData(int folderId, int shortcodeId)
         {
@@ -382,7 +341,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info("Loading shortcode...");
 
-            var ds = (DataSource)tableView?.Source;
+            var ds = (DataSource)TableView?.Source;
 
             try
             {
@@ -422,7 +381,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested)
                     return;
 
-                InitializeNavigationBarTitle();
+                NavigationItem.Title = shortcodePreview?.Name;
 
                 if (composeButton != null)
                     composeButton.Enabled = shortcode?.Addresses?.Any() ?? false;
@@ -463,7 +422,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodePreview = null;
             shortcode = null;
 
-            InitializeNavigationBarTitle();
+            NavigationItem.Title = shortcodePreview?.Name;
 
             if (composeButton != null)
                 composeButton.Enabled = false;
@@ -471,7 +430,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (fileToButton != null)
                 fileToButton.Enabled = false;
 
-            var ds = tableView?.Source as DataSource;
+            var ds = TableView?.Source as DataSource;
             ds?.Clear();
         }
 
@@ -496,13 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     },
                     folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Shortcode,
-                    folder.Id,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
+                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, folder.Id, new List<int> { shortcode.Id }));
 
                 dismissAction();
 
@@ -538,12 +491,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     shortcode
                 });
 
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
-                    ObjectType.Shortcode,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
+                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Shortcode, new List<int> { shortcode.Id }));
 
                 dismissAction();
 
@@ -563,10 +511,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
-            ShortcodeViewController viewController;
-            UITableView tableView;
+            readonly WeakReference<ShortcodeViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool empty = true;
             bool loading = true;
@@ -578,8 +526,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public DataSource(ShortcodeViewController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -650,12 +598,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (string.IsNullOrWhiteSpace(documentAddress.Name))
                 {
-                    var compactCell = tableView.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell ?? DocumentAddressesCompactTableViewCell.Create();
+                    var compactCell = tableViewWeakReference.Unwrap()?.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell ?? DocumentAddressesCompactTableViewCell.Create();
                     compactCell.Initialize(documentAddress);
                     return compactCell;
                 }
 
-                var cell = tableView.DequeueReusableCell(DocumentAddressesTableViewCell.Key) as DocumentAddressesTableViewCell ?? DocumentAddressesTableViewCell.Create();
+                var cell = tableViewWeakReference.Unwrap()?.DequeueReusableCell(DocumentAddressesTableViewCell.Key) as DocumentAddressesTableViewCell ?? DocumentAddressesTableViewCell.Create();
                 cell.Initialize(documentAddress);
                 return cell;
             }
@@ -730,7 +678,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (documentAddress == null)
                     return;
 
-                viewController.DocumentAddressClicked(documentAddress);
+                viewControllerWeakReference.Unwrap()?.DocumentAddressClicked(documentAddress);
 
                 if (tableView?.IndexPathForSelectedRow != null)
                     tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
@@ -741,7 +689,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 empty = false;
                 loading = true;
 
-                tableView.InsertSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void EndRefresh(string description, DocumentAddress[] toAddresses, DocumentAddress[] ccAddresses, DocumentAddress[] bccAddresses)
@@ -754,15 +702,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 this.ccAddresses = ccAddresses;
                 this.bccAddresses = bccAddresses;
 
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, 3)), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, 3)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public void Clear()
             {
-                var sections = NumberOfSections(tableView);
+                var sections = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
                 empty = true;
                 loading = true;
@@ -772,7 +720,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ccAddresses = new DocumentAddress[0];
                 bccAddresses = new DocumentAddress[0];
 
-                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, sections)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, sections)), UITableViewRowAnimation.Fade);
             }
 
             public DocumentAddress DocumentAddessAtRow(NSIndexPath indexPath)
@@ -787,19 +735,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     documentAddress = bccAddresses[indexPath.Row];
 
                 return documentAddress;
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                tableView = null;
-                viewController = null;
-
-                description = null;
-                toAddresses = null;
-                ccAddresses = null;
-                bccAddresses = null;
             }
         }
 
