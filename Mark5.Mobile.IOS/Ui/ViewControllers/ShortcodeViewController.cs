@@ -59,6 +59,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
             RestorationIdentifier = nameof(ShortcodeViewController);
             RestorationClass = Class;
         }
@@ -203,6 +207,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var location = gr.LocationInView(TableView);
             var indexPath = TableView?.IndexPathForRowAtPoint(location);
+
+            if (indexPath == null)
+                return;
+
             var cell = TableView?.CellAt(indexPath);
             var dataSource = TableView?.Source as DataSource;
             var da = dataSource?.DocumentAddessAtRow(indexPath);
@@ -220,10 +228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var vc = new CopyToWorktrayViewController
                     {
-                        BusinessEntities = new List<IBusinessEntity>
-                        {
-                            shortcode
-                        }
+                        BusinessEntities = new List<IBusinessEntity> { shortcode }
                     };
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));

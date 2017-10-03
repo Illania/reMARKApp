@@ -310,7 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             comments = new BadgeBarButtonItem(commentsButton)
             {
-                BadgeBackgroundColor = Theme.Brown,
+                BadgeBackgroundColor = Theme.DarkerBlue,
                 Enabled = false
             };
             replyActions = new UIBarButtonItem

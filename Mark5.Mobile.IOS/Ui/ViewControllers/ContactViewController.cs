@@ -21,7 +21,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ContactViewController : AbstractViewController, ISecondaryViewController, IUIViewControllerRestoration
+    public class ContactViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
         public bool Modal { get; set; }
 
@@ -37,14 +37,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         UIView headerView;
+        UILabel nameLabel;
+        UILabel nameSubLabel;
         UIButton button1;
         UIButton button2;
         UIButton button3;
         UIButton button4;
-        UILabel nameLabel;
-        UILabel nameSubLabel;
-        UITableView tableView;
-        UIToolbar toolbar;
+
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
         UIButton commentsButton;
@@ -52,12 +51,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem actionsLinksButton;
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem editButtonItem;
-        NSLayoutConstraint headerViewOffset;
 
         CancellationTokenSource cts;
 
         TinyMessageSubscriptionToken contactChangedToken;
         TinyMessageSubscriptionToken childrenAddedToken;
+
+        public ContactViewController()
+            : base(UITableViewStyle.Grouped)
+        {
+        }
 
         public override void LoadView()
         {
@@ -70,10 +73,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
             RestorationIdentifier = nameof(ContactViewController);
             RestorationClass = Class;
-
-            ExtendedLayoutIncludesOpaqueBars = true;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -84,8 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeHandlers();
             SubscribeToMessages();
 
-            if (headerViewOffset != null)
-                headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
+            NavigationController.ToolbarHidden = false;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -93,10 +97,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info("Appeared");
-
-            headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
 
             if (refreshDataOnAppear)
             {
@@ -113,6 +113,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeinitializeHandlers();
+
+            NavigationController.ToolbarHidden = true;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -125,63 +127,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
-        {
-            base.ViewWillTransitionToSize(toSize, coordinator);
-
-            coordinator.AnimateAlongsideTransition(ctx => { },
-                ctx =>
-                {
-                    if (tableView == null)
-                        return;
-
-                    headerViewOffset.Constant = NavigationController.NavigationBar.Frame.Bottom;
-                    tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                    tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-                });
-        }
-
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = false;
+            TableView.Source = new DataSource(this, TableView);
+            TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed));
 
-            View.BackgroundColor = Theme.DarkerBlue;
-
-            headerView = new UIView();
-            headerView.BackgroundColor = Theme.DarkerBlue;
-            headerView.TranslatesAutoresizingMaskIntoConstraints = false;
-
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView);
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            tableView.EstimatedRowHeight = 60f;
-            tableView.ContentInset = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.ScrollIndicatorInsets = new UIEdgeInsets(0f, 0f, 45f + (TabBarController?.TabBar?.Frame.Height ?? 0f), 0f);
-            tableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed)
-            {
-                MinimumPressDuration = 1f
-            });
-
-            View.AddSubview(tableView);
-            View.AddSubview(headerView);
-
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
-                headerViewOffset = NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(headerView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 140f)
-            });
+            headerView = new UIView(new CGRect(0f, 0f, 0f, 160f));
 
             nameLabel = new UILabel();
             nameLabel.Font = Theme.DefaultFont.WithRelativeSize(6f);
-            nameLabel.TextColor = Theme.LightGray;
+            nameLabel.TextColor = Theme.DarkerBlue;
             nameLabel.TextAlignment = UITextAlignment.Center;
             nameLabel.Lines = 1;
             nameLabel.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -196,7 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             nameSubLabel = new UILabel();
             nameSubLabel.Font = Theme.DefaultFont.WithRelativeSize(-2f);
-            nameSubLabel.TextColor = Theme.LightGray;
+            nameSubLabel.TextColor = Theme.DarkerBlue;
             nameSubLabel.TextAlignment = UITextAlignment.Center;
             nameSubLabel.Lines = 1;
             nameSubLabel.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -222,7 +177,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button1.Enabled = false;
             button1.Alpha = 0f;
             button1.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            button1.TintColor = Theme.LightGray;
+            button1.TintColor = Theme.DarkerBlue;
             button1.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button1);
             buttonsView.AddConstraints(new[]
@@ -238,7 +193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button2.Enabled = false;
             button2.Alpha = 0f;
             button2.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_mobile.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            button2.TintColor = Theme.LightGray;
+            button2.TintColor = Theme.DarkerBlue;
             button2.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button2);
             buttonsView.AddConstraints(new[]
@@ -254,7 +209,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button3.Enabled = false;
             button3.Alpha = 0f;
             button3.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_sms.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            button3.TintColor = Theme.LightGray;
+            button3.TintColor = Theme.DarkerBlue;
             button3.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button3);
             buttonsView.AddConstraints(new[]
@@ -270,7 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button4.Enabled = false;
             button4.Alpha = 0f;
             button4.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            button4.TintColor = Theme.LightGray;
+            button4.TintColor = Theme.DarkerBlue;
             button4.TranslatesAutoresizingMaskIntoConstraints = false;
             buttonsView.AddSubview(button4);
             buttonsView.AddConstraints(new[]
@@ -283,14 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(button4, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
             });
 
-
-            assignCategoryButton = new UIBarButtonItem();
-            assignCategoryButton.Image = UIImage.FromBundle(Path.Combine("icons", "flag.png"));
-            assignCategoryButton.Enabled = false;
-
-            fileToButton = new UIBarButtonItem();
-            fileToButton.Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png"));
-            fileToButton.Enabled = false;
+            TableView.TableHeaderView = headerView;
 
             commentsButton = new UIButton(UIButtonType.System)
             {
@@ -298,40 +246,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Enabled = false
             };
             commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
-            {
-                BadgeBackgroundColor = Theme.Brown,
-                Enabled = false
-            };
 
-            actionsLinksButton = new UIBarButtonItem();
-            actionsLinksButton.Image = UIImage.FromBundle(Path.Combine("icons", "actions.png"));
-            actionsLinksButton.Enabled = false;
-
-            toolbar = new UIToolbar();
-            toolbar.BarStyle = UIBarStyle.Default;
-            toolbar.Items = new[]
+            ToolbarItems = new[]
             {
-                assignCategoryButton,
+                assignCategoryButton = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "flag.png")),
+                    Enabled = false
+                },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                fileToButton,
+                fileToButton = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
+                    Enabled = false
+                },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                commentsBadgeButton,
+                commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
+                {
+                    BadgeBackgroundColor = Theme.DarkerBlue,
+                    Enabled = false
+                },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                actionsLinksButton
+                actionsLinksButton = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "actions.png")),
+                    Enabled = false
+                }
             };
-            toolbar.BarTintColor = Theme.Gray;
-            toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
-            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            View.AddSubview(toolbar);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
-            });
         }
 
         void InitializeNavigationBar()
@@ -410,7 +351,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (commentsButton != null)
                 commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
-            
+
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
 
@@ -433,45 +374,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void UnsubscribeFromMessages()
         {
-            if (contactChangedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<ContactChangedMessage>(contactChangedToken);
-                contactChangedToken = null;
-            }
-
-            if (childrenAddedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<ChildrenContactAddedMessage>(childrenAddedToken);
-                childrenAddedToken = null;
-            }
+            contactChangedToken?.Dispose();
+            childrenAddedToken?.Dispose();
         }
 
-        void HandleContactChangedMessage(ContactChangedMessage obj)
-        {
-            RefreshAllOnAppear();
-        }
+        void HandleContactChangedMessage(ContactChangedMessage obj) => RefreshAllOnAppear();
 
-        void HandleChildrenAddedMessage(ChildrenContactAddedMessage obj)
-        {
-            RefreshAllOnAppear();
-        }
+        void HandleChildrenAddedMessage(ChildrenContactAddedMessage obj) => RefreshAllOnAppear();
 
         void RefreshAllOnAppear()
         {
-            var ds = tableView?.Source as DataSource;
+            var ds = TableView?.Source as DataSource;
             ds?.Clear();
             contactId = contactPreview.Id;
             contactPreview = null;
 
             if (SplitViewController == null)
-            {
                 refreshDataOnAppear = true;
-            }
             else
-            {
                 RefreshData();
-            }
-
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -479,13 +400,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (gr.State != UIGestureRecognizerState.Began)
                 return;
 
-            var location = gr.LocationInView(tableView);
-            var indexPath = tableView?.IndexPathForRowAtPoint(location);
-            var cell = tableView?.CellAt(indexPath);
-            var dataSource = tableView?.Source as DataSource;
+            var location = gr.LocationInView(TableView);
+            var indexPath = TableView?.IndexPathForRowAtPoint(location);
+
+            if (indexPath == null)
+                return;
+
+            var cell = TableView?.CellAt(indexPath);
+            var dataSource = TableView?.Source as DataSource;
             var row = dataSource?.RowAt(indexPath);
             if (cell != null && row != null)
-                row.OnLongClicked(this, tableView, cell, indexPath);
+                row.OnLongClicked(this, TableView, cell, indexPath);
         }
 
         void Button1_TouchUpInside(object sender, EventArgs e)
@@ -565,16 +490,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var createAllowed = ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed;
 
             if (createAllowed && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
-            {
                 listString.Add(Localization.GetString("add_person"));
-            }
             if (createAllowed && contactPreview.Type == ContactType.Company)
-            {
                 listString.Add(Localization.GetString("add_department"));
-            }
 
             var index = await Dialogs.ShowListDialogAsync(this, null, listString.ToArray(), editButtonItem);
-
             if (index < 0)
                 return;
 
@@ -623,10 +543,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var vc = new CopyToWorktrayViewController
                     {
-                        BusinessEntities = new List<IBusinessEntity>
-                        {
-                            contact
-                        }
+                        BusinessEntities = new List<IBusinessEntity> { contact }
                     };
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
@@ -671,10 +588,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
         {
-            var vc = new CommentsListViewController
-            {
-                Entity = contact
-            };
+            var vc = new CommentsListViewController { Entity = contact };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -687,7 +601,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, actionsLinksButton);
-
             if (result < 0)
                 return;
 
@@ -706,10 +619,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
+        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
         {
@@ -733,10 +643,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Integration.CallOrText(this, tv, cell, ca.Address);
         }
 
-        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
-        {
-            Integration.ShowOnMap(this, tv, cell, pa);
-        }
+        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
@@ -815,7 +722,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info("Loading contact...");
 
-            var ds = (DataSource)tableView?.Source;
+            var ds = (DataSource)TableView?.Source;
 
             try
             {
@@ -969,7 +876,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (actionsLinksButton != null)
                 actionsLinksButton.Enabled = false;
 
-            var ds = tableView?.Source as DataSource;
+            var ds = TableView?.Source as DataSource;
             ds?.Clear();
         }
 
@@ -1031,17 +938,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to delete contact [contactId={contact.Id}]");
 
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity>
-                {
-                    contact
-                });
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { contact });
 
                 CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
                     ObjectType.Contact,
-                    new List<int>
-                    {
-                        contact.Id
-                    }));
+                    new List<int> { contact.Id }));
 
                 dismissAction();
 
@@ -1123,6 +1024,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (tableView?.IndexPathForSelectedRow != null)
                     tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+            }
+
+            public override void Scrolled(UIScrollView scrollView) => ScrollChanged(scrollView);
+            public override void DraggingStarted(UIScrollView scrollView) => ScrollChanged(scrollView);
+            public override void DraggingEnded(UIScrollView scrollView, bool willDecelerate) => ScrollChanged(scrollView);
+            override public void DecelerationEnded(UIScrollView scrollView) => ScrollChanged(scrollView);
+
+            void ScrollChanged(UIScrollView scrollView)
+            {
+                var offset = scrollView.ContentOffset.Y;
+                var inset = -scrollView.SafeAreaInsets.Top;
+                var show = offset > inset + 30;
+
+                viewController.UpdateTitle(show);
             }
 
             public void StartRefresh()
@@ -1737,6 +1652,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             #endregion
+        }
+
+        private void UpdateTitle(bool show)
+        {
+            var newValue = show ? nameLabel.Text : null;
+
+            if (NavigationItem.Title != newValue)
+                NavigationItem.Title = newValue;
         }
 
         #region State restoration
