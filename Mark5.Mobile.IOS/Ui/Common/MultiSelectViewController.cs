@@ -10,7 +10,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
     public class MultiSelectViewController<T> : AbstractTableViewController
     {
         readonly TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
-        public Task<T[]> Task => tcs.Task;
+        public Task<T[]> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;

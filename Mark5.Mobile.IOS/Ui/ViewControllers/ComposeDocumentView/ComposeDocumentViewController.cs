@@ -848,7 +848,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var vc = new PhonebookContactsListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var pa = await vc.Task;
+            var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 
@@ -860,7 +860,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var vc = new PickerShortcodesFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var sc = await vc.Task;
+            var sc = await vc.Result;
             if (sc != null && sc.Addresses != null && sc.Addresses.Any())
             {
                 var addresses = sc.Addresses;
@@ -877,7 +877,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var pa = await vc.Task;
+            var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 
@@ -889,7 +889,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var pa = await vc.Task;
+            var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 
@@ -963,7 +963,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
 
-            var templatePreview = await tp.Task;
+            var templatePreview = await tp.Result;
 
             DismissViewController(true, null);
 

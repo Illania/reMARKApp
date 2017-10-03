@@ -202,7 +202,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new PickerParentContactFoldersListView(ContactPreview.Type);
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
 
-            var selectedParent = await vc.Task;
+            var selectedParent = await vc.Result;
             if (selectedParent != null)
             {
                 ParentContactPreview = selectedParent;
@@ -217,11 +217,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ResponsibleUsersSelectionController
             {
-                PreselectedSystemUsersId = Contact.ResponsibleUserIds,
+                PreselectedSystemUserIds = Contact.ResponsibleUserIds,
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
 
-            var selectedUsers = await vc.Task;
+            var selectedUsers = await vc.Result;
             if (selectedUsers != null)
             {
                 Contact.ResponsibleUsers.Clear();

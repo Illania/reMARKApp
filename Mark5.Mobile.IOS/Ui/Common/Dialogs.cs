@@ -95,7 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var msvc = new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer);
             vc.PresentViewController(new NavigationController(msvc, UIModalPresentationStyle.FormSheet), true, null);
-            return msvc.Task;
+            return msvc.Result;
         }
 
         static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string message, string[] listStrings)

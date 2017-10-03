@@ -10,7 +10,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     public class PickerParentContactFoldersListView : AbstractFoldersListViewController
     {
         readonly TaskCompletionSource<ContactPreview> tcs = new TaskCompletionSource<ContactPreview>();
-        public Task<ContactPreview> Task => tcs.Task;
+        public Task<ContactPreview> Result => tcs.Task;
 
         readonly ContactType childrenType;
         
@@ -37,7 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             };
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }
@@ -99,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var vc = new PickerParentContactFoldersListView(folder, childrenType);
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }

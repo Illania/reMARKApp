@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class SelectCategoriesListViewController : AbstractTableViewController
     {
         readonly TaskCompletionSource<List<int>> tcs = new TaskCompletionSource<List<int>>();
-        public Task<List<int>> Task => tcs.Task;
+        public Task<List<int>> Result => tcs.Task;
         
         public ModuleType Module { get; set; }
         public List<int> PreselectedItemIds { get; set; }

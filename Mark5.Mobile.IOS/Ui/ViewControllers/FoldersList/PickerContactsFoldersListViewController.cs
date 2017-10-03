@@ -10,7 +10,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     public class PickerContactsFoldersListViewController : AbstractFoldersListViewController
     {
         readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
-        public Task<Recipient> Task => tcs.Task;
+        public Task<Recipient> Result => tcs.Task;
 
         UIBarButtonItem cancelModeItem;
 
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             };
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var vc = new PickerContactsFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }

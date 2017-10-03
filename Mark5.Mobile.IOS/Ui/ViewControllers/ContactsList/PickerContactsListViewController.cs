@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
     public class PickerContactsListViewController : AbstractContactsListViewController
     {
         readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
-        public Task<Recipient> Task => tcs.Task;
+        public Task<Recipient> Result => tcs.Task;
 
         public PickerContactsListViewController()
             : base(true)

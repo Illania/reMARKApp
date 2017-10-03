@@ -10,7 +10,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
     public class PickerShortcodesFoldersListViewController : AbstractFoldersListViewController
     {
         readonly TaskCompletionSource<Shortcode> tcs = new TaskCompletionSource<Shortcode>();
-        public Task<Shortcode> Task => tcs.Task;
+        public Task<Shortcode> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
 
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             };
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }
@@ -96,7 +96,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var vc = new PickerShortcodesFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }

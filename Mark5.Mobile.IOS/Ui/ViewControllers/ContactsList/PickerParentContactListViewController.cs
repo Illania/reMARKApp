@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
     public class PickerParentContactListViewController : AbstractContactsListViewController
     {
         readonly TaskCompletionSource<ContactPreview> tcs = new TaskCompletionSource<ContactPreview>();
-        public Task<ContactPreview> Task => tcs.Task;
+        public Task<ContactPreview> Result => tcs.Task;
 
         public ContactType ChildrenType { get; set; }
 

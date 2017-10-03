@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -11,20 +10,19 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
+using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ResponsibleUsersSelectionController : AbstractViewController
+    public class ResponsibleUsersSelectionController : AbstractTableViewController
     {
-        public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
-        public Task<List<SystemUser>> Task => tcs.Task;
+        public List<int> PreselectedSystemUserIds { get; set; }
 
-        public List<int> PreselectedSystemUsersId { get; set; }
+        readonly public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
+        public Task<List<SystemUser>> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
-
-        UITableView tableView;
 
         public override void LoadView()
         {
@@ -38,14 +36,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            ExtendedLayoutIncludesOpaqueBars = true;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
             InitializeHandlers();
         }
 
@@ -55,8 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource)tableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
         }
 
@@ -71,15 +69,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            cancelItem = null;
+            doneItem = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         void InitializeNavigationBar()
         {
+            NavigationItem.Title = Localization.GetString("select_users");
+
             cancelItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             NavigationItem.SetLeftBarButtonItem(cancelItem, false);
 
@@ -89,27 +106,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_system_users"));
-            tableView.AllowsSelection = true;
-            tableView.AllowsMultipleSelection = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            NavigationItem.Title = Localization.GetString("select_users");
+            TableView.Source = new DataSource(this, TableView);
+            TableView.AllowsMultipleSelection = true;
         }
 
         void InitializeHandlers()
@@ -137,10 +135,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoneItem_Clicked(object sender, EventArgs e)
         {
-            var ds = (DataSource)tableView.Source;
-
-            var selectedUsers = ds.SelectedItems;
-
+            var selectedUsers = ((DataSource)TableView.Source).SelectedItems;
             tcs.SetResult(selectedUsers);
         }
 
@@ -152,8 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
                 usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
-                var ds = (DataSource)tableView.Source;
-                ds.SetItems(usersDepartments.Users, PreselectedSystemUsersId);
+                ((DataSource)TableView.Source).SetItems(usersDepartments.Users, PreselectedSystemUserIds);
             }
             catch (Exception ex)
             {
@@ -163,24 +157,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
             public bool Empty => systemUsersInView.Count < 1;
-
             public List<SystemUser> SelectedItems { get; set; } = new List<SystemUser>();
 
-            ResponsibleUsersSelectionController viewController;
-            UITableView tableView;
-            string emptyText;
+            readonly WeakReference<ResponsibleUsersSelectionController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
             List<SystemUser> systemUsersInView = new List<SystemUser>();
 
-            public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView, string emptyText)
+            public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -191,7 +182,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (systemUsersInView.Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    emptyCell.Initialize(Localization.GetString("no_system_users"));
                     return emptyCell;
                 }
 
@@ -257,7 +248,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 SelectedItems.AddRange(systemUsersInView.Where(s => preselectedSystemUsersId.Contains(s.Id)));
 
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
@@ -265,16 +256,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = true;
 
                 systemUsersInView.Clear();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                systemUsersInView = null;
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }
     }

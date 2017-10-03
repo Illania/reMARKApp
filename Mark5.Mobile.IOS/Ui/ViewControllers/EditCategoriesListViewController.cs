@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
 
         readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        public Task<bool> Task => tcs.Task;
+        public Task<bool> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;

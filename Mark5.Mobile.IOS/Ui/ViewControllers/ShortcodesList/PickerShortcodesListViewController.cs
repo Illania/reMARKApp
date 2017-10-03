@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
     public class PickerShortcodesListViewController : AbstractShortcodesListViewController
     {
         readonly TaskCompletionSource<Shortcode> tcs = new TaskCompletionSource<Shortcode>();
-        public Task<Shortcode> Task => tcs.Task;
+        public Task<Shortcode> Result => tcs.Task;
 
         public PickerShortcodesListViewController()
             : base(true)

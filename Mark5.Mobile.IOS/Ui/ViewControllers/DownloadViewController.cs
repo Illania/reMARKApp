@@ -51,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
 
         readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        public Task Task => tcs.Task;
+        public Task Result => tcs.Task;
 
         UIBarButtonItem doneItem;
 

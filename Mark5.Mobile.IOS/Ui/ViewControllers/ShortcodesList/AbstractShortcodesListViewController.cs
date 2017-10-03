@@ -324,7 +324,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 {
                     var vc = new DownloadViewController { Folder = Folder };
                     NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
-                    await vc.Task;
+                    await vc.Result;
                 }
                 if (result == -1)
                 {

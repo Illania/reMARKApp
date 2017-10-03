@@ -9,6 +9,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public partial class SuggestionsTableViewCell : UITableViewCell
     {
+        public const float Height = 50f;
+
         public static readonly UINib Nib = UINib.FromName("SuggestionsTableViewCell", NSBundle.MainBundle);
         public static readonly NSString Key = new NSString("SuggestionsTableViewCell");
 

@@ -144,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             PresentViewController(new NavigationController(vc), true, null);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
 
             if (result)
                 RefreshData();

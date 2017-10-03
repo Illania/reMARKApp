@@ -1144,7 +1144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     };
                     parentViewControllerWeakReference.Unwrap()?.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
 
-                    var result = await vc.Task;
+                    var result = await vc.Result;
                     if (result == null)
                         return;
 

@@ -18,8 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class TemplatesListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
-        public Task<TemplatePreview> Task => tcs.Task;
         readonly TaskCompletionSource<TemplatePreview> tcs = new TaskCompletionSource<TemplatePreview>();
+        public Task<TemplatePreview> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
 
