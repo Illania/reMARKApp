@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
+using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -280,15 +281,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var ra = phonebookContactsInView[indexPath.Section][indexPath.Row];
+                var pbc = phonebookContactsInView[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
-                cell.Initialize(ra);
-
-                return cell;
+                if (string.IsNullOrWhiteSpace(pbc.Name))
+                {
+                    var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
+                    cell.TextLabel.Text = pbc.Address;
+                    return cell;
+                }
+                else
+                {
+                    var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
+                    cell.TextLabel.Text = pbc.Name;
+                    cell.DetailTextLabel.Text = pbc.Address;
+                    return cell;
+                }
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => SuggestionsTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {

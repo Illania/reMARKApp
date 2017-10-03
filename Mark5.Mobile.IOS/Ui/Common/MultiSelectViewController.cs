@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
@@ -112,14 +113,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
         void CancelItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
-
             DismissViewController(true, null);
         }
 
         void DoneItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(selectedItems.ToArray());
-
             DismissViewController(true, null);
         }
 
@@ -130,14 +129,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell("default") ?? new UITableViewCell(UITableViewCellStyle.Default, "default");
+            var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell", UITableViewCellSelectionStyle.None);
 
             var d = data[indexPath.Row];
-
             cell.TextLabel.Text = description(d);
-            cell.TextLabel.Font = Theme.DefaultFont;
             cell.Accessory = selectedItems.Contains(d) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-            cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
             return cell;
         }

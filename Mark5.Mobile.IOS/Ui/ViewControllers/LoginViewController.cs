@@ -681,18 +681,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void OnKeyboardDidChangeFrameNotification(object sender, UIKeyboardEventArgs e)
         {
             if (IsViewLoaded)
-                SlideViewOverKeyboard(e.Notification, true);
+                SlideViewOverKeyboard(e, true);
         }
 
         #endregion
 
         #region Helper methods
 
-        void SlideViewOverKeyboard(NSNotification notification, bool up)
+        void SlideViewOverKeyboard(UIKeyboardEventArgs e, bool up)
         {
             View.LayoutIfNeeded();
 
-            var remainingScreenHeight = View.Frame.Height - KeyboardUtilities.KeyboardHeightFromNotification(notification);
+            var remainingScreenHeight = View.Frame.Height - e.FrameEnd.Height;
             var formHeight = loginButton.Frame.GetMaxY() - usernameTextField.Frame.GetMinY();
             var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.5f;
             var requiredMovement = usernameTextField.Frame.GetMinY() - distanceFromTopOfTheScreen;

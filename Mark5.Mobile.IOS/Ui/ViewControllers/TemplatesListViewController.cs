@@ -11,7 +11,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Utilities.Extensions;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -249,7 +249,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty =>!templatesInView.SelectMany(v => v).Any();
+            public bool Empty => !templatesInView.SelectMany(v => v).Any();
             public IEnumerable<TemplatePreview> Items => templatesInView.SelectMany(i => i);
 
             readonly WeakReference<TemplatesListViewController> viewControllerWeakReference;
@@ -290,10 +290,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var tp = templatesInView[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("default") ?? new UITableViewCell(UITableViewCellStyle.Default, "default");
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell");
                 cell.TextLabel.Text = tp.Name;
-                cell.TextLabel.Font = Theme.DefaultFont;
-
                 return cell;
             }
 
@@ -391,15 +389,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var tp = templatesInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell");
                 cell.TextLabel.Text = tp.Name;
-                cell.TextLabel.Font = Theme.DefaultFont;
                 cell.DetailTextLabel.Text = tp.Private ? Localization.GetString("private") : Localization.GetString("public");
-                cell.DetailTextLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
 
                 return cell;
             }
-            
+
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
 
             public override nint RowsInSection(UITableView tableview, nint section)

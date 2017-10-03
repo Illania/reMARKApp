@@ -100,7 +100,6 @@
 		<Compile Include="Ui\Common\IPrimaryViewController.cs" />
 		<Compile Include="Ui\Common\ISecondaryViewController.cs" />
 		<Compile Include="Ui\Common\ITaggedViewController.cs" />
-		<Compile Include="Ui\Common\KeyboardUtilities.cs" />
 		<Compile Include="Ui\Common\Localization.cs" />
 		<Compile Include="Ui\Common\MultiSelectViewController.cs" />
 		<Compile Include="Ui\Common\NavigationController.cs" />
@@ -149,8 +148,6 @@
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.designer.cs" />
 		<Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
@@ -287,6 +284,7 @@
 		<Compile Include="Ui\Common\DarkNavigationController.cs" />
 		<Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
 		<Compile Include="Ui\Common\AbstractMultiViewController.cs" />
+		<Compile Include="Utilities\UITableViewCellUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -393,7 +391,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\PhysicalAddressTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 	</ItemGroup>

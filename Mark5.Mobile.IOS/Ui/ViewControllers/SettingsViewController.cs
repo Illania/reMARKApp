@@ -98,12 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 vc.SettingsReader = SettingsReader;
                 vc.SettingsStore = SettingsStore;
                 vc.View.TintColor = View.TintColor;
-
-                // Compared to original code, assignment of currentChildViewController
-                // was skipped, because it is not in the binding and is not very important
-
                 NavigationController.PushViewController(vc, true);
-
                 return;
             }
 
@@ -115,10 +110,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == LocalTemplateKey)
             {
-                var cell = (EditTextViewCell) tableView.DequeueReusableCell(EditTextViewCell.Key);
+                var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
                 if (cell == null)
                 {
-                    cell = (EditTextViewCell) EditTextViewCell.Nib.Instantiate(null, null)[0];
+                    cell = (EditTextViewCell)EditTextViewCell.Nib.Instantiate(null, null)[0];
                     cell.ContentChanged += (sender, e) => PlatformConfig.Preferences.LocalTemplate = cell.Content;
                 }
                 cell.Content = PlatformConfig.Preferences.LocalTemplate;
@@ -128,48 +123,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UsernameKey)
             {
-                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = Managers.ActiveConnectionInfo?.Username;
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
-
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
 
             if (specifier.Key == ServerAddressKey)
             {
-                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
-
                 var ci = Managers.ActiveConnectionInfo;
 
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
-
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
 
             if (specifier.Key == SslEnabledKey)
             {
-                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
-
                 var sslOff = Managers.ActiveConnectionInfo?.SslMode != SslMode.Off;
 
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = sslOff ? Localization.GetString("enabled") : Localization.GetString("disabled");
-                cell.DetailTextLabel.TextColor = sslOff ? UIColor.Gray : Theme.Brown;
-
+                cell.DetailTextLabel.TextColor = sslOff ? Theme.DarkGray : Theme.Brown;
                 return cell;
             }
 
             if (specifier.Key == VersionKey)
             {
-                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = string.Format("{0} ({1})", NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"], NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]);
-
+                cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
 
@@ -340,10 +328,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
                     ? null
-                    : new[]
-                    {
-                        LocalTemplateKey
-                    },
+                    : new[] { LocalTemplateKey },
                 false);
         }
 
@@ -352,12 +337,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = base.GetCell(tableView, indexPath);
-
-                if (cell.TextLabel != null)
-                    cell.TextLabel.Font = Theme.DefaultFont;
-                if (cell.DetailTextLabel != null)
-                    cell.DetailTextLabel.Font = Theme.DefaultLightFont;
-
+                cell.TextLabel.Font = Theme.DefaultFont;
+                cell.DetailTextLabel.Font = Theme.DefaultLightFont;
                 return cell;
             }
         }

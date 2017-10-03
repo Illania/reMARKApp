@@ -107,8 +107,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsTableView = new UITableView
             {
                 BackgroundColor = Theme.Gray,
-                RowHeight = UITableView.AutomaticDimension,
-                EstimatedRowHeight = 44f,
                 TableFooterView = new UIView(CGRect.Empty),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -285,12 +283,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return emptyCell;
                 }
 
-                var printableSuggestion = Suggestions[indexPath.Row];
+                var s = Suggestions[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
-                cell.Initialize(printableSuggestion);
-
-                return cell;
+                if (string.IsNullOrWhiteSpace(s.Name))
+                {
+                    var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
+                    cell.TextLabel.Text = s.Address;
+                    return cell;
+                }
+                else
+                {
+                    var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
+                    cell.TextLabel.Text = s.Name;
+                    cell.DetailTextLabel.Text = s.Address;
+                    return cell;
+                }
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)

@@ -115,13 +115,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == AppVersionKey)
             {
-                var cell = tableView.DequeueReusableCell("value1") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1");
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
-
                 return cell;
             }
 

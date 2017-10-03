@@ -9,7 +9,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Utilities.Extensions;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -241,11 +241,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (indexPath.Section == 0)
                 {
-                    var ownCell = tableView.DequeueReusableCell("default") ?? new UITableViewCell(UITableViewCellStyle.Default, "default");
+                    var ownCell = tableView.DequeueReusableCell("ownCell") ?? UITableViewCellUtilities.CreateDefault("ownCell", UITableViewCellSelectionStyle.None);
                     ownCell.TextLabel.Text = Localization.GetString("own_worktray");
-                    ownCell.TextLabel.Font = Theme.DefaultFont;
-                    ownCell.SelectionStyle = UITableViewCellSelectionStyle.None;
-
                     ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
                         ? UITableViewCellAccessory.Checkmark
                         : UITableViewCellAccessory.None;
@@ -265,13 +262,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var su = systemUsersInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
-                cell.TextLabel.Font = Theme.DefaultFont;
                 cell.DetailTextLabel.Text = su.Username;
-                cell.DetailTextLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-
                 cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
                     ? UITableViewCellAccessory.Checkmark
                     : UITableViewCellAccessory.None;

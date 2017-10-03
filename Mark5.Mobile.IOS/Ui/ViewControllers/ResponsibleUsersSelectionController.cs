@@ -6,11 +6,11 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Utilities.Extensions;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -166,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            List<SystemUser> systemUsersInView = new List<SystemUser>();
+            readonly List<SystemUser> systemUsersInView = new List<SystemUser>();
 
             public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView)
             {
@@ -188,13 +188,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var su = systemUsersInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
-                cell.TextLabel.Font = Theme.DefaultFont;
                 cell.DetailTextLabel.Text = su.Username;
-                cell.DetailTextLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
                 cell.Accessory = SelectedItems.Contains(su) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
                 return cell;
             }
@@ -220,11 +217,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return systemUsersInView.Count;
             }
 
-            public override nint NumberOfSections(UITableView tableView)
-            {
-                return 1;
-            }
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
@@ -246,6 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 systemUsersInView.Clear();
                 systemUsersInView.AddRange(systemUsers.OrderBy(s => s.Username));
 
+                SelectedItems.Clear();
                 SelectedItems.AddRange(systemUsersInView.Where(s => preselectedSystemUsersId.Contains(s.Id)));
 
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);

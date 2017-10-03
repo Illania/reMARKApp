@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -172,13 +173,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var ra = recentAddressesInView[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
-                cell.Initialize(ra);
-
-                return cell;
+                if (string.IsNullOrWhiteSpace(ra.Name))
+                {
+                    var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
+                    cell.TextLabel.Text = ra.Address;
+                    return cell;
+                }
+                else
+                {
+                    var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
+                    cell.TextLabel.Text = ra.Name;
+                    cell.DetailTextLabel.Text = ra.Address;
+                    return cell;
+                }
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => SuggestionsTableViewCell.Height;
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
