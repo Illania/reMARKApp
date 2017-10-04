@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 {
@@ -6,8 +9,18 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
     public abstract class AnalyticsEvent
     {
-        public abstract string Name { get; }
+        public virtual string Name { get; protected set; }
         public List<AnalyticsParameter> Parameters { get; }
+
+        protected string GetModuleString(ModuleType module)
+        {
+            return $"_{module.ToString().ToLower()}";
+        }
+
+        protected string GetQuantityString(int quantity)
+        {
+            return $"_{(quantity == 1 ? "single" : "multiple")}";
+        }
     }
 
     public abstract class AnalyticsParameter
@@ -59,236 +72,147 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         Another
     }
 
-    public enum SwitchDocumentType
+    public enum Quantity
     {
-        Swype,
-        Arrows,
+        Single,
+        Multiple,
     }
 
     #endregion
 
-    #region General Events
+    #region Actions Events
 
-    public class OpenNotificationListEvent : AnalyticsEvent
+    public class SetFavoriteEvent : AnalyticsEvent
     {
-        public override string Name => "open_notification_list";
-    }
-
-    public class OpenSubfolderEvent : AnalyticsEvent
-    {
-        public override string Name => "open_subfolder";
-
-        readonly ModuleType module;
-        readonly FolderType type;
-
-        public OpenSubfolderEvent(ModuleType module, FolderType type)
+        public SetFavoriteEvent(ModuleType module, int quantity)
         {
-            this.module = module;
-            this.type = type;
+            Name = "set_favorite" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
-    public class AddToFavoriteEvent : AnalyticsEvent
+    public class SetSyncEvent : AnalyticsEvent
     {
-        public override string Name => "add_to_favorite";
-
-        readonly ModuleType module;
-        readonly int quantity;
-
-        public AddToFavoriteEvent(ModuleType module, int quantity)
+        public SetSyncEvent(ModuleType module, int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
+            Name = "set_sync" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
-    public class AddToSyncEvent : AnalyticsEvent
+    public class SetNotifyEvent : AnalyticsEvent
     {
-        public override string Name => "add_to_sync";
-
-        readonly ModuleType module;
-        readonly int quantity;
-
-        public AddToSyncEvent(ModuleType module, int quantity)
+        public SetNotifyEvent(ModuleType module, int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
+            Name = "set_notify" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
-    public class AddToNotifyEvent : AnalyticsEvent
+    public class SetReadStatusEvent : AnalyticsEvent
     {
-        public override string Name => "add_to_notify";
-
-        readonly ModuleType module;
-        readonly int quantity;
-
-        public AddToNotifyEvent(ModuleType module, int quantity)
+        public SetReadStatusEvent(int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
+            Name = "set_read_status" + GetQuantityString(quantity);
         }
     }
-
-    public class RemoveFromFavoriteEvent : AnalyticsEvent
-    {
-        public override string Name => "remove_from_favorite";
-
-        readonly ModuleType module;
-        readonly int quantity;
-
-        public RemoveFromFavoriteEvent(ModuleType module, int quantity)
-        {
-            this.module = module;
-            this.quantity = quantity;
-        }
-    }
-
-    public class RemoveFromSyncEvent : AnalyticsEvent
-    {
-        public override string Name => "remove_from_sync";
-
-        readonly ModuleType module;
-        readonly int quantity;
-
-        public RemoveFromSyncEvent(ModuleType module, int quantity)
-        {
-            this.module = module;
-            this.quantity = quantity;
-        }
-    }
-
-    public class RemoveFromNotifyEvent : AnalyticsEvent
-    {
-        public override string Name => "remove_from_notify";
-
-        readonly ModuleType module;
-        readonly int quantity;
-
-        public RemoveFromNotifyEvent(ModuleType module, int quantity)
-        {
-            this.module = module;
-            this.quantity = quantity;
-        }
-    }
-
-    public class ExpandSubfolderEvent : AnalyticsEvent
-    {
-        public override string Name => "expand_subfolder";
-
-        readonly ModuleType module;
-
-        public ExpandSubfolderEvent(ModuleType module)
-        {
-            this.module = module;
-        }
-    }
-
-    public class PullToRefreshEvent : AnalyticsEvent
-    {
-        public override string Name => "pull_to_refresh";
-
-        readonly string viewName;
-
-        public PullToRefreshEvent(string viewName)
-        {
-            this.viewName = viewName;
-        }
-    }
-
-    public class FilteringEvent : AnalyticsEvent
-    {
-        public override string Name => "filtering";
-
-        readonly string viewName;
-
-        public FilteringEvent(string viewName)
-        {
-            this.viewName = viewName;
-        }
-    }
-
-    //TODO How do we deal with the search fields?
 
     public class CopyToWorktrayEvent : AnalyticsEvent
     {
-        public override string Name => "copy_to_worktray";
-
-        readonly ModuleType module;
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public CopyToWorktrayEvent(ModuleType module, int quantity, ActionOrigin origin)
+        public CopyToWorktrayEvent(ModuleType module, int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
-            this.origin = origin;
+            Name = "copy_to_worktray" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
     public class CopyToFolderEvent : AnalyticsEvent
     {
-        public override string Name => "copy_to_folder";
-
-        readonly ModuleType module;
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public CopyToFolderEvent(ModuleType module, int quantity, ActionOrigin origin)
+        public CopyToFolderEvent(ModuleType module, int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
-            this.origin = origin;
+            Name = "copy_to_folder" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
     public class DeleteEvent : AnalyticsEvent
     {
-        public override string Name => "delete";
-
-        readonly ModuleType module;
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public DeleteEvent(ModuleType module, int quantity, ActionOrigin origin)
+        public DeleteEvent(ModuleType module, int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
-            this.origin = origin;
+            Name = "delete" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
     public class DeleteFromFolderEvent : AnalyticsEvent
     {
-        public override string Name => "delete_from_folder";
-
-        readonly ModuleType module;
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public DeleteFromFolderEvent(ModuleType module, int quantity, ActionOrigin origin)
+        public DeleteFromFolderEvent(ModuleType module, int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
-            this.origin = origin;
+            Name = "delete_from_folder" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
-    public class EditCategoriesEvent : AnalyticsEvent
+    public class SetPriorityEvent : AnalyticsEvent
     {
-        public override string Name => "edit_categories";
-
-        readonly ModuleType module;
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public EditCategoriesEvent(ModuleType module, int quantity, ActionOrigin origin)
+        public SetPriorityEvent(int quantity)
         {
-            this.module = module;
-            this.quantity = quantity;
-            this.origin = origin;
+            Name = "set_priority" + GetQuantityString(quantity);
         }
     }
+
+    public class SetCategories : AnalyticsEvent
+    {
+        public SetCategories(ModuleType module)
+        {
+            Name = "set_priority" + GetModuleString(module);
+        }
+    }
+
+    public class ReplyEvent : AnalyticsEvent
+    {
+        public override string Name => "reply";
+    }
+
+    public class ReplyAllEvent : AnalyticsEvent
+    {
+        public override string Name => "reply_all";
+    }
+
+    public class ForwardEvent : AnalyticsEvent
+    {
+        public override string Name => "forward";
+    }
+
+    public class CopyToNewEvent : AnalyticsEvent
+    {
+        public CopyToNewEvent(CopyToNewOption option)
+        {
+            Name = "copy_to_new_" + option.ToString(); //TODO check
+        }
+    }
+
+
+    public class AddCommentEvent : AnalyticsEvent
+    {
+        public AddCommentEvent(ModuleType module)
+        {
+            Name = "add_comment" + GetModuleString(module);
+        }
+    }
+
+    public class RemoveCommentEvent : AnalyticsEvent
+    {
+        public RemoveCommentEvent(ModuleType module)
+        {
+            Name = "remove_comment" + GetModuleString(module);
+        }
+    }
+
+    public class EditCommentEvent : AnalyticsEvent
+    {
+        public EditCommentEvent(ModuleType module)
+        {
+            Name = "edit_comment" + GetModuleString(module);
+        }
+    }
+
+    #endregion
+
+    #region View Opening events
 
     public class OpenLinksEvent : AnalyticsEvent
     {
@@ -325,88 +249,7 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
             this.module = module;
         }
     }
-
-    public class AddCommentEvent : AnalyticsEvent
-    {
-        public override string Name => "add_comment";
-
-        readonly ModuleType module;
-
-        public AddCommentEvent(ModuleType module)
-        {
-            this.module = module;
-        }
-    }
-
-    public class RemoveCommentEvent : AnalyticsEvent
-    {
-        public override string Name => "remove_comment";
-
-        readonly ModuleType module;
-
-        public RemoveCommentEvent(ModuleType module)
-        {
-            this.module = module;
-        }
-    }
-
-    public class EditCommentEvent : AnalyticsEvent
-    {
-        public override string Name => "edit_comment";
-
-        readonly ModuleType module;
-
-        public EditCommentEvent(ModuleType module)
-        {
-            this.module = module;
-        }
-    }
-
-    #endregion
-
     #region Documents
-
-    public class MarkDocumentAsReadEvent : AnalyticsEvent
-    {
-        public override string Name => "mark_as_read";
-
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public MarkDocumentAsReadEvent(int quantity, ActionOrigin origin)
-        {
-            this.quantity = quantity;
-            this.origin = origin;
-        }
-    }
-
-    public class MarkDocumentAsUnreadEvent : AnalyticsEvent
-    {
-        public override string Name => "mark_as_unread";
-
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public MarkDocumentAsUnreadEvent(int quantity, ActionOrigin origin)
-        {
-            this.quantity = quantity;
-            this.origin = origin;
-        }
-    }
-
-    public class SetDocumentPriorityEvent : AnalyticsEvent
-    {
-        public override string Name => "set_priority";
-
-        readonly int quantity;
-        readonly ActionOrigin origin;
-
-        public SetDocumentPriorityEvent(int quantity, ActionOrigin origin)
-        {
-            this.quantity = quantity;
-            this.origin = origin;
-        }
-    }
 
     public class AddAttachmentEvent : AnalyticsEvent
     {
@@ -432,54 +275,6 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         public ContactPickerEvent(ContactPickerChoice choice)
         {
             this.choice = choice;
-        }
-    }
-
-    public class ReplyEvent : AnalyticsEvent
-    {
-        public override string Name => "reply";
-
-        readonly ActionOrigin origin;
-
-        public ReplyEvent(ActionOrigin origin)
-        {
-            this.origin = origin;
-        }
-    }
-
-    public class ReplyAllEvent : AnalyticsEvent
-    {
-        public override string Name => "reply_all";
-
-        readonly ActionOrigin origin;
-
-        public ReplyAllEvent(ActionOrigin origin)
-        {
-            this.origin = origin;
-        }
-    }
-
-    public class ForwardEvent : AnalyticsEvent
-    {
-        public override string Name => "forward";
-
-        readonly ActionOrigin origin;
-
-        public ForwardEvent(ActionOrigin origin)
-        {
-            this.origin = origin;
-        }
-    }
-
-    public class CopyToNewEvent : AnalyticsEvent
-    {
-        public override string Name => "copy_to_new";
-
-        readonly CopyToNewOption option;
-
-        public CopyToNewEvent(CopyToNewOption option)
-        {
-            this.option = option;
         }
     }
 
@@ -524,6 +319,46 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
     #endregion
 
     #region Shortcodes
+
+    #endregion
+
+    #region Misc Events
+
+    public class ExpandSubfolderEvent : AnalyticsEvent
+    {
+        public override string Name => "expand_subfolder";
+
+        readonly ModuleType module;
+
+        public ExpandSubfolderEvent(ModuleType module)
+        {
+            this.module = module;
+        }
+    }
+
+    public class PullToRefreshEvent : AnalyticsEvent
+    {
+        public override string Name => "pull_to_refresh";
+
+        readonly string viewName;
+
+        public PullToRefreshEvent(string viewName)
+        {
+            this.viewName = viewName;
+        }
+    }
+
+    public class FilteringEvent : AnalyticsEvent
+    {
+        public override string Name => "filtering";
+
+        readonly string viewName;
+
+        public FilteringEvent(string viewName)
+        {
+            this.viewName = viewName;
+        }
+    }
 
     #endregion
 }
