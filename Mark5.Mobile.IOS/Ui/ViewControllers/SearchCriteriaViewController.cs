@@ -28,12 +28,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = false;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
-
             RestorationIdentifier = nameof(SearchCriteriaViewController);
             RestorationClass = Class;
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
         }
 
         protected override void Dispose(bool disposing)

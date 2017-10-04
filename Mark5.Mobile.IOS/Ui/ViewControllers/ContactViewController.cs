@@ -73,10 +73,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = false;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-
             RestorationIdentifier = nameof(ContactViewController);
             RestorationClass = Class;
         }
@@ -84,6 +80,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             InitializeNavigationBar();
             InitializeHandlers();
@@ -130,9 +130,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView);
+            TableView.BackgroundColor = Theme.White;
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed));
 
             headerView = new UIView(new CGRect(0f, 0f, 0f, 160f));
+            headerView.BackgroundColor = Theme.White;
 
             nameLabel = new UILabel();
             nameLabel.Font = Theme.DefaultFont.WithRelativeSize(6f);

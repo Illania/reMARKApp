@@ -117,18 +117,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             });
         }
 
-        public override void ViewDidLoad()
+        public override async void ViewWillAppear(bool animated)
         {
-            base.ViewDidLoad();
+            base.ViewWillAppear(animated);
 
             if (NavigationController != null)
                 NavigationController.NavigationBar.PrefersLargeTitles = false;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
-        }
-
-        public override async void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
 
             closeItem.Clicked += CloseItem_Clicked;
             resetItem.Clicked += ResetItem_Clicked;
