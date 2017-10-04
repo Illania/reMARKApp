@@ -179,10 +179,9 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
     {
         public CopyToNewEvent(CopyToNewOption option)
         {
-            Name = "copy_to_new_" + option.ToString(); //TODO check
+            Name = "copy_to_new_" + option.ToString(); //The only one for which we have capital letters
         }
     }
-
 
     public class AddCommentEvent : AnalyticsEvent
     {
