@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 {
@@ -14,7 +11,7 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
         protected string GetModuleString(ModuleType module)
         {
-            return $"_{module.ToString().ToLower()}";
+            return $"_{module.ToString().ToLowerInvariant()}";
         }
 
         protected string GetQuantityString(int quantity)
@@ -50,11 +47,12 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         }
     }
 
-    public enum ActionOrigin
+    public enum ContactFastActionChoice
     {
-        List,
-        EntityView,
-        Swype
+        Email,
+        Call,
+        Text,
+        Map
     }
 
     public enum ContactPickerChoice
@@ -72,10 +70,10 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         Another
     }
 
-    public enum Quantity
+    public enum AddAttachmentType
     {
-        Single,
-        Multiple,
+        Photo,
+        Local
     }
 
     #endregion
@@ -214,149 +212,315 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
     #region View Opening events
 
-    public class OpenLinksEvent : AnalyticsEvent
+    public class OpenDocumentEvent : AnalyticsEvent
     {
-        public override string Name => "open_links";
-
-        readonly ModuleType module;
-
-        public OpenLinksEvent(ModuleType module)
+        public OpenDocumentEvent(bool isExternal)
         {
-            this.module = module;
+            Name = "open_document" + $"{(isExternal ? "_is_external" : "")}";
         }
     }
 
-    public class OpenActionsEvent : AnalyticsEvent
+    public class OpenContactEvent : AnalyticsEvent
     {
-        public override string Name => "open_actions";
+        public override string Name => "open_contact";
+    }
 
-        readonly ModuleType module;
+    public class OpenShortcodeEvent : AnalyticsEvent
+    {
+        public override string Name => "open_shortcode";
+    }
 
-        public OpenActionsEvent(ModuleType module)
+    public class OpenLinksEvent : AnalyticsEvent
+    {
+        public OpenLinksEvent(ModuleType module)
         {
-            this.module = module;
+            Name = "open_links" + GetModuleString(module);
         }
     }
 
     public class OpenCommentsEvent : AnalyticsEvent
     {
-        public override string Name => "open_comments";
-
-        readonly ModuleType module;
-
         public OpenCommentsEvent(ModuleType module)
         {
-            this.module = module;
+            Name = "open_comments" + GetModuleString(module);
         }
     }
-    #region Documents
 
-    public class AddAttachmentEvent : AnalyticsEvent
+    public class OpenActionsEvent : AnalyticsEvent
     {
-        public override string Name => "add_attachment";
-    }
-
-    public class RemoveAttachmentEvent : AnalyticsEvent
-    {
-        public override string Name => "remove_attachment";
-    }
-
-    public class OpenAttachmentEvent : AnalyticsEvent
-    {
-        public override string Name => "open_attachment";
-    }
-
-    public class ContactPickerEvent : AnalyticsEvent
-    {
-        public override string Name => "contact_picker";
-
-        readonly ContactPickerChoice choice;
-
-        public ContactPickerEvent(ContactPickerChoice choice)
+        public OpenActionsEvent(ModuleType module)
         {
-            this.choice = choice;
+            Name = "open_actions" + GetModuleString(module);
         }
     }
 
-    public class TemplateAddedEvent : AnalyticsEvent
+    public class OpenCategoriesEvent : AnalyticsEvent
     {
-        public override string Name => "template_added";
-
-        readonly TemplateType type;
-
-        public TemplateAddedEvent(TemplateType type)
+        public OpenCategoriesEvent(ModuleType module)
         {
-            this.type = type;
+            Name = "open_categories" + GetModuleString(module);
         }
     }
 
-    public class SaveDocumentAsDraft : AnalyticsEvent
+    public class OpenSearchEvent : AnalyticsEvent
     {
-        public override string Name => "save_document_draft";
+        public OpenSearchEvent(ModuleType module)
+        {
+            Name = "open_search" + GetModuleString(module);
+        }
     }
 
-    public class OpenMailViewer : AnalyticsEvent
+    public class OpenMailViewerEvent : AnalyticsEvent
     {
         public override string Name => "open_mail_viewer";
     }
 
-    public class SwitchDocument : AnalyticsEvent
+    public class OpenSettingsEvent : AnalyticsEvent
     {
-        public override string Name => "switch_document";
+        public override string Name => "open_settings";
+    }
 
-        readonly SwitchDocumentType type;
+    public class OpenNotificationListEvent : AnalyticsEvent
+    {
+        public override string Name => "open_notification_list";
+    }
 
-        public SwitchDocument(SwitchDocumentType type)
+    public class AddContactEvent : AnalyticsEvent
+    {
+        public override string Name => "add_contact";
+    }
+
+    public class EditContactEvent : AnalyticsEvent
+    {
+        public override string Name => "edit_contact";
+    }
+
+    public class AddSubContactEvent : AnalyticsEvent
+    {
+        public override string Name => "add_subcontact";
+    }
+
+    public class AddShortcodeEvent : AnalyticsEvent
+    {
+        public override string Name => "add_shortcode";
+    }
+
+    public class EditShortcodeEvent : AnalyticsEvent
+    {
+        public override string Name => "edit_shortcode";
+    }
+
+    public class ComposeNewDocumentEvent : AnalyticsEvent
+    {
+        public override string Name => "compose_new_document";
+    }
+
+    public class ComposeEditDraft : AnalyticsEvent
+    {
+        public override string Name => "compose_edit_draft";
+    }
+
+    #endregion
+
+    #region Documents
+
+    public class ComposeAddAttachment : AnalyticsEvent
+    {
+        public ComposeAddAttachment(AddAttachmentType type)
         {
-            this.type = type;
+            Name = "compose_add_attachment_" + type.ToString().ToLowerInvariant();
         }
+    }
+
+    public class ComposeRemoveAttachmentEvent : AnalyticsEvent
+    {
+        public override string Name => "compose_remove_attachment";
+    }
+
+    public class ComposeShowPreviousEmailEvent : AnalyticsEvent
+    {
+        public override string Name => "compose_show_previous_email";
+    }
+
+    public class ComposeEditedPreviousEmailEvent : AnalyticsEvent
+    {
+        public override string Name => "compose_edited_previous_email";
+    }
+
+    public class ComposeEmailRecoveredEvent : AnalyticsEvent
+    {
+        public override string Name => "compose_email_recovered_event";
+    }
+
+    public class ComposeSaveDraftEvent : AnalyticsEvent
+    {
+        public override string Name => "compose_save_draft";
+    }
+
+    public class ComposeAddTemplateEvent : AnalyticsEvent
+    {
+        public ComposeAddTemplateEvent(TemplateType type)
+        {
+            Name = "compose_add_template_" + type.ToString().ToLowerInvariant();
+        }
+    }
+
+    public class ComposeContactPickerEvent : AnalyticsEvent
+    {
+        public ComposeContactPickerEvent(ContactPickerChoice type)
+        {
+            Name = "compose_contact_picker_" + type.ToString().ToLowerInvariant();
+        }
+    }
+
+    public class DocumentQuickSwitchEvent : AnalyticsEvent
+    {
+        public override string Name => "document_quick_switch";
+    }
+
+
+    public class DocumentOpenAttachment : AnalyticsEvent
+    {
+        public override string Name => "document_open_attachment";
+    }
+
+    public class DocumentShowDetail : AnalyticsEvent
+    {
+        public override string Name => "document_show_detail";
+    }
+
+    public class GetMoreDocumentsEvent : AnalyticsEvent
+    {
+        public override string Name => "filtering";
     }
 
     #endregion
 
     #region Contacts
 
+    public class ContactFastActionEvent : AnalyticsEvent
+    {
+        public ContactFastActionEvent(ContactFastActionChoice type)
+        {
+            Name = "contact_fast_action_" + type.ToString().ToLowerInvariant();
+        }
+    }
+
+    public class ContactCallNumberEvent : AnalyticsEvent
+    {
+        public override string Name => "contact_call_number";
+    }
+
+    public class ContactClickEmailEvent : AnalyticsEvent
+    {
+        public override string Name => "contact_click_email";
+    }
+
+    public class ContactClickPhysicalAddressEvent : AnalyticsEvent
+    {
+        public override string Name => "contact_click_physical_address";
+    }
+
+    public class ContactNavigateSubContactEvent : AnalyticsEvent
+    {
+        public override string Name => "contact_navigate_subcontact";
+    }
+
     #endregion
 
     #region Shortcodes
+
+    public class ShortcodeClickEmailEvent : AnalyticsEvent
+    {
+        public override string Name => "shortcode_click_email";
+    }
+
+    public class ShortcodeComposeDocumentEvent : AnalyticsEvent
+    {
+        public override string Name => "ShortcodeComposeDocumentEvent";
+    }
+
+    #endregion
+
+    #region Settings
+
+    public class SettingsUpdateSystemConfigurationEvent : AnalyticsEvent
+    {
+        public override string Name => "settings_update_system_configuration";
+    }
+
+    public class SettingsCacheCleanUpEvent : AnalyticsEvent
+    {
+        public override string Name => "settings_cache_clean_up";
+    }
+
+    public class SettingsLogOut : AnalyticsEvent
+    {
+        public override string Name => "settings_log_out";
+    }
 
     #endregion
 
     #region Misc Events
 
-    public class ExpandSubfolderEvent : AnalyticsEvent
+    public class NotificationClickedEvent : AnalyticsEvent
     {
-        public override string Name => "expand_subfolder";
-
-        readonly ModuleType module;
-
-        public ExpandSubfolderEvent(ModuleType module)
-        {
-            this.module = module;
-        }
+        public override string Name => "notification_clicked";
+    }
+    public class NotificationMarkAllAsReadEvent : AnalyticsEvent
+    {
+        public override string Name => "notification_mark_all_as_read";
     }
 
+    public class OpenLocalFolderEvent : AnalyticsEvent
+    {
+        public override string Name => "open_local_folder";
+    }
+
+    public class OpenFolderEvent : AnalyticsEvent
+    {
+        public OpenFolderEvent(ModuleType module, bool favorite)
+        {
+            Name = "open_folder" + GetModuleString(module);
+            if (favorite)
+            {
+                Name += "_favorite";
+            }
+        }
+    }
+    public class ExpandFolderEvent : AnalyticsEvent
+    {
+        public override string Name => "expand_folder";
+    }
     public class PullToRefreshEvent : AnalyticsEvent
     {
-        public override string Name => "pull_to_refresh";
-
-        readonly string viewName;
-
-        public PullToRefreshEvent(string viewName)
+        public PullToRefreshEvent(bool fromFolder = false, ModuleType type = ModuleType.None)
         {
-            this.viewName = viewName;
+            Name = "pull_to_refresh";
+            if (fromFolder == true)
+            {
+                Name += "_folder";
+            }
+            else
+            {
+                Name += GetModuleString(type);
+            }
         }
     }
 
-    public class FilteringEvent : AnalyticsEvent
+    public class FilterEvent : AnalyticsEvent
     {
-        public override string Name => "filtering";
-
-        readonly string viewName;
-
-        public FilteringEvent(string viewName)
+        public FilterEvent(bool fromFolder = false, ModuleType type = ModuleType.None)
         {
-            this.viewName = viewName;
+            Name = "filter";
+            if (fromFolder == true)
+            {
+                Name += "_folder";
+            }
+            else
+            {
+                Name += GetModuleString(type);
+            }
         }
     }
 
