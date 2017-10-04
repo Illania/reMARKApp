@@ -6,18 +6,19 @@ using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
-using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -36,7 +37,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
 
-        UIBarButtonItem composeButton;
+        UIView headerView;
+        UILabel nameLabel;
+        UIButton button1;
+
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem fileToButton;
 
@@ -69,11 +73,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (NavigationController != null)
                 NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
             InitializeHandlers();
-
-            NavigationController.ToolbarHidden = false;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -87,6 +89,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
+
+            if (NavigationController != null)
+                NavigationController.ToolbarHidden = false;
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -95,7 +100,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             DeinitializeHandlers();
 
-            NavigationController.ToolbarHidden = true;
+            if (NavigationController != null)
+                NavigationController.ToolbarHidden = true;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -110,7 +116,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            composeButton = null;
             doneButtonItem = null;
             fileToButton = null;
 
@@ -126,30 +131,65 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Debug("Disposed");
         }
 
-        void InitializeNavigationBar()
-        {
-            NavigationItem.Title = shortcodePreview?.Name;
-
-            if (Modal)
-            {
-                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
-            }
-            else
-            {
-                composeButton = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "compose.png")),
-                    Enabled = false
-                };
-                NavigationItem.SetRightBarButtonItem(composeButton, false);
-            }
-        }
-
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView);
+            TableView.BackgroundColor = Theme.White;
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed));
+
+            headerView = new UIView(new CGRect(0f, 0f, 0f, 160f))
+            {
+                BackgroundColor = Theme.White
+            };
+
+            nameLabel = new UILabel
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(6f),
+                TextColor = Theme.DarkerBlue,
+                TextAlignment = UITextAlignment.Center,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            headerView.AddSubview(nameLabel);
+            headerView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Top, 1f, 10f),
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 25f)
+            });
+
+            var buttonsView = new UIView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            headerView.AddSubview(buttonsView);
+            headerView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 35f),
+                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f)
+            });
+
+            button1 = new UIButton
+            {
+                Enabled = false,
+                Alpha = 0f,
+                TintColor = Theme.DarkerBlue,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            button1.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            buttonsView.AddSubview(button1);
+            buttonsView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Left, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Right, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60),
+                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+            });
+
+            TableView.TableHeaderView = headerView;
 
             ToolbarItems = new[]
             {
@@ -163,13 +203,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
         }
 
+        void InitializeNavigationBar()
+        {
+            if (Modal)
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
+            }
+        }
+
         void InitializeHandlers()
         {
+            if (button1 != null)
+                button1.TouchUpInside += Button1_TouchUpInside;
+
             if (fileToButton != null)
                 fileToButton.Clicked += FileToButton_Clicked;
-
-            if (composeButton != null)
-                composeButton.Clicked += ComposeButton_Clicked;
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
@@ -177,27 +226,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeinitializeHandlers()
         {
+            if (button1 != null)
+                button1.TouchUpInside -= Button1_TouchUpInside;
+
             if (fileToButton != null)
                 fileToButton.Clicked -= FileToButton_Clicked;
 
-            if (composeButton != null)
-                composeButton.Clicked -= ComposeButton_Clicked;
-
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
-        }
-
-        public void DocumentAddressClicked(DocumentAddress documentAddress)
-        {
-            var vc = new ComposeDocumentViewController
-            {
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
-                {
-                    { DocumentAddressType.To, new [] { documentAddress.FullAddress } }
-                }
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -213,9 +249,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var cell = TableView?.CellAt(indexPath);
             var dataSource = TableView?.Source as DataSource;
-            var da = dataSource?.DocumentAddessAtRow(indexPath);
-            if (cell != null && da != null)
-                Integration.CopyToClipboard(this, TableView, cell, da.Address);
+            var row = dataSource?.RowAt(indexPath);
+            if (cell != null && row != null)
+                row.OnLongClicked(this.Wrap(), TableView, cell, indexPath);
+        }
+
+        void Button1_TouchUpInside(object sender, EventArgs e)
+        {
+            var vc = new ComposeDocumentViewController
+            {
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.FullAddress).ToArray() },
+                    { DocumentAddressType.Cc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.FullAddress).ToArray() },
+                    { DocumentAddressType.Bcc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.FullAddress).ToArray() }
+                }
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -223,38 +274,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    var vc = new CopyToWorktrayViewController
-                    {
-                        BusinessEntities = new List<IBusinessEntity> { shortcode }
-                    };
-                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                }));
+                                               UIAlertActionStyle.Default,
+                                               a =>
+            {
+                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { shortcode } };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }));
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
-                    {
-                        shortcodePreview
-                    });
-                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                }));
+                                               UIAlertActionStyle.Default,
+                                               a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview });
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }));
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
-                    UIAlertActionStyle.Default,
-                    a =>
-                    {
-                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
-                            {
-                                shortcodePreview
-                            },
-                            folder);
-                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                    }));
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
+            {
+                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview }, folder);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }));
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
@@ -270,22 +311,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void ComposeButton_Clicked(object sender, EventArgs e)
+        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+
+        public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                 PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
                 {
-                    { DocumentAddressType.To, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.FullAddress).ToArray() },
-                    { DocumentAddressType.Cc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.FullAddress).ToArray() },
-                    { DocumentAddressType.Bcc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.FullAddress).ToArray() }
+                    { DocumentAddressType.To, new [] { documentAddress.FullAddress } }
                 }
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
 
         public void SetData(int folderId, int shortcodeId)
         {
@@ -327,10 +368,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodeId = shortcodeId;
         }
 
-        public bool IsShowingShortcodeWithId(int shortcodeId)
-        {
-            return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
-        }
+        public bool IsShowingShortcodeWithId(int shortcodeId) => shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
 
         public async void RefreshData()
         {
@@ -342,11 +380,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var folder = this.folder;
             var shortcodeId = this.shortcodeId;
             var shortcodePreview = this.shortcodePreview;
-            var shortcode = this.shortcode;
 
             CommonConfig.Logger.Info("Loading shortcode...");
 
-            var ds = (DataSource)TableView?.Source;
+            var ds = (DataSource)TableView.Source;
 
             try
             {
@@ -355,7 +392,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId != null && shortcodeId != null)
                 {
                     var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId.Value, shortcodeId.Value);
-                    shortcodePreview = swp.ShortcodePreview;
+                    this.shortcodePreview = swp.ShortcodePreview;
                     shortcode = swp.Shortcode;
                 }
 
@@ -368,33 +405,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (folderId == null && folder == null && shortcodePreview == null)
                 {
                     var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(-1, shortcodeId.Value);
-                    shortcodePreview = swp.ShortcodePreview;
+                    this.shortcodePreview = swp.ShortcodePreview;
                     shortcode = swp.Shortcode;
                 }
-
-                this.folderId = folderId;
-                this.folder = folder;
-                this.shortcodeId = shortcodeId;
-                this.shortcodePreview = shortcodePreview;
-                this.shortcode = shortcode;
-
-                var description = shortcodePreview?.Description;
-                var toAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
 
                 if (token.IsCancellationRequested)
                     return;
 
-                NavigationItem.Title = shortcodePreview?.Name;
+                nameLabel.Text = this.shortcodePreview.Name;
 
-                if (composeButton != null)
-                    composeButton.Enabled = shortcode?.Addresses?.Any() ?? false;
+                button1.Enabled = shortcode.Addresses.Any();
+                button1.Alpha = 1f;
 
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
 
-                ds.EndRefresh(description, toAddresses, ccAddresses, bccAddresses);
+                ds.EndRefresh(this.shortcodePreview, shortcode);
             }
             catch (Exception ex)
             {
@@ -412,10 +438,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        public void SetRefreshDataOnAppear()
-        {
-            refreshDataOnAppear = true;
-        }
+        public void SetRefreshDataOnAppear() => refreshDataOnAppear = true;
 
         public void ClearData()
         {
@@ -427,24 +450,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodePreview = null;
             shortcode = null;
 
-            NavigationItem.Title = shortcodePreview?.Name;
+            nameLabel.Text = string.Empty;
 
-            if (composeButton != null)
-                composeButton.Enabled = false;
+            button1.Alpha = 0f;
+            button1.Enabled = false;
 
             if (fileToButton != null)
                 fileToButton.Enabled = false;
 
-            var ds = TableView?.Source as DataSource;
-            ds?.Clear();
+            ((DataSource)TableView.Source)?.Clear();
         }
-
-        #region Actions
 
         async void RemoveFromFolder(UIAlertAction a)
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcode"));
-
             if (!result)
                 return;
 
@@ -454,11 +473,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to remove shortcode from folder [shortcodeId={shortcode.Id}, folderId={folder.Id}]");
 
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity>
-                    {
-                        shortcode
-                    },
-                    folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { shortcode }, folder);
 
                 CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, folder.Id, new List<int> { shortcode.Id }));
 
@@ -481,7 +496,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async void Delete(UIAlertAction a)
         {
             var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcode"));
-
             if (!result)
                 return;
 
@@ -491,10 +505,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Info($"Attempting to delete shortcode [shortcodeId={shortcode.Id}]");
 
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity>
-                {
-                    shortcode
-                });
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { shortcode });
 
                 CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Shortcode, new List<int> { shortcode.Id }));
 
@@ -514,7 +525,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        #endregion
+        void UpdateTitle(bool show)
+        {
+            var title = show ? nameLabel.Text : null;
+            NavigationItem.Title = title;
+        }
 
         class DataSource : UITableViewSource
         {
@@ -524,10 +539,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             bool empty = true;
             bool loading = true;
 
-            string description = string.Empty;
-            DocumentAddress[] toAddresses = new DocumentAddress[0];
-            DocumentAddress[] ccAddresses = new DocumentAddress[0];
-            DocumentAddress[] bccAddresses = new DocumentAddress[0];
+            readonly SectionCollection sections = new SectionCollection();
 
             public DataSource(ShortcodeViewController viewController, UITableView tableView)
             {
@@ -543,73 +555,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
 
-                if (indexPath.Section == 0)
-                {
-                    if (string.IsNullOrWhiteSpace(description))
-                    {
-                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                        emptyCell.Initialize(Localization.GetString("no_description"));
-                        return emptyCell;
-                    }
-
-                    var cell = tableView.DequeueReusableCell(DescriptionTableViewCell.Key) as DescriptionTableViewCell ?? DescriptionTableViewCell.Create();
-                    cell.Initialize(description);
-                    return cell;
-                }
-
-                if (indexPath.Section == 1)
-                {
-                    if (toAddresses.Length < 1)
-                    {
-                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                        emptyCell.Initialize(Localization.GetString("no_addresses"));
-                        return emptyCell;
-                    }
-
-                    var address = toAddresses[indexPath.Row];
-                    return GetInitializedDocumentAddressCell(address);
-                }
-
-                if (indexPath.Section == 2)
-                {
-                    if (ccAddresses.Length < 1)
-                    {
-                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                        emptyCell.Initialize(Localization.GetString("no_addresses"));
-                        return emptyCell;
-                    }
-
-                    var address = ccAddresses[indexPath.Row];
-                    return GetInitializedDocumentAddressCell(address);
-                }
-
-                if (indexPath.Section == 3)
-                {
-                    if (bccAddresses.Length < 1)
-                    {
-                        var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                        emptyCell.Initialize(Localization.GetString("no_addresses"));
-                        return emptyCell;
-                    }
-
-                    var address = bccAddresses[indexPath.Row];
-                    return GetInitializedDocumentAddressCell(address);
-                }
-
-                return null;
-            }
-
-            UITableViewCell GetInitializedDocumentAddressCell(DocumentAddress documentAddress)
-            {
-                if (string.IsNullOrWhiteSpace(documentAddress.Name))
-                {
-                    var compactCell = tableViewWeakReference.Unwrap()?.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell ?? DocumentAddressesCompactTableViewCell.Create();
-                    compactCell.Initialize(documentAddress);
-                    return compactCell;
-                }
-
-                var cell = tableViewWeakReference.Unwrap()?.DequeueReusableCell(DocumentAddressesTableViewCell.Key) as DocumentAddressesTableViewCell ?? DocumentAddressesTableViewCell.Create();
-                cell.Initialize(documentAddress);
+                var row = sections[indexPath.Section].Rows[indexPath.Row];
+                var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
+                row.Bind(cell);
                 return cell;
             }
 
@@ -621,19 +569,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                if (section == 0)
-                    return 1;
-
-                if (section == 1)
-                    return toAddresses.Length > 0 ? toAddresses.Length : 1;
-
-                if (section == 2)
-                    return ccAddresses.Length > 0 ? ccAddresses.Length : 1;
-
-                if (section == 3)
-                    return bccAddresses.Length > 0 ? bccAddresses.Length : 1;
-
-                return 0;
+                return sections[(int)section].Rows.Count;
             }
 
             public override nint NumberOfSections(UITableView tableView)
@@ -644,49 +580,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return 1;
 
-                return 4;
-            }
-
-            public override string TitleForHeader(UITableView tableView, nint section)
-            {
-                if (empty)
-                    return string.Empty;
-                if (loading)
-                    return string.Empty;
-
-                if (section == 0)
-                    return Localization.GetString("description");
-                if (section == 1)
-                    return Localization.GetString("to");
-                if (section == 2)
-                    return Localization.GetString("cc");
-                if (section == 3)
-                    return Localization.GetString("bcc");
-
-                return string.Empty;
+                return sections.Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
+                var cell = tableView.CellAt(indexPath);
+                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                DocumentAddress documentAddress = null;
-
-                if (indexPath.Section == 1)
-                    documentAddress = toAddresses[indexPath.Row];
-                if (indexPath.Section == 2)
-                    documentAddress = ccAddresses[indexPath.Row];
-                if (indexPath.Section == 3)
-                    documentAddress = bccAddresses[indexPath.Row];
-
-                if (documentAddress == null)
-                    return;
-
-                viewControllerWeakReference.Unwrap()?.DocumentAddressClicked(documentAddress);
+                sections[indexPath.Section].Rows[indexPath.Row].OnClicked(viewControllerWeakReference, tableView, cell, indexPath);
 
                 if (tableView?.IndexPathForSelectedRow != null)
                     tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+            }
+
+            public override void Scrolled(UIScrollView scrollView) => ScrollChanged(scrollView);
+            public override void DraggingStarted(UIScrollView scrollView) => ScrollChanged(scrollView);
+            public override void DraggingEnded(UIScrollView scrollView, bool willDecelerate) => ScrollChanged(scrollView);
+            public override void DecelerationEnded(UIScrollView scrollView) => ScrollChanged(scrollView);
+
+            void ScrollChanged(UIScrollView scrollView)
+            {
+                var offset = scrollView.ContentOffset.Y;
+                var inset = -scrollView.SafeAreaInsets.Top;
+                var show = offset > inset + 30;
+
+                viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
             }
 
             public void StartRefresh()
@@ -697,53 +617,239 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
-            public void EndRefresh(string description, DocumentAddress[] toAddresses, DocumentAddress[] ccAddresses, DocumentAddress[] bccAddresses)
+            public void EndRefresh(ShortcodePreview shortcodePreview, Shortcode shortcode)
             {
-                empty = false;
-                loading = false;
+                var allSections = new AbstractSection[]
+                {
+                    new DescriptionSection(),
+                    new DocumentAddressSection()
+                };
 
-                this.description = description;
-                this.toAddresses = toAddresses;
-                this.ccAddresses = ccAddresses;
-                this.bccAddresses = bccAddresses;
+                foreach (var section in allSections)
+                {
+                    section.ShortcodePreview = shortcodePreview;
+                    section.Shortcode = shortcode;
 
-                tableViewWeakReference.Unwrap()?.BeginUpdates();
-                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, 3)), UITableViewRowAnimation.Fade);
-                tableViewWeakReference.Unwrap()?.EndUpdates();
+                    if (!section.Empty)
+                    {
+                        section.InitializeRows();
+                        sections.Add(section);
+                    }
+                }
+
+                allSections = null;
+
+                if (sections.Count < 1)
+                {
+                    empty = true;
+                    loading = false;
+
+                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+                else if (sections.Count == 1)
+                {
+                    empty = false;
+                    loading = false;
+
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+                else if (sections.Count > 1)
+                {
+                    empty = false;
+                    loading = false;
+
+                    tableViewWeakReference.Unwrap()?.BeginUpdates();
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, sections.Count - 1)), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.EndUpdates();
+                }
             }
 
             public void Clear()
             {
-                var sections = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
+                var numberOfSections = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
                 empty = true;
                 loading = true;
 
-                description = string.Empty;
-                toAddresses = new DocumentAddress[0];
-                ccAddresses = new DocumentAddress[0];
-                bccAddresses = new DocumentAddress[0];
+                sections.Clear();
 
-                tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, sections)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(0, numberOfSections)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
-            public DocumentAddress DocumentAddessAtRow(NSIndexPath indexPath)
+            public AbstractRow RowAt(NSIndexPath indexPath) => sections[indexPath.Section].Rows[indexPath.Row];
+
+            public class SectionCollection : List<AbstractSection>
             {
-                DocumentAddress documentAddress = null;
+            }
 
-                if (indexPath.Section == 1)
-                    documentAddress = toAddresses[indexPath.Row];
-                if (indexPath.Section == 2)
-                    documentAddress = ccAddresses[indexPath.Row];
-                if (indexPath.Section == 3)
-                    documentAddress = bccAddresses[indexPath.Row];
+            public abstract class AbstractSection
+            {
+                WeakReference<ShortcodePreview> weakShortcodePreview;
+                WeakReference<Shortcode> weakShortcode;
 
-                return documentAddress;
+                public ShortcodePreview ShortcodePreview
+                {
+                    get => weakShortcodePreview.Unwrap();
+                    set => weakShortcodePreview = value.Wrap();
+                }
+
+                public Shortcode Shortcode
+                {
+                    get => weakShortcode.Unwrap();
+                    set => weakShortcode = value.Wrap();
+                }
+
+                public abstract bool Empty { get; }
+                public RowCollection Rows { get; } = new RowCollection();
+                public abstract void InitializeRows();
+            }
+
+            public class DescriptionSection : AbstractSection
+            {
+                public override bool Empty => string.IsNullOrWhiteSpace(ShortcodePreview?.Description);
+
+                public override void InitializeRows()
+                {
+                    Rows.Add(new DescriptionRow(ShortcodePreview, Shortcode));
+                }
+            }
+
+            public class DocumentAddressSection : AbstractSection
+            {
+                public override bool Empty => !Shortcode?.Addresses?.Any() ?? true;
+
+                public override void InitializeRows()
+                {
+                    var toAddresses = Shortcode.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                    foreach (var a in toAddresses)
+                        Rows.Add(new DocumentAddressRow(ShortcodePreview, Shortcode, a));
+
+                    var ccAddresses = Shortcode.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                    foreach (var a in ccAddresses)
+                        Rows.Add(new DocumentAddressRow(ShortcodePreview, Shortcode, a));
+
+                    var bccAddresses = Shortcode.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                    foreach (var a in bccAddresses)
+                        Rows.Add(new DocumentAddressRow(ShortcodePreview, Shortcode, a));
+                }
+            }
+
+            public class RowCollection : List<AbstractRow>
+            {
+            }
+
+            public abstract class AbstractRow
+            {
+                WeakReference<ShortcodePreview> weakShortcodePreview;
+                WeakReference<Shortcode> weakShortcode;
+
+                public ShortcodePreview ShortcodePreview
+                {
+                    get => weakShortcodePreview.Unwrap();
+                    set => weakShortcodePreview = value.Wrap();
+                }
+
+                public Shortcode Shortcode
+                {
+                    get => weakShortcode.Unwrap();
+                    set => weakShortcode = value.Wrap();
+                }
+
+                protected AbstractRow(ShortcodePreview shortcodePreview, Shortcode shortcode)
+                {
+                    ShortcodePreview = shortcodePreview;
+                    Shortcode = shortcode;
+                }
+
+                public virtual string Key => ShortcodeInfoTableViewCell.Key;
+                public virtual UITableViewCell CreateCell() => ShortcodeInfoTableViewCell.Create();
+                public abstract void Bind(UITableViewCell cell);
+                public virtual void OnClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
+                public virtual void OnLongClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
+            }
+
+            public class DescriptionRow : AbstractRow
+            {
+                public DescriptionRow(ShortcodePreview shortcodePreview, Shortcode shortcode)
+                    : base(shortcodePreview, shortcode)
+                {
+                }
+
+                public override string Key { get => base.Key + "_Description"; }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    var cic = (ContactInfoTableViewCell)cell;
+                    cic.Accessory = UITableViewCellAccessory.None;
+                    cic.SelectionStyle = UITableViewCellSelectionStyle.Default;
+                    cic.Initialize(Localization.GetString("description").ToUpper(), ShortcodePreview.Description, true);
+                }
+
+                public override void OnLongClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, ShortcodePreview.Description);
+                }
+            }
+
+            public class DocumentAddressRow : AbstractRow
+            {
+                readonly WeakReference<DocumentAddress> weakDocumentAddress;
+
+                public DocumentAddressRow(ShortcodePreview shortcodePreview, Shortcode shortcode, DocumentAddress documentAddress)
+                    : base(shortcodePreview, shortcode)
+                {
+                    weakDocumentAddress = documentAddress.Wrap();
+                }
+
+                public override string Key
+                {
+                    get
+                    {
+                        if (string.IsNullOrWhiteSpace(weakDocumentAddress.Unwrap()?.Name))
+                            return DocumentAddressesCompactTableViewCell.Key;
+
+                        return DocumentAddressesTableViewCell.Key;
+                    }
+                }
+
+                public override UITableViewCell CreateCell()
+                {
+                    if (string.IsNullOrWhiteSpace(weakDocumentAddress.Unwrap()?.Name))
+                        return DocumentAddressesCompactTableViewCell.Create();
+
+                    return DocumentAddressesTableViewCell.Create();
+                }
+
+                public override void Bind(UITableViewCell cell)
+                {
+                    var da = weakDocumentAddress.Unwrap();
+
+                    if (string.IsNullOrWhiteSpace(weakDocumentAddress.Unwrap()?.Name))
+                    {
+                        var c = (DocumentAddressesCompactTableViewCell)cell;
+                        c.Initialize(da);
+                    }
+                    else
+                    {
+                        var c = (DocumentAddressesTableViewCell)cell;
+                        c.Initialize(da);
+                    }
+                }
+
+                public override void OnClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewControllerWeakReference.Unwrap()?.DocumentAddressClicked(weakDocumentAddress.Unwrap());
+                }
+
+                public override void OnLongClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                {
+                    viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
+                }
             }
         }
-
-        #region State restoration
 
         public override void EncodeRestorableState(NSCoder coder)
         {
@@ -789,8 +895,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             return new ShortcodeViewController();
         }
-
-        #endregion
-
     }
 }

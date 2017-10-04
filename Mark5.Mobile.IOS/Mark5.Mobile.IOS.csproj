@@ -118,8 +118,6 @@
 		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\DescriptionTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\DescriptionTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentAddressesTableViewCell.cs" />
@@ -286,6 +284,8 @@
 		<Compile Include="Ui\Common\AbstractMultiViewController.cs" />
 		<Compile Include="Utilities\UITableViewCellUtilities.cs" />
 		<Compile Include="Ui\Common\TouchTransparentView.cs" />
+		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.designer.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -377,7 +377,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ContactInfoTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\DescriptionTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsCompactTableViewCell.xib" />
@@ -394,6 +393,7 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
+		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">

@@ -8,6 +8,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
     {
         public string Tag { get; set; }
 
+        int searchButtonCounter;
+
         public NavigationController()
         {
         }
