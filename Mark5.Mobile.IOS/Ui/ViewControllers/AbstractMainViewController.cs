@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -66,6 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TabBar.Items[2].Enabled = false;
 
+            ViewControllerSelected += AbstractMainViewController_ViewControllerSelected;
             searchButton.TouchUpInside += SearchButton_TouchUpInside;
         }
 
@@ -80,7 +82,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
+            ViewControllerSelected -= AbstractMainViewController_ViewControllerSelected;
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
+        }
+
+        void AbstractMainViewController_ViewControllerSelected(object sender, UITabBarSelectionEventArgs e)
+        {
+            var nc = e.ViewController as UINavigationController;
+            if (nc == null)
+                return;
+
+            SetSearchButtonHidden(nc.ToolbarHidden, true);
         }
 
         public void SetSearchButtonHidden(bool hidden, bool animated)

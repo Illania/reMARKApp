@@ -764,8 +764,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Shortcode = shortcode;
                 }
 
-                public virtual string Key => ShortcodeInfoTableViewCell.Key;
-                public virtual UITableViewCell CreateCell() => ShortcodeInfoTableViewCell.Create();
+                public virtual string Key => ShortcodeInfoTableViewCell.DefaultId;
+                public virtual UITableViewCell CreateCell() => new ShortcodeInfoTableViewCell();
                 public abstract void Bind(UITableViewCell cell);
                 public virtual void OnClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
                 public virtual void OnLongClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
@@ -782,7 +782,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void Bind(UITableViewCell cell)
                 {
-                    var cic = (ContactInfoTableViewCell)cell;
+                    var cic = (ShortcodeInfoTableViewCell)cell;
                     cic.Accessory = UITableViewCellAccessory.None;
                     cic.SelectionStyle = UITableViewCellSelectionStyle.Default;
                     cic.Initialize(Localization.GetString("description").ToUpper(), ShortcodePreview.Description, true);
@@ -797,46 +797,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public class DocumentAddressRow : AbstractRow
             {
                 readonly WeakReference<DocumentAddress> weakDocumentAddress;
+                readonly bool compact;
 
                 public DocumentAddressRow(ShortcodePreview shortcodePreview, Shortcode shortcode, DocumentAddress documentAddress)
                     : base(shortcodePreview, shortcode)
                 {
                     weakDocumentAddress = documentAddress.Wrap();
+                    compact = string.IsNullOrWhiteSpace(documentAddress?.Name);
                 }
 
                 public override string Key
                 {
                     get
                     {
-                        if (string.IsNullOrWhiteSpace(weakDocumentAddress.Unwrap()?.Name))
-                            return DocumentAddressesCompactTableViewCell.Key;
+                        if (compact)
+                            return DocumentAddressTableViewCell.CompactId;
 
-                        return DocumentAddressesTableViewCell.Key;
+                        return DocumentAddressTableViewCell.DefaultId;
                     }
                 }
 
                 public override UITableViewCell CreateCell()
                 {
-                    if (string.IsNullOrWhiteSpace(weakDocumentAddress.Unwrap()?.Name))
-                        return DocumentAddressesCompactTableViewCell.Create();
+                    if (compact)
+                        return new DocumentAddressTableViewCell(DocumentAddressTableViewCell.CompactId);
 
-                    return DocumentAddressesTableViewCell.Create();
+                    return new DocumentAddressTableViewCell(DocumentAddressTableViewCell.DefaultId);
                 }
 
                 public override void Bind(UITableViewCell cell)
                 {
                     var da = weakDocumentAddress.Unwrap();
-
-                    if (string.IsNullOrWhiteSpace(weakDocumentAddress.Unwrap()?.Name))
-                    {
-                        var c = (DocumentAddressesCompactTableViewCell)cell;
-                        c.Initialize(da);
-                    }
-                    else
-                    {
-                        var c = (DocumentAddressesTableViewCell)cell;
-                        c.Initialize(da);
-                    }
+                    var c = (DocumentAddressTableViewCell)cell;
+                    c.Initialize(da);
                 }
 
                 public override void OnClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
