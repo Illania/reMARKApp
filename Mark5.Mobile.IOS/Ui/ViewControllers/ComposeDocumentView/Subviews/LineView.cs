@@ -108,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     return Task.CompletedTask;
                 }
 
-                if (PreviousDocument.Lines.FirstOrDefault(l => l.Guid == defaultOutgoingLine.Guid) != null)
+                if (PreviousDocument.Lines.FirstOrDefault(l => l.Guid == defaultOutgoingLine?.Guid) != null)
                     SetLine(defaultOutgoingLine);
                 else
                 {
