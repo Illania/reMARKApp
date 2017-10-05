@@ -1,27 +1,40 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class EmptyTableViewCell : UITableViewCell
+    public class EmptyTableViewCell : UITableViewCell
     {
-        public static readonly NSString Key = new NSString("EmptyTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("EmptyTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString DefaultId = new NSString(nameof(EmptyTableViewCell));
 
-        public static EmptyTableViewCell Create()
+        readonly UILabel label;
+
+        public EmptyTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-            return (EmptyTableViewCell) Nib.Instantiate(null, null)[0];
+            SelectionStyle = UITableViewCellSelectionStyle.None;
+            Accessory = UITableViewCellAccessory.None;
+
+            label = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkGray,
+                TextAlignment = UITextAlignment.Center,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(label);
+            ContentView.AddConstraints(new[]
+            {
+                label.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
+                label.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                label.HeightAnchor.ConstraintEqualTo(22f),
+                label.WidthAnchor.ConstraintEqualTo(ContentView.WidthAnchor, 1f, -16f),
+                ContentView.HeightAnchor.ConstraintGreaterThanOrEqualTo(44f)
+            });
         }
 
-        protected EmptyTableViewCell(IntPtr handle)
-            : base(handle)
-        {
-        }
-
-        public void Initialize(string text)
-        {
-            EmptyLabel.Text = text;
-        }
+        public void Initialize(string text) => label.Text = text;
     }
 }

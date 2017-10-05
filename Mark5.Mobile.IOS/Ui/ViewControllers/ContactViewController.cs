@@ -977,7 +977,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return null;
 
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
                 var row = sections[indexPath.Section].Rows[indexPath.Row];
                 var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();

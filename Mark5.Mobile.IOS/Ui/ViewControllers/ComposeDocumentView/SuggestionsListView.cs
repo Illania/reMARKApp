@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -270,14 +270,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 if (Loading && indexPath.Row == Suggestions.Count)
                 {
-                    var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) ?? WaitTableViewCell.Create();
+                    var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) ?? new WaitTableViewCell();
                     waitingCell.BackgroundColor = UIColor.Clear;
                     return waitingCell;
                 }
 
                 if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_suggestions_available"));
                     emptyCell.BackgroundColor = UIColor.Clear;
                     return emptyCell;

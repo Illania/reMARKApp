@@ -2,7 +2,6 @@
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
-using CoreGraphics;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {

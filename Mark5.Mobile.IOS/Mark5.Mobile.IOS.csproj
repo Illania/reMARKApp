@@ -125,7 +125,6 @@
 		<Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\EditTextViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\EmptyTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
@@ -143,7 +142,6 @@
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\WaitTableViewCell.designer.cs" />
 		<Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
@@ -376,7 +374,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsCompactTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\EmptyTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\FoldersTableViewCell.xib" />
@@ -385,7 +382,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\PhysicalAddressTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
