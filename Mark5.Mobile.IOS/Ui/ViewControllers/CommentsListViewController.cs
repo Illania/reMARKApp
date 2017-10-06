@@ -456,7 +456,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => CommentsTableViewCell.Height;
 
-
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
@@ -468,9 +467,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (loading || Items.Count < 1 || tableView.Editing)
-                    return new UITableViewRowAction[0];
-                
                 var actions = new List<UITableViewRowAction>();
                 var comment = Items[indexPath.Row];
 
