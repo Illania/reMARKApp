@@ -238,14 +238,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty => objectLinksInView.Count < 1;
+            public bool Empty => items.Count < 1;
 
             readonly WeakReference<ObjectLinksListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            string[] objectLinksSections = new string[0];
-            Dictionary<string, ObjectLink[]> objectLinksInView = new Dictionary<string, ObjectLink[]>();
+            string[] sections = new string[0];
+            Dictionary<string, ObjectLink[]> items = new Dictionary<string, ObjectLink[]>();
 
             public DataSource(ObjectLinksListViewController viewController, UITableView tableView)
             {
@@ -258,15 +258,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (objectLinksInView.Count < 1)
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_object_links"));
                     return emptyCell;
                 }
 
-                var section = objectLinksSections[indexPath.Section];
-                var ol = objectLinksInView[section][indexPath.Row];
+                var section = sections[indexPath.Section];
+                var ol = items[section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(ObjectLinksTableViewCell.Key) as ObjectLinksTableViewCell ?? ObjectLinksTableViewCell.Create();
                 cell.Initialize(ol);
@@ -274,49 +274,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
-            public override nint RowsInSection(UITableView tableview, nint section)
-            {
-                if (loading)
-                    return 1;
-
-                if (objectLinksInView.Count < 1)
-                    return 1;
-
-                var sectionName = objectLinksSections[section];
-                return objectLinksInView[sectionName].Length;
-            }
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ObjectLinksTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (objectLinksInView.Count < 1)
+                return sections.Length;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (loading || Empty)
                     return 1;
 
-                return objectLinksSections.Length;
+                var sectionName = sections[section];
+                return items[sectionName].Length;
             }
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                if (loading)
-                    return string.Empty;
+                if (loading || Empty)
+                    return null;
 
-                if (objectLinksInView.Count < 1)
-                    return string.Empty;
-
-                return objectLinksSections[section];
+                return sections[section];
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ObjectLinksTableViewCell.Height;
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                var section = objectLinksSections[indexPath.Section];
-                var ol = objectLinksInView[section][indexPath.Row];
+                var section = sections[indexPath.Section];
+                var ol = items[section][indexPath.Row];
 
                 viewControllerWeakReference.Unwrap()?.ObjectLinkSelected(ol);
             }
@@ -325,13 +317,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                objectLinksSections = objectLinks.Keys.ToArray();
-                objectLinksInView = new Dictionary<string, ObjectLink[]>(objectLinks);
+                sections = objectLinks.Keys.ToArray();
+                items = new Dictionary<string, ObjectLink[]>(objectLinks);
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                if (objectLinksSections.Length > 1)
-                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Fade);
+                if (sections.Length > 1)
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, sections.Length - 1)), UITableViewRowAnimation.Fade);
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
@@ -339,8 +331,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                objectLinksSections = new string[0];
-                objectLinksInView.Clear();
+                sections = new string[0];
+                items.Clear();
 
                 var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 

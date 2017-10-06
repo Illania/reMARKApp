@@ -247,15 +247,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => !phonebookContactsInView.SelectMany(v => v).Any();
-            public List<Recipient> Items => phonebookContactsInView.SelectMany(v => v).ToList();
+            public bool Empty => !items.SelectMany(v => v).Any();
+            public List<Recipient> Items => items.SelectMany(v => v).ToList();
 
             readonly WeakReference<PhonebookContactsListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly string emptyText;
 
             bool loading = true;
-            readonly List<List<Recipient>> phonebookContactsInView = new List<List<Recipient>>();
+            readonly List<List<Recipient>> items = new List<List<Recipient>>();
 
             public DataSource(PhonebookContactsListViewController viewController, UITableView tableView, string emptyText)
             {
@@ -276,7 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var pbc = phonebookContactsInView[indexPath.Section][indexPath.Row];
+                var pbc = items[indexPath.Section][indexPath.Row];
 
                 if (string.IsNullOrWhiteSpace(pbc.Name))
                 {
@@ -298,7 +298,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return phonebookContactsInView.Count;
+                return items.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -306,16 +306,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return phonebookContactsInView[(int)section].Count;
+                return items[(int)section].Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var ra = phonebookContactsInView[indexPath.Section][indexPath.Row];
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
+                var ra = items[indexPath.Section][indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.PhonebookAddressSelected(ra, tableView.CellAt(indexPath));
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView) => phonebookContactsInView.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper())
+            public override string[] SectionIndexTitles(UITableView tableView) => items.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper())
                                                                                                          .ToArray();
 
             public void SetItems(List<Recipient> phonebookContacts)
@@ -324,8 +328,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var sectionsCount = phonebookContacts.Count;
 
-                phonebookContactsInView.Clear();
-                phonebookContactsInView.AddRange(phonebookContacts.GroupBy(cp => cp.Name.SafeSubstring(0, 1)).Select(s => s.ToList()));
+                items.Clear();
+                items.AddRange(phonebookContacts.GroupBy(cp => cp.Name.SafeSubstring(0, 1)).Select(s => s.ToList()));
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
@@ -340,7 +344,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
-                phonebookContactsInView.Clear();
+                items.Clear();
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 if (sectionsCount > 1)

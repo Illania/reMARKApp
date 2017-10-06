@@ -198,12 +198,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         void EnableDoneButton() => doneItem.Enabled = true;
-
         void DisableDoneButton() => doneItem.Enabled = false;
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => systemUsersInView.Count < 1;
+            public bool Empty => items.Count < 1;
             public bool IsOwnSelected => tableViewWeakReference.Unwrap()?.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0)) ?? false;
 
             public List<SystemUser> SelectedItems
@@ -216,7 +215,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return new List<SystemUser>();
 
                     var rows = tableView.IndexPathsForSelectedRows.Where(indexPath => indexPath.Section != 0).ToArray();
-                    return rows.Select(ip => systemUsersInView[ip.Row]).ToList();
+                    return rows.Select(ip => items[ip.Row]).ToList();
                 }
             }
 
@@ -224,7 +223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            readonly List<SystemUser> systemUsersInView = new List<SystemUser>(50);
+            readonly List<SystemUser> items = new List<SystemUser>(50);
 
             public DataSource(CopyToWorktrayViewController viewController, UITableView tableView)
             {
@@ -248,18 +247,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (systemUsersInView.Count < 1)
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_system_users"));
                     return emptyCell;
                 }
 
-                var su = systemUsersInView[indexPath.Row];
+                var su = items[indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
                 cell.DetailTextLabel.Text = su.Username;
+
                 cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
                     ? UITableViewCellAccessory.Checkmark
                     : UITableViewCellAccessory.None;
@@ -272,13 +272,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (section == 0)
                     return 1;
 
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (systemUsersInView.Count < 1)
-                    return 1;
-
-                return systemUsersInView.Count;
+                return items.Count;
             }
 
             public override nint NumberOfSections(UITableView tableView) => 2;
@@ -288,6 +285,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
 
                 if (tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Length > 0)
@@ -299,6 +299,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
                 cell.Accessory = UITableViewCellAccessory.None;
 
                 if (tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Length > 0)
@@ -311,8 +314,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                systemUsersInView.Clear();
-                systemUsersInView.AddRange(systemUsers);
+                items.Clear();
+                items.AddRange(systemUsers);
 
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
             }
@@ -321,7 +324,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                systemUsersInView.Clear();
+                items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
             }
         }

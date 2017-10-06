@@ -973,11 +973,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                if (empty)
-                    return null;
-
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
+                
+                if (empty)
+                    return null;
 
                 var row = sections[indexPath.Section].Rows[indexPath.Row];
                 var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
@@ -987,22 +987,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (empty)
-                    return 0;
-
                 if (loading)
                     return 1;
+                
+                if (empty)
+                    return 0;
 
                 return sections[(int)section].Rows.Count;
             }
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (empty)
-                    return 0;
-
                 if (loading)
                     return 1;
+                
+                if (empty)
+                    return 0;
 
                 return sections.Count;
             }

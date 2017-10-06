@@ -517,7 +517,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DocumentPreviewLongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (TableView.Editing)
+            if (TableView.Editing || ((DataSource)TableView.Source).Empty)
                 return;
 
             StartEditing();
@@ -1112,7 +1112,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-
             public bool Empty => Items.Count < 1;
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
             public bool LoadMoreEnabled { get; set; }
@@ -1136,7 +1135,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (Items.Count < 1)
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(emptyText);
@@ -1171,7 +1170,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (Items.Count > 0 && Items[indexPath.Row]?.Direction == DocumentDirection.External)
+                if (!Empty && Items[indexPath.Row].Direction == DocumentDirection.External)
                     return ExternalDocumentsTableViewCell.Height;
 
                 return CompactList ? DocumentsCompactTableViewCell.Height : DocumentsTableViewCell.Height;
@@ -1179,16 +1178,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
-                    return 1;
-
-                if (Items.Count < 1)
+                if (loading || Empty)
                     return 1;
 
                 return Items.Count;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => true;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -1246,6 +1249,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
+                    return;
+
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var dp = Items[indexPath.Row];

@@ -224,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ContactPreviewLongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (TableView.Editing)
+            if (TableView.Editing || ((DataSource)TableView.Source).Empty)
                 return;
 
             StartEditing();
@@ -358,14 +358,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => !contactPreviewsInView.SelectMany(v => v).Any();
-            public IEnumerable<ContactPreview> Items => contactPreviewsInView.SelectMany(i => i);
+            public bool Empty => !items.SelectMany(v => v).Any();
+            public IEnumerable<ContactPreview> Items => items.SelectMany(i => i);
 
             readonly WeakReference<ContactsSearchResultsViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            readonly List<List<ContactPreview>> contactPreviewsInView = new List<List<ContactPreview>>(25);
+            readonly List<List<ContactPreview>> items = new List<List<ContactPreview>>(25);
 
             public DataSource(ContactsSearchResultsViewController viewController, UITableView tableView)
             {
@@ -378,18 +378,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (!contactPreviewsInView.SelectMany(v => v).Any())
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_contacts_found"));
                     return emptyCell;
                 }
 
-                var cp = contactPreviewsInView[indexPath.Section][indexPath.Row];
+                var cp = items[indexPath.Section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(ContactsTableViewCell.Key) as ContactsTableViewCell ?? ContactsTableViewCell.Create();
                 cell.Initialize(cp);
-
                 return cell;
             }
 
@@ -397,36 +396,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (!contactPreviewsInView.SelectMany(v => v).Any())
-                    return 1;
-
-                return contactPreviewsInView.Count;
+                return items.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (!contactPreviewsInView.SelectMany(v => v).Any())
-                    return 1;
-
-                return contactPreviewsInView[(int)section].Count;
+                return items[(int)section].Count;
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView) => contactPreviewsInView.SelectMany(i => i)
-                                                                                                       .Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
-                                                                                                       .Distinct()
-                                                                                                       .ToArray();
+            public override string[] SectionIndexTitles(UITableView tableView) => items.SelectMany(i => i)
+                                                                                       .Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
+                                                                                       .Distinct()
+                                                                                       .ToArray();
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
-                for (var section = 0; section < contactPreviewsInView.Count; section++)
+                for (var section = 0; section < items.Count; section++)
                 {
-                    var row = contactPreviewsInView[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
+                    var row = items[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
                     if (row >= 0)
                     {
                         tableView.ScrollToRow(NSIndexPath.FromRowSection(row, section), UITableViewScrollPosition.Top, true);
@@ -437,13 +430,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => true;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var actions = new List<UITableViewRowAction>();
 
-                var contactPreview = contactPreviewsInView[indexPath.Section][indexPath.Row];
+                var contactPreview = items[indexPath.Section][indexPath.Row];
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                     Localization.GetString("copy_to_worktray_ml"),
@@ -472,7 +472,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView.Editing)
                     return;
 
-                var cp = contactPreviewsInView[indexPath.Section][indexPath.Row];
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
+                var cp = items[indexPath.Section][indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.ContactSelected(tableView, cp);
             }
 
@@ -480,16 +484,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                var count = contactPreviewsInView.Count;
+                var count = items.Count;
                 var isInputListPopulated = contactPreviews.Any();
 
                 if (isInputListPopulated)
-                    contactPreviewsInView.Add(contactPreviews);
+                    items.Add(contactPreviews);
 
                 if (count == 0)
                     tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 else if (isInputListPopulated)
-                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(contactPreviewsInView.Count - 1), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(items.Count - 1), UITableViewRowAnimation.Fade);
             }
 
             public void RemoveItems(List<int> contactsId)
@@ -499,11 +503,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var indexPaths = contactsId.Select(id => FindItemIndexPath(id)).Where(idx => idx != null).OrderByDescending(idx => idx.Section).ThenByDescending(idx => idx.Row).ToList();
                 foreach (var indexPath in indexPaths)
                 {
-                    contactPreviewsInView[indexPath.Section].RemoveAt(indexPath.Row);
-                    if (!contactPreviewsInView[indexPath.Section].Any())
+                    items[indexPath.Section].RemoveAt(indexPath.Row);
+                    if (!items[indexPath.Section].Any())
                     {
-                        contactPreviewsInView.RemoveAt(indexPath.Section);
-                        if (contactPreviewsInView.Count == 0)
+                        items.RemoveAt(indexPath.Section);
+                        if (items.Count == 0)
                             tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                         else
                             tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
@@ -519,7 +523,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                contactPreviewsInView.Clear();
+                items.Clear();
 
                 var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
@@ -530,21 +534,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
+            public ContactPreview FindItemAtIndexPath(NSIndexPath indexPath) => items[indexPath.Section][indexPath.Row];
+
             public NSIndexPath FindItemIndexPath(ContactPreview cp) => FindItemIndexPath(cp.Id);
 
             public NSIndexPath FindItemIndexPath(int id)
             {
-                for (var section = 0; section < contactPreviewsInView.Count; section++)
-                    for (var row = 0; row < contactPreviewsInView[section].Count; row++)
-                        if (contactPreviewsInView[section][row].Id == id)
+                for (var section = 0; section < items.Count; section++)
+                    for (var row = 0; row < items[section].Count; row++)
+                        if (items[section][row].Id == id)
                             return NSIndexPath.FromRowSection(row, section);
 
                 return null;
-            }
-
-            public ContactPreview FindItemAtIndexPath(NSIndexPath indexPath)
-            {
-                return contactPreviewsInView[indexPath.Section][indexPath.Row];
             }
         }
 

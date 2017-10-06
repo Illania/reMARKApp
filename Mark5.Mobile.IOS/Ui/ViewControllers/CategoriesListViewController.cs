@@ -147,13 +147,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => !categoriesInView.Any();
+            public bool Empty => !items.Any();
 
             readonly WeakReference<UITableView> tableViewWeakReference;
 
-            readonly List<Category> categoriesInView = new List<Category>();
-
             bool loading = true;
+            readonly List<Category> items = new List<Category>();
 
             public DataSource(UITableView tableView)
             {
@@ -173,28 +172,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.Key) as CategoriesTableViewCell ?? CategoriesTableViewCell.Create();
-                cell.Initialize(categoriesInView[indexPath.Row]);
+                cell.Initialize(items[indexPath.Row]);
                 return cell;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (categoriesInView.Count < 1)
-                    return 1;
-
-                return categoriesInView.Count;
+                return items.Count;
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView) => categoriesInView.Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
-                                                                                                  .Distinct()
-                                                                                                  .ToArray();
+            public override string[] SectionIndexTitles(UITableView tableView) => items.Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
+                                                                                       .Distinct()
+                                                                                       .ToArray();
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
-                var row = categoriesInView.FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
+                var row = items.FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
                 if (row >= 0)
                     tableView.ScrollToRow(NSIndexPath.FromRowSection(row, 0), UITableViewScrollPosition.Top, true);
 
@@ -207,8 +203,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                categoriesInView.Clear();
-                categoriesInView.AddRange(categories.OrderBy(c => c.Name));
+                items.Clear();
+                items.AddRange(categories.OrderBy(c => c.Name));
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
@@ -216,7 +212,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                categoriesInView.Clear();
+                items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }

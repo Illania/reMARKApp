@@ -372,15 +372,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void InitializeSections()
             {
-                birthdateSection = new BirthdateSection(this);
-
                 var sectionsToInsert = new List<AbstractSection> {
                     new GeneralSection(this),
                     new EmailAddressesSection(this),
                     new PhoneNumbersSection(this, CommunicationAddressType.Phone),
                     new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
                     new PhysicalAddressesSection(this),
-                    birthdateSection,
+                    (birthdateSection = new BirthdateSection(this)),
                     new AdditionalSection(this)
                 };
 

@@ -201,14 +201,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public static readonly nint Failed = 1;
             }
 
-            public bool Empty => !documentsToUploadInView.SelectMany(kv => kv.Value).Any();
-
             readonly WeakReference<DocumentsToUploadListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-
-            readonly Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>> documentsToUploadInView = new Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>>
+            readonly Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>> items = new Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>>
             {
                 { Section.Pending, new List<(Guid, DocumentPreview)>(25) },
                 { Section.Failed, new List<(Guid, DocumentPreview)>(25) }
@@ -225,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (documentsToUploadInView[indexPath.Section].Count < 1)
+                if (items[indexPath.Section].Count < 1)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     if (indexPath.Section == Section.Pending)
@@ -235,7 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var dp = documentsToUploadInView[indexPath.Section][indexPath.Row];
+                var dp = items[indexPath.Section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(DocumentToUploadTableViewCell.Key) as DocumentToUploadTableViewCell ?? DocumentToUploadTableViewCell.Create();
                 cell.Initialize(dp, indexPath.Section);
@@ -246,13 +243,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || items[section].Count < 1)
                     return 1;
 
-                if (documentsToUploadInView[section].Count < 1)
-                    return 1;
-
-                return documentsToUploadInView[section].Count;
+                return items[section].Count;
             }
 
             public override string TitleForHeader(UITableView tableView, nint section)
@@ -270,33 +264,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (tableView.Editing)
+                    return;
+
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
                 if (indexPath.Section == Section.Failed)
-                    viewControllerWeakReference.Unwrap()?.FailedDocumentSelected(documentsToUploadInView[Section.Failed][indexPath.Row].Guid);
+                    viewControllerWeakReference.Unwrap()?.FailedDocumentSelected(items[Section.Failed][indexPath.Row].Guid);
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return false;
+                
                 return indexPath.Section == Section.Failed;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (indexPath.Section == Section.Pending)
-                    return new UITableViewRowAction[0];
-
                 var actions = new UITableViewRowAction[2];
                 actions[0] = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
                                                          Localization.GetString("delete"),
                                                          (a, nsip) =>
                 {
-                    viewControllerWeakReference.Unwrap()?.DeleteFailedDocumentToUpload(documentsToUploadInView[indexPath.Section][indexPath.Row]);
+                    viewControllerWeakReference.Unwrap()?.DeleteFailedDocumentToUpload(items[indexPath.Section][indexPath.Row]);
                 });
                 actions[0].BackgroundColor = Theme.Brown;
                 actions[1] = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                          Localization.GetString("resend"),
                                                          (a, nsip) =>
                 {
-                    viewControllerWeakReference.Unwrap()?.ResendFailedDocumentToUpload(documentsToUploadInView[indexPath.Section][indexPath.Row]);
+                    viewControllerWeakReference.Unwrap()?.ResendFailedDocumentToUpload(items[indexPath.Section][indexPath.Row]);
                 });
                 actions[1].BackgroundColor = Theme.DarkBlue;
                 return actions;
@@ -306,10 +308,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                documentsToUploadInView[Section.Pending].Clear();
-                documentsToUploadInView[Section.Pending].AddRange(queue);
-                documentsToUploadInView[Section.Failed].Clear();
-                documentsToUploadInView[Section.Failed].AddRange(failed);
+                items[Section.Pending].Clear();
+                items[Section.Pending].AddRange(queue);
+                items[Section.Failed].Clear();
+                items[Section.Failed].AddRange(failed);
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Pending), UITableViewRowAnimation.Fade);
@@ -321,8 +323,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                documentsToUploadInView[Section.Pending].Clear();
-                documentsToUploadInView[Section.Failed].Clear();
+                items[Section.Pending].Clear();
+                items[Section.Failed].Clear();
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Pending), UITableViewRowAnimation.Fade);

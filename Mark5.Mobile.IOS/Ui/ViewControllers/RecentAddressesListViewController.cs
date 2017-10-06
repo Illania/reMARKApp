@@ -140,13 +140,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => !recentAddressesInView.Any();
+            public bool Empty => !items.Any();
 
             readonly WeakReference<RecentAddressesListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            readonly List<RecentAddress> recentAddressesInView = new List<RecentAddress>(25);
+            readonly List<RecentAddress> items = new List<RecentAddress>(25);
 
             public DataSource(RecentAddressesListViewController viewController, UITableView tableView)
             {
@@ -166,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var ra = recentAddressesInView[indexPath.Row];
+                var ra = items[indexPath.Row];
 
                 if (string.IsNullOrWhiteSpace(ra.Name))
                 {
@@ -188,15 +188,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return recentAddressesInView.Count;
+                return items.Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.Editing)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                var ra = recentAddressesInView[indexPath.Row];
+                var ra = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.RecentAddressSelected(ra);
             }
 
@@ -204,10 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                var isInputListPopulated = recentAddresses.Any();
-
-                if (isInputListPopulated)
-                    recentAddressesInView.AddRange(recentAddresses);
+                items.AddRange(recentAddresses);
 
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
@@ -216,9 +214,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                var count = recentAddressesInView.Count;
+                var count = items.Count;
 
-                recentAddressesInView.Clear();
+                items.Clear();
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);

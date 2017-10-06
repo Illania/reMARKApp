@@ -227,7 +227,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ShortcodePreviewLongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (TableView.Editing)
+            if (TableView.Editing || ((DataSource)TableView.Source).Empty)
                 return;
 
             StartEditing();
@@ -377,14 +377,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => !shortcodePreviewsInView.SelectMany(v => v).Any();
-            public IEnumerable<ShortcodePreview> Items => shortcodePreviewsInView.SelectMany(i => i);
+            public bool Empty => !items.Any();
 
             readonly WeakReference<ShortcodesSearchResultsViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            readonly List<List<ShortcodePreview>> shortcodePreviewsInView = new List<List<ShortcodePreview>>(25);
+            readonly List<List<ShortcodePreview>> items = new List<List<ShortcodePreview>>(25);
 
             public DataSource(ShortcodesSearchResultsViewController viewController, UITableView tableView)
             {
@@ -397,18 +396,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (!shortcodePreviewsInView.SelectMany(v => v).Any())
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_shortcodes_found"));
                     return emptyCell;
                 }
 
-                var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
+                var cp = items[indexPath.Section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
                 cell.Initialize(cp);
-
                 return cell;
             }
 
@@ -416,36 +414,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (!shortcodePreviewsInView.SelectMany(v => v).Any())
-                    return 1;
-
-                return shortcodePreviewsInView.Count;
+                return items.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (!shortcodePreviewsInView.SelectMany(v => v).Any())
-                    return 1;
-
-                return shortcodePreviewsInView[(int)section].Count;
+                return items[(int)section].Count;
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView) => shortcodePreviewsInView.SelectMany(i => i)
-                                                                                                         .Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
-                                                                                                         .Distinct()
-                                                                                                         .ToArray();
+            public override string[] SectionIndexTitles(UITableView tableView) => items.SelectMany(i => i)
+                                                                                       .Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
+                                                                                       .Distinct()
+                                                                                       .ToArray();
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
-                for (var section = 0; section < shortcodePreviewsInView.Count; section++)
+                for (var section = 0; section < items.Count; section++)
                 {
-                    var row = shortcodePreviewsInView[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
+                    var row = items[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
                     if (row >= 0)
                     {
                         tableView.ScrollToRow(NSIndexPath.FromRowSection(row, section), UITableViewScrollPosition.Top, true);
@@ -456,21 +448,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => true;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var actions = new List<UITableViewRowAction>();
 
-                var shortcodePreview = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
+                var shortcodePreview = items[indexPath.Section][indexPath.Row];
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                     Localization.GetString("copy_to_worktray_ml"),
                     (a, ip) =>
-                    {
-                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(shortcodePreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
-                    });
+                {
+                    viewControllerWeakReference.Unwrap()?.CopyToWorktray(shortcodePreview);
+                    viewControllerWeakReference.Unwrap()?.EndEditing();
+                });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
 
@@ -491,7 +490,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (tableView.Editing)
                     return;
 
-                var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
+                var cp = items[indexPath.Section][indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.ShortcodeSelected(tableView, cp);
             }
 
@@ -499,16 +502,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                var count = shortcodePreviewsInView.Count;
+                var count = items.Count;
                 var isInputListPopulated = shortcodePreviews.Any();
 
                 if (isInputListPopulated)
-                    shortcodePreviewsInView.Add(shortcodePreviews);
+                    items.Add(shortcodePreviews);
 
                 if (count == 0)
                     tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 else if (isInputListPopulated)
-                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(shortcodePreviewsInView.Count - 1), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(items.Count - 1), UITableViewRowAnimation.Fade);
             }
 
             public void RemoveItems(List<int> shortcodeIds)
@@ -518,11 +521,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var indexPaths = shortcodeIds.Select(id => FindItemIndexPath(id)).Where(idx => idx != null).OrderByDescending(idx => idx.Section).ThenByDescending(idx => idx.Row).ToList();
                 foreach (var indexPath in indexPaths)
                 {
-                    shortcodePreviewsInView[indexPath.Section].RemoveAt(indexPath.Row);
-                    if (!shortcodePreviewsInView[indexPath.Section].Any())
+                    items[indexPath.Section].RemoveAt(indexPath.Row);
+                    if (!items[indexPath.Section].Any())
                     {
-                        shortcodePreviewsInView.RemoveAt(indexPath.Section);
-                        if (shortcodePreviewsInView.Count == 0)
+                        items.RemoveAt(indexPath.Section);
+                        if (items.Count == 0)
                             tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                         else
                             tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
@@ -538,7 +541,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                shortcodePreviewsInView.Clear();
+                items.Clear();
 
                 var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
@@ -549,22 +552,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
+            public ShortcodePreview FindItemAtIndexPath(NSIndexPath indexPath) => items[indexPath.Section][indexPath.Row];
+
             public NSIndexPath FindItemIndexPath(ShortcodePreview sp) => FindItemIndexPath(sp.Id);
 
             public NSIndexPath FindItemIndexPath(int id)
             {
-                for (var section = 0; section < shortcodePreviewsInView.Count; section++)
-                    for (var row = 0; row < shortcodePreviewsInView[section].Count; row++)
-                        if (shortcodePreviewsInView[section][row].Id == id)
+                for (var section = 0; section < items.Count; section++)
+                    for (var row = 0; row < items[section].Count; row++)
+                        if (items[section][row].Id == id)
                             return NSIndexPath.FromRowSection(row, section);
 
                 return null;
             }
 
-            public ShortcodePreview FindItemAtIndexPath(NSIndexPath indexPath)
-            {
-                return shortcodePreviewsInView[indexPath.Section][indexPath.Row];
-            }
         }
 
         #endregion

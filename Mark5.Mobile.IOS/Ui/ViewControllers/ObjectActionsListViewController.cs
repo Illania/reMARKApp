@@ -138,13 +138,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => objectActionsInView.Count < 1;
+            public bool Empty => items.Count < 1;
 
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
             string[] objectActionsSections = new string[0];
-            Dictionary<string, ObjectAction[]> objectActionsInView = new Dictionary<string, ObjectAction[]>();
+            Dictionary<string, ObjectAction[]> items = new Dictionary<string, ObjectAction[]>();
 
             public DataSource(UITableView tableView)
             {
@@ -156,7 +156,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (objectActionsInView.Count < 1)
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_object_actions"));
@@ -164,7 +164,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var section = objectActionsSections[indexPath.Section];
-                var oa = objectActionsInView[section][indexPath.Row];
+                var oa = items[section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.Key) as ObjectActionsTableViewCell ?? ObjectActionsTableViewCell.Create();
                 cell.Initialize(oa);
@@ -174,22 +174,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
-                    return 1;
-
-                if (objectActionsInView.Count < 1)
+                if (loading || Empty)
                     return 1;
 
                 var sectionName = objectActionsSections[section];
-                return objectActionsInView[sectionName].Length;
+                return items[sectionName].Length;
             }
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
-                    return 1;
-
-                if (objectActionsInView.Count < 1)
+                if (loading || Empty)
                     return 1;
 
                 return objectActionsSections.Length;
@@ -197,11 +191,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                if (loading)
-                    return string.Empty;
-
-                if (objectActionsInView.Count < 1)
-                    return string.Empty;
+                if (loading || Empty)
+                    return null;
 
                 return objectActionsSections[section];
             }
@@ -213,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 objectActionsSections = objectActions.Keys.ToArray();
-                objectActionsInView = new Dictionary<string, ObjectAction[]>(objectActions);
+                items = new Dictionary<string, ObjectAction[]>(objectActions);
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
@@ -227,7 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = true;
 
                 objectActionsSections = new string[0];
-                objectActionsInView.Clear();
+                items.Clear();
 
                 var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 

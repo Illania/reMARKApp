@@ -267,12 +267,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
+            public bool Empty => items.Count < 1;
 
             readonly WeakReference<NotificationsListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
-            public List<Notification> Items { get; } = new List<Notification>();
             bool loading = true;
+            readonly List<Notification> items = new List<Notification>();
 
             public DataSource(NotificationsListViewController viewController, UITableView tableView)
             {
@@ -285,14 +286,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (Items.Count < 1)
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_notifications"));
                     return emptyCell;
                 }
 
-                var n = Items[indexPath.Row];
+                var n = items[indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
                 cell.Initialize(n);
@@ -302,34 +303,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableViewWeakReference.Unwrap()?.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                var n = Items[indexPath.Row];
+                var n = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.NotificationSelected(n, indexPath);
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (Items.Count < 1)
-                    return 1;
-
-                return Items.Count;
+                return items.Count;
             }
 
             public void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
             {
                 loading = false;
 
-                Items.Clear();
+                items.Clear();
 
                 if (filter == null)
-                    Items.AddRange(notifications);
+                    items.AddRange(notifications);
                 else
-                    Items.AddRange(notifications.Where(filter).ToList());
+                    items.AddRange(notifications.Where(filter).ToList());
 
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
@@ -338,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                Items.Clear();
+                items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }

@@ -16,13 +16,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
-        string title;
-        T[] data;
+        readonly string title;
+        readonly T[] data;
         T[] preselected;
-        Func<T, string> description;
-        IEqualityComparer<T> equalityComparer;
+        readonly Func<T, string> description;
+        readonly IEqualityComparer<T> equalityComparer;
 
-        HashSet<T> selectedItems;
+        readonly HashSet<T> selectedItems;
 
         public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
             : base(UITableViewStyle.Grouped)
@@ -92,11 +92,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             cancelItem.Clicked -= CancelItem_Clicked;
             doneItem.Clicked -= DoneItem_Clicked;
-
-            title = null;
-            data = null;
-            description = null;
-            selectedItems = null;
         }
 
         public override void Recycle()
@@ -122,19 +117,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             DismissViewController(true, null);
         }
 
-        public override nint RowsInSection(UITableView tableView, nint section)
-        {
-            return data.Length;
-        }
+        public override nint RowsInSection(UITableView tableView, nint section) => data.Length;
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell", UITableViewCellSelectionStyle.None);
-
             var d = data[indexPath.Row];
+            var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell", UITableViewCellSelectionStyle.None);
             cell.TextLabel.Text = description(d);
             cell.Accessory = selectedItems.Contains(d) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-
             return cell;
         }
 
@@ -142,12 +132,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
+            var cell = tableView.CellAt(indexPath);
+            if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                return;
+            
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
             selectedItems.Add(data[indexPath.Row]);
         }
 
         public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
         {
+            var cell = tableView.CellAt(indexPath);
+            if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                return;
+            
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
             selectedItems.Remove(data[indexPath.Row]);
         }

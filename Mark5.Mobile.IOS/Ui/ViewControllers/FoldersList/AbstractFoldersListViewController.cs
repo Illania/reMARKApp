@@ -952,6 +952,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading[indexPath.Section] || foldersInView[indexPath.Section].Count < 1 || tableView.Editing)
+                    return;
+                
                 var f = foldersInView[indexPath.LongSection][indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
@@ -982,7 +985,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (section == Section.Local)
                     return Localization.GetString("local_folders").ToUpper(CultureInfo.CurrentCulture);
 
-                return string.Empty;
+                return null;
             }
 
             public override bool ShouldIndentWhileEditing(UITableView tableView, NSIndexPath indexPath)
@@ -997,6 +1000,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading[indexPath.Section] || foldersInView[indexPath.Section].Count < 1 || tableView.Editing)
+                    return new UITableViewRowAction[0];
+                
                 if (disableRowActions)
                     return new UITableViewRowAction[0];
 
@@ -1271,6 +1277,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading || foldersInView.Count < 1 || tableView.Editing)
+                    return;
+                
                 var f = foldersInView[indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
@@ -1292,6 +1301,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading || foldersInView.Count < 1 || tableView.Editing)
+                    return new UITableViewRowAction[0];
+                
                 if (disableRowActions)
                     return new UITableViewRowAction[0];
 
@@ -1496,6 +1508,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
+                if (loading || foldersInView.Count < 1 || tableView.Editing)
+                    return;
+                
                 var f = foldersInView[indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)

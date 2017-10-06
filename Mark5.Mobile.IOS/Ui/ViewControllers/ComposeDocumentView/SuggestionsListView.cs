@@ -248,7 +248,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             public bool Empty => !Suggestions.Any();
 
             public bool Searching { get; set; }
-
             public bool Loading => answersReceived < 3 && Searching;
 
             int answersReceived;
@@ -311,7 +310,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (Empty)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var printableSuggestion = Suggestions[indexPath.Row];

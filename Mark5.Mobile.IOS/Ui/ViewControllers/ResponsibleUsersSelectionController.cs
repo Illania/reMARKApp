@@ -154,14 +154,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => systemUsersInView.Count < 1;
+            public bool Empty => items.Count < 1;
             public List<SystemUser> SelectedItems { get; set; } = new List<SystemUser>();
 
             readonly WeakReference<ResponsibleUsersSelectionController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            readonly List<SystemUser> systemUsersInView = new List<SystemUser>();
+            readonly List<SystemUser> items = new List<SystemUser>();
 
             public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView)
             {
@@ -174,14 +174,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (systemUsersInView.Count < 1)
+                if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_system_users"));
                     return emptyCell;
                 }
 
-                var su = systemUsersInView[indexPath.Row];
+                var su = items[indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
@@ -195,7 +195,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
             {
-                if (SelectedItems.Contains(systemUsersInView.ElementAtOrDefault(indexPath.Row)))
+                if (SelectedItems.Contains(items.ElementAtOrDefault(indexPath.Row)))
                     tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
                 else
                     tableView.DeselectRow(indexPath, false);
@@ -203,38 +203,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (systemUsersInView.Count < 1)
-                    return 1;
-
-                return systemUsersInView.Count;
+                return items.Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
-                SelectedItems.Add(systemUsersInView[indexPath.Row]);
+                SelectedItems.Add(items[indexPath.Row]);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+                
                 cell.Accessory = UITableViewCellAccessory.None;
-                SelectedItems.Remove(systemUsersInView[indexPath.Row]);
+                SelectedItems.Remove(items[indexPath.Row]);
             }
 
             public void SetItems(List<SystemUser> systemUsers, List<int> preselectedSystemUsersId)
             {
                 loading = false;
 
-                systemUsersInView.Clear();
-                systemUsersInView.AddRange(systemUsers.OrderBy(s => s.Username));
+                items.Clear();
+                items.AddRange(systemUsers.OrderBy(s => s.Username));
 
                 SelectedItems.Clear();
-                SelectedItems.AddRange(systemUsersInView.Where(s => preselectedSystemUsersId.Contains(s.Id)));
+                SelectedItems.AddRange(items.Where(s => preselectedSystemUsersId.Contains(s.Id)));
 
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
@@ -243,7 +246,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                systemUsersInView.Clear();
+                items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }
