@@ -59,51 +59,7 @@ namespace Mark5.Mobile.Droid.Service
                     {
                         incomingCallLayout = LayoutNewContext(context);
                         wm.AddView(incomingCallLayout, overlayParams);
-                        /*var incomingNumber = intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber);
-                        Task.Run(async () =>
-                        {
-                            var folder = new Folder();
-                            //folder.Id = 6;
-                            folder.Id = 7;
-                            var cps = await Managers.ContactsManager.GetContactPreviewsAsync(folder, sourceType: SourceType.Auto);
-                            return cps;
-                        }).
-                            ContinueWith(contacts =>
-                            {
-                                if (contacts.IsFaulted)
-                                    throw contacts.Exception;
-
-                                Toast.MakeText(context, "test", ToastLength.Long).Show();
-                                var contact = contacts.Result.Find(cp => cp.PrimaryAddress.Type.Equals(CommunicationAddressType.Phone));// && cp.PrimaryAddressString.Equals(incomingNumber));
-
-                            if (contact != null)
-                                {
-                                    Toast toast = Toast.MakeText(context, "", ToastLength.Long);
-                                    toast.SetText(contact.Name + "is calling :^)");
-                                    toast.Duration = ToastLength.Long;
-                                    toast.Show();
-                                }
-                            }, TaskScheduler.FromCurrentSynchronizationContext());
-
-
-                                     Managers.ContactsManager.GetAllContactPreviews(folder,
-                                                                   (res) =>
-                    {
-                        var contact = res.Find(cp => cp.PrimaryAddress.Type.Equals(CommunicationAddressType.Phone) && cp.PrimaryAddressString.Equals(incomingNumber));
-
-                        if (contact != null)
-                        {
-                            Toast toast = Toast.MakeText(context, "test", ToastLength.Long);
-                            toast.SetText(contact.Name + "is calling :^)");
-                            toast.Duration = ToastLength.Long;
-                            toast.Show();
-                        }
-                    },() => { },
-                                                                   async (ex) => {
-                                                                       CommonConfig.Logger.Error($"Could not identify calling number.", ex);
-
-                                                                       await Dialogs.ShowErrorDialogAsync(this, ex);
-                                                                   });*/
+                        var incomingNumber = intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber);
                     }
                     else //Screen is locked
                     {

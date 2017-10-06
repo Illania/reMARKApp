@@ -1,7 +1,15 @@
 ﻿using System;
-
 using Foundation;
 using CallKit;
+using Mark5.Mobile.Common;
+using System.Threading.Tasks;
+using UIKit;
+using System.Runtime.InteropServices;
+using System.Text;
+using PCLStorage;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Database;
+using System.IO;
 
 namespace CallOverlayExtension
 {
@@ -18,15 +26,13 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
+            //CommonConfig.Logger.Info("WE ARE IN HERE...");
+            Console.WriteLine("WE ARE IN HERE...");
+            /*
             //initialization
-            /*Task.Run(async () =>
+            Task.Run(async () =>
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
-
-                var preferences = new Preferences();
-
-                if (preferences.ResetOnLaunch)
-                    Integration.ClearData();
 
                 CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
                 CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
@@ -34,7 +40,7 @@ namespace CallOverlayExtension
                 CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.Logger = new ConsoleAndFileLogger();
+                /*CommonConfig.Logger = new ConsoleAndFileLogger();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.HttpClientHandler = () => new NativeMessageHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
                 CommonConfig.OnStartTransmission = ActivityIndicator.Show;
@@ -42,9 +48,9 @@ namespace CallOverlayExtension
                 CommonConfig.MessengerHub = new TinyMessengerHub();
                 CommonConfig.Phonebook = new Phonebook();
                 CommonConfig.Reachability = new Reachability();
-                CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
+                CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);*/
 
-                if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
+                /*if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>
                     {
                         var url = NSUrl.FromFilename(filename);
@@ -59,6 +65,22 @@ namespace CallOverlayExtension
                     };
                 else
                     CommonConfig.Utf8Normalizer = filename => filename;
+                
+#if !DEBUG
+                CommonConfig.Logger.Level = LogLevel.INFO;
+#else
+                CommonConfig.Logger.Level = LogLevel.DEBUG;
+#endif
+
+
+
+                //((ConsoleAndFileLogger)CommonConfig.Logger).CleanUpOldLogFiles();
+                await DatabaseUtils.InitializeDatabases();
+
+
+
+            })
+            .Wait();
             */
             if (!AddIdentificationPhoneNumbers(cxContext))
             {
@@ -75,8 +97,8 @@ namespace CallOverlayExtension
         {
             // Numbers must be provided in numerically ascending order.
 
-            long[] phoneNumbers = { 18775555555, 18885555555 };
-            string[] labels = { "Telemarketer", "Local business" };
+            long[] phoneNumbers = { 4560443773};
+            string[] labels = { "Rune"};
 
             for (var i = 0; i < phoneNumbers.Length; i++)
             {
