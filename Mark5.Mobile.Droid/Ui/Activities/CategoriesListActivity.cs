@@ -19,16 +19,13 @@ namespace Mark5.Mobile.Droid
         Toolbar toolbar;
         CategoriesListFragment clf;
 
-        public static Intent CreateIntent(Context context, ContactPreview contactPreview = null, DocumentPreview documentPreview = null)
+        public static Intent CreateIntent(Context context, BusinessEntityPreview bep)
         {
             var intent = new Intent(context, typeof(CategoriesListActivity));
 
-            if(contactPreview != null)
-                intent.PutExtra(BusinessEntityPreviewIntentKey,Serializer.Serialize(contactPreview));
-            
-            if(documentPreview != null)
-               intent.PutExtra(BusinessEntityPreviewIntentKey, Serializer.Serialize(documentPreview)); 
-            
+            if (bep != null)
+                intent.PutExtra(BusinessEntityPreviewIntentKey, Serializer.Serialize(bep));
+
             return intent;
         }
 

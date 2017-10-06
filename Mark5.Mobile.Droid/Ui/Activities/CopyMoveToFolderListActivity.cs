@@ -23,17 +23,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Context context, int modeType, ModuleType moduleType, List<IBusinessEntity> be, Folder folder = null)
+        public static Intent CreateIntent(Context context, ModeType modeType, ModuleType moduleType, List<IBusinessEntity> be, Folder folder = null)
         {
             var intent = new Intent(context, typeof(CopyMoveToFolderListActivity));
-            intent.PutExtra(ModeIntentKey, modeType);
+            intent.PutExtra(ModeIntentKey, (int)modeType);
             intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
             intent.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(be));
 
             if (folder != null)
                 intent.PutExtra(FromFolderIntentKey, Serializer.Serialize(folder));
-            
-            return intent;     
+
+            return intent;
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var listMode = (ModeType) Intent.Extras.GetInt(ModeIntentKey);
+                var listMode = (ModeType)Intent.Extras.GetInt(ModeIntentKey);
                 var moduleType = Serializer.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
                 var be = Intent.HasExtra(BusinessEntitiesIntentKey) ? Serializer.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey)) : null;
                 var fromFolder = Intent.HasExtra(FromFolderIntentKey) ? Serializer.Deserialize<Folder>(Intent.Extras.GetString(FromFolderIntentKey)) : null;
@@ -63,13 +63,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     case ModeType.Copy:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
-                        var (cmflf,tag) = CopyMoveToFolderListFragment.NewInstance(Folder.RootForModule(moduleType), be, actionType: CopyMoveToFolderListFragment.ActionType.Copy, loadRemoteFromCache: true);
+                        var (cmflf, tag) = CopyMoveToFolderListFragment.NewInstance(Folder.RootForModule(moduleType), be, actionType: CopyMoveToFolderListFragment.ActionType.Copy, loadRemoteFromCache: true);
                         ft.Replace(Resource.Id.fragment_container, cmflf, tag);
                         break;
                     case ModeType.Move:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
-                        var (cmflf2,tag2) = CopyMoveToFolderListFragment.NewInstance(Folder.RootForModule(moduleType), be, fromFolder, CopyMoveToFolderListFragment.ActionType.Move, true);
-                        ft.Replace(Resource.Id.fragment_container, cmflf2, tag2); 
+                        var (cmflf2, tag2) = CopyMoveToFolderListFragment.NewInstance(Folder.RootForModule(moduleType), be, fromFolder, CopyMoveToFolderListFragment.ActionType.Move, true);
+                        ft.Replace(Resource.Id.fragment_container, cmflf2, tag2);
                         break;
                 }
 

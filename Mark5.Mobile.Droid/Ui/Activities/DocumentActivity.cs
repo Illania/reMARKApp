@@ -30,19 +30,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (failedDocumentToUploadGuid != null)
                 intent.PutExtra(FailedDocumentToUploadGuidIntentKey, failedDocumentToUploadGuid);
-            
+
             if (folderId != null)
                 intent.PutExtra(FolderIdIntentKey, folderId.Value);
-            
+
             if (documentId != null)
                 intent.PutExtra(DocumentIdIntentKey, documentId.Value);
-            
-            if(documentPreview != null)
-                intent.PutExtra(DocumentPreviewIntentKey, documentPreview);
-            
+
+            if (documentPreview != null)
+                intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+
             if (notificationGuid != null)
                 intent.PutExtra(NotificationGuidIntentKey, notificationGuid);
-            
+
             return intent;
         }
 

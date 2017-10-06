@@ -18,9 +18,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickDateRangeFragment : RetainableStateFragment
     {
-        public Task<(long,long)> Task => tcs.Task;
+        public Task<(long, long)> Task => tcs.Task;
 
-        readonly TaskCompletionSource<(long,long)> tcs = new TaskCompletionSource<(long,long)>();
+        readonly TaskCompletionSource<(long, long)> tcs = new TaskCompletionSource<(long, long)>();
 
         const string FromTimestampBundleKey = "FromTimestamp_f9118547-848d-48fd-a9a8-b2d721494ef8";
         const string ToTimestampBundleKey = "ToTimestamp_680c200a-8617-412f-aec6-8c0c059db839";
@@ -58,6 +58,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(FromTimestampBundleKey))
+                fromTimestamp = Arguments.GetLong(FromTimestampBundleKey);
+
+            if (Arguments.ContainsKey(ToTimestampBundleKey))
+                toTimestamp = Arguments.GetLong(ToTimestampBundleKey);
+
+            if (Arguments.ContainsKey(StartWithToDateBundleKey))
+                startWithToDate = Arguments.GetBoolean(StartWithToDateBundleKey);
+
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
             var scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
@@ -94,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.date);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.date);
 
             CommonConfig.Logger.Info($"Created {nameof(PickDateRangeFragment)}");
         }
@@ -232,8 +241,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            tcs.SetResult((fromTimestamp,toTimestamp));
-            ((AppCompatActivity) Activity).OnBackPressed();
+            tcs.SetResult((fromTimestamp, toTimestamp));
+            ((AppCompatActivity)Activity).OnBackPressed();
         }
 
         #region Retained State

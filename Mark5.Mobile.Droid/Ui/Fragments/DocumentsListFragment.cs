@@ -68,7 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
 
             if (folder != null)
-                args.PutString(FolderBundleKey,Serializer.Serialize(folder));
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
             var fragment = new DocumentsListFragment();
             fragment.Arguments = args;
@@ -388,12 +388,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-	                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                    StartActivity(ComposeDocumentActivity.CreateIntent(Context,
                                                                        DocumentCreationModeFlag.Edit,
-	                                                                   CopyToNewOption.None,
-	                                                                   previousDocumentDirection: documentPreview.Direction,
-	                                                                   previousDocumentFolderId: Folder.Id,
-	                                                                   previousDocumentId: documentPreview.Id));
+                                                                       CopyToNewOption.None,
+                                                                       previousDocumentDirection: documentPreview.Direction,
+                                                                       previousDocumentFolderId: Folder.Id,
+                                                                       previousDocumentId: documentPreview.Id));
                 }
                 else
                 {
@@ -430,7 +430,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void ShowCategories(DocumentPreview documentPreview)
         {
-            StartActivity(CategoriesListActivity.CreateIntent(Context, documentPreview: documentPreview));
+            StartActivity(CategoriesListActivity.CreateIntent(Context, documentPreview));
         }
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -496,7 +496,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context,(int)CopyMoveToFolderListActivity.ModeType.Copy,ModuleType.Documents,
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Documents,
                                                                         CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 actionMode?.Finish();
                 return true;
@@ -504,7 +504,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
                                                                         CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), Folder));
                 actionMode?.Finish();
                 return true;
@@ -633,7 +633,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 

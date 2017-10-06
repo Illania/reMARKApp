@@ -286,7 +286,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     CommonConfig.Logger.Debug($"Retrieved {cps?.Count} contacts");
 
-                Activity.RunOnUiThread(() => adapter.AppendItems(cps));
+                    Activity.RunOnUiThread(() => adapter.AppendItems(cps));
                 },
                 () =>
                 {
@@ -327,14 +327,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 ActionMode?.Finish();
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(),Folder));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), Folder));
                 ActionMode?.Finish();
                 return true;
             }
@@ -414,7 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 

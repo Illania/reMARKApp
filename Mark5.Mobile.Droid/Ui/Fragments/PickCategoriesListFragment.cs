@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (PickCategoriesListFragment fragment, string tag) NewInstance(ObjectType objectType, int[] preselectedCategoryIds)
         {
             var args = new Bundle();
-            args.PutString(ObjectTypeBundleKey, Serializer.Serialize(objectType));
+            args.PutInt(ObjectTypeBundleKey, (int)objectType);
 
             if (preselectedCategoryIds != null)
                 args.PutIntArray(PreselectedCategoryIdsBundleKey, preselectedCategoryIds);
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             if (Arguments.ContainsKey(ObjectTypeBundleKey))
-                objectType = Serializer.Deserialize<ObjectType>(ObjectTypeBundleKey);
+                objectType = (ObjectType)Arguments.GetInt(ObjectTypeBundleKey);
 
             if (Arguments.ContainsKey(PreselectedCategoryIdsBundleKey))
                 preselectedCategoryIds = Arguments.GetIntArray(PreselectedCategoryIdsBundleKey);

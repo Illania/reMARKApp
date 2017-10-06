@@ -239,39 +239,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, 
-                                                                        (int)CopyMoveToFolderListActivity.ModeType.Copy, 
-                                                                        ModuleType.Contacts, 
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context,
+                                                                        CopyMoveToFolderListActivity.ModeType.Copy,
+                                                                        ModuleType.Contacts,
                                                                         new List<IBusinessEntity>
-													                    {
-													                        contactPreview
-													                    }));
+                                                                        {
+                                                                            contactPreview
+                                                                        }));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
 
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, 
-                                                                        (int)CopyMoveToFolderListActivity.ModeType.Move, 
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context,
+                                                                        CopyMoveToFolderListActivity.ModeType.Move,
                                                                         ModuleType.Contacts,
-				                                                        new List<IBusinessEntity>
-				                                                        {
-				                                                                            contactPreview
-				                                                        },
+                                                                        new List<IBusinessEntity>
+                                                                        {
+                                                                                            contactPreview
+                                                                        },
                                                                         folder));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                StartActivityForResult(CategoriesListActivity.CreateIntent(Context,contactPreview), RequestCodes.CategoriesRequest);
+                StartActivityForResult(CategoriesListActivity.CreateIntent(Context, contactPreview), RequestCodes.CategoriesRequest);
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Comments)
             {
-                StartActivityForResult(CommentsListActivity.CreateIntent(Context,contact), RequestCodes.CommentsRequest);
+                StartActivityForResult(CommentsListActivity.CreateIntent(Context, contact), RequestCodes.CommentsRequest);
                 return true;
             }
 
@@ -284,7 +284,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Links)
             {
-                StartActivity(ObjectLinksActivity.CreateIntent(Context,contactPreview));
+                StartActivity(ObjectLinksActivity.CreateIntent(Context, contactPreview));
                 return true;
             }
 
@@ -340,7 +340,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,new List<IBusinessEntity> { contactPreview }));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, new List<IBusinessEntity> { contactPreview }));
             }
         }
 
@@ -423,14 +423,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_children_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
             if (index >= 0)
-                StartActivityForResult(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.New, 
+                StartActivityForResult(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.New,
                                                                            contactType: (int)values[index], parentContactPreview: contactPreview), RequestCodes.ChildrenRequest);
-            
+
         }
 
         void EditContact()
         {
-            StartActivityForResult(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.Edit, contactType: (int)contactPreview.Type, 
+            StartActivityForResult(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.Edit, contactType: (int)contactPreview.Type,
                                                                        contactPreview: contactPreview, contact: contact), RequestCodes.EditRequest);
         }
 
@@ -785,7 +785,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
 
-            var (cf,tag) = NewInstance(folder: folder, contactPreview: cp);
+            var (cf, tag) = NewInstance(folder: folder, contactPreview: cp);
             ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
             ft.Replace(Resource.Id.fragment_container, cf, tag);
             ft.AddToBackStack(null);

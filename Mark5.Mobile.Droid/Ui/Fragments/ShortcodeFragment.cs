@@ -83,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(NotificationGuidBundleKey))
                 NotificationGuid = Serializer.Deserialize<Guid>(Arguments.GetString(NotificationGuidBundleKey));
-            
+
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodeFragment)} [folder.name={folder?.Name}, folder.id={folderId ?? folder?.Id}, shortcodeId={shortcodeId ?? shortcodePreview?.Id}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -182,15 +182,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes,
-                                                                        new List<IBusinessEntity>{  shortcodePreview  }));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Shortcodes,
+                                                                        new List<IBusinessEntity> { shortcodePreview }));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, (int)CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes,
-				                                                        new List<IBusinessEntity>{  shortcodePreview  }, folder));
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Shortcodes,
+                                                                        new List<IBusinessEntity> { shortcodePreview }, folder));
                 return true;
             }
 
@@ -252,7 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context,new List<IBusinessEntity> { shortcodePreview }));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, new List<IBusinessEntity> { shortcodePreview }));
             }
         }
 

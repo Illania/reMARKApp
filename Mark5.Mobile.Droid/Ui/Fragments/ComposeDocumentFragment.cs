@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ComposeDocumentFragment : RetainableStateFragment
     {
         readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>(10);
-        
+
         const string RestoreWorkingCopyBundleKey = "RestoreWorkingCopy_a6c252fc-09b9-44a9-941f-ea3785c0864d";
         const string DocumentCreationModeFlagBundleKey = "DocumentCreationModeFlag_b181c281-54bd-4c21-a476-a69ea0f83872";
         const string CopyToNewOptionBundleKey = "CopyToNewOption_e3d9e971-7873-497c-9239-838e14286d2e";
@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses;
 
         bool restoreWorkingCopy;
-        
+
         DocumentCreationModeFlag documentCreationModeFlag = DocumentCreationModeFlag.New;
         CopyToNewOption copyToNewOption;
 
@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
 
             if (documentCreationModeFlag != DocumentCreationModeFlag.None)
-                args.PutString(DocumentCreationModeFlagBundleKey, Serializer.Serialize(documentCreationModeFlag));
+                args.PutInt(DocumentCreationModeFlagBundleKey, (int)documentCreationModeFlag);
 
             if (copyToNewOption != null)
                 args.PutString(CopyToNewOptionBundleKey, Serializer.Serialize(copyToNewOption.Value));
@@ -106,7 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preconfiguredEmailAddresses != null)
                 args.PutString(PreconfiguredEmailAddressesBundleKey, Serializer.Serialize(preconfiguredEmailAddresses));
-            
+
             var fragment = new ComposeDocumentFragment();
             fragment.Arguments = args;
 
@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             if (Arguments.ContainsKey(DocumentCreationModeFlagBundleKey))
-                documentCreationModeFlag = Serializer.Deserialize<DocumentCreationModeFlag>(Arguments.GetString(DocumentCreationModeFlagBundleKey));
+                documentCreationModeFlag = (DocumentCreationModeFlag)Arguments.GetInt(DocumentCreationModeFlagBundleKey);
 
             if (Arguments.ContainsKey(CopyToNewOptionBundleKey))
                 copyToNewOption = Serializer.Deserialize<CopyToNewOption>(Arguments.GetString(CopyToNewOptionBundleKey));
@@ -499,7 +499,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        
+
         async void RecipientView_AddButtonClicked(object sender, EventArgs e)
         {
             var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
@@ -732,7 +732,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool IsFormValid()
         {
             var recipientAdded = false;
-            foreach (var recipientView in new RecipientsView[] {toView,ccView,bccView})
+            foreach (var recipientView in new RecipientsView[] { toView, ccView, bccView })
                 recipientAdded |= !recipientView.Empty;
 
             if (!recipientAdded)

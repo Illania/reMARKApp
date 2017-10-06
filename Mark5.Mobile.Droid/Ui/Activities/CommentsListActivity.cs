@@ -19,16 +19,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         CommentsListFragment cf;
 
-        public static Intent CreateIntent(Context context, Contact contact = null, Document document = null)
+        public static Intent CreateIntent(Context context, IBusinessEntity be = null)
         {
             var intent = new Intent(context, typeof(CommentsListActivity));
 
-            if(contact != null)
-                intent.PutExtra(EntityIntentKey, Serializer.Serialize(contact));
-            
-            if(document != null)
-                intent.PutExtra(EntityIntentKey, Serializer.Serialize(document));
-            
+            if (be != null)
+                intent.PutExtra(EntityIntentKey, Serializer.Serialize(be));
+
             return intent;
         }
 
@@ -60,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                cf = (CommentsListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                cf = (CommentsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CommentsListActivity)}");
             }
         }
