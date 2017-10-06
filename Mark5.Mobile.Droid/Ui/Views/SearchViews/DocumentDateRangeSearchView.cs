@@ -98,14 +98,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             var (f, tag) = PickDateRangeFragment.NewInstance(fromTimestamp, toTimestamp, startWithTo);
             parentFragment.ReplaceFragment(f, tag);
 
-            var (fromTimeStamp,toTimeStamp) = await f.Task;
-            UpdateTimestamps(fromTimestamp,toTimestamp);
+            var (fromTimeStamp, toTimeStamp) = await f.Task;
+            UpdateTimestamps(fromTimeStamp, toTimeStamp);
         }
 
-        void UpdateTimestamps(long fromTimestamp, long toTimestamp)
+        void UpdateTimestamps(long fromTimeStamp, long toTimeStamp)
         {
-            this.fromTimestamp = fromTimestamp;
-            this.toTimestamp = toTimestamp;
+            fromTimestamp = fromTimeStamp;
+            toTimestamp = toTimeStamp;
 
             UpdateText();
             UpdateCriteria();

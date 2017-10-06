@@ -557,7 +557,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             });
 
-            Activity?.OnBackPressed();
+            Activity?.Finish();
         }
 
         void SendDocument(bool saveDraft = false)
