@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
     public class ComposeDocumentViewController : AbstractViewController
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
+        const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
 
         string DefaultTitle = Localization.GetString("new_document");
 
@@ -633,12 +633,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug("Saving working copy...");
 
-                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
-                {
-                    var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
-                    foreach (var subView in subViews)
-                        await subView.UpdateDocument();
-                });
+                ComposeDocumentSubView[] subViews = null;
+
+                InvokeOnMainThread(() => subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray());
+
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
