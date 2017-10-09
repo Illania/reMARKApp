@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
             intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
 
-            return intent;    
+            return intent;
         }
 
         protected override async void OnCreate(Bundle savedInstanceState)
@@ -123,7 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 // We need to call OnPageSelected manually due to a possible bug in ViewPager
                 if (pager.CurrentItem == 0)
-                    pager.Post(() => ((ViewPager.IOnPageChangeListener) this).OnPageSelected(pager.CurrentItem));
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
             }
             else
             {
@@ -136,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 // We need to call OnPageSelected manually due to a possible bug in ViewPager
                 if (pager.CurrentItem == 0)
-                    pager.Post(() => ((ViewPager.IOnPageChangeListener) this).OnPageSelected(pager.CurrentItem));
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
 
                 CommonConfig.Logger.Info($"Restored {nameof(SwipeDocumentActivity)}");
             }

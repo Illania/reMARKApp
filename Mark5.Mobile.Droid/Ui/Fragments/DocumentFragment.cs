@@ -26,7 +26,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentFragment : RetainableStateFragment
+    public class DocumentFragment : BaseFragment
     {
         const string FolderIdBundleKey = "FolderId_7215e56b-5ec3-436d-b4e3-900449cb1ad0";
         const string FolderBundleKey = "Folder_592db8d9-d212-4476-ac83-fd4bb11cc8d9";
@@ -246,14 +246,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnDestroyedByUser()
-        {
-            base.OnDestroyedByUser();
-
-            setReadStatusCancellationTokenSource?.Cancel();
-            setReadStatusCancellationTokenSource = null;
-        }
-
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (resultCode == (int)Result.Ok)
@@ -443,28 +435,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new DocumentFragmentState
-            {
-                FolderId = FolderId,
-                Folder = Folder,
-                DocumentId = DocumentId,
-                DocumentPreview = DocumentPreview
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is DocumentFragmentState dfs)
-            {
-                FolderId = dfs.FolderId;
-                Folder = dfs.Folder;
-                DocumentId = dfs.DocumentId;
-                DocumentPreview = dfs.DocumentPreview;
-            }
         }
 
         void RefreshView()
@@ -986,17 +956,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public static int CommentsRequest = 1;
             public static int CategoriesRequest = 2;
-        }
-
-        class DocumentFragmentState : IRetainableState
-        {
-            public int? FolderId { get; set; }
-
-            public Folder Folder { get; set; }
-
-            public int? DocumentId { get; set; }
-
-            public DocumentPreview DocumentPreview { get; set; }
         }
     }
 }
