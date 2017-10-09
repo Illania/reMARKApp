@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Resource.String.folders,
             Resource.String.notifications
         };
-       
+
         const string RemoteFolderBundleKey = "RemoteFolder_403cbd64-83e9-4e13-8809-0868debb55b9";
 
         Folder remoteFolder;
@@ -38,13 +38,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
 
             if (remoteFolder != null)
-                args.PutString(RemoteFolderBundleKey,Serializer.Serialize(remoteFolder));
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
 
             var fragment = new FoldersNotificationsListFragment();
             fragment.Arguments = args;
 
             var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
-           
+
             return (fragment, tag);
         }
 
@@ -52,7 +52,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if ((Arguments != null) && Arguments.ContainsKey(RemoteFolderBundleKey))
                 remoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
-            
+
+            if (remoteFolder.Root)
+                remoteFolder = Folder.RootForModule(remoteFolder.Module);
+
             CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsRetainableState)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.pager, container, false);
@@ -93,8 +96,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     break;
             }
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = remoteFolder.Root ? null : remoteFolder.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = remoteFolder.Root ? null : remoteFolder.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersNotificationsRetainableState)}");
         }

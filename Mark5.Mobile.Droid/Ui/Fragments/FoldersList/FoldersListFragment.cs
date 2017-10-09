@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
         protected SearchView SearchView;
-        protected RecyclerView RecyclerView;  
+        protected RecyclerView RecyclerView;
         protected SwipeRefreshLayout RefreshLayout;
         protected List<Section> AvailableSections;
         protected bool SearchEnabled;
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (hideSearch != null)
                 args.PutBoolean(HideSearchBundleKey, hideSearch.Value);
-            
+
             var fragment = new FoldersListFragment();
             fragment.Arguments = args;
 
@@ -82,7 +82,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (Arguments.ContainsKey(RemoteFolderBundleKey))
                 RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
-                
+
+            if (RemoteFolder.Root)
+                RemoteFolder = Folder.RootForModule(RemoteFolder.Module);
+
             if (Arguments.ContainsKey(HideSearchBundleKey))
                 HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
 
@@ -91,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
                 LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
-            
+
             Container = container;
 
             CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
@@ -706,7 +709,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (favourite)
                     t = Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
                 else
-                    t = Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);               
+                    t = Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
                 await t;
             }
 
