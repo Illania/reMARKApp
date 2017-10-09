@@ -25,7 +25,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ContactFragment : RetainableStateFragment
+    public class ContactFragment : BaseFragment
     {
         const string FolderIdBundleKey = "FolderId_da4826eb-eb7a-4ceb-bd12-9c735bef1552";
         const string FolderBundleKey = "Folder_40876832-91a3-46d7-a57e-6d850847c2a5";
@@ -850,51 +850,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 contact.Comments.Clear();
                 contact.Comments.AddRange(comments);
             }
-        }
-
-        #endregion
-
-        #region RetainedInstance
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ContactFragmentState
-            {
-                FolderId = folderId,
-                Folder = folder,
-                ContactId = contactId,
-                Contact = contact,
-                ContactPreview = contactPreview
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is ContactFragmentState cfs)
-            {
-                folderId = cfs.FolderId;
-                folder = cfs.Folder;
-                contact = cfs.Contact;
-                contactPreview = cfs.ContactPreview;
-                contactId = cfs.ContactId;
-            }
-        }
-
-        #endregion
-
-        #region State
-
-        class ContactFragmentState : IRetainableState
-        {
-            public int? FolderId { get; set; }
-
-            public Folder Folder { get; set; }
-
-            public int? ContactId { get; set; }
-
-            public Contact Contact { get; set; }
-
-            public ContactPreview ContactPreview { get; set; }
         }
 
         #endregion

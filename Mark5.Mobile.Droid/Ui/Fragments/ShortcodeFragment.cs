@@ -21,7 +21,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ShortcodeFragment : RetainableStateFragment
+    public class ShortcodeFragment : BaseFragment
     {
         const string FolderIdBundleKey = "FolderId_20cd4171-75b6-4c2a-b82e-73b4491da5da";
         const string FolderBundleKey = "Folder_3c6faf65-a2e2-498f-8188-c731b373adb3";
@@ -345,31 +345,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ShortcodeFragmentState
-            {
-                FolderId = folderId,
-                Folder = folder,
-                ShortcodeId = shortcodeId,
-                ShortcodePreview = shortcodePreview,
-                Shortcode = shortcode
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var sfs = restoredState as ShortcodeFragmentState;
-            if (sfs != null)
-            {
-                folderId = sfs.FolderId;
-                folder = sfs.Folder;
-                shortcodeId = sfs.ShortcodeId;
-                shortcodePreview = sfs.ShortcodePreview;
-                shortcode = sfs.Shortcode;
-            }
-        }
-
         void AddressesView_DocumentAddressClicked(object sender, DocumentAddress e)
         {
             if (e.Type == CommunicationAddressType.Email)
@@ -439,19 +414,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.RequestLayout();
 
             Activity.InvalidateOptionsMenu();
-        }
-
-        class ShortcodeFragmentState : IRetainableState
-        {
-            public int? FolderId { get; set; }
-
-            public Folder Folder { get; set; }
-
-            public int? ShortcodeId { get; set; }
-
-            public ShortcodePreview ShortcodePreview { get; set; }
-
-            public Shortcode Shortcode { get; set; }
         }
     }
 }
