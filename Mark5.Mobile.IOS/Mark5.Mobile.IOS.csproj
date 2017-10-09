@@ -110,12 +110,8 @@
 		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.cs" />
@@ -138,7 +134,6 @@
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
@@ -367,9 +362,6 @@
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
 		<InterfaceDefinition Include="Ui\TableViewCells\CategoriesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\CommentsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\ContactInfoTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsCompactTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsTableViewCell.xib" />
@@ -380,7 +372,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\PhysicalAddressTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 	</ItemGroup>

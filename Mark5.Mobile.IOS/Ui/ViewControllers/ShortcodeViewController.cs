@@ -549,36 +549,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
-                
                 if (empty)
                     return null;
 
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
+
                 var row = sections[indexPath.Section].Rows[indexPath.Row];
-                var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
+                var cell = tableView.DequeueReusableCell(row.Id) ?? row.CreateCell();
                 row.Bind(cell);
                 return cell;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
-                    return 1;
-                
                 if (empty)
                     return 0;
+
+                if (loading)
+                    return 1;
 
                 return sections[(int)section].Rows.Count;
             }
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
-                    return 1;
-                
                 if (empty)
                     return 0;
+
+                if (loading)
+                    return 1;
 
                 return sections.Count;
             }
@@ -764,7 +764,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Shortcode = shortcode;
                 }
 
-                public virtual string Key => ShortcodeInfoTableViewCell.DefaultId;
+                public virtual string Id => ShortcodeInfoTableViewCell.DefaultId;
                 public virtual UITableViewCell CreateCell() => new ShortcodeInfoTableViewCell();
                 public abstract void Bind(UITableViewCell cell);
                 public virtual void OnClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
@@ -778,7 +778,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key { get => base.Key + "_Description"; }
+                public override string Id { get => base.Id + "_Description"; }
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -806,7 +806,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     compact = string.IsNullOrWhiteSpace(documentAddress?.Name);
                 }
 
-                public override string Key
+                public override string Id
                 {
                     get
                     {

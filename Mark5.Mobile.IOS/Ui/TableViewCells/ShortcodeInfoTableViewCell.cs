@@ -27,6 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 Editable = false,
                 ScrollEnabled = false,
+                ClipsToBounds = false,
                 TextContainerInset = UIEdgeInsets.Zero,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };

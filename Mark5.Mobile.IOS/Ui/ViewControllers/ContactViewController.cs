@@ -612,7 +612,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void ActionsLinksButton_Clicked(object sender, EventArgs e)
         {
-            var actionLinksListString = new []
+            var actionLinksListString = new[]
             {
                 Localization.GetString("actions"),
                 Localization.GetString("links")
@@ -820,7 +820,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (editButtonItem != null)
                     editButtonItem.Enabled = true;
-                
+
                 ds.EndRefresh(this.contactPreview, contact);
             }
             catch (Exception ex)
@@ -973,36 +973,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
-                if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
-                
                 if (empty)
                     return null;
 
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
+
                 var row = sections[indexPath.Section].Rows[indexPath.Row];
-                var cell = tableView.DequeueReusableCell(row.Key) ?? row.CreateCell();
+                var cell = tableView.DequeueReusableCell(row.Id) ?? row.CreateCell();
                 row.Bind(cell);
                 return cell;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
-                    return 1;
-                
                 if (empty)
                     return 0;
+
+                if (loading)
+                    return 1;
 
                 return sections[(int)section].Rows.Count;
             }
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
-                    return 1;
-                
                 if (empty)
                     return 0;
+
+                if (loading)
+                    return 1;
 
                 return sections.Count;
             }
@@ -1280,8 +1280,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Contact = contact;
                 }
 
-                public virtual string Key => ContactInfoTableViewCell.Key;
-                public virtual UITableViewCell CreateCell() => ContactInfoTableViewCell.Create();
+                public virtual string Id => ContactInfoTableViewCell.DefaultId;
+                public virtual UITableViewCell CreateCell() => new ContactInfoTableViewCell();
                 public abstract void Bind(UITableViewCell cell);
                 public virtual void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
                 public virtual void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
@@ -1294,7 +1294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key { get => base.Key + "_Description"; }
+                public override string Id { get => base.Id + "_Description"; }
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -1320,39 +1320,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakCommunicationAddress = communicationAddress.Wrap();
                 }
 
-                public override string Key
+                public override string Id
                 {
                     get
                     {
                         if (string.IsNullOrWhiteSpace(weakCommunicationAddress.Unwrap()?.Description))
-                            return CommunicationAddressCompactTableViewCell.Key;
+                            return CommunicationAddressTableViewCell.CompactId;
 
-                        return CommunicationAddressTableViewCell.Key;
+                        return CommunicationAddressTableViewCell.DefaultId;
                     }
                 }
 
                 public override UITableViewCell CreateCell()
                 {
                     if (string.IsNullOrWhiteSpace(weakCommunicationAddress.Unwrap()?.Description))
-                        return CommunicationAddressCompactTableViewCell.Create();
+                        return new CommunicationAddressTableViewCell(CommunicationAddressTableViewCell.CompactId);
 
-                    return CommunicationAddressTableViewCell.Create();
+                    return new CommunicationAddressTableViewCell(CommunicationAddressTableViewCell.DefaultId);
                 }
 
                 public override void Bind(UITableViewCell cell)
                 {
                     var ca = weakCommunicationAddress.Unwrap();
 
-                    if (string.IsNullOrWhiteSpace(ca.Description))
-                    {
-                        var cactcv = (CommunicationAddressCompactTableViewCell)cell;
-                        cactcv.Initialize(ca);
-                    }
-                    else
-                    {
-                        var catcv = (CommunicationAddressTableViewCell)cell;
-                        catcv.Initialize(ca);
-                    }
+                    var catcv = (CommunicationAddressTableViewCell)cell;
+                    catcv.Initialize(ca);
                 }
 
                 public override void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1376,9 +1368,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakPhysicalAddress = physicalAddress.Wrap();
                 }
 
-                public override string Key => PhysicalAddressTableViewCell.Key;
+                public override string Id => PhysicalAddressTableViewCell.DefaultId;
 
-                public override UITableViewCell CreateCell() => PhysicalAddressTableViewCell.Create();
+                public override UITableViewCell CreateCell() => new PhysicalAddressTableViewCell();
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -1407,7 +1399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     weakLinkedContactPreview = linkedContactPreview.Wrap();
                 }
 
-                public override string Key => base.Key + "_LinkedContact";
+                public override string Id => base.Id + "_LinkedContact";
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -1442,14 +1434,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key => base.Key + "_WebPage";
+                public override string Id => base.Id + "_WebPage";
 
                 public override void Bind(UITableViewCell cell)
                 {
                     var cic = (ContactInfoTableViewCell)cell;
                     cic.Accessory = UITableViewCellAccessory.DisclosureIndicator;
                     cic.SelectionStyle = UITableViewCellSelectionStyle.Default;
-                    cic.Initialize(Localization.GetString("webpage").ToUpper(), new NSAttributedString(Contact.WebPageAddress, foregroundColor: Theme.DarkBlue, underlineStyle: NSUnderlineStyle.Single));
+                    cic.Initialize(Localization.GetString("webpage").ToUpper(), Contact.WebPageAddress);
                 }
 
                 public override void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -1470,16 +1462,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key => base.Key + "_Birthdate";
+                public override string Id => base.Id + "_Birthdate";
 
                 public override void Bind(UITableViewCell cell)
                 {
                     var cic = (ContactInfoTableViewCell)cell;
                     cic.Accessory = UITableViewCellAccessory.None;
                     cic.SelectionStyle = UITableViewCellSelectionStyle.None;
-                    cic.Initialize(Localization.GetString("birthdate").ToUpper(),
-                                   Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToServerTime()
-                                   .ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsLongDateString());
+                    cic.Initialize(Localization.GetString("birthdate").ToUpper(), Contact.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime()
+                                   .ConvertUtcToServerTime()
+                                   .ConvertDateTimeToTimestampMilliseconds()
+                                   .FormatUserTimestampAsLongDateString());
                 }
             }
 
@@ -1490,7 +1483,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key => base.Key + "_Account";
+                public override string Id => base.Id + "_Account";
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -1513,7 +1506,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key => base.Key + "_Ledger";
+                public override string Id => base.Id + "_Ledger";
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -1536,7 +1529,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key => base.Key + "_Vat";
+                public override string Id => base.Id + "_Vat";
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -1559,7 +1552,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key => base.Key + "_ResponsibleUsers";
+                public override string Id => base.Id + "_ResponsibleUsers";
 
                 public override void Bind(UITableViewCell cell)
                 {
@@ -1577,7 +1570,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                 }
 
-                public override string Key => base.Key + "_ShortId";
+                public override string Id => base.Id + "_ShortId";
 
                 public override void Bind(UITableViewCell cell)
                 {

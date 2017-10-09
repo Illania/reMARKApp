@@ -10,30 +10,68 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class PhysicalAddressTableViewCell : UITableViewCell
+    public class PhysicalAddressTableViewCell : UITableViewCell
     {
-        public static readonly NSString Key = new NSString("PhysicalAddressTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("PhysicalAddressTableViewCell", NSBundle.MainBundle);
 
-        public PhysicalAddressTableViewCell(IntPtr handle)
-            : base(handle)
-        {
-        }
+        public static readonly NSString DefaultId = new NSString(nameof(PhysicalAddressTableViewCell));
 
-        public static PhysicalAddressTableViewCell Create()
+        readonly UILabel topLabel;
+        readonly UITextView bottomTextView;
+        readonly UIImageView iconImage;
+
+        public PhysicalAddressTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-            var cell = (PhysicalAddressTableViewCell) Nib.Instantiate(null, null)[0];
-            cell.TypeLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-3f);
-            cell.AddressLabel.Font = Theme.DefaultFont;
-            cell.IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            return cell;
+            topLabel = new UILabel
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                TextColor = Theme.DarkGray,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            bottomTextView = new UITextView
+            {
+                Editable = false,
+                ScrollEnabled = false,
+                ClipsToBounds = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            bottomTextView.TextContainer.LineFragmentPadding = 0f;
+
+            iconImage = new UIImageView
+            {
+                Image = UIImage.FromBundle(Path.Combine("icons", "map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            ContentView.Add(topLabel);
+            ContentView.Add(bottomTextView);
+            ContentView.Add(iconImage);
+
+            ContentView.AddConstraints(new[]
+            {
+                    topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                    topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
+                    topLabel.BottomAnchor.ConstraintEqualTo(bottomTextView.TopAnchor, -4f),
+                    topLabel.HeightAnchor.ConstraintEqualTo(20f),
+
+                    bottomTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    bottomTextView.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                    bottomTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
+
+                    iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                    iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                    iconImage.WidthAnchor.ConstraintEqualTo(20f),
+                    iconImage.HeightAnchor.ConstraintEqualTo(20f),
+                });
         }
 
         public void Initialize(PhysicalAddress pa)
         {
-            TypeLabel.Text = Localization.GetString("address").ToUpper();
-            if (pa.Type != null && !string.IsNullOrWhiteSpace(pa.Type.Name) && pa.Type.Name != "[None]")
-                TypeLabel.Text += " " + pa.Type.Name.ToUpper();
+            topLabel.Text = Localization.GetString("address").ToUpper();
 
             var cnAddress = new CNMutablePostalAddress
             {
@@ -47,10 +85,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var sb = new StringBuilder();
             if (pa.Type != null && pa.Type.Id > 0)
                 sb.Append(pa.Type.Name).AppendLine();
+            sb.Append(new CNPostalAddressFormatter().GetStringFromPostalAddress(cnAddress));
 
-            var formatter = new CNPostalAddressFormatter();
-            sb.Append(formatter.GetStringFromPostalAddress(cnAddress));
-            AddressLabel.Text = sb.ToString();
+            bottomTextView.AttributedText = new NSAttributedString(sb.ToString(), new UIStringAttributes { Font = Theme.DefaultFont });
         }
     }
 }
