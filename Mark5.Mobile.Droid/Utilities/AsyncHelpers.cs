@@ -8,13 +8,40 @@ namespace Mark5.Mobile.Droid.Utilities
 {
     public static class AsyncHelpers
     {
+        public static Task RunOnUiThreadSync(Activity activity, Action f)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            activity.RunOnUiThread(() =>
+           {
+               f();
+               tcs.SetResult(true);
+           });
+
+            return tcs.Task;
+        }
+
         public static Task RunOnUiThreadAsync(Activity activity, Func<Task> f)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            activity.RunOnUiThread(async () => {
+            activity.RunOnUiThread(async () =>
+            {
                 await f();
                 tcs.SetResult(true);
+            });
+
+            return tcs.Task;
+        }
+
+        public static Task<T> RunOnUiThreadAsync<T>(Activity activity, Func<Task<T>> f)
+        {
+            var tcs = new TaskCompletionSource<T>();
+
+            activity.RunOnUiThread(async () =>
+            {
+                var result = await f();
+                tcs.SetResult(result);
             });
 
             return tcs.Task;
