@@ -142,6 +142,17 @@
 
     #endregion
 
+    #region Shortcodes
+
+    public enum ShortcodeCreationModeFlag
+    {
+        None = 0,
+        New = 1,
+        Edit = 2,
+    }
+
+    #endregion
+
     #region Calendar
 
     public enum CalendarCategoryType

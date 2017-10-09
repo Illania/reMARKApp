@@ -656,7 +656,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void UpdateContactPreview(ContactPreviewChanged m)
+        public void UpdateContactPreview(ContactPreviewChangedMessage m)
         {
             var position = adapter.GetPosition(m.ContactPreview.Id);
             if (position >= 0)

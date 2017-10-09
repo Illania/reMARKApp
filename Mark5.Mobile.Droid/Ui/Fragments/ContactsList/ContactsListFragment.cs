@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
                 fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-                fab.SetImageResource(Resource.Drawable.action_add_contact);
+                fab.SetImageResource(Resource.Drawable.action_add);
                 fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
                 fab.Visibility = ViewStates.Visible;
             }
