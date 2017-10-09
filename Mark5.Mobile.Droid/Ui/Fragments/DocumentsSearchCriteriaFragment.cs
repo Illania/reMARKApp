@@ -52,9 +52,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var paddingLinearLayout = Conversion.ConvertDpToPixels(12);
             var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
-            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
@@ -65,8 +65,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.BackgroundTintList = ColorStateList.ValueOf(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
             fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
 
-            var p = (CoordinatorLayout.LayoutParams) fab.LayoutParameters;
-            p.Gravity = (int) (GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
+            p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
@@ -82,14 +82,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fromToCriteria = new DocumentFromToSearchView(Context);
             subviews.Add(fromToCriteria);
 
-            var extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
-            subviews.Add(extraFieldsCriteria);
+            DocumentExtraFieldsSearchView extraFieldsCriteria = null;
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+            {
+                extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
+                subviews.Add(extraFieldsCriteria);
+            }
 
             var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
             subviews.Add(attUnreadCriteria);
 
-            var handledCriteria = new DocumentHandledSearchView(Context);
-            subviews.Add(handledCriteria);
+            DocumentHandledSearchView handledCriteria = null;
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+            {
+                handledCriteria = new DocumentHandledSearchView(Context);
+                subviews.Add(handledCriteria);
+            }
 
             containerLinearLayout.AddView(directionCriteria);
             containerLinearLayout.AddView(subjectMessageCriteria);
@@ -97,10 +105,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(daterangeCriteria);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+            if (extraFieldsCriteria != null)
                 containerLinearLayout.AddView(extraFieldsCriteria);
             containerLinearLayout.AddView(attUnreadCriteria);
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+            if (handledCriteria != null)
                 containerLinearLayout.AddView(handledCriteria);
 
             HasOptionsMenu = true;
@@ -169,8 +177,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
         }
@@ -229,7 +237,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             searchCriteria = new SearchDocumentsCriteria();
             containerLinearLayout.RequestFocus();
-            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
             RefreshViews();
 
             try
@@ -263,7 +271,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void ReplaceFragment(Fragment f, string tag)
         {
-            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
             fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
@@ -302,8 +310,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var df = restoredState as DocumentSearchCriteriaFragmentState;
-            if (df != null)
+            if (restoredState is DocumentSearchCriteriaFragmentState df)
                 searchCriteria = df.Criteria;
         }
 

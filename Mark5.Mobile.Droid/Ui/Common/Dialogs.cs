@@ -371,12 +371,15 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         #region Error dialogs
 
-        public static Task ShowErrorDialogAsync(Activity activity, Exception ex)
+        public static Task ShowErrorDialogAsync(Context context, Exception ex)
         {
+            if (context == null)
+                return Task.CompletedTask;
+
             var tcs = new TaskCompletionSource<bool>();
-            var builder = new MaterialDialog.Builder(activity);
-            builder.Title(GetErrorTitle(activity, ex));
-            builder.Content(GetErrorMessage(activity, ex));
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(GetErrorTitle(context, ex));
+            builder.Content(GetErrorMessage(context, ex));
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             if (ShouldShowCreateReport(ex))
@@ -384,14 +387,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 builder.NeutralText(Resource.String.report);
                 builder.OnNeutral(new SingleButtonCallback(() =>
                 {
-                    var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                    var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(t =>
                             {
                                 dismissAction();
 
                                 if (!t.IsFaulted)
-                                    activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
+                                    context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
 
                                 tcs.SetResult(true);
                             },
@@ -403,11 +406,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static void ShowErrorDialog(Activity activity, Exception ex, Action action = null)
+        public static void ShowErrorDialog(Context context, Exception ex, Action action = null)
         {
-            var builder = new MaterialDialog.Builder(activity);
-            builder.Title(GetErrorTitle(activity, ex));
-            builder.Content(GetErrorMessage(activity, ex));
+            if (context == null)
+                return;
+
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(GetErrorTitle(context, ex));
+            builder.Content(GetErrorMessage(context, ex));
             builder.PositiveText(Resource.String.ok);
             if (action != null)
                 builder.OnPositive(new SingleButtonCallback(action));
@@ -416,17 +422,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 builder.NeutralText(Resource.String.report);
                 builder.OnNeutral(new SingleButtonCallback(() =>
                 {
-                    var dismissAction = ShowInfiniteProgressDialog(activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                    var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(t =>
                             {
                                 dismissAction();
 
                                 if (!t.IsFaulted)
-                                    activity.StartActivity(SystemReportCollector.CreateShareReportIntent(activity, t.Result));
+                                    context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
 
-                                if (action != null)
-                                    action();
+                                action?.Invoke();
                             },
                             TaskScheduler.FromCurrentSynchronizationContext());
                 }));
@@ -532,8 +537,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             public bool OnSelection(MaterialDialog p0, View p1, int p2, string p3)
             {
-                if (action != null)
-                    action(p2);
+                action?.Invoke(p2);
                 return true;
             }
         }
@@ -549,8 +553,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             public bool OnSelection(MaterialDialog p0, int[] p1, string[] p2)
             {
-                if (action != null)
-                    action(p1);
+                action?.Invoke(p1);
                 return true;
             }
         }
@@ -566,8 +569,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             public void OnSelection(MaterialDialog p0, View p1, int p2, string p3)
             {
-                if (action != null)
-                    action(p2);
+                action?.Invoke(p2);
             }
         }
 
