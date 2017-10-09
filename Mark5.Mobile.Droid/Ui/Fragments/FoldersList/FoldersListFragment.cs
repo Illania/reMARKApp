@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             fab = ((BaseAppCompatActivity)Activity).Fab;
-            if (HideFab || RemoteFolder?.Module == ModuleType.Shortcodes)
+            if (HideFab)
             {
                 fab.Visibility = ViewStates.Gone;
                 fab = null;
@@ -151,8 +151,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (RemoteFolder?.Module == ModuleType.Contacts
                     && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
                 {
-                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetImageResource(Resource.Drawable.action_add);
                     fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
+                    fab.Visibility = ViewStates.Visible;
+                }
+                if (RemoteFolder?.Module == ModuleType.Shortcodes
+                    && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
+                {
+                    fab.SetImageResource(Resource.Drawable.action_add);
+                    fab.SetOnClickListener(new ActionOnClickListener(CreateShortcode));
                     fab.Visibility = ViewStates.Visible;
                 }
             }
@@ -246,6 +253,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
                 StartActivity(intent);
             }
+        }
+
+        void CreateShortcode()
+        {
+            var intent = new Intent(Context, typeof(AddEditShortcodeActivity));
+            intent.PutExtra(AddEditShortcodeActivity.ShortcodeCreationModeFlagIntentKey, (int)ShortcodeCreationModeFlag.New);
+            StartActivity(intent);
         }
 
         #endregion

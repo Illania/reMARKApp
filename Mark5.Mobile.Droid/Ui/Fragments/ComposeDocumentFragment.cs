@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
+        const int AutoSaveWorkingCopyInterval = 5000; // 2.5 seconds
 
         public bool RestoreWorkingCopy { get; set; }
 
@@ -610,11 +610,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug("Saving working copy...");
 
-                await AsyncHelpers.RunOnUiThreadAsync(Activity, async () =>
-                {
-                    foreach (var subView in subViews)
-                        await subView.UpdateDocument();
-                });
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {

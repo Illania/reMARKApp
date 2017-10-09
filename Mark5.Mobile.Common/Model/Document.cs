@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Mark5.Mobile.Common.Utilities;
+using Newtonsoft.Json;
 using SQLite;
 
 namespace Mark5.Mobile.Common.Model
@@ -91,6 +93,7 @@ namespace Mark5.Mobile.Common.Model
 
         Dictionary<DocumentExtraFieldInfo, string> extraFields;
 
+        [JsonIgnore]
         [Ignore]
         public Dictionary<DocumentExtraFieldInfo, string> ExtraFields
         {
@@ -124,7 +127,11 @@ namespace Mark5.Mobile.Common.Model
         public string CommentsString { get => Serializer.Serialize(Comments); set => Comments = Serializer.Deserialize<List<Comment>>(value); }
 
         [Column("ExtraFieldsString")]
-        public string ExtraFieldsString { get => Serializer.Serialize(ExtraFields); set => ExtraFields = Serializer.Deserialize<Dictionary<DocumentExtraFieldInfo, string>>(value); }
+        public string ExtraFieldsString
+        {
+            get => Serializer.Serialize(ExtraFields.ToList());
+            set => ExtraFields = (Serializer.Deserialize<List<KeyValuePair<DocumentExtraFieldInfo, string>>>(value)).ToDictionary(x => x.Key, x => x.Value);
+        }
 
         #endregion
 
@@ -133,4 +140,5 @@ namespace Mark5.Mobile.Common.Model
             return $"[Document: Id={Id}, IsEncrypted={IsEncrypted}]";
         }
     }
+
 }

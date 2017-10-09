@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
                 fab = ((BaseAppCompatActivity)Activity).Fab;
-                fab.SetImageResource(Resource.Drawable.action_add_contact);
+                fab.SetImageResource(Resource.Drawable.action_add);
                 fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
                 fab.Visibility = ViewStates.Visible;
             }

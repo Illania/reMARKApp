@@ -82,14 +82,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fromToCriteria = new DocumentFromToSearchView(Context);
             subviews.Add(fromToCriteria);
 
-            var extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
-            subviews.Add(extraFieldsCriteria);
+            DocumentExtraFieldsSearchView extraFieldsCriteria = null;
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+            {
+                extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
+                subviews.Add(extraFieldsCriteria);
+            }
 
             var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
             subviews.Add(attUnreadCriteria);
 
-            var handledCriteria = new DocumentHandledSearchView(Context);
-            subviews.Add(handledCriteria);
+            DocumentHandledSearchView handledCriteria = null;
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+            {
+                handledCriteria = new DocumentHandledSearchView(Context);
+                subviews.Add(handledCriteria);
+            }
 
             containerLinearLayout.AddView(directionCriteria);
             containerLinearLayout.AddView(subjectMessageCriteria);
@@ -97,10 +105,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(daterangeCriteria);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+            if (extraFieldsCriteria != null)
                 containerLinearLayout.AddView(extraFieldsCriteria);
             containerLinearLayout.AddView(attUnreadCriteria);
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+            if (handledCriteria != null)
                 containerLinearLayout.AddView(handledCriteria);
 
             HasOptionsMenu = true;
@@ -302,8 +310,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var df = restoredState as DocumentSearchCriteriaFragmentState;
-            if (df != null)
+            if (restoredState is DocumentSearchCriteriaFragmentState df)
                 searchCriteria = df.Criteria;
         }
 

@@ -23,6 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityMovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
+        TinyMessageSubscriptionToken shortcodePreviewChangedToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -55,13 +56,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                slf = (ShortcodesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                slf = (ShortcodesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodesListActivity)}");
             }
 
             entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(slf.UpdateMovedEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
             entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(slf.UpdateRemovedFromFolderEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
             entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(slf.UpdateRemovedEntities, m => slf != null && m.Sender != slf && m.ObjectType == ObjectType.Shortcode);
+            shortcodePreviewChangedToken = CommonConfig.MessengerHub.Subscribe<ShortcodePreviewChangedMessage>(slf.UpdateShortcodePreview, m => slf != null && m.Sender != slf);
         }
 
         public override void Finish()
@@ -78,6 +80,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityMovedFromFolderToken?.Dispose();
             entityRemovedFromFolderToken?.Dispose();
             entityRemovedToken?.Dispose();
+            shortcodePreviewChangedToken?.Dispose();
         }
     }
 }
