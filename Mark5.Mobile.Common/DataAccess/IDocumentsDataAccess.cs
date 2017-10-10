@@ -17,6 +17,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<Document> GetDocumentAsync(int documentId);
 
+        Task<DocumentPreview> GetDocumentPreviewAsync(int documentId);
+
         Task SaveDocumentWithPreviewAsync(DocumentContainer container);
 
         Task<DocumentContainer> GetDocumentWithPreviewAsync(int documentId);
