@@ -9,9 +9,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -47,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshing;
 
+        TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
         TinyMessageSubscriptionToken removedFromFolderToken;
@@ -229,15 +230,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
+            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Document);
-            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
         }
 
         void UnsubscribeFromMessages()
         {
+            readStatusChangedToken?.Dispose();
             commentsCountChangedToken?.Dispose();
             categoriesChangedToken?.Dispose();
             removedFromFolderToken?.Dispose();
@@ -299,8 +302,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 vc.HidesBottomBarWhenPushed = false;
 
                 vc.ClearData();
-                vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
 
                 if (!searchController.Active)
                 {
@@ -320,8 +321,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var ds = (DataSource)tableView.Source;
 
                 var vc = new DocumentViewController();
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-                vc.OnComplete = () => vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
                 if (!searchController.Active)
                     vc.SetData(Folder, documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
                 else
@@ -932,26 +931,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Events
 
-        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
-        {
-            BeginInvokeOnMainThread(() =>
-            {
-                var selectedRow = tableView.IndexPathForSelectedRow;
-
-                (tableView.Source as DataSource).UpdateDocumentPreview(e.DocumentPreview);
-                tableView.ReloadData();
-
-                if (selectedRow != null)
-                    tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
-            });
-        }
-
-        void CommentsCountChangedHandler(DocumentPreviewCommentsCountChangedMessage message)
+        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
                 var ds = tableView.Source as DataSource;
                 var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.IsReadByCurrent = message.IsReadByCurrent;
+                    documentPreview.IsReadByAnyone = message.IsReadByAnyone;
+
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new NSIndexPath[]
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+            });
+        }
+
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
 
                 if (index >= 0)
                 {
@@ -1092,7 +1104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RemoveDocumentsFromList(m.EntitiesId);
         }
 
-        void HandleDeleted(EntityDeletedMessage m)
+        void HandleDeleted(EntityRemovedMessage m)
         {
             RemoveDocumentsFromList(m.EntitiesId);
         }
@@ -1375,19 +1387,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 viewController = null;
                 documentsTableView = null;
                 Items = null;
-            }
-
-            public void UpdateDocumentPreview(DocumentPreview documentPreview)
-            {
-                var documentRow = Items.IndexOf(d => d.Id == documentPreview.Id);
-                if (documentRow < 0)
-                    return;
-
-                documentsTableView.ReloadRows(new NSIndexPath[]
-                    {
-                        NSIndexPath.FromRowSection(documentRow, 0)
-                    },
-                    UITableViewRowAnimation.Fade);
             }
         }
 

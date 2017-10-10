@@ -11,7 +11,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -76,8 +75,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.comments);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.comments);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
         }
@@ -172,7 +171,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
@@ -210,7 +208,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         case ObjectType.Document:
                             var document = Entity as Document;
                             await Managers.DocumentsManager.DeleteComment(document, comment);
-                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
                             var contact = Entity as Contact;
@@ -250,7 +247,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         case ObjectType.Document:
                             var document = Entity as Document;
                             await Managers.DocumentsManager.EditComment(document, newComment);
-                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
                             var contact = Entity as Contact;

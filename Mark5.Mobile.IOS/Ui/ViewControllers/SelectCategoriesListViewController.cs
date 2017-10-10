@@ -29,7 +29,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Task<List<Category>> Task => tcs.Task;
 
-
         public SelectCategoriesListViewController(ModuleType module, List<int> preselectedItems)
         {
             this.module = module;

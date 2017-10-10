@@ -15,7 +15,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.ShortcodeViews;
@@ -326,14 +325,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     },
                     Folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Shortcode,
-                    Folder.Id,
-                    new List<int>
-                    {
-                        ShortcodePreview.Id
-                    }));
-
                 dismissAction();
             }
             catch (Exception ex)
@@ -362,13 +353,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     ShortcodePreview
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
-                    ObjectType.Shortcode,
-                    new List<int>
-                    {
-                        ShortcodePreview.Id
-                    }));
 
                 dismissAction();
                 CloseRequest?.Invoke();

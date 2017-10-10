@@ -9,7 +9,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
@@ -66,14 +65,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
 
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
+            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length);
         }
 
         public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource)tableView.Source;
             if (ds.Empty)
                 await RefreshData();
         }
@@ -282,12 +281,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         case ObjectType.Document:
                             var documentPreview = BusinessEntityPreview as DocumentPreview;
                             await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, categoriesToAssign);
-                            CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, documentPreview.Id, ObjectType.Document, categoriesToAssign));
                             break;
                         case ObjectType.Contact:
                             var contactPreview = BusinessEntityPreview as ContactPreview;
                             await Managers.ContactsManager.SetCategoriesAsync(contactPreview, categoriesToAssign);
-                            CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, contactPreview.Id, ObjectType.Contact, categoriesToAssign));
                             break;
                         default:
                             throw new ArgumentException("Invalid BusinessEntityPreview!");
@@ -461,7 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                return Empty ? 1 : categoriesInView[sectionIndexes[(int) section]].Count;
+                return Empty ? 1 : categoriesInView[sectionIndexes[(int)section]].Count;
             }
 
             public override string[] SectionIndexTitles(UITableView tableView)
@@ -477,7 +474,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                return Empty ? string.Empty : sectionIndexes[(int) section];
+                return Empty ? string.Empty : sectionIndexes[(int)section];
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
@@ -698,7 +695,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                return Empty ? 1 : categoriesInView[sectionIndexes[(int) section]].Count;
+                return Empty ? 1 : categoriesInView[sectionIndexes[(int)section]].Count;
             }
 
             public override string[] SectionIndexTitles(UITableView tableView)
@@ -714,7 +711,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                return Empty ? string.Empty : sectionIndexes[(int) section];
+                return Empty ? string.Empty : sectionIndexes[(int)section];
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)

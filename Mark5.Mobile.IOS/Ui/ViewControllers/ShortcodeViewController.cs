@@ -8,8 +8,8 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -228,14 +228,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             shortcodeChangedToken?.Dispose();
-            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<ShortcodeChangedMessage>(HandleShortcodeChanged, (arg) => arg.ShortcodePreview.Id == shortcodePreview?.Id);
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleShortcodeChanged, (arg) => arg.EntityPreview.ObjectType == ObjectType.Shortcode
+                                                                                                     && arg.EntityPreview.Id == shortcodePreview?.Id);
         }
 
         void UnsubscribeFromMessages()
         {
             if (shortcodeChangedToken != null)
             {
-                CommonConfig.MessengerHub.Unsubscribe<ShortcodeChangedMessage>(shortcodeChangedToken);
+                CommonConfig.MessengerHub.Unsubscribe<EntityPreviewChangedMessage>(shortcodeChangedToken);
                 shortcodeChangedToken = null;
             }
         }
@@ -413,7 +414,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodeId = shortcodeId;
         }
 
-        void HandleShortcodeChanged(ShortcodeChangedMessage obj)
+        void HandleShortcodeChanged(EntityPreviewChangedMessage obj)
         {
             var ds = tableView?.Source as DataSource;
             ds?.Clear();
@@ -564,14 +565,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     },
                     folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Shortcode,
-                    folder.Id,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
-
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
@@ -605,13 +598,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     shortcode
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
-                    ObjectType.Shortcode,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
 
                 dismissAction();
 

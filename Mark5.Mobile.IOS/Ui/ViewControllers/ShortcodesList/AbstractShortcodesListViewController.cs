@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,7 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -42,6 +42,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         bool refreshing;
 
         protected CancellationTokenSource cts;
+
+        TinyMessageSubscriptionToken removedFromFolderToken;
+        TinyMessageSubscriptionToken movedFromFolderToken;
+        TinyMessageSubscriptionToken deletedToken;
+        TinyMessageSubscriptionToken shortcodeChangedToken;
 
         protected AbstractShortcodesListViewController(bool disableRowActions)
         {
@@ -127,6 +132,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
+            UnsubscribeFromMessages();
+
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
@@ -196,11 +203,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             TableView.TableHeaderView = SearchController.SearchBar;
         }
 
-        TinyMessageSubscriptionToken removedFromFolderToken;
-        TinyMessageSubscriptionToken movedFromFolderToken;
-        TinyMessageSubscriptionToken deletedToken;
-        TinyMessageSubscriptionToken shortcodeChangedToken;
-
         void SubscribeToMessages()
         {
             removedFromFolderToken?.Dispose();
@@ -210,37 +212,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
 
             deletedToken?.Dispose();
-            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
 
             shortcodeChangedToken?.Dispose();
-            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<ShortcodeChangedMessage>(HandleShortcodeChanged);
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleShortcodeChanged, m => m.EntityPreview.ObjectType == ObjectType.Shortcode);
         }
 
         void UnsubscribeFromMessages()
         {
-            if (removedFromFolderToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityRemovedFromFolderMessage>(removedFromFolderToken);
-                removedFromFolderToken = null;
-            }
-
-            if (movedFromFolderToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityMovedFromFolderMessage>(movedFromFolderToken);
-                movedFromFolderToken = null;
-            }
-
-            if (deletedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<EntityDeletedMessage>(deletedToken);
-                deletedToken = null;
-            }
-
-            if (shortcodeChangedToken != null)
-            {
-                CommonConfig.MessengerHub.Unsubscribe<ShortcodeChangedMessage>(shortcodeChangedToken);
-                shortcodeChangedToken = null;
-            }
+            removedFromFolderToken?.Dispose();
+            movedFromFolderToken?.Dispose();
+            deletedToken?.Dispose();
+            shortcodeChangedToken?.Dispose();
         }
 
         void InitializeNavigationBarTitle()
@@ -719,14 +702,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RemoveShortcodesFromList(m.EntitiesId);
         }
 
-        void HandleDeleted(EntityDeletedMessage m)
+        void HandleDeleted(EntityRemovedMessage m)
         {
             RemoveShortcodesFromList(m.EntitiesId);
         }
 
-        void HandleShortcodeChanged(ShortcodeChangedMessage m)
+        void HandleShortcodeChanged(EntityPreviewChangedMessage m)
         {
-            UpdateShortcodeFromList(m.ShortcodePreview);
+            UpdateShortcodeFromList(m.EntityPreview as ShortcodePreview);
         }
 
         void UpdateShortcodeFromList(ShortcodePreview sp)

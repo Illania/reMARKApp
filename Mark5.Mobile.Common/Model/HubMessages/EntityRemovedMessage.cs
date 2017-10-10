@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
-namespace Mark5.Mobile.Droid.Model.HubMessages
+namespace Mark5.Mobile.Common.Model.HubMessages
 {
     public class EntityRemovedMessage : TinyMessageBase
     {

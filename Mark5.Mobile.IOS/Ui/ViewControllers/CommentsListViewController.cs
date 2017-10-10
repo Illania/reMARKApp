@@ -7,7 +7,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
@@ -272,12 +271,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case ObjectType.Document:
                         var document = Entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                         break;
                     case ObjectType.Contact:
                         var contact = Entity as Contact;
                         newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
-                        CommonConfig.MessengerHub.Publish(new ContactPreviewCommentsCountChangedMessage(this, contact.Id, contact.Comments.Count));
                         break;
                     default:
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
@@ -324,12 +321,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         case ObjectType.Document:
                             var document = Entity as Document;
                             await Managers.DocumentsManager.DeleteComment(document, comment);
-                            CommonConfig.MessengerHub.Publish(new DocumentPreviewCommentsCountChangedMessage(this, document.Id, document.Comments.Count));
                             break;
                         case ObjectType.Contact:
                             var contact = Entity as Contact;
                             await Managers.ContactsManager.DeleteComment(contact, comment);
-                            CommonConfig.MessengerHub.Publish(new ContactPreviewCommentsCountChangedMessage(this, contact.Id, contact.Comments.Count));
                             break;
                         default:
                             throw new ArgumentException("The input business entity does not have comments defined in the model");

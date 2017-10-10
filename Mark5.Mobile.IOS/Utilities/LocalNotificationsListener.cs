@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void Initialize()
         {
-            CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(m =>
             {
                 NSOperationQueue.MainQueue.InvokeOnMainThread(() =>
                 {
@@ -31,7 +31,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 });
             }, m =>
             {
-                return m.Change == DocumentUploadStatusChanged.Status.DocumentSentFailed;
+                return m.Change == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed;
             });
         }
     }
