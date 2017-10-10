@@ -134,6 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             doneButtonItem = null;
             fileToButton = null;
+            editButtonItem = null;
 
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
             ((DataSource)TableView.Source)?.Clear();
@@ -403,8 +404,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage, (m) => contactPreview?.Id == m.ContactPreview.Id);
-            childrenAddedToken = CommonConfig.MessengerHub.Subscribe<ChildrenContactAddedMessage>(HandleChildrenAddedMessage, (m) => contactPreview?.Id == m.ParentContactPreview.Id);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage, m => contactPreview?.Id == m.ContactPreview.Id);
+            childrenAddedToken = CommonConfig.MessengerHub.Subscribe<ChildrenContactAddedMessage>(HandleChildrenAddedMessage, m => contactPreview?.Id == m.ParentContactPreview.Id);
         }
 
         void UnsubscribeFromMessages()
@@ -537,7 +538,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     ContactPreview = contactPreview,
                     Contact = contact,
-                    CreationModeFlag = ContactCreationModeFlag.Edit,
+                    CreationModeFlag = ContactCreationModeFlag.Edit
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }

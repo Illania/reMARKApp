@@ -112,11 +112,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (ReuseIdentifier == DefaultId)
             {
-                topLabel.Text = da.Name;
-                bottomLabel.Text = da.FullAddress;
+                topLabel.Text = string.IsNullOrWhiteSpace(da.Name) ? da.Address : $"{da.Name} <{da.Address}>";
+                bottomLabel.Text = da.FullAttention;
             }
             else
-                topLabel.Text = da.FullAddress;
+                topLabel.Text = string.IsNullOrWhiteSpace(da.Name) ? da.Address : $"{da.Name} <{da.Address}>";
         }
     }
 }

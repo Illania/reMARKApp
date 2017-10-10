@@ -10,7 +10,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditContactTableViewCell;
+using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -391,7 +391,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var row = RowAtIndexPath(indexPath);
-                var cell = tableView.DequeueReusableCell(row.Key) as AddEditContactTableViewCell;
+                var cell = tableView.DequeueReusableCell(row.Key) as AddEditTableViewCell;
                 if (cell == null)
                 {
                     cell = row.CreateCell();
@@ -839,7 +839,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public abstract class AbstractRow
             {
-                protected AddEditContactTableViewCell Cell;
+                protected AddEditTableViewCell Cell;
                 protected AbstractSection Section;
 
                 public DataSource DataSource { get => Section.DataSource; }
@@ -865,9 +865,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Section = section;
                 }
 
-                public abstract AddEditContactTableViewCell CreateCell();
+                public abstract AddEditTableViewCell CreateCell();
 
-                public void BindCell(AddEditContactTableViewCell cell)
+                public void BindCell(AddEditTableViewCell cell)
                 {
                     Cell = cell;
                     Initialize();
@@ -922,7 +922,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override string Key => TextFieldTableViewCell.Key;
 
-                public override AddEditContactTableViewCell CreateCell() => new TextFieldTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new TextFieldTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -958,7 +958,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override string Key => TitledTextViewTableViewCell.Key;
 
-                public override AddEditContactTableViewCell CreateCell() => new TitledTextViewTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new TitledTextViewTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -996,7 +996,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override string Key => DisclosureIndicatorTableViewCell.Key;
 
-                public override AddEditContactTableViewCell CreateCell() => new DisclosureIndicatorTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new DisclosureIndicatorTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -1016,7 +1016,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override string Key => MultiRowHeaderTableViewCell.Key;
 
-                public override AddEditContactTableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new MultiRowHeaderTableViewCell();
 
                 public override void RefreshRow() { }
 
@@ -1405,7 +1405,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     base.OnClicked(indexPath);
                 }
 
-                public override AddEditContactTableViewCell CreateCell() => new BirthdateTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new BirthdateTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -1457,7 +1457,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override string Key => PhysicalAddressTableViewCell.Key;
 
-                public override AddEditContactTableViewCell CreateCell() => new PhysicalAddressTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new PhysicalAddressTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -1500,7 +1500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return Validator.IsEmailValid(Content.Address);
                 }
 
-                public override AddEditContactTableViewCell CreateCell() => new EmailAddressTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new EmailAddressTableViewCell();
 
                 protected override void Initialize()
                 {
@@ -1575,7 +1575,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override string Key => PhoneNumberTableViewCell.Key;
 
-                public override AddEditContactTableViewCell CreateCell() => new PhoneNumberTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new PhoneNumberTableViewCell();
 
                 protected override void Initialize()
                 {

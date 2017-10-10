@@ -38,10 +38,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         CancellationTokenSource cts;
 
         TinyMessageSubscriptionToken contactChangedToken;
-        TinyMessageSubscriptionToken categoriesChangedToken;
         TinyMessageSubscriptionToken removedFromFolderToken;
         TinyMessageSubscriptionToken movedFromFolderToken;
         TinyMessageSubscriptionToken deletedToken;
+        TinyMessageSubscriptionToken categoriesChangedToken;
 
         protected AbstractContactsListViewController(bool disableRowActions)
         {
@@ -84,8 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
             CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource)TableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 RefreshData();
 
             NSOperationQueue.MainQueue.AddOperation(() =>
@@ -237,20 +236,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void SubscribeToMessages()
         {
-            categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChanged);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
             deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
-            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleAction);
+            categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
         }
 
         void UnsubscribeFromMessages()
         {
-            categoriesChangedToken?.Dispose();
+            contactChangedToken?.Dispose();
             removedFromFolderToken?.Dispose();
             movedFromFolderToken?.Dispose();
             deletedToken?.Dispose();
-            contactChangedToken?.Dispose();
+            categoriesChangedToken?.Dispose();
         }
 
         #endregion
@@ -366,8 +365,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 {
                     InvokeOnMainThread(() =>
                     {
-                        var ds = (DataSource)TableView.Source;
-                        ds.AppendItems(cps);
+                        ((DataSource)TableView.Source).AppendItems(cps);
                     });
                 },
                 () =>
@@ -656,7 +654,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Messages handlers
 
-        void HandleAction(ContactChangedMessage m) => UpdateContactOnList(m.ContactPreview);
+        void HandleContactChanged(ContactChangedMessage m) => UpdateContactOnList(m.ContactPreview);
 
         void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveContactsFromList(m.EntitiesId);
 
@@ -679,11 +677,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                     var selectedRow = TableView.IndexPathForSelectedRow;
 
-                    TableView.ReloadRows(new[]
-                        {
-                            indexPath
-                        },
-                        UITableViewRowAnimation.Fade);
+                    TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
                         TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
@@ -849,7 +843,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             {
                 if (disableRowActions)
                     return false;
-                
+
                 var cell = tableView.CellAt(indexPath);
                 if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return false;

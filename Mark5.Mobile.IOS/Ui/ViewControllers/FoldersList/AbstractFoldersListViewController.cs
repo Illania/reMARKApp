@@ -32,6 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected UIBarButtonItem EditModeItem;
         protected UIBarButtonItem ComposeDocumentItem;
         protected UIBarButtonItem CreateContactItem;
+        protected UIBarButtonItem CreateShortcodeItem;
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
@@ -144,6 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             EditModeItem = null;
             ComposeDocumentItem = null;
             CreateContactItem = null;
+            CreateShortcodeItem = null;
 
             searchCancellationTokenSource?.Dispose();
             searchCancellationTokenSource = null;
@@ -216,12 +218,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CreateContactItem = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"))
+                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
                 };
                 NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
             }
 
-            if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes)
+            if (ParentFolder.Module == ModuleType.Shortcodes && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
+            {
+                CreateShortcodeItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
+                };
+                NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
+            }
+
+            if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
             {
                 if (IsRootOfFoldersList)
                 {
@@ -274,6 +285,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (CreateContactItem != null)
                 CreateContactItem.Clicked += CreateContactItem_Clicked;
 
+            if (CreateShortcodeItem != null)
+                CreateShortcodeItem.Clicked += CreateShortcodeItem_Clicked;
+
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
@@ -288,6 +302,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (CreateContactItem != null)
                 CreateContactItem.Clicked -= CreateContactItem_Clicked;
 
+            if (CreateShortcodeItem != null)
+                CreateShortcodeItem.Clicked -= CreateShortcodeItem_Clicked;
+
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
 
@@ -301,8 +318,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New
             };
-
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        void CreateShortcodeItem_Clicked(object sender, EventArgs e)
+        {
+            var vc = new AddEditShortcodeViewController
+            {
+                CreationModeFlag = ShortcodeCreationModeFlag.New,
+            };
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         async void CreateContactItem_Clicked(object sender, EventArgs e)

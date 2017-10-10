@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,6 +18,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -41,10 +42,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UILabel nameLabel;
         UIButton button1;
 
-        UIBarButtonItem doneButtonItem;
         UIBarButtonItem fileToButton;
+        UIBarButtonItem doneButtonItem;
+        UIBarButtonItem editButtonItem;
 
         CancellationTokenSource cts;
+
+        TinyMessageSubscriptionToken shortcodeChangedToken;
 
         public ShortcodeViewController()
             : base(UITableViewStyle.Grouped)
@@ -76,6 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
             InitializeHandlers();
+            SubscribeToMessages();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -108,6 +113,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning("Received memory warning!");
 
+            UnsubscribeFromMessages();
+
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
@@ -118,6 +125,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             doneButtonItem = null;
             fileToButton = null;
+            editButtonItem = null;
 
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
             ((DataSource)TableView.Source)?.Clear();
@@ -210,6 +218,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
+            else
+            {
+                if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed)
+                {
+                    editButtonItem = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle(Path.Combine("icons", "pencil")),
+                        Enabled = false
+                    };
+                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                }
+            }
         }
 
         void InitializeHandlers()
@@ -222,6 +242,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
+
+            if (editButtonItem != null)
+                editButtonItem.Clicked += EditButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
@@ -234,6 +257,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
+
+            if (editButtonItem != null)
+                editButtonItem.Clicked -= EditButtonItem_Clicked;
+        }
+
+        void SubscribeToMessages()
+        {
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<ShortcodeChangedMessage>(HandleShortcodeChangedMessage, m => shortcodePreview?.Id == m.ShortcodePreview.Id);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            shortcodeChangedToken?.Dispose();
+        }
+
+        private void HandleShortcodeChangedMessage(ShortcodeChangedMessage obj) => RefreshAllOnAppear();
+
+        void RefreshAllOnAppear()
+        {
+            ((DataSource)TableView.Source)?.Clear();
+            shortcodeId = shortcodePreview.Id;
+            shortcodePreview = null;
+
+            if (SplitViewController == null)
+                refreshDataOnAppear = true;
+            else
+                RefreshData();
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -265,6 +315,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     { DocumentAddressType.Cc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.FullAddress).ToArray() },
                     { DocumentAddressType.Bcc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.FullAddress).ToArray() }
                 }
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        void EditButtonItem_Clicked(object sender, EventArgs e)
+        {
+            var vc = new AddEditShortcodeViewController
+            {
+                ShortcodePreview = shortcodePreview,
+                Shortcode = shortcode,
+                CreationModeFlag = ShortcodeCreationModeFlag.Edit
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
@@ -389,9 +450,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ds.StartRefresh();
 
-                if (folderId != null && shortcodeId != null)
+                if ((folderId != null || folder != null) && shortcodeId != null)
                 {
-                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId.Value, shortcodeId.Value);
+                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folder?.Id ?? folderId.Value, shortcodeId.Value);
                     this.shortcodePreview = swp.ShortcodePreview;
                     shortcode = swp.Shortcode;
                 }
@@ -419,6 +480,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
+
+                if (editButtonItem != null)
+                    editButtonItem.Enabled = true;
 
                 ds.EndRefresh(this.shortcodePreview, shortcode);
             }
@@ -605,7 +669,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var offset = scrollView.ContentOffset.Y;
                 var inset = -scrollView.SafeAreaInsets.Top;
                 var show = offset > inset + 30;
-
                 viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
             }
 
@@ -803,7 +866,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     : base(shortcodePreview, shortcode)
                 {
                     weakDocumentAddress = documentAddress.Wrap();
-                    compact = string.IsNullOrWhiteSpace(documentAddress?.Name);
+                    compact = string.IsNullOrWhiteSpace(documentAddress?.FullAttention);
                 }
 
                 public override string Id

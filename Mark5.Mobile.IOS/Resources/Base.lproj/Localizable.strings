@@ -1,12 +1,18 @@
 "account" = "Account";
 "actions" = "Actions";
+"attention" = "Attention";
 "area" = "Area";
 "add" = "Add";
+"add_to" = "add to";
+"add_cc" = "add cc";
+"add_bcc" = "add bcc";
 "add_contact" = "Add contact";
 "add_phone" = "add phone";
 "add_mobile" = "add mobile";
+"add_empty" = "Add empty";
 "add_email" = "add email";
 "add_fax" = "add fax";
+"add_from_contact" = "Add from contact";
 "add_person" = "Add person";
 "add_department" = "Add department";
 "add_physical_address" = "add address";
@@ -14,6 +20,7 @@
 "add_birthdate" = "add birthdate";
 "adding_contact___" = "Adding contact...";
 "adding_comment___" = "Adding comment...";
+"adding_shortcode___" = "Adding shortcode...";
 "address" = "Address";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
@@ -45,6 +52,7 @@
 "close" = "Close";
 "comments" = "Comments";
 "company" = "Company";
+"compose_email" = "Compose email";
 "company_department" = "Company/Department";
 "confirm" = "Confirm";
 "confirm_copy_to_folder" = "Copy";
@@ -122,6 +130,7 @@
 "edit_categories" = "Edit categories";
 "edit_contact" = "Edit contact";
 "editing_contact___" = "Editing contact...";
+"editing_shortcode___" = "Editing shortcode...";
 "edit_message" = "Edit message";
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "editing_comment___" = "Editing comment...";

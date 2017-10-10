@@ -122,6 +122,12 @@ namespace Mark5.ServiceReference.AppService
 
         GetShortcodeResult EndGetShortcode(IAsyncResult asyncResult);
 
+        [OperationContract(Action = "CreateOrUpdateShortcode", AsyncPattern = true)]
+        [FaultContract(typeof(AppServiceFaultDetail), Name = "AppServiceFaultDetail", Namespace = "com.nordic-it.appservice.v3")]
+        IAsyncResult BeginCreateOrUpdateShortcode(CreateOrUpdateShortcodeParameters parameters, AsyncCallback callback, object asyncState);
+
+        CreateOrUpdateShortcodeResult EndCreateOrUpdateShortcode(IAsyncResult asyncResult);
+
         #endregion
 
         #region Calendar module

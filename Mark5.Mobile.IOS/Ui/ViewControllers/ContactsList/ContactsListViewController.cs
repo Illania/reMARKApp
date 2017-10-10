@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
                 CreateContactItem = new UIBarButtonItem();
-                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_contact.png"));
+                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"));
                 NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
                 RightButton = CreateContactItem;
             }

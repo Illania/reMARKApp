@@ -282,11 +282,16 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             return new DocumentAddress
             {
+                Id = da.Id,
                 Name = da.Name,
                 Type = da.Type.ConvertEnum<CommunicationAddressType>(),
                 AddressType = da.AddressType.ConvertEnum<DocumentAddressType>(),
                 Address = da.Address,
-                FullAddress = da.FullAddress
+                FullAddress = da.FullAddress,
+                Attention = da.Attention,
+                FullAttention = da.FullAttention,
+                ObjectId = da.ObjectId,
+                ObjectType = da.ObjectType.ConvertEnum<ObjectType>()
             };
         }
 
@@ -946,11 +951,16 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             return new DataContract.DocumentAddress
             {
+                Id = da.Id,
                 Name = da.Name,
                 Type = da.Type.ConvertEnum<DataContract.CommunicationAddressType>(),
                 AddressType = da.AddressType.ConvertEnum<DataContract.DocumentAddressType>(),
                 Address = da.Address,
-                FullAddress = da.FullAddress
+                FullAddress = da.FullAddress,
+                Attention = da.Attention,
+                FullAttention = da.FullAttention,
+                ObjectId = da.ObjectId,
+                ObjectType = da.ObjectType.ConvertEnum<DataContract.ObjectType>()
             };
         }
 
@@ -960,6 +970,28 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = defi.Id,
                 Name = defi.Name
+            };
+        }
+
+        public static DataContract.Shortcode Convert(this Shortcode s)
+        {
+            return new DataContract.Shortcode
+            {
+                Id = s.Id,
+                Guid = s.Guid,
+                Addresses = s.Addresses.Select(a => a.Convert()).ToList(),
+            };
+        }
+
+        public static DataContract.ShortcodePreview Convert(this ShortcodePreview sp)
+        {
+            return new DataContract.ShortcodePreview
+            {
+                Id = sp.Id,
+                Guid = sp.Guid,
+                Name = sp.Name,
+                Description = sp.Description,
+                AddressCount = sp.AddressCount,
             };
         }
 

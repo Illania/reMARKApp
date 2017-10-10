@@ -28,7 +28,7 @@ namespace Mark5.ServiceReference.AppService
 
             public AuthenticateResult EndAuthenticate(IAsyncResult asyncResult)
             {
-                return (AuthenticateResult) EndInvoke("Authenticate", new object[0], asyncResult);
+                return (AuthenticateResult)EndInvoke("Authenticate", new object[0], asyncResult);
             }
 
             #endregion
@@ -48,7 +48,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetFoldersResult EndGetFolders(IAsyncResult asyncResult)
             {
-                return (GetFoldersResult) EndInvoke("GetFolders", new object[0], asyncResult);
+                return (GetFoldersResult)EndInvoke("GetFolders", new object[0], asyncResult);
             }
 
             #endregion
@@ -68,7 +68,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetDocumentPreviewsResult EndGetDocumentPreviews(IAsyncResult asyncResult)
             {
-                return (GetDocumentPreviewsResult) EndInvoke("GetDocumentPreviews", new object[0], asyncResult);
+                return (GetDocumentPreviewsResult)EndInvoke("GetDocumentPreviews", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetDocument(GetDocumentParameters parameters, AsyncCallback callback, object asyncState)
@@ -84,7 +84,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetDocumentResult EndGetDocument(IAsyncResult asyncResult)
             {
-                return (GetDocumentResult) EndInvoke("GetDocument", new object[0], asyncResult);
+                return (GetDocumentResult)EndInvoke("GetDocument", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSendDocument(SendDocumentParameters parameters, AsyncCallback callback, object asyncState)
@@ -100,7 +100,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SendDocumentResult EndSendDocument(IAsyncResult asyncResult)
             {
-                return (SendDocumentResult) EndInvoke("SendDocument", new object[0], asyncResult);
+                return (SendDocumentResult)EndInvoke("SendDocument", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSetDocumentsReadStatus(SetDocumentsReadStatusParameters parameters, AsyncCallback callback, object asyncState)
@@ -116,7 +116,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SetDocumentsReadStatusResult EndSetDocumentsReadStatus(IAsyncResult asyncResult)
             {
-                return (SetDocumentsReadStatusResult) EndInvoke("SetDocumentsReadStatus", new object[0], asyncResult);
+                return (SetDocumentsReadStatusResult)EndInvoke("SetDocumentsReadStatus", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSetDocumentPriority(SetDocumentPriorityParameters parameters, AsyncCallback callback, object asyncState)
@@ -132,7 +132,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SetDocumentPriorityResult EndSetDocumentPriority(IAsyncResult asyncResult)
             {
-                return (SetDocumentPriorityResult) EndInvoke("SetDocumentPriority", new object[0], asyncResult);
+                return (SetDocumentPriorityResult)EndInvoke("SetDocumentPriority", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginMoveToSpam(MoveToSpamParameters parameters, AsyncCallback callback, object asyncState)
@@ -148,7 +148,7 @@ namespace Mark5.ServiceReference.AppService
 
             public MoveToSpamResult EndMoveToSpam(IAsyncResult asyncResult)
             {
-                return (MoveToSpamResult) EndInvoke("MoveToSpam", new object[0], asyncResult);
+                return (MoveToSpamResult)EndInvoke("MoveToSpam", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetTemplatePreviews(GetTemplatePreviewsParameters parameters, AsyncCallback callback, object asyncState)
@@ -164,7 +164,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetTemplatePreviewsResult EndGetTemplatePreviews(IAsyncResult asyncResult)
             {
-                return (GetTemplatePreviewsResult) EndInvoke("GetTemplatePreviews", new object[0], asyncResult);
+                return (GetTemplatePreviewsResult)EndInvoke("GetTemplatePreviews", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetTemplate(GetTemplateParameters parameters, AsyncCallback callback, object asyncState)
@@ -180,7 +180,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetTemplateResult EndGetTemplate(IAsyncResult asyncResult)
             {
-                return (GetTemplateResult) EndInvoke("GetTemplate", new object[0], asyncResult);
+                return (GetTemplateResult)EndInvoke("GetTemplate", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetDefaultTemplate(GetDefaultTemplateParameters parameters, AsyncCallback callback, object asyncState)
@@ -196,7 +196,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetDefaultTemplateResult EndGetDefaultTemplate(IAsyncResult asyncResult)
             {
-                return (GetDefaultTemplateResult) EndInvoke("GetDefaultTemplate", new object[0], asyncResult);
+                return (GetDefaultTemplateResult)EndInvoke("GetDefaultTemplate", new object[0], asyncResult);
             }
 
             #endregion
@@ -216,7 +216,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetContactPreviewsResult EndGetContactPreviews(IAsyncResult asyncResult)
             {
-                return (GetContactPreviewsResult) EndInvoke("GetContactPreviews", new object[0], asyncResult);
+                return (GetContactPreviewsResult)EndInvoke("GetContactPreviews", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetContact(GetContactParameters parameters, AsyncCallback callback, object asyncState)
@@ -232,7 +232,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetContactResult EndGetContact(IAsyncResult asyncResult)
             {
-                return (GetContactResult) EndInvoke("GetContact", new object[0], asyncResult);
+                return (GetContactResult)EndInvoke("GetContact", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginCreateOrUpdateContact(CreateOrUpdateContactParameters parameters, AsyncCallback callback, object asyncState)
@@ -248,7 +248,7 @@ namespace Mark5.ServiceReference.AppService
 
             public CreateOrUpdateContactResult EndCreateOrUpdateContact(IAsyncResult asyncResult)
             {
-                return (CreateOrUpdateContactResult) EndInvoke("CreateOrUpdateContact", new object[0], asyncResult);
+                return (CreateOrUpdateContactResult)EndInvoke("CreateOrUpdateContact", new object[0], asyncResult);
             }
 
             #endregion
@@ -268,7 +268,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetShortcodePreviewsResult EndGetShortcodePreviews(IAsyncResult asyncResult)
             {
-                return (GetShortcodePreviewsResult) EndInvoke("GetShortcodePreviews", new object[0], asyncResult);
+                return (GetShortcodePreviewsResult)EndInvoke("GetShortcodePreviews", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetShortcode(GetShortcodeParameters parameters, AsyncCallback callback, object asyncState)
@@ -284,7 +284,24 @@ namespace Mark5.ServiceReference.AppService
 
             public GetShortcodeResult EndGetShortcode(IAsyncResult asyncResult)
             {
-                return (GetShortcodeResult) EndInvoke("GetShortcode", new object[0], asyncResult);
+                return (GetShortcodeResult)EndInvoke("GetShortcode", new object[0], asyncResult);
+            }
+
+
+            public IAsyncResult BeginCreateOrUpdateShortcode(CreateOrUpdateShortcodeParameters parameters, AsyncCallback callback, object asyncState)
+            {
+                return BeginInvoke("CreateOrUpdateShortcode",
+                    new object[]
+                    {
+                        parameters
+                    },
+                    callback,
+                    asyncState);
+            }
+
+            public CreateOrUpdateShortcodeResult EndCreateOrUpdateShortcode(IAsyncResult asyncResult)
+            {
+                return (CreateOrUpdateShortcodeResult)EndInvoke("CreateOrUpdateShortcode", new object[0], asyncResult);
             }
 
             #endregion
@@ -304,7 +321,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetCalendarEventsResult EndGetCalendarEvents(IAsyncResult asyncResult)
             {
-                return (GetCalendarEventsResult) EndInvoke("GetCalendarEvents", new object[0], asyncResult);
+                return (GetCalendarEventsResult)EndInvoke("GetCalendarEvents", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetCalendarAppointment(GetCalendarAppointmentParameters parameters, AsyncCallback callback, object asyncState)
@@ -320,7 +337,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetCalendarAppointmentResult EndGetCalendarAppointment(IAsyncResult asyncResult)
             {
-                return (GetCalendarAppointmentResult) EndInvoke("GetCalendarAppointment", new object[0], asyncResult);
+                return (GetCalendarAppointmentResult)EndInvoke("GetCalendarAppointment", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetCalendarTask(GetCalendarTaskParameters parameters, AsyncCallback callback, object asyncState)
@@ -336,7 +353,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetCalendarTaskResult EndGetCalendarTask(IAsyncResult asyncResult)
             {
-                return (GetCalendarTaskResult) EndInvoke("GetCalendarTask", new object[0], asyncResult);
+                return (GetCalendarTaskResult)EndInvoke("GetCalendarTask", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginCreateOrUpdateCalendarAppointment(CreateOrUpdateCalendarAppointmentParameters parameters, AsyncCallback callback, object asyncState)
@@ -352,7 +369,7 @@ namespace Mark5.ServiceReference.AppService
 
             public CreateOrUpdateCalendarAppointmentResult EndCreateOrUpdateCalendarAppointment(IAsyncResult asyncResult)
             {
-                return (CreateOrUpdateCalendarAppointmentResult) EndInvoke("CreateOrUpdateCalendarAppointment", new object[0], asyncResult);
+                return (CreateOrUpdateCalendarAppointmentResult)EndInvoke("CreateOrUpdateCalendarAppointment", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginCreateOrUpdateCalendarTask(CreateOrUpdateCalendarTaskParameters parameters, AsyncCallback callback, object asyncState)
@@ -368,7 +385,7 @@ namespace Mark5.ServiceReference.AppService
 
             public CreateOrUpdateCalendarTaskResult EndCreateOrUpdateCalendarTask(IAsyncResult asyncResult)
             {
-                return (CreateOrUpdateCalendarTaskResult) EndInvoke("CreateOrUpdateCalendarTask", new object[0], asyncResult);
+                return (CreateOrUpdateCalendarTaskResult)EndInvoke("CreateOrUpdateCalendarTask", new object[0], asyncResult);
             }
 
             #endregion
@@ -388,7 +405,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetSavedSearchesResult EndGetSavedSearches(IAsyncResult asyncResult)
             {
-                return (GetSavedSearchesResult) EndInvoke("GetSavedSearches", new object[0], asyncResult);
+                return (GetSavedSearchesResult)EndInvoke("GetSavedSearches", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSearchDocuments(SearchDocumentsParameters parameters, AsyncCallback callback, object asyncState)
@@ -404,7 +421,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SearchDocumentsResult EndSearchDocuments(IAsyncResult asyncResult)
             {
-                return (SearchDocumentsResult) EndInvoke("SearchDocuments", new object[0], asyncResult);
+                return (SearchDocumentsResult)EndInvoke("SearchDocuments", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSearchContacts(SearchContactsParameters parameters, AsyncCallback callback, object asyncState)
@@ -420,7 +437,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SearchContactsResult EndSearchContacts(IAsyncResult asyncResult)
             {
-                return (SearchContactsResult) EndInvoke("SearchContacts", new object[0], asyncResult);
+                return (SearchContactsResult)EndInvoke("SearchContacts", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSearchShortcodes(SearchShortcodesParameters parameters, AsyncCallback callback, object asyncState)
@@ -436,7 +453,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SearchShortcodesResult EndSearchShortcodes(IAsyncResult asyncResult)
             {
-                return (SearchShortcodesResult) EndInvoke("SearchShortcodes", new object[0], asyncResult);
+                return (SearchShortcodesResult)EndInvoke("SearchShortcodes", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSearchCalendarEvents(SearchCalendarEventsParameters parameters, AsyncCallback callback, object asyncState)
@@ -452,7 +469,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SearchCalendarEventsResult EndSearchCalendarEvents(IAsyncResult asyncResult)
             {
-                return (SearchCalendarEventsResult) EndInvoke("SearchCalendarEvents", new object[0], asyncResult);
+                return (SearchCalendarEventsResult)EndInvoke("SearchCalendarEvents", new object[0], asyncResult);
             }
 
             #endregion
@@ -472,7 +489,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetNotificationsResult EndGetNotifications(IAsyncResult asyncResult)
             {
-                return (GetNotificationsResult) EndInvoke("GetNotifications", new object[0], asyncResult);
+                return (GetNotificationsResult)EndInvoke("GetNotifications", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSetFoldersNotifications(SetFoldersNotificationsParameters parameters, AsyncCallback callback, object asyncState)
@@ -488,7 +505,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SetFoldersNotificationsResult EndSetFoldersNotifications(IAsyncResult asyncResult)
             {
-                return (SetFoldersNotificationsResult) EndInvoke("SetFoldersNotifications", new object[0], asyncResult);
+                return (SetFoldersNotificationsResult)EndInvoke("SetFoldersNotifications", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetFoldersNotifications(GetFoldersNotificationsParameters parameters, AsyncCallback callback, object asyncState)
@@ -504,7 +521,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetFoldersNotificationsResult EndGetFoldersNotifications(IAsyncResult asyncResult)
             {
-                return (GetFoldersNotificationsResult) EndInvoke("GetFoldersNotifications", new object[0], asyncResult);
+                return (GetFoldersNotificationsResult)EndInvoke("GetFoldersNotifications", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetCalendarNotificationsEnabled(GetCalendarNotificationsEnabledParameters parameters, AsyncCallback callback, object asyncState)
@@ -520,7 +537,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetCalendarNotificationsEnabledResult EndGetCalendarNotificationsEnabled(IAsyncResult asyncResult)
             {
-                return (GetCalendarNotificationsEnabledResult) EndInvoke("GetCalendarNotificationsEnabled", new object[0], asyncResult);
+                return (GetCalendarNotificationsEnabledResult)EndInvoke("GetCalendarNotificationsEnabled", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSetCalendarNotificationsEnabled(SetCalendarNotificationsEnabledParameters parameters, AsyncCallback callback, object asyncState)
@@ -536,7 +553,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SetCalendarNotificationsEnabledResult EndSetCalendarNotificationsEnabled(IAsyncResult asyncResult)
             {
-                return (SetCalendarNotificationsEnabledResult) EndInvoke("SetCalendarNotificationsEnabled", new object[0], asyncResult);
+                return (SetCalendarNotificationsEnabledResult)EndInvoke("SetCalendarNotificationsEnabled", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetNotificationsSound(GetNotificationsSoundParameters parameters, AsyncCallback callback, object asyncState)
@@ -552,7 +569,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetNotificationsSoundResult EndGetNotificationsSound(IAsyncResult asyncResult)
             {
-                return (GetNotificationsSoundResult) EndInvoke("GetNotificationsSound", new object[0], asyncResult);
+                return (GetNotificationsSoundResult)EndInvoke("GetNotificationsSound", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSetNotificationsSound(SetNotificationsSoundParameters parameters, AsyncCallback callback, object asyncState)
@@ -568,7 +585,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SetNotificationsSoundResult EndSetNotificationsSound(IAsyncResult asyncResult)
             {
-                return (SetNotificationsSoundResult) EndInvoke("SetNotificationsSound", new object[0], asyncResult);
+                return (SetNotificationsSoundResult)EndInvoke("SetNotificationsSound", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginClearAllNotifications(ClearAllNotificationsParameters parameters, AsyncCallback callback, object asyncState)
@@ -584,7 +601,7 @@ namespace Mark5.ServiceReference.AppService
 
             public ClearAllNotificationsResult EndClearAllNotifications(IAsyncResult asyncResult)
             {
-                return (ClearAllNotificationsResult) EndInvoke("ClearAllNotifications", new object[0], asyncResult);
+                return (ClearAllNotificationsResult)EndInvoke("ClearAllNotifications", new object[0], asyncResult);
             }
 
             #endregion
@@ -604,7 +621,7 @@ namespace Mark5.ServiceReference.AppService
 
             public AddCommentResult EndAddComment(IAsyncResult asyncResult)
             {
-                return (AddCommentResult) EndInvoke("AddComment", new object[0], asyncResult);
+                return (AddCommentResult)EndInvoke("AddComment", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginEditComment(EditCommentParameters parameters, AsyncCallback callback, object asyncState)
@@ -620,7 +637,7 @@ namespace Mark5.ServiceReference.AppService
 
             public EditCommentResult EndEditComment(IAsyncResult asyncResult)
             {
-                return (EditCommentResult) EndInvoke("EditComment", new object[0], asyncResult);
+                return (EditCommentResult)EndInvoke("EditComment", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginDeleteComment(DeleteCommentParameters parameters, AsyncCallback callback, object asyncState)
@@ -636,7 +653,7 @@ namespace Mark5.ServiceReference.AppService
 
             public DeleteCommentResult EndDeleteComment(IAsyncResult asyncResult)
             {
-                return (DeleteCommentResult) EndInvoke("DeleteComment", new object[0], asyncResult);
+                return (DeleteCommentResult)EndInvoke("DeleteComment", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetAllCategories(GetAllCategoriesParameters parameters, AsyncCallback callback, object asyncState)
@@ -652,7 +669,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetAllCategoriesResult EndGetAllCategories(IAsyncResult asyncResult)
             {
-                return (GetAllCategoriesResult) EndInvoke("GetAllCategories", new object[0], asyncResult);
+                return (GetAllCategoriesResult)EndInvoke("GetAllCategories", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginSetCategories(SetCategoriesParameters parameters, AsyncCallback callback, object asyncState)
@@ -668,7 +685,7 @@ namespace Mark5.ServiceReference.AppService
 
             public SetCategoriesResult EndSetCategories(IAsyncResult asyncResult)
             {
-                return (SetCategoriesResult) EndInvoke("SetCategories", new object[0], asyncResult);
+                return (SetCategoriesResult)EndInvoke("SetCategories", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetObjectActions(GetObjectActionsParameters parameters, AsyncCallback callback, object asyncState)
@@ -684,7 +701,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetObjectActionsResult EndGetObjectActions(IAsyncResult asyncResult)
             {
-                return (GetObjectActionsResult) EndInvoke("GetObjectActions", new object[0], asyncResult);
+                return (GetObjectActionsResult)EndInvoke("GetObjectActions", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetObjectLinks(GetObjectLinksParameters parameters, AsyncCallback callback, object asyncState)
@@ -700,7 +717,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetObjectLinksResult EndGetObjectLinks(IAsyncResult asyncResult)
             {
-                return (GetObjectLinksResult) EndInvoke("GetObjectLinks", new object[0], asyncResult);
+                return (GetObjectLinksResult)EndInvoke("GetObjectLinks", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetRecentAddresses(GetRecentAddressesParameters parameters, AsyncCallback callback, object asyncState)
@@ -716,7 +733,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetRecentAddressesResult EndGetRecentAddresses(IAsyncResult asyncResult)
             {
-                return (GetRecentAddressesResult) EndInvoke("GetRecentAddresses", new object[0], asyncResult);
+                return (GetRecentAddressesResult)EndInvoke("GetRecentAddresses", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginFileToFolder(FileToFolderParameters parameters, AsyncCallback callback, object asyncState)
@@ -732,7 +749,7 @@ namespace Mark5.ServiceReference.AppService
 
             public FileToFolderResult EndFileToFolder(IAsyncResult asyncResult)
             {
-                return (FileToFolderResult) EndInvoke("FileToFolder", new object[0], asyncResult);
+                return (FileToFolderResult)EndInvoke("FileToFolder", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginCopyToWorktray(CopyToWorktrayParameters parameters, AsyncCallback callback, object asyncState)
@@ -748,7 +765,7 @@ namespace Mark5.ServiceReference.AppService
 
             public CopyToWorktrayResult EndCopyToWorktray(IAsyncResult asyncResult)
             {
-                return (CopyToWorktrayResult) EndInvoke("CopyToWorktray", new object[0], asyncResult);
+                return (CopyToWorktrayResult)EndInvoke("CopyToWorktray", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginDelete(DeleteParameters parameters, AsyncCallback callback, object asyncState)
@@ -764,7 +781,7 @@ namespace Mark5.ServiceReference.AppService
 
             public DeleteResult EndDelete(IAsyncResult asyncResult)
             {
-                return (DeleteResult) EndInvoke("Delete", new object[0], asyncResult);
+                return (DeleteResult)EndInvoke("Delete", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginRemoveFromFolder(RemoveFromFolderParameters parameters, AsyncCallback callback, object asyncState)
@@ -780,7 +797,7 @@ namespace Mark5.ServiceReference.AppService
 
             public RemoveFromFolderResult EndRemoveFromFolder(IAsyncResult asyncResult)
             {
-                return (RemoveFromFolderResult) EndInvoke("RemoveFromFolder", new object[0], asyncResult);
+                return (RemoveFromFolderResult)EndInvoke("RemoveFromFolder", new object[0], asyncResult);
             }
 
             #endregion
@@ -800,7 +817,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetSystemSettingsResult EndGetSystemSettings(IAsyncResult asyncResult)
             {
-                return (GetSystemSettingsResult) EndInvoke("GetSystemSettings", new object[0], asyncResult);
+                return (GetSystemSettingsResult)EndInvoke("GetSystemSettings", new object[0], asyncResult);
             }
 
             public IAsyncResult BeginGetSystemUsers(GetSystemUsersParameters parameters, AsyncCallback callback, object asyncState)
@@ -816,7 +833,7 @@ namespace Mark5.ServiceReference.AppService
 
             public GetSystemUsersResult EndGetSystemUsers(IAsyncResult asyncResult)
             {
-                return (GetSystemUsersResult) EndInvoke("GetSystemUsers", new object[0], asyncResult);
+                return (GetSystemUsersResult)EndInvoke("GetSystemUsers", new object[0], asyncResult);
             }
 
             #endregion
@@ -836,7 +853,7 @@ namespace Mark5.ServiceReference.AppService
 
             public TestResult EndTest(IAsyncResult asyncResult)
             {
-                return (TestResult) EndInvoke("Test", new object[0], asyncResult);
+                return (TestResult)EndInvoke("Test", new object[0], asyncResult);
             }
 
             #endregion

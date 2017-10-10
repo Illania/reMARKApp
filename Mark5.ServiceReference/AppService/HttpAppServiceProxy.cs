@@ -262,6 +262,11 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetShortcodeResult, GetShortcodeParameters>("GetShortcode", parameters, ct);
         }
 
+        public async Task<CreateOrUpdateShortcodeResult> CreateOrUpdateShortcodeAsync(CreateOrUpdateShortcodeParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<CreateOrUpdateShortcodeResult, CreateOrUpdateShortcodeParameters>("CreateOrUpdateShortcode", parameters, ct);
+        }
+
         public async Task<GetCalendarEventsResult> GetCalendarEventsAsync(GetCalendarEventsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<GetCalendarEventsResult, GetCalendarEventsParameters>("GetCalendarEvents", parameters, ct);
