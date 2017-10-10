@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -33,6 +33,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         protected UITableViewController SearchResultsController;
         protected DataSource SearchResultsDataSource;
 
+        protected UIBarButtonItem LeftButton;
+        protected UIBarButtonItem RightButton;
+
         protected CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
@@ -43,6 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         TinyMessageSubscriptionToken removedFromFolderToken;
         TinyMessageSubscriptionToken movedFromFolderToken;
         TinyMessageSubscriptionToken deletedToken;
+        TinyMessageSubscriptionToken shortcodeChangedToken;
 
         protected AbstractShortcodesListViewController(bool disableRowActions)
         {
@@ -123,6 +127,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             CommonConfig.Logger.Warning($"{nameof(AbstractShortcodesListViewController)} received memory warning!");
 
+            UnsubscribeFromMessages();
+
             var ds = TableView?.Source as DataSource;
             ds?.Reset();
 
@@ -136,7 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         #region Initialization
 
-        void InitializeNavigationBar()
+        protected virtual void InitializeNavigationBar()
         {
             ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -199,9 +205,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void SubscribeToMessages()
         {
+            removedFromFolderToken?.Dispose();
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+
+            movedFromFolderToken?.Dispose();
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+
+            deletedToken?.Dispose();
             deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
+
+            shortcodeChangedToken?.Dispose();
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleShortcodeChanged, m => m.EntityPreview.ObjectType == ObjectType.Shortcode);
         }
 
         void UnsubscribeFromMessages()
@@ -209,6 +223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             removedFromFolderToken?.Dispose();
             movedFromFolderToken?.Dispose();
             deletedToken?.Dispose();
+            shortcodeChangedToken?.Dispose();
         }
 
         void InitializeNavigationBarTitle()
@@ -219,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             UIView.AnimationsEnabled = true;
         }
 
-        void InitializeHandlers()
+        protected virtual void InitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked += ExitEditItem_Clicked;
@@ -231,7 +246,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        void DeinitializeHandlers()
+        protected virtual void DeinitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked -= ExitEditItem_Clicked;
@@ -269,6 +284,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         void StartEditing()
         {
             TableView.SetEditing(true, true);
+
+            LeftButton = NavigationItem.LeftBarButtonItem;
+            RightButton = NavigationItem.RightBarButtonItem;
+
             NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
             NavigationItem.SetLeftBarButtonItem(EditItem, true);
 
@@ -293,8 +312,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(null, true);
-            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+            NavigationItem.SetRightBarButtonItem(RightButton, true);
+            NavigationItem.SetLeftBarButtonItem(LeftButton, true);
 
             SearchController.SearchBar.UserInteractionEnabled = true;
             SearchController.SearchBar.Alpha = 1f;
@@ -688,6 +707,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RemoveShortcodesFromList(m.EntitiesId);
         }
 
+        void HandleShortcodeChanged(EntityPreviewChangedMessage m)
+        {
+            UpdateShortcodeFromList(m.EntityPreview as ShortcodePreview);
+        }
+
+        void UpdateShortcodeFromList(ShortcodePreview sp)
+        {
+            if (SearchController.Active)
+                SearchResultsDataSource.UpdateItem(sp);
+
+            var ds = (DataSource)TableView.Source;
+            ds.UpdateItem(sp);
+        }
+
         #endregion
 
         #region Utilities
@@ -834,6 +867,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                 var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
                 viewController.ShortcodeSelected(tableView, cp);
+            }
+
+            public void UpdateItem(ShortcodePreview sp)
+            {
+                var indexPath = FindItemIndexPath(sp);
+                if (indexPath != null)
+                {
+                    shortcodePreviewsInView[indexPath.Section][indexPath.Row] = sp;
+                    tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
             }
 
             public void AppendItems(List<ShortcodePreview> shortcodePreviews)

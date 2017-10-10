@@ -67,6 +67,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                     AddressesLayout.AddView(av);
                 }
             }
+            else
+            {
+                Visibility = ViewStates.Gone;
+            }
         }
 
         class AddressView : LinearLayoutCompat
@@ -90,18 +94,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.ShortcodeViews
                 var addressView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = address.Address
+                    Text = string.IsNullOrEmpty(address.Name) ? address.Address : $"{address.Name} <{address.Address}>"
                 };
 
                 addressView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
                 AddView(addressView);
 
-                if (!string.IsNullOrWhiteSpace(address.Name))
+                if (!string.IsNullOrWhiteSpace(address.FullAttention))
                 {
                     var nameView = new AppCompatTextView(Context)
                     {
                         LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                        Text = address.Name
+                        Text = address.FullAttention
                     };
 
                     nameView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);

@@ -1,11 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -65,10 +67,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return Task.CompletedTask;
         }
 
-        public override Task UpdateDocument()
+        public override async Task UpdateDocument()
         {
-            DocumentPreview.Subject = subjectTextView.Text;
-            return Task.CompletedTask;
+            await AsyncHelpers.RunOnUiThreadSync((Activity)Context, () => DocumentPreview.Subject = subjectTextView.Text);
+            return;
         }
 
         public void SetSubject(string subject)

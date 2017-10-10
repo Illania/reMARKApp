@@ -16,7 +16,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class AddEditContactActivity : BaseAppCompatActivity
     {
         public const string ContactIntentKey = "Contact_16fd7751-f195-4a43-87fa-097115921e6d";
-        public const string ContactIdIntentKey = "ContactId_43fa5c1e-6033-42dd-9600-1e805b03e7d6";
         public const string ContactPreviewIntentKey = "ContactPreview_c0e57f66-55f3-4b64-8745-3a9bb944047c";
         public const string ContactCreationModeFlag = "ContactCreationModeFlag_05d04d74-9022-47bb-9618-c6f16540cca7";
         public const string ParentContactPreviewIntentKey = "ParentContactPreview_51c32114-bf48-4832-ab5e-8de28d3c3304";
@@ -45,9 +44,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var cf = new AddEditContactFragment();
 
                 cf.CloseRequest = CloseRequest;
-
-                if (Intent.HasExtra(ContactIdIntentKey))
-                    cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
                     cf.ContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));

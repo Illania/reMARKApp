@@ -18,14 +18,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public static DocumentAddressesCompactTableViewCell Create()
         {
-            var cell = (DocumentAddressesCompactTableViewCell) Nib.Instantiate(null, null)[0];
+            var cell = (DocumentAddressesCompactTableViewCell)Nib.Instantiate(null, null)[0];
             cell.IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             return cell;
         }
 
         public void Initialize(DocumentAddress documentAddress)
         {
-            AddressLabel.Text = documentAddress.FullAddress;
+            AddressLabel.Text = string.IsNullOrEmpty(documentAddress.Name) ? documentAddress.Address : $"{documentAddress.Name} <{documentAddress.Address}>";
         }
     }
 }

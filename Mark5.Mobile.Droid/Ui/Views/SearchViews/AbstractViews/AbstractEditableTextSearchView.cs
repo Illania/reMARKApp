@@ -76,7 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int) GravityFlags.CenterVertical,
+                    Gravity = (int)GravityFlags.CenterVertical,
                 }
             };
 
@@ -102,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         void BottomEditText_FocusChange(object sender, FocusChangeEventArgs e)
         {
             if (!e.HasFocus)
-                ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow((sender as View).WindowToken, HideSoftInputFlags.None);
+                ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow((sender as View).WindowToken, HideSoftInputFlags.None);
             else
                 PrepareViewsExpansion();
         }
@@ -116,8 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
             for (var i = 0; i < containerLayout.ChildCount; i++)
             {
-                var view = containerLayout.GetChildAt(i) as AbstractEditableTextSearchView<T>;
-                if (view != null)
+                if (containerLayout.GetChildAt(i) is AbstractEditableTextSearchView<T> view)
                     view.Visibility = ViewStates.Visible;
             }
         }
@@ -148,7 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bottomEditText.RequestFocus();
             bottomEditText.SetSelection(bottomEditText.Text.Length);
 
-            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).ShowSoftInput(bottomEditText, ShowFlags.Implicit);
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).ShowSoftInput(bottomEditText, ShowFlags.Implicit);
 
             cancelIconLayout.Visibility = ViewStates.Visible;
         }

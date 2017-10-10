@@ -11,6 +11,7 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Webkit;
+using AngleSharp.Dom.Html;
 using AngleSharp.Html;
 using AngleSharp.Parser.Html;
 using Java.Interop;
@@ -163,8 +164,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task UpdateDocument()
         {
-            Document.HtmlBody = await RetrieveCombinedText();
-            DocumentPreview.Preview = await GetPreview(Document.HtmlBody);
+            (Document.HtmlBody, DocumentPreview.Preview) = await RetrieveCombinedText();
         }
 
         public async Task InsertTemplate(Template template)
@@ -201,59 +201,62 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         async Task<string> GetBodyWithHeader(string content, ContentType contentType)
         {
-            if (contentType == ContentType.Html)
-            {
-                var htmlHeader = GetHtmlHeader();
+            return await Task.Run(async () =>
+           {
+               if (contentType == ContentType.Html)
+               {
+                   var htmlHeader = GetHtmlHeader();
 
-                var htmlParser = new HtmlParser();
-                var htmlDocument = await htmlParser.ParseAsync(content);
-                var body = htmlDocument.Body;
-                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
-                body.InsertBefore(parsedHeader.Body, body.FirstChild);
+                   var htmlParser = new HtmlParser();
+                   var htmlDocument = await htmlParser.ParseAsync(content);
+                   var body = htmlDocument.Body;
+                   var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+                   body.InsertBefore(parsedHeader.Body, body.FirstChild);
 
-                var ce = htmlDocument.CreateElement("div");
-                ce.ClassName = OldEditableContentClass;
-                ce.Id = "editable-one";
-                ce.SetAttribute("contentEditable", "true");
-                ce.SetAttribute("style", "outline: 0px solid transparent");
+                   var ce = htmlDocument.CreateElement("div");
+                   ce.ClassName = OldEditableContentClass;
+                   ce.Id = "editable-one";
+                   ce.SetAttribute("contentEditable", "true");
+                   ce.SetAttribute("style", "outline: 0px solid transparent");
 
-                ce.InnerHtml = body.InnerHtml;
-                body.InnerHtml = ce.OuterHtml;
+                   ce.InnerHtml = body.InnerHtml;
+                   body.InnerHtml = ce.OuterHtml;
 
-                var textWriter = new StringWriter();
-                htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                   var textWriter = new StringWriter();
+                   htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
-                return textWriter.ToString();
-            }
+                   return textWriter.ToString();
+               }
 
-            if (contentType == ContentType.PlainText)
-            {
-                var htmlHeader = GetHtmlHeader();
+               if (contentType == ContentType.PlainText)
+               {
+                   var htmlHeader = GetHtmlHeader();
 
-                var htmlParser = new HtmlParser();
-                var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
+                   var htmlParser = new HtmlParser();
+                   var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
 
-                var contentHtml = parsedHeader.CreateElement("pre");
-                contentHtml.TextContent = content;
+                   var contentHtml = parsedHeader.CreateElement("pre");
+                   contentHtml.TextContent = content;
 
-                parsedHeader.Body.Append(contentHtml);
+                   parsedHeader.Body.Append(contentHtml);
 
-                var ce = parsedHeader.CreateElement("div");
-                ce.ClassName = OldEditableContentClass;
-                ce.Id = "editable-one";
-                ce.SetAttribute("contentEditable", "true");
-                ce.SetAttribute("style", "outline: 0px solid transparent");
+                   var ce = parsedHeader.CreateElement("div");
+                   ce.ClassName = OldEditableContentClass;
+                   ce.Id = "editable-one";
+                   ce.SetAttribute("contentEditable", "true");
+                   ce.SetAttribute("style", "outline: 0px solid transparent");
 
-                ce.InnerHtml = parsedHeader.Body.InnerHtml;
-                parsedHeader.Body.InnerHtml = ce.OuterHtml;
+                   ce.InnerHtml = parsedHeader.Body.InnerHtml;
+                   parsedHeader.Body.InnerHtml = ce.OuterHtml;
 
-                var textWriter = new StringWriter();
-                parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                   var textWriter = new StringWriter();
+                   parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
 
-                return textWriter.ToString();
-            }
+                   return textWriter.ToString();
+               }
 
-            return "";
+               return "";
+           });
         }
 
         string GetHtmlHeader()
@@ -277,26 +280,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return header.ToString();
         }
 
-        async Task<string> RetrieveCombinedText()
+        async Task<(string content, string preview)> RetrieveCombinedText()
         {
-            var newContentString = await GetNewHtmlContentAsync(true);
+            var htmlParser = new HtmlParser();
+
+            var newContentString = await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => GetNewHtmlContentAsync());
+            var newContentParsed = await htmlParser.ParseAsync(newContentString);
+            var newContentProcessedString = await ProcessRetrievedContent(newContentParsed, NewEditableContentClass);
 
             if (oldContentLoaded)
             {
-                var oldContentString = await GetOldHtmlContentAsync(true);
-
-                var htmlParser = new HtmlParser();
-                var newContentParsed = await htmlParser.ParseAsync(newContentString);
+                var oldContentString = await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => GetOldHtmlContentAsync());
                 var oldContentParsed = await htmlParser.ParseAsync(oldContentString);
-                var oldContentInDiv = newContentParsed.CreateElement("div");
-                oldContentInDiv.InnerHtml = oldContentParsed.Body.InnerHtml;
-                newContentParsed.Body.Append(oldContentInDiv);
+                var oldContentProcessed = await ProcessRetrievedContent(oldContentParsed, OldEditableContentClass);
+                var oldContentProcessedParsed = await htmlParser.ParseAsync(oldContentProcessed);
+
+                var newContentProcessedParsed = await htmlParser.ParseAsync(newContentProcessedString);
+
+                var oldContentInDiv = newContentProcessedParsed.CreateElement("div");
+                oldContentInDiv.InnerHtml = oldContentProcessedParsed.Body.InnerHtml;
+                newContentProcessedParsed.Body.Append(oldContentInDiv);
                 var textWriter = new StringWriter();
-                newContentParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-                return textWriter.ToString();
+                newContentProcessedParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
+                var content = textWriter.ToString();
+                var preview = GetPreview(newContentProcessedParsed);
+                return (content, preview);
             }
 
-            return newContentString;
+            return (newContentProcessedString, GetPreview(newContentParsed));
         }
 
         #region Get/Set contents
@@ -307,7 +318,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             ((Activity)context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
-        async Task<string> GetNewHtmlContentAsync(bool processing)
+        async Task<string> GetNewHtmlContentAsync()
         {
             try
             {
@@ -321,7 +332,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 NewSetGetContentAsyncSemaphore.Release();
             }
 
-            return processing ? await ProcessRetrievedContent(new HtmlParser(), newContent, NewEditableContentClass) : newContent;
+            return newContent;
         }
 
         async Task SetOldHtmlContentAsync(string htmlString)
@@ -330,7 +341,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
         }
 
-        async Task<string> GetOldHtmlContentAsync(bool processing)
+        async Task<string> GetOldHtmlContentAsync()
         {
             try
             {
@@ -344,14 +355,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 OldSetGetContentAsyncSemaphore.Release();
             }
 
-            return processing ? await ProcessRetrievedContent(new HtmlParser(), oldContent, OldEditableContentClass) : oldContent;
+            return oldContent;
         }
 
         #endregion
 
         async Task SetWebContentPart(string parentElementClass, ContentType contentType, string content)
         {
-            var currentContent = await GetNewHtmlContentAsync(false);
+            var currentContent = await GetNewHtmlContentAsync();
 
             var htmlParser = new HtmlParser();
             var currentHtmlDocument = await htmlParser.ParseAsync(currentContent);
@@ -401,10 +412,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
         }
 
-        static async Task<string> ProcessRetrievedContent(HtmlParser htmlParser, string content, string elementClass)
+        static async Task<string> ProcessRetrievedContent(IHtmlDocument currentHtmlDocument, string elementClass)
         {
-            var currentHtmlDocument = await htmlParser.ParseAsync(content);
-
             var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
             foreach (var matchingElement in matchingElements)
                 matchingElement.Attributes.RemoveNamedItem("contenteditable");
@@ -426,11 +435,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return tcs.Task;
         }
 
-        static async Task<string> GetPreview(string htmlText)
+        static string GetPreview(IHtmlDocument contentParsed)
         {
-            var htmlParser = new HtmlParser();
-            var newContentParsed = await htmlParser.ParseAsync(htmlText);
-            var textContent = newContentParsed.Body.TextContent;
+            var textContent = contentParsed.Body.TextContent;
             return textContent.SafeSubstring(0, 300).TrimStart();
         }
 
@@ -478,8 +485,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override IComposeDocumentViewState GetState()
         {
-            var newContentString = AsyncHelpers.RunSync(() => { return GetNewHtmlContentAsync(false); });
-            var oldContentString = AsyncHelpers.RunSync(() => { return GetOldHtmlContentAsync(false); });
+            var newContentString = AsyncHelpers.RunSync(() => { return GetNewHtmlContentAsync(); });
+            var oldContentString = AsyncHelpers.RunSync(() => { return GetOldHtmlContentAsync(); });
 
             return new ContentViewState
             {

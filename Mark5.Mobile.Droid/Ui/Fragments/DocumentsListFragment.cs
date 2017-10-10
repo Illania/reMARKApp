@@ -1271,15 +1271,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
+                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
 
-                var dpvh = vh as DocumentPreviewViewHolder;
-                if (dpvh != null)
-                    return dpvh.BubbleDate;
+                if (vh != null)
+                {
+                    var dpvh = vh as DocumentPreviewViewHolder;
+                    if (dpvh != null)
+                        return dpvh.BubbleDate;
 
-                var edpvh = vh as ExternalDocumentPreviewViewHolder;
-                if (edpvh != null)
-                    return edpvh.BubbleDate;
+                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                    if (edpvh != null)
+                        return edpvh.BubbleDate;
+                }
 
                 return string.Empty;
             }

@@ -5,38 +5,40 @@
 // Manual changes to this file may not be handled correctly.
 //
 using Foundation;
-using System.CodeDom.Compiler;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-	[Register ("DocumentAddressesTableViewCell")]
-	partial class DocumentAddressesTableViewCell
-	{
-		[Outlet]
-		UIKit.UILabel AddressLabel { get; set; }
+    [Register("DocumentAddressesTableViewCell")]
+    partial class DocumentAddressesTableViewCell
+    {
+        [Outlet]
+        UIKit.UILabel AttentionLabel { get; set; }
 
-		[Outlet]
-		UIKit.UIImageView IconImage { get; set; }
+        [Outlet]
+        UIKit.UIImageView IconImage { get; set; }
 
-		[Outlet]
-		UIKit.UILabel NameLabel { get; set; }
-		
-		void ReleaseDesignerOutlets ()
-		{
-			if (AddressLabel != null) {
-				AddressLabel.Dispose ();
-				AddressLabel = null;
-			}
+        [Outlet]
+        UIKit.UILabel AddressLabel { get; set; }
 
-			if (IconImage != null) {
-				IconImage.Dispose ();
-				IconImage = null;
-			}
+        void ReleaseDesignerOutlets()
+        {
+            if (AttentionLabel != null)
+            {
+                AttentionLabel.Dispose();
+                AttentionLabel = null;
+            }
 
-			if (NameLabel != null) {
-				NameLabel.Dispose ();
-				NameLabel = null;
-			}
-		}
-	}
+            if (IconImage != null)
+            {
+                IconImage.Dispose();
+                IconImage = null;
+            }
+
+            if (AddressLabel != null)
+            {
+                AddressLabel.Dispose();
+                AddressLabel = null;
+            }
+        }
+    }
 }

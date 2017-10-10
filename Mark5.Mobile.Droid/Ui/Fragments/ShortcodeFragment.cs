@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -23,6 +24,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodeFragment : RetainableStateFragment
     {
+        static class RequestCodes
+        {
+            public const int EditRequest = 1;
+        }
+
         public int? FolderId { get; set; }
         public Folder Folder { get; set; }
         public int? ShortcodeId { get; set; }
@@ -34,6 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ProgressBar progress;
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
+
+        bool forceRefresh;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -82,7 +90,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
-            await RefreshData();
+            await RefreshData(forceRefresh);
+            forceRefresh = false;
         }
 
         #region Options menu
@@ -93,6 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int CopyToWorktray = 30;
             public const int CopyToFolder = 40;
             public const int MoveToFolder = 41;
+            public const int Edit = 50;
             public const int Actions = 70;
             public const int Links = 80;
             public const int Delete = 90;
@@ -119,6 +129,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+
+            if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed)
+                menu.Add(Menu.None, MenuItemActions.Edit, MenuItemActions.Edit, Resource.String.edit);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -209,6 +222,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (item.ItemId == MenuItemActions.Edit)
+            {
+                var intent = new Intent(Context, typeof(AddEditShortcodeActivity));
+                intent.PutExtra(AddEditShortcodeActivity.ShortcodeIntentKey, Serializer.Serialize(Shortcode));
+                intent.PutExtra(AddEditShortcodeActivity.ShortcodePreviewIntentKey, Serializer.Serialize(ShortcodePreview));
+                intent.PutExtra(AddEditShortcodeActivity.ShortcodeCreationModeFlagIntentKey, (int)ShortcodeCreationModeFlag.Edit);
+
+                StartActivityForResult(intent, RequestCodes.EditRequest);
+            }
+
             if (item.ItemId == MenuItemActions.Actions)
             {
                 var i = new Intent(Activity, typeof(ObjectActionsActivity));
@@ -240,6 +263,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            forceRefresh |= (resultCode == (int)Result.Ok && requestCode == RequestCodes.EditRequest);
         }
 
         async void CopyToWorktrayAction()
@@ -361,16 +389,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task RefreshData()
+        async Task RefreshData(bool force = false)
         {
             try
             {
                 if (NotificationGuid != default(Guid))
                     await Managers.NotificationsManager.MarkAsRead(NotificationGuid);
 
-                if (ShortcodeId.HasValue && ShortcodePreview == null && Shortcode == null)
+                if (force || (ShortcodeId.HasValue && ShortcodePreview == null && Shortcode == null))
                 {
-                    var container = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(FolderId ?? Folder?.Id, ShortcodeId.Value);
+                    var container = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(FolderId ?? Folder?.Id, ShortcodeId ?? ShortcodePreview.Id);
                     ShortcodePreview = container.ShortcodePreview;
                     Shortcode = container.Shortcode;
                 }
@@ -386,8 +414,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                CloseRequest?.Invoke();
             }
         }
 
@@ -400,8 +427,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
-                var dv = linearLayout.GetChildAt(i) as ShortcodeView;
-                if (dv != null)
+                if (linearLayout.GetChildAt(i) is ShortcodeView dv)
                 {
                     dv.ShortcodePreview = ShortcodePreview;
                     dv.Shortcode = Shortcode;
@@ -429,8 +455,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var sfs = restoredState as ShortcodeFragmentState;
-            if (sfs != null)
+            if (restoredState is ShortcodeFragmentState sfs)
             {
                 FolderId = sfs.FolderId;
                 Folder = sfs.Folder;

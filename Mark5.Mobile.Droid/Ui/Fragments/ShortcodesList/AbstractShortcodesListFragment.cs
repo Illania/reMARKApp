@@ -602,6 +602,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Messenger hub related
 
+        public void UpdateShortcodePreview(EntityPreviewChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.EntityPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                adapter.Items[position] = (ShortcodePreview)m.EntityPreview;
+            }
+
+            position = searchAdapter.GetPosition(m.EntityPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                adapter.Items[position] = (ShortcodePreview)m.EntityPreview;
+            }
+        }
+
         public void UpdateMovedEntities(EntityMovedFromFolderMessage m)
         {
             foreach (var entityId in m.EntitiesId)

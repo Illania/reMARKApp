@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
@@ -17,7 +17,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Views.AddEdtiContactViews;
+using Mark5.Mobile.Droid.Ui.Views.AddEditContactViews;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -31,7 +31,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
-        public int? ContactId { get; set; }
         public ContactType ContactType { get; set; }
         public ContactCreationModeFlag CreationModeFlag { get; set; }
         public Action CloseRequest { get; set; }
@@ -57,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={ContactId ?? ContactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -70,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.SetImageResource(Resource.Drawable.action_save_contact);
+            fab.SetImageResource(Resource.Drawable.action_save);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
             fab.Enabled = true;
             fab.Size = FloatingActionButton.SizeNormal;
@@ -134,19 +133,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             int resId = 0;
 
-            switch (ContactType)
+            if (CreationModeFlag == ContactCreationModeFlag.New)
             {
-                case ContactType.Person:
-                    resId = Resource.String.edit_contact_create_person;
-                    break;
-                case ContactType.Company:
-                    resId = Resource.String.edit_contact_create_company;
-                    break;
-                case ContactType.Department:
-                    resId = Resource.String.edit_contact_create_department;
-                    break;
-                default:
-                    throw new ArgumentException("Contact type needs to be defined");
+                switch (ContactType)
+                {
+                    case ContactType.Person:
+                        resId = Resource.String.edit_contact_create_person;
+                        break;
+                    case ContactType.Company:
+                        resId = Resource.String.edit_contact_create_company;
+                        break;
+                    case ContactType.Department:
+                        resId = Resource.String.edit_contact_create_department;
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
+            }
+            else if (CreationModeFlag == ContactCreationModeFlag.Edit)
+            {
+                switch (ContactType)
+                {
+                    case ContactType.Person:
+                        resId = Resource.String.edit_contact_edit_person;
+                        break;
+                    case ContactType.Company:
+                        resId = Resource.String.edit_contact_edit_company;
+                        break;
+                    case ContactType.Department:
+                        resId = Resource.String.edit_contact_edit_department;
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
             }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(resId);
@@ -229,7 +248,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={ContactId ?? ContactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...");
         }
 
@@ -361,7 +380,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={ContactId ?? ContactPreview?.Id}, " +
+                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={ContactPreview?.Id}, " +
                                      $"type={ContactType}, mode={CreationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -385,7 +404,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = Contact,
                 ParentContactPreview = ParentContactPreview,
                 CreationModeFlag = CreationModeFlag,
-                ContactId = ContactId,
                 ContactType = ContactType,
                 SecondaryLayoutShown = secondaryLayoutShown,
                 ParentPreselected = ParentPreselected,
@@ -400,7 +418,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ContactPreview = state.ContactPreview;
                 ParentContactPreview = state.ParentContactPreview;
                 CreationModeFlag = state.CreationModeFlag;
-                ContactId = state.ContactId;
                 ContactType = state.ContactType;
                 secondaryLayoutShown = state.SecondaryLayoutShown;
                 ParentPreselected = ParentPreselected;

@@ -121,7 +121,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (ContactPreview.Type == ContactType.Company || ContactPreview.Type == ContactType.Department)
                 {
-                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetImageResource(Resource.Drawable.action_add);
                     fab.SetOnClickListener(new ActionOnClickListener(AddChildrenContact));
                     fab.Visibility = ViewStates.Visible;
                 }
