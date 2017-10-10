@@ -53,9 +53,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if ((Arguments != null) && Arguments.ContainsKey(RemoteFolderBundleKey))
                 remoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
 
-            if (remoteFolder.Root)
-                remoteFolder = Folder.RootForModule(remoteFolder.Module);
-
             CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsRetainableState)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.pager, container, false);
@@ -80,6 +77,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
+
+            if (remoteFolder.Root)
+                remoteFolder = Folder.RootForModule(remoteFolder.Module);
 
             var title = string.Empty;
 

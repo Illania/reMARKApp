@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fragment = new ObjectLinksFragment();
             fragment.Arguments = args;
 
-             var tag = $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
+            var tag = $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
 
             return (fragment, tag);
         }
@@ -50,8 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             if (Arguments.ContainsKey(BusinessEntityBundleKey))
-                businessEntity = Serializer.Deserialize<IBusinessEntity>(BusinessEntityBundleKey);
-            
+                businessEntity = Serializer.Deserialize<IBusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -60,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-            var padding = (int) (TypedValue.ApplyDimension(ComplexUnitType.Dip, 10f, Resources.DisplayMetrics) + 0.5f);
+            var padding = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 10f, Resources.DisplayMetrics) + 0.5f);
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             return rootView;
@@ -70,8 +70,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.links);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.links);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
         }
@@ -175,7 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else if (ol.FromObjectType == ObjectType.Contact)
                 {
-                    StartActivity(ContactActivity.CreateIntent(Context, contactId:ol.FromObjectId));
+                    StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.FromObjectId));
                 }
                 else if (ol.FromObjectType == ObjectType.Shortcode)
                 {
@@ -190,7 +190,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else if (ol.ToObjectType == ObjectType.Contact)
                 {
-                    StartActivity(ContactActivity.CreateIntent(Context, contactId:ol.ToObjectId));
+                    StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.ToObjectId));
                 }
                 else if (ol.ToObjectType == ObjectType.Shortcode)
                 {

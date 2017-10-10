@@ -80,20 +80,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(RemoteFolderBundleKey))
-                RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
+            if (Arguments != null)
+            {
+                if (Arguments.ContainsKey(RemoteFolderBundleKey))
+                    RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
 
-            if (RemoteFolder.Root)
-                RemoteFolder = Folder.RootForModule(RemoteFolder.Module);
+                if (Arguments.ContainsKey(HideSearchBundleKey))
+                    HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
 
-            if (Arguments.ContainsKey(HideSearchBundleKey))
-                HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
+                if (Arguments.ContainsKey(HideFabBundleKey))
+                    HideFab = Arguments.GetBoolean(HideFabBundleKey);
 
-            if (Arguments.ContainsKey(HideFabBundleKey))
-                HideFab = Arguments.GetBoolean(HideFabBundleKey);
-
-            if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
-                LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
+                if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
+                    LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
+            }
 
             Container = container;
 
@@ -141,6 +141,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
+
+            if (RemoteFolder.Root)
+                RemoteFolder = Folder.RootForModule(RemoteFolder.Module);
 
             if (!(view.Parent is ViewPager))
             {
