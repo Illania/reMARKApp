@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Mark5.Mobile.Droid</RootNamespace>
     <AssemblyName>Mark5.Mobile.Droid</AssemblyName>
-    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -228,7 +228,6 @@
     <Compile Include="Ui\Activities\MainActivity.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
-    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
