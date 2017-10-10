@@ -7,12 +7,14 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -24,6 +26,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
+        UITableView tableView;
+
+        TinyMessageSubscriptionToken readStatusChangedToken;
+        TinyMessageSubscriptionToken commentsCountChangedToken;
+        TinyMessageSubscriptionToken categoriesChangedToken;
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -32,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
+            SubscribeToMessages();
         }
 
         public override void ViewDidLoad()
@@ -83,6 +92,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ((DataSource)TableView.Source)?.Reset();
 
+            UnsubscribeFromMessages();
+
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
@@ -101,6 +112,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (CommonConfig.Logger.IsDebugEnabled())
                 CommonConfig.Logger.Debug("Disposed");
+        }
+
+        void SubscribeToMessages()
+        {
+            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
+            categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            readStatusChangedToken?.Dispose();
+            commentsCountChangedToken?.Dispose();
+            categoriesChangedToken?.Dispose();
         }
 
         #endregion
@@ -237,8 +262,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void DocumentSelected(DocumentPreview documentPreview)
         {
             var vc = new DocumentViewController();
-            vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-            vc.OnComplete = () => { vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated; };
             vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
             vc.SetRefreshDataOnAppear();
 
@@ -444,19 +467,90 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Event handlers
+        #region Message handlers
 
-        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
+        void RemoveDocumentsFromList(IEnumerable<int> ids)
         {
             BeginInvokeOnMainThread(() =>
             {
-                var selectedRow = TableView.IndexPathForSelectedRow;
+                ((DataSource)TableView.Source).RemoveItems(ids.ToList());
+            });
+        }
 
-                ((DataSource)TableView.Source).UpdateDocumentPreview(e.DocumentPreview);
-                TableView.ReloadData();
+        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
 
-                if (selectedRow != null)
-                    TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.IsReadByCurrent = message.IsReadByCurrent;
+                    documentPreview.IsReadByAnyone = message.IsReadByAnyone;
+
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+            });
+        }
+
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.CommentsCount = message.CommentsCount;
+
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new NSIndexPath[]
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+            });
+        }
+
+        void CategoriesChangedHandler(EntityCategoriesChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.Categories.Clear();
+                    documentPreview.Categories.AddRange(message.Categories);
+
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new NSIndexPath[]
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+
             });
         }
 
@@ -475,14 +569,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.SetEditing(false, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
-        }
-
-        void RemoveDocumentsFromList(IEnumerable<int> ids)
-        {
-            BeginInvokeOnMainThread(() =>
-            {
-                ((DataSource)TableView.Source).RemoveItems(ids.ToList());
-            });
         }
 
         public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview, out bool previousDocumentAvailable, out bool nextDocumentAvailable, bool scrollToDocument = false)
@@ -705,15 +791,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 Items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-            }
-
-            public void UpdateDocumentPreview(DocumentPreview documentPreview)
-            {
-                var documentRow = Items.IndexOf(d => d.Id == documentPreview.Id);
-                if (documentRow < 0)
-                    return;
-
-                tableViewWeakReference.Unwrap()?.ReloadRows(new[] { NSIndexPath.FromRowSection(documentRow, 0) }, UITableViewRowAnimation.Fade);
             }
         }
 

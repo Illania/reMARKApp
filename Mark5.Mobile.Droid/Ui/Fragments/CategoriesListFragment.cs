@@ -71,8 +71,8 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.categories);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Droid
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -112,7 +112,7 @@ namespace Mark5.Mobile.Droid
                     CloseRequest = CloseRequest
                 };
 
-                var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
+                var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
                 ft.AddToBackStack(null);
@@ -211,8 +211,7 @@ namespace Mark5.Mobile.Droid
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var clfs = restoredState as CategoriesListFragmentState;
-            if (clfs != null)
+            if (restoredState is CategoriesListFragmentState clfs)
                 BusinessEntityPreview = clfs.BusinessEntityPreview;
         }
 

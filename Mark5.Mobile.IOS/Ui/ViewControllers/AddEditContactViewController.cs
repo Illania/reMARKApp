@@ -8,7 +8,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -264,12 +263,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView.EndEditing(true);
                 var parentId = ParentContactPreview == null ? -1 : ParentContactPreview.Id;
                 await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
-
-                if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                    CommonConfig.MessengerHub.Publish(new ContactChangedMessage(this, ContactPreview));
-
-                if (ParentContactPreview != null)
-                    CommonConfig.MessengerHub.Publish(new ChildrenContactAddedMessage(this, ParentContactPreview));
 
                 dismissAction();
                 DismissViewController(true, null);

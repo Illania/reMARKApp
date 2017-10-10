@@ -10,6 +10,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -18,6 +19,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 using WebKit;
 
@@ -86,12 +88,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
         GetNextDocumentPreviewDelegate GetNextDocumentPreview { get; set; }
 
-        public event EventHandler<ReadStatusUpdatedEventArgs> ReadStatusUpdated;
-
         CancellationTokenSource readStatusCts;
         CancellationTokenSource loadCts;
 
         bool refreshDataOnAppear;
+
+        TinyMessageSubscriptionToken readStatusChangedToken;
+        TinyMessageSubscriptionToken commentsCountChangedToken;
+        TinyMessageSubscriptionToken draftSentToken;
 
         #region UIViewController overrides
 
@@ -104,6 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitSubViews();
             InitToolbar();
             InitBackgroundView();
+            SubscribeToMessages();
         }
 
         public override void ViewDidLoad()
@@ -152,6 +157,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning("Received memory warning!");
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -433,6 +440,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        void SubscribeToMessages()
+        {
+            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler, m => m.DocumentPreviewId == document?.Id);
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document && m.EntityId == document?.Id);
+            draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(DraftSentHandler, m => m.DocumentId == document?.Id);
+
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            readStatusChangedToken?.Dispose();
+            commentsCountChangedToken?.Dispose();
+            draftSentToken?.Dispose();
+        }
+
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
             failedDocumentToUploadGuid = Guid.Empty;
@@ -678,19 +700,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return;
 
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
-
-                    BeginInvokeOnMainThread(() =>
-                    {
-                        if (token.IsCancellationRequested)
-                            return;
-                        if (dp == null)
-                            return;
-
-                        readByView.RefreshView();
-                        readByView.UpdateVisibility();
-
-                        ReadStatusUpdated?.Invoke(this, new ReadStatusUpdatedEventArgs(dp));
-                    });
                 }
                 catch (Exception ex)
                 {
@@ -1116,10 +1125,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
 
-                readByView.RefreshView();
-
-                ReadStatusUpdated?.Invoke(this, new ReadStatusUpdatedEventArgs(documentPreview));
-
                 dismissAction();
             }
             catch (Exception ex)
@@ -1265,11 +1270,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { document }, folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Document,
-                    folder.Id,
-                    new List<int> { document.Id }));
-
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
@@ -1304,13 +1304,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     document
                 });
 
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
-                    ObjectType.Document,
-                    new List<int>
-                    {
-                        document.Id
-                    }));
-
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
@@ -1325,6 +1318,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Error while deleting document [documentId={document.Id}]", ex);
                 await Dialogs.ShowErrorDialogAsync(this, ex);
             }
+        }
+
+        #endregion
+
+        #region Messages handlers
+
+        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage obj)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                readByView.RefreshView();
+                readByView.UpdateVisibility();
+            });
+        }
+
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() => comments.SetBadgeValue(document.Comments.Count().ToString(), false));
+        }
+
+        void DraftSentHandler(DraftSentMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                if (Modal)
+                    DismissViewController(true, null);
+                else
+                    NavigationController?.PopViewController(true);
+            });
         }
 
         #endregion
@@ -1374,7 +1396,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (coder.DecodeBool("modal"))
                 return null;
-            
+
             return new DocumentViewController();
         }
 

@@ -17,8 +17,8 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -602,20 +602,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Messenger hub related
 
-        public void UpdateShortcodePreview(ShortcodePreviewChangedMessage m)
+        public void UpdateShortcodePreview(EntityPreviewChangedMessage m)
         {
-            var position = adapter.GetPosition(m.ShortcodePreview.Id);
+            var position = adapter.GetPosition(m.EntityPreview.Id);
             if (position >= 0)
             {
                 shouldNotifyAdapter = true;
-                adapter.Items[position] = m.ShortcodePreview;
+                adapter.Items[position] = (ShortcodePreview)m.EntityPreview;
             }
 
-            position = searchAdapter.GetPosition(m.ShortcodePreview.Id);
+            position = searchAdapter.GetPosition(m.EntityPreview.Id);
             if (position >= 0)
             {
                 shouldNotifySearchAdapter = true;
-                adapter.Items[position] = m.ShortcodePreview;
+                adapter.Items[position] = (ShortcodePreview)m.EntityPreview;
             }
         }
 

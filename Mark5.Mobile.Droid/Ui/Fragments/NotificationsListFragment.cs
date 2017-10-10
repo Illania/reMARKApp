@@ -12,8 +12,8 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -75,8 +75,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!(view.Parent is ViewPager))
             {
-                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.notifications);
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.notifications);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
 
             CommonConfig.Logger.Info($"Created {nameof(NotificationsListFragment)}");
@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             await RefreshData();
 
-            newNotificationsToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsReceived>(m => Activity.RunOnUiThread(async () => await RefreshData()));
+            newNotificationsToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsReceivedMessage>(m => Activity.RunOnUiThread(async () => await RefreshData()));
         }
 
         public override void OnPause()
@@ -100,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(NotificationsListFragment)}...");
 
             if (newNotificationsToken != null)
-                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsReceived>(newNotificationsToken);
+                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsReceivedMessage>(newNotificationsToken);
         }
 
         #endregion

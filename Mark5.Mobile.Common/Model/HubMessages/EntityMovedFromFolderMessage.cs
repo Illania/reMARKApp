@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using Mark5.Mobile.Common.Model;
 using TinyMessenger;
 
-namespace Mark5.Mobile.Droid.Model.HubMessages
+namespace Mark5.Mobile.Common.Model.HubMessages
 {
-    public class EntityRemovedFromFolderMessage : TinyMessageBase
+    public class EntityMovedFromFolderMessage : TinyMessageBase
     {
         public ObjectType ObjectType { get; }
 
@@ -12,7 +11,7 @@ namespace Mark5.Mobile.Droid.Model.HubMessages
 
         public List<int> EntitiesId { get; }
 
-        public EntityRemovedFromFolderMessage(object sender, ObjectType objectType, int fromFolderId, List<int> entityId)
+        public EntityMovedFromFolderMessage(object sender, ObjectType objectType, int fromFolderId, List<int> entityId)
             : base(sender)
         {
             ObjectType = objectType;

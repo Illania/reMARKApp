@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -116,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(DocumentUploadStatusChanged);
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(DocumentUploadStatusChanged);
         }
 
         void UnsubscribeFromMessages()
@@ -181,7 +180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Message handlers
 
-        void DocumentUploadStatusChanged(DocumentUploadStatusChanged m)
+        void DocumentUploadStatusChanged(DocumentUploadStatusChangedMessage m)
         {
             BeginInvokeOnMainThread(async () =>
             {

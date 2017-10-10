@@ -6,13 +6,13 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -76,7 +76,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info("Appeared");
 
             newNotificationsMessageToken?.Dispose();
-            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg =>
+            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsReceivedMessage>(msg =>
             {
                 BeginInvokeOnMainThread(() =>
                 {

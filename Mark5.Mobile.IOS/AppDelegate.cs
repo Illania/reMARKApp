@@ -13,10 +13,10 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
@@ -225,7 +225,7 @@ namespace Mark5.Mobile.IOS
                 if (n.ObjectType == ObjectType.Document)
                 {
                     if (notification.Request.Identifier != LocalNotificationsListener.DocumentFailedToSendIdentifier)
-                        CommonConfig.MessengerHub.Publish(new NewNotificationsMessage(this));
+                        CommonConfig.MessengerHub.Publish(new NewNotificationsReceivedMessage(this));
 
                     options(UNNotificationPresentationOptions.Alert);
                 }

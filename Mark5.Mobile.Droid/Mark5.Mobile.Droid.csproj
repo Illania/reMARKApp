@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Mark5.Mobile.Droid</RootNamespace>
     <AssemblyName>Mark5.Mobile.Droid</AssemblyName>
-    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -228,7 +228,6 @@
     <Compile Include="Ui\Activities\MainActivity.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
-    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
@@ -373,15 +372,6 @@
     <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
     <Compile Include="Ui\Activities\DownloadActivity.cs" />
     <Compile Include="Ui\Fragments\DownloadFragment.cs" />
-    <Compile Include="Model\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityRemovedMessage.cs" />
-    <Compile Include="Model\HubMessages\NewNotificationsReceived.cs" />
     <Compile Include="Ui\Activities\TemplatesListActivity.cs" />
     <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
     <Compile Include="Model\FileDescription.cs" />
@@ -394,7 +384,6 @@
     <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
-    <Compile Include="Model\HubMessages\ContactPreviewChangedMessage.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Ui\Activities\AddEditShortcodeActivity.cs" />
     <Compile Include="Ui\Fragments\AddEditShortcodeFragment.cs" />

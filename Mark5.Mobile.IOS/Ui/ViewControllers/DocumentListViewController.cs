@@ -9,6 +9,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -42,6 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         AutoRefreshWorker autoRefreshWorker;
         Action newDocumentsAvailableAction;
 
+        TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
         TinyMessageSubscriptionToken removedFromFolderToken;
@@ -273,15 +275,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewCommentsCountChangedMessage>(CommentsCountChangedHandler);
+            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Document);
-            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
         }
 
         void UnsubscribeFromMessages()
         {
+            readStatusChangedToken?.Dispose();
             commentsCountChangedToken?.Dispose();
             categoriesChangedToken?.Dispose();
             removedFromFolderToken?.Dispose();
@@ -483,8 +487,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 vc.HidesBottomBarWhenPushed = false;
 
                 vc.ClearData();
-                vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
 
                 if (!searchController.Active)
                 {
@@ -502,12 +504,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 var vc = new DocumentViewController();
-                vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-                vc.OnComplete = () => vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated;
-                if (!searchController.Active)
-                    vc.SetData(Folder, documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
-                else
+                if (searchController.Active)
                     vc.SetData(Folder, documentPreview);
+                else
+                    vc.SetData(Folder, documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
                 vc.SetRefreshDataOnAppear();
 
                 newDocumentsAvailableAction = vc.RefreshNavigationBar;
@@ -906,11 +906,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Messages handlers
 
-        void CommentsCountChangedHandler(DocumentPreviewCommentsCountChangedMessage message)
+        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
                 var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ((DataSource)TableView.Source).Items[index];
+                    documentPreview.IsReadByCurrent = message.IsReadByCurrent;
+                    documentPreview.IsReadByAnyone = message.IsReadByAnyone;
+
+                    var selectedRow = TableView.IndexPathForSelectedRow;
+
+                    TableView.ReloadRows(new [] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+            });
+        }
+
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
 
                 if (index >= 0)
                 {
@@ -953,7 +975,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveDocumentsFromList(m.EntitiesId);
 
-        void HandleDeleted(EntityDeletedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+        void HandleDeleted(EntityRemovedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
 
         #endregion
 

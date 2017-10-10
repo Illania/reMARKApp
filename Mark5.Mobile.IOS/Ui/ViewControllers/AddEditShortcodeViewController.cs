@@ -201,9 +201,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView.EndEditing(true);
                 await Managers.ShortcodesManager.CreateOrUpdateShortcodeAsync(Shortcode, ShortcodePreview);
 
-                if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
-                    CommonConfig.MessengerHub.Publish(new ShortcodeChangedMessage(this, ShortcodePreview));
-
                 dismissAction();
                 DismissViewController(true, null);
             }

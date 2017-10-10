@@ -9,9 +9,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -264,7 +264,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<ShortcodeChangedMessage>(HandleShortcodeChangedMessage, m => shortcodePreview?.Id == m.ShortcodePreview.Id);
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleShortcodeChangedMessage, arg => arg.EntityPreview.ObjectType == ObjectType.Shortcode && arg.EntityPreview.Id == shortcodePreview?.Id);
         }
 
         void UnsubscribeFromMessages()
@@ -272,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodeChangedToken?.Dispose();
         }
 
-        private void HandleShortcodeChangedMessage(ShortcodeChangedMessage obj) => RefreshAllOnAppear();
+        void HandleShortcodeChangedMessage(EntityPreviewChangedMessage obj) => RefreshAllOnAppear();
 
         void RefreshAllOnAppear()
         {
@@ -539,8 +539,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { shortcode }, folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Shortcode, folder.Id, new List<int> { shortcode.Id }));
-
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
@@ -570,8 +568,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Attempting to delete shortcode [shortcodeId={shortcode.Id}]");
 
                 await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { shortcode });
-
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Shortcode, new List<int> { shortcode.Id }));
 
                 dismissAction();
 

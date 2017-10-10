@@ -8,8 +8,8 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities.Extensions;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -236,10 +236,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void SubscribeToMessages()
         {
-            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChanged);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleContactChanged, m => m.EntityPreview.ObjectType == ObjectType.Contact);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
         }
 
@@ -654,13 +654,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Messages handlers
 
-        void HandleContactChanged(ContactChangedMessage m) => UpdateContactOnList(m.ContactPreview);
+        void HandleContactChanged(EntityPreviewChangedMessage m) => UpdateContactOnList((ContactPreview)m.EntityPreview);
 
         void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveContactsFromList(m.EntitiesId);
 
         void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveContactsFromList(m.EntitiesId);
 
-        void HandleDeleted(EntityDeletedMessage m) => RemoveContactsFromList(m.EntitiesId);
+        void HandleDeleted(EntityRemovedMessage m) => RemoveContactsFromList(m.EntitiesId);
 
         void HandleCategoriesChanged(EntityCategoriesChangedMessage message)
         {

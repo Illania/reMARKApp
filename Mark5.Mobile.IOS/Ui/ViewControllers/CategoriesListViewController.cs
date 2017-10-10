@@ -128,8 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ((DataSource)TableView.Source).SetItems(cp.Categories);
         }
 
-        void DismissItem_Clicked(object sender, EventArgs e) =>
-            DismissViewController(true, null);
+        void DismissItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         async void EditItem_Clicked(object sender, EventArgs e)
         {

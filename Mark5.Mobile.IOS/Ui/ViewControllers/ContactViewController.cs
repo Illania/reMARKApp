@@ -9,9 +9,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -57,7 +57,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CancellationTokenSource cts;
 
         TinyMessageSubscriptionToken contactChangedToken;
-        TinyMessageSubscriptionToken childrenAddedToken;
 
         public ContactViewController()
             : base(UITableViewStyle.Grouped)
@@ -404,18 +403,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SubscribeToMessages()
         {
-            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleContactChangedMessage, m => contactPreview?.Id == m.ContactPreview.Id);
-            childrenAddedToken = CommonConfig.MessengerHub.Subscribe<ChildrenContactAddedMessage>(HandleChildrenAddedMessage, m => contactPreview?.Id == m.ParentContactPreview.Id);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleContactChangedMessage, m => m.ObjectType == ObjectType.Contact && contactPreview?.Id == m.EntityId);
         }
 
         void UnsubscribeFromMessages()
         {
             contactChangedToken?.Dispose();
-            childrenAddedToken?.Dispose();
         }
 
-        void HandleContactChangedMessage(ContactChangedMessage obj) => RefreshAllOnAppear();
-        void HandleChildrenAddedMessage(ChildrenContactAddedMessage obj) => RefreshAllOnAppear();
+        void HandleContactChangedMessage(EntityChangedMessage obj) => RefreshAllOnAppear();
 
         void RefreshAllOnAppear()
         {
@@ -931,8 +927,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Attempting to delete contact [contactId={contact.Id}]");
 
                 await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { contact });
-
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this, ObjectType.Contact, new List<int> { contact.Id }));
 
                 dismissAction();
 
