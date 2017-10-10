@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
@@ -93,6 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         TinyMessageSubscriptionToken commentsCountChangedToken;
+        TinyMessageSubscriptionToken draftSentToken;
 
         #region UIViewController overrides
 
@@ -463,11 +465,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
+            draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(DraftSentHandler);
+
         }
 
         void UnsubscribeFromMessages()
         {
             commentsCountChangedToken?.Dispose();
+            draftSentToken?.Dispose();
         }
 
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
@@ -1358,6 +1363,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (message.EntityId == document?.Id)
             {
                 BeginInvokeOnMainThread(() => comments.SetBadgeValue(document.Comments.Count().ToString(), false));
+            }
+        }
+
+        void DraftSentHandler(DraftSentMessage message)
+        {
+            if (message.DocumentId == document?.Id)
+            {
+                BeginInvokeOnMainThread(() =>
+                {
+                    if (Modal)
+                        DismissViewController(true, null);
+                    else
+                        NavigationController?.PopViewController(true);
+                });
             }
         }
 

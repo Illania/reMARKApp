@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -678,6 +678,25 @@ namespace Mark5.Mobile.Common.Manager
 
         async Task ExecutePostSendActionsAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId)
         {
+            if (precedingDocumentId > 0)
+            {
+                try
+                {
+                    var previousDocumentPreview = await documentsDataAccess.GetDocumentPreviewAsync(precedingDocumentId);
+
+                    if (previousDocumentPreview.Direction == DocumentDirection.Draft)
+                    {
+                        await documentsDataAccess.DeleteAsync(new List<DocumentPreview> { previousDocumentPreview });
+
+                        CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Document, new List<int> { previousDocumentPreview.Id }));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while deleting draft", ex);
+                }
+            }
+
             if (precedingDocumentId > 0 && (flag == DocumentCreationModeFlag.Reply || flag == DocumentCreationModeFlag.ReplyAll))
             {
                 try
