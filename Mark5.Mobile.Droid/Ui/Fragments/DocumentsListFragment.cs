@@ -112,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_new);
             fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
             fab.Visibility = ViewStates.Visible;
