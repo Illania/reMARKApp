@@ -11,8 +11,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
     public class AttachmentsView : MailViewerSubview
     {
         readonly WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference;
-        readonly UILabel titleLabel;
-        readonly UIStackView stackView;
+        UILabel titleLabel;
+        UIStackView stackView;
 
         public AttachmentsView(MailViewerViewController mailViewerViewController)
         {
@@ -50,16 +50,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             });
         }
 
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                titleLabel?.RemoveFromSuperview();
+                titleLabel = null;
+
+                stackView?.RemoveFromSuperview();
+                foreach (var v in stackView.ArrangedSubviews)
+                    v.RemoveFromSuperview();
+                stackView = null;
+            }
+        }
+
         public override void RefreshView()
         {
             if (MailMessage == null)
                 return;
 
-            stackView.ArrangedSubviews.ForEach(v =>
-            {
-                stackView.RemoveArrangedSubview(v);
-                v.RemoveFromSuperview();
-            });
+            stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
 
             foreach (var att in MailMessage.Attachments)
             {

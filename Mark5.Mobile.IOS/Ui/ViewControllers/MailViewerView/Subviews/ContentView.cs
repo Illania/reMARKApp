@@ -21,12 +21,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         readonly WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference;
 
         UIActivityIndicatorView spinner;
+        WKUserContentController userContentController;
+        WKWebViewConfiguration configuration;
         WKWebView webView;
         NSLayoutConstraint webViewHeightConstraint;
 
         public ContentView(MailViewerViewController mailViewerViewController)
         {
             mailViewerViewControllerWeakReference = mailViewerViewController.Wrap();
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                spinner?.RemoveFromSuperview();
+                spinner = null;
+
+                webView?.RemoveFromSuperview();
+                if (webView != null)
+                    webView.NavigationDelegate = null;
+                webView = null;
+                userContentController?.RemoveScriptMessageHandler("sizeNotification");
+                userContentController = null;
+                configuration = null;
+
+                webViewHeightConstraint = null;
+            }
         }
 
         void CreateWebView()
@@ -39,6 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 HidesWhenStopped = true
             };
+            spinner.StartAnimating();
             ContainerView.AddSubview(spinner);
             ContainerView.AddConstraints(new[]
             {
@@ -46,15 +68,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 NSLayoutConstraint.Create(spinner, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
             });
 
-            spinner.StartAnimating();
 
+            webView?.RemoveFromSuperview();
             if (webView != null)
-            {
-                webView.RemoveFromSuperview();
                 webView.NavigationDelegate = null;
-            }
-
             webView = null;
+            userContentController?.RemoveScriptMessageHandler("sizeNotification");
+            userContentController = null;
+            configuration = null;
+
+            webViewHeightConstraint = null;
 
             var preferences = new WKPreferences
             {
@@ -66,14 +89,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
 
-            var userContentController = new WKUserContentController();
+            userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
             userContentController.AddUserScript(wkscript3);
-
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
-            var configuration = new WKWebViewConfiguration
+            configuration = new WKWebViewConfiguration
             {
                 UserContentController = userContentController,
                 Preferences = preferences,

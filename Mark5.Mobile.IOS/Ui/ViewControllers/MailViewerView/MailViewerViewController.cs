@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
 using MailBee;
@@ -14,7 +13,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model.Exceptions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -37,8 +35,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         UIStackView stackViewBeforeContent;
         ContentView contentView;
         UIStackView stackViewAfterContent;
-
-        UIDocumentInteractionController attachmentInteractionController;
 
         MailMessage mailMessage;
 
@@ -178,6 +174,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             base.DidReceiveMemoryWarning();
         }
 
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            closeItem = null;
+            shareItem = null;
+
+            mainScrollView.RemoveFromSuperview();
+            stackViewBeforeContent.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
+            stackViewBeforeContent.RemoveFromSuperview();
+            contentView.RemoveFromSuperview();
+            stackViewAfterContent.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
+            stackViewAfterContent.RemoveFromSuperview();
+
+            mainScrollView = null;
+            stackViewBeforeContent = null;
+            contentView = null;
+            stackViewAfterContent = null;
+        }
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -202,113 +218,111 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
             Task.Run(async () =>
+            {
+                var auth = AuthenticatorFactory.Create();
+                if (!await auth.IsAuthenticatedAsync())
+                    throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
+
+                if (url == null)
+                    throw new MailViewerException("File could not be loaded.");
+
+                var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
+                if (!result)
+                    throw new MailViewerException(_error.ToString());
+
+                var name = url.LastPathComponent;
+                var size = int.Parse(sizeObject.ToString());
+
+                if (size > MaxSize)
                 {
-                    var auth = AuthenticatorFactory.Create();
-                    if (!await auth.IsAuthenticatedAsync())
-                        throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
+                    CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
 
-                    if (url == null)
-                        throw new MailViewerException("File could not be loaded.");
+                    throw new MailViewerException("File too large.");
+                }
 
-                    var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
-                    if (!result)
-                        throw new MailViewerException(_error.ToString());
-
-                    var name = url.LastPathComponent;
-                    var size = int.Parse(sizeObject.ToString());
-
-                    if (size > MaxSize)
+                if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    byte[] bytes;
+                    using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
                     {
-                        CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
-
-                        throw new MailViewerException("File too large.");
+                        bytes = ReadToEnd(stream);
                     }
 
-                    if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
+                    try
                     {
-                        byte[] bytes;
-                        using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                        var mm = new MailMessage
                         {
-                            bytes = ReadToEnd(stream);
-                        }
-
-                        try
-                        {
-                            var mm = new MailMessage
-                            {
-                                ThrowExceptions = true
-                            };
-                            mm.LoadMessage(bytes);
-                            bytes = null;
-                            MakeHtmlSafe(mm);
-                            InlineImages(mm);
-                            return mm;
-                        }
-                        catch (MailBeeException ex)
-                        {
-                            throw new MailViewerException("File could not be loaded.", ex);
-                        }
+                            ThrowExceptions = true
+                        };
+                        mm.LoadMessage(bytes);
+                        bytes = null;
+                        MakeHtmlSafe(mm);
+                        InlineImages(mm);
+                        return mm;
                     }
+                    catch (MailBeeException ex)
+                    {
+                        throw new MailViewerException("File could not be loaded.", ex);
+                    }
+                }
 
-                    if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
-                        using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
+                    using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                    {
+                        using (var msgStream = new MemoryStream())
                         {
-                            using (var msgStream = new MemoryStream())
-                            {
-                                inputStream.CopyTo(msgStream);
-                                inputStream.Dispose();
+                            inputStream.CopyTo(msgStream);
+                            inputStream.Dispose();
 
-                                using (var emlStream = new MemoryStream())
+                            using (var emlStream = new MemoryStream())
+                            {
+                                try
                                 {
-                                    try
-                                    {
-                                        var msgConverter = new MsgConvert();
-                                        msgConverter.MsgToEml(msgStream, emlStream);
-                                        msgStream.Dispose();
+                                    var msgConverter = new MsgConvert();
+                                    msgConverter.MsgToEml(msgStream, emlStream);
+                                    msgStream.Dispose();
 
-                                        emlStream.Position = 0;
+                                    emlStream.Position = 0;
 
-                                        var mm = new MailMessage
-                                        {
-                                            ThrowExceptions = true
-                                        };
-                                        mm.LoadMessage(emlStream.ToArray());
-                                        emlStream.Dispose();
-                                        MakeHtmlSafe(mm);
-                                        InlineImages(mm);
-                                        return mm;
-                                    }
-                                    catch (MailBeeException ex)
+                                    var mm = new MailMessage
                                     {
-                                        throw new MailViewerException("File could not be loaded.", ex);
-                                    }
+                                        ThrowExceptions = true
+                                    };
+                                    mm.LoadMessage(emlStream.ToArray());
+                                    emlStream.Dispose();
+                                    MakeHtmlSafe(mm);
+                                    InlineImages(mm);
+                                    return mm;
+                                }
+                                catch (MailBeeException ex)
+                                {
+                                    throw new MailViewerException("File could not be loaded.", ex);
                                 }
                             }
                         }
+                    }
 
-                    throw new MailViewerException("Unsupported file.");
-                })
-                .ContinueWith(t =>
-                    {
-                        dismissAction();
+                throw new MailViewerException("Unsupported file.");
+            }).ContinueWith(t =>
+            {
+                dismissAction();
 
-                        if (t.IsFaulted)
-                        {
-                            var ex = t.Exception.InnerException;
-                            mailMessage = null;
+                if (t.IsFaulted)
+                {
+                    var ex = t.Exception.InnerException;
+                    mailMessage = null;
 
-                            CommonConfig.Logger.Error(ex);
+                    CommonConfig.Logger.Error(ex);
 
-                            Dialogs.ShowErrorDialog(this, ex);
-                        }
-                        else
-                        {
-                            mailMessage = t.Result;
+                    Dialogs.ShowErrorDialog(this, ex);
+                }
+                else
+                {
+                    mailMessage = t.Result;
 
-                            RefreshView();
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+                    RefreshView();
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void RefreshView()
@@ -362,7 +376,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                     PresentViewController(new NavigationController(new MailViewerViewController(tempFile), UIModalPresentationStyle.PageSheet), true, null);
                 else
                 {
-                    attachmentInteractionController = UIDocumentInteractionController.FromUrl(tempFile);
+                    var attachmentInteractionController = UIDocumentInteractionController.FromUrl(tempFile);
                     attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
 
                     var previewSuccessful = attachmentInteractionController.PresentPreview(true);

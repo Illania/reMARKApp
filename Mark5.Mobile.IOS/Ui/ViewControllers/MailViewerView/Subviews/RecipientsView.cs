@@ -1,6 +1,7 @@
 ﻿using System;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -19,7 +20,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         }
 
         readonly Type type;
-        readonly UITextView textView;
+
+        UILabel label;
+        UITextView textView;
 
         bool expanded;
 
@@ -27,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         {
             this.type = type;
 
-            var titleLabel = new UILabel()
+            var titleLabel = new UILabel
             {
                 Text = GetTitle() + ":",
                 Font = Theme.DefaultFont,
@@ -71,10 +74,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
             });
 
-            var textViewTapGestureRecognizer = new UITapGestureRecognizer();
-            textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
-            textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
-            textView.AddGestureRecognizer(textViewTapGestureRecognizer);
+            textView.AddGestureRecognizer(new UITapGestureRecognizer(HandleTextTapped));
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                label?.RemoveFromSuperview();
+                label = null;
+
+                textView?.RemoveFromSuperview();
+                textView.GestureRecognizers.ForEach(textView.RemoveGestureRecognizer);
+                textView = null;
+            }
         }
 
         public override void RefreshView()

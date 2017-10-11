@@ -8,11 +8,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class DateReceivedView : MailViewerSubview
     {
-        readonly UITextView textView;
+        UILabel label;
+        UITextView textView;
 
         public DateReceivedView()
         {
-            var label = new UILabel
+            label = new UILabel
             {
                 Text = Localization.GetString("date") + ":",
                 Font = Theme.DefaultFont,
@@ -50,6 +51,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
             });
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                label?.RemoveFromSuperview();
+                label = null;
+
+                textView?.RemoveFromSuperview();
+                textView = null;
+            }
         }
 
         public override void RefreshView()
