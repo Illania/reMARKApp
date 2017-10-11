@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Android.Content;
 using Android.Content.Res;
@@ -58,9 +58,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var paddingLinearLayout = Conversion.ConvertDpToPixels(12);
             var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
-            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
@@ -72,8 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
             fab.Visibility = ViewStates.Visible;
 
-            var p = (CoordinatorLayout.LayoutParams) fab.LayoutParameters;
-            p.Gravity = (int) (GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
+            p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
@@ -99,8 +99,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
 
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchCriteriaFragment)}");
         }

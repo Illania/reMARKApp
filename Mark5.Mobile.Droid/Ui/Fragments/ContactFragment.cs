@@ -17,7 +17,6 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.ContactViews;
@@ -159,11 +158,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
-                var fab = ((View)container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+                var fab = ((BaseAppCompatActivity)Activity).Fab;
 
                 if (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department)
                 {
-                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetImageResource(Resource.Drawable.action_add);
                     fab.SetOnClickListener(new ActionOnClickListener(AddChildrenContact));
                     fab.Visibility = ViewStates.Visible;
                 }
@@ -358,11 +357,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { contactPreview }, folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Contact,
-                    folder.Id,
-                    new List<int> { contactPreview.Id }));
-
                 dismissAction();
             }
             catch (Exception ex)
@@ -391,13 +385,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     contactPreview
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
-                    ObjectType.Contact,
-                    new List<int>
-                    {
-                        contactPreview.Id
-                    }));
 
                 dismissAction();
                 Activity?.OnBackPressed();

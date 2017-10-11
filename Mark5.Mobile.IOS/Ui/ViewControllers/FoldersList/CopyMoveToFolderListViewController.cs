@@ -4,7 +4,6 @@ using System.Linq;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -197,7 +196,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, folder);
-                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
                 dismissAction();
             }
             catch (Exception ex)

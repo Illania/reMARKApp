@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static void Initialize()
         {
-            CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(m =>
             {
                 try
                 {
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 }
             }, m =>
             {
-                return m.Change == DocumentUploadStatusChanged.Status.DocumentSentFailed;
+                return m.Change == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed;
             });
         }
     }

@@ -195,6 +195,16 @@ namespace Mark5.ServiceReference.AppService
             return Channel.EndGetShortcode(asyncResult);
         }
 
+        public IAsyncResult BeginCreateOrUpdateShortcode(CreateOrUpdateShortcodeParameters parameters, AsyncCallback callback, object asyncState)
+        {
+            return Channel.BeginCreateOrUpdateShortcode(parameters, callback, asyncState);
+        }
+
+        public CreateOrUpdateShortcodeResult EndCreateOrUpdateShortcode(IAsyncResult asyncResult)
+        {
+            return Channel.EndCreateOrUpdateShortcode(asyncResult);
+        }
+
         #endregion
 
         #region Calendar

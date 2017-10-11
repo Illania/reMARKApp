@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,13 +8,14 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -43,6 +44,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
 
+        TinyMessageSubscriptionToken shortcodeChangedToken;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -67,6 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeNavigationBar();
             InitializeNavigationBarTitle();
             InitializeHandlers();
+            SubscribeToMessages();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -83,6 +87,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
+
+            if (composeButton != null && shortcode != null && shortcodePreview != null)
+                composeButton.Enabled = true;
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -95,6 +102,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning($"{nameof(ShortcodeViewController)} received memory warning!");
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -216,6 +225,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
         }
 
+        void SubscribeToMessages()
+        {
+            shortcodeChangedToken?.Dispose();
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleShortcodeChanged, (arg) => arg.EntityPreview.ObjectType == ObjectType.Shortcode
+                                                                                                     && arg.EntityPreview.Id == shortcodePreview?.Id);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            if (shortcodeChangedToken != null)
+            {
+                CommonConfig.MessengerHub.Unsubscribe<EntityPreviewChangedMessage>(shortcodeChangedToken);
+                shortcodeChangedToken = null;
+            }
+        }
+
         void RowLongPressed(UILongPressGestureRecognizer gr)
         {
             if (gr.State != UIGestureRecognizerState.Began)
@@ -303,19 +328,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void ComposeButton_Clicked(object sender, EventArgs e)
+        async void ComposeButton_Clicked(object sender, EventArgs e)
         {
-            var vc = new ComposeDocumentViewController
+            var choices = new List<string> { };
+
+            if (shortcode?.Addresses.Any() ?? false)
             {
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
+                choices.Add(Localization.GetString("compose_email"));
+            }
+            if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed)
+            {
+                choices.Add(Localization.GetString("edit"));
+            }
+
+            var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, choices.ToArray(), composeButton);
+
+            if (choices[choiceIndex] == Localization.GetString("compose_email"))
+            {
+                var vc = new ComposeDocumentViewController
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
                 {
                     { DocumentAddressType.To, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.FullAddress).ToArray() },
                     { DocumentAddressType.Cc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.FullAddress).ToArray() },
                     { DocumentAddressType.Bcc, shortcode.Addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.FullAddress).ToArray() }
                 }
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else if (choices[choiceIndex] == Localization.GetString("edit"))
+            {
+                var vc = new AddEditShortcodeViewController
+                {
+                    CreationModeFlag = ShortcodeCreationModeFlag.Edit,
+                    Shortcode = shortcode,
+                    ShortcodePreview = shortcodePreview,
+                };
+                PresentViewController(new NavigationController(vc), true, null);
+            }
         }
 
         void DoneButtonItem_Clicked(object sender, EventArgs e)
@@ -363,6 +414,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodeId = shortcodeId;
         }
 
+        void HandleShortcodeChanged(EntityPreviewChangedMessage obj)
+        {
+            var ds = tableView?.Source as DataSource;
+            ds?.Clear();
+            shortcodeId = shortcodePreview.Id;
+            shortcodePreview = null;
+
+            if (SplitViewController == null)
+            {
+                refreshDataOnAppear = true;
+            }
+            else
+            {
+                RefreshData();
+            }
+        }
+
         public bool IsShowingShortcodeWithId(int shortcodeId)
         {
             return shortcodePreview?.Id == shortcodeId || this.shortcodeId == shortcodeId;
@@ -388,9 +456,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 ds.StartRefresh();
 
-                if (folderId != null && shortcodeId != null)
+                if ((folderId != null || folder != null) && shortcodeId != null)
                 {
-                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId.Value, shortcodeId.Value);
+                    var swp = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folder?.Id ?? folderId, shortcodeId.Value);
                     shortcodePreview = swp.ShortcodePreview;
                     shortcode = swp.Shortcode;
                 }
@@ -415,9 +483,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 this.shortcode = shortcode;
 
                 var description = shortcodePreview?.Description;
-                var toAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.To).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
-                var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var toAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var ccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Email).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
+                var bccAddresses = shortcode?.Addresses?.Where(da => da.AddressType == DocumentAddressType.Bcc && da.Type == CommunicationAddressType.Email).OrderBy(da => da.Name).ThenBy(da => da.FullAddress).ToArray();
 
                 if (token.IsCancellationRequested)
                     return;
@@ -425,7 +493,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 InitializeNavigationBarTitle();
 
                 if (composeButton != null)
-                    composeButton.Enabled = shortcode?.Addresses?.Any() ?? false;
+                    composeButton.Enabled = (shortcode?.Addresses?.Any() ?? false)
+                        || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed;
 
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
@@ -496,14 +565,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     },
                     folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Shortcode,
-                    folder.Id,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
-
                 dismissAction();
 
                 if (SplitViewController != null && !SplitViewController.Collapsed)
@@ -537,13 +598,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     shortcode
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityDeletedMessage(this,
-                    ObjectType.Shortcode,
-                    new List<int>
-                    {
-                        shortcode.Id
-                    }));
 
                 dismissAction();
 
@@ -648,7 +702,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             UITableViewCell GetInitializedDocumentAddressCell(DocumentAddress documentAddress)
             {
-                if (string.IsNullOrWhiteSpace(documentAddress.Name))
+                if (string.IsNullOrWhiteSpace(documentAddress.FullAttention))
                 {
                     var compactCell = tableView.DequeueReusableCell(DocumentAddressesCompactTableViewCell.Key) as DocumentAddressesCompactTableViewCell ?? DocumentAddressesCompactTableViewCell.Create();
                     compactCell.Initialize(documentAddress);

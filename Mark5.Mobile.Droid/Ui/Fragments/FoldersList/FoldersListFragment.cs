@@ -175,8 +175,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
-            fab = ((View)Container.Parent.Parent.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            if (HideFab || RemoteFolder?.Module == ModuleType.Shortcodes)
+            fab = ((BaseAppCompatActivity)Activity).Fab;
+            if (HideFab)
             {
                 fab.Visibility = ViewStates.Gone;
                 fab = null;
@@ -192,8 +192,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (RemoteFolder?.Module == ModuleType.Contacts
                     && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
                 {
-                    fab.SetImageResource(Resource.Drawable.action_add_contact);
+                    fab.SetImageResource(Resource.Drawable.action_add);
                     fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
+                    fab.Visibility = ViewStates.Visible;
+                }
+                if (RemoteFolder?.Module == ModuleType.Shortcodes
+                    && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
+                {
+                    fab.SetImageResource(Resource.Drawable.action_add);
+                    fab.SetOnClickListener(new ActionOnClickListener(CreateShortcode));
                     fab.Visibility = ViewStates.Visible;
                 }
             }
@@ -283,6 +290,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
             if (index >= 0)
                 StartActivity(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.New, contactType: (int)values[index]));
+        }
+
+        void CreateShortcode()
+        {
+            StartActivity(AddEditShortcodeActivity.CreateIntent(Context, ShortcodeCreationModeFlag.New));
         }
 
         #endregion

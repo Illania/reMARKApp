@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +16,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -93,8 +92,8 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.categories);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(EditCategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
         }
@@ -118,7 +117,7 @@ namespace Mark5.Mobile.Droid
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -140,12 +139,10 @@ namespace Mark5.Mobile.Droid
                     case ObjectType.Document:
                         var documentPreview = businessEntityPreview as DocumentPreview;
                         await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories.Values.ToList());
-                        CommonConfig.MessengerHub.Publish(new DocumentPreviewCategoriesChangedMessage(this, documentPreview.Id, documentPreview.Categories));
                         break;
                     case ObjectType.Contact:
                         var contactPreview = businessEntityPreview as ContactPreview;
                         await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories.Values.ToList());
-                        CommonConfig.MessengerHub.Publish(new ContactPreviewCategoriesChangedMessage(this, contactPreview.Id, contactPreview.Categories));
                         break;
                     default:
                         throw new ArgumentException("Invalid BusinessEntityPreview!");
@@ -247,13 +244,13 @@ namespace Mark5.Mobile.Droid
 
             if (selectedCategories.Count < 1)
             {
-                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_categories);
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_categories);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
             else
             {
-                ((AppCompatActivity) Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.categories_selected, selectedCategories.Count, selectedCategories.Count);
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.categories_selected, selectedCategories.Count, selectedCategories.Count);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
             }
         }
 

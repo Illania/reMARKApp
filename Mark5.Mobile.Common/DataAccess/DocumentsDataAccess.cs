@@ -156,6 +156,27 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
+        public async Task<DocumentPreview> GetDocumentPreviewAsync(int documentId)
+        {
+            try
+            {
+                DocumentPreview documentPreview = null;
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var result = c.Find<DocumentPreview>(documentId);
+
+                    documentPreview = result ?? throw new DataNotFoundException("Document Preview could not be found.");
+                });
+
+                return documentPreview;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting document preview.", ex);
+            }
+        }
+
         public async Task SaveDocumentWithPreviewAsync(DocumentContainer container)
         {
             try

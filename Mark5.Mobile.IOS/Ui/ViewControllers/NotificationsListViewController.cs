@@ -7,7 +7,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using TinyMessenger;
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"{nameof(NotificationsListViewController)} appeared");
 
             newNotificationsMessageToken?.Dispose();
-            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsMessage>(msg =>
+            newNotificationsMessageToken = CommonConfig.MessengerHub.Subscribe<NewNotificationsReceivedMessage>(msg =>
             {
                 BeginInvokeOnMainThread(async () =>
                 {
@@ -95,7 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (newNotificationsMessageToken != null)
             {
-                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsMessage>(newNotificationsMessageToken);
+                CommonConfig.MessengerHub.Unsubscribe<NewNotificationsReceivedMessage>(newNotificationsMessageToken);
                 newNotificationsMessageToken = null;
             }
 

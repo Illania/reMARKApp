@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,13 +9,14 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
-using DataContract = Mark5.ServiceReference.DataContract;
 using PCLStorage;
+using DataContract = Mark5.ServiceReference.DataContract;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -194,6 +195,8 @@ namespace Mark5.Mobile.Common.Manager
                 }
                 await documentsDataAccess.SetDocumentReadStatusAsync(documentPreview, document);
 
+                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, documentPreview.Id, documentPreview.IsReadByCurrent, documentPreview.IsReadByAnyone));
+
                 return;
             }
 
@@ -221,6 +224,7 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     dp.IsReadByCurrent = isRead;
                     dp.IsReadByAnyone = dp.IsReadByAnyone || isRead;
+                    CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
                 }
 
                 await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews);
@@ -251,6 +255,8 @@ namespace Mark5.Mobile.Common.Manager
                 documentPreviews.ForEach(dp => dp.Priority = priority);
 
                 await documentsDataAccess.SetDocumentPreviewsPriorityAsync(documentPreviews, priority);
+
+                documentPreviews.ForEach(dp => CommonConfig.MessengerHub.Publish(new DocumentPreviewPriorityChangedMessage(this, dp.Id, priority)));
 
                 return;
             }
@@ -435,6 +441,8 @@ namespace Mark5.Mobile.Common.Manager
 
                 await documentsDataAccess.SetCategoriesAsync(documentPreview, categories);
 
+                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Document, documentPreview.Id, documentPreview.Categories.ToList()));
+
                 return;
             }
 
@@ -464,6 +472,8 @@ namespace Mark5.Mobile.Common.Manager
                 document.Comments.Add(comment);
 
                 await documentsDataAccess.AddCommentAsync(document, comment);
+
+                CommonConfig.MessengerHub.Publish(new EntityPreviewCommentCountChangedMessage(this, ObjectType.Document, document.Id, document.Comments.Count));
 
                 return comment;
             }
@@ -525,6 +535,8 @@ namespace Mark5.Mobile.Common.Manager
 
                 document.Comments.Remove(comment);
                 await documentsDataAccess.DeleteCommentAsync(document, comment);
+
+                CommonConfig.MessengerHub.Publish(new EntityPreviewCommentCountChangedMessage(this, ObjectType.Document, document.Id, document.Comments.Count));
 
                 return;
             }
@@ -654,6 +666,8 @@ namespace Mark5.Mobile.Common.Manager
                 documentPreview.Guid = result.Guid;
                 documentPreview.ReferenceNumber = result.ReferenceNumber;
 
+                await ExecutePostSendActionsAsync(document, documentPreview, flag, precedingDocumentId, precedingDocumentFolderId);
+
                 return;
             }
 
@@ -661,6 +675,44 @@ namespace Mark5.Mobile.Common.Manager
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
 
             throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        async Task ExecutePostSendActionsAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId)
+        {
+            if (precedingDocumentId > 0)
+            {
+                try
+                {
+                    var previousDocumentPreview = await documentsDataAccess.GetDocumentPreviewAsync(precedingDocumentId);
+
+                    if (previousDocumentPreview.Direction == DocumentDirection.Draft)
+                    {
+                        await documentsDataAccess.DeleteAsync(new List<DocumentPreview> { previousDocumentPreview });
+
+                        CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this, ObjectType.Document, new List<int> { previousDocumentPreview.Id }));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while deleting draft", ex);
+                }
+            }
+
+            if (precedingDocumentId > 0 && (flag == DocumentCreationModeFlag.Reply || flag == DocumentCreationModeFlag.ReplyAll))
+            {
+                try
+                {
+                    var container = await documentsDataAccess.GetDocumentWithPreviewAsync(precedingDocumentId);
+                    var previousDocument = container.Document;
+                    var previousDocumentPreview = container.DocumentPreview;
+
+                    await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while setting previous document as read", ex);
+                }
+            }
         }
 
         internal async Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto)

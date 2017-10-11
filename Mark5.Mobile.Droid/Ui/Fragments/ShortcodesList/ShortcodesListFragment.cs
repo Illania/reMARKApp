@@ -1,9 +1,12 @@
-﻿using System;
-using Android.Views;
+using Android.Content;
 using Android.OS;
+using Android.Support.Design.Widget;
+using Android.Views;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -22,6 +25,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(AbstractShortcodesListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
 
             return (fragment, tag);
+        }
+
+        FloatingActionButton fab;
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
+        {
+            if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
+            {
+                fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+                fab.SetImageResource(Resource.Drawable.action_add);
+                fab.SetOnClickListener(new ActionOnClickListener(CreateShortcode));
+                fab.Visibility = ViewStates.Visible;
+            }
+
+            return base.OnCreateView(inflater, container, savedInstanceState);
+        }
+
+        void CreateShortcode()
+        {
+            StartActivity(AddEditShortcodeActivity.CreateIntent(Context, ShortcodeCreationModeFlag.New));
         }
 
         #region Adapter callbacks

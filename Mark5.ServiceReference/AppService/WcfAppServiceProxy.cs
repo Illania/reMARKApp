@@ -189,6 +189,15 @@ namespace Mark5.ServiceReference.AppService
             return result;
         }
 
+
+        public async Task<CreateOrUpdateShortcodeResult> CreateOrUpdateShortcodeAsync(CreateOrUpdateShortcodeParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            var c = GetClient();
+            var result = await InvokeAsync(c, c.BeginCreateOrUpdateShortcode, c.EndCreateOrUpdateShortcode, parameters, ct);
+            c = null;
+            return result;
+        }
+
         #endregion
 
         #region Calendar module
@@ -494,7 +503,7 @@ namespace Mark5.ServiceReference.AppService
                 ct.ThrowIfCancellationRequested();
 
                 var result = await Task.Factory.FromAsync(beginMethod, endMethod, parameters, null);
-                ((ICommunicationObject) client).Close();
+                ((ICommunicationObject)client).Close();
                 success = true;
                 return result;
             }
@@ -502,13 +511,13 @@ namespace Mark5.ServiceReference.AppService
             {
                 try
                 {
-                    ((ICommunicationObject) client)?.Close();
+                    ((ICommunicationObject)client)?.Close();
                 }
                 catch
                 {
                     try
                     {
-                        ((ICommunicationObject) client)?.Abort();
+                        ((ICommunicationObject)client)?.Abort();
                     }
                     catch
                     {
@@ -522,7 +531,7 @@ namespace Mark5.ServiceReference.AppService
                 if (!success)
                     try
                     {
-                        ((ICommunicationObject) client)?.Abort();
+                        ((ICommunicationObject)client)?.Abort();
                     }
                     catch
                     {

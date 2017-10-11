@@ -9,8 +9,8 @@ using Firebase.Messaging;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities.Service
@@ -62,7 +62,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                     var nm = Android.Support.V4.App.NotificationManagerCompat.From(this);
                     nm.Notify((int)(Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
 
-                    CommonConfig.MessengerHub.Publish(new NewNotificationsReceived(this));
+                    CommonConfig.MessengerHub.Publish(new NewNotificationsReceivedMessage(this));
                 }
 
                 StackIfNeeded();

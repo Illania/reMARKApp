@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Graphics;
@@ -39,8 +39,8 @@ namespace Mark5.Mobile.Droid
         {
             var args = new Bundle();
 
-            if(businessEntity != null)
-                args.PutString(BusinessEntityPreviewBundleKey,Serializer.Serialize(businessEntity));
+            if (businessEntity != null)
+                args.PutString(BusinessEntityPreviewBundleKey, Serializer.Serialize(businessEntity));
 
             var fragment = new CategoriesListFragment();
             fragment.Arguments = args;
@@ -93,8 +93,8 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.categories);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
         }
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.Droid
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView) MenuItemCompat.GetActionView(filterItem);
+            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Droid
             {
                 var (eclf, tag) = EditCategoriesListFragment.NewInstance(businessEntityPreview);
 
-                var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
+                var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, eclf, tag);
                 ft.AddToBackStack(null);
@@ -229,8 +229,7 @@ namespace Mark5.Mobile.Droid
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var clfs = restoredState as CategoriesListFragmentState;
-            if (clfs != null)
+            if (restoredState is CategoriesListFragmentState clfs)
                 businessEntityPreview = clfs.BusinessEntityPreview;
         }
 

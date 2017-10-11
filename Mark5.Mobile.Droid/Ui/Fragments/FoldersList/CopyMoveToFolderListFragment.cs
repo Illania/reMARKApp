@@ -8,7 +8,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -47,7 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]" + $" / {nameof(CopyMoveToFolderListFragment)} [businessEntities.Count={businessEntities.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id ?? -1}]";
 
-            return (fragment,tag);
+            return (fragment, tag);
         }
 
         #region Fragment overrides
@@ -138,7 +137,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, toFolder);
-                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
             }
             catch (Exception ex)
             {

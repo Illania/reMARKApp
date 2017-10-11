@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
-        const int AutoSaveWorkingCopyInterval = 2500; // 2.5 seconds
+        const int AutoSaveWorkingCopyInterval = 5000; // 2.5 seconds
 
         DocumentDirection previousDocumentDirection;
         int? previousDocumentFolderId;
@@ -189,7 +189,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     linearLayout.AddView(new Divider(Context));
             }
 
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_send);
             fab.SetOnClickListener(new ActionOnClickListener(() => SendDocument()));
             fab.Enabled = false;
@@ -663,11 +663,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug("Saving working copy...");
 
-                await AsyncHelpers.RunOnUiThreadAsync(Activity, async () =>
-                {
-                    foreach (var subView in subViews)
-                        await subView.UpdateDocument();
-                });
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {

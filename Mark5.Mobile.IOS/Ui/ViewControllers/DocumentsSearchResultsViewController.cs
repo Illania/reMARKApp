@@ -7,12 +7,14 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -26,6 +28,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UITableView tableView;
 
+        TinyMessageSubscriptionToken readStatusChangedToken;
+        TinyMessageSubscriptionToken commentsCountChangedToken;
+        TinyMessageSubscriptionToken categoriesChangedToken;
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -34,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
+            SubscribeToMessages();
         }
 
         public override void ViewDidLoad()
@@ -88,8 +95,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var ds = tableView?.Source as DataSource;
             ds?.Reset();
 
+            UnsubscribeFromMessages();
+
             GC.Collect();
             base.DidReceiveMemoryWarning();
+        }
+
+        void SubscribeToMessages()
+        {
+            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
+            categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            readStatusChangedToken?.Dispose();
+            commentsCountChangedToken?.Dispose();
+            categoriesChangedToken?.Dispose();
         }
 
         #endregion
@@ -166,8 +189,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var ds = (DataSource)tableView.Source;
 
             var vc = new DocumentViewController();
-            vc.ReadStatusUpdated += DocumentViewController_ReadStatusUpdated;
-            vc.OnComplete = () => { vc.ReadStatusUpdated -= DocumentViewController_ReadStatusUpdated; };
 
             vc.SetData(documentPreview, ds.GetNextDocumentPreview, ds.GetPreviousDocumentPreview);
             vc.SetRefreshDataOnAppear();
@@ -522,17 +543,83 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Events
 
-        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
+        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
-                var selectedRow = tableView.IndexPathForSelectedRow;
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
 
-                (tableView.Source as DataSource).UpdateDocumentPreview(e.DocumentPreview);
-                tableView.ReloadData();
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.IsReadByCurrent = message.IsReadByCurrent;
+                    documentPreview.IsReadByAnyone = message.IsReadByAnyone;
 
-                if (selectedRow != null)
-                    tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new NSIndexPath[]
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+            });
+        }
+
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.CommentsCount = message.CommentsCount;
+
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new NSIndexPath[]
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
+            });
+        }
+
+        void CategoriesChangedHandler(EntityCategoriesChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var ds = tableView.Source as DataSource;
+                var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
+
+                if (index >= 0)
+                {
+                    var documentPreview = ds.Items[index];
+                    documentPreview.Categories.Clear();
+                    documentPreview.Categories.AddRange(message.Categories);
+
+                    var selectedRow = tableView.IndexPathForSelectedRow;
+
+                    tableView.ReloadRows(new NSIndexPath[]
+                        {
+                            NSIndexPath.FromRowSection(index, 0)
+                        },
+                        UITableViewRowAnimation.Fade);
+
+                    if (selectedRow != null)
+                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                }
             });
         }
 

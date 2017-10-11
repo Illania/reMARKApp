@@ -88,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!IsAdded || IsDetached || IsRemoving)
                 return;
 
-            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(m =>
             {
                 Activity.RunOnUiThread(async () =>
                 {

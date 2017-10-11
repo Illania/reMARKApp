@@ -21,7 +21,7 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class LoginActivity : AppCompatActivity
+    public class LoginActivity : BaseAppCompatActivity
     {
         TextInputEditText usernameEditText;
         TextInputEditText passwordEditText;

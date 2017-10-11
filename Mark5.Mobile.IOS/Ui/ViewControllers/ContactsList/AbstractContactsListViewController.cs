@@ -8,7 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -207,8 +207,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged, m => m.ObjectType == ObjectType.Contact);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Contact);
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Contact);
-            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
-            contactChangedToken = CommonConfig.MessengerHub.Subscribe<ContactChangedMessage>(HandleAction);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Contact);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleContactChanged, m => m.EntityPreview.ObjectType == ObjectType.Contact);
         }
 
         void UnsubscribeFromMessages()
@@ -715,9 +715,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Messages handlers
 
-        void HandleAction(ContactChangedMessage m)
+        void HandleContactChanged(EntityPreviewChangedMessage m)
         {
-            UpdateContactFromList(m.ContactPreview);
+            UpdateContactFromList((ContactPreview)m.EntityPreview);
         }
 
         void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
@@ -730,7 +730,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             RemoveContactsFromList(m.EntitiesId);
         }
 
-        void HandleDeleted(EntityDeletedMessage m)
+        void HandleDeleted(EntityRemovedMessage m)
         {
             RemoveContactsFromList(m.EntitiesId);
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
@@ -17,7 +17,6 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Views.AddEditContactViews;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -40,7 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ContactCreationModeFlag creationModeFlag;
         ContactPreview parentContactPreview;
         bool parentPreselected;
- 
+
         LinearLayoutCompat linearLayout;
         LinearLayoutCompat secondaryLinearLayout;
         ProgressBar progressBar;
@@ -68,10 +67,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (contactPreview != null)
                 args.PutString(ContactPreviewBundleKey, Serializer.Serialize(contactPreview));
-            
+
             if (contactId != null)
                 args.PutInt(ContactIdBundleKey, contactId.Value);
-            
+
             if (contactType != null)
                 args.PutInt(ContactTypeBundleKey, (int)contactType);
 
@@ -89,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var tag = $"{nameof(AddEditContactFragment)}";
 
-            return (fragment, tag);  
+            return (fragment, tag);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -127,8 +126,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.SetImageResource(Resource.Drawable.action_save_contact);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
+            fab.SetImageResource(Resource.Drawable.action_save);
             fab.SetOnClickListener(new ActionOnClickListener(HandleSend));
             fab.Enabled = true;
             fab.Size = FloatingActionButton.SizeNormal;
@@ -192,19 +191,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             int resId = 0;
 
-            switch (contactType)
+            if (creationModeFlag == ContactCreationModeFlag.New)
             {
-                case ContactType.Person:
-                    resId = Resource.String.edit_contact_create_person;
-                    break;
-                case ContactType.Company:
-                    resId = Resource.String.edit_contact_create_company;
-                    break;
-                case ContactType.Department:
-                    resId = Resource.String.edit_contact_create_department;
-                    break;
-                default:
-                    throw new ArgumentException("Contact type needs to be defined");
+                switch (contactType)
+                {
+                    case ContactType.Person:
+                        resId = Resource.String.edit_contact_create_person;
+                        break;
+                    case ContactType.Company:
+                        resId = Resource.String.edit_contact_create_company;
+                        break;
+                    case ContactType.Department:
+                        resId = Resource.String.edit_contact_create_department;
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
+            }
+            else if (creationModeFlag == ContactCreationModeFlag.Edit)
+            {
+                switch (contactType)
+                {
+                    case ContactType.Person:
+                        resId = Resource.String.edit_contact_edit_person;
+                        break;
+                    case ContactType.Company:
+                        resId = Resource.String.edit_contact_edit_company;
+                        break;
+                    case ContactType.Department:
+                        resId = Resource.String.edit_contact_edit_department;
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
             }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(resId);
@@ -287,7 +306,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={contactId ?? contactPreview?.Id}, " +
+            CommonConfig.Logger.Info($"Created {nameof(AddEditContactFragment)} [contact.id={contactPreview?.Id}, " +
                                      $"type={contactType}, mode={creationModeFlag}]...");
         }
 
@@ -320,8 +339,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        #region Refresh methods
 
+        #region Refresh methods
         void RefreshData()
         {
             if (contact != null && contactPreview != null)
@@ -362,10 +381,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+
+
         #endregion
-
         #region Handlers
-
         void OnParentContactRequest()
         {
             StartActivityForResult(ParentContactSelectorFoldersListActivity.CreateIntent(Context, contactPreview.Type), RequestCodes.ParentContactRequestCode);
@@ -376,10 +395,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             parentContactPreview = null;
         }
 
+
+
         #endregion
-
         #region Actions
-
         async void HandleSend()
         {
             if (personNameView != null && !personNameView.ContainsValidContent())
@@ -411,24 +430,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 dismissAction();
 
-                if (creationModeFlag == ContactCreationModeFlag.Edit)
-                    CommonConfig.MessengerHub.Publish(new ContactPreviewChanged(this, contactPreview));
-                
                 Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={contactId ?? contactPreview?.Id}, " +
+                CommonConfig.Logger.Error($"Error while adding/editing contact [contact.id={contactPreview?.Id}, " +
                                      $"type={contactType}, mode={creationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 
-        #endregion
 
+
+        #endregion
         #region RetainableState 
 
         public override IRetainableState OnRetainInstanceState()
@@ -439,7 +456,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Contact = contact,
                 ParentContactPreview = parentContactPreview,
                 CreationModeFlag = creationModeFlag,
-                ContactId = contactId,
                 ContactType = contactType,
                 SecondaryLayoutShown = secondaryLayoutShown,
                 ParentPreselected = parentPreselected,
@@ -473,8 +489,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool ParentPreselected { get; set; }
         }
 
-        #endregion
 
+
+
+
+        #endregion
         static class RequestCodes
         {
             public const int ParentContactRequestCode = 111;

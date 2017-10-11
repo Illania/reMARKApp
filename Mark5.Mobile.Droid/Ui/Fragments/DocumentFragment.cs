@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +17,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -549,7 +548,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 RefreshView<RecipentsView>();
-                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
             }
             catch (Exception ex)
             {
@@ -586,7 +584,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
 
                 RefreshView<RecipentsView>();
-                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
 
                 dismissAction();
             }
@@ -611,7 +608,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, false, ServerConfig.SystemSettings.UserInfo.User);
 
                 RefreshView<RecipentsView>();
-                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, DocumentPreview.Id, DocumentPreview.IsReadByCurrent, DocumentPreview.IsReadByAnyone));
 
                 dismissAction();
             }
@@ -685,7 +681,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     priority);
 
                 RefreshView<PriorityView>();
-                CommonConfig.MessengerHub.Publish(new DocumentPreviewPriorityChangedMessage(this, DocumentPreview.Id, DocumentPreview.Priority));
 
                 dismissAction();
             }
@@ -717,14 +712,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     },
                     Folder);
 
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this,
-                    ObjectType.Document,
-                    Folder.Id,
-                    new List<int>
-                    {
-                        DocumentPreview.Id
-                    }));
-
                 dismissAction();
             }
             catch (Exception ex)
@@ -753,13 +740,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     DocumentPreview
                 });
-
-                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
-                    ObjectType.Document,
-                    new List<int>
-                    {
-                        DocumentPreview.Id
-                    }));
 
                 dismissAction();
                 Activity?.OnBackPressed();

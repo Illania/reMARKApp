@@ -3,17 +3,17 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class ComposeDocumentActivity : AppCompatActivity
+    public class ComposeDocumentActivity : BaseAppCompatActivity
     {
         const string DocumentCreationModeFlagIntentKey = "DocumentCreationModeFlag_290d1383-175d-4e2d-8f5e-ca899baff3f7";
         const string CopyToNewOptionIntentKey = "CopyToNewOptions_f298d024-4df0-431d-ad3d-1834eb0dede0";

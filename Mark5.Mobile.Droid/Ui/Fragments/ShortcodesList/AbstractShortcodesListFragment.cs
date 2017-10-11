@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,7 +18,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Model.HubMessages;
+using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -570,6 +571,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
 
         #region Messenger hub related
+
+        public void UpdateShortcodePreview(EntityPreviewChangedMessage m)
+        {
+            var position = adapter.GetPosition(m.EntityPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifyAdapter = true;
+                adapter.Items[position] = (ShortcodePreview)m.EntityPreview;
+            }
+
+            position = searchAdapter.GetPosition(m.EntityPreview.Id);
+            if (position >= 0)
+            {
+                shouldNotifySearchAdapter = true;
+                adapter.Items[position] = (ShortcodePreview)m.EntityPreview;
+            }
+        }
 
         public void UpdateMovedEntities(EntityMovedFromFolderMessage m)
         {
