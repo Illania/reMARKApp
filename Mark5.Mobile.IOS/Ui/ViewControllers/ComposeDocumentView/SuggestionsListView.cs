@@ -53,12 +53,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitializeSuggestionsView()
         {
-            BackgroundColor = UIColor.White;
+            BackgroundColor = Theme.White;
 
             spaceView = new UIView
             {
                 Opaque = false,
-                BackgroundColor = UIColor.Clear,
+                BackgroundColor = Theme.Clear,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
@@ -270,7 +270,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (Loading && indexPath.Row == Suggestions.Count)
                 {
                     var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) ?? new WaitTableViewCell();
-                    waitingCell.BackgroundColor = UIColor.Clear;
+                    waitingCell.BackgroundColor = Theme.Clear;
                     return waitingCell;
                 }
 
@@ -278,7 +278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_suggestions_available"));
-                    emptyCell.BackgroundColor = UIColor.Clear;
+                    emptyCell.BackgroundColor = Theme.Clear;
                     return emptyCell;
                 }
 

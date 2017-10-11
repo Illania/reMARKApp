@@ -761,7 +761,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
-                    TintColor = UIColor.Clear,
+                    TintColor = Theme.Clear,
                     TextAlignment = UITextAlignment.Center,
                     InputView = countryPicker,
                     InputAccessoryView = countryPickerToolbar,

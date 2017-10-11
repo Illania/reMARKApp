@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 {
@@ -17,16 +17,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public AttachmentsView()
         {
-            Initialize();
-        }
-
-        void Initialize()
-        {
             titleLabel = new UILabel
             {
                 Text = Localization.GetString("attachments") + ":",
                 Font = Theme.DefaultFont,
-                TextColor = UIColor.LightGray,
+                TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -56,16 +51,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             });
         }
 
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                titleLabel?.RemoveFromSuperview();
+                titleLabel = null;
+
+                stackView?.RemoveFromSuperview();
+                foreach (var v in stackView.ArrangedSubviews)
+                {
+                    if (v is UIButton b)
+                        b.TouchUpInside -= HandleShowMoreButtonTapped;
+                    v.RemoveFromSuperview();
+                }
+                stackView = null;
+            }
+        }
+
         public override void RefreshView()
         {
             if (Document == null)
                 return;
 
-            stackView.ArrangedSubviews.ForEach(v =>
+            foreach (var v in stackView.ArrangedSubviews)
             {
-                stackView.RemoveArrangedSubview(v);
+                if (v is UIButton b)
+                    b.TouchUpInside -= HandleShowMoreButtonTapped;
                 v.RemoveFromSuperview();
-            });
+            };
 
             if (Document.Attachments.Count > 4)
             {
@@ -75,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                     stackView.AddArrangedSubview(alssv);
                 }
 
-                var showMoreButton = UIButton.FromType(UIButtonType.RoundedRect);
+                var showMoreButton = new UIButton(UIButtonType.RoundedRect);
                 showMoreButton.SetTitle(Localization.GetString("show_more___"), UIControlState.Normal);
                 showMoreButton.TintColor = Theme.DarkBlue;
                 showMoreButton.TouchUpInside += HandleShowMoreButtonTapped;
@@ -104,13 +118,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         #region Event handlers
 
-        public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs) => AttachmentTapped(this, eventArgs);
+        public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs) => AttachmentTapped?.Invoke(this, eventArgs);
 
         void HandleShowMoreButtonTapped(object sender, EventArgs e)
         {
-            var btn = (UIButton) sender;
+            var btn = (UIButton)sender;
             btn.TouchUpInside -= HandleShowMoreButtonTapped;
-            stackView.RemoveArrangedSubview(btn);
             btn.RemoveFromSuperview();
 
             foreach (var ad in Document.Attachments.Skip(3))
@@ -128,13 +141,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     {
         public AttachmentDescription Attachment { get; }
 
-        readonly AttachmentsView view;
-
+        WeakReference<AttachmentsView> viewWeakReference;
         UIButton attachmentButton;
 
         public AttachmentsSubView(AttachmentsView view, AttachmentDescription attachmentDescription)
         {
-            this.view = view;
+            viewWeakReference = view.Wrap();
             Attachment = attachmentDescription;
 
             InitSubViews();
@@ -145,11 +157,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             Opaque = false;
             TranslatesAutoresizingMaskIntoConstraints = false;
 
-            attachmentButton = UIButton.FromType(UIButtonType.RoundedRect);
+            attachmentButton = new UIButton(UIButtonType.RoundedRect);
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
             attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
             attachmentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-            attachmentButton.TouchUpInside += (sender, e) => view.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(Attachment));
+            attachmentButton.TouchUpInside += AttachmentButton_TouchUpInside;
             attachmentButton.Opaque = false;
             attachmentButton.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(attachmentButton);
@@ -160,6 +172,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f)
             });
+        }
+
+        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => viewWeakReference.Unwrap()?.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(Attachment));
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                attachmentButton.RemoveFromSuperview();
+                attachmentButton.TouchUpInside -= AttachmentButton_TouchUpInside;
+                attachmentButton = null;
+            }
         }
     }
 

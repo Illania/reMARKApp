@@ -167,7 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, .75f)
             });
 
-            addCommentButton = new UIButton(UIButtonType.System)
+            addCommentButton = new UIButton
             {
                 Enabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false

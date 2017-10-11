@@ -48,7 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             Notification = notification;
 
-            BackgroundColor = UIColor.White;
+            BackgroundColor = Theme.White;
 
             UIImage icon;
             switch (notification.ObjectType)

@@ -159,11 +159,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            View.BackgroundColor = UIColor.White;
+            View.BackgroundColor = Theme.White;
 
             scrollView = new UIScrollView
             {
-                BackgroundColor = UIColor.White,
+                BackgroundColor = Theme.White,
                 ShowsVerticalScrollIndicator = true,
                 ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true,
@@ -183,7 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             stackView = new UIStackView
             {
-                BackgroundColor = UIColor.White,
+                BackgroundColor = Theme.White,
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,

@@ -94,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
-            attachmentButton = UIButton.FromType(UIButtonType.RoundedRect);
+            attachmentButton = new UIButton(UIButtonType.RoundedRect);
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
             attachmentButton.SetTitle(attachment.Name + " (" + UI.PrettyFileSize(attachment.Size) + ")", UIControlState.Normal);
             attachmentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;

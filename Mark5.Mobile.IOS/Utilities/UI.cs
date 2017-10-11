@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                return UIColor.Clear;
+                return Theme.Clear;
             }
         }
 

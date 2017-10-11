@@ -278,7 +278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TableView.TableHeaderView = headerView;
 
-            commentsButton = new UIButton(UIButtonType.System)
+            commentsButton = new UIButton
             {
                 Frame = new CGRect(0f, 0f, 25f, 25f),
                 Enabled = false
@@ -301,7 +301,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
                 {
-                    BadgeBackgroundColor = Theme.DarkerBlue,
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),

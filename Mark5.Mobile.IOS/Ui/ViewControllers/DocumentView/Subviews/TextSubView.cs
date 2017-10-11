@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             {
                 Text = labelText + ":",
                 Font = Theme.DefaultFont,
-                TextColor = UIColor.LightGray,
+                TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -55,6 +55,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
             });
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                label?.RemoveFromSuperview();
+                label = null;
+
+                TextView?.RemoveFromSuperview();
+                TextView = null;
+            }
         }
     }
 }

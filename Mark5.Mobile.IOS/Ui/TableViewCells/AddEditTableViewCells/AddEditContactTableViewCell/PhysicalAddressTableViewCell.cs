@@ -137,7 +137,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                TintColor = UIColor.Clear,
+                TintColor = Theme.Clear,
                 Text = Localization.GetString("country"),
                 InputView = countryPicker,
                 InputAccessoryView = countryPickerToolbar,

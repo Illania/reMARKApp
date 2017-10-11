@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -686,7 +686,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
-                    TintColor = UIColor.Clear,
+                    TintColor = Theme.Clear,
                     TextAlignment = UITextAlignment.Center,
                     InputView = fromDatePicker,
                     InputAccessoryView = fromDatePickerToolbar,
@@ -755,7 +755,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
-                    TintColor = UIColor.Clear,
+                    TintColor = Theme.Clear,
                     TextAlignment = UITextAlignment.Center,
                     InputView = toDatePicker,
                     InputAccessoryView = toDatePickerToolbar,

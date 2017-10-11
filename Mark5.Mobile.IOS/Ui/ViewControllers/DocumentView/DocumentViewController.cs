@@ -30,7 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
         public bool Modal { get; set; }
-        public Action OnComplete { get; set; }
 
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null;
 
@@ -76,12 +75,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem replyActions;
         UIBarButtonItem userActions;
 
-        UIToolbar toolbar;
-
-        DocumentSubView[] subViews;
-
-        UIDocumentInteractionController attachmentInteractionController;
-
         public delegate DocumentPreview GetPreviousDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
         public delegate DocumentPreview GetNextDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
 
@@ -97,6 +90,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
 
+        IEnumerable<DocumentSubView> DocumentSubViews
+        {
+            get
+            {
+                foreach (var ds in stackViewBeforeContent.OfType<DocumentSubView>())
+                    yield return ds;
+                yield return contentView;
+                foreach (var ds in stackViewAfterContent.OfType<DocumentSubView>())
+                    yield return ds;
+            }
+        }
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -108,7 +113,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitSubViews();
             InitToolbar();
             InitBackgroundView();
-            SubscribeToMessages();
         }
 
         public override void ViewDidLoad()
@@ -126,6 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
+            SubscribeToMessages();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -139,19 +144,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
+
+            if (NavigationController != null)
+                NavigationController.ToolbarHidden = false;
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
 
+            loadCts?.Cancel();
+            loadCts = null;
+
             readStatusCts?.Cancel();
             readStatusCts = null;
 
-            if (IsMovingFromParentViewController || IsBeingDismissed)
-                OnComplete?.Invoke();
-
             DeinitializeHandlers();
+            UnsubscribeFromMessages();
+
+            if (NavigationController != null)
+                NavigationController.ToolbarHidden = true;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -162,6 +174,71 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
+        }
+
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            doneButtonItem = null;
+            previousDocumentButtonItem = null;
+            nextDocumentButtonItem = null;
+            editDocumentButtonItem = null;
+
+            GetPreviousDocumentPreview = null;
+            GetNextDocumentPreview = null;
+
+            mainScrollView.RemoveFromSuperview();
+            stackViewBeforeContent.RemoveFromSuperview();
+            stackViewAfterContent.RemoveFromSuperview();
+
+            fromView.RemoveFromSuperview();
+            toView.RemoveFromSuperview();
+            ccView.RemoveFromSuperview();
+            bccView.RemoveFromSuperview();
+            extraFieldsView.RemoveFromSuperview();
+            originatorView.RemoveFromSuperview();
+            subjectView.RemoveFromSuperview();
+            dateReceivedView.RemoveFromSuperview();
+            priorityView.RemoveFromSuperview();
+            contentView.RemoveFromSuperview();
+            attachmentsListView.RemoveFromSuperview();
+            creatorView.RemoveFromSuperview();
+            readByView.RemoveFromSuperview();
+            referenceNumberView.RemoveFromSuperview();
+
+            backgroundView.RemoveFromSuperview();
+            spinner.RemoveFromSuperview();
+
+            mainScrollView = null;
+            stackViewBeforeContent = null;
+            stackViewAfterContent = null;
+
+            fromView = null;
+            toView = null;
+            ccView = null;
+            bccView = null;
+            extraFieldsView = null;
+            originatorView = null;
+            subjectView = null;
+            dateReceivedView = null;
+            priorityView = null;
+            contentView = null;
+            attachmentsListView = null;
+            creatorView = null;
+            readByView = null;
+            referenceNumberView = null;
+
+            backgroundView = null;
+            spinner = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         #endregion
@@ -213,7 +290,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true,
                 ScrollsToTop = true,
-                UserInteractionEnabled = true,
                 ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -242,7 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
             });
 
-            contentView = new ContentView(DecidePolicyForNavigationAction);
+            contentView = new ContentView(this);
             mainScrollView.AddSubview(contentView);
             mainScrollView.AddConstraints(new[]
             {
@@ -272,94 +348,63 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitSubViews()
         {
-            var viewsBeforeContent = new List<DocumentSubView>();
-            var viewsAfterContent = new List<DocumentSubView>();
+            stackViewBeforeContent.AddArrangedSubview(subjectView = new SubjectView());
+            stackViewBeforeContent.AddArrangedSubview(fromView = new FromView());
+            stackViewBeforeContent.AddArrangedSubview(toView = new ToView());
+            stackViewBeforeContent.AddArrangedSubview(ccView = new CcView());
+            stackViewBeforeContent.AddArrangedSubview(bccView = new BccView());
+            stackViewBeforeContent.AddArrangedSubview(dateReceivedView = new DateReceivedView());
+            stackViewBeforeContent.AddArrangedSubview(extraFieldsView = new ExtraFieldsView());
+            stackViewBeforeContent.AddArrangedSubview(priorityView = new PriorityView());
+            stackViewBeforeContent.AddArrangedSubview(attachmentsListView = new AttachmentsView());
+            stackViewAfterContent.AddArrangedSubview(referenceNumberView = new ReferenceNumberView());
+            stackViewAfterContent.AddArrangedSubview(readByView = new ReadByView());
+            stackViewAfterContent.AddArrangedSubview(creatorView = new CreatorView());
+            stackViewAfterContent.AddArrangedSubview(originatorView = new OriginatorView());
 
-            viewsBeforeContent.Add(subjectView = new SubjectView());
-            viewsBeforeContent.Add(fromView = new FromView());
-            viewsBeforeContent.Add(toView = new ToView());
-            viewsBeforeContent.Add(ccView = new CcView());
-            viewsBeforeContent.Add(bccView = new BccView());
-            viewsBeforeContent.Add(dateReceivedView = new DateReceivedView());
-            viewsBeforeContent.Add(extraFieldsView = new ExtraFieldsView());
-            viewsBeforeContent.Add(priorityView = new PriorityView());
-            viewsBeforeContent.Add(attachmentsListView = new AttachmentsView());
-            viewsAfterContent.Add(referenceNumberView = new ReferenceNumberView());
-            viewsAfterContent.Add(readByView = new ReadByView());
-            viewsAfterContent.Add(creatorView = new CreatorView());
-            viewsAfterContent.Add(originatorView = new OriginatorView());
-
-            viewsBeforeContent.ForEach(stackViewBeforeContent.AddArrangedSubview);
-            viewsAfterContent.ForEach(stackViewAfterContent.AddArrangedSubview);
-
-            subViews = viewsBeforeContent.Append(contentView).Concat(viewsAfterContent).ToArray();
-
-            subViews.ForEach(v => v.UpdateVisibility());
+            DocumentSubViews.ForEach(v => v.UpdateVisibility());
         }
 
         void InitToolbar()
         {
-            flag = new UIBarButtonItem
-            {
-                Image = UIImage.FromBundle(Path.Combine("icons", "flag.png")),
-                Enabled = false
-            };
-            fileTo = new UIBarButtonItem
-            {
-                Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
-                Enabled = false
-            };
-            commentsButton = new UIButton(UIButtonType.System)
+            commentsButton = new UIButton
             {
                 Frame = new CGRect(0f, 0f, 25f, 25f),
                 Enabled = false
             };
             commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            comments = new BadgeBarButtonItem(commentsButton)
-            {
-                BadgeBackgroundColor = Theme.DarkerBlue,
-                Enabled = false
-            };
-            replyActions = new UIBarButtonItem
-            {
-                Image = UIImage.FromBundle(Path.Combine("icons", "reply.png")),
-                Enabled = false
-            };
-            userActions = new UIBarButtonItem
-            {
-                Image = UIImage.FromBundle(Path.Combine("icons", "actions.png")),
-                Enabled = false
-            };
-            toolbar = new UIToolbar
-            {
-                BarStyle = UIBarStyle.Default,
-                Items = new[]
-                {
-                    flag,
-                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                    replyActions,
-                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                    fileTo,
-                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                    comments,
-                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                    userActions
-                },
-                BarTintColor = Theme.Gray,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            toolbar.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            toolbar.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            View.AddSubview(toolbar);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 45f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(toolbar, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -(TabBarController?.TabBar?.Frame.Height ?? 0f))
-            });
 
-            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, 45f, 0f);
+            ToolbarItems = new[]
+            {
+                flag = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "flag.png")),
+                    Enabled = false
+                },
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                replyActions = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "reply.png")),
+                    Enabled = false
+                },
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                fileTo = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
+                    Enabled = false
+                },
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                comments = new BadgeBarButtonItem(commentsButton)
+                {
+                    Enabled = false
+                },
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                userActions = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "actions.png")),
+                    Enabled = false
+                }
+            };
         }
 
         void InitBackgroundView()
@@ -394,50 +439,72 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
-            fromView.RecipientTapped += RecipientsView_RecipientTapped;
-            toView.RecipientTapped += RecipientsView_RecipientTapped;
-            ccView.RecipientTapped += RecipientsView_RecipientTapped;
-            bccView.RecipientTapped += RecipientsView_RecipientTapped;
-            attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
+            if (fromView != null)
+                fromView.RecipientTapped += RecipientsView_RecipientTapped;
+            if (toView != null)
+                toView.RecipientTapped += RecipientsView_RecipientTapped;
+            if (ccView != null)
+                ccView.RecipientTapped += RecipientsView_RecipientTapped;
+            if (bccView != null)
+                bccView.RecipientTapped += RecipientsView_RecipientTapped;
+            if (attachmentsListView != null)
+                attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
 
-            flag.Clicked += Flag_Clicked;
-            fileTo.Clicked += FileTo_Clicked;
-            replyActions.Clicked += ReplyActions_Clicked;
-            commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
-            userActions.Clicked += UserActions_Clicked;
+            if (flag != null)
+                flag.Clicked += Flag_Clicked;
+            if (fileTo != null)
+                fileTo.Clicked += FileTo_Clicked;
+            if (replyActions != null)
+                replyActions.Clicked += ReplyActions_Clicked;
+            if (commentsButton != null)
+                commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+            if (userActions != null)
+                userActions.Clicked += UserActions_Clicked;
 
-            if (Modal)
+            if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
-            else
-            {
+
+            if (nextDocumentButtonItem != null)
                 nextDocumentButtonItem.Clicked += NextDocumentButton_Clicked;
+            if (previousDocumentButtonItem != null)
                 previousDocumentButtonItem.Clicked += PreviousDocumentButton_Clicked;
+            if (editDocumentButtonItem != null)
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
-            }
         }
 
         void DeinitializeHandlers()
         {
-            fromView.RecipientTapped -= RecipientsView_RecipientTapped;
-            toView.RecipientTapped -= RecipientsView_RecipientTapped;
-            ccView.RecipientTapped -= RecipientsView_RecipientTapped;
-            bccView.RecipientTapped -= RecipientsView_RecipientTapped;
-            attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
+            if (fromView != null)
+                fromView.RecipientTapped -= RecipientsView_RecipientTapped;
+            if (toView != null)
+                toView.RecipientTapped -= RecipientsView_RecipientTapped;
+            if (ccView != null)
+                ccView.RecipientTapped -= RecipientsView_RecipientTapped;
+            if (bccView != null)
+                bccView.RecipientTapped -= RecipientsView_RecipientTapped;
+            if (attachmentsListView != null)
+                attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
 
-            flag.Clicked -= Flag_Clicked;
-            fileTo.Clicked -= FileTo_Clicked;
-            replyActions.Clicked -= ReplyActions_Clicked;
-            commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
-            userActions.Clicked -= UserActions_Clicked;
+            if (flag != null)
+                flag.Clicked -= Flag_Clicked;
+            if (fileTo != null)
+                fileTo.Clicked -= FileTo_Clicked;
+            if (replyActions != null)
+                replyActions.Clicked -= ReplyActions_Clicked;
+            if (commentsButton != null)
+                commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
+            if (userActions != null)
+                userActions.Clicked -= UserActions_Clicked;
 
-            if (Modal)
+            if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
-            else
-            {
+
+            if (nextDocumentButtonItem != null)
                 nextDocumentButtonItem.Clicked -= NextDocumentButton_Clicked;
+            if (previousDocumentButtonItem != null)
                 previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
+            if (editDocumentButtonItem != null)
                 editDocumentButtonItem.Clicked -= EditDocumentButtonItem_Clicked;
-            }
         }
 
         void SubscribeToMessages()
@@ -445,7 +512,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler, m => m.DocumentPreviewId == document?.Id);
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document && m.EntityId == document?.Id);
             draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(DraftSentHandler, m => m.DocumentId == document?.Id);
-
         }
 
         void UnsubscribeFromMessages()
@@ -549,9 +615,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             GetNextDocumentPreview = null;
             notificationGuid = default(Guid);
 
-            NavigationController.SetNavigationBarHidden(false, true);
-            mainScrollView.SetContentOffset(new CGPoint(0, -mainScrollView.ContentInset.Top), false);
-
             nextDocumentButtonItem.Enabled = false;
             previousDocumentButtonItem.Enabled = false;
 
@@ -618,9 +681,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
 
                 RefreshView();
-
-                if (NavigationController != null)
-                    mainScrollView.SetContentOffset(new CGPoint(-NavigationController.NavigationBar.Frame.Bottom, 0), false);
 
                 EndRefreshing();
 
@@ -710,14 +770,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshView()
         {
-            subViews.ForEach(v =>
+            DocumentSubViews.ForEach(v =>
             {
                 v.Document = document;
                 v.DocumentPreview = documentPreview;
                 v.RefreshView();
             });
-
-            subViews.ForEach(v => v.UpdateVisibility());
+            DocumentSubViews.ForEach(v => v.UpdateVisibility());
 
             RefreshNavigationBar();
 
@@ -811,7 +870,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
+                    var attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
                     attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
 
                     var previewSuccessful = attachmentInteractionController.PresentPreview(true);
@@ -842,33 +901,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RecipientsView_RecipientTapped(object sender, RecipientTappedEventArgs e)
         {
-            PresentComposeViewWithPreconfiguredAddresses(new string[]
-            {
-                e.Recipent
-            });
-        }
-
-        WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
-        {
-            if (navigationAction.NavigationType == WKNavigationType.LinkActivated || navigationAction.NavigationType == WKNavigationType.BackForward || navigationAction.NavigationType == WKNavigationType.FormSubmitted || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
-            {
-                if (navigationAction.Request.Url.Scheme == "mailto")
-                {
-                    var address = navigationAction.Request.Url.ResourceSpecifier;
-                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
-                }
-                else
-                {
-                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
-                }
-
-                return WKNavigationActionPolicy.Cancel;
-            }
-
-            if (navigationAction.NavigationType == WKNavigationType.Reload)
-                return WKNavigationActionPolicy.Cancel;
-
-            return WKNavigationActionPolicy.Allow;
+            PresentComposeViewWithPreconfiguredAddresses(new string[] { e.Recipent });
         }
 
         void PresentComposeViewWithPreconfiguredAddresses(string[] preconfiguredEmailAddresses)
@@ -1322,6 +1355,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
+        #region Utilities 
+
+        public WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
+        {
+            if (navigationAction.NavigationType == WKNavigationType.LinkActivated || navigationAction.NavigationType == WKNavigationType.BackForward || navigationAction.NavigationType == WKNavigationType.FormSubmitted || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
+            {
+                if (navigationAction.Request.Url.Scheme == "mailto")
+                {
+                    var address = navigationAction.Request.Url.ResourceSpecifier;
+                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
+                }
+                else
+                {
+                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
+                }
+
+                return WKNavigationActionPolicy.Cancel;
+            }
+
+            if (navigationAction.NavigationType == WKNavigationType.Reload)
+                return WKNavigationActionPolicy.Cancel;
+
+            return WKNavigationActionPolicy.Allow;
+        }
+
+        #endregion
+
         #region Messages handlers
 
         void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage obj)
@@ -1402,15 +1462,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-    }
-
-    public class ReadStatusUpdatedEventArgs : EventArgs
-    {
-        public DocumentPreview DocumentPreview { get; }
-
-        public ReadStatusUpdatedEventArgs(DocumentPreview documentPreview)
-        {
-            DocumentPreview = documentPreview;
-        }
     }
 }

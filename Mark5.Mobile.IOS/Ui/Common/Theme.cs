@@ -22,6 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public static UIColor Gray => UIColor.FromRGB(245f / 255f, 245f / 255f, 245f / 255f);
         public static UIColor DarkGray => UIColor.FromRGB(153f / 255f, 153f / 255f, 153f / 255f);
         public static UIColor Black => UIColor.Black;
+        public static UIColor Clear => UIColor.Clear;
 
         #endregion
 

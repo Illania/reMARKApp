@@ -145,8 +145,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void Initialize()
         {
-            BadgeBackgroundColor = UIColor.Red;
-            BadgeTextColor = UIColor.White;
+            BadgeBackgroundColor = Theme.DarkerBlue;
+            BadgeTextColor = Theme.White;
             BadgeFont = UIFont.SystemFontOfSize(10);
             BadgePadding = 5;
             BadgeMinSize = 8;

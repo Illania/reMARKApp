@@ -34,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 Text = Localization.GetString("attachments") + ":",
                 Font = Theme.DefaultFont,
-                TextColor = UIColor.LightGray,
+                TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 Distribution = UIStackViewDistribution.Fill;
                 Axis = UILayoutConstraintAxis.Horizontal;
 
-                filenameButton = UIButton.FromType(UIButtonType.System);
+                filenameButton = new UIButton();
                 filenameButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 filenameButton.TitleLabel.Font = Theme.DefaultFont;
                 filenameButton.SetTitle(AttachmentDescription.Name + " (" + UI.PrettyFileSize(AttachmentDescription.SizeInBytes) + ")", UIControlState.Normal);
@@ -237,7 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 deleteButton = new UIButton();
                 deleteButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "remove.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                deleteButton.BackgroundColor = UIColor.Clear;
+                deleteButton.BackgroundColor = Theme.Clear;
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 deleteButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
                 deleteButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -274,7 +274,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 Distribution = UIStackViewDistribution.Fill;
                 Axis = UILayoutConstraintAxis.Horizontal;
 
-                filenameButton = UIButton.FromType(UIButtonType.System);
+                filenameButton = new UIButton();
                 filenameButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 filenameButton.TitleLabel.Font = Theme.DefaultFont;
                 filenameButton.SetTitle(FileDescription.Name + " (" + UI.PrettyFileSize(FileDescription.SizeInBytes) + ")", UIControlState.Normal);
@@ -285,7 +285,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 deleteButton = new UIButton();
                 deleteButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "remove.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                deleteButton.BackgroundColor = UIColor.Clear;
+                deleteButton.BackgroundColor = Theme.Clear;
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 deleteButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
                 deleteButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);

@@ -979,24 +979,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Event handlers
-
-        void DocumentViewController_ReadStatusUpdated(object sender, ReadStatusUpdatedEventArgs e)
-        {
-            BeginInvokeOnMainThread(() =>
-            {
-                var selectedRow = TableView.IndexPathForSelectedRow;
-
-                ((DataSource)TableView.Source).UpdateItem(e.DocumentPreview.Id);
-                TableView.ReloadData();
-
-                if (selectedRow != null)
-                    TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
-            });
-        }
-
-        #endregion
-
         #region Utilities
 
         void StartEditing()
