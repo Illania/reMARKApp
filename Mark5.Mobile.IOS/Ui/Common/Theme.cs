@@ -1,9 +1,9 @@
+using System;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using WebKit;
-using System;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -128,7 +128,25 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 var text = header.TextLabel.Text ?? string.Empty;
                 header.TextLabel.Text = null;
-                header.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = Theme.DefaultLightFont, ForegroundColor = Theme.DarkerBlue });
+                header.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = DefaultLightFont, ForegroundColor = DarkerBlue });
+                return;
+            }
+
+            if (view is UIButton button)
+            {
+                button.TitleLabel.Font = DefaultFont;
+                return;
+            }
+
+            if (view is UITextField textField)
+            {
+                textField.Font = DefaultFont;
+                return;
+            }
+
+            if (view is UITextView textView)
+            {
+                textView.Font = DefaultFont;
                 return;
             }
 
