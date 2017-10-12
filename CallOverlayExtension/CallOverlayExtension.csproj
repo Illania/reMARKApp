@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Utilities\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -118,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallDirectoryHandler.cs" />
+    <Compile Include="Utilities\ConsoleLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">

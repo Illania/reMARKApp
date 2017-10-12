@@ -2,6 +2,7 @@
 using Foundation;
 using CallKit;
 using Mark5.Mobile.Common;
+using CallOverlayExtension.Utilities;
 using System.Threading.Tasks;
 using UIKit;
 using System.Runtime.InteropServices;
@@ -9,6 +10,7 @@ using System.Text;
 using PCLStorage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Database;
+using Mark5.Mobile.Common.Extensions;
 using System.IO;
 
 namespace CallOverlayExtension
@@ -26,10 +28,7 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
-            //CommonConfig.Logger.Info("WE ARE IN HERE...");
-            Console.WriteLine("WE ARE IN HERE...");
-            /*
-            //initialization
+            /*//initialization
             Task.Run(async () =>
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
@@ -40,17 +39,10 @@ namespace CallOverlayExtension
                 CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
-                /*CommonConfig.Logger = new ConsoleAndFileLogger();
-                CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
-                CommonConfig.HttpClientHandler = () => new NativeMessageHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
-                CommonConfig.OnStartTransmission = ActivityIndicator.Show;
-                CommonConfig.OnStopTransmission = ActivityIndicator.Hide;
-                CommonConfig.MessengerHub = new TinyMessengerHub();
-                CommonConfig.Phonebook = new Phonebook();
-                CommonConfig.Reachability = new Reachability();
-                CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);*/
+                CommonConfig.Logger = new ConsoleLogger();
 
-                /*if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
+
+                if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>
                     {
                         var url = NSUrl.FromFilename(filename);
@@ -80,8 +72,8 @@ namespace CallOverlayExtension
 
 
             })
-            .Wait();
-            */
+            .Wait();*/
+
             if (!AddIdentificationPhoneNumbers(cxContext))
             {
                 Console.WriteLine("Unable to add identification phone numbers");
@@ -97,8 +89,8 @@ namespace CallOverlayExtension
         {
             // Numbers must be provided in numerically ascending order.
 
-            long[] phoneNumbers = { 4560443773};
-            string[] labels = { "Rune"};
+            long[] phoneNumbers = { 004560443773};
+            string[] labels = { "Bob"};
 
             for (var i = 0; i < phoneNumbers.Length; i++)
             {
