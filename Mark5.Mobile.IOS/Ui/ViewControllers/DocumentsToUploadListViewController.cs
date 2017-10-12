@@ -259,6 +259,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return null;
             }
 
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => DocumentToUploadTableViewCell.Height;
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)

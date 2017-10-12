@@ -1,7 +1,9 @@
 using CoreGraphics;
+using Foundation;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using WebKit;
+using System;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -43,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Apply theme methods
 
-        public static void ApplyTheme(UIWindow window)
+        public static void ApplyTheme(this UIWindow window)
         {
             window.TintColor = TintColor;
 
@@ -118,6 +120,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UITableViewHeaderFooterView.Appearance.TintColor = LightGray;
 
             WKWebView.Appearance.TintColor = DarkBlue;
+        }
+
+        public static void ApplyTheme(this UIView view)
+        {
+            if (view is UITableViewHeaderFooterView header)
+            {
+                var text = header.TextLabel.Text ?? string.Empty;
+                header.TextLabel.Text = null;
+                header.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = Theme.DefaultLightFont, ForegroundColor = Theme.DarkerBlue });
+                return;
+            }
+
+            throw new ArgumentException($"No theme found for view type {view.GetType().Name}!");
         }
 
         #endregion

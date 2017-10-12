@@ -59,7 +59,7 @@ namespace Mark5.Mobile.IOS
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
 
                 Window = new UIWindow(UIScreen.MainScreen.Bounds);
-                Theme.ApplyTheme(Window);
+                Window.ApplyTheme();
 
                 UIViewController vc;
                 if (!isLoggedIn)

@@ -60,6 +60,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RefreshHiddenSettings();
         }
 
+        public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
         {
             var footerText = SettingsReader.GetFooterText(section);
@@ -68,10 +70,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return 0f;
 
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
-
-            var attributes = new UIStringAttributes();
-            attributes.Font = Theme.DefaultFont;
-            var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue), NSStringDrawingOptions.UsesLineFragmentOrigin, attributes, null);
+            var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue),
+                                                                NSStringDrawingOptions.UsesLineFragmentOrigin,
+                                                                new UIStringAttributes { Font = Theme.DefaultFont },
+                                                                null);
 
             return size.Height + 10f;
         }
@@ -93,10 +95,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var specifier = SettingsReader.GetSpecifier(indexPath);
             if (specifier.Type == "PSMultiValueSpecifier")
             {
-                var vc = new CustomSpecifierValuesViewController();
-                vc.CurrentSpecifier = specifier;
-                vc.SettingsReader = SettingsReader;
-                vc.SettingsStore = SettingsStore;
+                var vc = new CustomSpecifierValuesViewController
+                {
+                    CurrentSpecifier = specifier,
+                    SettingsReader = SettingsReader,
+                    SettingsStore = SettingsStore
+                };
                 vc.View.TintColor = View.TintColor;
                 NavigationController.PushViewController(vc, true);
                 return;
@@ -123,9 +127,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UsernameKey)
             {
+                var ci = Managers.ActiveConnectionInfo;
+
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = Managers.ActiveConnectionInfo?.Username;
+                cell.DetailTextLabel.Text = ci?.Username;
                 cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
@@ -143,12 +149,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == SslEnabledKey)
             {
-                var sslOff = Managers.ActiveConnectionInfo?.SslMode != SslMode.Off;
+                var ci = Managers.ActiveConnectionInfo;
+                var sslEnabled = ci?.SslMode != SslMode.Off;
 
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = sslOff ? Localization.GetString("enabled") : Localization.GetString("disabled");
-                cell.DetailTextLabel.TextColor = sslOff ? Theme.DarkGray : Theme.Brown;
+                cell.DetailTextLabel.Text = sslEnabled ? Localization.GetString("enabled") : Localization.GetString("disabled");
+                cell.DetailTextLabel.TextColor = sslEnabled ? Theme.DarkGray : Theme.Brown;
                 return cell;
             }
 
@@ -184,29 +191,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("settingsViewController:buttonTappedForSpecifier:")]
         public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
         {
-            if (specifier.Key == LogoutKey)
-            {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
-
-                try
-                {
-                    if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                        await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error(ex);
-                }
-
-                PlatformConfig.Preferences.ResetOnLaunch = true;
-
-                dismissAction();
-
-                Dialogs.ShowBlockingDialog(this, Localization.GetString("please_restart"));
-
-                return;
-            }
-
             if (specifier.Key == SendFeedbackKey)
             {
                 try
@@ -287,6 +271,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
+            if (specifier.Key == LogoutKey)
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
+
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                        await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error(ex);
+                }
+
+                PlatformConfig.Preferences.ResetOnLaunch = true;
+
+                dismissAction();
+
+                Dialogs.ShowBlockingDialog(this, Localization.GetString("please_restart"));
+
+                return;
+            }
+
             if (specifier.Key == OpenSettingsAppKey)
                 UIApplication.SharedApplication.OpenUrl(new NSUrl(UIApplication.OpenSettingsUrlString), new NSDictionary(), null);
         }
@@ -295,7 +302,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             // Nothing to do
         }
-
 
         async void SettingsChanged(NSNotification n)
         {
@@ -307,7 +313,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (key == DocumentsToDownloadKey)
             {
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-
                 return;
             }
 
@@ -316,7 +321,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
                 return;
             }
 
@@ -327,9 +331,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RefreshHiddenSettings()
         {
             SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
-                    ? null
-                    : new[] { LocalTemplateKey },
-                false);
+                          ? null
+                          : new[] { LocalTemplateKey }, false);
         }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController
@@ -337,8 +340,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = base.GetCell(tableView, indexPath);
-                cell.TextLabel.Font = Theme.DefaultFont;
-                cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+
+                if (cell.TextLabel != null)
+                    cell.TextLabel.Font = Theme.DefaultFont;
+                if (cell.DetailTextLabel != null)
+                    cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+                
                 return cell;
             }
         }

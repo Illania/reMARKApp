@@ -197,6 +197,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return objectActionsSections[section];
             }
 
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ObjectActionsTableViewCell.Height;
 
             public void SetItems(Dictionary<string, ObjectAction[]> objectActions)

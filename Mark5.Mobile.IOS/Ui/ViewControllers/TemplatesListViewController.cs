@@ -313,6 +313,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return section == 0 ? Localization.GetString("private") : Localization.GetString("public");
             }
 
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);

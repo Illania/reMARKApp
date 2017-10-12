@@ -301,6 +301,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return sections[section];
             }
 
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);

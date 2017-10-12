@@ -1019,6 +1019,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return null;
             }
 
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
                 if (disableRowActions)
