@@ -14,6 +14,7 @@ namespace Mark5.Mobile.Droid.Service
     {
         static LinearLayout incomingCallLayout;
         static LinearLayout onGoingCallLayout;
+        Context context;
         bool registered;
 
         public void Register()
@@ -30,6 +31,13 @@ namespace Mark5.Mobile.Droid.Service
 
         public void Unregister()
         {
+            var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
+            if (incomingCallLayout.IsShown)
+                wm.RemoveView(incomingCallLayout);
+
+            if (onGoingCallLayout.IsShown)
+                wm.RemoveView(onGoingCallLayout);
+            
             if (!registered)
                 return;
             
@@ -40,11 +48,13 @@ namespace Mark5.Mobile.Droid.Service
 
         public override void OnReceive(Context context, Intent intent)
         {
+            this.context = context;
+
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M && Settings.CanDrawOverlays(context))
             {
                 var state = intent.GetStringExtra(TelephonyManager.ExtraState);
 
-                IWindowManager wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
+                var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
                 var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, WindowManagerTypes.SystemOverlay,
                                                                   WindowManagerFlags.NotTouchModal | WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent)
                 {
