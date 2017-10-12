@@ -177,7 +177,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ActionSheetWillAppear(this, EventArgs.Empty);
 
             var lineNames = availableOutgoingLines.Select(l => l.Name).ToArray();
-            var result = await Dialogs.ShowListDialogAsync(viewController, null, lineNames, selectedLineLabel);
+            var result = await Dialogs.ShowListDialogAsync(viewController, lineNames, selectedLineLabel);
 
             if (result >= 0)
                 SetLine(availableOutgoingLines[result]);

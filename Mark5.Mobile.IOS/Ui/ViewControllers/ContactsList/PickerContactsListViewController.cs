@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 var emailAddresses = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email).Select(ca => ca.Address).ToArray();
                 if (emailAddresses.Any())
                 {
-                    var index = await Dialogs.ShowListDialogAsync(this, null, emailAddresses, cell);
+                    var index = await Dialogs.ShowListDialogAsync(this, emailAddresses, cell);
                     if (index < 0)
                         return;
 

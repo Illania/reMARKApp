@@ -288,7 +288,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CopyToFolder(List<ContactPreview> selectedContacts)
         {
-            var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, selectedContacts.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 

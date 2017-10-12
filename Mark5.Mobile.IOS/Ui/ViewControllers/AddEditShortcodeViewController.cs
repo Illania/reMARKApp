@@ -216,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var strings = new[] { Localization.GetString("add_from_contact"), Localization.GetString("add_empty") };
 
-            var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, strings, tableView, cell);
+            var choiceIndex = await Dialogs.ShowListDialogAsync(this, strings, tableView, cell);
 
             if (choiceIndex == 0)
             {

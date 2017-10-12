@@ -697,7 +697,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 Localization.GetString("contact_picker_phonebook"),
             };
 
-            var choice = await Dialogs.ShowListDialogAsync(this, null, strings, sender as UIView);
+            var choice = await Dialogs.ShowListDialogAsync(this, strings, sender as UIView);
 
             switch (choice)
             {
@@ -945,7 +945,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     Localization.GetString("template_selection_local"),
                     Localization.GetString("template_selection_another")
                 };
-                var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("template_selection_title"), templateListStrings, contentView);
+                var result = await Dialogs.ShowListDialogAsync(this, templateListStrings, contentView);
                 switch (result)
                 {
                     case -1:

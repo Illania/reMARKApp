@@ -57,33 +57,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         async void CreateContactItem_Clicked(object sender, EventArgs e)
         {
-            var choices = new[] { Localization.GetString("company"), Localization.GetString("department"), Localization.GetString("person") };
-            var choice = await Dialogs.ShowListDialogAsync(this, Localization.GetString("add_contact"), choices, CreateContactItem);
+            var choice = await Dialogs.ShowListDialogAsync(this,
+                                                           new[] {Localization.GetString("add_company"), Localization.GetString("add_department"), Localization.GetString("add_person") },
+                                                           CreateContactItem);
+            if (choice < 0)
+                return;
 
-            if (choice >= 0)
+            ContactType type = ContactType.None;
+            switch (choice)
             {
-                ContactType type = ContactType.None;
-                switch (choice)
-                {
-                    case 0:
-                        type = ContactType.Company;
-                        break;
-                    case 1:
-                        type = ContactType.Department;
-                        break;
-                    case 2:
-                        type = ContactType.Person;
-                        break;
-                }
-
-                var vc = new AddEditContactViewController
-                {
-                    CreationModeFlag = ContactCreationModeFlag.New,
-                    ContactType = type,
-                };
-
-                PresentViewController(new NavigationController(vc), true, null);
+                case 0:
+                    type = ContactType.Company;
+                    break;
+                case 1:
+                    type = ContactType.Department;
+                    break;
+                case 2:
+                    type = ContactType.Person;
+                    break;
             }
+
+            var vc = new AddEditContactViewController
+            {
+                CreationModeFlag = ContactCreationModeFlag.New,
+                ContactType = type,
+            };
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         protected override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)

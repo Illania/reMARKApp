@@ -354,7 +354,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
-            var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 

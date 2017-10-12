@@ -49,8 +49,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content) =>
-            ShowConfirmDialogAsync(vc, title, content, Localization.GetString("ok"));
+        public static async Task ShowConfirmDialogAsync(UIViewController vc, string title, string content)
+        {
+            await ShowConfirmDialogAsync(vc, title, content, Localization.GetString("ok"));
+        }
 
         public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content, string confirmationText)
         {
@@ -61,30 +63,30 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIView anchorView)
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string[] listStrings, UIView anchorView)
         {
             var tcs = new TaskCompletionSource<int>();
-            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            var actionSheet = PrepareLisDialogActionSheet(tcs, listStrings);
             if (actionSheet.PopoverPresentationController != null)
                 actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorView);
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIBarButtonItem anchorBarButtonItem)
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string[] listStrings, UIBarButtonItem anchorBarButtonItem)
         {
             var tcs = new TaskCompletionSource<int>();
-            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            var actionSheet = PrepareLisDialogActionSheet(tcs, listStrings);
             if (actionSheet.PopoverPresentationController != null)
                 actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorBarButtonItem);
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UITableView tableView, UITableViewCell anchorCell)
+        public static Task<int> ShowListDialogAsync(UIViewController vc, string[] listStrings, UITableView tableView, UITableViewCell anchorCell)
         {
             var tcs = new TaskCompletionSource<int>();
-            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            var actionSheet = PrepareLisDialogActionSheet(tcs, listStrings);
             if (actionSheet.PopoverPresentationController != null)
                 actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, anchorCell);
             vc.PresentViewController(actionSheet, true, null);
@@ -98,14 +100,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return msvc.Result;
         }
 
-        static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string message, string[] listStrings)
+        static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string[] listStrings)
         {
-            var actionSheet = UIAlertController.Create(null, message, UIAlertControllerStyle.ActionSheet);
+            var actionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
             for (var i = 0; i < listStrings.Length; i++)
             {
-                var ab = i;
-                actionSheet.AddAction(UIAlertAction.Create(listStrings[ab], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));
+                var ii = i;
+                actionSheet.AddAction(UIAlertAction.Create(listStrings[ii], UIAlertActionStyle.Default, a => tcs.SetResult(ii)));
             }
 
             actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
@@ -141,23 +143,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
             if (ShouldShowCreateReport(ex))
+            {
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"),
-                    UIAlertActionStyle.Cancel,
-                    a =>
+                                                     UIAlertActionStyle.Cancel,
+                                                     a =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
                     {
-                        var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                            .ContinueWith(t =>
-                                {
-                                    dismissAction();
+                        dismissAction();
 
-                                    if (!t.IsFaulted)
-                                        vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
-                                    else
-                                        tcs.SetResult(true);
-                                },
-                                TaskScheduler.FromCurrentSynchronizationContext());
-                    }));
+                        if (!t.IsFaulted)
+                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                        else
+                            tcs.SetResult(true);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
             return tcs.Task;
         }
@@ -170,21 +172,21 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, null));
             if (ShouldShowCreateReport(ex))
+            {
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"),
-                    UIAlertActionStyle.Cancel,
-                    a =>
+                                                     UIAlertActionStyle.Cancel,
+                                                     a =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
                     {
-                        var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                            .ContinueWith(t =>
-                                {
-                                    dismissAction();
+                        dismissAction();
 
-                                    if (!t.IsFaulted)
-                                        vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
-                                },
-                                TaskScheduler.FromCurrentSynchronizationContext());
-                    }));
+                        if (!t.IsFaulted)
+                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
         }
 

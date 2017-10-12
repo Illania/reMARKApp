@@ -26,8 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
-        UITableView tableView;
-
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
@@ -211,7 +209,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    var vc = new CopyMoveToFolderListViewController(selectedDocuments.Cast<IBusinessEntity>().ToList());
+                    var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, selectedDocuments.Cast<IBusinessEntity>().ToList());
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
 
@@ -334,7 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
         {
-            var vc = new CopyMoveToFolderListViewController(selectedDocument.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, selectedDocument.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -382,7 +380,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
-            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), barButtonItem);
+            var result = await Dialogs.ShowListDialogAsync(this, priorityStrings.ToArray(), barButtonItem);
 
             if (result < 0)
                 return;
@@ -396,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
-            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), tv, cell);
+            var result = await Dialogs.ShowListDialogAsync(this, priorityStrings.ToArray(), tv, cell);
 
             if (result < 0)
                 return;
@@ -481,7 +479,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = tableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 var index = ds.Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
 
                 if (index >= 0)
@@ -490,12 +488,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     documentPreview.IsReadByCurrent = message.IsReadByCurrent;
                     documentPreview.IsReadByAnyone = message.IsReadByAnyone;
 
-                    var selectedRow = tableView.IndexPathForSelectedRow;
+                    var selectedRow = TableView.IndexPathForSelectedRow;
 
-                    tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
-                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
                 }
             });
         }
@@ -504,7 +502,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = tableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
 
                 if (index >= 0)
@@ -512,16 +510,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var documentPreview = ds.Items[index];
                     documentPreview.CommentsCount = message.CommentsCount;
 
-                    var selectedRow = tableView.IndexPathForSelectedRow;
+                    var selectedRow = TableView.IndexPathForSelectedRow;
 
-                    tableView.ReloadRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(index, 0)
-                        },
-                        UITableViewRowAnimation.Fade);
+                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
-                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
                 }
             });
         }
@@ -530,7 +524,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var ds = tableView.Source as DataSource;
+                var ds = TableView.Source as DataSource;
                 var index = ds.Items.FindIndex(dp => dp.Id == message.EntityId);
 
                 if (index >= 0)
@@ -539,16 +533,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     documentPreview.Categories.Clear();
                     documentPreview.Categories.AddRange(message.Categories);
 
-                    var selectedRow = tableView.IndexPathForSelectedRow;
+                    var selectedRow = TableView.IndexPathForSelectedRow;
 
-                    tableView.ReloadRows(new NSIndexPath[]
-                        {
-                            NSIndexPath.FromRowSection(index, 0)
-                        },
-                        UITableViewRowAnimation.Fade);
+                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
-                        tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
                 }
 
             });

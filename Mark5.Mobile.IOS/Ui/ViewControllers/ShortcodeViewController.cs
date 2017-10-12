@@ -345,7 +345,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                UIAlertActionStyle.Default,
                                                a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview });
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, new List<IBusinessEntity> { shortcodePreview });
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
@@ -354,7 +354,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview }, folder);
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, new List<IBusinessEntity> { shortcodePreview }, folder);
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 

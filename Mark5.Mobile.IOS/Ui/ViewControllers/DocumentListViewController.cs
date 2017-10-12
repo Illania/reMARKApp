@@ -603,7 +603,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var priorities = new[] { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p)).ToArray();
-            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings, barButtonItem);
+            var result = await Dialogs.ShowListDialogAsync(this, priorityStrings, barButtonItem);
 
             if (result < 0)
                 return;
@@ -617,7 +617,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
-            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), tv, cell);
+            var result = await Dialogs.ShowListDialogAsync(this, priorityStrings.ToArray(), tv, cell);
 
             if (result < 0)
                 return;
@@ -750,7 +750,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CopyToFolder(List<DocumentPreview> selectedDocument)
         {
-            var vc = new CopyMoveToFolderListViewController(selectedDocument.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, selectedDocument.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -759,7 +759,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void MoveToFolder(List<DocumentPreview> selectedDocument)
         {
-            var vc = new CopyMoveToFolderListViewController(selectedDocument.Cast<IBusinessEntity>().ToList(), Folder)
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, selectedDocument.Cast<IBusinessEntity>().ToList(), Folder)
             {
                 ModalPresentationStyle = UIModalPresentationStyle.PageSheet
             };

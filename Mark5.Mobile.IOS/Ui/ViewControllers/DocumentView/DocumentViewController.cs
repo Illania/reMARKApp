@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -931,7 +931,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("categories")
             };
 
-            var result = await Dialogs.ShowListDialogAsync(this, null, flagListStrings, flag);
+            var result = await Dialogs.ShowListDialogAsync(this, flagListStrings, flag);
 
             if (result < 0)
                 return;
@@ -956,7 +956,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("forward"),
                 Localization.GetString("copy_to_new")};
 
-            var result = await Dialogs.ShowListDialogAsync(this, null, replyListStrings, replyActions);
+            var result = await Dialogs.ShowListDialogAsync(this, replyListStrings, replyActions);
 
             if (result < 0)
                 return;
@@ -987,7 +987,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Priority.Urgent
             };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
-            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("select_priority"), priorityStrings.ToArray(), barButtonItem);
+            var result = await Dialogs.ShowListDialogAsync(this, priorityStrings.ToArray(), barButtonItem);
 
             if (result < 0)
                 return;
@@ -1050,10 +1050,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
-                    {
-                        document
-                    });
+                    var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, new List<IBusinessEntity> { document });
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
 
@@ -1062,11 +1059,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity>
-                            {
-                                document
-                            },
-                            folder);
+                        var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, new List<IBusinessEntity> { document }, folder);
                         PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                     }));
 
@@ -1187,7 +1180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("links")
             };
 
-            var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, userActions);
+            var result = await Dialogs.ShowListDialogAsync(this, actionLinksListString, userActions);
 
             if (result < 0)
                 return;
@@ -1235,21 +1228,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var hasAttachments = document.Attachments.Any();
 
-            string[] modes = null;
-
+            string[] modes;
             if (hasAttachments)
-            {
-                modes = new[] { Localization.GetString("copy_to_new_addresses"),
-                Localization.GetString("copy_to_new_text_and_attachments"), Localization.GetString("copy_to_new_attachments") };
-            }
+                modes = new[] { Localization.GetString("copy_to_new_addresses"), Localization.GetString("copy_to_new_text_and_attachments"), Localization.GetString("copy_to_new_attachments") };
             else
-            {
-                modes = new[] { Localization.GetString("copy_to_new_addresses"),
-                Localization.GetString("copy_to_new_text") };
-            }
+                modes = new[] { Localization.GetString("copy_to_new_addresses"), Localization.GetString("copy_to_new_text") };
 
-            var result = await Dialogs.ShowListDialogAsync(this, Localization.GetString("copy_to_new_title"), modes, replyActions);
-
+            var result = await Dialogs.ShowListDialogAsync(this, modes, replyActions);
             if (result < 0)
                 return;
 

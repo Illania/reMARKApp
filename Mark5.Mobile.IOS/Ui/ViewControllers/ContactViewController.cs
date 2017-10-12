@@ -472,7 +472,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("call"), formattedNumbers, (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, formattedNumbers, (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
@@ -500,7 +500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("show_on_map"), physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListDialogAsync(this, physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
@@ -521,7 +521,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 && contactPreview.Type == ContactType.Company)
                 listString.Add(Localization.GetString("add_department"));
 
-            var index = await Dialogs.ShowListDialogAsync(this, null, listString.ToArray(), editButtonItem);
+            var index = await Dialogs.ShowListDialogAsync(this, listString.ToArray(), editButtonItem);
             if (index < 0)
                 return;
 
@@ -573,7 +573,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                UIAlertActionStyle.Default,
                                                a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, new List<IBusinessEntity> { contactPreview });
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
@@ -582,7 +582,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview }, folder);
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, new List<IBusinessEntity> { contactPreview }, folder);
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
@@ -614,7 +614,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("links")
             };
 
-            var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, actionsLinksButton);
+            var result = await Dialogs.ShowListDialogAsync(this, actionLinksListString, actionsLinksButton);
             if (result < 0)
                 return;
 

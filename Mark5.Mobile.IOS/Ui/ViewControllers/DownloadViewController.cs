@@ -547,11 +547,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoneItem_Clicked(object sender, EventArgs e) => NavigationController.DismissViewController(true, null);
 
-        void StartButton_TouchUpInside(object sender, EventArgs e)
+        async void StartButton_TouchUpInside(object sender, EventArgs e)
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
-                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("youre_offline_title"), Localization.GetString("youre_offline_message"));
+                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("youre_offline_title"), Localization.GetString("youre_offline_message"));
                 return;
             }
 

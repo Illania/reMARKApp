@@ -60,21 +60,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                         var deparments = contact.Children.Where(c => c.Type == ContactType.Department);
 
                         if (!deparments.Any())
-                        {
                             selectedContactPreview = contactPreview;
-                        }
                         else
                         {
                             var choices = new List<ContactPreview> { contactPreview };
                             choices.AddRange(deparments);
                             var strings = choices.Select(DisplayText).ToArray();
 
-                            var index = await Dialogs.ShowListDialogAsync(this, Localization.GetString("parent_contact_selector_choose"), strings, tableView.CellAt(indexPath));
-
+                            var index = await Dialogs.ShowListDialogAsync(this, strings, tableView.CellAt(indexPath));
                             if (index >= 0)
-                            {
                                 selectedContactPreview = choices[index];
-                            }
                         }
                     }
                     catch (Exception ex)
