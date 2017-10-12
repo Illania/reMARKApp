@@ -13,9 +13,11 @@ using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid
 {
@@ -34,6 +36,8 @@ namespace Mark5.Mobile.Droid
 
         CategoriesListAdapter adapter;
         CategoriesListAdapter searchAdapter;
+
+        TinyMessageSubscriptionToken categoriesEditedToken;
 
         public static (CategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
         {
@@ -97,6 +101,15 @@ namespace Mark5.Mobile.Droid
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
+
+            SubscribeToMessages();
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            UnsubscribeFromMessages();
         }
 
         public override void OnResume()
@@ -141,6 +154,18 @@ namespace Mark5.Mobile.Droid
             return base.OnOptionsItemSelected(item);
         }
 
+        void SubscribeToMessages()
+        {
+            categoriesEditedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged,
+                                                                                                        (arg) => arg.EntityId == businessEntityPreview?.Id
+                                                                                                        && arg.ObjectType == businessEntityPreview?.ObjectType);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            categoriesEditedToken?.Dispose();
+        }
+
         void RefreshView()
         {
             switch (businessEntityPreview.ObjectType)
@@ -158,6 +183,24 @@ namespace Mark5.Mobile.Droid
             }
         }
 
+        void HandleCategoriesChanged(EntityCategoriesChangedMessage obj)
+        {
+            switch (businessEntityPreview.ObjectType)
+            {
+                case ObjectType.Document:
+                    var documentPreview = businessEntityPreview as DocumentPreview;
+                    documentPreview.Categories.Clear();
+                    documentPreview.Categories.AddRange(obj.Categories);
+                    break;
+                case ObjectType.Contact:
+                    var contactPreview = businessEntityPreview as ContactPreview;
+                    contactPreview.Categories.Clear();
+                    contactPreview.Categories.AddRange(obj.Categories);
+                    break;
+                default:
+                    throw new ArgumentException("The business entity provided does not have categories in the model");
+            }
+        }
 
         #region Filtering
 
