@@ -28,7 +28,6 @@
 "autosave_recover_content" = "MARK5 recovered an autosaved email. Do you want to continue editing it?";
 "back" = "Back";
 "bcc" = "Bcc";
-"big_attachment_title" = "Big attachment";
 "big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?";
 "birthdate" = "Birthdate";
 "browse_files" = "Browse files...";

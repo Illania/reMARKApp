@@ -762,7 +762,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     {
                         if (PlatformConfig.Preferences.LargeAttachmentWarning &&
                             e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
-                            !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
+                            !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
                         {
                             dismissAction();
                             return;
