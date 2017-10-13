@@ -10,6 +10,7 @@ using PCLStorage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
+using CallOverlayExtension.Utilities;
 using System.IO;
 
 namespace CallOverlayExtension
@@ -26,8 +27,7 @@ namespace CallOverlayExtension
         {
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
-
-            /*//initialization
+            //initialization
             Task.Run(async () =>
             {
                 var mainFolder = FileSystem.Current.LocalStorage;
@@ -64,14 +64,12 @@ namespace CallOverlayExtension
 #endif
 
 
-
-                //((ConsoleAndFileLogger)CommonConfig.Logger).CleanUpOldLogFiles();
                 await DatabaseUtils.InitializeDatabases();
 
 
 
             })
-            .Wait();*/
+            .Wait();
 
             if (!AddIdentificationPhoneNumbers(cxContext))
             {
@@ -89,7 +87,7 @@ namespace CallOverlayExtension
             // Numbers must be provided in numerically ascending order.
 
             long[] phoneNumbers = { 004560443773};
-            string[] labels = { "BobbyBOBNES"};
+            string[] labels = { "test1"};
 
             for (var i = 0; i < phoneNumbers.Length; i++)
             {
