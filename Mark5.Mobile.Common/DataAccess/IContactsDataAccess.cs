@@ -43,6 +43,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<List<Recipient>> GetSuggestions(string phrase);
 
+        Task<List<ContactPhoneNumber>> GetContactPhoneNumbers();
+
         Task DeleteAllAsync();
     }
 }

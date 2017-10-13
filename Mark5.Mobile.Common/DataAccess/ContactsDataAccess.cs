@@ -472,7 +472,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<ContactPhoneNumber>> GetPhoneNumbers()
+        public async Task<List<ContactPhoneNumber>> GetContactPhoneNumbers()
         {
             try
             {

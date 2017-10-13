@@ -99,6 +99,8 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger?.Error(ex);
             }
 
+            var test = Managers.ContactsManager.GetContactPhoneNumbers().Result;
+
             return false; // Always return false to pass handling of notifications to FinishedLaunching
         }
 

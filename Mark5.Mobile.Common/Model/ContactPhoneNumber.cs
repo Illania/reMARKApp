@@ -60,5 +60,5 @@ namespace Mark5.Mobile.Common.Model
             return x.GetHashCode().CompareTo(y.GetHashCode());
         }
     }
-    }
+
 }
