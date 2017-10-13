@@ -2,7 +2,6 @@
 using Foundation;
 using CallKit;
 using Mark5.Mobile.Common;
-using CallOverlayExtension.Utilities;
 using System.Threading.Tasks;
 using UIKit;
 using System.Runtime.InteropServices;
@@ -90,7 +89,7 @@ namespace CallOverlayExtension
             // Numbers must be provided in numerically ascending order.
 
             long[] phoneNumbers = { 004560443773};
-            string[] labels = { "Bob"};
+            string[] labels = { "BobbyBOBNES"};
 
             for (var i = 0; i < phoneNumbers.Length; i++)
             {

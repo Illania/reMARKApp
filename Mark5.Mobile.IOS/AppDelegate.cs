@@ -26,6 +26,7 @@ using PCLStorage;
 using TinyMessenger;
 using UIKit;
 using UserNotifications;
+using CallKit;
 
 namespace Mark5.Mobile.IOS
 {
@@ -36,6 +37,24 @@ namespace Mark5.Mobile.IOS
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            CXCallDirectoryManager.SharedInstance.ReloadExtension("com.nordic-it.mark5.mobile.ios.extensions.callid",
+                                                                  error =>
+                                                                 {
+                                                                     if (error == null)
+                                                                     {
+                                                                         // Reloaded extension successfully 
+                                                                         CommonConfig.Logger.Info("NO ERROR");
+                            
+                                                                     }
+                                                                     else
+                                                                     {
+                                                                         // Extension failed, see error.Code 
+                                                                         // and error.Description for more 
+                                                                         // information 
+                                                                        CommonConfig.Logger.Info("NO ERROR");
+                                                                     }
+                                                                 });
+
             try
             {
                 var startupTime = new Stopwatch();
