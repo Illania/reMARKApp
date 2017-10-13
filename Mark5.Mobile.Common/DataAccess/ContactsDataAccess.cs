@@ -472,6 +472,40 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
+        public async Task<List<ContactPhoneNumber>> GetPhoneNumbers()
+        {
+            try
+            {
+                List<ContactPhoneNumber> phoneNumbers = null;
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var commandString = $"select C.{nameof(Contact.FirstName)}||C.{nameof(Contact.LastName)} as {nameof(ContactPhoneNumber.Name)}"
+                        + $"CA.{nameof(ContactCommunicationAddress.Address)} as {nameof(ContactPhoneNumber.Number)}"
+                        + $"from {nameof(Contact)} C "
+                        + $"natural join "
+                        + $"{nameof(ContactCommunicationAddress)} CA "
+                        + $"on C.{nameof(Contact.Id)} = CA.{nameof(ContactCommunicationAddress.Id)} "
+                        + $"where ((CA.{nameof(ContactCommunicationAddress.Type)} = @addressTypePhone) or (CA.{nameof(ContactCommunicationAddress.Type)} = @addressTypeMobile)) "
+                        + $"limit 100 "
+                        + $"collate nocase";
+
+                    var cmd = c.CreateCommand(commandString);
+                    cmd.Bind("@addressTypePhone", (int)CommunicationAddressType.Phone);
+                    cmd.Bind("@addressTypeMobile", (int)CommunicationAddressType.Mobile);
+                    var result = cmd.ExecuteQuery<ContactPhoneNumber>();
+                    phoneNumbers = result;
+                });
+
+                return phoneNumbers;
+            }
+            catch
+            {
+                return new List<ContactPhoneNumber>();
+            }
+        }
+
+
         public async Task DeleteAllAsync()
         {
             await contactsDatabase.RunInConnectionAsync(c =>
