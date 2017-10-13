@@ -207,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             catch (Exception ex)
             {
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
                 CommonConfig.Logger.Error($"Error while sending/editing shortcode [creationMode = {CreationModeFlag}, shortcodeId = {Shortcode?.Id}]", ex);
             }
         }
@@ -216,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var strings = new[] { Localization.GetString("add_from_contact"), Localization.GetString("add_empty") };
 
-            var choiceIndex = await Dialogs.ShowListDialogAsync(this, strings, tableView, cell);
+            var choiceIndex = await Dialogs.ShowListActionSheetAsync(this, strings, tableView, cell);
 
             if (choiceIndex == 0)
             {

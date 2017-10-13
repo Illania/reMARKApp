@@ -123,7 +123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (!isAvailable)
                     return;
 
-                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("autosave_recover_title"), Localization.GetString("autosave_recover_content"));
+                var shouldRecover = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("autosave_recover_title"), Localization.GetString("autosave_recover_content"));
                 if (shouldRecover)
                 {
                     var vc = new ComposeDocumentViewController { RestoreWorkingCopy = true };

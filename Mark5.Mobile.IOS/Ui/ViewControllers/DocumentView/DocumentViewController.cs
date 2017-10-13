@@ -68,12 +68,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIView backgroundView;
         UIActivityIndicatorView spinner;
 
-        UIBarButtonItem flag;
-        UIBarButtonItem fileTo;
+        UIBarButtonItem flagButton;
+        UIBarButtonItem fileToButton;
         UIButton commentsButton;
-        BadgeBarButtonItem comments;
-        UIBarButtonItem replyActions;
-        UIBarButtonItem userActions;
+        BadgeBarButtonItem commentsBadgeButton;
+        UIBarButtonItem replyActionsButton;
+        UIBarButtonItem userActionsButton;
 
         public delegate DocumentPreview GetPreviousDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
         public delegate DocumentPreview GetNextDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
@@ -376,30 +376,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ToolbarItems = new[]
             {
-                flag = new UIBarButtonItem
+                flagButton = new UIBarButtonItem
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "flag.png")),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                replyActions = new UIBarButtonItem
+                replyActionsButton = new UIBarButtonItem
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "reply.png")),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                fileTo = new UIBarButtonItem
+                fileToButton = new UIBarButtonItem
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                comments = new BadgeBarButtonItem(commentsButton)
+                commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
                 {
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                userActions = new UIBarButtonItem
+                userActionsButton = new UIBarButtonItem
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "actions.png")),
                     Enabled = false
@@ -450,16 +450,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (attachmentsListView != null)
                 attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
 
-            if (flag != null)
-                flag.Clicked += Flag_Clicked;
-            if (fileTo != null)
-                fileTo.Clicked += FileTo_Clicked;
-            if (replyActions != null)
-                replyActions.Clicked += ReplyActions_Clicked;
+            if (flagButton != null)
+                flagButton.Clicked += FlagButton_Clicked;
+            if (fileToButton != null)
+                fileToButton.Clicked += FileToButton_Clicked;
+            if (replyActionsButton != null)
+                replyActionsButton.Clicked += ReplyActionsButton_Clicked;
             if (commentsButton != null)
                 commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
-            if (userActions != null)
-                userActions.Clicked += UserActions_Clicked;
+            if (userActionsButton != null)
+                userActionsButton.Clicked += UserActionsButton_Clicked;
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
@@ -485,16 +485,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (attachmentsListView != null)
                 attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
 
-            if (flag != null)
-                flag.Clicked -= Flag_Clicked;
-            if (fileTo != null)
-                fileTo.Clicked -= FileTo_Clicked;
-            if (replyActions != null)
-                replyActions.Clicked -= ReplyActions_Clicked;
+            if (flagButton != null)
+                flagButton.Clicked -= FlagButton_Clicked;
+            if (fileToButton != null)
+                fileToButton.Clicked -= FileToButton_Clicked;
+            if (replyActionsButton != null)
+                replyActionsButton.Clicked -= ReplyActionsButton_Clicked;
             if (commentsButton != null)
                 commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
-            if (userActions != null)
-                userActions.Clicked -= UserActions_Clicked;
+            if (userActionsButton != null)
+                userActionsButton.Clicked -= UserActionsButton_Clicked;
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
@@ -623,13 +623,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             rightButtons[1] = previousDocumentButtonItem;
             NavigationItem.SetRightBarButtonItems(rightButtons, true);
 
-            flag.Enabled = false;
-            fileTo.Enabled = false;
-            replyActions.Enabled = false;
-            comments.SetBadgeValue("0", false);
-            comments.Enabled = false;
+            flagButton.Enabled = false;
+            fileToButton.Enabled = false;
+            replyActionsButton.Enabled = false;
+            commentsBadgeButton.SetBadgeValue("0", false);
+            commentsBadgeButton.Enabled = false;
             commentsButton.Enabled = false;
-            userActions.Enabled = false;
+            userActionsButton.Enabled = false;
 
             RefreshView();
         }
@@ -692,7 +692,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error($"Downloading document failed [folder.name={folder?.Name}, folder.id={folderId ?? folder?.Id}, documentId={documentId ?? documentPreview?.Id}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
                 if (Modal)
                     DismissViewController(true, null);
@@ -783,13 +783,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
             if (enableBottomActions)
             {
-                flag.Enabled = document != null;
-                fileTo.Enabled = document != null;
-                replyActions.Enabled = document != null;
-                comments.BadgeValue = document?.Comments?.Count.ToString();
-                comments.Enabled = document != null;
+                flagButton.Enabled = document != null;
+                fileToButton.Enabled = document != null;
+                replyActionsButton.Enabled = document != null;
+                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
+                commentsBadgeButton.Enabled = document != null;
                 commentsButton.Enabled = document != null;
-                userActions.Enabled = document != null;
+                userActionsButton.Enabled = document != null;
             }
 
             UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
@@ -848,9 +848,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (string.IsNullOrWhiteSpace(path))
                 {
-                    if (PlatformConfig.Preferences.LargeAttachmentWarning &&
-                        attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
-                        !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                    if (PlatformConfig.Preferences.LargeAttachmentWarning
+                        && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                        && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
                     {
                         dismissAction();
                         return;
@@ -881,7 +881,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         if (!openInSuccessful)
                         {
                             CommonConfig.Logger.Warning($"Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={document.Id}, attachment={attachmentDescription}]");
-                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
                     }
                 }
@@ -891,7 +891,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, attachment.Name={attachmentDescription?.Name}", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {
@@ -922,7 +922,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Toolbar event handlers
 
-        async void Flag_Clicked(object sender, EventArgs e)
+        async void FlagButton_Clicked(object sender, EventArgs e)
         {
             var isRead = documentPreview.IsReadByCurrent;
             var flagListStrings = new string[]
@@ -931,7 +931,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("categories")
             };
 
-            var result = await Dialogs.ShowListDialogAsync(this, flagListStrings, flag);
+            var result = await Dialogs.ShowListActionSheetAsync(this, flagListStrings, flagButton);
 
             if (result < 0)
                 return;
@@ -947,7 +947,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void ReplyActions_Clicked(object sender, EventArgs e)
+        async void ReplyActionsButton_Clicked(object sender, EventArgs e)
         {
             var replyListStrings = new string[]
             {
@@ -956,7 +956,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("forward"),
                 Localization.GetString("copy_to_new")};
 
-            var result = await Dialogs.ShowListDialogAsync(this, replyListStrings, replyActions);
+            var result = await Dialogs.ShowListActionSheetAsync(this, replyListStrings, replyActionsButton);
 
             if (result < 0)
                 return;
@@ -987,7 +987,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Priority.Urgent
             };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
-            var result = await Dialogs.ShowListDialogAsync(this, priorityStrings.ToArray(), barButtonItem);
+            var result = await Dialogs.ShowListActionSheetAsync(this, priorityStrings.ToArray(), barButtonItem);
 
             if (result < 0)
                 return;
@@ -1019,7 +1019,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while setting priority for document [documentId={document.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -1029,7 +1029,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             priorityView.UpdateVisibility();
         }
 
-        void FileTo_Clicked(object sender, EventArgs e)
+        void FileToButton_Clicked(object sender, EventArgs e)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
@@ -1159,7 +1159,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error($"Marking as {(isReadByCurrent ? "unread" : "read")}  failed [documentPreview={documentPreview}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -1172,7 +1172,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        async void UserActions_Clicked(object sender, EventArgs e)
+        async void UserActionsButton_Clicked(object sender, EventArgs e)
         {
             var actionLinksListString = new string[]
             {
@@ -1180,7 +1180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("links")
             };
 
-            var result = await Dialogs.ShowListDialogAsync(this, actionLinksListString, userActions);
+            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, userActionsButton);
 
             if (result < 0)
                 return;
@@ -1234,7 +1234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
                 modes = new[] { Localization.GetString("copy_to_new_addresses"), Localization.GetString("copy_to_new_text") };
 
-            var result = await Dialogs.ShowListDialogAsync(this, modes, replyActions);
+            var result = await Dialogs.ShowListActionSheetAsync(this, modes, replyActionsButton);
             if (result < 0)
                 return;
 
@@ -1275,8 +1275,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void RemoveFromFolder(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_document"));
-
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
                 return;
 
@@ -1300,14 +1300,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while removing document from folder [documentId={document.Id}, folderId={folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
         async void Delete(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_document"));
-
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
                 return;
 
@@ -1334,7 +1334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting document [documentId={document.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -1353,7 +1353,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
+                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
                 }
 
                 return WKNavigationActionPolicy.Cancel;
@@ -1380,7 +1380,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
         {
-            BeginInvokeOnMainThread(() => comments.SetBadgeValue(document.Comments.Count().ToString(), false));
+            BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
         }
 
         void DraftSentHandler(DraftSentMessage message)

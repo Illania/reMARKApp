@@ -314,7 +314,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                     CommonConfig.Logger.Error(ex);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 }
                 else
                 {
@@ -390,7 +390,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                         {
                             CommonConfig.Logger.Warning("Failed to present open in view - there is no app that can open this type of attachment installed");
 
-                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
                     }
                 }
@@ -403,7 +403,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                 dismissAction();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 

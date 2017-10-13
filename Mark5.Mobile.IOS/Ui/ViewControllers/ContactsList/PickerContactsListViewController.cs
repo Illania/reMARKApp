@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 var emailAddresses = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email).Select(ca => ca.Address).ToArray();
                 if (emailAddresses.Any())
                 {
-                    var index = await Dialogs.ShowListDialogAsync(this, emailAddresses, cell);
+                    var index = await Dialogs.ShowListActionSheetAsync(this, emailAddresses, cell);
                     if (index < 0)
                         return;
 
@@ -45,14 +45,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 }
                 else
                 {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
                 }
             }
             catch (Exception ex)
             {
                 dismissAction();
                 CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {

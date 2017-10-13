@@ -337,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 dismissAction();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -407,70 +407,60 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region NavigationBar Event Handlers
 
-        void AttachmentButtonItem_Clicked(object sender, EventArgs e)
+        async void AttachmentButtonItem_Clicked(object sender, EventArgs e)
         {
-            var sourceChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("take_photo"),
-                UIAlertActionStyle.Default,
-                a =>
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("take_photo"), Localization.GetString("existing_photo"), Localization.GetString("browse_files") }, d);
+            if (source < 0)
+                return;
+
+            if (source == 0)
+            {
+                var picker = new UIImagePickerController
                 {
-                    var picker = new UIImagePickerController
-                    {
-                        AllowsEditing = false,
-                        SourceType = UIImagePickerControllerSourceType.Camera,
-                        CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo,
-                        CameraDevice = UIImagePickerControllerCameraDevice.Rear,
-                        Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
-                        ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-                    };
-                    if (picker.PopoverPresentationController != null)
-                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-                    PresentViewController(picker, true, null);
-                }));
-            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("existing_photo"),
-                UIAlertActionStyle.Default,
-                a =>
+                    AllowsEditing = false,
+                    SourceType = UIImagePickerControllerSourceType.Camera,
+                    CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo,
+                    CameraDevice = UIImagePickerControllerCameraDevice.Rear,
+                    Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
+                    ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                };
+                if (picker.PopoverPresentationController != null)
+                    picker.PopoverPresentationController.Delegate = d;
+                PresentViewController(picker, true, null);
+            }
+
+            if (source == 1)
+            {
+                var picker = new UIImagePickerController
                 {
-                    var picker = new UIImagePickerController
-                    {
-                        AllowsEditing = false,
-                        SourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum,
-                        MediaTypes = new[]
-                        {
-                            UTType.Image.ToString()
-                        },
-                        Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
-                        ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-                    };
-                    if (picker.PopoverPresentationController != null)
-                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-                    PresentViewController(picker, true, null);
-                }));
-            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("browse_files"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    var picker = new UIDocumentMenuViewController(new[]
+                    AllowsEditing = false,
+                    SourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum,
+                    MediaTypes = new[] { UTType.Image.ToString() },
+                    Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
+                    ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                };
+                if (picker.PopoverPresentationController != null)
+                    picker.PopoverPresentationController.Delegate = d;
+                PresentViewController(picker, true, null);
+            }
+
+            if (source == 2)
+            {
+                var picker = new UIDocumentMenuViewController(new[]
                         {
                             "public.content",
                             "public.data",
                             "public.msg",
                             "public.eml"
-                        },
-                        UIDocumentPickerMode.Import)
-                    {
-                        Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
-                    };
-                    if (picker.PopoverPresentationController != null)
-                        picker.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-                    PresentViewController(picker, true, null);
-                }));
-            sourceChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
-
-            if (sourceChooser.PopoverPresentationController != null)
-                sourceChooser.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-
-            PresentViewController(sourceChooser, true, null);
+                        }, UIDocumentPickerMode.Import)
+                {
+                    Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
+                };
+                if (picker.PopoverPresentationController != null)
+                    picker.PopoverPresentationController.Delegate = d;
+                PresentViewController(picker, true, null);
+            }
         }
 
         async void HandleAttachmentUrl(NSUrl url)
@@ -490,7 +480,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                 {
-                    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("attachment_too_big")));
+                    await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("attachment_too_big")));
                     return;
                 }
 
@@ -501,7 +491,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
+                await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
             }
             finally
             {
@@ -520,7 +510,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                 {
-                    await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("attachment_too_big")));
+                    await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("attachment_too_big")));
                     return;
                 }
 
@@ -531,7 +521,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 CommonConfig.Logger.Error($"Failed to save image [FileName={filename}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
+                await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
             }
             finally
             {
@@ -544,16 +534,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             await SendDocument(false);
         }
 
-        async void CancelButtonItem_Clicked(object sender, EventArgs e)
+        void CancelButtonItem_Clicked(object sender, EventArgs e)
         {
-            var confirm = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("save_draft"), Localization.GetString("confirm_save_as_draft"));
-            if (confirm)
-                await SendDocument(true);
-            else
-                await SaveAndCloseComposeViewController();
+            var actionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("save_draft"), UIAlertActionStyle.Default, async a => await SendDocument(true)));
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("delete_draft"), UIAlertActionStyle.Destructive, async a => await DiscardAndCloseComposeViewController()));
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            if (actionSheet.PopoverPresentationController != null)
+                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            PresentViewController(actionSheet, true, null);
         }
 
-        async Task SaveAndCloseComposeViewController()
+        async Task DiscardAndCloseComposeViewController()
         {
             autoSaveWorkingCopyWorker?.Stop();
             await autoSaveWorkingCopyWorker?.Finished();
@@ -573,7 +565,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (containsInvalidEmails)
             {
-                var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses"));
+                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses"));
                 if (!result)
                     return;
             }
@@ -621,7 +613,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -697,7 +689,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 Localization.GetString("contact_picker_phonebook"),
             };
 
-            var choice = await Dialogs.ShowListDialogAsync(this, strings, sender as UIView);
+            var choice = await Dialogs.ShowListActionSheetAsync(this, strings, sender as UIView);
 
             switch (choice)
             {
@@ -770,7 +762,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     {
                         if (PlatformConfig.Preferences.LargeAttachmentWarning &&
                             e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
-                            !await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
+                            !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
                         {
                             dismissAction();
                             return;
@@ -808,7 +800,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         {
                             CommonConfig.Logger.Warning($"Failed to present open in view - there is no app that can open this type of attachment installed [documentId={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
 
-                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
                     }
                 }
@@ -818,7 +810,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {
@@ -842,7 +834,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Failed to remove attachment [document.Id={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -945,7 +937,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     Localization.GetString("template_selection_local"),
                     Localization.GetString("template_selection_another")
                 };
-                var result = await Dialogs.ShowListDialogAsync(this, templateListStrings, contentView);
+                var result = await Dialogs.ShowListActionSheetAsync(this, templateListStrings, contentView);
                 switch (result)
                 {
                     case -1:
@@ -1001,7 +993,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error($"Error while getting default template [PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {
@@ -1024,7 +1016,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error($"Error while getting template [templatePreview.Id={templatePreview?.Id}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}] ", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {
@@ -1135,7 +1127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     var vc = viewControllerWeakReference.Unwrap();
                     if (vc != null)
-                        Dialogs.ShowErrorDialog(vc, ex);
+                        Dialogs.ShowErrorAlert(vc, ex);
 
                     picker.DismissViewController(true, null);
                 }

@@ -332,7 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async void CreateContactItem_Clicked(object sender, EventArgs e)
         {
-            var choice = await Dialogs.ShowListDialogAsync(this,
+            var choice = await Dialogs.ShowListActionSheetAsync(this,
                                                            new[] { Localization.GetString("add_company"), Localization.GetString("add_department"), Localization.GetString("add_person") },
                                                            CreateContactItem);
             if (choice < 0)
@@ -380,7 +380,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     CommonConfig.Logger.Error("Could not save favorite folders order", ex);
 
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
 
                 if (searchController != null)
@@ -471,7 +471,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error($"Could not refresh folders [parentFolder={ParentFolder}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
                 if (!IsRootOfFoldersList)
                     NavigationController?.PopViewController(true);
@@ -502,7 +502,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error($"Could not refresh favorites [parentFolder={ParentFolder}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
                 if (!IsRootOfFoldersList)
                     NavigationController?.PopViewController(true);
@@ -612,7 +612,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error("Could not add folder to favorites", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -648,7 +648,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error("Could not remote folder from favorites", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -685,7 +685,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error("Could not enable notifications for folder", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -719,7 +719,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error("Could not disable notifications for folder", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -749,7 +749,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error("Could not enabled sync for folder", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -779,7 +779,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.Logger.Error("Could not disable sync for folder", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 

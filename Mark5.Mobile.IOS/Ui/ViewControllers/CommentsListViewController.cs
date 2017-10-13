@@ -301,7 +301,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={Entity?.Id}, commentContent={newCommentContent}] ", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {
@@ -332,7 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (t.IsFaulted)
                 {
                     CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                    await Dialogs.ShowErrorDialogAsync(this, t.Exception.InnerException);
+                    await Dialogs.ShowErrorAlertAsync(this, t.Exception.InnerException);
                 }
                 else
                     ((DataSource)tableView.Source).RemoveComment(comment);

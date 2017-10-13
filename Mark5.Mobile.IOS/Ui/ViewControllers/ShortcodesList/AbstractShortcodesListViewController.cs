@@ -261,6 +261,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 return;
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             var rows = TableView.IndexPathsForSelectedRows.ToArray();
             var selectedShortcodes = rows.Select(ip => ((DataSource)TableView.Source).FindItemAtIndexPath(ip)).ToList();
@@ -291,15 +292,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcodes)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcodes, d)));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => ExitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                eas.PopoverPresentationController.Delegate = d;
 
             ExitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -321,7 +322,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
             {
-                var result = await Dialogs.ShowYesNoCancelDialogAsync(this,
+                var result = await Dialogs.ShowYesNoCancelAlertAsync(this,
                                                                       Localization.GetString("folder_offline_title"),
                                                                       Localization.GetString("folder_offline_message"),
                                                                       Localization.GetString("folder_offline_go_online"),
@@ -383,7 +384,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                     CommonConfig.Logger.Error($"Could not refresh shortcodes [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
 
                     NavigationController?.PopViewController(true);
                 },
@@ -420,6 +421,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         void ShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
@@ -439,26 +441,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcode)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcode, d)));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => EndEditing()));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
+                eas.PopoverPresentationController.Delegate = d;
 
             PresentViewController(eas, true, null);
         }
 
-        void RemoveFromFolder(ShortcodePreview selectedShortcode) =>
-            RemoveFromFolder(new List<ShortcodePreview> { selectedShortcode });
+        void RemoveFromFolder(ShortcodePreview selectedShortcode, UIPopoverPresentationControllerDelegate d) =>
+            RemoveFromFolder(new List<ShortcodePreview> { selectedShortcode }, d);
 
-        async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes)
+        async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcodes"));
-
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
             {
                 EndEditing();
@@ -484,17 +485,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while removing shortcodes from folder [folderId={Folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
-        void Delete(ShortcodePreview selectedShortcode) =>
-            Delete(new List<ShortcodePreview> { selectedShortcode });
+        void Delete(ShortcodePreview selectedShortcode, UIPopoverPresentationControllerDelegate d) =>
+            Delete(new List<ShortcodePreview> { selectedShortcode }, d);
 
-        async void Delete(List<ShortcodePreview> selectedShortcodes)
+        async void Delete(List<ShortcodePreview> selectedShortcodes, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcodes"));
-
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
             {
                 EndEditing();
@@ -520,7 +520,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting shortcodes", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 

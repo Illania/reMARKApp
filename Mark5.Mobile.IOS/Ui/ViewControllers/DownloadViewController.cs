@@ -551,7 +551,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
-                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("youre_offline_title"), Localization.GetString("youre_offline_message"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("youre_offline_title"), Localization.GetString("youre_offline_message"));
                 return;
             }
 
@@ -677,7 +677,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var hapticGenerator = new UINotificationFeedbackGenerator();
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 });
             }
 
@@ -707,14 +707,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
+            await Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
         }
 
         async void CancelButton_TouchUpInside(object sender, EventArgs e)
         {
             ((UIButton)sender).Enabled = false;
 
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("download_interrupt_warning"));
+            var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("download_interrupt_warning"));
             if (result)
                 cts?.Cancel();
             else

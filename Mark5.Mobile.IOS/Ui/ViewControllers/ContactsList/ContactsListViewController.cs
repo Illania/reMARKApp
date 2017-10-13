@@ -57,7 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         async void CreateContactItem_Clicked(object sender, EventArgs e)
         {
-            var choice = await Dialogs.ShowListDialogAsync(this,
+            var choice = await Dialogs.ShowListActionSheetAsync(this,
                                                            new[] {Localization.GetString("add_company"), Localization.GetString("add_department"), Localization.GetString("add_person") },
                                                            CreateContactItem);
             if (choice < 0)

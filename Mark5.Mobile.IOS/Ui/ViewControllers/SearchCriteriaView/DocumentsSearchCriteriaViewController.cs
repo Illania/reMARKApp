@@ -1123,7 +1123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     var data = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.ToArray();
                     var preselected = data.Where(l => Criteria.LineGuids.Contains(l.Guid)).ToArray();
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewControllerWeakReference.Unwrap(),
+                    var result = await Dialogs.ShowMultiSelectViewControllerAsync(parentViewControllerWeakReference.Unwrap(),
                                                                           Localization.GetString("search_lines"),
                                                                           data,
                                                                           preselected,
@@ -1176,7 +1176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         }
                     };
 
-                    var result = await Dialogs.ShowMultiSelectDialogAsync(parentViewControllerWeakReference.Unwrap(),
+                    var result = await Dialogs.ShowMultiSelectViewControllerAsync(parentViewControllerWeakReference.Unwrap(),
                                                                           Localization.GetString("priority"),
                                                                           data,
                                                                           preselected,

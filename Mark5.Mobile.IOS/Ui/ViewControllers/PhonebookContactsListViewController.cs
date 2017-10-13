@@ -166,14 +166,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ex = t.Exception.InnerException;
                     CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                     tcs.SetResult(null);
                     return;
                 }
 
                 if (t.Result == null)
                 {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
                                                          Localization.GetString("phonebook_contacts_no_access_content"));
                     tcs.SetResult(null);
                 }

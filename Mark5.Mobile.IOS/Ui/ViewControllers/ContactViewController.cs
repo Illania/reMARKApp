@@ -472,7 +472,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, formattedNumbers, (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, formattedNumbers, (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
@@ -500,7 +500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
@@ -521,7 +521,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 && contactPreview.Type == ContactType.Company)
                 listString.Add(Localization.GetString("add_department"));
 
-            var index = await Dialogs.ShowListDialogAsync(this, listString.ToArray(), editButtonItem);
+            var index = await Dialogs.ShowListActionSheetAsync(this, listString.ToArray(), editButtonItem);
             if (index < 0)
                 return;
 
@@ -614,7 +614,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("links")
             };
 
-            var result = await Dialogs.ShowListDialogAsync(this, actionLinksListString, actionsLinksButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, actionsLinksButton);
             if (result < 0)
                 return;
 
@@ -828,7 +828,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ds.Clear();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
                 if (SplitViewController == null)
                     NavigationController.PopViewController(true);
@@ -882,7 +882,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void RemoveFromFolder(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contact"));
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
                 return;
 
@@ -908,14 +909,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while removing contact from folder [contactId={contact.Id}, folderId={folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
         async void Delete(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contact"));
-
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
                 return;
 
@@ -939,7 +940,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting contact [contactId={contact.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 

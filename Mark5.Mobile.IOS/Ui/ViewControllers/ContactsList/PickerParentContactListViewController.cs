@@ -31,13 +31,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             {
                 var content = ChildrenType == ContactType.Person ? Localization.GetString("parent_contact_selector_invalid_person_content") : Localization.GetString("parent_contact_selector_invalid_department_content");
 
-                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_person_title"), content);
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("parent_contact_selector_invalid_person_title"), content);
             }
             else if (contactPreview.Type == ContactType.Department)
             {
                 if (ChildrenType == ContactType.Department)
                 {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_department_title"), Localization.GetString("parent_contact_selector_invalid_department_content"));
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("parent_contact_selector_invalid_department_title"), Localization.GetString("parent_contact_selector_invalid_department_content"));
                 }
 
                 selectedContactPreview = contactPreview;
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                             choices.AddRange(deparments);
                             var strings = choices.Select(DisplayText).ToArray();
 
-                            var index = await Dialogs.ShowListDialogAsync(this, strings, tableView.CellAt(indexPath));
+                            var index = await Dialogs.ShowListActionSheetAsync(this, strings, tableView.CellAt(indexPath));
                             if (index >= 0)
                                 selectedContactPreview = choices[index];
                         }
@@ -76,7 +76,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     {
                         dismissAction();
                         CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
-                        await Dialogs.ShowErrorDialogAsync(this, ex);
+                        await Dialogs.ShowErrorAlertAsync(this, ex);
                     }
                 }
             }

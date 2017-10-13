@@ -119,7 +119,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async Task CopyBusinessEntityToFolder(Folder folder)
         {
-            var confirmed = await Dialogs.ShowListDialogAsync(this, new [] {Localization.GetString("copy")}, View);
+            var confirmed = await Dialogs.ShowListActionSheetAsync(this, new [] {Localization.GetString("copy")}, View);
             if (confirmed < 0)
                 return;
 
@@ -136,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {
@@ -146,7 +146,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async Task MoveBusinessEntityToFolder(Folder folder)
         {
-            var confirmed = await Dialogs.ShowListDialogAsync(this, new[] { Localization.GetString("move") }, View);
+            var confirmed = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("move") }, View);
             if (confirmed < 0)
                 return;
 
@@ -163,7 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.Logger.Error($"Error while moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {

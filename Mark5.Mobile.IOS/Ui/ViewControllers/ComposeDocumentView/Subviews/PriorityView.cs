@@ -120,7 +120,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (!weakViewController.TryGetTarget(out UIViewController viewController))
                 return;
 
-            var result = await Dialogs.ShowListDialogAsync(viewController, priorityStrings, selectedPriorityLabel);
+            var result = await Dialogs.ShowListActionSheetAsync(viewController, priorityStrings, selectedPriorityLabel);
             switch (result)
             {
                 case 0:
