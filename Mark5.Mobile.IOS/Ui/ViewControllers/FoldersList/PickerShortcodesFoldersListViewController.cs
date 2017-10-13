@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList;
@@ -24,37 +25,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
         }
 
-        protected async override void FolderSelected(Folder folder)
+        public override void Recycle()
         {
-            var vc = new PickerShortcodesListViewController
-            {
-                Folder = folder,
-            };
-            NavigationController.PushViewController(vc, true);
+            base.Recycle();
 
-            var result = await vc.Result;
-            if (result != null)
-                tcs.SetResult(result);
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         protected override void InitializeNavigationBar()
         {
             if (IsRootOfFoldersList)
-                switch (ParentFolder.Module)
-                {
-                    case ModuleType.Documents:
-                        NavigationItem.Title = Localization.GetString("documents");
-                        break;
-                    case ModuleType.Contacts:
-                        NavigationItem.Title = Localization.GetString("contacts");
-                        break;
-                    case ModuleType.Shortcodes:
-                        NavigationItem.Title = Localization.GetString("shortcodes");
-                        break;
-                    default:
-                        NavigationItem.Title = " ";
-                        break;
-                }
+                NavigationItem.Title = Localization.GetString("shortcodes");
             else
                 NavigationItem.Title = ParentFolder.Name;
 
@@ -84,9 +74,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 cancelItem.Clicked -= CancelItem_Clicked;
         }
 
-        void CancelItem_Clicked(object sender, EventArgs e)
+        void CancelItem_Clicked(object sender, EventArgs e) => tcs.SetResult(null);
+
+        protected async override void FolderSelected(Folder folder)
         {
-            tcs.SetResult(null);
+            var vc = new PickerShortcodesListViewController
+            {
+                Folder = folder,
+            };
+            NavigationController.PushViewController(vc, true);
+
+            var result = await vc.Result;
+            if (result != null)
+                tcs.SetResult(result);
         }
 
         protected override async void FolderExpand(Folder folder)

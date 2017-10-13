@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList;
@@ -13,8 +14,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public Task<ContactPreview> Result => tcs.Task;
 
         readonly ContactType childrenType;
-        
-        UIBarButtonItem cancelModeItem;
+
+        UIBarButtonItem cancelItem;
 
         public PickerParentContactFoldersListView(ContactType type)
             : base(ModuleType.Contacts, true, true, true)
@@ -28,6 +29,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             childrenType = type;
         }
 
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
+        protected override void InitializeNavigationBar()
+        {
+            if (IsRootOfFoldersList)
+                NavigationItem.Title = Localization.GetString("contacts");
+            else
+                NavigationItem.Title = ParentFolder.Name;
+
+            if (IsRootOfFoldersList)
+            {
+                cancelItem = new UIBarButtonItem
+                {
+                    Title = Localization.GetString("cancel")
+                };
+                NavigationItem.SetLeftBarButtonItem(cancelItem, false);
+            }
+        }
+
+        protected override void InitializeHandlers()
+        {
+            base.InitializeHandlers();
+
+            if (cancelItem != null)
+                cancelItem.Clicked += CancelItem_Clicked;
+        }
+
+        protected override void DeinitializeHandlers()
+        {
+            base.DeinitializeHandlers();
+
+            if (cancelItem != null)
+                cancelItem.Clicked -= CancelItem_Clicked;
+        }
+
+        void CancelItem_Clicked(object sender, EventArgs e) => tcs.SetResult(null);
+
         protected async override void FolderSelected(Folder folder)
         {
             var vc = new PickerParentContactListViewController()
@@ -40,56 +92,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
-        }
-
-        protected override void InitializeNavigationBar()
-        {
-            if (IsRootOfFoldersList)
-                switch (ParentFolder.Module)
-                {
-                    case ModuleType.Documents:
-                        NavigationItem.Title = Localization.GetString("documents");
-                        break;
-                    case ModuleType.Contacts:
-                        NavigationItem.Title = Localization.GetString("contacts");
-                        break;
-                    case ModuleType.Shortcodes:
-                        NavigationItem.Title = Localization.GetString("shortcodes");
-                        break;
-                    default:
-                        NavigationItem.Title = " ";
-                        break;
-                }
-            else
-                NavigationItem.Title = ParentFolder.Name;
-            
-            if (IsRootOfFoldersList)
-            {
-                cancelModeItem = new UIBarButtonItem();
-                cancelModeItem.Title = Localization.GetString("cancel");
-                NavigationItem.SetLeftBarButtonItem(cancelModeItem, false);
-            }
-        }
-
-        protected override void InitializeHandlers()
-        {
-            base.InitializeHandlers();
-
-            if (cancelModeItem != null)
-                cancelModeItem.Clicked += CancelModeItem_Clicked;
-        }
-
-        protected override void DeinitializeHandlers()
-        {
-            base.DeinitializeHandlers();
-
-            if (cancelModeItem != null)
-                cancelModeItem.Clicked -= CancelModeItem_Clicked;
-        }
-
-        void CancelModeItem_Clicked(object sender, EventArgs e)
-        {
-            tcs.SetResult(null);
         }
 
         protected override async void FolderExpand(Folder folder)
