@@ -850,7 +850,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     if (PlatformConfig.Preferences.LargeAttachmentWarning
                         && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                        && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                        && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
                     {
                         dismissAction();
                         return;
