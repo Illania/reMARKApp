@@ -1,46 +1,65 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class ContactInfoTableViewCell : UITableViewCell
+    public class ContactInfoTableViewCell : UITableViewCell
     {
-        public static readonly NSString Key = new NSString("ContactInfoTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("ContactInfoTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString DefaultId = new NSString(nameof(ContactInfoTableViewCell));
 
-        protected ContactInfoTableViewCell(IntPtr handle)
-            : base(handle)
+        readonly UILabel topLabel;
+        readonly UITextView bottomTextView;
+
+        public ContactInfoTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-        }
+            topLabel = new UILabel
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                TextColor = Theme.DarkGray,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
 
-        public static ContactInfoTableViewCell Create()
-        {
-            var cell = (ContactInfoTableViewCell) Nib.Instantiate(null, null)[0];
-            cell.TypeLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-3f);
-            cell.InfoTextView.Font = Theme.DefaultFont;
-            cell.InfoTextView.Editable = false;
-            cell.InfoTextView.TextContainerInset = UIEdgeInsets.Zero;
-            cell.InfoTextView.TextContainer.LineFragmentPadding = 0;
+            bottomTextView = new UITextView
+            {
+                Editable = false,
+                ScrollEnabled = false,
+                ClipsToBounds = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            bottomTextView.TextContainer.LineFragmentPadding = 0f;
 
-            return cell;
+            ContentView.Add(topLabel);
+            ContentView.Add(bottomTextView);
+
+            ContentView.AddConstraints(new[]
+            {
+                topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                topLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
+                topLabel.HeightAnchor.ConstraintEqualTo(22f),
+
+                bottomTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                bottomTextView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                bottomTextView.TopAnchor.ConstraintEqualTo(topLabel.BottomAnchor, 4f),
+                bottomTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
+            });
         }
 
         public void Initialize(string type, string info, bool enableDataDetection = false)
         {
-            TypeLabel.Text = type;
-            InfoTextView.Text = info;
-
-            if (enableDataDetection)
-                InfoTextView.DataDetectorTypes = UIDataDetectorType.All;
+            Initialize(type, new NSAttributedString(info, new UIStringAttributes { Font = Theme.DefaultFont }), enableDataDetection);
         }
 
-        public void Initialize(string type, NSAttributedString info)
+        public void Initialize(string type, NSAttributedString info, bool dataDetection = false)
         {
-            TypeLabel.Text = type.ToUpper();
-            InfoTextView.AttributedText = info;
+            topLabel.Text = type.ToUpper();
+            bottomTextView.AttributedText = info;
+            bottomTextView.DataDetectorTypes = dataDetection ? UIDataDetectorType.All : UIDataDetectorType.None;
         }
     }
 }

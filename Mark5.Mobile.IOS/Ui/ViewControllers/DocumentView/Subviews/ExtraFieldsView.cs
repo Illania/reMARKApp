@@ -12,11 +12,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         public ExtraFieldsView()
         {
-            InitializeView();
-        }
-
-        void InitializeView()
-        {
             stackView = new UIStackView
             {
                 Opaque = false,
@@ -36,16 +31,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             });
         }
 
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                stackView?.RemoveFromSuperview();
+                foreach (var v in stackView.ArrangedSubviews)
+                    v.RemoveFromSuperview();
+                stackView = null;
+            }
+        }
+
         public override void RefreshView()
         {
             if (Document == null)
                 return;
 
-            stackView.ArrangedSubviews.ForEach(v =>
-            {
-                stackView.RemoveArrangedSubview(v);
-                v.RemoveFromSuperview();
-            });
+            stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
 
             foreach (var efi in Document.ExtraFields)
             {

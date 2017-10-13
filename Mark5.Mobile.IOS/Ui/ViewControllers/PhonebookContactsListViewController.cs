@@ -7,38 +7,30 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
+using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class PhonebookContactsListViewController : AbstractViewController, IUISearchResultsUpdating
+    public class PhonebookContactsListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
         readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
+        public Task<Recipient> Result => tcs.Task;
 
-        public Task<Recipient> ReturnTask => tcs.Task;
+        UIBarButtonItem exitItem;
 
-        UIBarButtonItem exitEditItem;
-        UITableView tableView;
-
-        UITableViewController searchResultsController;
-        DataSource searchResultsDataSource;
         UISearchController searchController;
-
-        CancellationTokenSource cts;
-
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
-
-        #region UIViewControllerOverrides
 
         public override void LoadView()
         {
             base.LoadView();
 
             InitializeNavigationBar();
-            InitializeNavigationBarTitle();
             InitializeView();
             InitializeSearchBar();
         }
@@ -47,6 +39,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
             InitializeHandlers();
         }
 
@@ -54,11 +50,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(PhonebookContactsListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource) tableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 RefreshData();
+
+            NSOperationQueue.MainQueue.AddOperation(() =>
+            {
+                var ni = NavigationItem;
+
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
+
+                if (ni.SearchController == null)
+                    ni.SearchController = searchController;
+            });
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -67,69 +73,65 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             DeinitializeHandlers();
 
-            cts?.Cancel();
+            if (searchController != null && searchController.Active)
+                searchController.Active = false;
         }
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(PhonebookContactsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
-        #endregion
+        public override void Recycle()
+        {
+            base.Recycle();
 
-        #region Initialization
+            exitItem = null;
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            searchController.SearchResultsUpdater = null;
+            searchController = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
 
         void InitializeNavigationBar()
         {
-            exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
-            NavigationItem.SetLeftBarButtonItem(exitEditItem, true);
+            NavigationItem.Title = Localization.GetString("phonebook_contacts_title");
+
+            exitItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            NavigationItem.SetLeftBarButtonItem(exitItem, true);
         }
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView();
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("phonebook_contacts_empty"));
-            tableView.AllowsSelectionDuringEditing = false;
-            tableView.AllowsMultipleSelectionDuringEditing = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            tableView.EstimatedRowHeight = 44f;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            UIView.AnimationsEnabled = false;
-            NavigationItem.Title = Localization.GetString("phonebook_contacts_title");
-            NavigationItem.Prompt = null;
-            UIView.AnimationsEnabled = true;
+            TableView.Source = new DataSource(this, TableView, Localization.GetString("phonebook_contacts_empty"));
         }
 
         void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
 
-            searchResultsController = new UITableViewController();
-            searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_phonebook_matching"));
+            var searchResultsController = new UITableViewController();
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_phonebook_matching"));
             searchResultsController.TableView.Source = searchResultsDataSource;
-            searchResultsController.TableView.EstimatedRowHeight = 44f;
-            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
             searchController = new UISearchController(searchResultsController)
             {
@@ -139,87 +141,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SearchResultsUpdater = this
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
-
-            tableView.TableHeaderView = searchController.SearchBar;
         }
 
         void InitializeHandlers()
         {
-            if (exitEditItem != null)
-                exitEditItem.Clicked += ExitEditItem_Clicked;
+            if (exitItem != null)
+                exitItem.Clicked += ExitItem_Clicked;
         }
 
         void DeinitializeHandlers()
         {
-            if (exitEditItem != null)
-                exitEditItem.Clicked -= ExitEditItem_Clicked;
+            if (exitItem != null)
+                exitItem.Clicked -= ExitItem_Clicked;
         }
-
-        #endregion
-
-        #region Refreshing
 
         void RefreshData()
         {
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
-            List<Recipient> contacts = null;
-
             Task.Run(() =>
-              {
-                  contacts = CommonConfig.Phonebook.GetPhonebookContacts();
-              }).ContinueWith(t =>
-           {
-               InvokeOnMainThread(async () =>
-               {
-                   if (t.IsFaulted)
-                   {
-                       var ex = t.Exception.InnerException;
-                       CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
-                       await Dialogs.ShowErrorDialogAsync(this, ex);
-                       tcs.SetResult(null);
-                   }
+            {
+                return CommonConfig.Phonebook.GetPhonebookContacts();
+            }).ContinueWith(async t =>
+            {
+                if (t.IsFaulted)
+                {
+                    var ex = t.Exception.InnerException;
+                    CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
+                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    tcs.SetResult(null);
+                    return;
+                }
 
-                   if (contacts == null)
-                   {
-                       await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
-                                                            Localization.GetString("phonebook_contacts_no_access_content"));
-                       tcs.SetResult(null);
-                   }
-                   else
-                   {
-                       var ds = (DataSource) tableView.Source;
-                       ds.SetItems(contacts.OrderBy(c => c.Name).ToList());
-                   }
-               });
-
-           });
+                if (t.Result == null)
+                {
+                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
+                                                         Localization.GetString("phonebook_contacts_no_access_content"));
+                    tcs.SetResult(null);
+                }
+                else
+                    ((DataSource)TableView.Source).SetItems(t.Result.OrderBy(c => c.Name).ToList());
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        #endregion
+        void ExitItem_Clicked(object sender, EventArgs e) => tcs.SetResult(null);
 
-        #region Actions
+        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell) => tcs.SetResult(pb);
 
-        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell)
-        {
-            tcs.SetResult(pb);
-        }
-
-        #endregion
-
-        #region Event Handlers
-
-        void ExitEditItem_Clicked(object sender, EventArgs e)
-        {
-            tcs.SetResult(null);
-        }
-
-        #endregion
-
-        #region Filter
-
-        public void UpdateSearchResultsForSearchController(UISearchController searchController)
+        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {
             var searchText = searchController.SearchBar.Text;
 
@@ -227,7 +194,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
-                searchResultsDataSource.Reset();
+
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
+                ((DataSource)dataSource)?.Reset();
             }
             else
             {
@@ -247,20 +216,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void DoSearchContacts(string searchText, CancellationToken ct)
         {
-            searchResultsDataSource.Reset();
+            var tableViewController = searchController?.SearchResultsController as UITableViewController;
+            var dataSource = tableViewController?.TableView?.Source as DataSource;
+            dataSource?.Reset();
 
             await Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
 
-            var ds = (DataSource) tableView.Source;
+            var ds = (DataSource)TableView.Source;
             var filteredContacts = ds.Items.Where(cp => MatchesQuery(cp, searchText)).ToList();
 
             if (ct.IsCancellationRequested)
                 return;
 
-            searchResultsDataSource.SetItems(filteredContacts);
+            dataSource?.SetItems(filteredContacts);
         }
 
         static bool MatchesQuery(Recipient cp, string query)
@@ -274,47 +245,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return false;
         }
 
-        #endregion
-
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
-            public bool Empty => !phonebookContactsInView.SelectMany(v => v).Any();
+            public bool Empty => !items.SelectMany(v => v).Any();
+            public List<Recipient> Items => items.SelectMany(v => v).ToList();
 
-            public List<Recipient> Items => phonebookContactsInView.SelectMany(v => v).ToList();
-
-            PhonebookContactsListViewController viewController;
-            UITableView tableView;
+            readonly WeakReference<PhonebookContactsListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
             readonly string emptyText;
 
-            List<List<Recipient>> phonebookContactsInView = new List<List<Recipient>>(25);
-
             bool loading = true;
+            readonly List<List<Recipient>> items = new List<List<Recipient>>();
 
             public DataSource(PhonebookContactsListViewController viewController, UITableView tableView, string emptyText)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
                 this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
                 if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
-                var ra = phonebookContactsInView[indexPath.Section][indexPath.Row];
+                var pbc = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
-                cell.Initialize(ra);
-
-                return cell;
+                if (string.IsNullOrWhiteSpace(pbc.Name))
+                {
+                    var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
+                    cell.TextLabel.Text = pbc.Address;
+                    return cell;
+                }
+                else
+                {
+                    var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
+                    cell.TextLabel.Text = pbc.Name;
+                    cell.DetailTextLabel.Text = pbc.Address;
+                    return cell;
+                }
             }
 
             public override nint NumberOfSections(UITableView tableView)
@@ -322,7 +298,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return phonebookContactsInView.Count;
+                return items.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -330,53 +306,51 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return phonebookContactsInView[(int) section].Count;
-            }
-
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return false;
+                return items[(int)section].Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.Editing)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                var ra = phonebookContactsInView[indexPath.Section][indexPath.Row];
-                viewController.PhonebookAddressSelected(ra, tableView.CellAt(indexPath));
+                var ra = items[indexPath.Section][indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.PhonebookAddressSelected(ra, tableView.CellAt(indexPath));
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView)
-            {
-                return phonebookContactsInView.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper()).ToArray();
-            }
+            public override string[] SectionIndexTitles(UITableView tableView) => items.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper())
+                                                                                                         .ToArray();
 
             public void SetItems(List<Recipient> phonebookContacts)
             {
                 loading = false;
 
-                phonebookContactsInView = phonebookContacts.GroupBy(cp => cp.Name.SafeSubstring(0, 1)).Select(s => s.ToList()).ToList();
-                tableView.ReloadData();
+                var sectionsCount = phonebookContacts.Count;
+
+                items.Clear();
+                items.AddRange(phonebookContacts.GroupBy(cp => cp.Name.SafeSubstring(0, 1)).Select(s => s.ToList()));
+
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                if (sectionsCount > 1)
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public void Reset()
             {
                 loading = true;
 
-                var count = phonebookContactsInView.Count;
+                var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
-                phonebookContactsInView.Clear();
-                tableView.ReloadData();
-            }
+                items.Clear();
 
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                phonebookContactsInView = null;
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                if (sectionsCount > 1)
+                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
         }
     }

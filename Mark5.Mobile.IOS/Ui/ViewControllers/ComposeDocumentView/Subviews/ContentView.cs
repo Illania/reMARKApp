@@ -155,7 +155,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(separatorBeforeExpand, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
             });
 
-            expandButton = UIButton.FromType(UIButtonType.System);
+            expandButton = new UIButton();
             expandButton.SetTitle(Localization.GetString("show_original_message"), UIControlState.Normal);
             expandButton.TranslatesAutoresizingMaskIntoConstraints = false;
             expandButton.TitleLabel.Font = Theme.DefaultFont;

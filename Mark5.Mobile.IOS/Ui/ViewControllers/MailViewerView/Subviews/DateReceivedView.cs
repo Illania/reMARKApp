@@ -8,16 +8,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class DateReceivedView : MailViewerSubview
     {
-        readonly UITextView textView;
+        UILabel label;
+        UITextView textView;
 
         public DateReceivedView()
         {
-            var label = new UILabel();
-            label.Text = Localization.GetString("date") + ":";
-            label.Font = Theme.DefaultFont;
-            label.TextColor = UIColor.LightGray;
-            label.Opaque = false;
-            label.TranslatesAutoresizingMaskIntoConstraints = false;
+            label = new UILabel
+            {
+                Text = Localization.GetString("date") + ":",
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkGray,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -28,18 +30,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
             });
 
-            textView = new UITextView();
-            textView.Font = Theme.DefaultFont;
-            textView.Editable = false;
-            textView.Opaque = false;
-            textView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            textView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            textView.SpellCheckingType = UITextSpellCheckingType.Yes;
+            textView = new UITextView
+            {
+                Font = Theme.DefaultFont,
+                Editable = false,
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                SpellCheckingType = UITextSpellCheckingType.Yes,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             textView.TextContainer.LineFragmentPadding = 0f;
-            textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.ClipsToBounds = false;
-            textView.ScrollEnabled = false;
-            textView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
             {
@@ -48,6 +51,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
             });
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                label?.RemoveFromSuperview();
+                label = null;
+
+                textView?.RemoveFromSuperview();
+                textView = null;
+            }
         }
 
         public override void RefreshView()

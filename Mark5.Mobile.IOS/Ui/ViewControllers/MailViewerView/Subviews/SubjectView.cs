@@ -6,22 +6,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class SubjectView : MailViewerSubview
     {
-        readonly UITextView textView;
+        UITextView textView;
 
         public SubjectView()
         {
-            textView = new UITextView();
-            textView.Font = Theme.DefaultFont.WithRelativeSize(4f);
-            textView.Editable = false;
-            textView.Opaque = false;
-            textView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            textView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            textView.SpellCheckingType = UITextSpellCheckingType.Yes;
+            textView = new UITextView
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(4f),
+                Editable = false,
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                SpellCheckingType = UITextSpellCheckingType.Yes,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             textView.TextContainer.LineFragmentPadding = 0f;
-            textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.ClipsToBounds = false;
-            textView.ScrollEnabled = false;
-            textView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
             {
@@ -30,6 +31,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
             });
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                textView?.RemoveFromSuperview();
+                textView = null;
+            }
         }
 
         public override void RefreshView()

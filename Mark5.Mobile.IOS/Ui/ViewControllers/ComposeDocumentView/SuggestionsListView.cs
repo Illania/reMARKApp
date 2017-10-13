@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -53,12 +53,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitializeSuggestionsView()
         {
-            BackgroundColor = UIColor.White;
+            BackgroundColor = Theme.White;
 
             spaceView = new UIView
             {
                 Opaque = false,
-                BackgroundColor = UIColor.Clear,
+                BackgroundColor = Theme.Clear,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
@@ -107,8 +107,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsTableView = new UITableView
             {
                 BackgroundColor = Theme.Gray,
-                RowHeight = UITableView.AutomaticDimension,
-                EstimatedRowHeight = 44f,
                 TableFooterView = new UIView(CGRect.Empty),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -250,7 +248,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             public bool Empty => !Suggestions.Any();
 
             public bool Searching { get; set; }
-
             public bool Loading => answersReceived < 3 && Searching;
 
             int answersReceived;
@@ -272,25 +269,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 if (Loading && indexPath.Row == Suggestions.Count)
                 {
-                    var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) ?? WaitTableViewCell.Create();
-                    waitingCell.BackgroundColor = UIColor.Clear;
+                    var waitingCell = tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) ?? new WaitTableViewCell();
+                    waitingCell.BackgroundColor = Theme.Clear;
                     return waitingCell;
                 }
 
                 if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(Localization.GetString("no_suggestions_available"));
-                    emptyCell.BackgroundColor = UIColor.Clear;
+                    emptyCell.BackgroundColor = Theme.Clear;
                     return emptyCell;
                 }
 
-                var printableSuggestion = Suggestions[indexPath.Row];
+                var s = Suggestions[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
-                cell.Initialize(printableSuggestion);
-
-                return cell;
+                if (string.IsNullOrWhiteSpace(s.Name))
+                {
+                    var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
+                    cell.TextLabel.Text = s.Address;
+                    return cell;
+                }
+                else
+                {
+                    var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
+                    cell.TextLabel.Text = s.Name;
+                    cell.DetailTextLabel.Text = s.Address;
+                    return cell;
+                }
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -304,7 +310,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (Empty)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var printableSuggestion = Suggestions[indexPath.Row];

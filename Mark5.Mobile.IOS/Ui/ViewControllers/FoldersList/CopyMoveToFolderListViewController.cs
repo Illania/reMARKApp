@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         UIBarButtonItem cancelModeItem;
 
         public CopyMoveToFolderListViewController(List<IBusinessEntity> businessEntities, Folder fromFolder = null)
-            : base(businessEntities.FirstOrDefault().ModuleType, true, true, true)
+            : base(fromFolder.Module, true, true, true)
         {
             this.businessEntities = businessEntities;
             this.fromFolder = fromFolder;
@@ -32,9 +32,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             this.fromFolder = fromFolder;
         }
 
-        protected override void InitializeNavigationBarTitle()
+        protected override void InitializeNavigationBar()
         {
-            Func<string> getTitle = () =>
+            string GetTitle()
             {
                 switch (ParentFolder.Module)
                 {
@@ -51,22 +51,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             };
 
-            UIView.AnimationsEnabled = false;
             if (IsRootOfFoldersList)
             {
-                NavigationItem.Title = fromFolder == null ? Localization.GetString("copy_to_folder") : Localization.GetString("move_to_folder");
-                NavigationItem.Prompt = getTitle();
+                NavigationItem.Title = GetTitle();
+                NavigationItem.Prompt = fromFolder == null ? Localization.GetString("copy_to_folder") : Localization.GetString("move_to_folder");
             }
             else
             {
-                NavigationItem.Title = ParentFolder.Name;
-                NavigationItem.Prompt = getTitle();
+                NavigationItem.Title = GetTitle();
+                NavigationItem.Prompt = ParentFolder.Name;
             }
-            UIView.AnimationsEnabled = true;
-        }
 
-        protected override void InitializeNavigationBar()
-        {
             if (IsRootOfFoldersList)
             {
                 cancelModeItem = new UIBarButtonItem();

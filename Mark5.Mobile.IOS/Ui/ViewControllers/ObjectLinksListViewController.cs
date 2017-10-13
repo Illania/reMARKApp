@@ -1,26 +1,26 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ObjectLinksListViewController : AbstractViewController
+    public class ObjectLinksListViewController : AbstractTableViewController
     {
         readonly IBusinessEntity businessEntity;
 
         UIBarButtonItem doneItem;
-        UITableView tableView;
 
         public ObjectLinksListViewController(IBusinessEntity businessEntity)
+            : base(UITableViewStyle.Grouped)
         {
             this.businessEntity = businessEntity;
         }
@@ -33,38 +33,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            ExtendedLayoutIncludesOpaqueBars = true;
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
             InitializeHandlers();
 
-            if (tableView?.IndexPathForSelectedRow != null)
-                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+            if (TableView?.IndexPathForSelectedRow != null)
+                TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
 
-            if (tableView?.IndexPathsForSelectedRows?.Length > 0)
-                foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
-                    tableView.DeselectRow(selectedIndexPath, true);
-
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
+            if (TableView?.IndexPathsForSelectedRows?.Length > 0)
+                foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
+                    TableView.DeselectRow(selectedIndexPath, true);
         }
 
         public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ObjectLinksListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource) tableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
         }
 
@@ -77,42 +70,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ObjectLinksListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            doneItem = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         void InitializeNavigationBar()
         {
+            NavigationItem.Title = Localization.GetString("links");
+
             doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             NavigationItem.SetRightBarButtonItem(doneItem, false);
         }
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_object_links"));
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            NavigationItem.Title = Localization.GetString("links");
+            TableView.Source = new DataSource(this, TableView);
         }
 
         void InitializeHandlers()
@@ -127,10 +120,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneItem.Clicked -= DoneItem_Clicked;
         }
 
-        void DoneItem_Clicked(object sender, EventArgs e)
-        {
-            NavigationController.DismissViewController(true, null);
-        }
+        void DoneItem_Clicked(object sender, EventArgs e) => NavigationController.DismissViewController(true, null);
 
         public void ObjectLinkSelected(ObjectLink link)
         {
@@ -164,8 +154,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void PresentDocumentViewController(int documentId)
         {
-            var vc = new DocumentViewController();
-            vc.Modal = true;
+            var vc = new DocumentViewController
+            {
+                Modal = true
+            };
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId);
 
@@ -174,8 +166,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void PresentContactViewController(int contactId)
         {
-            var vc = new ContactViewController();
-            vc.Modal = true;
+            var vc = new ContactViewController
+            {
+                Modal = true
+            };
             vc.SetRefreshDataOnAppear();
             vc.SetData(contactId);
 
@@ -184,8 +178,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void PresentShortcodeViewController(int shortcodeId)
         {
-            var vc = new ShortcodeViewController();
-            vc.Modal = true;
+            var vc = new ShortcodeViewController
+            {
+                Modal = true
+            };
             vc.SetRefreshDataOnAppear();
             vc.SetData(shortcodeId);
 
@@ -202,9 +198,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ProcessObjectLinks(objectLinks);
 
-                var grouppedObjectLinks = objectLinks.OrderBy(ol => ol.TypeInfo.DescriptionSimple).GroupBy(ol => ol.IsReverse ? ol.TypeInfo.DescriptionComplexReverse : ol.TypeInfo.DescriptionComplex).ToDictionary(kv => kv.Key, kv => kv.ToArray());
-                var ds = (DataSource) tableView.Source;
-                ds.SetItems(grouppedObjectLinks);
+                var grouppedObjectLinks = objectLinks.OrderBy(ol => ol.TypeInfo.DescriptionSimple)
+                                                     .GroupBy(ol => ol.IsReverse ? ol.TypeInfo.DescriptionComplexReverse : ol.TypeInfo.DescriptionComplex)
+                                                     .ToDictionary(kv => kv.Key, kv => kv.ToArray());
+                ((DataSource)TableView.Source).SetItems(grouppedObjectLinks);
             }
             catch (Exception ex)
             {
@@ -241,37 +238,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable
         {
-            public bool Empty => objectLInksInView.Count < 1;
+            public bool Empty => items.Count < 1;
 
-            ObjectLinksListViewController viewController;
-            UITableView tableView;
-            string emptyText;
+            readonly WeakReference<ObjectLinksListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            string[] objectLinksSections = new string[0];
-            Dictionary<string, ObjectLink[]> objectLInksInView = new Dictionary<string, ObjectLink[]>();
+            string[] sections = new string[0];
+            Dictionary<string, ObjectLink[]> items = new Dictionary<string, ObjectLink[]>();
 
-            public DataSource(ObjectLinksListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(ObjectLinksListViewController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (objectLInksInView.Count < 1)
+                if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_object_links"));
                     return emptyCell;
                 }
 
-                var section = objectLinksSections[indexPath.Section];
-                var ol = objectLInksInView[section][indexPath.Row];
+                var section = sections[indexPath.Section];
+                var ol = items[section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(ObjectLinksTableViewCell.Key) as ObjectLinksTableViewCell ?? ObjectLinksTableViewCell.Create();
                 cell.Initialize(ol);
@@ -279,102 +274,75 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
-            public override nint RowsInSection(UITableView tableview, nint section)
-            {
-                if (loading)
-                    return 1;
-
-                if (objectLInksInView.Count < 1)
-                    return 1;
-
-                var sectionName = objectLinksSections[section];
-                return objectLInksInView[sectionName].Length;
-            }
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ObjectLinksTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (objectLInksInView.Count < 1)
+                return sections.Length;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (loading || Empty)
                     return 1;
 
-                return objectLinksSections.Length;
+                var sectionName = sections[section];
+                return items[sectionName].Length;
             }
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                if (loading)
-                    return string.Empty;
+                if (loading || Empty)
+                    return null;
 
-                if (objectLInksInView.Count < 1)
-                    return string.Empty;
-
-                return objectLinksSections[section];
+                return sections[section];
             }
 
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
-            {
-                var v = headerView as UITableViewHeaderFooterView;
-                if (v == null)
-                    return;
-
-                v.TextLabel.TextColor = Theme.DarkerBlue;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return 72f;
-            }
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.CellAt(indexPath).SelectionStyle == UITableViewCellSelectionStyle.None)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                var section = objectLinksSections[indexPath.Section];
-                var ol = objectLInksInView[section][indexPath.Row];
+                var section = sections[indexPath.Section];
+                var ol = items[section][indexPath.Row];
 
-                viewController.ObjectLinkSelected(ol);
+                viewControllerWeakReference.Unwrap()?.ObjectLinkSelected(ol);
             }
 
             public void SetItems(Dictionary<string, ObjectLink[]> objectLinks)
             {
                 loading = false;
 
-                objectLinksSections = objectLinks.Keys.ToArray();
-                objectLInksInView = new Dictionary<string, ObjectLink[]>(objectLinks);
+                sections = objectLinks.Keys.ToArray();
+                items = new Dictionary<string, ObjectLink[]>(objectLinks);
 
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                if (objectLinksSections.Length > 1)
-                    tableView.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, objectLinksSections.Length - 1)), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                if (sections.Length > 1)
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, sections.Length - 1)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public void Reset()
             {
                 loading = true;
 
-                var sectionsCount = objectLinksSections.Length;
+                sections = new string[0];
+                items.Clear();
 
-                objectLinksSections = new string[0];
-                objectLInksInView.Clear();
+                var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
-                tableView.BeginUpdates();
-                tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                objectLinksSections = new string[0];
-                objectLInksInView = null;
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                if (sectionsCount > 1)
+                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
         }
     }

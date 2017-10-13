@@ -1,4 +1,5 @@
-﻿using UIKit;
+﻿using System;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -9,8 +10,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void LoadView()
         {
             base.LoadView();
+            View.BackgroundColor = Theme.White;
+        }
 
-            View.BackgroundColor = UIColor.White;
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+
+            if (IsBeingDismissed
+                || IsMovingFromParentViewController
+                || (NavigationController?.IsBeingDismissed ?? false)
+                || (NavigationController?.IsMovingFromParentViewController ?? false))
+            {
+                Recycle();
+#if DEBUG
+                GC.Collect();
+#endif
+            }
+        }
+
+        public virtual void Recycle()
+        {
         }
     }
 }

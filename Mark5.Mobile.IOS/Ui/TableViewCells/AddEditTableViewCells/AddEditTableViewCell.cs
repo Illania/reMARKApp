@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             var separator = new UIView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = UIColor.LightGray
+                BackgroundColor = Theme.DarkGray
             };
             return separator;
         }
@@ -68,13 +68,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         public void SetErrorState(bool error, bool animate = true)
         {
             if (!animate || !error)
-                BackgroundColor = error ? Theme.LightBrown : UIColor.Clear;
+                BackgroundColor = error ? Theme.LightBrown : Theme.Clear;
             else
             {
                 AnimateKeyframes(1.0f, 0, UIViewKeyframeAnimationOptions.CalculationModeLinear, () =>
                  {
                      AddKeyframeWithRelativeStartTime(0, 0.33, () => BackgroundColor = Theme.LightBrown);
-                     AddKeyframeWithRelativeStartTime(0.33, 0.33, () => BackgroundColor = UIColor.Clear);
+                     AddKeyframeWithRelativeStartTime(0.33, 0.33, () => BackgroundColor = Theme.Clear);
                      AddKeyframeWithRelativeStartTime(0.66, 0.33, () => BackgroundColor = Theme.LightBrown);
                  }, (finished) => { });
             }

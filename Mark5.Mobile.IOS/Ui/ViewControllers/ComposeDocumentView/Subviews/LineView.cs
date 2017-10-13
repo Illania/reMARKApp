@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 Text = Localization.GetString("line") + ": ",
                 Font = Theme.DefaultFont,
-                TextColor = UIColor.LightGray,
+                TextColor = Theme.DarkGray,
                 Opaque = false,
                 Lines = 0,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -148,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void SetLine(Line line)
         {
-            selectedLineLabel.TextColor = UIColor.DarkTextColor;
+            selectedLineLabel.TextColor = Theme.Black;
 
             if (line != null && availableOutgoingLines.Select(l => l.Guid).Contains(line.Guid))
             {

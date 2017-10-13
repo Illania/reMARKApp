@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -41,13 +42,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SettingsStore.SetBool(values.SslMode == SslMode.AllowSelfSigned, AcceptSelfSignedKey);
         }
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            ExtendedLayoutIncludesOpaqueBars = true;
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -61,8 +55,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            if (observer != null)
-                NSNotificationCenter.DefaultCenter.RemoveObserver(observer);
+            observer?.Dispose();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         public void SettingsViewControllerDidEnd(AppSettingsViewController sender)
@@ -104,7 +105,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    SetHiddenKeys(new string [0], true);
+                    SetHiddenKeys(new string[0], true);
                 }
             }
         }
@@ -114,13 +115,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == AppVersionKey)
             {
-                var cell = tableView.DequeueReusableCell("value1cell") ?? new UITableViewCell(UITableViewCellStyle.Value1, "value1cell");
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
-
                 return cell;
             }
 
@@ -149,8 +146,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                     .ContinueWith(t =>
                         {
-                            if (dismissAction != null)
-                                dismissAction();
+                            dismissAction?.Invoke();
 
                             if (!t.IsFaulted)
                             {
@@ -176,9 +172,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
 
-            var attributes = new UIStringAttributes();
-            attributes.Font = Theme.DefaultFont;
-            var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue), NSStringDrawingOptions.UsesLineFragmentOrigin, attributes, null);
+            var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue),
+                                                                NSStringDrawingOptions.UsesLineFragmentOrigin,
+                                                                new UIStringAttributes { Font = Theme.DefaultFont },
+                                                                null);
 
             return size.Height + 10f;
         }

@@ -5,21 +5,21 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
+using Foundation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
     public class PickerShortcodesListViewController : AbstractShortcodesListViewController
     {
         readonly TaskCompletionSource<Shortcode> tcs = new TaskCompletionSource<Shortcode>();
-
-        public Task<Shortcode> Task => tcs.Task;
+        public Task<Shortcode> Result => tcs.Task;
 
         public PickerShortcodesListViewController()
             : base(true)
         {
         }
 
-        public async override void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
+        public async override void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_shortcode___"));
 

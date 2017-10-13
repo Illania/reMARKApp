@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.IOS.Utilities;
+﻿using Mark5.Mobile.IOS.Ui.ViewControllers;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
@@ -6,6 +7,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
     public class NavigationController : UINavigationController, ITaggedViewController
     {
         public string Tag { get; set; }
+
+        int searchButtonCounter;
 
         public NavigationController()
         {
@@ -26,6 +29,24 @@ namespace Mark5.Mobile.IOS.Ui.Common
             : this(rootViewController)
         {
             ModalPresentationStyle = Integration.IsIPad() ? iPadStyle : iPhoneStyle;
+        }
+
+        public override void LoadView()
+        {
+            base.LoadView();
+            View.BackgroundColor = Theme.White;
+        }
+
+        public override void SetToolbarHidden(bool hidden, bool animated)
+        {
+            base.SetToolbarHidden(hidden, animated);
+
+            if (SplitViewController == null)
+            {
+                var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
+                var root = del?.Window?.RootViewController as AbstractMainViewController;
+                root?.SetSearchButtonHidden(hidden, true);
+            }
         }
     }
 }

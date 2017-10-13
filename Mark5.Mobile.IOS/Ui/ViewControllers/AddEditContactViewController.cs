@@ -61,8 +61,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void ViewDidAppear(bool animated)
         {
-            CommonConfig.Logger.Info($"{nameof(AddEditContactViewController)} appeared");
-            base.ViewWillAppear(animated);
+            base.ViewDidAppear(animated);
+
+            CommonConfig.Logger.Info("Appeared");
+
             RefreshData();
         }
 
@@ -72,8 +74,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             DeInitializeHandlers();
             UnsubscribeFromKeyboardEvents();
-
-            CommonConfig.Logger.Info($"{nameof(AddEditContactViewController)} will disappear");
         }
 
         #endregion
@@ -198,10 +198,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void DataSource_ParentRowClicked(object sender, EventArgs e)
         {
-            var vc = new ParentContactSelectorFolderListView(ContactPreview.Type);
+            var vc = new PickerParentContactFoldersListView(ContactPreview.Type);
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
 
-            var selectedParent = await vc.Task;
+            var selectedParent = await vc.Result;
             if (selectedParent != null)
             {
                 ParentContactPreview = selectedParent;
@@ -216,11 +216,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var vc = new ResponsibleUsersSelectionController
             {
-                PreselectedSystemUsersId = Contact.ResponsibleUserIds,
+                PreselectedSystemUserIds = Contact.ResponsibleUserIds,
             };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
 
-            var selectedUsers = await vc.Task;
+            var selectedUsers = await vc.Result;
             if (selectedUsers != null)
             {
                 Contact.ResponsibleUsers.Clear();
@@ -365,15 +365,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void InitializeSections()
             {
-                birthdateSection = new BirthdateSection(this);
-
                 var sectionsToInsert = new List<AbstractSection> {
                     new GeneralSection(this),
                     new EmailAddressesSection(this),
                     new PhoneNumbersSection(this, CommunicationAddressType.Phone),
                     new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
                     new PhysicalAddressesSection(this),
-                    birthdateSection,
+                    (birthdateSection = new BirthdateSection(this)),
                     new AdditionalSection(this)
                 };
 

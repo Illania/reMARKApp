@@ -4,13 +4,14 @@ using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public partial class DocumentToUploadTableViewCell : UITableViewCell
     {
+        public const float Height = 68f;
+
         public static readonly NSString Key = new NSString("DocumentToUploadTableViewCell");
         public static readonly UINib Nib = UINib.FromName("DocumentToUploadTableViewCell", NSBundle.MainBundle);
 
@@ -50,13 +51,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var address = data.DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
             SenderLabel.Text = address == null ? string.Empty : string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
             SubjectLabel.Text = string.IsNullOrWhiteSpace(data.DocumentPreview.Subject) ? Localization.GetString("no_subject") : data.DocumentPreview.Subject;
-        }
-
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
         }
     }
 }

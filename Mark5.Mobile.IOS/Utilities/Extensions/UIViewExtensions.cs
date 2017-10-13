@@ -4,8 +4,11 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public static class UiViewExtension
+    public static class UIViewExtensions
     {
+
+        #region Constraints backup/restore methods
+
         public static Dictionary<UIView, NSLayoutConstraint[]> BackupConstaints(this UIView view)
         {
             var backup = new Dictionary<UIView, NSLayoutConstraint[]>();
@@ -51,20 +54,17 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public static bool IsVisible(this UIView view)
-        {
-            return !view.Hidden && view.Alpha > 0f;
-        }
-
-        #region Helper methods
-
         static bool IsConstraintRelevant(NSLayoutConstraint constraint)
         {
             var attributes = new[]
             {
                 NSLayoutAttribute.Top,
                 NSLayoutAttribute.Bottom,
+                NSLayoutAttribute.Left,
+                NSLayoutAttribute.Right,
                 NSLayoutAttribute.Height,
+                NSLayoutAttribute.Width,
+                NSLayoutAttribute.CenterX,
                 NSLayoutAttribute.CenterY,
                 NSLayoutAttribute.Baseline
             };

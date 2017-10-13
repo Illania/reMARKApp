@@ -11,20 +11,19 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
-    public class ParentContactSelectorListViewController : AbstractContactsListViewController
+    public class PickerParentContactListViewController : AbstractContactsListViewController
     {
         readonly TaskCompletionSource<ContactPreview> tcs = new TaskCompletionSource<ContactPreview>();
-
-        public Task<ContactPreview> Task => tcs.Task;
+        public Task<ContactPreview> Result => tcs.Task;
 
         public ContactType ChildrenType { get; set; }
 
-        public ParentContactSelectorListViewController()
+        public PickerParentContactListViewController()
             : base(true)
         {
         }
 
-        public async override void ContactSelected(UITableView tableView, ContactPreview contactPreview, NSIndexPath indexPath)
+        protected async override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
             ContactPreview selectedContactPreview = null;
 
@@ -92,8 +91,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 tcs.SetResult(selectedContactPreview);
                 NavigationController.PopViewController(true);
             }
-
-            tableView.DeselectRow(indexPath, true);
         }
 
         string DisplayText(ContactPreview cp)

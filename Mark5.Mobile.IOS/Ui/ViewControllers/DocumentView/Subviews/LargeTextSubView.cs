@@ -10,23 +10,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         protected LargeTextSubView()
         {
-            Initialize();
-        }
-
-        void Initialize()
-        {
-            TextView = new UITextView();
-            TextView.Font = Theme.DefaultFont.WithRelativeSize(4f);
-            TextView.Editable = false;
-            TextView.Opaque = false;
-            TextView.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-            TextView.AutocorrectionType = UITextAutocorrectionType.Yes;
-            TextView.SpellCheckingType = UITextSpellCheckingType.Yes;
+            TextView = new UITextView
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(4f),
+                Editable = false,
+                Opaque = false,
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                SpellCheckingType = UITextSpellCheckingType.Yes,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             TextView.TextContainer.LineFragmentPadding = 0f;
-            TextView.TextContainerInset = UIEdgeInsets.Zero;
-            TextView.ClipsToBounds = false;
-            TextView.ScrollEnabled = false;
-            TextView.TranslatesAutoresizingMaskIntoConstraints = false;
             ContainerView.AddSubview(TextView);
             ContainerView.AddConstraints(new[]
             {
@@ -35,6 +32,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
             });
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                TextView?.RemoveFromSuperview();
+                TextView = null;
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
 using Photos;
 using UIKit;
+using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
@@ -111,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{typeof(ComposeDocumentViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             await LoadDocument();
         }
@@ -158,11 +159,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             AutomaticallyAdjustsScrollViewInsets = true;
 
-            View.BackgroundColor = UIColor.White;
+            View.BackgroundColor = Theme.White;
 
             scrollView = new UIScrollView
             {
-                BackgroundColor = UIColor.White,
+                BackgroundColor = Theme.White,
                 ShowsVerticalScrollIndicator = true,
                 ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true,
@@ -182,7 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             stackView = new UIStackView
             {
-                BackgroundColor = UIColor.White,
+                BackgroundColor = Theme.White,
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
@@ -449,7 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    var picker = new DocumentMenuViewController(new[]
+                    var picker = new UIDocumentMenuViewController(new[]
                         {
                             "public.content",
                             "public.data",
@@ -854,7 +855,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var vc = new PhonebookContactsListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var pa = await vc.ReturnTask;
+            var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 
@@ -863,10 +864,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenShortcodes()
         {
-            var vc = new PickerShortcodesFolderListViewController();
+            var vc = new PickerShortcodesFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var sc = await vc.Task;
+            var sc = await vc.Result;
             if (sc != null && sc.Addresses != null && sc.Addresses.Any())
             {
                 var addresses = sc.Addresses;
@@ -880,10 +881,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenContacts(RecipientsView recipientsView)
         {
-            var vc = new PickerContactsFolderListViewController();
+            var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var pa = await vc.Task;
+            var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 
@@ -895,7 +896,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
-            var pa = await vc.Task;
+            var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
 
@@ -969,7 +970,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
 
-            var templatePreview = await tp.ResultTask;
+            var templatePreview = await tp.Result;
 
             DismissViewController(true, null);
 
@@ -1085,12 +1086,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         class ImagePickerControllerDelegate : UIImagePickerControllerDelegate
         {
-            readonly WeakReference<ComposeDocumentViewController> vcWeak;
+            readonly WeakReference<ComposeDocumentViewController> viewControllerWeakReference;
             readonly Action<string, NSData> handler;
 
             public ImagePickerControllerDelegate(ComposeDocumentViewController vc, Action<string, NSData> handler)
             {
-                vcWeak = new WeakReference<ComposeDocumentViewController>(vc);
+                viewControllerWeakReference = vc.Wrap();
                 this.handler = handler;
             }
 
@@ -1132,7 +1133,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     CommonConfig.Logger.Error("Could not pick media", ex);
 
-                    if (vcWeak.TryGetTarget(out ComposeDocumentViewController vc))
+                    var vc = viewControllerWeakReference.Unwrap();
+                    if (vc != null)
                         Dialogs.ShowErrorDialog(vc, ex);
 
                     picker.DismissViewController(true, null);

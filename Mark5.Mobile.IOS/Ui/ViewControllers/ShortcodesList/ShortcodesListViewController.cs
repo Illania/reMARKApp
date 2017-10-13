@@ -31,8 +31,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
             {
-                CreateShortcodeItem = new UIBarButtonItem();
-                CreateShortcodeItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"));
+                CreateShortcodeItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
+                };
                 NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
                 RightButton = CreateShortcodeItem;
             }
@@ -64,16 +66,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             PresentViewController(new NavigationController(vc), true, null);
         }
 
-        public override void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
+        public override void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
-            if (tableView == SearchResultsController.TableView)
-            {
-                var ds = (DataSource)tableView.Source;
-                var indexPath = ds.FindItemIndexPath(shortcodePreview);
-                if (indexPath != null)
-                    tableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
-            }
-
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];

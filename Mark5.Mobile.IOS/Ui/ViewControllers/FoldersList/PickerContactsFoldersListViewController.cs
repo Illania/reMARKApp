@@ -7,38 +7,32 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
-    public class ParentContactSelectorFolderListView : AbstractFoldersListViewController
+    public class PickerContactsFoldersListViewController : AbstractFoldersListViewController
     {
-        ContactType childrenType;
-
-        readonly TaskCompletionSource<ContactPreview> tcs = new TaskCompletionSource<ContactPreview>();
-
-        public Task<ContactPreview> Task => tcs.Task;
+        readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
+        public Task<Recipient> Result => tcs.Task;
 
         UIBarButtonItem cancelModeItem;
 
-        public ParentContactSelectorFolderListView(ContactType type)
+        public PickerContactsFoldersListViewController()
             : base(ModuleType.Contacts, true, true, true)
         {
-            childrenType = type;
         }
 
-        protected ParentContactSelectorFolderListView(Folder folder, ContactType type)
+        protected PickerContactsFoldersListViewController(Folder folder)
             : base(folder, true, true, true)
         {
-            childrenType = type;
         }
 
         protected async override void FolderSelected(Folder folder)
         {
-            var vc = new ParentContactSelectorListViewController()
+            var vc = new PickerContactsListViewController
             {
                 Folder = folder,
-                ChildrenType = childrenType,
             };
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }
@@ -78,10 +72,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.FolderExpand(folder);
 
-            var vc = new ParentContactSelectorFolderListView(folder, childrenType);
+            var vc = new PickerContactsFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);
 
-            var result = await vc.Task;
+            var result = await vc.Result;
             if (result != null)
                 tcs.SetResult(result);
         }

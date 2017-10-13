@@ -91,37 +91,23 @@
 		<Compile Include="Ui\Common\AbstractViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\Common\Dialogs.cs" />
-		<Compile Include="Ui\Common\DocumentMenuViewController.cs" />
 		<Compile Include="Ui\Common\IPrimaryViewController.cs" />
 		<Compile Include="Ui\Common\ISecondaryViewController.cs" />
 		<Compile Include="Ui\Common\ITaggedViewController.cs" />
-		<Compile Include="Ui\Common\KeyboardUtilities.cs" />
 		<Compile Include="Ui\Common\Localization.cs" />
 		<Compile Include="Ui\Common\MultiSelectViewController.cs" />
 		<Compile Include="Ui\Common\NavigationController.cs" />
 		<Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
-		<Compile Include="Ui\Common\ReachabilityBar.cs" />
 		<Compile Include="Ui\Common\SeparatorSubView.cs" />
 		<Compile Include="Ui\Common\Theme.cs" />
-		<Compile Include="Ui\Common\TouchTransparentView.cs" />
 		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\DescriptionTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\DescriptionTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\DocumentAddressesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\DocumentAddressesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsTableViewCell.cs" />
@@ -129,7 +115,6 @@
 		<Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\EditTextViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\EmptyTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
@@ -143,13 +128,9 @@
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\SuggestionsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\WaitTableViewCell.designer.cs" />
 		<Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
@@ -239,32 +220,28 @@
 		<Compile Include="Utilities\Extensions\ObjectExtensions.cs" />
 		<Compile Include="Utilities\Extensions\StringExtensions.cs" />
 		<Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
-		<Compile Include="Utilities\Extensions\UiTextViewExtensions.cs" />
-		<Compile Include="Utilities\Extensions\UiViewExtension.cs" />
+		<Compile Include="Utilities\Extensions\UITextViewExtensions.cs" />
+		<Compile Include="Utilities\Extensions\UIViewExtensions.cs" />
 		<Compile Include="Ui\ViewControllers\DownloadViewController.cs" />
 		<Compile Include="Utilities\ActivityIndicator.cs" />
 		<Compile Include="Ui\ViewControllers\RecentAddressesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFolderListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFoldersListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\PickerContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\PickerShortcodesFolderListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\PickerShortcodesFoldersListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesTableViewCell.designer.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.designer.cs" />
 		<Compile Include="Model\FileDescription.cs" />
 		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentToUploadTableViewCell.designer.cs" />
 		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\ParentContactSelectorFolderListView.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsList\ParentContactSelectorListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\FoldersList\PickerParentContactFoldersListView.cs" />
+		<Compile Include="Ui\ViewControllers\ContactsList\PickerParentContactListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
 		<Compile Include="Config.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
@@ -281,6 +258,16 @@
 		<Compile Include="Ui\ViewControllers\AddEditShortcodeViewController.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\AddressTableViewCell.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
+		<Compile Include="Ui\Common\AbstractTableViewController.cs" />
+		<Compile Include="Ui\ViewControllers\EditCategoriesListViewController.cs" />
+		<Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
+		<Compile Include="Ui\Common\DarkNavigationController.cs" />
+		<Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
+		<Compile Include="Ui\Common\AbstractMultiViewController.cs" />
+		<Compile Include="Utilities\UITableViewCellUtilities.cs" />
+		<Compile Include="Ui\Common\TouchTransparentView.cs" />
+		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 	</ItemGroup>
 	<ItemGroup>
@@ -315,12 +302,6 @@
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
 		</Reference>
-		<Reference Include="HockeySDK">
-		  <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
-		</Reference>
-		<Reference Include="HockeySDK.iOSBindings">
-		  <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
-		</Reference>
 		<Reference Include="SQLite-net">
 		  <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
 		</Reference>
@@ -336,8 +317,14 @@
 		<Reference Include="SQLitePCLRaw.batteries_v2">
 		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
+		<Reference Include="HockeySDK">
+		  <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+		</Reference>
+		<Reference Include="HockeySDK.iOSBindings">
+		  <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
+		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.5.5\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.0\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -369,29 +356,17 @@
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
 		<InterfaceDefinition Include="Ui\TableViewCells\CategoriesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\CommentsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressCompactTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\CommunicationAddressTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\ContactInfoTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\DescriptionTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesCompactTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\DocumentAddressesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsCompactTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\EmptyTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\FoldersTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\PhysicalAddressTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\SuggestionsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\WaitTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\TemplatesSearchResultsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
@@ -569,5 +544,5 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
-	<Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
+	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
 </Project>

@@ -71,6 +71,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         SslMode sslMode = SslMode.On;
 
+        NSObject didChangeFrameNotificationObserver;
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -85,18 +87,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.LightContent;
+
             authenticator = AuthenticatorFactory.Create();
 
             InitializeHandlers();
 
-            UIKeyboard.Notifications.ObserveDidChangeFrame((sender, e) => OnKeyboardDidChangeFrameNotification(e.Notification));
+            didChangeFrameNotificationObserver = UIKeyboard.Notifications.ObserveDidChangeFrame(OnKeyboardDidChangeFrameNotification);
         }
 
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(LoginViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
             StartLogoScaleAnimation();
         }
@@ -105,14 +109,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
+            UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.Default;
+
             usernameTextField.ResignFirstResponder();
             passwordTextField.ResignFirstResponder();
             hostnameTextField.ResignFirstResponder();
             portTextField.ResignFirstResponder();
 
+            DeinitializeHandlers();
+            
             authenticator = null;
 
-            DeinitializeHandlers();
+            didChangeFrameNotificationObserver?.Dispose();
+        }
+
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            logoContainer = null;
+            logoImageView = null;
+
+            settingsButton = null;
+
+            usernameTextField = null;
+            hostnameTextField = null;
+            passwordTextField = null;
+            portTextField = null;
+            loginButton = null;
+
+            logoContainerCenterYConstraint = null;
+            usernameTextFieldTopConstraint = null;
+            passwordTextFieldTopConstraint = null;
+            hostnameTextFieldTopConstraint = null;
+            portTextFieldTopConstraint = null;
+            loginButtonTopConstraint = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         #endregion
@@ -163,15 +202,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            logoContainer.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoContainer.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            logoContainer.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoContainer.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            logoContainer.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            logoContainer.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            logoContainer.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            logoContainer.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(logoContainer);
-            logoContainerCenterYConstraint = NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterY, 1f, LogoImageViewToViewInitialDistance);
             View.AddConstraints(new[]
             {
-                logoContainerCenterYConstraint,
+                logoContainerCenterYConstraint = NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterY, 1f, LogoImageViewToViewInitialDistance),
                 NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1f, 0f),
                 NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.Height, NSLayoutRelation.Equal, View, NSLayoutAttribute.Height, 1f, 0f)
@@ -184,10 +222,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            logoImageView.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoImageView.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            logoImageView.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoImageView.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            logoImageView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            logoImageView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            logoImageView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            logoImageView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             logoContainer.AddSubview(logoImageView);
             logoContainer.AddConstraints(new[]
             {
@@ -196,7 +234,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(logoImageView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, logoContainer, NSLayoutAttribute.Width, 1f, 0f),
                 NSLayoutConstraint.Create(logoImageView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, logoContainer, NSLayoutAttribute.Height, 1f, 0f)
             });
-
 
             var backgroundImageView = new UIImageView
             {
@@ -240,10 +277,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             View.AddSubview(usernameTextField);
-            usernameTextFieldTopConstraint = NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoImageView, NSLayoutAttribute.Bottom, 1f, TextFieldToLogoImageViewInitialDistance);
             View.AddConstraints(new[]
             {
-                usernameTextFieldTopConstraint,
+                usernameTextFieldTopConstraint = NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoImageView, NSLayoutAttribute.Bottom, 1f, TextFieldToLogoImageViewInitialDistance),
                 NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
                 NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
@@ -263,10 +299,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             View.AddSubview(passwordTextField);
-            passwordTextFieldTopConstraint = NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, usernameTextField, NSLayoutAttribute.Bottom, 1f, 50f);
             View.AddConstraints(new[]
             {
-                passwordTextFieldTopConstraint,
+                passwordTextFieldTopConstraint = NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, usernameTextField, NSLayoutAttribute.Bottom, 1f, 50f),
                 NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
                 NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
@@ -284,10 +319,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             View.AddSubview(hostnameTextField);
-            hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance);
             View.AddConstraints(new[]
             {
-                hostnameTextFieldTopConstraint,
+                hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance),
                 NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
                 NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
@@ -306,10 +340,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             View.AddSubview(portTextField);
-            portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostnameTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance);
             View.AddConstraints(new[]
             {
-                portTextFieldTopConstraint,
+                portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostnameTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance),
                 NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
                 NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
@@ -322,10 +355,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton.Enabled = false;
             loginButton.Alpha = 0.7f;
             View.AddSubview(loginButton);
-            loginButtonTopConstraint = NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, portTextField, NSLayoutAttribute.Bottom, 1f, LoginButtonToTextFieldInitialDistance);
             View.AddConstraints(new[]
             {
-                loginButtonTopConstraint,
+                loginButtonTopConstraint = NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, portTextField, NSLayoutAttribute.Bottom, 1f, LoginButtonToTextFieldInitialDistance),
                 NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
                 NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, LoginButtonWidth),
                 NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, LoginButtonHeight)
@@ -444,25 +476,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void SettingsButton_TouchUpInside(object sender, EventArgs e)
         {
-            var sv = new LoginSettingsViewController.SettingsValues
-            {
-                SslMode = sslMode
-            };
+            var sv = new LoginSettingsViewController.SettingsValues { SslMode = sslMode };
             var vc = new LoginSettingsViewController(sv);
             vc.RestrictedSettingsValuesUpdated += LoginSettingsViewController_RestrictedSettingsValuesUpdated;
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void TextField_EditingChanged(object sender, EventArgs e)
-        {
-            ValidateForm();
-        }
+        void TextField_EditingChanged(object sender, EventArgs e) => ValidateForm();
 
         void LoginSettingsViewController_RestrictedSettingsValuesUpdated(object sender, LoginSettingsViewController.SettingsValues values)
         {
             sslMode = values.SslMode;
 
-            var loginSettingsViewController = (LoginSettingsViewController) sender;
+            var loginSettingsViewController = (LoginSettingsViewController)sender;
             loginSettingsViewController.RestrictedSettingsValuesUpdated -= LoginSettingsViewController_RestrictedSettingsValuesUpdated;
         }
 
@@ -471,7 +497,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.LayoutIfNeeded();
             StartShowFieldsAnimation();
 
-            var bounceAnimation = (CAKeyFrameAnimation) sender;
+            var bounceAnimation = (CAKeyFrameAnimation)sender;
             bounceAnimation.AnimationStopped -= BounceAnimation_AnimationStopped;
         }
 
@@ -623,15 +649,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 UIViewController vc;
                 if (Integration.IsIPad())
-                    vc = new SplitMainViewController
-                    {
-                        ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
-                    };
+                    vc = new SplitMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
                 else
-                    vc = new SimpleMainViewController
-                    {
-                        ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
-                    };
+                    vc = new SimpleMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
 
                 PresentViewController(vc, true, null);
             }
@@ -658,21 +678,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Notification receivers
 
-        void OnKeyboardDidChangeFrameNotification(NSNotification notification)
+        void OnKeyboardDidChangeFrameNotification(object sender, UIKeyboardEventArgs e)
         {
             if (IsViewLoaded)
-                SlideViewOverKeyboard(notification, true);
+                SlideViewOverKeyboard(e, true);
         }
 
         #endregion
 
         #region Helper methods
 
-        void SlideViewOverKeyboard(NSNotification notification, bool up)
+        void SlideViewOverKeyboard(UIKeyboardEventArgs e, bool up)
         {
             View.LayoutIfNeeded();
 
-            var remainingScreenHeight = View.Frame.Height - KeyboardUtilities.KeyboardHeightFromNotification(notification);
+            var remainingScreenHeight = View.Frame.Height - e.FrameEnd.Height;
             var formHeight = loginButton.Frame.GetMaxY() - usernameTextField.Frame.GetMinY();
             var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.5f;
             var requiredMovement = usernameTextField.Frame.GetMinY() - distanceFromTopOfTheScreen;

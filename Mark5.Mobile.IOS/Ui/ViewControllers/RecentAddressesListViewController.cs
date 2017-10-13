@@ -1,43 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class RecentAddressesListViewController : AbstractViewController
+    public class RecentAddressesListViewController : AbstractTableViewController
     {
         readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
-
-        public Task<Recipient> Task => tcs.Task;
+        public Task<Recipient> Result => tcs.Task;
 
         UIBarButtonItem exitEditItem;
-        UITableView tableView;
-
-        CancellationTokenSource cts;
-
-        #region UIViewControllerOverrides
 
         public override void LoadView()
         {
             base.LoadView();
 
             InitializeNavigationBar();
-            InitializeNavigationBarTitle();
             InitializeView();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             InitializeHandlers();
         }
@@ -46,10 +44,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(RecentAddressesListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource) tableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
         }
 
@@ -58,57 +55,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeinitializeHandlers();
-
-            cts?.Cancel();
         }
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(RecentAddressesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
-        #endregion
+        public override void Recycle()
+        {
+            base.Recycle();
 
-        #region Initialization
+            exitEditItem = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
 
         void InitializeNavigationBar()
         {
+            NavigationItem.Title = Localization.GetString("recent_addresses_title");
+
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             NavigationItem.SetLeftBarButtonItem(exitEditItem, true);
         }
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView();
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("recent_addresses_empty"));
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            tableView.EstimatedRowHeight = 50f;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            UIView.AnimationsEnabled = false;
-            NavigationItem.Title = Localization.GetString("recent_addresses_title");
-            NavigationItem.Prompt = null;
-            UIView.AnimationsEnabled = true;
+            TableView.Source = new DataSource(this, TableView);
         }
 
         void InitializeHandlers()
@@ -123,21 +109,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 exitEditItem.Clicked -= ExitEditItem_Clicked;
         }
 
-        #endregion
-
-        #region Refreshing
-
         async Task RefreshData()
         {
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
             try
             {
                 var addresses = await Managers.DocumentsManager.GetRecentAddressesAsync();
-
-                var ds = (DataSource) tableView.Source;
-                ds.SetItems(addresses);
+                ((DataSource)TableView.Source).SetItems(addresses);
             }
             catch (Exception ex)
             {
@@ -151,62 +128,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        #endregion
-
-        #region Actions
-
         public void RecentAddressSelected(RecentAddress ra)
         {
             tcs.SetResult(new Recipient(ra));
         }
-
-        #endregion
-
-        #region Event Handlers
 
         void ExitEditItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
         }
 
-        #endregion
-
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
-            public bool Empty { get { return !recentAddressesInView.Any(); } }
+            public bool Empty => !items.Any();
 
-            RecentAddressesListViewController viewController;
-            UITableView tableView;
-            readonly string emptyText;
+            readonly WeakReference<RecentAddressesListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            List<RecentAddress> recentAddressesInView = new List<RecentAddress>(25);
+            readonly List<RecentAddress> items = new List<RecentAddress>(25);
 
-            public DataSource(RecentAddressesListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(RecentAddressesListViewController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
                 if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("recent_addresses_empty"));
                     return emptyCell;
                 }
 
-                var ra = recentAddressesInView[indexPath.Row];
+                var ra = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(SuggestionsTableViewCell.Key) as SuggestionsTableViewCell ?? SuggestionsTableViewCell.Create();
-                cell.Initialize(ra);
-
-                return cell;
+                if (string.IsNullOrWhiteSpace(ra.Name))
+                {
+                    var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
+                    cell.TextLabel.Text = ra.Address;
+                    return cell;
+                }
+                else
+                {
+                    var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
+                    cell.TextLabel.Text = ra.Name;
+                    cell.DetailTextLabel.Text = ra.Address;
+                    return cell;
+                }
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -214,56 +188,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return recentAddressesInView.Count;
-            }
-
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return false;
+                return items.Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (tableView.Editing)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                var ra = recentAddressesInView[indexPath.Row];
-                viewController.RecentAddressSelected(ra);
+                var ra = items[indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.RecentAddressSelected(ra);
             }
 
             public void SetItems(List<RecentAddress> recentAddresses)
             {
                 loading = false;
 
-                var isInputListPopulated = recentAddresses.Any();
+                items.AddRange(recentAddresses);
 
-                if (isInputListPopulated)
-                    recentAddressesInView.AddRange(recentAddresses);
-
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
             {
                 loading = true;
 
-                var count = recentAddressesInView.Count;
+                var count = items.Count;
 
-                recentAddressesInView.Clear();
+                items.Clear();
 
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-
-                tableView.EndUpdates();
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                recentAddressesInView = null;
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
         }
     }

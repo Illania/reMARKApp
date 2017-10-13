@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    public class MultiSelectViewController<T> : UITableViewController
+    public class MultiSelectViewController<T> : AbstractTableViewController
     {
+        readonly TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
+        public Task<T[]> Result => tcs.Task;
+
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
-        string title;
-        T[] data;
+        readonly string title;
+        readonly T[] data;
         T[] preselected;
-        Func<T, string> description;
-        IEqualityComparer<T> equalityComparer;
+        readonly Func<T, string> description;
+        readonly IEqualityComparer<T> equalityComparer;
 
-        HashSet<T> selectedItems;
-
-        TaskCompletionSource<T[]> tcs = new TaskCompletionSource<T[]>();
-
-        public Task<T[]> Task => tcs.Task;
+        readonly HashSet<T> selectedItems;
 
         public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
             : base(UITableViewStyle.Grouped)
@@ -39,6 +39,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             Title = title;
 
@@ -88,58 +92,60 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             cancelItem.Clicked -= CancelItem_Clicked;
             doneItem.Clicked -= DoneItem_Clicked;
+        }
 
-            title = null;
-            data = null;
-            description = null;
-            selectedItems = null;
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            cancelItem = null;
+            doneItem = null;
+
+            TableView.DataSource = null;
+            TableView.Delegate = null;
         }
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
-
             DismissViewController(true, null);
         }
 
         void DoneItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(selectedItems.ToArray());
-
             DismissViewController(true, null);
         }
 
-        public override nint RowsInSection(UITableView tableView, nint section)
-        {
-            return data.Length;
-        }
+        public override nint RowsInSection(UITableView tableView, nint section) => data.Length;
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell("cell");
-
-            if (cell == null)
-            {
-                cell = new UITableViewCell(UITableViewCellStyle.Default, "cell");
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-            }
-
             var d = data[indexPath.Row];
-
+            var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell", UITableViewCellSelectionStyle.None);
             cell.TextLabel.Text = description(d);
             cell.Accessory = selectedItems.Contains(d) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-
             return cell;
         }
 
+        public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 44f;
+
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
+            var cell = tableView.CellAt(indexPath);
+            if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                return;
+            
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
             selectedItems.Add(data[indexPath.Row]);
         }
 
         public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
         {
+            var cell = tableView.CellAt(indexPath);
+            if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                return;
+            
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
             selectedItems.Remove(data[indexPath.Row]);
         }

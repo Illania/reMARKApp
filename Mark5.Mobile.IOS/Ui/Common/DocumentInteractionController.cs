@@ -1,30 +1,32 @@
 ﻿using CoreGraphics;
 using UIKit;
+using System;
+using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
     class DocumentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
     {
-        readonly UIViewController parentController;
+        readonly WeakReference<UIViewController> parentControllerWeakReference;
 
         public DocumentInteractionControllerDelegate(UIViewController parentController)
         {
-            this.parentController = parentController;
+            parentControllerWeakReference = parentController.Wrap();
         }
 
         public override UIViewController ViewControllerForPreview(UIDocumentInteractionController controller)
         {
-            return parentController;
+            return parentControllerWeakReference.Unwrap();
         }
 
         public override UIView ViewForPreview(UIDocumentInteractionController controller)
         {
-            return parentController.View;
+            return parentControllerWeakReference.Unwrap()?.View;
         }
 
         public override CGRect RectangleForPreview(UIDocumentInteractionController controller)
         {
-            return parentController.View.Frame;
+            return parentControllerWeakReference.Unwrap()?.View.Frame ?? CGRect.Empty;
         }
     }
 }
