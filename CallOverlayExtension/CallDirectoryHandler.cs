@@ -12,6 +12,10 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
 using CallOverlayExtension.Utilities;
 using System.IO;
+using Mark5.Mobile.Common.Manager;
+using System.Linq;
+using System.Collections.Generic;
+using Mark5.Mobile.Common.Model;
 
 namespace CallOverlayExtension
 {
@@ -62,12 +66,7 @@ namespace CallOverlayExtension
 #else
                 CommonConfig.Logger.Level = LogLevel.DEBUG;
 #endif
-
-
                 await DatabaseUtils.InitializeDatabases();
-
-
-
             })
             .Wait();
 
@@ -84,9 +83,9 @@ namespace CallOverlayExtension
 
         bool AddIdentificationPhoneNumbers(CXCallDirectoryExtensionContext context)
         {
-            // Numbers must be provided in numerically ascending order.
-
-            long[] phoneNumbers = { 004560443773};
+            // Numbers must be provided in numerically ascending order
+            var numbers = Managers.ContactsManager.GetContactPhoneNumbers().Result;
+            long[] phoneNumbers = { 004560443773 };
             string[] labels = { "test1"};
 
             for (var i = 0; i < phoneNumbers.Length; i++)
