@@ -11,8 +11,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
     public class ContactsListViewController : AbstractContactsListViewController, IUIViewControllerRestoration
     {
-        protected UIBarButtonItem CreateContactItem;
-
         public ContactsListViewController()
             : base(false)
         {
@@ -32,10 +30,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
-                CreateContactItem = new UIBarButtonItem();
-                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"));
-                NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
-                RightButton = CreateContactItem;
+                RightButton = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
+                };
+                NavigationItem.SetRightBarButtonItem(RightButton, false);
             }
         }
 
@@ -43,23 +42,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             base.InitializeHandlers();
 
-            if (CreateContactItem != null)
-                CreateContactItem.Clicked += CreateContactItem_Clicked;
+            if (RightButton != null)
+                RightButton.Clicked += RightButton_Clicked;
         }
 
         protected override void DeinitializeHandlers()
         {
             base.DeinitializeHandlers();
 
-            if (CreateContactItem != null)
-                CreateContactItem.Clicked -= CreateContactItem_Clicked;
+            if (RightButton != null)
+                RightButton.Clicked -= RightButton_Clicked;
         }
 
-        async void CreateContactItem_Clicked(object sender, EventArgs e)
+        async void RightButton_Clicked(object sender, EventArgs e)
         {
-            var choice = await Dialogs.ShowListActionSheetAsync(this,
-                                                           new[] {Localization.GetString("add_company"), Localization.GetString("add_department"), Localization.GetString("add_person") },
-                                                           CreateContactItem);
+            var choice = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("add_company"), Localization.GetString("add_department"), Localization.GetString("add_person") }, RightButton);
             if (choice < 0)
                 return;
 

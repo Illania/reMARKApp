@@ -19,6 +19,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
         }
 
+        public override void Recycle()
+        {
+            base.Recycle();
+
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
         public async override void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_shortcode___"));
@@ -27,9 +35,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             {
                 var shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(Folder, shortcodePreview.Id);
                 dismissAction();
-
                 tcs.SetResult(shortcode);
-
+                NavigationController.PopViewController(true);
             }
             catch (Exception ex)
             {

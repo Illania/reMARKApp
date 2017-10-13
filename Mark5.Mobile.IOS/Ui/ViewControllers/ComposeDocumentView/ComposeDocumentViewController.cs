@@ -867,8 +867,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
                 bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
             }
-
-            DismissViewController(true, null);
         }
 
         async Task DoOpenContacts(RecipientsView recipientsView)
@@ -879,8 +877,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
-
-            DismissViewController(true, null);
         }
 
         async Task DoOpenRecents(RecipientsView recipientsView)

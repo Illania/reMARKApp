@@ -33,14 +33,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 tcs.SetResult(null);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (CommonConfig.Logger.IsDebugEnabled())
-                CommonConfig.Logger.Debug("Disposed");
-        }
-
         protected override void InitializeNavigationBar()
         {
             if (IsRootOfFoldersList)
@@ -86,7 +78,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             var result = await vc.Result;
             if (result != null)
+            {
+                if (NavigationController.ViewControllers.Length == 1 && NavigationController.ViewControllers[0] == this)
+                    NavigationController.DismissViewController(true, null);
+                else
+                    NavigationController.PopViewController(false);
                 tcs.SetResult(result);
+            }
         }
 
         protected override async void FolderExpand(Folder folder)
@@ -98,7 +96,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             var result = await vc.Result;
             if (result != null)
+            {
+                if (NavigationController.ViewControllers.Length == 1 && NavigationController.ViewControllers[0] == this)
+                    NavigationController.DismissViewController(true, null);
+                else
+                    NavigationController.PopViewController(false);
                 tcs.SetResult(result);
+            }
         }
     }
 }

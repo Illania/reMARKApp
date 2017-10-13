@@ -217,20 +217,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var strings = new[] { Localization.GetString("add_from_contact"), Localization.GetString("add_empty") };
 
             var choiceIndex = await Dialogs.ShowListActionSheetAsync(this, strings, tableView, cell);
-
             if (choiceIndex == 0)
             {
                 var vc = new PickerContactsFoldersListViewController();
                 PresentViewController(new NavigationController(vc), true, null);
 
                 var pa = await vc.Result;
-                DismissViewController(true, null);
-
                 if (pa != null)
                     return new DocumentAddress { Address = pa.Address };
-
             }
-            else if (choiceIndex == 1)
+            if (choiceIndex == 1)
                 return new DocumentAddress();
 
             return null;

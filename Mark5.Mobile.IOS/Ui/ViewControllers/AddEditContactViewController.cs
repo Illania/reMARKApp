@@ -208,8 +208,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dataSource.UpdateParentContact(ParentContactPreview);
                 ((DataSource.ParentRow)sender).ReloadRow();
             }
-
-            DismissViewController(true, null);
         }
 
         async void DataSource_ResponsibleUserRowClicked(object sender, EventArgs e)

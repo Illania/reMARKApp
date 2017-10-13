@@ -10,8 +10,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
     public class ShortcodesListViewController : AbstractShortcodesListViewController, IUIViewControllerRestoration
     {
-        protected UIBarButtonItem CreateShortcodeItem;
-
         public ShortcodesListViewController()
             : base(false)
         {
@@ -31,12 +29,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
             {
-                CreateShortcodeItem = new UIBarButtonItem
+                RightButton = new UIBarButtonItem
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
                 };
-                NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
-                RightButton = CreateShortcodeItem;
+                NavigationItem.SetRightBarButtonItem(RightButton, false);
             }
         }
 
@@ -44,19 +41,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             base.InitializeHandlers();
 
-            if (CreateShortcodeItem != null)
-                CreateShortcodeItem.Clicked += CreateShortcodeItem_Clicked;
+            if (RightButton != null)
+                RightButton.Clicked += RightButton_Clicked;
         }
 
         protected override void DeinitializeHandlers()
         {
             base.DeinitializeHandlers();
 
-            if (CreateShortcodeItem != null)
-                CreateShortcodeItem.Clicked -= CreateShortcodeItem_Clicked;
+            if (RightButton != null)
+                RightButton.Clicked -= RightButton_Clicked;
         }
 
-        void CreateShortcodeItem_Clicked(object sender, System.EventArgs e)
+        void RightButton_Clicked(object sender, System.EventArgs e)
         {
             var vc = new AddEditShortcodeViewController
             {
