@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -20,7 +19,6 @@ using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
 using Photos;
 using UIKit;
-using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
@@ -550,7 +548,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             autoSaveWorkingCopyWorker?.Stop();
             await autoSaveWorkingCopyWorker?.Finished();
             await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
-            PopOrDismissViewController();
+
+            if (PresentingViewController == null)
+                NavigationController?.PopViewController(true);
+            else
+                DismissViewController(true, null);
         }
 
         #endregion
@@ -599,13 +601,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
 
                 if (previousDocumentPreview?.Direction == DocumentDirection.Draft)
-                {
                     CommonConfig.MessengerHub.PublishAsync(new DraftSentMessage(this, previousDocumentPreview.Id));
-                }
 
                 dismissAction();
 
-                PopOrDismissViewController();
+                if (PresentingViewController == null)
+                    NavigationController?.PopViewController(true);
+                else
+                    DismissViewController(true, null);
             }
             catch (Exception ex)
             {
@@ -615,14 +618,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-        }
-
-        void PopOrDismissViewController()
-        {
-            if (PresentingViewController != null)
-                DismissViewController(true, null);
-            else
-                NavigationController.PopViewController(true);
         }
 
         async Task SaveWorkingCopy()
@@ -850,8 +845,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
-
-            DismissViewController(true, null);
         }
 
         async Task DoOpenShortcodes()
@@ -887,8 +880,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
-
-            DismissViewController(true, null);
         }
 
         #endregion
@@ -959,9 +950,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
 
             var templatePreview = await tp.Result;
-
-            DismissViewController(true, null);
-
             if (templatePreview != null)
                 await GetTemplate(templatePreview);
         }
@@ -1137,7 +1125,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             public DocumentMenuDelegate(ComposeDocumentViewController vc, Action<NSUrl> handler)
             {
-                vcWeak = new WeakReference<ComposeDocumentViewController>(vc);
+                vcWeak = vc.Wrap();
                 this.handler = handler;
             }
 
@@ -1151,8 +1139,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 documentPicker.Delegate = this;
                 documentPicker.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
 
-                if (vcWeak.TryGetTarget(out ComposeDocumentViewController vc))
-                    vc.PresentViewController(documentPicker, true, null);
+                vcWeak.Unwrap()?.PresentViewController(documentPicker, true, null);
             }
 
             public override void WasCancelled(UIDocumentMenuViewController documentMenu)

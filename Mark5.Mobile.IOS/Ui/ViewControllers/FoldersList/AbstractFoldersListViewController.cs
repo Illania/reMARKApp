@@ -164,7 +164,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             base.Dispose(disposing);
 
             if (CommonConfig.Logger.IsDebugEnabled())
-                CommonConfig.Logger.Debug("Disposed" + "     " + ParentFolder?.Name);
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         #endregion
@@ -785,7 +785,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public void SaveOffline(Folder folder)
         {
-            NavigationController.PresentViewController(new NavigationController(new DownloadViewController { Folder = folder.ShallowCopy() }, UIModalPresentationStyle.FormSheet), true, null);
+            PresentViewController(new NavigationController(new DownloadViewController { Folder = folder.ShallowCopy() }, UIModalPresentationStyle.FormSheet), true, null);
         }
 
         #endregion

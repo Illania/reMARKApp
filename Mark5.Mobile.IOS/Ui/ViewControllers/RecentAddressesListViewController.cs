@@ -131,11 +131,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void RecentAddressSelected(RecentAddress ra)
         {
             tcs.SetResult(new Recipient(ra));
+            DismissViewController(true, null);
         }
 
         void ExitEditItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
+            DismissViewController(true, null);
         }
 
         class DataSource : UITableViewSource

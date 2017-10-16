@@ -231,8 +231,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ((DataSource.ResponsibleUsersRow)sender).ReloadRow();
             }
-
-            DismissViewController(true, null);
         }
 
         void DataSource_ParentRemoved(object sender, EventArgs e)

@@ -114,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneItem.Clicked -= DoneItem_Clicked;
         }
 
-        void DoneItem_Clicked(object sender, EventArgs e) => NavigationController.DismissViewController(true, null);
+        void DoneItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         async Task RefreshData()
         {
@@ -132,7 +132,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                NavigationController.DismissViewController(true, null);
+                DismissViewController(true, null);
             }
         }
 

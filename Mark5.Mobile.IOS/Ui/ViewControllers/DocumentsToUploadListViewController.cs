@@ -151,10 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void FailedDocumentSelected(Guid guid)
         {
-            var vc = new DocumentViewController
-            {
-                Modal = true
-            };
+            var vc = new DocumentViewController();
             vc.SetData(guid);
             vc.SetRefreshDataOnAppear();
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -281,7 +278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.CellAt(indexPath);
                 if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return false;
-                
+
                 return indexPath.Section == Section.Failed;
             }
 

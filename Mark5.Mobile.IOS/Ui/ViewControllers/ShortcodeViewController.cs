@@ -25,8 +25,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ShortcodeViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
-        public bool Modal { get; set; }
-
         public bool Empty => folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null;
 
         int? folderId;
@@ -213,12 +211,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            if (Modal)
-            {
-                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
-            }
-            else
+            if (PresentingViewController == null)
             {
                 if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed)
                 {
@@ -229,6 +222,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     };
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
+            }
+            else
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
         }
 
@@ -280,7 +278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodeId = shortcodePreview.Id;
             shortcodePreview = null;
 
-            if (SplitViewController == null)
+            if (SplitViewController == null || SplitViewController.Collapsed)
                 refreshDataOnAppear = true;
             else
                 RefreshData();
@@ -497,8 +495,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                if (SplitViewController == null)
-                    NavigationController.PopViewController(true);
+                if (SplitViewController == null || SplitViewController.Collapsed)
+                {
+                    if (PresentingViewController == null)
+                        NavigationController?.PopViewController(true);
+                    else
+                        DismissViewController(true, null);
+                }
             }
         }
 
@@ -545,7 +548,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
@@ -576,7 +579,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
@@ -909,7 +912,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
 
-            coder.Encode(Modal, "modal");
+            coder.Encode(PresentingViewController != null, "doNotRestore");
 
             if (folderId.HasValue)
                 coder.Encode(folderId.Value, "folderId");
@@ -944,7 +947,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
-            if (coder.DecodeBool("modal"))
+            if (coder.DecodeBool("doNotRestore"))
                 return null;
 
             return new ShortcodeViewController();

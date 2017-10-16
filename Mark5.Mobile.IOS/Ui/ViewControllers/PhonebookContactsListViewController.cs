@@ -182,9 +182,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void ExitItem_Clicked(object sender, EventArgs e) => tcs.SetResult(null);
+        void ExitItem_Clicked(object sender, EventArgs e)
+        {
+            tcs.SetResult(null);
+            DismissViewController(true, null);
+        }
 
-        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell) => tcs.SetResult(pb);
+        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell)
+        {
+            tcs.SetResult(pb);
+            DismissViewController(true, null);
+        }
 
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {

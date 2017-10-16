@@ -263,7 +263,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var vc = new DocumentViewController();
             vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
             vc.SetRefreshDataOnAppear();
-
             NavigationController.PushViewController(vc, true);
         }
 

@@ -178,6 +178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error("Error while retrieving template previews", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
                 tcs.SetResult(null);
+                DismissViewController(true, null);
             }
         }
 

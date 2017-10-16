@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async void DoneItem_Clicked(object sender, EventArgs e)
@@ -173,7 +173,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async Task RefreshData()

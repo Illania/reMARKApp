@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.SetToolbarHidden(hidden, animated);
 
-            if (SplitViewController == null)
+            if (SplitViewController == null || SplitViewController.Collapsed)
             {
                 var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
                 var root = del?.Window?.RootViewController as AbstractMainViewController;

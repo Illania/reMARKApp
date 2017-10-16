@@ -251,13 +251,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PresentDocumentViewController(int documentId, Guid notificationGuid)
         {
-            var vc = new DocumentViewController
-            {
-                Modal = true
-            };
+            var vc = new DocumentViewController();
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId, notificationGuid);
-
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
