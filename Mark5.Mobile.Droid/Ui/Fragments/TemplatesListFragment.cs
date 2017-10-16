@@ -22,13 +22,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class TemplatesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        readonly Handler searchHandler = new Handler();
+
         RecyclerView recyclerView;
         SearchView searchView;
 
         TemplatesListAdapter adapter;
         TemplatesListAdapter searchAdapter;
 
-        readonly Handler searchHandler = new Handler();
+        public static (TemplatesListFragment fragment, string tag) NewInstance()
+        {
+            var fragment = new TemplatesListFragment();
+            var tag = $"{nameof(TemplatesListFragment)}";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -138,6 +146,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
+        static bool MatchesQuery(TemplatePreview sp, string query)
+        {
+            if (sp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
+        }
+
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
@@ -182,14 +198,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        static bool MatchesQuery(TemplatePreview sp, string query)
-        {
-            if (sp.Name?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            return false;
-        }
-
         #endregion
 
         #region Retainable State
@@ -213,8 +221,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag() => $"{nameof(TemplatesListFragment)}";
-
         class TemplateListFragmentState : IRetainableState
         {
             public List<TemplatePreview> TemplatePreviews { get; set; }
@@ -224,22 +230,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class TemplatesListAdapter : RecyclerView.Adapter
         {
+            public override int ItemCount => templatesInView.Sum(f => f.Count) + 2;
+
             public event EventHandler<TemplatePreview> ItemClicked = delegate { };
 
             readonly int sectionHeight = Conversion.ConvertDpToPixels(56);
-
-            public static class ViewType
-            {
-                public const int TemplateView = 0;
-                public const int SectionView = 1;
-            }
-
-            //If we decide to change the order of public and private some of the functions need to be modified slightly
-            public static class Section
-            {
-                public const int Private = 0;
-                public const int Public = 1;
-            }
 
             List<List<TemplatePreview>> templatesInView = new List<List<TemplatePreview>>(2)
             {
@@ -250,8 +245,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool Empty => !Items.Any();
 
             public IEnumerable<TemplatePreview> Items => templatesInView.SelectMany(t => t);
-
-            public override int ItemCount => templatesInView.Sum(f => f.Count) + 2;
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
@@ -281,24 +274,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     templateViewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, preview)));
                     templateViewHolder.Name = preview.Name;
                 }
-            }
-
-            TemplatePreview GetItemAtPosition(int position)
-            {
-                var privateCount = templatesInView[Section.Private].Count;
-                var publicCount = templatesInView[Section.Public].Count;
-
-                if (position < privateCount + 1)
-                {
-                    return templatesInView[Section.Private][position - 1];
-                }
-
-                return templatesInView[Section.Public][position - 2 - privateCount];
-            }
-
-            int GetSectionAtPosition(int position)
-            {
-                return position == 0 ? Section.Private : Section.Public;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -346,6 +321,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeRemoved(2, size - 2);
             }
 
+            TemplatePreview GetItemAtPosition(int position)
+            {
+                var privateCount = templatesInView[Section.Private].Count;
+                var publicCount = templatesInView[Section.Public].Count;
+
+                if (position < privateCount + 1)
+                {
+                    return templatesInView[Section.Private][position - 1];
+                }
+
+                return templatesInView[Section.Public][position - 2 - privateCount];
+            }
+
+            int GetSectionAtPosition(int position)
+            {
+                return position == 0 ? Section.Private : Section.Public;
+            }
+
             #region RecyclerView ViewHolders
 
             class TemplateViewHolder : RecyclerView.ViewHolder
@@ -375,6 +368,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             #endregion
+
+            public static class ViewType
+            {
+                public const int TemplateView = 0;
+                public const int SectionView = 1;
+            }
+
+            //If we decide to change the order of public and private some of the functions need to be modified slightly
+            public static class Section
+            {
+                public const int Private = 0;
+                public const int Public = 1;
+            }
         }
 
     }

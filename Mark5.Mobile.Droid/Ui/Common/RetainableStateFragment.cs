@@ -1,6 +1,5 @@
 using System;
 using Android.OS;
-using Android.Support.V4.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 
@@ -101,11 +100,13 @@ namespace Mark5.Mobile.Droid.Ui.Common
             retainedFragment = null;
         }
 
+        //TODO Remove this?
         string SafeGenerateTag()
         {
             try
             {
-                return GenerateTag();
+                return "NotAnEmptyTag";
+                //return GenerateTag();
             }
             catch (Exception ex)
             {
@@ -114,8 +115,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 return null;
             }
         }
-
-        public abstract string GenerateTag();
 
         public interface IRetainableState
         {

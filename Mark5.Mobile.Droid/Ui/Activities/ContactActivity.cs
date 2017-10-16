@@ -1,5 +1,6 @@
 using System;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -22,6 +23,25 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context, int? folderId = null, Folder folder = null, int? contactId = null, ContactPreview contactPreview = null)
+        {
+            var intent = new Intent(context, typeof(ContactActivity));
+
+            if (folderId != null)
+                intent.PutExtra(FolderIdIntentKey, folderId.Value);
+            
+            if (folder != null)
+                intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+            
+            if (contactId != null)
+                intent.PutExtra(ContactIdIntentKey, contactId.Value);
+            
+            if (contactPreview != null)
+                intent.PutExtra(ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
+            
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -38,27 +58,30 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var cf = new ContactFragment();
+                int? folderId = null;
+                Folder folder = null;
+                int? contactId = null;
+                ContactPreview contactPreview = null;
+                Guid? notificationGuid = null;
 
                 if (Intent.HasExtra(FolderIdIntentKey))
-                    cf.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+                    folderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    cf.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(ContactIdIntentKey))
-                    cf.ContactId = Intent.Extras.GetInt(ContactIdIntentKey);
+                    contactId = Intent.Extras.GetInt(ContactIdIntentKey);
 
                 if (Intent.HasExtra(ContactPreviewIntentKey))
-                    cf.ContactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
+                    contactPreview = Serializer.Deserialize<ContactPreview>(Intent.Extras.GetString(ContactPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    cf.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
-                cf.CloseRequest = OnBackPressed;
-
+                var (cf, tag) = ContactFragment.NewInstance(folderId, folder, contactId, contactPreview, notificationGuid);
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, cf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactActivity)}");

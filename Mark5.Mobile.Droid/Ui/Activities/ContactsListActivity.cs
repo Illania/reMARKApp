@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -26,6 +27,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityRemovedToken;
         TinyMessageSubscriptionToken contactPreviewChangedToken;
 
+        public static Intent CreateIntent(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(ContactsListActivity));
+            intent.PutExtra(FolderIntentKey,Serializer.Serialize(folder));
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -43,14 +52,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = new ContactsListFragment
-                {
-                    Folder = folder,
-                    CloseRequest = OnBackPressed
-                };
-                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                (clf, tag) = ContactsListFragment.NewInstance(folder);
+
+                ft.Replace(Resource.Id.fragment_container, clf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactsListActivity)}");

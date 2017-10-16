@@ -17,6 +17,7 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -38,8 +39,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         bool permissionsAsked;
 
-        #region Activity lifecycle
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(MainActivity));
+        }
 
+        #region Activity lifecycle
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -94,19 +99,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
 
-                Task.Run(async () =>
-                    {
-                        var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-                        return ss;
-                    })
-                    .ContinueWith(t =>
-                        {
-                            var ss = t.Result;
-
-                            navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
-                        },
-                        TaskScheduler.FromCurrentSynchronizationContext());
-
+                var ss = AsyncHelpers.RunSync(() => Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local));
+                navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
+ 
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
             else
@@ -201,59 +196,31 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             drawerToggle.OnConfigurationChanged(newConfig);
         }
 
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (drawerToggle.OnOptionsItemSelected(item))
+                return true;
+
+            return base.OnOptionsItemSelected(item);
+        }
+
         #endregion
 
         #region Utility methods
-
-        async void CheckAutoSavedDocument()
-        {
-            try
-            {
-                var isAvailable = await Managers.DocumentsManager.IsDocumentWorkingCopyAvailableAsync();
-                if (!isAvailable)
-                    return;
-
-                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
-                if (shouldRecover)
-                {
-                    StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.None, CopyToNewOption.None, true));
-                }
-                else
-                {
-                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Error while checking is there is an autosaved document", ex);
-            }
-        }
 
         public void LockDrawer()
         {
             drawer?.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
         }
-
+        
         public void UnlockDrawer()
         {
             drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
         }
 
-        void NavHeaderSettingsButton_Click(object sender, EventArgs e)
-        {
-            drawerToggle.RunWhenIdle(() =>
-            {
-                var i = new Intent(this, typeof(PreferenceActivity));
-                StartActivity(i);
-            });
-
-            drawer.CloseDrawer(GravityCompat.Start);
-        }
-
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
             CommonConfig.Logger.Info($"Switching to {menuItem.TitleFormatted}...");
-
             drawerToggle.RunWhenIdle(() =>
                 {
                     if (lastSelectedItem != menuItem)
@@ -276,18 +243,44 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return true;
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (drawerToggle.OnOptionsItemSelected(item))
-                return true;
-
-            return base.OnOptionsItemSelected(item);
-        }
-
         public void OnBackStackChanged()
         {
             drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
             drawerToggle.SyncState();
+        }
+
+        void NavHeaderSettingsButton_Click(object sender, EventArgs e)
+        {
+            drawerToggle.RunWhenIdle(() =>
+            {
+                StartActivity(PreferenceActivity.CreateIntent(this));
+            });
+
+            drawer.CloseDrawer(GravityCompat.Start);
+        }
+
+        async void CheckAutoSavedDocument()
+        {
+            try
+            {
+                var isAvailable = await Managers.DocumentsManager.IsDocumentWorkingCopyAvailableAsync();
+                if (!isAvailable)
+                    return;
+
+                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
+                if (shouldRecover)
+                {
+                    StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.None, CopyToNewOption.None, true));
+                }
+                else
+                {
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while checking if there is an autosaved document", ex);
+            }
         }
 
         #endregion
@@ -344,22 +337,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     Restore(fm);
             }
 
+
             void Create(FragmentManager fm)
             {
                 RetainableStateFragment f = null;
+                string tag;
 
                 if (ModuleType == ModuleType.Documents)
-                    f = new FoldersNotificationsListFragment
-                    {
-                        RemoteFolder = Folder.RootForModule(ModuleType)
-                    };
-                else if (ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
-                    f = new FoldersListFragment
-                    {
-                        RemoteFolder = Folder.RootForModule(ModuleType)
-                    };
-
-                var tag = f.GenerateTag();
+                    (f, tag) = FoldersNotificationsListFragment.NewInstance(Folder.RootForModule(ModuleType));
+                else //(ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
+                    (f, tag) = FoldersListFragment.NewInstance(Folder.RootForModule(ModuleType));
+                
                 var ft = fm.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, f, tag);
@@ -384,9 +372,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     RetainableStateFragment f = null;
 
                     if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
-                        f = new FoldersNotificationsListFragment();
+                        f = FoldersNotificationsListFragment.NewInstance();
                     else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
-                        f = new FoldersListFragment();
+                        f = FoldersListFragment.NewInstance();
 
                     f.SetInitialSavedState(state);
 

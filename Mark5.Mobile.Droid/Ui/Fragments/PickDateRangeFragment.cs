@@ -1,6 +1,6 @@
-using System;
+﻿using System;
+using System.Threading.Tasks;
 using Android.Animation;
-using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -13,24 +13,60 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.SearchViews;
-using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickDateRangeFragment : RetainableStateFragment
     {
+        public Task<(long, long)> Task => tcs.Task;
+
+        readonly TaskCompletionSource<(long, long)> tcs = new TaskCompletionSource<(long, long)>();
+
+        const string FromTimestampBundleKey = "FromTimestamp_f9118547-848d-48fd-a9a8-b2d721494ef8";
+        const string ToTimestampBundleKey = "ToTimestamp_680c200a-8617-412f-aec6-8c0c059db839";
+        const string StartWithToDateBundleKey = "StartWithToDate_3ce7c7d1-0d5d-4821-8b17-cbc0a04889cf";
+
         DocumentPickDateHeaderView dateHeaderView;
 
         CalendarView fromCalendarView;
         CalendarView toCalendarView;
 
-        public Action<long, long> CloseRequest { get; set; }
-        public bool StartWithToDate { get; set; }
-        public long FromTimestamp { get; set; }
-        public long ToTimestamp { get; set; }
+        long fromTimestamp;
+        long toTimestamp;
+        bool startWithToDate;
+
+        public static (PickDateRangeFragment fragment, string tag) NewInstance(long? fromTimestamp, long? toTimestamp, bool? startWithToDate)
+        {
+            var args = new Bundle();
+
+            if (fromTimestamp != null)
+                args.PutLong(FromTimestampBundleKey, fromTimestamp.Value);
+
+            if (toTimestamp != null)
+                args.PutLong(ToTimestampBundleKey, toTimestamp.Value);
+
+            if (startWithToDate != null)
+                args.PutBoolean(StartWithToDateBundleKey, startWithToDate.Value);
+
+            var fragment = new PickDateRangeFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(PickDateRangeFragment)}";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(FromTimestampBundleKey))
+                fromTimestamp = Arguments.GetLong(FromTimestampBundleKey);
+
+            if (Arguments.ContainsKey(ToTimestampBundleKey))
+                toTimestamp = Arguments.GetLong(ToTimestampBundleKey);
+
+            if (Arguments.ContainsKey(StartWithToDateBundleKey))
+                startWithToDate = Arguments.GetBoolean(StartWithToDateBundleKey);
+
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
             var scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
@@ -67,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.date);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.date);
 
             CommonConfig.Logger.Info($"Created {nameof(PickDateRangeFragment)}");
         }
@@ -97,7 +133,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fromCalendarView.MaxDate = toLimitCalendar.TimeInMillis;
             toCalendarView.MaxDate = toLimitCalendar.TimeInMillis;
 
-            var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+            var fromDate = fromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
             var fromDateCalendar = Java.Util.Calendar.Instance;
             fromDateCalendar.Set(Java.Util.CalendarField.Year, fromDate.Year);
             fromDateCalendar.Set(Java.Util.CalendarField.Month, fromDate.Month - 1);
@@ -106,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fromDateCalendar.Set(Java.Util.CalendarField.Minute, 0);
             fromDateCalendar.Set(Java.Util.CalendarField.Second, 1);
 
-            var toDate = ToTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+            var toDate = toTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
             var toDateCalendar = Java.Util.Calendar.Instance;
             toDateCalendar.Set(Java.Util.CalendarField.Year, toDate.Year);
             toDateCalendar.Set(Java.Util.CalendarField.Month, toDate.Month - 1);
@@ -115,13 +151,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             toDateCalendar.Set(Java.Util.CalendarField.Minute, 59);
             toDateCalendar.Set(Java.Util.CalendarField.Second, 59);
 
-            fromCalendarView.Date = FromTimestamp == -1 ? fromLimitCalendar.TimeInMillis : fromDateCalendar.TimeInMillis;
-            toCalendarView.Date = ToTimestamp == -1 ? toLimitCalendar.TimeInMillis : toDateCalendar.TimeInMillis;
+            fromCalendarView.Date = fromTimestamp == -1 ? fromLimitCalendar.TimeInMillis : fromDateCalendar.TimeInMillis;
+            toCalendarView.Date = toTimestamp == -1 ? toLimitCalendar.TimeInMillis : toDateCalendar.TimeInMillis;
 
             UpdateDatePickersLimits();
             UpdateText();
 
-            if (StartWithToDate)
+            if (startWithToDate)
                 SelectTo();
             else
                 SelectFrom();
@@ -161,7 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void FromDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            FromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 0, DateTimeKind.Unspecified).ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            fromTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 0, 0, 0, DateTimeKind.Unspecified).ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             UpdateDatePickersLimits();
@@ -171,7 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void ToDatePicker_DateChange(object sender, CalendarView.DateChangeEventArgs e)
         {
-            ToTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Unspecified).ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            toTimestamp = new DateTime(e.Year, e.Month + 1, e.DayOfMonth, 23, 59, 59, DateTimeKind.Unspecified).ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
             UpdateText();
             CloseFragment();
@@ -179,15 +215,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void UpdateText()
         {
-            dateHeaderView.SetToText(ToTimestamp);
-            dateHeaderView.SetFromText(FromTimestamp);
+            dateHeaderView.SetToText(toTimestamp);
+            dateHeaderView.SetFromText(fromTimestamp);
         }
 
         void UpdateDatePickersLimits()
         {
-            if (FromTimestamp != -1)
+            if (fromTimestamp != -1)
             {
-                var fromDate = FromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+                var fromDate = fromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
                 var fromDateCalendar = Java.Util.Calendar.Instance;
                 fromDateCalendar.Set(Java.Util.CalendarField.Year, fromDate.Year);
                 fromDateCalendar.Set(Java.Util.CalendarField.Month, fromDate.Month - 1);
@@ -205,9 +241,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CloseFragment()
         {
-            if (CloseRequest != null)
-                CloseRequest(FromTimestamp, ToTimestamp);
-            ((AppCompatActivity) Activity).OnBackPressed();
+            tcs.SetResult((fromTimestamp, toTimestamp));
+            ((AppCompatActivity)Activity).OnBackPressed();
         }
 
         #region Retained State
@@ -216,8 +251,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new PickDateRangeFragmentState
             {
-                FromTimestamp = FromTimestamp,
-                ToTimestamp = ToTimestamp,
+                FromTimestamp = fromTimestamp,
+                ToTimestamp = toTimestamp,
                 StartWithToDate = toCalendarView.Visibility == ViewStates.Visible,
             };
         }
@@ -227,15 +262,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fs = restoredState as PickDateRangeFragmentState;
             if (fs != null)
             {
-                FromTimestamp = fs.FromTimestamp;
-                ToTimestamp = fs.ToTimestamp;
-                StartWithToDate = fs.StartWithToDate;
+                fromTimestamp = fs.FromTimestamp;
+                toTimestamp = fs.ToTimestamp;
+                startWithToDate = fs.StartWithToDate;
             }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickDateRangeFragment)}";
         }
 
         class PickDateRangeFragmentState : IRetainableState

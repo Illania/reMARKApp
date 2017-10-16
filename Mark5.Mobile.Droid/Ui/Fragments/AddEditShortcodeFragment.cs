@@ -22,15 +22,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class AddEditShortcodeFragment : RetainableStateFragment
     {
+        const string ShortcodeBundleKey = "Shortcode_abf63445-9b80-4ddf-8af6-f1d0d8ea2044";
+        const string ShortcodePreviewBundleKey = "ShortcodePreview_880203fa-26a5-4111-a85a-d907fa3fdbd1";
+        const string ShortcodeCreationModeFlagBundleKey = "ShortcodeCreationModeFlag_0e4124b4-943c-4078-b88b-e4d15e9c0fde";
+
         static class RequestCodes
         {
             public const int ContactAddressRequestCode = 111;
         }
 
-        public Shortcode Shortcode { get; set; }
-        public ShortcodePreview ShortcodePreview { get; set; }
-        public ShortcodeCreationModeFlag CreationModeFlag { get; set; }
-        public Action CloseRequest { get; set; }
+        Shortcode shortcode;
+        ShortcodePreview shortcodePreview;
+        ShortcodeCreationModeFlag creationModeFlag;
 
         LinearLayoutCompat linearLayout;
         ProgressBar progressBar;
@@ -47,10 +50,41 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AddEditShortcodeView> subviews = new List<AddEditShortcodeView>();
 
+        public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, Shortcode shortcode, ShortcodePreview shortcodePreview)
+        {
+            Bundle args = new Bundle();
+
+            if (shortcode != null)
+                args.PutString(ShortcodeBundleKey, Serializer.Serialize(shortcode));
+
+            if (shortcodePreview != null)
+                args.PutString(ShortcodePreviewBundleKey, Serializer.Serialize(shortcodePreview));
+
+            if (flag != null)
+                args.PutInt(ShortcodeCreationModeFlagBundleKey, (int)flag);
+
+            var fragment = new AddEditShortcodeFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(AddEditShortcodeFragment)}";
+
+            return (fragment, tag);
+        }
+
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AddEditShortcodeFragment)} [shortcode.id={ShortcodePreview?.Id}, " +
-                                     $" mode={CreationModeFlag}]...");
+            if (Arguments.ContainsKey(ShortcodeBundleKey))
+                shortcode = Serializer.Deserialize<Shortcode>(Arguments.GetString(ShortcodeBundleKey));
+
+            if (Arguments.ContainsKey(ShortcodePreviewBundleKey))
+                shortcodePreview = Serializer.Deserialize<ShortcodePreview>(Arguments.GetString(ShortcodePreviewBundleKey));
+
+            if (Arguments.ContainsKey(ShortcodeCreationModeFlagBundleKey))
+                creationModeFlag = (ShortcodeCreationModeFlag)Arguments.GetInt(ShortcodeCreationModeFlagBundleKey);
+
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditShortcodeFragment)} [shortcode.id={shortcodePreview?.Id}, " +
+                                     $" mode={creationModeFlag}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -84,11 +118,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void SetTitle()
         {
             var resId = 0;
-            if (CreationModeFlag == ShortcodeCreationModeFlag.New)
+            if (creationModeFlag == ShortcodeCreationModeFlag.New)
             {
                 resId = Resource.String.edit_shortcode_create;
             }
-            else if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
+            else if (creationModeFlag == ShortcodeCreationModeFlag.Edit)
             {
                 resId = Resource.String.edit_shortcode_edit;
             }
@@ -117,8 +151,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditShortcodeFragment)} [shortcode.id={ShortcodePreview?.Id}, " +
-                                     $" mode={CreationModeFlag}]...");
+            CommonConfig.Logger.Info($"Created {nameof(AddEditShortcodeFragment)} [shortcode.id={shortcodePreview?.Id}, " +
+                                     $" mode={creationModeFlag}]...");
         }
 
         public override void OnResume()
@@ -141,10 +175,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshData()
         {
-            if (CreationModeFlag == ShortcodeCreationModeFlag.New && Shortcode == null && ShortcodePreview == null)
+            if (creationModeFlag == ShortcodeCreationModeFlag.New && shortcode == null && shortcodePreview == null)
             {
-                Shortcode = new Shortcode();
-                ShortcodePreview = new ShortcodePreview();
+                shortcode = new Shortcode();
+                shortcodePreview = new ShortcodePreview();
             }
 
             RefreshView();
@@ -157,9 +191,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             foreach (var subview in subviews)
             {
-                subview.Shortcode = Shortcode;
-                subview.ShortcodePreview = ShortcodePreview;
-                subview.CreationModeFlag = CreationModeFlag;
+                subview.Shortcode = shortcode;
+                subview.ShortcodePreview = shortcodePreview;
+                subview.CreationModeFlag = creationModeFlag;
                 subview.RefreshView();
             }
         }
@@ -174,26 +208,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            var titleResource = CreationModeFlag == ShortcodeCreationModeFlag.Edit ? Resource.String.edit_shortcode_edit_loading : Resource.String.edit_shortcode_add_loading;
+            var titleResource = creationModeFlag == ShortcodeCreationModeFlag.Edit ? Resource.String.edit_shortcode_edit_loading : Resource.String.edit_shortcode_add_loading;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
 
             try
             {
-                await Managers.ShortcodesManager.CreateOrUpdateShortcodeAsync(Shortcode, ShortcodePreview);
+                await Managers.ShortcodesManager.CreateOrUpdateShortcodeAsync(shortcode, shortcodePreview);
 
                 dismissAction();
 
-                if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
-                    CommonConfig.MessengerHub.Publish(new ShortcodePreviewChangedMessage(this, ShortcodePreview));
+                if (creationModeFlag == ShortcodeCreationModeFlag.Edit)
+                    CommonConfig.MessengerHub.Publish(new ShortcodePreviewChangedMessage(this, shortcodePreview));
 
-                CloseRequest?.Invoke();
+                Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing shortcode  [shortcode.id={ShortcodePreview?.Id}, " +
-                                     $" mode={CreationModeFlag}]...", ex);
+                CommonConfig.Logger.Error($"Error while adding/editing shortcode  [shortcode.id={shortcodePreview?.Id}, " +
+                                     $" mode={creationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -237,18 +271,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Retainable State
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(AddEditShortcodeFragment)}";
-        }
-
         public override IRetainableState OnRetainInstanceState()
         {
             return new AddEditShortcodeFragmentState
             {
-                Shortcode = Shortcode,
-                ShortcodePreview = ShortcodePreview,
-                CreationModeFlag = CreationModeFlag,
+                Shortcode = shortcode,
+                ShortcodePreview = shortcodePreview,
+                CreationModeFlag = creationModeFlag,
                 RequestAddressType = requestAddressType,
             };
         }
@@ -257,9 +286,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (restoredState is AddEditShortcodeFragmentState state)
             {
-                Shortcode = state.Shortcode;
-                ShortcodePreview = state.ShortcodePreview;
-                CreationModeFlag = state.CreationModeFlag;
+                shortcode = state.Shortcode;
+                shortcodePreview = state.ShortcodePreview;
+                creationModeFlag = state.CreationModeFlag;
                 requestAddressType = state.RequestAddressType;
             }
         }

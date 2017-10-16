@@ -21,6 +21,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context,
+                                          ShortcodeCreationModeFlag flag,
+                                          Shortcode shortcode = null,
+                                          ShortcodePreview shortcodePreview = null)
+        {
+            var intent = new Intent(context, typeof(AddEditShortcodeActivity));
+
+            intent.PutExtra(ShortcodeCreationModeFlagIntentKey, (int)flag);
+
+            if (shortcode != null)
+                intent.PutExtra(ShortcodeIntentKey, Serializer.Serialize(shortcode));
+            if (shortcodePreview != null)
+                intent.PutExtra(ShortcodePreviewIntentKey, Serializer.Serialize(shortcodePreview));
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -37,21 +54,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var cf = new AddEditShortcodeFragment();
-
-                cf.CloseRequest = CloseRequest;
+                ShortcodePreview sp = null;
+                Shortcode s = null;
+                ShortcodeCreationModeFlag? flag = null;
 
                 if (Intent.HasExtra(ShortcodePreviewIntentKey))
-                    cf.ShortcodePreview = Serializer.Deserialize<ShortcodePreview>(Intent.Extras.GetString(ShortcodePreviewIntentKey));
+                    sp = Serializer.Deserialize<ShortcodePreview>(Intent.Extras.GetString(ShortcodePreviewIntentKey));
 
                 if (Intent.HasExtra(ShortcodeIntentKey))
-                    cf.Shortcode = Serializer.Deserialize<Shortcode>(Intent.Extras.GetString(ShortcodeIntentKey));
+                    s = Serializer.Deserialize<Shortcode>(Intent.Extras.GetString(ShortcodeIntentKey));
 
                 if (Intent.HasExtra(ShortcodeCreationModeFlagIntentKey))
-                    cf.CreationModeFlag = (ShortcodeCreationModeFlag)Intent.Extras.GetInt(ShortcodeCreationModeFlagIntentKey);
+                    flag = (ShortcodeCreationModeFlag)Intent.Extras.GetInt(ShortcodeCreationModeFlagIntentKey);
+
+                var (cf, tag) = AddEditShortcodeFragment.NewInstance(flag, s, sp);
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, cf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(AddEditShortcodeActivity)}");
@@ -62,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        void CloseRequest()
+        public override void OnBackPressed()
         {
             var intent = new Intent();
             SetResult(Result.Ok, intent);

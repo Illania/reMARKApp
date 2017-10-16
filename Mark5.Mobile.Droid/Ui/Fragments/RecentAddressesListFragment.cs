@@ -24,6 +24,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         RecentAddressesListAdapter adapter;
 
+        public static (RecentAddressesListFragment fragment, string tag) NewInstance()
+        {
+            var fragment = new RecentAddressesListFragment();
+            var tag = $"{nameof(RecentAddressesListFragment)}";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(RecentAddressesListFragment)}");
@@ -101,11 +109,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #region Retainable State
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(RecentAddressesListFragment)}";
-        }
 
         public override IRetainableState OnRetainInstanceState()
         {

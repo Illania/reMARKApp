@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -21,8 +22,27 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
 
         DocumentsSearchResultsFragment dlf;
+        string dlfFragmentTag;
 
         TinyMessageSubscriptionToken readStatusToken;
+
+        public static Intent CreateIntent(Context context, ModuleType moduleType, SearchContactsCriteria contactCriteria = null, 
+                                          SearchDocumentsCriteria documentCriteria = null, SearchShortcodesCriteria shortcodeCriteria = null) 
+        {
+            var intent = new Intent(context, typeof(SearchResultsActivity));
+            intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+
+            if (contactCriteria != null)
+                intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(contactCriteria));
+            
+            if(documentCriteria != null)
+                intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(documentCriteria));
+            
+            if(shortcodeCriteria != null)
+                intent.PutExtra(CriteriaIntentKey, Serializer.Serialize(shortcodeCriteria));
+            
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -48,12 +68,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    dlf = new DocumentsSearchResultsFragment
-                    {
-                        Criteria = criteria,
-                        CloseRequest = OnBackPressed
-                    };
-                    ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                    (dlf, dlfFragmentTag) = DocumentsSearchResultsFragment.NewInstance(criteria);
+                    ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                     ft.Commit();
                 }
 
@@ -62,12 +78,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchContactsCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var csrf = new ContactsSearchResultsFragment
-                    {
-                        Criteria = criteria,
-                        CloseRequest = OnBackPressed
-                    };
-                    ft.Replace(Resource.Id.fragment_container, csrf, csrf.GenerateTag());
+                    var (csrf, tag) = ContactsSearchResultsFragment.NewInstance(criteria);
+                    ft.Replace(Resource.Id.fragment_container, csrf, tag);
                     ft.Commit();
                 }
 
@@ -76,12 +88,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var criteria = Serializer.Deserialize<SearchShortcodesCriteria>(Intent.Extras.GetString(CriteriaIntentKey));
 
                     var ft = SupportFragmentManager.BeginTransaction();
-                    var ssrf = new ShortcodesSearchResultsFragment
-                    {
-                        Criteria = criteria,
-                        CloseRequest = OnBackPressed
-                    };
-                    ft.Replace(Resource.Id.fragment_container, ssrf, ssrf.GenerateTag());
+                    var (ssrf, tag) = ShortcodesSearchResultsFragment.NewInstance(criteria);
+                    ft.Replace(Resource.Id.fragment_container, ssrf, tag);
                     ft.Commit();
                 }
 

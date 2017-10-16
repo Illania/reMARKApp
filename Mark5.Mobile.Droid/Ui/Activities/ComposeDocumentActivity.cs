@@ -15,11 +15,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ComposeDocumentActivity : BaseAppCompatActivity
     {
-        Toolbar toolbar;
-        ComposeDocumentFragment cdf;
-
         const string DocumentCreationModeFlagIntentKey = "DocumentCreationModeFlag_290d1383-175d-4e2d-8f5e-ca899baff3f7";
-        const string CopyToNewOptionsIntentKey = "CopyToNewOptions_f298d024-4df0-431d-ad3d-1834eb0dede0";
+        const string CopyToNewOptionIntentKey = "CopyToNewOptions_f298d024-4df0-431d-ad3d-1834eb0dede0";
         const string RestoreWorkingCopyIntentKey = "RestoreWorkingCopy_7c921825-0a4b-47e6-91b6-9c3d59a895e6";
         const string PreviousDocumentDirectionIntentKey = "PreviousDocumentDirection_edefdcd2-764f-439d-891b-178b8de29333";
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderId_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
@@ -28,6 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
+
+        Toolbar toolbar;
+        ComposeDocumentFragment cdf;
 
         public static Intent CreateIntent(Context context,
                                           DocumentCreationModeFlag documentCreationModeFlag,
@@ -39,8 +39,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                           Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
+
             intent.PutExtra(DocumentCreationModeFlagIntentKey, (int)documentCreationModeFlag);
-            intent.PutExtra(CopyToNewOptionsIntentKey, (int)copyToNewOptions);
+            intent.PutExtra(CopyToNewOptionIntentKey, (int)copyToNewOptions);
             intent.PutExtra(RestoreWorkingCopyIntentKey, restoreWorkingCopy);
 
             if (previousDocumentDirection != DocumentDirection.None)
@@ -74,28 +75,42 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                cdf = new ComposeDocumentFragment()
-                {
-                    DocumentCreationModeFlag = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey),
-                    CopyToNewOption = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionsIntentKey),
-                    RestoreWorkingCopy = Intent.Extras.GetBoolean(RestoreWorkingCopyIntentKey)
-                };
+                DocumentCreationModeFlag? documentCreationMode = null;
+                CopyToNewOption? copyToNewOption = null;
+                bool? restoreWorkingCopy = null;
+                DocumentDirection? previousDocumentDirection = null;
+                int? previousDocumentFolderId = null;
+                int? previousDocumentId = null;
+                Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null;
+
+                if (Intent.HasExtra(DocumentCreationModeFlagIntentKey))
+                    documentCreationMode = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey);
+
+                if (Intent.HasExtra(CopyToNewOptionIntentKey))
+                    copyToNewOption = (CopyToNewOption)Intent.Extras.GetInt(CopyToNewOptionIntentKey);
+
+                if (Intent.HasExtra(RestoreWorkingCopyIntentKey))
+                    restoreWorkingCopy = Intent.Extras.GetBoolean(RestoreWorkingCopyIntentKey);
 
                 if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
-                    cdf.PreviousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
-
+                    previousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
+                
                 if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
-                    cdf.PreviousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
+                    previousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
 
                 if (Intent.HasExtra(PreviousDocumentIdIntentKey))
-                    cdf.PreviousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
+                    previousDocumentId = Intent.Extras.GetInt(PreviousDocumentIdIntentKey);
 
                 if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
-                    cdf.PreconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
+                    preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
 
-                cdf.CloseRequest = base.OnBackPressed;
-
-                cdfFragmentTag = cdf.GenerateTag();
+                (cdf, cdfFragmentTag) = ComposeDocumentFragment.NewInstance(documentCreationMode.Value,
+                                                                            copyToNewOption,
+                                                                            restoreWorkingCopy,
+                                                                            previousDocumentDirection,
+                                                                            previousDocumentFolderId,
+                                                                            previousDocumentId,
+                                                                            preconfiguredEmailAddresses);
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);

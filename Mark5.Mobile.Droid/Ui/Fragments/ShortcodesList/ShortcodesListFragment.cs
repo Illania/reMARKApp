@@ -1,4 +1,5 @@
-﻿using Android.Content;
+using Android.Content;
+using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -11,6 +12,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ShortcodesListFragment : AbstractShortcodesListFragment
     {
+        public static (ShortcodesListFragment fragment, string tag) NewInstance(Folder folder)
+        {
+            var args = new Bundle();
+
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            var fragment = new ShortcodesListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(AbstractShortcodesListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
+
+            return (fragment, tag);
+        }
+
         FloatingActionButton fab;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
@@ -28,9 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void CreateShortcode()
         {
-            var intent = new Intent(Context, typeof(AddEditShortcodeActivity));
-            intent.PutExtra(AddEditShortcodeActivity.ShortcodeCreationModeFlagIntentKey, (int)ShortcodeCreationModeFlag.New);
-            StartActivity(intent);
+            StartActivity(AddEditShortcodeActivity.CreateIntent(Context, ShortcodeCreationModeFlag.New));
         }
 
         #region Adapter callbacks
@@ -39,10 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ActionMode == null)
             {
-                var i = new Intent(Activity, typeof(ShortcodeActivity));
-                i.PutExtra(ShortcodeActivity.FolderIntentKey, Serializer.Serialize(Folder));
-                i.PutExtra(ShortcodeActivity.ShortcodePreviewIntentKey, Serializer.Serialize(shortcodePreview));
-                StartActivity(i);
+                StartActivity(ShortcodeActivity.CreateIntent(Context, folder: Folder, shortcodePreview: shortcodePreview));
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿using Android.OS;
+using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
@@ -6,8 +6,10 @@ using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using System;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -19,13 +21,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Resource.String.notifications
         };
 
-        public Folder RemoteFolder { get; set; }
+        const string RemoteFolderBundleKey = "RemoteFolder_403cbd64-83e9-4e13-8809-0868debb55b9";
+
+        Folder remoteFolder;
 
         TabLayout tabLayout;
         ViewPager pager;
 
+        public static FoldersNotificationsListFragment NewInstance()
+        {
+            return new FoldersNotificationsListFragment();
+        }
+
+        public static (FoldersNotificationsListFragment fragment, string tag) NewInstance(Folder remoteFolder)
+        {
+            var args = new Bundle();
+
+            if (remoteFolder != null)
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
+
+            var fragment = new FoldersNotificationsListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if ((Arguments != null) && Arguments.ContainsKey(RemoteFolderBundleKey))
+                remoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsRetainableState)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.pager, container, false);
@@ -35,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             pager = rootView.FindViewById<ViewPager>(Resource.Id.pager);
             pager.OffscreenPageLimit = 1;
             pager.AddOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-            pager.Adapter = new PagerAdapter(ChildFragmentManager, RemoteFolder);
+            pager.Adapter = new PagerAdapter(ChildFragmentManager, remoteFolder);
 
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
 
@@ -51,9 +78,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            if (remoteFolder.Root)
+                remoteFolder = Folder.RootForModule(remoteFolder.Module);
+
             var title = string.Empty;
 
-            switch (RemoteFolder.Module)
+            switch (remoteFolder.Module)
             {
                 case ModuleType.Documents:
                     title = GetString(Resource.String.documents);
@@ -67,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = remoteFolder.Root ? null : remoteFolder.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersNotificationsRetainableState)}");
         }
@@ -76,7 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             return new FoldersNotificationsRetainableState
             {
-                Folder = RemoteFolder,
+                Folder = remoteFolder,
                 SelectedTab = pager.CurrentItem
             };
         }
@@ -85,14 +115,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (restoredState is FoldersNotificationsRetainableState srs)
             {
-                RemoteFolder = srs.Folder;
+                remoteFolder = srs.Folder;
                 pager.CurrentItem = srs.SelectedTab;
             }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(FoldersNotificationsListFragment)} [FolderId={RemoteFolder.Id}, ModuleType={RemoteFolder.Module}]";
         }
 
         class FoldersNotificationsRetainableState : IRetainableState
@@ -119,15 +144,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 switch (position)
                 {
                     case 0:
-                        return new FoldersListFragment
-                        {
-                            RemoteFolder = folder
-                        };
+                        //Item1 is the fragment
+                        return FoldersListFragment.NewInstance(folder).fragment;
                     case 1:
-                        return new NotificationsListFragment
-                        {
-                            ObjectTypes = folder.Module.ObjectTypes()
-                        };
+                        return NotificationsListFragment.NewInstance(folder.Module.ObjectTypes()).fragment;
                     default:
                         return null;
                 }

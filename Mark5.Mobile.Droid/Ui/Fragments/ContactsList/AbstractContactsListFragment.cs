@@ -27,13 +27,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public abstract class AbstractContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        static class RequestCodes
-        {
-            public const int SaveOfflineRequest = 1;
-        }
-
         public Folder Folder { get; set; }
-        public Action CloseRequest { get; set; }
+
+        protected ContactsListAdapter CurrentAdapter => (ContactsListAdapter)recyclerView.GetAdapter();
+
+        protected ActionMode ActionMode;
+
+        readonly Handler searchHandler = new Handler();
+
+        protected const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
 
         bool refreshing;
 
@@ -42,22 +44,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         ContactsListAdapter adapter;
         ContactsListAdapter searchAdapter;
-        protected ActionMode ActionMode;
         SearchView searchView;
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
-        protected ContactsListAdapter CurrentAdapter => (ContactsListAdapter)recyclerView.GetAdapter();
-
         CancellationTokenSource cts;
-
-        readonly Handler searchHandler = new Handler();
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(FolderBundleKey))
+                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -178,10 +178,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                var i = new Intent(Activity, typeof(SearchActivity));
-                i.PutExtra(SearchActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
-                StartActivity(i);
-
+                StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Contacts));
                 return true;
             }
 
@@ -234,11 +231,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(ContactsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
-        }
-
         #endregion
 
         #region Refreshing
@@ -266,10 +258,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await Managers.FoldersManager.RemoveSavedFolderInfo(Folder);
                 if (result == 0)
                 {
-                    var i = new Intent(Activity, typeof(DownloadActivity));
-                    i.PutExtra(DownloadActivity.FolderIntentKey, Serializer.Serialize(Folder));
-                    StartActivityForResult(i, RequestCodes.SaveOfflineRequest);
-
+                    StartActivityForResult(DownloadActivity.CreateIntent(Context, Folder), RequestCodes.SaveOfflineRequest);
                     refreshLayout.Refreshing = false;
                     refreshing = false;
 
@@ -312,8 +301,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     Dialogs.ShowErrorDialog(Activity, ex);
 
-                    if (CloseRequest != null && adapter.ItemCount < 1)
-                        CloseRequest();
+                    if (adapter.ItemCount < 1)
+                        Activity?.OnBackPressed();
                 },
                 startRowId,
                 cts.Token,
@@ -335,16 +324,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #endregion
 
         #region Action mode
-
-        static class MenuItemActions
-        {
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int Categories = 50;
-            public const int DeleteFromFolder = 70;
-            public const int Delete = 71;
-        }
 
         public bool OnCreateActionMode(ActionMode mode, IMenu menu)
         {
@@ -386,35 +365,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                StartActivity(i);
-
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 ActionMode?.Finish();
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
-                StartActivity(i);
-
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), Folder));
                 ActionMode?.Finish();
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.First()));
-                StartActivity(i);
-
+                StartActivity(CategoriesListActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.First()));
                 ActionMode?.Finish();
                 return true;
             }
@@ -472,9 +437,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
-                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
-                StartActivity(i);
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 
@@ -536,9 +499,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        static class MenuItemActions
+        {
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int Categories = 50;
+            public const int DeleteFromFolder = 70;
+            public const int Delete = 71;
+        }
+
         #endregion
 
         #region Filtering
+
+        static bool MatchesQuery(ContactPreview cp, string query)
+        {
+            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+
+            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
+                return true;
+
+            return false;
+        }
 
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
@@ -590,44 +586,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
         {
             return false;
-        }
-
-        static bool MatchesQuery(ContactPreview cp, string query)
-        {
-            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.CompanyName?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.ShortId?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.Description?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (cp.PrimaryAddress?.Address?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
-            if (cp.Categories.Any(da => da.Name?.ContainsCaseInsensitive(query) ?? false))
-                return true;
-
-            return false;
-        }
-
-        #endregion
-
-        #region State
-
-        class ContactsListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-
-            public List<ContactPreview> ContactPreviews { get; set; }
-
-            public List<ContactPreview> SelectedContactPreviews { get; set; }
-
-            public bool RefreshInProgress { get; set; }
         }
 
         #endregion
@@ -738,11 +696,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class ContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
+            public override int ItemCount => Items.Count;
+
             public List<ContactPreview> Items { get; } = new List<ContactPreview>(1000);
 
             public List<ContactPreview> SelectedItems => selectedContactsInView.Values.ToList();
-
-            public override int ItemCount => Items.Count;
 
             public int SelectedItemCount => selectedContactsInView.Count;
 
@@ -947,5 +905,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        #region State
+
+        class ContactsListFragmentState : IRetainableState
+        {
+            public Folder Folder { get; set; }
+
+            public List<ContactPreview> ContactPreviews { get; set; }
+
+            public List<ContactPreview> SelectedContactPreviews { get; set; }
+
+            public bool RefreshInProgress { get; set; }
+        }
+
+        #endregion
+
+        static class RequestCodes
+        {
+            public const int SaveOfflineRequest = 1;
+        }
+
     }
 }

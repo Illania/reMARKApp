@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -16,6 +17,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         Toolbar toolbar;
 
         PhonebookContactsListFragment plf;
+        string plfFragmentTag;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(PhonebookContactsListActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -35,8 +42,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                plf = new PhonebookContactsListFragment();
-                ft.Replace(Resource.Id.fragment_container, plf, plf.GenerateTag());
+                (plf, plfFragmentTag) = PhonebookContactsListFragment.NewInstance();
+                ft.Replace(Resource.Id.fragment_container, plf, plfFragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PhonebookContactsListActivity)}");

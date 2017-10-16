@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -8,6 +9,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -15,14 +17,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickLinesListFragment : RetainableStateFragment
     {
+        public Task<List<Guid>> Task => tcs.Task;
+
+        readonly TaskCompletionSource<List<Guid>> tcs = new TaskCompletionSource<List<Guid>>();
+
+        const string SelectedLinesGuidBundleKey = "SelectedLinesGuid_4e3da19f-f5e8-4aa8-ac6e-6ff12711b2b9";
+
         RecyclerView recyclerView;
         LinesListViewAdapter adapter;
 
-        public List<Guid> SelectedLinesGuid { get; set; }
-        public Action<List<Guid>> CloseRequest { get; set; }
+        List<Guid> selectedLinesGuid;
+
+        public static (PickLinesListFragment fragment, string tag) NewInstance(List<Guid> selectedLinesGuid)
+        {
+            var args = new Bundle();
+
+            if (selectedLinesGuid != null)
+                args.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(selectedLinesGuid));
+
+            var fragment = new PickLinesListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(PickLinesListFragment)}";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(SelectedLinesGuidBundleKey))
+                selectedLinesGuid = Serializer.Deserialize<List<Guid>>(Arguments.GetString(SelectedLinesGuidBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(PickLinesListFragment)}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -59,13 +84,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void RefreshData()
-        {
-            var availableLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
-            adapter.SetSelectedLinesGuid(SelectedLinesGuid);
-            adapter.SetItems(availableLines);
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -84,10 +102,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
+        public void RefreshData()
+        {
+            var availableLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            adapter.SetSelectedLinesGuid(selectedLinesGuid);
+            adapter.SetItems(availableLines);
+        }
+
         void CloseFragment()
         {
-            if (CloseRequest != null)
-                CloseRequest(adapter.SelectedLinesGuid);
+            tcs.SetResult(adapter.SelectedLinesGuid);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 
@@ -105,12 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-                SelectedLinesGuid = clfs.SelectedLinesGuid;
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickLinesListFragment)}";
+                selectedLinesGuid = clfs.SelectedLinesGuid;
         }
 
         class PickLinesListFragmentState : IRetainableState
@@ -122,9 +141,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class LinesListViewAdapter : RecyclerView.Adapter
         {
-            public List<Guid> SelectedLinesGuid { get; } = new List<Guid>(10);
-
             public override int ItemCount => Items.Count;
+
+            public List<Guid> SelectedLinesGuid { get; } = new List<Guid>(10);
 
             public List<Line> Items { get; } = new List<Line>(10);
 

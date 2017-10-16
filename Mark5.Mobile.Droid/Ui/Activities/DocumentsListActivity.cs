@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -17,6 +18,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
 
+        const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
+        const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
+
         Toolbar toolbar;
 
         DocumentsListFragment dlf;
@@ -30,11 +34,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
 
-        const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
-        const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
-
         string dlfFragmentTag;
         string dtuFragmentTag;
+
+        public static Intent CreateIntent(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(DocumentsListActivity));
+            intent.PutExtra(FolderIntentKey,Serializer.Serialize(folder));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -57,21 +66,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 if (folder.Local && folder.Id == Folder.LocalRootForModule(ModuleType.Documents).SubFolders[0].Id)
                 {
-                    odlf = new DocumentsToUploadListFragment
-                    {
-                        CloseRequest = OnBackPressed
-                    };
-                    dtuFragmentTag = odlf.GenerateTag();
+                    (odlf, dtuFragmentTag) = DocumentsToUploadListFragment.NewInstance();
                     ft.Replace(Resource.Id.fragment_container, odlf, dtuFragmentTag);
                 }
                 else
                 {
-                    dlf = new DocumentsListFragment
-                    {
-                        Folder = folder,
-                        CloseRequest = OnBackPressed
-                    };
-                    dlfFragmentTag = dlf.GenerateTag();
+                    (dlf, dlfFragmentTag) = DocumentsListFragment.NewInstance(folder);
                     ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                 }
                 ft.Commit();

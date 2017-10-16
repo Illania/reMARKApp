@@ -14,11 +14,20 @@ namespace Mark5.Mobile.Droid
     public class CategoriesListActivity : BaseAppCompatActivity
     {
         public const string BusinessEntityPreviewIntentKey = "BusinessEntityPreview_43dc8df1-dc88-4e39-81d6-59ea495c35ff";
-
         public const string CategoriesResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
 
         Toolbar toolbar;
         CategoriesListFragment clf;
+
+        public static Intent CreateIntent(Context context, BusinessEntityPreview bep)
+        {
+            var intent = new Intent(context, typeof(CategoriesListActivity));
+
+            if (bep != null)
+                intent.PutExtra(BusinessEntityPreviewIntentKey, Serializer.Serialize(bep));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -37,14 +46,12 @@ namespace Mark5.Mobile.Droid
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var bep = Serializer.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = new CategoriesListFragment
-                {
-                    BusinessEntityPreview = bep,
-                    CloseRequest = OnBackPressed
-                };
-                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                (clf, tag) = CategoriesListFragment.NewInstance(bep);
+
+                ft.Replace(Resource.Id.fragment_container, clf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CategoriesListActivity)}");

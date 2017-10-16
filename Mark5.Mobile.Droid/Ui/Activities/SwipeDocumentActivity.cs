@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V4.App;
@@ -30,6 +31,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         ViewPager pager;
 
         SwipeDocumentActivityState state;
+
+        public static Intent CreateIntent(Context context, Folder folder, DocumentPreview documentPreview)
+        {
+            var intent = new Intent(context, typeof(SwipeDocumentActivity));
+            intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+            intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+
+            return intent;
+        }
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -113,7 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 // We need to call OnPageSelected manually due to a possible bug in ViewPager
                 if (pager.CurrentItem == 0)
-                    pager.Post(() => ((ViewPager.IOnPageChangeListener) this).OnPageSelected(pager.CurrentItem));
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
             }
             else
             {
@@ -126,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 // We need to call OnPageSelected manually due to a possible bug in ViewPager
                 if (pager.CurrentItem == 0)
-                    pager.Post(() => ((ViewPager.IOnPageChangeListener) this).OnPageSelected(pager.CurrentItem));
+                    pager.Post(() => ((ViewPager.IOnPageChangeListener)this).OnPageSelected(pager.CurrentItem));
 
                 CommonConfig.Logger.Info($"Restored {nameof(SwipeDocumentActivity)}");
             }
@@ -178,15 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var s = state;
                 var fd = state.FragmentStates[position];
 
-                var df = new DocumentFragment
-                {
-                    FolderId = s.FolderId,
-                    Folder = s.Folder,
-                    DocumentId = fd.DocumentId,
-                    DocumentPreview = fd.DocumentPreview,
-                    NotificationGuid = fd.NotificationGuid,
-                    CloseRequest = s.CloseRequest
-                };
+                var df = DocumentFragment.NewInstance(s.Folder, s.FolderId, fd.DocumentPreview, fd.DocumentId, fd.NotificationGuid).fragment;
 
                 return df;
             }
