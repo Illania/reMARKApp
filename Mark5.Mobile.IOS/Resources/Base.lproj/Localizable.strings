@@ -106,6 +106,12 @@
 "edit" = "Edit";
 "edit_categories" = "Edit categories";
 "edit_contact" = "Edit contact";
+"edit_contact_create_person" = "Create person";
+"edit_contact_create_company" = "Create company";
+"edit_contact_create_department" = "Create department";
+"edit_contact_edit_person" = "Edit person";
+"edit_contact_edit_company" = "Edit company";
+"edit_contact_edit_department" = "Edit department";
 "editing_contact___" = "Editing contact...";
 "editing_shortcode___" = "Editing shortcode...";
 "edit_message" = "Edit message";
