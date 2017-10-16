@@ -138,7 +138,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -164,7 +164,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             base.Dispose(disposing);
 
             if (CommonConfig.Logger.IsDebugEnabled())
-                CommonConfig.Logger.Debug("Disposed");
+                CommonConfig.Logger.Debug("Disposed" + "     " + ParentFolder?.Name);
         }
 
         #endregion

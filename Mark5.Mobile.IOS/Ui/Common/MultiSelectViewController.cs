@@ -94,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             doneItem.Clicked -= DoneItem_Clicked;
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 

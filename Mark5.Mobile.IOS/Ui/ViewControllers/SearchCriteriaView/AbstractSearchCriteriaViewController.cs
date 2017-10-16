@@ -161,7 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             willHideNotificationObserver?.Dispose();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 

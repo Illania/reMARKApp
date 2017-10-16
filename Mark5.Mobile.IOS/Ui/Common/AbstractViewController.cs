@@ -7,6 +7,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
     {
         public string Tag { get; set; }
 
+        bool recycled;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -22,14 +24,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 || (NavigationController?.IsBeingDismissed ?? false)
                 || (NavigationController?.IsMovingFromParentViewController ?? false))
             {
-                Recycle();
+                RecycleIfNeeded();
 #if DEBUG
                 GC.Collect();
 #endif
             }
         }
 
-        public virtual void Recycle()
+        public void RecycleIfNeeded()
+        {
+            if (!recycled)
+            {
+                Recycle();
+                recycled = true;
+            }
+        }
+
+        protected virtual void Recycle()
         {
         }
     }

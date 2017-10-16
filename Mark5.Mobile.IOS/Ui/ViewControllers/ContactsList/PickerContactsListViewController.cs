@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     var address = emailAddresses[index];
 
                     tcs.SetResult(new Recipient(contactPreview.Name, address, RecipientType.Contact));
-                    NavigationController.DismissViewController(true, null);
+                    DismissViewController(true, null);
                 }
                 else
                     await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));

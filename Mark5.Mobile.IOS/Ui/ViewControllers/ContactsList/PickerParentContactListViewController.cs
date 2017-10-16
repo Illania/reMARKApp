@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (selectedContactPreview != null)
             {
                 tcs.SetResult(selectedContactPreview);
-                NavigationController.PopViewController(false);
+                DismissViewController(true, null);
             }
         }
 

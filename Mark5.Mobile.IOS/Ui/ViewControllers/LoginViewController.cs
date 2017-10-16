@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using CoreAnimation;
 using CoreGraphics;
@@ -123,7 +123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             didChangeFrameNotificationObserver?.Dispose();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 

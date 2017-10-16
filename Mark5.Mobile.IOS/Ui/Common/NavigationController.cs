@@ -46,5 +46,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 root?.SetSearchButtonHidden(hidden, true);
             }
         }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+
+            if (IsBeingDismissed
+                || IsMovingFromParentViewController)
+            {
+                foreach (var vc in ViewControllers)
+                {
+                    (vc as AbstractViewController)?.RecycleIfNeeded();
+                    (vc as AbstractTableViewController)?.RecycleIfNeeded();
+                }
+            }
+        }
     }
 }

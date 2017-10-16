@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
-using Foundation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 var shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(Folder, shortcodePreview.Id);
                 dismissAction();
                 tcs.SetResult(shortcode);
-                NavigationController.PopViewController(true);
+                DismissViewController(true, null);
             }
             catch (Exception ex)
             {

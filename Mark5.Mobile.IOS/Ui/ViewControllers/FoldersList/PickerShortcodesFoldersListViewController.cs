@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList;
@@ -25,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -66,7 +65,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 cancelItem.Clicked -= CancelItem_Clicked;
         }
 
-        void CancelItem_Clicked(object sender, EventArgs e) => tcs.SetResult(null);
+        void CancelItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+            tcs.SetResult(null);
+        }
 
         protected async override void FolderSelected(Folder folder)
         {
@@ -78,13 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             var result = await vc.Result;
             if (result != null)
-            {
-                if (NavigationController.ViewControllers.Length == 1 && NavigationController.ViewControllers[0] == this)
-                    NavigationController.DismissViewController(true, null);
-                else
-                    NavigationController.PopViewController(false);
                 tcs.SetResult(result);
-            }
         }
 
         protected override async void FolderExpand(Folder folder)
@@ -96,13 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             var result = await vc.Result;
             if (result != null)
-            {
-                if (NavigationController.ViewControllers.Length == 1 && NavigationController.ViewControllers[0] == this)
-                    NavigationController.DismissViewController(true, null);
-                else
-                    NavigationController.PopViewController(false);
                 tcs.SetResult(result);
-            }
         }
     }
 }
