@@ -482,7 +482,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     fileToButton.Enabled = true;
 
                 if (editButtonItem != null)
+                {
                     editButtonItem.Enabled = true;
+                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                }
+
+                if (doneButtonItem != null)
+                    NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
 
                 ds.EndRefresh(this.shortcodePreview, shortcode);
             }
@@ -521,6 +527,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (fileToButton != null)
                 fileToButton.Enabled = false;
+
+            NavigationItem.SetRightBarButtonItem(null, false);
 
             ((DataSource)TableView.Source)?.Clear();
         }

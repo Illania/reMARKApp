@@ -101,7 +101,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             UnsubscribeFromKeyboardEvents();
 
-            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
             ((DataSource)TableView.Source)?.Reset();
         }
 
@@ -119,13 +118,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            cancelButtonItem = new UIBarButtonItem();
-            cancelButtonItem.Title = Localization.GetString("cancel");
+            cancelButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("cancel")
+            };
             NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
 
-            saveButtonItem = new UIBarButtonItem();
-            saveButtonItem.Title = Localization.GetString("save");
-            saveButtonItem.Enabled = true;
+            saveButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("save"),
+                Enabled = true
+            };
             NavigationItem.SetRightBarButtonItem(saveButtonItem, false);
 
             SetTitle();
@@ -135,7 +138,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.Source = new DataSource(this, TableView);
             TableView.TableFooterView = new UIView();
-            TableView.TranslatesAutoresizingMaskIntoConstraints = false;
             TableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
             TableView.Editing = true;
             TableView.AllowsSelectionDuringEditing = true;
@@ -244,8 +246,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (CreationModeFlag == ContactCreationModeFlag.New)
             {
                 Contact = new Contact();
-                ContactPreview = new ContactPreview();
-                ContactPreview.Type = ContactType;
+                ContactPreview = new ContactPreview { Type = ContactType };
             }
 
             ds.Refresh(Contact, ContactPreview, ParentContactPreview, CreationModeFlag, ParentPreselected);

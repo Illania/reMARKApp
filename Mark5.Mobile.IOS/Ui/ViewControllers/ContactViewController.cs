@@ -531,6 +531,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = new AddEditContactViewController
                 {
+                    ContactType = contactPreview.Type,
                     ContactPreview = contactPreview,
                     Contact = contact,
                     CreationModeFlag = ContactCreationModeFlag.Edit
@@ -815,7 +816,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     actionsLinksButton.Enabled = true;
 
                 if (editButtonItem != null)
+                {
                     editButtonItem.Enabled = true;
+                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                }
+
+                if (doneButtonItem != null)
+                    NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
 
                 ds.EndRefresh(this.contactPreview, contact);
             }

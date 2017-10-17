@@ -114,6 +114,8 @@
 "edit_contact_edit_department" = "Edit department";
 "editing_contact___" = "Editing contact...";
 "editing_shortcode___" = "Editing shortcode...";
+"edit_shortcode_create" = "Create shortcode";
+"edit_shortcode_edit" = "Edit shortcode";
 "edit_message" = "Edit message";
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "editing_comment___" = "Editing comment...";
