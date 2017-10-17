@@ -5,14 +5,12 @@ using System.Text;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -28,10 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem saveButtonItem;
         UIBarButtonItem cancelButtonItem;
-
-        NSObject didShowNotificationObserver;
-        NSObject willChangeFrameNotificationObserver;
-        NSObject willHideNotification;
 
         UIView activeField;
 
@@ -58,7 +52,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             InitializeHandlers();
-            SubscribeToKeyboardEvents();
         }
 
 
@@ -76,7 +69,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeInitializeHandlers();
-            UnsubscribeFromKeyboardEvents();
         }
 
         public override void DidReceiveMemoryWarning()
@@ -84,8 +76,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
-
-            UnsubscribeFromKeyboardEvents();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -98,8 +88,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             saveButtonItem = null;
             cancelButtonItem = null;
             activeField = null;
-
-            UnsubscribeFromKeyboardEvents();
 
             ((DataSource)TableView.Source)?.Reset();
         }
@@ -176,20 +164,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TableViewDataSource.ParentRowClicked -= DataSource_ParentRowClicked;
                 TableViewDataSource.ParentRemoved -= DataSource_ParentRemoved;
             }
-        }
-
-        void SubscribeToKeyboardEvents()
-        {
-            didShowNotificationObserver = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
-            willChangeFrameNotificationObserver = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardWillChangeFrameNotification);
-            willHideNotification = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
-        }
-
-        void UnsubscribeFromKeyboardEvents()
-        {
-            didShowNotificationObserver?.Dispose();
-            willChangeFrameNotificationObserver?.Dispose();
-            willHideNotification?.Dispose();
         }
 
         void SetTitle()
@@ -349,57 +323,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (!string.IsNullOrWhiteSpace(Contact.LastName))
                 sb.Append(" " + Contact.LastName);
             ContactPreview.Name = sb.ToString();
-        }
-
-        #endregion
-
-        #region Keyboard
-
-        void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
-        {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(e.Notification), e.Notification, true, true);
-        }
-
-        void OnKeyboardWillChangeFrameNotification(object sender, UIKeyboardEventArgs e)
-        {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(e.Notification), e.Notification, false, false);
-        }
-
-        void OnKeyboardWillHideNotification(object sender, UIKeyboardEventArgs e)
-        {
-            AdjustViewToKeyboard(0f, e.Notification, false, true);
-        }
-
-        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool adjustContentOffset, bool adjustInsets)
-        {
-            if (notification == null)
-            {
-                View.LayoutIfNeeded();
-                return;
-            }
-
-            if (adjustContentOffset && activeField != null)
-            {
-                var difference = activeField.Frame.Bottom - TableView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
-
-                if (difference > 0)
-                {
-                    var co = TableView.ContentOffset;
-                    co.Y += difference;
-                    TableView.SetContentOffset(co, true);
-                }
-            }
-
-            if (adjustInsets)
-            {
-                var ci = TableView.ContentInset;
-                ci.Bottom = keyboardHeight;
-                TableView.ContentInset = ci;
-
-                ci = TableView.ScrollIndicatorInsets;
-                ci.Bottom = keyboardHeight;
-                TableView.ScrollIndicatorInsets = ci;
-            }
         }
 
         #endregion

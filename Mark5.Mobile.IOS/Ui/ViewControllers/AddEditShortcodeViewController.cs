@@ -25,10 +25,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem saveButtonItem;
         UIBarButtonItem cancelButtonItem;
 
-        NSObject didShowNotificationObserver;
-        NSObject willChangeFrameNotificationObserver;
-        NSObject willHideNotification;
-
         UIView activeField;
 
         bool refreshed;
@@ -54,7 +50,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             InitializeHandlers();
-            SubscribeToKeyboardEvents();
         }
 
 
@@ -70,7 +65,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeInitializeHandlers();
-            UnsubscribeFromKeyboardEvents();
 
             CommonConfig.Logger.Info($"{nameof(AddEditShortcodeViewController)} will disappear");
         }
@@ -80,8 +74,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
-
-            UnsubscribeFromKeyboardEvents();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -94,8 +86,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             saveButtonItem = null;
             cancelButtonItem = null;
             activeField = null;
-
-            UnsubscribeFromKeyboardEvents();
 
             ((DataSource)TableView.Source)?.Reset();
         }
@@ -178,20 +168,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (TableViewDataSource != null)
                 TableViewDataSource.ViewIsActivated -= DataSource_ViewIsActivated;
-        }
-
-        void SubscribeToKeyboardEvents()
-        {
-            didShowNotificationObserver = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
-            willChangeFrameNotificationObserver = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardWillChangeFrameNotification);
-            willHideNotification = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
-        }
-
-        void UnsubscribeFromKeyboardEvents()
-        {
-            didShowNotificationObserver?.Dispose();
-            willChangeFrameNotificationObserver?.Dispose();
-            willHideNotification?.Dispose();
         }
 
         #endregion
