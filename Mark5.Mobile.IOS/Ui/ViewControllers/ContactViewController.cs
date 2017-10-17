@@ -884,6 +884,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (actionsLinksButton != null)
                 actionsLinksButton.Enabled = false;
 
+            NavigationItem.SetRightBarButtonItem(null, false);
+
             ((DataSource)TableView.Source)?.Clear();
         }
 
