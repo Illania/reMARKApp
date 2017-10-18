@@ -1,4 +1,3 @@
-using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -9,35 +8,75 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class ObjectActionsTableViewCell : UITableViewCell
+    public class ObjectActionsTableViewCell : UITableViewCell
     {
-        public const float Height = 72f;
+        public static readonly NSString DefaultId = new NSString("ObjectActionsTableViewCell");
 
-        public static readonly UINib Nib = UINib.FromName("ObjectActionsTableViewCell", NSBundle.MainBundle);
-        public static readonly NSString Key = new NSString("ObjectActionsTableViewCell");
+        readonly UILabel descriptionLabel;
+        readonly UILabel usernameLabel;
+        readonly UILabel dateLabel;
 
-        public ObjectActionsTableViewCell(IntPtr handle)
-            : base(handle)
+        public ObjectActionsTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-        }
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
 
-        public static ObjectActionsTableViewCell Create()
-        {
-            var cell = (ObjectActionsTableViewCell) Nib.Instantiate(null, null)[0];
+            descriptionLabel = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                TextColor = Theme.Black,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(descriptionLabel);
 
-            cell.UsernameLabel.Font = Theme.DefaultBoldFont;
-            cell.DateLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
+            usernameLabel = new UILabel
+            {
+                Font = Theme.DefaultBoldFont,
+                TextColor = Theme.Black,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(usernameLabel);
 
-            cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+            dateLabel = new UILabel
+            {
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                TextColor = Theme.Black,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            dateLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            dateLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContentView.Add(dateLabel);
 
-            return cell;
+            ContentView.AddConstraints(new[]
+            {
+                usernameLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                usernameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
+
+                dateLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
+                dateLabel.LeadingAnchor.ConstraintEqualTo(usernameLabel.TrailingAnchor, 8f),
+                dateLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+
+                descriptionLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                descriptionLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                descriptionLabel.TopAnchor.ConstraintEqualTo(usernameLabel.BottomAnchor, 4f),
+                descriptionLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
+            });
+
         }
 
         public void Initialize(ObjectAction action)
         {
-            UsernameLabel.Text = action.Username ?? action.UserId.ToString();
-            DateLabel.Text = action.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
-            DescriptionLabel.Text = action.Description;
+            usernameLabel.Text = action.Username ?? action.UserId.ToString();
+            dateLabel.Text = action.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime()
+                .ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
+            descriptionLabel.Text = action.Description;
         }
     }
 }
