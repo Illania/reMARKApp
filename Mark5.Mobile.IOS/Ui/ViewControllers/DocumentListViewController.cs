@@ -216,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             RefreshControl = new UIRefreshControl();
 
-            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"));
+            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
             TableView.RefreshControl = RefreshControl;
             TableView.AllowsMultipleSelectionDuringEditing = true;
 
@@ -228,7 +228,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_documents"));
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_documents"), PlatformConfig.Preferences.CompactDocumentsList);
             searchResultsController.TableView.Source = searchResultsDataSource;
 
             searchController = new UISearchController(searchResultsController)
@@ -1122,19 +1122,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public bool Empty => Items.Count < 1;
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
             public bool LoadMoreEnabled { get; set; }
-            public bool CompactList { get; set; }
 
             readonly WeakReference<DocumentsListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly string emptyText;
+            readonly bool compactList;
 
             bool loading = true;
 
-            public DataSource(DocumentsListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(DocumentsListViewController viewController, UITableView tableView, string emptyText, bool compactList)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
                 this.emptyText = emptyText;
+                this.compactList = compactList;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -1156,28 +1157,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (dp.Direction == DocumentDirection.External)
                 {
-                    var cell = tableView.DequeueReusableCell(ExternalDocumentsTableViewCell.Key) as ExternalDocumentsTableViewCell ?? ExternalDocumentsTableViewCell.Create();
+                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.ExternalId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.ExternalId);
                     cell.Initialize(dp);
                     return cell;
                 }
 
-                if (CompactList)
+                if (compactList)
                 {
-                    var cell = tableView.DequeueReusableCell(DocumentsCompactTableViewCell.Key) as DocumentsCompactTableViewCell ?? DocumentsCompactTableViewCell.Create();
+                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.CompactId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.CompactId);
                     cell.Initialize(dp);
                     return cell;
                 }
                 else
                 {
-                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.Key) as DocumentsTableViewCell ?? DocumentsTableViewCell.Create();
+                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.DefaultId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.DefaultId);
                     cell.Initialize(dp);
                     return cell;
                 }
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return DocumentsTableViewCell.Height;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)

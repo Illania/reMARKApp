@@ -140,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeView()
         {
-            TableView.Source = new DataSource(this, TableView);
+            TableView.Source = new DataSource(this, TableView, PlatformConfig.Preferences.CompactDocumentsList);
             TableView.AllowsMultipleSelectionDuringEditing = true;
 
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(DocumentPreviewLongPressed));
@@ -610,17 +610,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             public bool Empty => Items.Count < 1;
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
-            public bool CompactList { get; set; }
 
             readonly WeakReference<DocumentsSearchResultsViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
+            readonly bool compactList;
 
             bool loading = true;
 
-            public DataSource(DocumentsSearchResultsViewController viewController, UITableView tableView)
+            public DataSource(DocumentsSearchResultsViewController viewController, UITableView tableView, bool compactList)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
+                this.compactList = compactList;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -639,28 +640,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (dp.Direction == DocumentDirection.External)
                 {
-                    var cell = tableView.DequeueReusableCell(ExternalDocumentsTableViewCell.Key) as ExternalDocumentsTableViewCell ?? ExternalDocumentsTableViewCell.Create();
+                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.ExternalId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.ExternalId);
                     cell.Initialize(dp);
                     return cell;
                 }
 
-                if (CompactList)
+                if (compactList)
                 {
-                    var cell = tableView.DequeueReusableCell(DocumentsCompactTableViewCell.Key) as DocumentsCompactTableViewCell ?? DocumentsCompactTableViewCell.Create();
+                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.CompactId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.CompactId);
                     cell.Initialize(dp);
                     return cell;
                 }
                 else
                 {
-                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.Key) as DocumentsTableViewCell ?? DocumentsTableViewCell.Create();
+                    var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.DefaultId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.DefaultId);
                     cell.Initialize(dp);
                     return cell;
                 }
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return DocumentsTableViewCell.Height;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)

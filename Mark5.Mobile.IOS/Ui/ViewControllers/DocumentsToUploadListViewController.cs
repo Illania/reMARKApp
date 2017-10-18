@@ -230,8 +230,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var dp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(DocumentToUploadTableViewCell.Key) as DocumentToUploadTableViewCell ?? DocumentToUploadTableViewCell.Create();
-                cell.Initialize(dp, indexPath.Section);
+                var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.UploadId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.UploadId);
+                cell.Initialize(dp.DocumentPreview);// TODO , indexPath.Section);
 
                 cell.SelectionStyle = indexPath.Section == Section.Failed
                     ? UITableViewCellSelectionStyle.Default
@@ -262,8 +262,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => DocumentToUploadTableViewCell.Height;
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
