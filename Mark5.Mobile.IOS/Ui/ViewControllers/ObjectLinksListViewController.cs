@@ -268,13 +268,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var section = sections[indexPath.Section];
                 var ol = items[section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ObjectLinksTableViewCell.Key) as ObjectLinksTableViewCell ?? ObjectLinksTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ObjectLinksTableViewCell.DefaultId) as ObjectLinksTableViewCell ?? new ObjectLinksTableViewCell();
                 cell.Initialize(ol);
 
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ObjectLinksTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {
