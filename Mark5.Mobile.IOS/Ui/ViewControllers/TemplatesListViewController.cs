@@ -90,7 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -178,6 +178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error("Error while retrieving template previews", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
                 tcs.SetResult(null);
+                DismissViewController(true, null);
             }
         }
 
@@ -405,10 +406,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var tp = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.TemplateSelected(tp);
             }

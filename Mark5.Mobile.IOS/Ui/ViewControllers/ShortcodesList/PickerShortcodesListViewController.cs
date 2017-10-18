@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
-using Foundation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
@@ -19,6 +19,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
         public async override void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_shortcode___"));
@@ -27,9 +35,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             {
                 var shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(Folder, shortcodePreview.Id);
                 dismissAction();
-
                 tcs.SetResult(shortcode);
-
+                DismissViewController(true, null);
             }
             catch (Exception ex)
             {

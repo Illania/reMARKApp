@@ -72,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async void DoneItem_Clicked(object sender, EventArgs e)
@@ -173,7 +173,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async Task RefreshData()
@@ -237,6 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ownCell = tableView.DequeueReusableCell("ownCell") ?? UITableViewCellUtilities.CreateDefault("ownCell", UITableViewCellSelectionStyle.None);
                     ownCell.TextLabel.Text = Localization.GetString("own_worktray");
+
                     ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
                         ? UITableViewCellAccessory.Checkmark
                         : UITableViewCellAccessory.None;
@@ -285,7 +286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
 
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
@@ -299,7 +300,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
 
                 cell.Accessory = UITableViewCellAccessory.None;

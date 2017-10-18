@@ -136,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -337,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 if (result == 0)
                 {
                     var vc = new DownloadViewController { Folder = Folder };
-                    NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
                     await vc.Result;
                 }
                 if (result == -1)
@@ -413,6 +413,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
+
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+                return;
 
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
@@ -838,17 +841,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (disableRowActions)
-                    return false;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -881,10 +874,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var cp = items[indexPath.Section][indexPath.Row];

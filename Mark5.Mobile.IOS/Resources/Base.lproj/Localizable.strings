@@ -28,7 +28,6 @@
 "autosave_recover_content" = "MARK5 recovered an autosaved email. Do you want to continue editing it?";
 "back" = "Back";
 "bcc" = "Bcc";
-"big_attachment_title" = "Big attachment";
 "big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?";
 "birthdate" = "Birthdate";
 "browse_files" = "Browse files...";
@@ -217,6 +216,7 @@
 "no_phonebook_matching" = "No matching phonebook contacts";
 "no_object_actions" = "There are no actions";
 "no_object_links" = "There are no links";
+"no_shortcodes_found" = "No shortcodes were found";
 "no_subject" = "No subject";
 "no_suggestions_available" = "No suggestions available";
 "no_templates" = "No templates";

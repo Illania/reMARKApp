@@ -85,7 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -232,6 +232,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
+
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+                return;
 
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
@@ -431,14 +434,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -471,10 +467,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var cp = items[indexPath.Section][indexPath.Row];

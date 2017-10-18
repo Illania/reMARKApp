@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -151,10 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void FailedDocumentSelected(Guid guid)
         {
-            var vc = new DocumentViewController
-            {
-                Modal = true
-            };
+            var vc = new DocumentViewController();
             vc.SetData(guid);
             vc.SetRefreshDataOnAppear();
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -235,6 +232,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var cell = tableView.DequeueReusableCell(DocumentToUploadTableViewCell.Key) as DocumentToUploadTableViewCell ?? DocumentToUploadTableViewCell.Create();
                 cell.Initialize(dp, indexPath.Section);
+
+                cell.SelectionStyle = indexPath.Section == Section.Failed
+                    ? UITableViewCellSelectionStyle.Default
+                    : UITableViewCellSelectionStyle.None;
+
                 return cell;
             }
 
@@ -272,17 +274,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                if (indexPath.Section == Section.Failed)
-                    viewControllerWeakReference.Unwrap()?.FailedDocumentSelected(items[Section.Failed][indexPath.Row].Guid);
+                viewControllerWeakReference.Unwrap()?.FailedDocumentSelected(items[Section.Failed][indexPath.Row].Guid);
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
+                    return false;
+                if (!cell.UserInteractionEnabled)
+                    return false;
+                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return false;
                 
-                return indexPath.Section == Section.Failed;
+                return true;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)

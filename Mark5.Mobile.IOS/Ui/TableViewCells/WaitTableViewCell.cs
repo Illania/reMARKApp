@@ -12,6 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public WaitTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
+            UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
 
@@ -20,6 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             spinner.StartAnimating();
+
             ContentView.Add(spinner);
             ContentView.AddConstraints(new[]
             {

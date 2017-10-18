@@ -29,8 +29,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
-        public bool Modal { get; set; }
-
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null;
 
         Guid failedDocumentToUploadGuid;
@@ -176,7 +174,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -247,12 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitNavigationBar()
         {
-            if (Modal)
-            {
-                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
-            }
-            else
+            if (PresentingViewController == null)
             {
                 nextDocumentButtonItem = null;
                 previousDocumentButtonItem = null;
@@ -278,6 +271,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 rightButtons[0] = nextDocumentButtonItem;
                 rightButtons[1] = previousDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
+            }
+            else
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
         }
 
@@ -681,9 +679,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
 
                 RefreshView();
-
                 EndRefreshing();
-
                 MarkAsReadIfNecessary();
             }
             catch (Exception ex)
@@ -694,10 +690,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                if (Modal)
-                    DismissViewController(true, null);
-                else
-                    NavigationController?.PopViewController(true);
+                if (SplitViewController == null || SplitViewController.Collapsed)
+                {
+                    if (PresentingViewController == null)
+                        NavigationController?.PopViewController(true);
+                    else
+                        DismissViewController(true, null);
+                }
             }
         }
 
@@ -706,12 +705,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             spinner.StartAnimating();
 
             View.BringSubviewToFront(backgroundView);
-            UIView.Animate(0.25,
-                () =>
-                {
-                    backgroundView.Alpha = 1f;
-                    mainScrollView.Alpha = 0f;
-                });
+            UIView.Animate(0.25, () =>
+            {
+                backgroundView.Alpha = 1f;
+                mainScrollView.Alpha = 0f;
+            });
         }
 
         void EndRefreshing(bool withError = false)
@@ -722,12 +720,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             View.SendSubviewToBack(backgroundView);
-            UIView.Animate(0.25,
-                () =>
-                {
-                    backgroundView.Alpha = 0f;
-                    mainScrollView.Alpha = 1f;
-                });
+            UIView.Animate(0.25, () =>
+            {
+                backgroundView.Alpha = 0f;
+                mainScrollView.Alpha = 1f;
+            });
         }
 
         void MarkAsReadIfNecessary()
@@ -800,36 +797,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void RefreshNavigationBar()
         {
-            if (Modal)
-                return;
-
-            bool _na;
-            bool _pa;
-
-            if (GetNextDocumentPreview != null)
-                nextDocumentButtonItem.Enabled = GetNextDocumentPreview(documentPreview, out _na, out _pa) != null;
-            else
-                nextDocumentButtonItem.Enabled = false;
-
-            if (GetPreviousDocumentPreview != null)
-                previousDocumentButtonItem.Enabled = GetPreviousDocumentPreview(documentPreview, out _na, out _pa) != null;
-            else
-                previousDocumentButtonItem.Enabled = false;
-
-            if (document == null || documentPreview.Direction != DocumentDirection.Draft)
+            if (PresentingViewController == null)
             {
-                var rightButtons = new UIBarButtonItem[2];
-                rightButtons[0] = nextDocumentButtonItem;
-                rightButtons[1] = previousDocumentButtonItem;
-                NavigationItem.SetRightBarButtonItems(rightButtons, true);
-            }
-            else
-            {
-                var rightButtons = new UIBarButtonItem[3];
-                rightButtons[0] = nextDocumentButtonItem;
-                rightButtons[1] = previousDocumentButtonItem;
-                rightButtons[2] = editDocumentButtonItem;
-                NavigationItem.SetRightBarButtonItems(rightButtons, true);
+                bool _na;
+                bool _pa;
+
+                if (GetNextDocumentPreview != null)
+                    nextDocumentButtonItem.Enabled = GetNextDocumentPreview(documentPreview, out _na, out _pa) != null;
+                else
+                    nextDocumentButtonItem.Enabled = false;
+
+                if (GetPreviousDocumentPreview != null)
+                    previousDocumentButtonItem.Enabled = GetPreviousDocumentPreview(documentPreview, out _na, out _pa) != null;
+                else
+                    previousDocumentButtonItem.Enabled = false;
+
+                if (document == null || documentPreview.Direction != DocumentDirection.Draft)
+                {
+                    var rightButtons = new UIBarButtonItem[2];
+                    rightButtons[0] = nextDocumentButtonItem;
+                    rightButtons[1] = previousDocumentButtonItem;
+                    NavigationItem.SetRightBarButtonItems(rightButtons, true);
+                }
+                else
+                {
+                    var rightButtons = new UIBarButtonItem[3];
+                    rightButtons[0] = nextDocumentButtonItem;
+                    rightButtons[1] = previousDocumentButtonItem;
+                    rightButtons[2] = editDocumentButtonItem;
+                    NavigationItem.SetRightBarButtonItems(rightButtons, true);
+                }
             }
         }
 
@@ -850,7 +847,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     if (PlatformConfig.Preferences.LargeAttachmentWarning
                         && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                        && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("big_attachment_title"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                        && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
                     {
                         dismissAction();
                         return;
@@ -1130,10 +1127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
+        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         #endregion
 
@@ -1293,7 +1287,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
@@ -1327,7 +1321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
@@ -1387,10 +1381,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                if (Modal)
-                    DismissViewController(true, null);
-                else
+                if (PresentingViewController == null)
                     NavigationController?.PopViewController(true);
+                else
+                    DismissViewController(true, null);
             });
         }
 
@@ -1402,7 +1396,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
 
-            coder.Encode(Modal, "modal");
+            coder.Encode(PresentingViewController != null, "doNotRestore");
 
             coder.Encode(failedDocumentToUploadGuid.ToByteArray(), "failedDocumentToUploadGuid");
             if (folderId.HasValue)
@@ -1439,7 +1433,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
-            if (coder.DecodeBool("modal"))
+            if (coder.DecodeBool("doNotRestore"))
                 return null;
 
             return new DocumentViewController();

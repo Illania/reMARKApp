@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -267,13 +267,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PresentDocumentViewController(int documentId, Guid notificationGuid)
         {
-            var vc = new DocumentViewController
-            {
-                Modal = true
-            };
+            var vc = new DocumentViewController();
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId, notificationGuid);
-
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -319,10 +315,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var n = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.NotificationSelected(n, indexPath);
             }

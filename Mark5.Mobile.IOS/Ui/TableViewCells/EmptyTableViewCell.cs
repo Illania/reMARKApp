@@ -13,6 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public EmptyTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
+            UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
 

@@ -81,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -246,8 +246,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TableViewDataSource.UpdateParentContact(ParentContactPreview);
                 ((DataSource.ParentRow)sender).ReloadRow();
             }
-
-            DismissViewController(true, null);
         }
 
         async void DataSource_ResponsibleUserRowClicked(object sender, EventArgs e)
@@ -271,8 +269,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ((DataSource.ResponsibleUsersRow)sender).ReloadRow();
             }
-
-            DismissViewController(true, null);
         }
 
         void DataSource_ParentRemoved(object sender, EventArgs e)

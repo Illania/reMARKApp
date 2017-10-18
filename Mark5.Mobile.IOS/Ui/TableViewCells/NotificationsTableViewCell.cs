@@ -79,10 +79,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             dateReceivedLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(dateReceivedLabel);
 
-            readImageView = new UIImageView();
+            readImageView = new UIImageView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             ContentView.Add(readImageView);
 
-            iconImageView = new UIImageView();
+            iconImageView = new UIImageView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             ContentView.Add(iconImageView);
 
             firstLineBottomConstraint = firstLineLabel.HeightAnchor.ConstraintEqualTo(22f);

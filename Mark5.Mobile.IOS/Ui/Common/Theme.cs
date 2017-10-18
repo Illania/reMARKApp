@@ -74,6 +74,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Font = DefaultFont.WithRelativeSize(12f)
             };
 
+            UIButton.Appearance.TintColor = DarkerBlue;
+
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
                 Font = DefaultFont
@@ -112,8 +114,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }, UIControlState.Selected);
 
             UISwitch.Appearance.OnTintColor = DarkBlue;
-
-            UILabel.Appearance.Font = DefaultFont;
 
             UIRefreshControl.Appearance.TintColor = LightGray;
 

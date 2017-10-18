@@ -25,8 +25,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ContactViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
-        public bool Modal { get; set; }
-
         public bool Empty => folderId == null && folder == null && contactId == null && contactPreview == null && contact == null;
 
         int? folderId;
@@ -127,7 +125,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -314,12 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            if (Modal)
-            {
-                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
-            }
-            else
+            if (PresentingViewController == null)
             {
                 if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
                 {
@@ -330,6 +323,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     };
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
+            }
+            else
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
         }
 
@@ -418,7 +416,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactId = contactPreview.Id;
             contactPreview = null;
 
-            if (SplitViewController == null)
+            if (SplitViewController == null || SplitViewController.Collapsed)
                 refreshDataOnAppear = true;
             else
                 RefreshData();
@@ -659,13 +657,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
-            var vc = new ContactViewController
-            {
-                Modal = Modal
-            };
+            var vc = new ContactViewController();
             vc.SetData(contactPreview);
             vc.SetRefreshDataOnAppear();
-            NavigationController.PushViewController(vc, true);
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
@@ -837,8 +832,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                if (SplitViewController == null)
-                    NavigationController.PopViewController(true);
+                if (SplitViewController == null || SplitViewController.Collapsed)
+                {
+                    if (PresentingViewController == null)
+                        NavigationController?.PopViewController(true);
+                    else
+                        DismissViewController(true, null);
+                }
             }
         }
 
@@ -911,7 +911,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
@@ -942,7 +942,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
@@ -1590,7 +1590,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
 
-            coder.Encode(Modal, "modal");
+            coder.Encode(PresentingViewController != null, "doNotRestore");
 
             if (folderId.HasValue)
                 coder.Encode(folderId.Value, "folderId");
@@ -1625,7 +1625,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
-            if (coder.DecodeBool("modal"))
+            if (coder.DecodeBool("doNotRestore"))
                 return null;
 
             return new ContactViewController();

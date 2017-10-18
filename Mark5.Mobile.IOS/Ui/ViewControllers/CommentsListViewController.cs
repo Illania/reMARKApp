@@ -82,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -167,12 +167,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, .75f)
             });
 
-            addCommentButton = new UIButton
+            addCommentButton = new UIButton(UIButtonType.System)
             {
                 Enabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            addCommentButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            addCommentButton.ApplyTheme();
             addCommentButton.SetTitle(Localization.GetString("add"), UIControlState.Normal);
             addCommentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             addCommentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
@@ -207,7 +207,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             commentTextView = new UITextView
             {
-                Font = Theme.DefaultFont,
                 AutocapitalizationType = UITextAutocapitalizationType.Sentences,
                 AutocorrectionType = UITextAutocorrectionType.Yes,
                 ScrollEnabled = false,
@@ -216,6 +215,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 InputAccessoryView = new KeyboardObserverInputAccessoryView()
             };
+            commentTextView.ApplyTheme();
             commentTextScrollView.AddSubview(commentTextView);
             commentTextScrollView.AddConstraints(new[]
             {
@@ -442,10 +442,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var cell = tableView.DequeueReusableCell(CommentsTableViewCell.Key) as CommentsTableViewCell ?? CommentsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(CommentsTableViewCell.DefaultId) as CommentsTableViewCell ?? new CommentsTableViewCell();
                 cell.Initialize(Items[indexPath.Row]);
                 return cell;
             }
+
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading || Empty)
@@ -454,16 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Items.Count;
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => CommentsTableViewCell.Height;
-
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {

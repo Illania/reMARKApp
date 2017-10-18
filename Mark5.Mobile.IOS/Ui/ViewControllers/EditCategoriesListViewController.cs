@@ -70,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -249,7 +249,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var c = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.Key) as CategoriesTableViewCell ?? CategoriesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
                 cell.Initialize(c);
 
                 cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
@@ -279,23 +279,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => CategoriesTableViewCell.Height;
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
-                
+
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
-                
+
                 cell.Accessory = UITableViewCellAccessory.None;
             }
 

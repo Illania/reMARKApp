@@ -23,31 +23,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
         protected async override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
             ContactPreview selectedContactPreview = null;
 
             if (contactPreview.Type == ContactType.Person)
             {
-                var content = ChildrenType == ContactType.Person ? Localization.GetString("parent_contact_selector_invalid_person_content") : Localization.GetString("parent_contact_selector_invalid_department_content");
+                var content = ChildrenType == ContactType.Person
+                                                         ? Localization.GetString("parent_contact_selector_invalid_person_content")
+                                                         : Localization.GetString("parent_contact_selector_invalid_department_content");
 
                 await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("parent_contact_selector_invalid_person_title"), content);
             }
             else if (contactPreview.Type == ContactType.Department)
             {
                 if (ChildrenType == ContactType.Department)
-                {
                     await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("parent_contact_selector_invalid_department_title"), Localization.GetString("parent_contact_selector_invalid_department_content"));
-                }
-
-                selectedContactPreview = contactPreview;
+                else
+                    selectedContactPreview = contactPreview;
             }
             else if (contactPreview.Type == ContactType.Company)
             {
                 if (ChildrenType == ContactType.Department)
-                {
                     selectedContactPreview = contactPreview;
-                }
                 else
                 {
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
@@ -65,9 +71,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                         {
                             var choices = new List<ContactPreview> { contactPreview };
                             choices.AddRange(deparments);
-                            var strings = choices.Select(DisplayText).ToArray();
 
-                            var index = await Dialogs.ShowListActionSheetAsync(this, strings, tableView.CellAt(indexPath));
+                            var index = await Dialogs.ShowListActionSheetAsync(this, choices.Select(DisplayText).ToArray(), tableView, tableView.CellAt(indexPath));
                             if (index >= 0)
                                 selectedContactPreview = choices[index];
                         }
@@ -84,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (selectedContactPreview != null)
             {
                 tcs.SetResult(selectedContactPreview);
-                NavigationController.PopViewController(true);
+                DismissViewController(true, null);
             }
         }
 

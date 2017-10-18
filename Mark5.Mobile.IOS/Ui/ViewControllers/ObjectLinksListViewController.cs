@@ -78,7 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -120,7 +120,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneItem.Clicked -= DoneItem_Clicked;
         }
 
-        void DoneItem_Clicked(object sender, EventArgs e) => NavigationController.DismissViewController(true, null);
+        void DoneItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         public void ObjectLinkSelected(ObjectLink link)
         {
@@ -154,37 +154,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void PresentDocumentViewController(int documentId)
         {
-            var vc = new DocumentViewController
-            {
-                Modal = true
-            };
+            var vc = new DocumentViewController();
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId);
-
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         public void PresentContactViewController(int contactId)
         {
-            var vc = new ContactViewController
-            {
-                Modal = true
-            };
+            var vc = new ContactViewController();
             vc.SetRefreshDataOnAppear();
             vc.SetData(contactId);
-
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         public void PresentShortcodeViewController(int shortcodeId)
         {
-            var vc = new ShortcodeViewController
-            {
-                Modal = true
-            };
+            var vc = new ShortcodeViewController();
             vc.SetRefreshDataOnAppear();
             vc.SetData(shortcodeId);
-
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -209,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                NavigationController.DismissViewController(true, null);
+                DismissViewController(true, null);
             }
         }
 
@@ -271,6 +259,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.DequeueReusableCell(ObjectLinksTableViewCell.DefaultId) as ObjectLinksTableViewCell ?? new ObjectLinksTableViewCell();
                 cell.Initialize(ol);
 
+                bool clickable;
+                if (ol.IsReverse)
+                    clickable = ol.FromObjectType == ObjectType.Document || ol.FromObjectType == ObjectType.Contact || ol.FromObjectType == ObjectType.Shortcode;
+                else
+                    clickable = ol.ToObjectType == ObjectType.Document || ol.ToObjectType == ObjectType.Contact || ol.ToObjectType == ObjectType.Shortcode;
+
+                cell.SelectionStyle = clickable
+                    ? UITableViewCellSelectionStyle.Default
+                    : UITableViewCellSelectionStyle.None;
+
                 return cell;
             }
 
@@ -303,10 +301,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var section = sections[indexPath.Section];
                 var ol = items[section][indexPath.Row];
 

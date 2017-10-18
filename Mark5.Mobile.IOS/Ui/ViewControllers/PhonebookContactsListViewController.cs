@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -182,9 +182,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void ExitItem_Clicked(object sender, EventArgs e) => tcs.SetResult(null);
+        void ExitItem_Clicked(object sender, EventArgs e)
+        {
+            tcs.SetResult(null);
+            DismissViewController(true, null);
+        }
 
-        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell) => tcs.SetResult(pb);
+        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell)
+        {
+            tcs.SetResult(pb);
+            DismissViewController(true, null);
+        }
 
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {
@@ -311,16 +319,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var ra = items[indexPath.Section][indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.PhonebookAddressSelected(ra, tableView.CellAt(indexPath));
             }
 
             public override string[] SectionIndexTitles(UITableView tableView) => items.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper())
-                                                                                                         .ToArray();
+                                                                                       .ToArray();
 
             public void SetItems(List<Recipient> phonebookContacts)
             {
