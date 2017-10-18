@@ -31,14 +31,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             TitleLabel.Text = link.IsReverse ? link.TypeInfo.DescriptionComplexReverse : link.TypeInfo.DescriptionComplex;
             SubtitleLabel.Text = link.Description;
-
-            var clickable = false;
-            if (link.IsReverse)
-                clickable = link.FromObjectType == ObjectType.Document || link.FromObjectType == ObjectType.Contact || link.FromObjectType == ObjectType.Shortcode;
-            else
-                clickable = link.ToObjectType == ObjectType.Document || link.ToObjectType == ObjectType.Contact || link.ToObjectType == ObjectType.Shortcode;
-
-            SelectionStyle = clickable ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }
     }
 }

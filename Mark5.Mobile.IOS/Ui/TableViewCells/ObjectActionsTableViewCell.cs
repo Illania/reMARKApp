@@ -28,8 +28,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             cell.UsernameLabel.Font = Theme.DefaultBoldFont;
             cell.DateLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
 
-            cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-
             return cell;
         }
 

@@ -168,6 +168,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.Key) as ObjectActionsTableViewCell ?? ObjectActionsTableViewCell.Create();
                 cell.Initialize(oa);
+                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
                 return cell;
             }

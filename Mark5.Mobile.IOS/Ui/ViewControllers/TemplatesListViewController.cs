@@ -406,10 +406,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var tp = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.TemplateSelected(tp);
             }

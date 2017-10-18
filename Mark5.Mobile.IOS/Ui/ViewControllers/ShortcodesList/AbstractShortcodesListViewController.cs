@@ -411,6 +411,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+                return;
+
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
@@ -736,7 +739,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                 var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
                 cell.Initialize(cp);
-
                 return cell;
             }
 
@@ -778,17 +780,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (disableRowActions)
-                    return false;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -821,10 +813,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var sp = items[indexPath.Section][indexPath.Row];

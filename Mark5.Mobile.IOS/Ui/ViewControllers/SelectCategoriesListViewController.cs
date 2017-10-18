@@ -257,9 +257,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (cell == null)
                     return;
 
-                if (cell is WaitTableViewCell || cell is EmptyTableViewCell)
-                    return;
-
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
             }
 
@@ -267,9 +264,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var cell = tableView.CellAt(indexPath);
                 if (cell == null)
-                    return;
-
-                if (cell is WaitTableViewCell || cell is EmptyTableViewCell)
                     return;
                 
                 cell.Accessory = UITableViewCellAccessory.None;

@@ -29,6 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             FolderNameLabel.Text = folder.Name;
             FolderPathLabel.Text = folder.Path;
             FolderIconImage.Image = GetIcon(folder);
+
+            UserInteractionEnabled = true;
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
         }
 
         public void Disable()
@@ -37,8 +40,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             FolderPathLabel.TextColor = Theme.DarkGray;
             FolderIconImage.TintColor = Theme.DarkGray;
 
-            SelectionStyle = UITableViewCellSelectionStyle.None;
             UserInteractionEnabled = false;
+            SelectionStyle = UITableViewCellSelectionStyle.None;
         }
 
         static UIImage GetIcon(Folder folder)

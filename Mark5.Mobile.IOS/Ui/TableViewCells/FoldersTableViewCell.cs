@@ -83,6 +83,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 ExpandButton.Alpha = 0f;
                 ExpandButton.Hidden = true;
             }
+
+            UserInteractionEnabled = true;
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
         }
 
         public void Disable()
@@ -91,14 +94,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             FolderIconImage.TintColor = Theme.DarkGray;
             FolderCheckedIndicatorImage.TintColor = Theme.DarkGray;
 
+            UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;
         }
 
-        partial void ExpandButtonTouchUpInside(NSObject sender)
-        {
-            if (ExpandCollapseClicked != null && folder != null)
-                ExpandCollapseClicked(this, folder);
-        }
+        partial void ExpandButtonTouchUpInside(NSObject sender) => ExpandCollapseClicked?.Invoke(this, folder);
 
         static UIImage GetIcon(Folder folder)
         {

@@ -974,10 +974,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (tableView.Editing)
                     return;
 
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var f = items[indexPath.LongSection][indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
@@ -989,10 +985,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var f = items[indexPath.LongSection][indexPath.Row];
@@ -1024,10 +1016,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
                 if (disableRowActions)
-                    return false;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return false;
 
                 if (tableView.Editing)
@@ -1145,9 +1133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override NSIndexPath CustomizeMoveTarget(UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath proposedIndexPath)
             {
-                return proposedIndexPath.Section == Section.Favorites
-                                        ? proposedIndexPath
-                                        : sourceIndexPath;
+                return proposedIndexPath.Section == Section.Favorites ? proposedIndexPath : sourceIndexPath;
             }
 
             public override void MoveRow(UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
@@ -1298,10 +1284,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (tableView.Editing)
                     return;
 
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var f = items[indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
@@ -1315,10 +1297,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (tableView.Editing)
                     return;
 
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var f = items[indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
@@ -1329,20 +1307,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             void Cell_ExpandCollapseClicked(object sender, Folder f) => viewControllerWeakReference.Unwrap()?.FolderExpand(f);
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (disableRowActions)
-                    return false;
-
-                if (tableView.Editing)
-                    return false;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -1526,8 +1491,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var cell = tableView.DequeueReusableCell(FoldersSearchResultsTableViewCell.Key) as FoldersSearchResultsTableViewCell ?? FoldersSearchResultsTableViewCell.Create();
                 cell.Initialize(f);
+
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     cell.Disable();
+
                 return cell;
             }
 
@@ -1546,10 +1513,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (tableView.Editing)
                     return;
 
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var f = items[indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
@@ -1561,10 +1524,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var f = items[indexPath.Row];

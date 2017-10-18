@@ -208,6 +208,7 @@
 "no_phonebook_matching" = "No matching phonebook contacts";
 "no_object_actions" = "There are no actions";
 "no_object_links" = "There are no links";
+"no_shortcodes_found" = "No shortcodes were found";
 "no_subject" = "No subject";
 "no_suggestions_available" = "No suggestions available";
 "no_templates" = "No templates";

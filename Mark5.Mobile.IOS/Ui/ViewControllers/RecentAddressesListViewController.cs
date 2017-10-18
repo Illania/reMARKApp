@@ -195,10 +195,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var ra = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.RecentAddressSelected(ra);
             }

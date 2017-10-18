@@ -237,6 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ownCell = tableView.DequeueReusableCell("ownCell") ?? UITableViewCellUtilities.CreateDefault("ownCell", UITableViewCellSelectionStyle.None);
                     ownCell.TextLabel.Text = Localization.GetString("own_worktray");
+
                     ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
                         ? UITableViewCellAccessory.Checkmark
                         : UITableViewCellAccessory.None;
@@ -285,7 +286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
 
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
@@ -299,7 +300,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
 
                 cell.Accessory = UITableViewCellAccessory.None;

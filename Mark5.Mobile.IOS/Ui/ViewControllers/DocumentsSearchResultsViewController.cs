@@ -276,6 +276,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+                return;
+
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
@@ -657,10 +660,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (Items[indexPath.Row]?.Direction == DocumentDirection.External)
-                    return ExternalDocumentsTableViewCell.Height;
-
-                return CompactList ? DocumentsCompactTableViewCell.Height : DocumentsTableViewCell.Height;
+                return DocumentsTableViewCell.Height;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -671,14 +671,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Items.Count;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -736,10 +729,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var dp = Items[indexPath.Row];

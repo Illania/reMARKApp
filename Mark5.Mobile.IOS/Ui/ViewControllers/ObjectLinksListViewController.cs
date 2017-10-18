@@ -259,6 +259,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.DequeueReusableCell(ObjectLinksTableViewCell.Key) as ObjectLinksTableViewCell ?? ObjectLinksTableViewCell.Create();
                 cell.Initialize(ol);
 
+                bool clickable;
+                if (ol.IsReverse)
+                    clickable = ol.FromObjectType == ObjectType.Document || ol.FromObjectType == ObjectType.Contact || ol.FromObjectType == ObjectType.Shortcode;
+                else
+                    clickable = ol.ToObjectType == ObjectType.Document || ol.ToObjectType == ObjectType.Contact || ol.ToObjectType == ObjectType.Shortcode;
+
+                cell.SelectionStyle = clickable
+                    ? UITableViewCellSelectionStyle.Default
+                    : UITableViewCellSelectionStyle.None;
+
                 return cell;
             }
 
@@ -293,10 +303,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var section = sections[indexPath.Section];
                 var ol = items[section][indexPath.Row];
 
