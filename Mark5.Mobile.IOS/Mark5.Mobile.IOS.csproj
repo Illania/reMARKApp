@@ -101,7 +101,6 @@
 		<Compile Include="Ui\Common\SeparatorSubView.cs" />
 		<Compile Include="Ui\Common\Theme.cs" />
 		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
@@ -354,7 +353,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
-		<InterfaceDefinition Include="Ui\TableViewCells\CategoriesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\CommentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsCompactTableViewCell.xib" />

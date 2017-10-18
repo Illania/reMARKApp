@@ -1,56 +1,60 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class CategoriesTableViewCell : UITableViewCell
+    public class CategoriesTableViewCell : UITableViewCell
     {
-        public const float Height = 44f;
+        public static readonly NSString DefaultId = new NSString(nameof(CategoriesTableViewCell));
 
-        public static readonly NSString Key = new NSString("CategoriesTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("CategoriesTableViewCell", NSBundle.MainBundle);
+        readonly UIView colorView;
+        readonly UILabel label;
 
-        public Category Category { get; private set; }
-
-        UIColor categoryColor;
-
-        public CategoriesTableViewCell(IntPtr handle)
-            : base(handle)
+        public CategoriesTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
+            SelectionStyle = UITableViewCellSelectionStyle.None;
+            Accessory = UITableViewCellAccessory.None;
+
+            colorView = new UIView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            colorView.Layer.BorderColor = Theme.DarkGray.CGColor;
+            colorView.Layer.BorderWidth = .75f;
+            colorView.Layer.CornerRadius = 10f;
+
+            label = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            ContentView.AddSubview(colorView);
+            ContentView.AddSubview(label);
+            ContentView.AddConstraints(new[]
+            {
+                colorView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                colorView.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                colorView.WidthAnchor.ConstraintEqualTo(20f),
+                colorView.HeightAnchor.ConstraintEqualTo(20f),
+
+                label.LeadingAnchor.ConstraintEqualTo(colorView.TrailingAnchor, 8f),
+                label.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                label.HeightAnchor.ConstraintEqualTo(22f),
+                label.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 12f),
+                label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -12f)
+            });
         }
-
-        public static CategoriesTableViewCell Create()
-        {
-            var cell = (CategoriesTableViewCell)Nib.Instantiate(null, null)[0];
-            cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-            return cell;
-        }
-
-        #region UITableViewCell overrides
-
-        public override void SetSelected(bool selected, bool animated)
-        {
-            base.SetSelected(selected, animated);
-
-            CategoryColorView.BackgroundColor = categoryColor;
-        }
-
-        #endregion
-
-        #region Custom methods
 
         public void Initialize(Category category)
         {
-            Category = category;
-
-            categoryColor = UI.UIColorFromHexString(category.HexColor);
-            CategoryColorView.BackgroundColor = categoryColor;
-            CategoryNameLabel.Text = category.Name;
+            colorView.BackgroundColor = UI.UIColorFromHexString(category.HexColor);
+            label.Text = category.Name;
         }
-
-        #endregion
     }
 }
