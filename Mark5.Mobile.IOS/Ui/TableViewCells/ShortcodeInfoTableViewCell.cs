@@ -31,6 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 TextContainerInset = UIEdgeInsets.Zero,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            bottomTextView.ApplyTheme();
             bottomTextView.TextContainer.LineFragmentPadding = 0f;
 
             ContentView.Add(topLabel);
@@ -41,7 +42,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 topLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
                 topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
-                topLabel.HeightAnchor.ConstraintEqualTo(22f),
 
                 bottomTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 bottomTextView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),

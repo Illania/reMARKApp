@@ -31,7 +31,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             middleLabel = new UILabel
             {
-                Font = Theme.DefaultFont,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -63,18 +62,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
                     topLabel.BottomAnchor.ConstraintEqualTo(middleLabel.TopAnchor, -4f),
-                    topLabel.HeightAnchor.ConstraintEqualTo(20f),
 
                     middleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     middleLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     middleLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                    middleLabel.HeightAnchor.ConstraintEqualTo(22f),
 
                     bottomLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     bottomLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     bottomLabel.TopAnchor.ConstraintEqualTo(middleLabel.BottomAnchor, 2f),
                     bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
-                    bottomLabel.HeightAnchor.ConstraintEqualTo(18f),
 
                     iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),

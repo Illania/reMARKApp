@@ -74,6 +74,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Font = DefaultFont.WithRelativeSize(12f)
             };
 
+            UIButton.Appearance.SetTitleColor(DarkerBlue, UIControlState.Normal);
+            UIButton.Appearance.SetTitleColor(DarkGray, UIControlState.Disabled);
+
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
                 Font = DefaultFont

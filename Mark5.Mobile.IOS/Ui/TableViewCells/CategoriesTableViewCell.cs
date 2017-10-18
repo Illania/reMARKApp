@@ -29,7 +29,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             label = new UILabel
             {
-                Font = Theme.DefaultFont,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -45,7 +44,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
                 label.LeadingAnchor.ConstraintEqualTo(colorView.TrailingAnchor, 8f),
                 label.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                label.HeightAnchor.ConstraintEqualTo(22f),
                 label.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 12f),
                 label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -12f)
             });
