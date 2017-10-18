@@ -31,6 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             middleLabel = new UILabel
             {
+                Font = Theme.DefaultFont,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
