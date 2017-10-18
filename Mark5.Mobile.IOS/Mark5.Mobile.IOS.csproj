@@ -122,7 +122,6 @@
 		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\NotificationsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
@@ -360,9 +359,9 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\FoldersTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 		<InterfaceDefinition Include="Resources\Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
+		<InterfaceDefinition Include="Resources\Ui\TableViewCells\NotificationsTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">

@@ -155,7 +155,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TableView.Source = new DataSource(this, TableView);
             TableView.RefreshControl = RefreshControl;
-            TableView.EstimatedRowHeight = NotificationsTableViewCell.Height;
         }
 
         void InitializeHandlers()
@@ -211,7 +210,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                var n1 = new Notification
+                {
+                    Type = EventType.NewObjectCreated,
+                    Title = "Test title",
+                    Message = "First line test \n Second line test",
+                    IsRead = false,
+                    ObjectType = ObjectType.Document,
+                };
+                var n2 = new Notification
+                {
+                    Type = EventType.DeleteReminderIfExists,
+                    Title = "Test title",
+                    Message = "First line test \n Second line test",
+                    IsRead = true,
+                    ObjectType = ObjectType.Document,
+                };
+                //var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                var notifications = new List<Notification> { n1, n2 };
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
                 ((DataSource)TableView.Source).SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
@@ -295,7 +311,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var n = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.DefaultId) as NotificationsTableViewCell ?? new NotificationsTableViewCell();
                 cell.Initialize(n);
 
                 return cell;
