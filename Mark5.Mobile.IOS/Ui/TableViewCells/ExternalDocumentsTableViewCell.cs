@@ -33,13 +33,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             return cell;
         }
 
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
-        }
-
         #region Custom methods
 
         public void Initialize(DocumentPreview documentPreview)

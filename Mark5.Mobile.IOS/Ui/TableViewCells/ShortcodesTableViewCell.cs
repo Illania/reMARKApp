@@ -26,13 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             return cell;
         }
 
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
-        }
-
         public void Initialize(ShortcodePreview shortcodePreview)
         {
             NameLabel.Text = shortcodePreview.Name;

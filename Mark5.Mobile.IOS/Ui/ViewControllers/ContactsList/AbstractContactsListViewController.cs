@@ -798,12 +798,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 var cp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ContactsTableViewCell.Key) as ContactsTableViewCell ?? ContactsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ContactsTableViewCell.DefaultId) as ContactsTableViewCell ?? new ContactsTableViewCell();
                 cell.Initialize(cp);
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ContactsTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {

@@ -105,7 +105,6 @@
 		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsCompactTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsTableViewCell.cs" />
@@ -202,7 +201,6 @@
 		<Compile Include="Utilities\ConsoleAndFileLogger.cs" />
 		<Compile Include="Utilities\DateTimeFormatter.cs" />
 		<Compile Include="Utilities\DeviceInfoProvider.cs" />
-		<Compile Include="Utilities\Hacks.cs" />
 		<Compile Include="Utilities\InsecureNativeMessageHandler.cs" />
 		<Compile Include="Utilities\Integration.cs" />
 		<Compile Include="Utilities\LocalNotificationsListener.cs" />
@@ -352,7 +350,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
-		<InterfaceDefinition Include="Ui\TableViewCells\ContactsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsCompactTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
