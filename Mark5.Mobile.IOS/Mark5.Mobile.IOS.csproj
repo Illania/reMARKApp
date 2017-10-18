@@ -129,7 +129,6 @@
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
@@ -366,7 +365,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>

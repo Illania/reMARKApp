@@ -1,4 +1,3 @@
-using System;
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -7,23 +6,35 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class ShortcodesTableViewCell : UITableViewCell
+    public class ShortcodesTableViewCell : UITableViewCell
     {
-        public const float Height = 50f;
+        public static readonly NSString DefaultId = new NSString(nameof(ShortcodesTableViewCell));
 
-        public static readonly UINib Nib = UINib.FromName("ShortcodesTableViewCell", NSBundle.MainBundle);
-        public static readonly NSString Key = new NSString("ShortcodesTableViewCell");
+        readonly UILabel label;
 
-        public ShortcodesTableViewCell(IntPtr handle)
-            : base(handle)
+        public ShortcodesTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-        }
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.DisclosureIndicator;
 
-        public static ShortcodesTableViewCell Create()
-        {
-            var cell = (ShortcodesTableViewCell) Nib.Instantiate(null, null)[0];
-            cell.NameLabel.Font = Theme.DefaultFont;
-            return cell;
+            label = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                TextColor = Theme.Black,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(label);
+            ContentView.AddConstraints(new[]
+            {
+                label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor, 12),
+                label.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 4),
+                label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -4),
+                label.HeightAnchor.ConstraintEqualTo(22f),
+            });
         }
 
         public override void LayoutSubviews()
@@ -35,7 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(ShortcodePreview shortcodePreview)
         {
-            NameLabel.Text = shortcodePreview.Name;
+            label.Text = shortcodePreview.Name;
         }
     }
 }
