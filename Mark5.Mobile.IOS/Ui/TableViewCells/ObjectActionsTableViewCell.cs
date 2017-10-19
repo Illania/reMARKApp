@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString("ObjectActionsTableViewCell");
 
-        readonly UILabel descriptionLabel;
+        readonly UITextView descriptionLabel;
         readonly UILabel usernameLabel;
         readonly UILabel dateLabel;
 
@@ -22,14 +22,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            descriptionLabel = new UILabel
+            descriptionLabel = new UITextView
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.Black,
                 TextAlignment = UITextAlignment.Left,
-                Lines = 1,
+                Selectable = false,
+                Editable = false,
+                ScrollEnabled = false,
+                ClipsToBounds = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                UserInteractionEnabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            descriptionLabel.TextContainer.LineFragmentPadding = 0f;
             ContentView.Add(descriptionLabel);
 
             usernameLabel = new UILabel
@@ -63,8 +69,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 dateLabel.LeadingAnchor.ConstraintEqualTo(usernameLabel.TrailingAnchor, 8f),
                 dateLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
 
-                descriptionLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
-                descriptionLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                descriptionLabel.LeadingAnchor.ConstraintEqualTo(usernameLabel.LeadingAnchor),
+                descriptionLabel.TrailingAnchor.ConstraintEqualTo(dateLabel.TrailingAnchor),
                 descriptionLabel.TopAnchor.ConstraintEqualTo(usernameLabel.BottomAnchor, 4f),
                 descriptionLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
             });

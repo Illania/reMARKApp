@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using Foundation;
@@ -14,12 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     public class NotificationsTableViewCell : UITableViewCell
     {
         public static readonly NSString DefaultId = new NSString("NotificationsTableViewCell");
-
-        readonly nfloat firstLineHeightConstraintConstant;
-        readonly nfloat firstLineBottomConstraintConstant;
-
-        readonly NSLayoutConstraint firstLineHeightConstraint;
-        readonly NSLayoutConstraint firstLineBottomConstraint;
+        public static readonly NSString NewObjectCreatedId = new NSString("NotificationsTableViewCell" + "_NewObjectCreated");
 
         readonly UILabel firstLineLabel;
         readonly UILabel secondLineLabel;
@@ -28,113 +22,119 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UIImageView readImageView;
         readonly UIImageView iconImageView;
 
-        public Notification Notification { get; private set; }
-
-        public NotificationsTableViewCell()
-            : base(UITableViewCellStyle.Default, DefaultId)
+        public NotificationsTableViewCell(NSString reuseIdentifier)
+            : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            firstLineLabel = new UILabel
+            if (reuseIdentifier == DefaultId || reuseIdentifier == NewObjectCreatedId)
             {
-                Font = Theme.DefaultBoldFont,
-                TextColor = Theme.Black,
-                TextAlignment = UITextAlignment.Left,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            ContentView.Add(firstLineLabel);
+                secondLineLabel = new UILabel
+                {
+                    Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                    TextColor = Theme.Black,
+                    TextAlignment = UITextAlignment.Left,
+                    Lines = 1,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                ContentView.Add(secondLineLabel);
 
-            secondLineLabel = new UILabel
+                titleLabel = new UILabel
+                {
+                    Font = Theme.DefaultFont,
+                    TextColor = Theme.Black,
+                    TextAlignment = UITextAlignment.Left,
+                    Lines = 1,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                };
+                titleLabel.SetContentHuggingPriority((float)UILayoutPriority.DefaultLow, UILayoutConstraintAxis.Horizontal);
+                ContentView.Add(titleLabel);
+
+                dateReceivedLabel = new UILabel
+                {
+                    Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                    TextColor = Theme.Black,
+                    TextAlignment = UITextAlignment.Left,
+                    Lines = 1,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                };
+                dateReceivedLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                dateReceivedLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                ContentView.Add(dateReceivedLabel);
+
+                readImageView = new UIImageView
+                {
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                ContentView.Add(readImageView);
+
+                iconImageView = new UIImageView
+                {
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                ContentView.Add(iconImageView);
+
+                ContentView.AddConstraints(new[]
+                {
+                    iconImageView.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
+                    iconImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    iconImageView.HeightAnchor.ConstraintEqualTo(15f),
+                    iconImageView.WidthAnchor.ConstraintEqualTo(15f),
+
+                    titleLabel.LeadingAnchor.ConstraintEqualTo(iconImageView.TrailingAnchor, 8f),
+                    titleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
+
+                    readImageView.TopAnchor.ConstraintEqualTo(iconImageView.BottomAnchor, 4f),
+                    readImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    readImageView.HeightAnchor.ConstraintEqualTo(15f),
+                    readImageView.WidthAnchor.ConstraintEqualTo(15f),
+
+                    secondLineLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
+                    secondLineLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+
+                    dateReceivedLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.TrailingAnchor, 8f),
+                    dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(secondLineLabel.TrailingAnchor),
+                    dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                    dateReceivedLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor,8f),
+                });
+            }
+
+            if (reuseIdentifier == DefaultId)
             {
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
-                TextColor = Theme.Black,
-                TextAlignment = UITextAlignment.Left,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            ContentView.Add(secondLineLabel);
+                firstLineLabel = new UILabel
+                {
+                    Font = Theme.DefaultBoldFont,
+                    TextColor = Theme.Black,
+                    TextAlignment = UITextAlignment.Left,
+                    Lines = 1,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                ContentView.AddSubview(firstLineLabel);
 
-            titleLabel = new UILabel
+                ContentView.AddConstraints(new[]
+                {
+                    firstLineLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
+                    firstLineLabel.TrailingAnchor.ConstraintEqualTo(dateReceivedLabel.TrailingAnchor),
+                    firstLineLabel.TopAnchor.ConstraintEqualTo(dateReceivedLabel.BottomAnchor, 2f),
+
+                    secondLineLabel.TopAnchor.ConstraintEqualTo(firstLineLabel.BottomAnchor, 2)
+                });
+            }
+
+            if (reuseIdentifier == NewObjectCreatedId)
             {
-                Font = Theme.DefaultFont,
-                TextColor = Theme.Black,
-                TextAlignment = UITextAlignment.Left,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false,
-            };
-            titleLabel.SetContentHuggingPriority((float)UILayoutPriority.DefaultLow, UILayoutConstraintAxis.Horizontal);
-            ContentView.Add(titleLabel);
-
-            dateReceivedLabel = new UILabel
-            {
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
-                TextColor = Theme.Black,
-                TextAlignment = UITextAlignment.Left,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false,
-            };
-            dateReceivedLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            dateReceivedLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            ContentView.Add(dateReceivedLabel);
-
-            readImageView = new UIImageView
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            ContentView.Add(readImageView);
-
-            iconImageView = new UIImageView
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            ContentView.Add(iconImageView);
-
-            firstLineBottomConstraint = firstLineLabel.HeightAnchor.ConstraintEqualTo(22f);
-            firstLineHeightConstraint = secondLineLabel.TopAnchor.ConstraintEqualTo(firstLineLabel.BottomAnchor, 2);
-
-            ContentView.AddConstraints(new[]
-            {
-                iconImageView.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
-                iconImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
-                iconImageView.HeightAnchor.ConstraintEqualTo(15f),
-                iconImageView.WidthAnchor.ConstraintEqualTo(15f),
-
-                titleLabel.LeadingAnchor.ConstraintEqualTo(iconImageView.TrailingAnchor, 8f),
-                titleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
-
-                readImageView.TopAnchor.ConstraintEqualTo(iconImageView.BottomAnchor, 4f),
-                readImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
-                readImageView.HeightAnchor.ConstraintEqualTo(15f),
-                readImageView.WidthAnchor.ConstraintEqualTo(15f),
-
-                firstLineLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
-                firstLineLabel.TopAnchor.ConstraintEqualTo(dateReceivedLabel.BottomAnchor, 2f),
-
-                secondLineLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
-                secondLineLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
-
-                dateReceivedLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.TrailingAnchor, 8f),
-                dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(secondLineLabel.TrailingAnchor),
-                dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(firstLineLabel.TrailingAnchor),
-                dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                dateReceivedLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor,8f),
-
-                firstLineBottomConstraint,
-                firstLineHeightConstraint,
-            });
-
-            firstLineBottomConstraintConstant = firstLineBottomConstraint.Constant;
-            firstLineHeightConstraintConstant = firstLineHeightConstraint.Constant;
+                ContentView.AddConstraints(new[]
+                {
+                    secondLineLabel.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, 2)
+                });
+            }
         }
 
         #region Custom methods
 
         public void Initialize(Notification notification)
         {
-            Notification = notification;
-
             BackgroundColor = Theme.White;
 
             UIImage icon;
@@ -152,28 +152,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             var splitMessage = notification.Message.Split('\n');
 
-            if (notification.Type == EventType.NewObjectCreated)
+            if (ReuseIdentifier == NewObjectCreatedId)
             {
                 titleLabel.Font = Theme.DefaultBoldFont;
 
                 titleLabel.Text = splitMessage.ElementAtOrDefault(0);
                 secondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
-
-                firstLineLabel.Hidden = true;
-                firstLineHeightConstraint.Constant = 0;
-                firstLineBottomConstraint.Constant = 0;
             }
-            else
+            else if (ReuseIdentifier == DefaultId)
             {
                 titleLabel.Font = Theme.DefaultFont;
 
                 titleLabel.Text = notification.Title;
                 firstLineLabel.Text = splitMessage.ElementAtOrDefault(0);
                 secondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
-
-                firstLineLabel.Hidden = false;
-                firstLineHeightConstraint.Constant = firstLineHeightConstraintConstant;
-                firstLineBottomConstraint.Constant = firstLineBottomConstraintConstant;
             }
 
             dateReceivedLabel.Text = notification.DateTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime()
