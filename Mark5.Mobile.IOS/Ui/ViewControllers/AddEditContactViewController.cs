@@ -2,21 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class AddEditContactViewController : AbstractViewController
+    public class AddEditContactViewController : AbstractTableViewController
     {
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
@@ -25,20 +24,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public ContactPreview ParentContactPreview { get; set; }
         public bool ParentPreselected { get; set; }
 
-        UIBarButtonItem saveButton;
-        UIBarButtonItem cancelButton;
-
-        UITableView tableView;
-
-        NSObject didShowNotificationObserver;
-        NSObject willChangeFrameNotificationObserver;
-        NSObject willHideNotification;
+        UIBarButtonItem saveButtonItem;
+        UIBarButtonItem cancelButtonItem;
 
         UIView activeField;
 
         bool refreshed;
 
-        DataSource dataSource;
+        DataSource TableViewDataSource => (DataSource)TableView.Source;
 
         #region UIViewControllerOverrides
 
@@ -54,8 +47,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
             InitializeHandlers();
-            SubscribeToKeyboardEvents();
         }
 
 
@@ -73,7 +69,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeInitializeHandlers();
-            UnsubscribeFromKeyboardEvents();
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning("Received memory warning!");
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            saveButtonItem = null;
+            cancelButtonItem = null;
+            activeField = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         #endregion
@@ -82,91 +106,106 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            cancelButton = new UIBarButtonItem();
-            cancelButton.Title = Localization.GetString("cancel");
-            NavigationItem.SetLeftBarButtonItem(cancelButton, false);
+            cancelButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("cancel")
+            };
+            NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
 
-            saveButton = new UIBarButtonItem();
-            saveButton.Title = Localization.GetString("save");
-            saveButton.Enabled = true;
-            NavigationItem.SetRightBarButtonItem(saveButton, false);
+            saveButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("save"),
+                Enabled = true
+            };
+            NavigationItem.SetRightBarButtonItem(saveButtonItem, false);
+
+            SetTitle();
         }
 
         void InitializeView()
         {
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Plain);
-
-            dataSource = new DataSource(this, tableView);
-            tableView.Source = dataSource;
-            tableView.TableFooterView = new UIView();
-            tableView.EstimatedRowHeight = 60f;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            tableView.ClipsToBounds = false;
-            tableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
-            tableView.Editing = true;
-            tableView.AllowsSelectionDuringEditing = true;
-            tableView.CellLayoutMarginsFollowReadableWidth = true;
-            View.AddSubview(tableView);
-
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
-            });
+            TableView.Source = new DataSource(this, TableView);
+            TableView.TableFooterView = new UIView();
+            TableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
+            TableView.Editing = true;
+            TableView.AllowsSelectionDuringEditing = true;
+            TableView.CellLayoutMarginsFollowReadableWidth = true;
         }
 
         void InitializeHandlers()
         {
-            if (cancelButton != null)
-                cancelButton.Clicked += CancelButton_Clicked;
+            if (cancelButtonItem != null)
+                cancelButtonItem.Clicked += CancelButton_Clicked;
 
-            if (saveButton != null)
-                saveButton.Clicked += SaveButton_Clicked;
+            if (saveButtonItem != null)
+                saveButtonItem.Clicked += SaveButton_Clicked;
 
-            if (dataSource != null)
+            if (TableViewDataSource != null)
             {
-                dataSource.ViewIsActivated += DataSource_ViewIsActivated;
-                dataSource.ResponsibleUserRowClicked += DataSource_ResponsibleUserRowClicked;
-                dataSource.ParentRowClicked += DataSource_ParentRowClicked;
-                dataSource.ParentRemoved += DataSource_ParentRemoved;
+                TableViewDataSource.ViewIsActivated += DataSource_ViewIsActivated;
+                TableViewDataSource.ResponsibleUserRowClicked += DataSource_ResponsibleUserRowClicked;
+                TableViewDataSource.ParentRowClicked += DataSource_ParentRowClicked;
+                TableViewDataSource.ParentRemoved += DataSource_ParentRemoved;
             }
         }
 
         void DeInitializeHandlers()
         {
-            if (cancelButton != null)
-                cancelButton.Clicked -= CancelButton_Clicked;
+            if (cancelButtonItem != null)
+                cancelButtonItem.Clicked -= CancelButton_Clicked;
 
-            if (saveButton != null)
-                saveButton.Clicked -= SaveButton_Clicked;
+            if (saveButtonItem != null)
+                saveButtonItem.Clicked -= SaveButton_Clicked;
 
-            if (dataSource != null)
+            if (TableViewDataSource != null)
             {
-                dataSource.ViewIsActivated -= DataSource_ViewIsActivated;
-                dataSource.ResponsibleUserRowClicked -= DataSource_ResponsibleUserRowClicked;
-                dataSource.ParentRowClicked -= DataSource_ParentRowClicked;
-                dataSource.ParentRemoved -= DataSource_ParentRemoved;
+                TableViewDataSource.ViewIsActivated -= DataSource_ViewIsActivated;
+                TableViewDataSource.ResponsibleUserRowClicked -= DataSource_ResponsibleUserRowClicked;
+                TableViewDataSource.ParentRowClicked -= DataSource_ParentRowClicked;
+                TableViewDataSource.ParentRemoved -= DataSource_ParentRemoved;
             }
         }
 
-        void SubscribeToKeyboardEvents()
+        void SetTitle()
         {
-            didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
-            willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
-            willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
-        }
+            string title = string.Empty;
 
-        void UnsubscribeFromKeyboardEvents()
-        {
-            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
+            if (CreationModeFlag == ContactCreationModeFlag.New)
             {
-                didShowNotificationObserver,
-                willChangeFrameNotificationObserver,
-                willHideNotification
-            });
+                switch (ContactType)
+                {
+                    case ContactType.Person:
+                        title = Localization.GetString("edit_contact_create_person");
+                        break;
+                    case ContactType.Company:
+                        title = Localization.GetString("edit_contact_create_company");
+                        break;
+                    case ContactType.Department:
+                        title = Localization.GetString("edit_contact_create_department");
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
+            }
+            else if (CreationModeFlag == ContactCreationModeFlag.Edit)
+            {
+                switch (ContactType)
+                {
+                    case ContactType.Person:
+                        title = Localization.GetString("edit_contact_edit_person");
+                        break;
+                    case ContactType.Company:
+                        title = Localization.GetString("edit_contact_edit_company");
+                        break;
+                    case ContactType.Department:
+                        title = Localization.GetString("edit_contact_edit_department");
+                        break;
+                    default:
+                        throw new ArgumentException("Contact type needs to be defined");
+                }
+            }
+
+            NavigationItem.Title = title;
         }
 
         #endregion
@@ -176,13 +215,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (refreshed)
                 return;
 
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource)TableView.Source;
 
             if (CreationModeFlag == ContactCreationModeFlag.New)
             {
                 Contact = new Contact();
-                ContactPreview = new ContactPreview();
-                ContactPreview.Type = ContactType;
+                ContactPreview = new ContactPreview { Type = ContactType };
             }
 
             ds.Refresh(Contact, ContactPreview, ParentContactPreview, CreationModeFlag, ParentPreselected);
@@ -205,7 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (selectedParent != null)
             {
                 ParentContactPreview = selectedParent;
-                dataSource.UpdateParentContact(ParentContactPreview);
+                TableViewDataSource.UpdateParentContact(ParentContactPreview);
                 ((DataSource.ParentRow)sender).ReloadRow();
             }
         }
@@ -245,7 +283,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void SaveButton_Clicked(object sender, EventArgs e)
         {
-            if (!dataSource.IsFormCorrect())
+            if (!TableViewDataSource.IsFormCorrect())
                 return;
 
             if (ContactPreview.Type == ContactType.Person)
@@ -256,7 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                tableView.EndEditing(true);
+                TableView.EndEditing(true);
                 var parentId = ParentContactPreview == null ? -1 : ParentContactPreview.Id;
                 await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
 
@@ -285,61 +323,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Keyboard
-
-        void OnKeyboardDidShowNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true, true);
-        }
-
-        void OnKeyboardWillChangeFrameNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, false, false);
-        }
-
-        void OnKeyboardWillHideNotification(NSNotification notification)
-        {
-            AdjustViewToKeyboard(0f, notification, false, true);
-        }
-
-        void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool adjustContentOffset, bool adjustInsets)
-        {
-            if (notification == null)
-            {
-                View.LayoutIfNeeded();
-                return;
-            }
-
-            if (adjustContentOffset && activeField != null)
-            {
-                var difference = activeField.Frame.Bottom - tableView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
-
-                if (difference > 0)
-                {
-                    var co = tableView.ContentOffset;
-                    co.Y += difference;
-                    tableView.SetContentOffset(co, true);
-                }
-            }
-
-            if (adjustInsets)
-            {
-                var ci = tableView.ContentInset;
-                ci.Bottom = keyboardHeight;
-                tableView.ContentInset = ci;
-
-                ci = tableView.ScrollIndicatorInsets;
-                ci.Bottom = keyboardHeight;
-                tableView.ScrollIndicatorInsets = ci;
-            }
-        }
-
-        #endregion
-
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
-            public AddEditContactViewController ViewController;
-            public UITableView TableView;
+            public WeakReference<AddEditContactViewController> viewControllerWeakReference;
+            public WeakReference<UITableView> tableViewWeakReference;
 
             public event EventHandler ViewIsActivated = delegate { };
             public event EventHandler ResponsibleUserRowClicked = delegate { };
@@ -354,8 +341,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public DataSource(AddEditContactViewController viewController, UITableView tableView)
             {
-                ViewController = viewController;
-                TableView = tableView;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
                 InitializeSections();
             }
 
@@ -476,15 +463,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     section.InitializeRows();
                 }
 
-                TableView.ReloadData();
+                tableViewWeakReference.Unwrap()?.ReloadData();
             }
 
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
 
-                TableView = null;
-                ViewController = null;
+                tableViewWeakReference = null;
+                viewControllerWeakReference = null;
 
                 sections = null;
             }
@@ -501,7 +488,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             AbstractRow RowAtIndexPath(NSIndexPath indexPath)
             {
-                return sections[indexPath.Section].Rows[indexPath.Row];
+                return sections[indexPath.Section].Rows.ElementAtOrDefault(indexPath.Row);
             }
 
             [Export("gestureRecognizer:shouldReceiveTouch:")]
@@ -537,6 +524,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 sections.ForEach(s => s.ParentContactPreview = parentContactPreview);
             }
 
+            public void Reset()
+            {
+                sections.Clear();
+
+                tableViewWeakReference.Unwrap()?.ReloadData();
+            }
+
             #region Support classes
 
             class SectionCollection : List<AbstractSection> { }
@@ -545,7 +539,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 public DataSource DataSource;
 
-                public UITableView TableView { get => DataSource.TableView; }
+                public UITableView TableView { get => DataSource.tableViewWeakReference.Unwrap(); }
                 public Contact Contact { get; set; }
                 public ContactPreview ContactPreview { get; set; }
                 public ContactPreview ParentContactPreview { get; set; }
@@ -669,7 +663,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Rows.Clear();
                     Rows.Add(row);
 
-                    TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
                 public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
@@ -680,8 +674,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Rows.Clear();
                     Rows.Add(headerRow);
 
-                    TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
-                    TableView.EndEditing(true);
+                    TableView?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.EndEditing(true);
                 }
             }
 
@@ -709,7 +703,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Contact.CommunicationAddresses.Add(ca);
                     Rows.Insert(Rows.Count - 1, new EmailAddressRow(this, ca));
-                    TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
                 public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
@@ -718,8 +712,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var ca = pnRow.Content;
                     Contact.CommunicationAddresses.Remove(ca);
                     Rows.Remove(row);
-                    TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
-                    TableView.EndEditing(true);
+                    TableView?.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.EndEditing(true);
                 }
 
                 public void DisablePrimaryOnOtherRows(EmailAddressRow row)
@@ -762,7 +756,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Contact.CommunicationAddresses.Add(ca);
                     Rows.Insert(Rows.Count - 1, new PhoneNumberRow(this, ca));
-                    TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
                 public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
@@ -771,8 +765,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var ca = pnRow.Content;
                     Contact.CommunicationAddresses.Remove(ca);
                     Rows.Remove(row);
-                    TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
-                    TableView.EndEditing(true);
+                    TableView?.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.EndEditing(true);
                 }
 
                 public void DisablePrimaryOnOtherRows(PhoneNumberRow row)
@@ -808,7 +802,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var ca = new PhysicalAddress();
                     Contact.PhysicalAddresses.Add(ca);
                     Rows.Insert(Rows.Count - 1, new PhysicalAddressRow(this, ca));
-                    TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
                 public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
@@ -817,8 +811,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var ca = pnRow.Content;
                     Contact.PhysicalAddresses.Remove(ca);
                     Rows.Remove(row);
-                    TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
-                    TableView.EndEditing(true);
+                    TableView?.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.EndEditing(true);
                 }
             }
 
@@ -832,7 +826,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected AbstractSection Section;
 
                 public DataSource DataSource { get => Section.DataSource; }
-                public UITableView TableView { get => Section.DataSource.TableView; }
+                public UITableView TableView { get => Section.DataSource.tableViewWeakReference.Unwrap(); }
                 public Contact Contact { get => Section.Contact; }
                 public ContactPreview ContactPreview { get => Section.ContactPreview; }
                 public ContactPreview ParentContactPreview { get => Section.ParentContactPreview; }
@@ -874,9 +868,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (Cell == null)
                         return;
 
-                    var indexPath = TableView.IndexPathForCell(Cell);
+                    var indexPath = TableView?.IndexPathForCell(Cell);
                     if (indexPath != null)
-                        TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                        TableView?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
                 public void SetErrorState(bool errorState, bool animate = true)
@@ -969,8 +963,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         //Used to make the cell grow with the content
                         UIView.AnimationsEnabled = false;
-                        TableView.BeginUpdates();
-                        TableView.EndUpdates();
+                        TableView?.BeginUpdates();
+                        TableView?.EndUpdates();
                         UIView.AnimationsEnabled = true;
                     }
                 }

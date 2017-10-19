@@ -6,31 +6,64 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class ObjectLinksTableViewCell : UITableViewCell
+    public class ObjectLinksTableViewCell : UITableViewCell
     {
-        public const float Height = 72f;
+        public static readonly NSString DefaultId = new NSString("ObjectLinksTableViewCell");
 
-        public static readonly UINib Nib = UINib.FromName("ObjectLinksTableViewCell", NSBundle.MainBundle);
-        public static readonly NSString Key = new NSString("ObjectLinksTableViewCell");
+        readonly UILabel titleLabel;
+        readonly UILabel subtitleLabel;
 
-        public ObjectLinksTableViewCell(IntPtr handle)
-            : base(handle)
+        public ObjectLinksTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-        }
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
 
-        public static ObjectLinksTableViewCell Create()
-        {
-            var cell = (ObjectLinksTableViewCell) Nib.Instantiate(null, null)[0];
+            titleLabel = new UILabel
+            {
+                Font = Theme.DefaultBoldFont,
+                TextColor = Theme.Black,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(titleLabel);
 
-            cell.TitleLabel.Font = Theme.DefaultBoldFont;
+            subtitleLabel = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                TextColor = Theme.Black,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(subtitleLabel);
 
-            return cell;
+            ContentView.AddConstraints(new[]
+            {
+                subtitleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                subtitleLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                subtitleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
+
+                titleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                titleLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                titleLabel.TopAnchor.ConstraintEqualTo(subtitleLabel.BottomAnchor, 4f),
+                titleLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
+            });
         }
 
         public void Initialize(ObjectLink link)
         {
-            TitleLabel.Text = link.IsReverse ? link.TypeInfo.DescriptionComplexReverse : link.TypeInfo.DescriptionComplex;
-            SubtitleLabel.Text = link.Description;
+            titleLabel.Text = link.IsReverse ? link.TypeInfo.DescriptionComplexReverse : link.TypeInfo.DescriptionComplex;
+            subtitleLabel.Text = link.Description;
+
+            var clickable = false;
+            if (link.IsReverse)
+                clickable = link.FromObjectType == ObjectType.Document || link.FromObjectType == ObjectType.Contact || link.FromObjectType == ObjectType.Shortcode;
+            else
+                clickable = link.ToObjectType == ObjectType.Document || link.ToObjectType == ObjectType.Contact || link.ToObjectType == ObjectType.Shortcode;
+
+            SelectionStyle = clickable ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }
     }
 }

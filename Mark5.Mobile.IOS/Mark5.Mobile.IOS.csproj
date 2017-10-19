@@ -107,21 +107,14 @@
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\EditTextViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\NotificationsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
@@ -343,13 +336,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
-		<InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\FoldersTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\NotificationsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\ObjectActionsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\ShortcodesTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">

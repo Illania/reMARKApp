@@ -7,28 +7,69 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class FoldersSearchResultsTableViewCell : UITableViewCell
+    public class FoldersSearchResultsTableViewCell : UITableViewCell
     {
-        public const float Height = 65f;
+        public static readonly NSString DefaultId = new NSString("FoldersSearchResultsTableViewCell");
 
-        public static readonly NSString Key = new NSString("FoldersSearchResultsTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("FoldersSearchResultsTableViewCell", NSBundle.MainBundle);
+        readonly UILabel folderNameLabel;
+        readonly UILabel folderPathLabel;
+        readonly UIImageView folderIconImage;
 
-        public static FoldersSearchResultsTableViewCell Create()
+        public FoldersSearchResultsTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-            return (FoldersSearchResultsTableViewCell) Nib.Instantiate(null, null)[0];
-        }
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
 
-        protected FoldersSearchResultsTableViewCell(IntPtr handle)
-            : base(handle)
-        {
+            folderNameLabel = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                TextColor = Theme.Black,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(folderNameLabel);
+
+            folderPathLabel = new UILabel
+            {
+                Font = Theme.DefaultLightFont,
+                TextColor = Theme.DarkGray,
+                TextAlignment = UITextAlignment.Left,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(folderPathLabel);
+
+            folderIconImage = new UIImageView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            ContentView.Add(folderIconImage);
+
+            ContentView.AddConstraints(new[]
+            {
+                folderIconImage.HeightAnchor.ConstraintEqualTo(20f),
+                folderIconImage.WidthAnchor.ConstraintEqualTo(20f),
+                folderIconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                folderIconImage.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+
+                folderNameLabel.LeadingAnchor.ConstraintEqualTo(folderIconImage.TrailingAnchor, 8f),
+                folderNameLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                folderNameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
+
+                folderPathLabel.TopAnchor.ConstraintEqualTo(folderNameLabel.BottomAnchor, 4f),
+                folderPathLabel.LeadingAnchor.ConstraintEqualTo(folderNameLabel.LeadingAnchor),
+                folderPathLabel.TrailingAnchor.ConstraintEqualTo(folderNameLabel.TrailingAnchor),
+                folderPathLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
+            });
         }
 
         public void Initialize(Folder folder)
         {
-            FolderNameLabel.Text = folder.Name;
-            FolderPathLabel.Text = folder.Path;
-            FolderIconImage.Image = GetIcon(folder);
+            folderNameLabel.Text = folder.Name;
+            folderPathLabel.Text = folder.Path;
+            folderIconImage.Image = GetIcon(folder);
 
             UserInteractionEnabled = true;
             SelectionStyle = UITableViewCellSelectionStyle.Default;
@@ -36,9 +77,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Disable()
         {
-            FolderNameLabel.TextColor = Theme.DarkGray;
-            FolderPathLabel.TextColor = Theme.DarkGray;
-            FolderIconImage.TintColor = Theme.DarkGray;
+            folderNameLabel.TextColor = Theme.DarkGray;
+            folderPathLabel.TextColor = Theme.DarkGray;
+            folderIconImage.TintColor = Theme.DarkGray;
 
             UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;

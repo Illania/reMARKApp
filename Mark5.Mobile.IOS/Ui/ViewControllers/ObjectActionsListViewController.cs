@@ -166,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var section = objectActionsSections[indexPath.Section];
                 var oa = items[section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.Key) as ObjectActionsTableViewCell ?? ObjectActionsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.DefaultId) as ObjectActionsTableViewCell ?? new ObjectActionsTableViewCell();
                 cell.Initialize(oa);
                 cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
@@ -199,8 +199,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ObjectActionsTableViewCell.Height;
 
             public void SetItems(Dictionary<string, ObjectAction[]> objectActions)
             {

@@ -9,7 +9,6 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -737,12 +736,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                 var cp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.DefaultId) as ShortcodesTableViewCell ?? new ShortcodesTableViewCell();
                 cell.Initialize(cp);
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ShortcodesTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {

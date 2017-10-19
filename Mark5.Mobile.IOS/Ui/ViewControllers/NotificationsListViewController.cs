@@ -155,7 +155,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TableView.Source = new DataSource(this, TableView);
             TableView.RefreshControl = RefreshControl;
-            TableView.EstimatedRowHeight = NotificationsTableViewCell.Height;
         }
 
         void InitializeHandlers()
@@ -291,7 +290,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var n = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
+                var reuseIdentifier = n.Type == EventType.NewObjectCreated ? NotificationsTableViewCell.NewObjectCreatedId : NotificationsTableViewCell.DefaultId;
+
+                var cell = tableView.DequeueReusableCell(reuseIdentifier) as NotificationsTableViewCell ?? new NotificationsTableViewCell(reuseIdentifier);
                 cell.Initialize(n);
 
                 return cell;
