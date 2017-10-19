@@ -118,7 +118,6 @@
 		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
@@ -354,7 +353,6 @@
 		<InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\ExternalDocumentsTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
-		<InterfaceDefinition Include="Ui\TableViewCells\FoldersTableViewCell.xib" />
 		<InterfaceDefinition Include="Ui\TableViewCells\DocumentToUploadTableViewCell.xib" />
 		<InterfaceDefinition Include="Resources\Ui\TableViewCells\ObjectLinksTableViewCell.xib" />
 		<InterfaceDefinition Include="Resources\Ui\TableViewCells\NotificationsTableViewCell.xib" />

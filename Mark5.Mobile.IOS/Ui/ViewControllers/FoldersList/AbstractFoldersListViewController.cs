@@ -940,10 +940,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return emptyCell;
                 }
 
-                var cell = tableView.DequeueReusableCell(FoldersTableViewCell.Key) as FoldersTableViewCell;
+                var cell = tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) as FoldersTableViewCell;
                 if (cell == null)
                 {
-                    cell = FoldersTableViewCell.Create();
+                    cell = new FoldersTableViewCell();
                     cell.ExpandCollapseClicked += Cell_ExpandCollapseClicked;
                 }
 
@@ -956,8 +956,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => FoldersTableViewCell.Height;
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
@@ -1251,10 +1249,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return emptyCell;
                 }
 
-                var cell = tableView.DequeueReusableCell(FoldersTableViewCell.Key) as FoldersTableViewCell;
+                var cell = tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) as FoldersTableViewCell;
                 if (cell == null)
                 {
-                    cell = FoldersTableViewCell.Create();
+                    cell = new FoldersTableViewCell();
                     cell.ExpandCollapseClicked += Cell_ExpandCollapseClicked;
                 }
 
@@ -1268,8 +1266,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => FoldersTableViewCell.Height;
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
