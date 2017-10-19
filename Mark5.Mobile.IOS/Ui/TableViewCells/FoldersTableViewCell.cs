@@ -104,13 +104,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             });
         }
 
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
-
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
-        }
-
         public void Initialize(Folder folder, bool folderIsOffline)
         {
             this.folder = folder;

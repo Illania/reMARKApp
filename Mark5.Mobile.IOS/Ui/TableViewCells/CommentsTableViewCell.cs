@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public class CommentsTableViewCell : UITableViewCell
     {
-        public static readonly NSString DefaultId = new NSString(nameof(CategoriesTableViewCell));
+        public static readonly NSString DefaultId = new NSString(nameof(CommentsTableViewCell));
 
         readonly UILabel authorLabel;
         readonly UILabel dateLabel;
