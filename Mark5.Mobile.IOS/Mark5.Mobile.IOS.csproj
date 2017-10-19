@@ -107,7 +107,6 @@
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\EditTextViewCell.designer.cs" />
 		<Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
@@ -337,8 +336,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
-		<InterfaceDefinition Include="Ui\TableViewCells\EditTextViewCell.xib" />
-		<InterfaceDefinition Include="Resources\Ui\TableViewCells\FoldersSearchResultsTableViewCell.xib" />
 	</ItemGroup>
 	<ItemGroup>
 		<ImageAsset Include="Assets.xcassets\Contents.json">

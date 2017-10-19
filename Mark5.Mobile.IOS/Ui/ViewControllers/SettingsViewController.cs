@@ -117,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
                 if (cell == null)
                 {
-                    cell = (EditTextViewCell)EditTextViewCell.Nib.Instantiate(null, null)[0];
+                    cell = new EditTextViewCell();
                     cell.ContentChanged += (sender, e) => PlatformConfig.Preferences.LocalTemplate = cell.Content;
                 }
                 cell.Content = PlatformConfig.Preferences.LocalTemplate;
@@ -345,7 +345,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cell.TextLabel.Font = Theme.DefaultFont;
                 if (cell.DetailTextLabel != null)
                     cell.DetailTextLabel.Font = Theme.DefaultLightFont;
-                
+
                 return cell;
             }
         }

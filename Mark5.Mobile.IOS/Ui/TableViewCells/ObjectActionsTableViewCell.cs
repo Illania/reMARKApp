@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString("ObjectActionsTableViewCell");
 
-        readonly UITextView descriptionLabel;
+        readonly UITextView descriptionTextView;
         readonly UILabel usernameLabel;
         readonly UILabel dateLabel;
 
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            descriptionLabel = new UITextView
+            descriptionTextView = new UITextView
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.Black,
@@ -35,8 +35,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 UserInteractionEnabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            descriptionLabel.TextContainer.LineFragmentPadding = 0f;
-            ContentView.Add(descriptionLabel);
+            descriptionTextView.TextContainer.LineFragmentPadding = 0f;
+            ContentView.Add(descriptionTextView);
 
             usernameLabel = new UILabel
             {
@@ -69,10 +69,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 dateLabel.LeadingAnchor.ConstraintEqualTo(usernameLabel.TrailingAnchor, 8f),
                 dateLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
 
-                descriptionLabel.LeadingAnchor.ConstraintEqualTo(usernameLabel.LeadingAnchor),
-                descriptionLabel.TrailingAnchor.ConstraintEqualTo(dateLabel.TrailingAnchor),
-                descriptionLabel.TopAnchor.ConstraintEqualTo(usernameLabel.BottomAnchor, 4f),
-                descriptionLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
+                descriptionTextView.LeadingAnchor.ConstraintEqualTo(usernameLabel.LeadingAnchor),
+                descriptionTextView.TrailingAnchor.ConstraintEqualTo(dateLabel.TrailingAnchor),
+                descriptionTextView.TopAnchor.ConstraintEqualTo(usernameLabel.BottomAnchor, 4f),
+                descriptionTextView.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
             });
 
         }
@@ -82,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             usernameLabel.Text = action.Username ?? action.UserId.ToString();
             dateLabel.Text = action.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime()
                 .ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
-            descriptionLabel.Text = action.Description;
+            descriptionTextView.Text = action.Description;
         }
     }
 }
