@@ -239,10 +239,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             InitializeMiddleLabel(dp);
             if (ReuseIdentifier == DefaultId)
                 InitializeBottomLabel(dp);
-            InitializeDirectionIndicator(dp);
-            InitializeUnreadIndicator(dp);
-            InitializeAttachmentIndicator(dp);
-            InitializeCommentsIndicator(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == UploadId)
+                InitializeDirectionIndicator(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId)
+                InitializeUnreadIndicator(dp);
+            if (ReuseIdentifier == DefaultId)
+            {
+                InitializeAttachmentIndicator(dp);
+                InitializeCommentsIndicator(dp);
+            }
         }
 
         void InitializeCategories(DocumentPreview dp)
