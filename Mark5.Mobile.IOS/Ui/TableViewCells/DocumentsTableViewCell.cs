@@ -231,15 +231,23 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(DocumentPreview dp)
         {
-            InitializeCategories(dp);
-            InitializeSender(dp);
-            InitializeDate(dp);
-            InitializeSubject(dp);
-            InitializePreview(dp);
-            InitializeDirectionIndicator(dp);
-            InitializeUnreadIndicator(dp);
-            InitializeAttachmentIndicator(dp);
-            InitializeCommentsIndicator(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == ExternalId)
+                InitializeCategories(dp);
+            InitializeTopLabel(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == ExternalId)
+                InitializeDate(dp);
+            InitializeMiddleLabel(dp);
+            if (ReuseIdentifier == DefaultId)
+                InitializeBottomLabel(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == UploadId)
+                InitializeDirectionIndicator(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId)
+                InitializeUnreadIndicator(dp);
+            if (ReuseIdentifier == DefaultId)
+            {
+                InitializeAttachmentIndicator(dp);
+                InitializeCommentsIndicator(dp);
+            }
         }
 
         void InitializeCategories(DocumentPreview dp)
@@ -259,7 +267,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
         }
 
-        void InitializeSender(DocumentPreview dp)
+        void InitializeTopLabel(DocumentPreview dp)
         {
             if (topLabel == null)
                 return;
@@ -297,7 +305,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 .FormatUserTimestampAsCompactShortDateTimeString();
         }
 
-        void InitializeSubject(DocumentPreview dp)
+        void InitializeMiddleLabel(DocumentPreview dp)
         {
             if (middleLabel == null)
                 return;
@@ -305,7 +313,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             middleLabel.Text = dp.Subject;
         }
 
-        void InitializePreview(DocumentPreview dp)
+        void InitializeBottomLabel(DocumentPreview dp)
         {
             if (bottomLabel == null)
                 return;
