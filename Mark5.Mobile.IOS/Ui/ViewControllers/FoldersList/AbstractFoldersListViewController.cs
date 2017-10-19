@@ -1485,7 +1485,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var f = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(FoldersSearchResultsTableViewCell.Key) as FoldersSearchResultsTableViewCell ?? FoldersSearchResultsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(FoldersSearchResultsTableViewCell.DefaultId) as FoldersSearchResultsTableViewCell ?? new FoldersSearchResultsTableViewCell();
                 cell.Initialize(f);
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
@@ -1493,8 +1493,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => FoldersSearchResultsTableViewCell.Height;
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
