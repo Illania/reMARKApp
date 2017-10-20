@@ -207,8 +207,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
             View.BackgroundColor = Theme.White;
 
             scrollView = new UIScrollView
@@ -497,7 +495,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 2)
             {
-                var picker = new UIDocumentMenuViewController(new[]
+                var picker = new UIDocumentPickerViewController(new[]
                         {
                             "public.content",
                             "public.data",
@@ -1133,18 +1131,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         jpegImage = image.AsJPEG();
                     }
 
-                    var referenceUrl = (NSUrl)info[UIImagePickerController.ReferenceUrl];
+                    PHAsset asset = null;
 
-                    string filename;
-                    if (referenceUrl != null)
+                    if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
                     {
-                        var results = PHAsset.FetchAssets(new[]
-                            {
+                        asset = (PHAsset)info[UIImagePickerController.PHAsset];
+                    }
+                    else
+                    {
+                        var referenceUrl = (NSUrl)info[UIImagePickerController.ReferenceUrl];
+
+                        if (referenceUrl != null)
+                        {
+                            var results = PHAsset.FetchAssets(new[]
+                                {
                                 referenceUrl
                             },
-                            null);
-                        var asset = (PHAsset)results.firstObject;
+                                null);
+                            asset = (PHAsset)results.firstObject;
+                        }
+                    }
 
+                    string filename = null;
+
+                    if (asset != null)
+                    {
                         var assetResources = PHAssetResource.GetAssetResources(asset);
                         filename = assetResources[0].OriginalFilename;
                     }
@@ -1170,7 +1181,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        class DocumentMenuDelegate : UIDocumentMenuDelegate, IUIDocumentPickerDelegate
+        class DocumentMenuDelegate : UIDocumentPickerDelegate, IUIDocumentPickerDelegate
         {
             readonly WeakReference<ComposeDocumentViewController> vcWeak;
             readonly Action<NSUrl> handler;
@@ -1181,22 +1192,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 this.handler = handler;
             }
 
-            public void DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)
+            public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)
             {
                 handler(url);
-            }
-
-            public override void DidPickDocumentPicker(UIDocumentMenuViewController documentMenu, UIDocumentPickerViewController documentPicker)
-            {
-                documentPicker.Delegate = this;
-                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-
-                vcWeak.Unwrap()?.PresentViewController(documentPicker, true, null);
-            }
-
-            public override void WasCancelled(UIDocumentMenuViewController documentMenu)
-            {
-                // Nothing to do
             }
         }
     }

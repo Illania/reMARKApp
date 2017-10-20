@@ -274,7 +274,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 Distribution = UIStackViewDistribution.Fill;
                 Axis = UILayoutConstraintAxis.Horizontal;
 
-                filenameButton = new UIButton();
+                filenameButton = new UIButton(UIButtonType.System);
                 filenameButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 filenameButton.TitleLabel.Font = Theme.DefaultFont;
                 filenameButton.SetTitle(FileDescription.Name + " (" + UI.PrettyFileSize(FileDescription.SizeInBytes) + ")", UIControlState.Normal);
