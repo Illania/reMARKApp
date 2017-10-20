@@ -60,7 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             ContentView.AddConstraints(new[]
             {
                 authorLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
-                authorLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
+                authorLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
 
                 dateLabel.LeadingAnchor.ConstraintEqualTo(authorLabel.TrailingAnchor, 8f),
                 dateLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
@@ -69,7 +69,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 commentTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 commentTextView.TopAnchor.ConstraintEqualTo(authorLabel.BottomAnchor, 4f),
                 commentTextView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                commentTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f)
+                commentTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -4f)
             });
 
         }

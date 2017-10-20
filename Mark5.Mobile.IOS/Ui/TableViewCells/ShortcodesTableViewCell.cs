@@ -1,7 +1,6 @@
 using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -21,24 +20,25 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             label = new UILabel
             {
                 Font = Theme.DefaultFont,
-                TextColor = Theme.Black,
-                TextAlignment = UITextAlignment.Left,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(label);
             ContentView.AddConstraints(new[]
             {
-                label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor, 12),
+                label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 label.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 4),
-                label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -4),
+                label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
+                label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
             });
         }
 
-        public void Initialize(ShortcodePreview shortcodePreview)
+        public void Initialize(ShortcodePreview sp)
         {
-            label.Text = shortcodePreview.Name;
+            if (string.IsNullOrEmpty(sp.Name))
+                label.Text = " ";
+            else
+                label.Text = sp.Name;
         }
     }
 }

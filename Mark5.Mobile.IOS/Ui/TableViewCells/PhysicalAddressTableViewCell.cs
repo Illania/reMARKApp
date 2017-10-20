@@ -22,8 +22,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public PhysicalAddressTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
+
             topLabel = new UILabel
             {
+                Text = Localization.GetString("address").ToUpper(),
                 Font = Theme.DefaultFont.WithRelativeSize(-2f),
                 TextColor = Theme.DarkGray,
                 Lines = 1,
@@ -32,12 +36,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             bottomTextView = new UITextView
             {
+                Selectable = false,
                 Editable = false,
                 ScrollEnabled = false,
                 ClipsToBounds = false,
                 TextContainerInset = UIEdgeInsets.Zero,
+                UserInteractionEnabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            bottomTextView.ApplyTheme();
             bottomTextView.TextContainer.LineFragmentPadding = 0f;
 
             iconImage = new UIImageView
@@ -52,27 +59,25 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             ContentView.AddConstraints(new[]
             {
-                    topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
-                    topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
-                    topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
-                    topLabel.BottomAnchor.ConstraintEqualTo(bottomTextView.TopAnchor, -4f),
-                    topLabel.HeightAnchor.ConstraintEqualTo(20f),
+                topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
+                topLabel.BottomAnchor.ConstraintEqualTo(bottomTextView.TopAnchor, -4f),
+                topLabel.HeightAnchor.ConstraintEqualTo(20f),
 
-                    bottomTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
-                    bottomTextView.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
-                    bottomTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
+                bottomTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                bottomTextView.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                bottomTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
 
-                    iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                    iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                    iconImage.WidthAnchor.ConstraintEqualTo(20f),
-                    iconImage.HeightAnchor.ConstraintEqualTo(20f),
-                });
+                iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                iconImage.WidthAnchor.ConstraintEqualTo(20f),
+                iconImage.HeightAnchor.ConstraintEqualTo(20f),
+            });
         }
 
         public void Initialize(PhysicalAddress pa)
         {
-            topLabel.Text = Localization.GetString("address").ToUpper();
-
             var cnAddress = new CNMutablePostalAddress
             {
                 Street = pa.Street,
@@ -82,12 +87,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 Country = pa.Country.Name,
             };
 
-            var sb = new StringBuilder();
-            if (pa.Type != null && pa.Type.Id > 0)
-                sb.Append(pa.Type.Name).AppendLine();
-            sb.Append(new CNPostalAddressFormatter().GetStringFromPostalAddress(cnAddress));
+            var formattedAddress = new CNPostalAddressFormatter().GetStringFromPostalAddress(cnAddress);
 
-            bottomTextView.AttributedText = new NSAttributedString(sb.ToString(), new UIStringAttributes { Font = Theme.DefaultFont });
+            if (pa.Type != null && pa.Type.Id > 0 && !string.IsNullOrEmpty(pa.Type.Name))
+            {
+                var sb = new StringBuilder();
+                sb.Append(pa.Type.Name).AppendLine();
+                sb.Append(formattedAddress);
+                formattedAddress = sb.ToString();
+            }
+
+            bottomTextView.Text = formattedAddress;
         }
-    }
+}
 }

@@ -943,8 +943,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var cell = tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) as FoldersTableViewCell;
                 if (cell == null)
                 {
-                    cell = new FoldersTableViewCell();
-                    cell.ExpandCollapseClicked += Cell_ExpandCollapseClicked;
+                    cell = new FoldersTableViewCell
+                    {
+                        ExpandGestureRecognizer = new UITapGestureRecognizer(ExpandCollapse)
+                    };
                 }
 
                 var f = items[indexPath.LongSection][indexPath.Row];
@@ -993,7 +995,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference?.Unwrap().FolderDeselected(f);
             }
 
-            void Cell_ExpandCollapseClicked(object sender, Folder f) => viewControllerWeakReference.Unwrap()?.FolderExpand(f);
+            void ExpandCollapse(UITapGestureRecognizer g)
+            {
+                var viewLocation = g.View.Bounds.Location;
+                var location = tableViewWeakReference.Unwrap()?.ConvertPointFromView(viewLocation, g.View);
+                if (location == null)
+                    return;
+                
+                var indexPath = tableViewWeakReference.Unwrap()?.IndexPathForRowAtPoint(location.Value);
+                if (indexPath == null)
+                    return;
+                
+                var f = items[indexPath.LongSection][indexPath.Row];
+
+                if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
+                    return;
+                
+                viewControllerWeakReference.Unwrap()?.FolderExpand(f);
+            }
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
@@ -1252,8 +1271,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var cell = tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) as FoldersTableViewCell;
                 if (cell == null)
                 {
-                    cell = new FoldersTableViewCell();
-                    cell.ExpandCollapseClicked += Cell_ExpandCollapseClicked;
+                    cell = new FoldersTableViewCell
+                    {
+                        ExpandGestureRecognizer = new UITapGestureRecognizer(ExpandCollapse)
+                    };
                 }
 
                 var f = items[indexPath.Row];
@@ -1301,7 +1322,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderDeselected(f);
             }
 
-            void Cell_ExpandCollapseClicked(object sender, Folder f) => viewControllerWeakReference.Unwrap()?.FolderExpand(f);
+            void ExpandCollapse(UITapGestureRecognizer g)
+            {
+                var viewLocation = g.View.Bounds.Location;
+                var location = tableViewWeakReference.Unwrap()?.ConvertPointFromView(viewLocation, g.View);
+                if (location == null)
+                    return;
+
+                var indexPath = tableViewWeakReference.Unwrap()?.IndexPathForRowAtPoint(location.Value);
+                if (indexPath == null)
+                    return;
+
+                var f = items[indexPath.Row];
+
+                if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
+                    return;
+                
+                viewControllerWeakReference.Unwrap()?.FolderExpand(f);
+            }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
 

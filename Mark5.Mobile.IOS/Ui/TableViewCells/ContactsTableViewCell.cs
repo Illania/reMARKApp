@@ -17,6 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public ContactsTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.DisclosureIndicator;
 
             categoriesStackView = new UIStackView
@@ -46,14 +47,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
                 label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 label.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                label.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 12f),
-                label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -12f)
+                label.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
+                label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f)
             });
         }
 
         public void Initialize(ContactPreview cp)
         {
-            label.Text = cp.Name;
+            if (string.IsNullOrEmpty(cp.Name))
+                label.Text = " ";
+            else
+                label.Text = cp.Name;
 
             categoriesStackView.Subviews.ForEach(v => v.RemoveFromSuperview());
             foreach (var c in cp.Categories)
