@@ -60,8 +60,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
+            /*var numbers = new System.Collections.Generic.List<ContactPhoneNumber>();
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                numbers = await Mobile.Common.Manager.Managers.ContactsManager.GetContactPhoneNumbers();
+                Mobile.Common.CommonConfig.Logger.Info("AMOUNT OF NUMBERS: " + numbers.Count);
+            });*/
             RestorationIdentifier = nameof(SimpleMainViewController);
+
         }
     }
 }

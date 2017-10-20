@@ -483,8 +483,8 @@ namespace Mark5.Mobile.Common.DataAccess
                     var commandString = $"select {nameof(ContactPreview.Name)} as {nameof(ContactPhoneNumber.Name)}, "
                         + $"{nameof(ContactCommunicationAddress.Address)} as {nameof(ContactPhoneNumber.Number)} "
                         + $"from {nameof(ContactPhoneNumber)} "
-                        + $"where (({nameof(ContactCommunicationAddress.Type)} = @addressTypePhone) or ({nameof(ContactCommunicationAddress.Type)} = @addressTypeMobile))"
-                        + $"order by {nameof(ContactCommunicationAddress.Address)} asc";
+                        + $"where (({nameof(ContactCommunicationAddress.Type)} = @addressTypePhone) or ({nameof(ContactCommunicationAddress.Type)} = @addressTypeMobile)) "
+                        + $"order by {nameof(ContactPhoneNumber.Number)} asc";
                     
                     var cmd = c.CreateCommand(commandString);
                     cmd.Bind("@addressTypePhone", (int)CommunicationAddressType.Phone);

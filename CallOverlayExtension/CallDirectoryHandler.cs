@@ -2,20 +2,6 @@
 using Foundation;
 using CallKit;
 using Mark5.Mobile.Common;
-using System.Threading.Tasks;
-using UIKit;
-using System.Runtime.InteropServices;
-using System.Text;
-using PCLStorage;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Common.Database;
-using Mark5.Mobile.Common.Extensions;
-using CallOverlayExtension.Utilities;
-using System.IO;
-using Mark5.Mobile.Common.Manager;
-using System.Linq;
-using System.Collections.Generic;
-using Mark5.Mobile.Common.Model;
 
 namespace CallOverlayExtension
 {
@@ -31,44 +17,33 @@ namespace CallOverlayExtension
         {
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
-            //initialization
-            Task.Run(async () =>
-            {
-                var mainFolder = FileSystem.Current.LocalStorage;
 
-                CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
-                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.Logger = new ConsoleLogger();
+            var groupPath = NSFileManager.DefaultManager.GetContainerUrl("com.nordic-it.mark5.mobile.ios.extensions.callid");
+           
 
+            //            //initialization
+            //            AsyncHelpers.RunSync(async () =>
+            //            {
+            //                var mainFolder = FileSystem.Current.LocalStorage;
 
-                if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
-                    CommonConfig.Utf8Normalizer = filename =>
-                    {
-                        var url = NSUrl.FromFilename(filename);
-                        var fsPtr = url.GetFileSystemRepresentationAsUtf8Ptr;
-                        var numBytes = 0;
-                        while (Marshal.ReadByte(fsPtr, numBytes) != 0)
-                            numBytes++;
+            //                CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
+            //                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
+            //                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
+            //                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
+            //                CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
+            //                CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
+            //                CommonConfig.Logger = new ConsoleLogger();
 
-                        var utf8Bytes = new byte[numBytes];
-                        Marshal.Copy(fsPtr, utf8Bytes, 0, numBytes);
-                        return Encoding.UTF8.GetString(utf8Bytes).SafeSubstringAfterLast(Path.DirectorySeparatorChar);
-                    };
-                else
-                    CommonConfig.Utf8Normalizer = filename => filename;
-                
-#if !DEBUG
-                CommonConfig.Logger.Level = LogLevel.INFO;
-#else
-                CommonConfig.Logger.Level = LogLevel.DEBUG;
-#endif
-                await DatabaseUtils.InitializeDatabases();
-            })
-            .Wait();
+            //#if !DEBUG
+            //                CommonConfig.Logger.Level = LogLevel.INFO;
+            //#else
+            //                CommonConfig.Logger.Level = LogLevel.DEBUG;
+            //#endif
+            //    var authenticator = AuthenticatorFactory.Create();
+            //    var ci = await authenticator.GetConnectionInfoAsync();
+            //    Managers.Initialize(ci);
+            //    await DatabaseUtils.InitializeDatabases();
+            //});
 
             if (!AddIdentificationPhoneNumbers(cxContext))
             {
@@ -84,15 +59,34 @@ namespace CallOverlayExtension
         bool AddIdentificationPhoneNumbers(CXCallDirectoryExtensionContext context)
         {
             // Numbers must be provided in numerically ascending order
-            var numbers = Managers.ContactsManager.GetContactPhoneNumbers().Result;
-            long[] phoneNumbers = { 004560443773 };
-            string[] labels = { "test1"};
-
+            /*long[] phoneNumbers = { 004560443773};
+            string[] labels = { "test1234"};
+            
             for (var i = 0; i < phoneNumbers.Length; i++)
             {
                 long phoneNumber = phoneNumbers[i];
                 string label = labels[i];
                 context.AddIdentificationEntry(phoneNumber, label);
+            }
+            var nbrs = new List<ContactPhoneNumber>();
+            CommonConfig.Logger.Info("-_____________________________________________-");
+
+            AsyncHelpers.RunSync(async () =>
+            {
+
+                    nbrs = await Managers.ContactsManager.GetContactPhoneNumbers();
+
+            });*/
+
+            for (var i = 004559500000; i < 004560500000; i++) 
+            {
+                string name;
+                if(i == 4560443773)
+                    name = "mathias5";
+                 else 
+                    name = "not mathias";
+                
+                context.AddIdentificationEntry(i, name);
             }
 
             return true;
@@ -106,6 +100,8 @@ namespace CallOverlayExtension
             // This may be used to store the error details in a location accessible by the extension's containing app, so that the
             // app may be notified about errors which occured while loading data even if the request to load data was initiated by
             // the user in Settings instead of via the app itself.
+
+            CommonConfig.Logger.Info("Error occurred: " + error.LocalizedFailureReason);
         }
     }
 }
