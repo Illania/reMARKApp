@@ -27,6 +27,7 @@ using TinyMessenger;
 using UIKit;
 using UserNotifications;
 using CallKit;
+using System.Collections.Generic;
 
 namespace Mark5.Mobile.IOS
 {
@@ -37,6 +38,36 @@ namespace Mark5.Mobile.IOS
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            try
+            {
+                Contact test = new Contact();
+                test.FirstName = "Mathias";
+                test.LastName = "Thomsen";
+                
+                var cs = new List<Contact>();
+                cs.Add(test);
+                var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios");
+                var scdp = new SharedContactsDatabaseProvider(url.Path);
+                AsyncHelpers.InvokeOnMainThreadAsync(this, async () => 
+                {
+                        await scdp.RunInConnectionAsync(c => {
+                            c.CreateTable<Contact>();
+                            c.Insert(cs);
+
+                            var commandString = $"select * from {nameof(Contact)}";
+
+                            var cmd = c.CreateCommand(commandString);
+                            var contacts = cmd.ExecuteQuery<Contact>();
+
+                        });
+                });
+            } 
+            catch (Exception ex)
+            {
+                
+            }
+           
+
             
             CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension("com.nordic-it.mark5.mobile.ios.extensions.callid",
                                                                                (CXCallDirectoryEnabledStatus status, NSError statuserror) => 

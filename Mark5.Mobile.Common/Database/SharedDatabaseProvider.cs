@@ -1,8 +1,9 @@
-﻿using Foundation;
+﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using SQLite;
 
-//"com.nordic-it.mark5.mobile.ios.extensions.callid"
+
 namespace Mark5.Mobile.Common.Database
 {
     public class SharedDatabaseProvider
@@ -10,10 +11,26 @@ namespace Mark5.Mobile.Common.Database
         readonly Mutex sharedLock = new Mutex();
         readonly SQLiteConnection connection;
 
-        public SharedDatabaseProvider(string groupId)
+        public SharedDatabaseProvider(string path, string dbName)
         {
-            var groupPath = NSFileManager.DefaultManager.GetContainerUrl(groupId);
-            connection = new SQLiteConnection(CommonConfig.DatabaseFolder.Path + CommonConfig.PathSeparator , true);
+            connection = new SQLiteConnection(path + $"/" + dbName , true);
+        }
+
+        public async Task RunInConnectionAsync(Action<SQLiteConnection> action)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    sharedLock.WaitOne();
+
+                    connection.RunInTransaction(() => { action(connection); });
+                }
+                finally
+                {
+                    sharedLock.ReleaseMutex();
+                }
+            });
         }
     }
 }

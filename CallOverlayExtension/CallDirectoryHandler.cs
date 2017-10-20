@@ -2,6 +2,7 @@
 using Foundation;
 using CallKit;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 
 namespace CallOverlayExtension
 {
@@ -18,8 +19,31 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
-            var groupPath = NSFileManager.DefaultManager.GetContainerUrl("com.nordic-it.mark5.mobile.ios.extensions.callid");
-           
+            System.Collections.Generic.List<Contact> contacts = new System.Collections.Generic.List<Contact>();
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                try
+                {
+                    var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios");
+                    var scdp = new Mark5.Mobile.Common.Database.SharedContactsDatabaseProvider(url.Path);
+                    await scdp.RunInConnectionAsync(c =>
+                    {
+                        var commandString = $"select * from {nameof(Contact)}";
+
+                        var cmd = c.CreateCommand(commandString);
+                        contacts = cmd.ExecuteQuery<Contact>();
+                    });
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }).Wait();
+
+            //cxContext.AddIdentificationEntry(004560443773, contacts.Find(c => c.LastName.Equals("Thomsen")).LastName);
+                
+
+            //var groupPath = NSFileManager.DefaultManager.GetContainerUrl("com.nordic-it.mark5.mobile.ios.extensions.callid");
 
             //            //initialization
             //            AsyncHelpers.RunSync(async () =>
@@ -78,16 +102,16 @@ namespace CallOverlayExtension
 
             });*/
 
-            for (var i = 004559500000; i < 004560500000; i++) 
+            /*for (var i = 004559500000; i < 004560500000; i++) 
             {
                 string name;
                 if(i == 4560443773)
-                    name = "mathias5";
+                    name = "the real mathias heyoo";
                  else 
                     name = "not mathias";
                 
                 context.AddIdentificationEntry(i, name);
-            }
+            }*/
 
             return true;
         }
