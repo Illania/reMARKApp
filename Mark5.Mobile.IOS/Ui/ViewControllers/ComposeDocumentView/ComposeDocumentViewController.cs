@@ -127,6 +127,58 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             observeWillShowNotification?.Dispose();
         }
 
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning("Received memory warning!");
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            cancelButtonItem = null;
+            sendButtonItem = null;
+            attachmentButtonItem = null;
+
+            scrollView?.RemoveFromSuperview();
+            stackView?.RemoveFromSuperview();
+
+            toView?.RemoveFromSuperview();
+            ccView?.RemoveFromSuperview();
+            bccView?.RemoveFromSuperview();
+            lineView?.RemoveFromSuperview();
+            priorityView?.RemoveFromSuperview();
+            subjectView?.RemoveFromSuperview();
+            attachmentsView?.RemoveFromSuperview();
+            contentView?.RemoveFromSuperview();
+
+            suggestionsListView?.RemoveFromSuperview();
+
+            scrollView = null;
+            stackView = null;
+            toView = null;
+            ccView = null;
+            bccView = null;
+            lineView = null;
+            priorityView = null;
+            subjectView = null;
+            attachmentsView = null;
+            contentView = null;
+            suggestionsListView = null;
+            attachmentInteractionController = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         #endregion
 
         #region Init methods
