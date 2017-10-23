@@ -20,6 +20,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public DocumentAddressTableViewCell(NSString reuseIdentifier)
             : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
+
             typeLabel = new UILabel
             {
                 Font = Theme.DefaultFont.WithSize(11f),

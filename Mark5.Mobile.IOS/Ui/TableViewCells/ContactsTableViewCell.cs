@@ -54,10 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(ContactPreview cp)
         {
-            if (string.IsNullOrEmpty(cp.Name))
-                label.Text = " ";
-            else
-                label.Text = cp.Name;
+            label.Text = cp.Name;
 
             categoriesStackView.Subviews.ForEach(v => v.RemoveFromSuperview());
             foreach (var c in cp.Categories)

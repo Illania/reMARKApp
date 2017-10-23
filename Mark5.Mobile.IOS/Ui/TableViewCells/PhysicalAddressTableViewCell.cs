@@ -12,7 +12,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public class PhysicalAddressTableViewCell : UITableViewCell
     {
-
         public static readonly NSString DefaultId = new NSString(nameof(PhysicalAddressTableViewCell));
 
         readonly UILabel topLabel;
@@ -99,5 +98,5 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             bottomTextView.Text = formattedAddress;
         }
-}
+    }
 }

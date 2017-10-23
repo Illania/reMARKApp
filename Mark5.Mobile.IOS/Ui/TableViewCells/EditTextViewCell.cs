@@ -11,7 +11,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public string Content { get => contentTextView.Text; set => contentTextView.Text = value; }
 
-        public event EventHandler ContentChanged { add => contentTextView.Changed += value; remove => contentTextView.Changed -= value; }
+        public event EventHandler ContentChanged
+        {
+            add => contentTextView.Changed += value;
+            remove => contentTextView.Changed -= value;
+        }
 
         readonly UITextView contentTextView;
 

@@ -35,10 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(ShortcodePreview sp)
         {
-            if (string.IsNullOrEmpty(sp.Name))
-                label.Text = " ";
-            else
-                label.Text = sp.Name;
+            label.Text = sp.Name;
         }
     }
 }

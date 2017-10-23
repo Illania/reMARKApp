@@ -57,16 +57,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(string type, string info, bool enableDataDetection = false)
         {
-            if (string.IsNullOrEmpty(type))
-                topLabel.Text = " ";
-            else
-                topLabel.Text = type.ToUpper();
-
-            if (string.IsNullOrEmpty(info))
-                bottomTextView.Text = " ";
-            else
-                bottomTextView.Text = info;
-
+            topLabel.Text = type.ToUpper();
+            bottomTextView.Text = info;
             bottomTextView.DataDetectorTypes = enableDataDetection ? UIDataDetectorType.All : UIDataDetectorType.None;
         }
     }

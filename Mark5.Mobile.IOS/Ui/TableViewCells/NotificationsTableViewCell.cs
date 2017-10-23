@@ -168,10 +168,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 secondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
             }
 
-            dateReceivedLabel.Text = notification.DateTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime()
-                .ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
-
+            dateReceivedLabel.Text = notification.DateTimeTimestamp
+                .ConvertTimestampMillisecondsToDateTime()
+                .ConvertUtcToUserTime()
+                .ConvertDateTimeToTimestampMilliseconds()
+                .FormatUserTimestampAsCompactShortDateTimeString();
             readImageView.Image = notification.IsRead ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+
             SelectionStyle = notification.ObjectType == ObjectType.Document ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }
 

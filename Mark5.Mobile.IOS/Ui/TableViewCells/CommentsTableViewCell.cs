@@ -76,12 +76,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(Comment comment)
         {
-            authorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id ? Localization.GetString("me") : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
+            authorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id
+                ? Localization.GetString("me")
+                : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
+
             dateLabel.Text = comment.DateAddedTimestamp
                 .ConvertTimestampMillisecondsToDateTime()
                 .ConvertUtcToUserTime()
                 .ConvertDateTimeToTimestampMilliseconds()
                 .FormatUserTimestampAsCompactLongDateTimeString();
+
             commentTextView.Text = comment.Content;
         }
     }

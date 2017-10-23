@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public ObjectActionsTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
-            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
 
             usernameLabel = new UILabel

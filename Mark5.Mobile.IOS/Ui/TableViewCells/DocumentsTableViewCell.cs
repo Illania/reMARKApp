@@ -37,6 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == ExternalId)
             {
+                SelectionStyle = UITableViewCellSelectionStyle.Default;
                 Accessory = UITableViewCellAccessory.DisclosureIndicator;
             }
             else
