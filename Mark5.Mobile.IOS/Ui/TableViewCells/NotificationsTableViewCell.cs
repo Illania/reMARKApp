@@ -12,8 +12,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public class NotificationsTableViewCell : UITableViewCell
     {
-        public static readonly NSString DefaultId = new NSString("NotificationsTableViewCell");
-        public static readonly NSString NewObjectCreatedId = new NSString("NotificationsTableViewCell" + "_NewObjectCreated");
+        public static readonly NSString DefaultId = new NSString(nameof(NotificationsTableViewCell));
+        public static readonly NSString NewObjectCreatedId = new NSString(nameof(NotificationsTableViewCell) + "_NewObjectCreated");
 
         readonly UILabel firstLineLabel;
         readonly UILabel secondLineLabel;
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     TextColor = Theme.Black,
                     TextAlignment = UITextAlignment.Left,
                     Lines = 1,
-                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    TranslatesAutoresizingMaskIntoConstraints = false
                 };
                 titleLabel.SetContentHuggingPriority((float)UILayoutPriority.DefaultLow, UILayoutConstraintAxis.Horizontal);
                 ContentView.Add(titleLabel);
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     TextColor = Theme.Black,
                     TextAlignment = UITextAlignment.Left,
                     Lines = 1,
-                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    TranslatesAutoresizingMaskIntoConstraints = false
                 };
                 dateReceivedLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 dateReceivedLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -168,10 +168,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 secondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
             }
 
-            dateReceivedLabel.Text = notification.DateTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime()
-                .ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString();
-
+            dateReceivedLabel.Text = notification.DateTimeTimestamp
+                .ConvertTimestampMillisecondsToDateTime()
+                .ConvertUtcToUserTime()
+                .ConvertDateTimeToTimestampMilliseconds()
+                .FormatUserTimestampAsCompactShortDateTimeString();
             readImageView.Image = notification.IsRead ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+
             SelectionStyle = notification.ObjectType == ObjectType.Document ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }
 

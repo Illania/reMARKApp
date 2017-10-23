@@ -7,11 +7,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public class EditTextViewCell : UITableViewCell
     {
-        public static readonly NSString Key = new NSString("EditTextViewCell");
+        public static readonly NSString Key = new NSString(nameof(EditTextViewCell));
 
         public string Content { get => contentTextView.Text; set => contentTextView.Text = value; }
 
-        public event EventHandler ContentChanged { add => contentTextView.Changed += value; remove => contentTextView.Changed -= value; }
+        public event EventHandler ContentChanged
+        {
+            add => contentTextView.Changed += value;
+            remove => contentTextView.Changed -= value;
+        }
 
         readonly UITextView contentTextView;
 
@@ -23,11 +27,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             contentTextView = new UITextView
             {
-                Font = Theme.DefaultFont,
-                TextColor = Theme.Black,
-                TextAlignment = UITextAlignment.Left,
+                ScrollEnabled = false,
+                ClipsToBounds = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                UserInteractionEnabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            contentTextView.ApplyTheme();
+            contentTextView.TextContainer.LineFragmentPadding = 0f;
             ContentView.Add(contentTextView);
 
             ContentView.AddConstraints(new[]

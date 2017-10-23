@@ -21,11 +21,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
+            folderIconImage = new UIImageView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            ContentView.Add(folderIconImage);
+
             folderNameLabel = new UILabel
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.Black,
-                TextAlignment = UITextAlignment.Left,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -35,54 +40,51 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 Font = Theme.DefaultLightFont,
                 TextColor = Theme.DarkGray,
-                TextAlignment = UITextAlignment.Left,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(folderPathLabel);
 
-            folderIconImage = new UIImageView
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-            };
-            ContentView.Add(folderIconImage);
-
             ContentView.AddConstraints(new[]
             {
+                folderIconImage.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                folderIconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 folderIconImage.HeightAnchor.ConstraintEqualTo(20f),
                 folderIconImage.WidthAnchor.ConstraintEqualTo(20f),
-                folderIconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                folderIconImage.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
 
                 folderNameLabel.LeadingAnchor.ConstraintEqualTo(folderIconImage.TrailingAnchor, 8f),
                 folderNameLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
                 folderNameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
 
-                folderPathLabel.TopAnchor.ConstraintEqualTo(folderNameLabel.BottomAnchor, 4f),
                 folderPathLabel.LeadingAnchor.ConstraintEqualTo(folderNameLabel.LeadingAnchor),
                 folderPathLabel.TrailingAnchor.ConstraintEqualTo(folderNameLabel.TrailingAnchor),
+                folderPathLabel.TopAnchor.ConstraintEqualTo(folderNameLabel.BottomAnchor, 4f),
                 folderPathLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
             });
         }
 
         public void Initialize(Folder folder)
         {
-            folderNameLabel.Text = folder.Name;
-            folderPathLabel.Text = folder.Path;
-            folderIconImage.Image = GetIcon(folder);
-
             UserInteractionEnabled = true;
             SelectionStyle = UITableViewCellSelectionStyle.Default;
+
+            folderIconImage.TintColor = Theme.TintColor;
+            folderNameLabel.TextColor = Theme.Black;
+            folderPathLabel.TextColor = Theme.DarkGray;
+
+            folderIconImage.Image = GetIcon(folder);
+            folderNameLabel.Text = folder.Name;
+            folderPathLabel.Text = folder.Path;
         }
 
         public void Disable()
         {
-            folderNameLabel.TextColor = Theme.DarkGray;
-            folderPathLabel.TextColor = Theme.DarkGray;
-            folderIconImage.TintColor = Theme.DarkGray;
-
             UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;
+
+            folderIconImage.TintColor = Theme.DarkGray;
+            folderNameLabel.TextColor = Theme.DarkGray;
+            folderPathLabel.TextColor = Theme.DarkGray;
         }
 
         static UIImage GetIcon(Folder folder)
