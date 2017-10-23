@@ -133,9 +133,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = tableView.CellAt(indexPath);
-            if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+            if (cell == null)
                 return;
-            
+
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
             selectedItems.Add(data[indexPath.Row]);
         }
@@ -143,9 +143,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = tableView.CellAt(indexPath);
-            if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+            if (cell == null)
                 return;
-            
+
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
             selectedItems.Remove(data[indexPath.Row]);
         }
