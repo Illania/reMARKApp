@@ -76,6 +76,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            NavigationItem.Title = Folder.Name;
+
             if (NavigationController != null)
                 NavigationController.NavigationBar.PrefersLargeTitles = true;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
@@ -200,8 +202,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            NavigationItem.Title = Folder.Name;
-
             composeDocumentItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"))
@@ -923,7 +923,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var selectedRow = TableView.IndexPathForSelectedRow;
 
-                    TableView.ReloadRows(new [] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
 
                     if (selectedRow != null)
                         TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);

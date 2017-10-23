@@ -82,6 +82,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             CommonConfig.Logger.Info("Appeared");
 
+            NavigationItem.Title = Folder.Name;
+
             if (((DataSource)TableView.Source).Empty)
                 RefreshData();
 
@@ -171,8 +173,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         protected virtual void InitializeNavigationBar()
         {
-            NavigationItem.Title = Folder.Name;
-
             ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
         }
