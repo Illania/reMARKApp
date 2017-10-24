@@ -45,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillAppear(animated);
 
             if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             InitializeHandlers();
