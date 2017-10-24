@@ -34,22 +34,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             addressTextField.EditingChanged += AddressTextField_EditingChanged;
             ContentView.Add(addressTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-            });
 
             descriptionTextField = new UITextField
             {
@@ -59,22 +46,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             descriptionTextField.EditingChanged += DescriptionTextField_EditingChanged;
             ContentView.Add(descriptionTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, descriptionTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-            });
 
             preferrableLabel = new UILabel
             {
@@ -83,12 +57,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 Text = Localization.GetString("preferrable"),
             };
             ContentView.Add(preferrableLabel);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
-            });
 
             preferrableSwitch = new UISwitch
             {
@@ -96,14 +64,69 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             preferrableSwitch.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(preferrableSwitch);
+
+            preferrableSwitch.ValueChanged += PreferrableSwitch_ValueChanged;
+
+            //ContentView.AddConstraints(new[]
+            //{
+            //    NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
+            //    NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+            //    NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+            //    NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+
+            //    NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+            //    NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+            //    NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+
+            //    NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+            //    NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+            //    NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+            //    NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+
+            //    NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+            //    NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+            //    NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, descriptionTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+
+            //    NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
+            //    NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+            //    NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+
+            //    NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
+            //    NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Left, NSLayoutRelation.Equal, preferrableLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
+            //    NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+            //    NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+            //});
+
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Left, NSLayoutRelation.Equal, preferrableLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+                addressTextField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                addressTextField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                addressTextField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                addressTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                horizontalSeparator.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                horizontalSeparator.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                horizontalSeparator.TopAnchor.ConstraintEqualTo(addressTextField.BottomAnchor, InnerVerticalMargin),
+
+                descriptionTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator.BottomAnchor, InnerVerticalMargin),
+                descriptionTextField.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                descriptionTextField.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                descriptionTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                horizontalSeparator2.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                horizontalSeparator2.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                horizontalSeparator2.TopAnchor.ConstraintEqualTo(descriptionTextField.BottomAnchor, InnerVerticalMargin),
+
+                preferrableLabel.TopAnchor.ConstraintEqualTo(horizontalSeparator2.BottomAnchor, InnerVerticalMargin),
+                preferrableLabel.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                preferrableLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+
+                preferrableSwitch.TopAnchor.ConstraintEqualTo(horizontalSeparator2.BottomAnchor, InnerVerticalMargin),
+                preferrableSwitch.LeadingAnchor.ConstraintEqualTo(preferrableLabel.TrailingAnchor, InnerHorizontalMargin),
+                preferrableSwitch.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                preferrableSwitch.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
             });
-            preferrableSwitch.ValueChanged += PreferrableSwitch_ValueChanged;
+
         }
 
         public override void Reset()

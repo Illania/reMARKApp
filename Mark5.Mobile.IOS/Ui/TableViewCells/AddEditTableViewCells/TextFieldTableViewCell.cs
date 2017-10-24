@@ -26,15 +26,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             textField.EditingChanged += TextField_EditingChanged;
             textField.AutocorrectionType = UITextAutocorrectionType.No;
-
             ContentView.AddSubview(textField);
 
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(textField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+                textField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                textField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                textField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                textField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
             });
         }
 

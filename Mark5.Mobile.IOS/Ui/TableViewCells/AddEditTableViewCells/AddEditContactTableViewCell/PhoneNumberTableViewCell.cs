@@ -74,33 +74,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             prefixTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(prefixTextField);
             prefixWidthConstraint = NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0.0f);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-                prefixWidthConstraint,
-            });
 
             chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(chevronButton);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.CenterY, 1f, 0f),
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var verticalSeparator = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator);
-            ContentView.AddConstraints(new[]
-            {
-               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.Bottom, 1f, 0f),
-            });
 
             numberTextField = new UITextField
             {
@@ -112,22 +93,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             numberTextField.EditingChanged += NumberTextField_EditingChanged;
             ContentView.Add(numberTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, verticalSeparator, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, numberTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-            });
 
             descriptionTextField = new UITextField
             {
@@ -137,22 +105,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             descriptionTextField.EditingChanged += DescriptionTextField_EditingChanged;
             ContentView.Add(descriptionTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, descriptionTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-            });
 
             preferrableLabel = new UILabel
             {
@@ -161,12 +116,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 Text = Localization.GetString("preferrable"),
             };
             ContentView.Add(preferrableLabel);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
-            });
 
             preferrableSwitch = new UISwitch
             {
@@ -174,14 +123,72 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             preferrableSwitch.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(preferrableSwitch);
+            preferrableSwitch.ValueChanged += PreferrableSwitch_ValueChanged;
+
             ContentView.AddConstraints(new[]
             {
+                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+                prefixWidthConstraint =  NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0.0f),
+
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.CenterY, 1f, 0f),
+                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+
+                NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
+               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
+               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, prefixTextField, NSLayoutAttribute.Bottom, 1f, 0f),
+
+                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, verticalSeparator, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
+                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(numberTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+
+                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, numberTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+
+                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(descriptionTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+
+                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, descriptionTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
+
+                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
+                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(preferrableLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+
                 NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.TopMargin, 1f, InnerVerticalMargin),
                 NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Left, NSLayoutRelation.Equal, preferrableLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
                 NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(preferrableSwitch, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
             });
-            preferrableSwitch.ValueChanged += PreferrableSwitch_ValueChanged;
+
+            ContentView.AddConstraints(new[]
+            {
+                prefixTextField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                prefixTextField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                prefixTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+                prefixWidthConstraint = prefixTextField.WidthAnchor.ConstraintGreaterThanOrEqualTo(0f),
+
+                chevronButton.LeadingAnchor.ConstraintEqualTo(prefixTextField.TrailingAnchor),
+                chevronButton.CenterYAnchor.ConstraintEqualTo(prefixTextField.CenterYAnchor),
+                chevronButton.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                verticalSeparator.LeadingAnchor.ConstraintEqualTo(chevronButton.TrailingAnchor, InnerHorizontalMargin),
+                verticalSeparator.TopAnchor.ConstraintEqualTo(prefixTextField.TopAnchor),
+                verticalSeparator.BottomAnchor.ConstraintEqualTo(prefixTextField.BottomAnchor),
+
+                numberTextField.TopAnchor.ConstraintEqualTo(prefixTextField.TopAnchor),
+                numberTextField.LeadingAnchor.ConstraintEqualTo(verticalSeparator.TrailingAnchor, InnerHorizontalMargin),
+                numberTextField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                numberTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+            });
         }
 
         public override void Reset()
