@@ -7,7 +7,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
     public abstract class AddEditTableViewCell : UITableViewCell
     {
         protected float HorizontalMargin = 8f;
-        protected float VerticalMargin = 4f;
+        protected float VerticalMargin = 8f;
         protected float InnerHorizontalMargin = 4f;
         protected float InnerVerticalMargin = 4f;
         protected float InnerRowHeight = 32f;
@@ -22,14 +22,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         protected UIView GetVerticalSeparator()
         {
             var separator = GetSeparator();
-            separator.AddConstraint(NSLayoutConstraint.Create(separator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, separatorMeasure));
+            separator.AddConstraint(separator.WidthAnchor.ConstraintEqualTo(separatorMeasure));
             return separator;
         }
 
         protected UIView GetHorizontalSeparator()
         {
             var separator = GetSeparator();
-            separator.AddConstraint(NSLayoutConstraint.Create(separator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, separatorMeasure));
+            separator.AddConstraint(separator.HeightAnchor.ConstraintEqualTo(separatorMeasure));
             return separator;
         }
 
@@ -54,12 +54,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 UserInteractionEnabled = false
             };
             chevronButton.AddSubview(disclosureCell);
+
             chevronButton.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Right, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Top, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(disclosureCell, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Bottom, 1f, 0f),
+                disclosureCell.LeadingAnchor.ConstraintEqualTo(chevronButton.LeadingAnchor),
+                disclosureCell.TrailingAnchor.ConstraintEqualTo(chevronButton.TrailingAnchor),
+                disclosureCell.TopAnchor.ConstraintEqualTo(chevronButton.TopAnchor),
+                disclosureCell.BottomAnchor.ConstraintEqualTo(chevronButton.BottomAnchor),
+
             });
 
             return chevronButton;

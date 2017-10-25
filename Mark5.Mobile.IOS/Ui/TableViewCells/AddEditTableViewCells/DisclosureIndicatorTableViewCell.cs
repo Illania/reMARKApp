@@ -46,8 +46,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
             ContentView.AddConstraints(new[]
             {
-                TitleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
-                TitleLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                TitleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                TitleLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
                 TitleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
 
                 ContentLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f),

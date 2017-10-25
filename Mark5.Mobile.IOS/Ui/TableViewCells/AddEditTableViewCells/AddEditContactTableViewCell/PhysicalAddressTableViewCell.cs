@@ -64,22 +64,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             addressTextField.EditingDidEnd += AddressTextField_EditingDidEnd;
             ContentView.Add(addressTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-            });
 
             zipTextField = new UITextField
             {
@@ -90,22 +77,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             zipTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             zipTextField.EditingDidEnd += ZipTextField_EditingDidEnd;
             ContentView.Add(zipTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 95f),
-                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(zipTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var verticalSeparator = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator);
-            ContentView.AddConstraints(new[]
-            {
-               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, zipTextField, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-               NSLayoutConstraint.Create(verticalSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, zipTextField, NSLayoutAttribute.Bottom, 1f, 0f),
-            });
+
 
             areaTextField = new UITextField
             {
@@ -116,22 +91,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             areaTextField.EditingDidEnd += AreaTextField_EditingDidEnd;
             ContentView.Add(areaTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, verticalSeparator, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(areaTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, areaTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-            });
 
             countryTextField = new UITextField
             {
@@ -144,33 +106,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             countryTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(countryTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-                NSLayoutConstraint.Create(countryTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 65.0f),
-            });
 
             chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(chevronButton);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, countryTextField, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, countryTextField, NSLayoutAttribute.CenterY, 1f, 0f),
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var verticalSeparator2 = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator2);
-            ContentView.AddConstraints(new[]
-            {
-               NSLayoutConstraint.Create(verticalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, chevronButton, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(verticalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-               NSLayoutConstraint.Create(verticalSeparator2, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, countryTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-            });
 
             cityTextField = new UITextField
             {
@@ -181,13 +124,55 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             cityTextField.EditingDidEnd += CityTextField_EditingDidEnd;
             ContentView.Add(cityTextField);
+
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, verticalSeparator2, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-                NSLayoutConstraint.Create(cityTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+                addressTextField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                addressTextField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                addressTextField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                addressTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                horizontalSeparator.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                horizontalSeparator.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                horizontalSeparator.TopAnchor.ConstraintEqualTo(addressTextField.BottomAnchor, InnerVerticalMargin),
+
+                zipTextField.WidthAnchor.ConstraintEqualTo(95f),
+                zipTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator.BottomAnchor, InnerVerticalMargin),
+                zipTextField.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                zipTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                verticalSeparator.LeadingAnchor.ConstraintEqualTo(zipTextField.TrailingAnchor, InnerHorizontalMargin),
+                verticalSeparator.TopAnchor.ConstraintEqualTo(horizontalSeparator.BottomAnchor, InnerVerticalMargin),
+                verticalSeparator.BottomAnchor.ConstraintEqualTo(zipTextField.BottomAnchor),
+
+                areaTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator.BottomAnchor, InnerVerticalMargin),
+                areaTextField.LeadingAnchor.ConstraintEqualTo(verticalSeparator.TrailingAnchor, InnerHorizontalMargin),
+                areaTextField.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                areaTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                horizontalSeparator2.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                horizontalSeparator2.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                horizontalSeparator2.TopAnchor.ConstraintEqualTo(areaTextField.BottomAnchor, InnerVerticalMargin),
+
+                countryTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator2.BottomAnchor, InnerVerticalMargin),
+                countryTextField.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                countryTextField.WidthAnchor.ConstraintEqualTo(65f),
+                countryTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                chevronButton.LeadingAnchor.ConstraintEqualTo(countryPicker.TrailingAnchor, InnerHorizontalMargin),
+                chevronButton.CenterYAnchor.ConstraintEqualTo(countryTextField.CenterYAnchor),
+                chevronButton.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                verticalSeparator2.LeadingAnchor.ConstraintEqualTo(chevronButton.TrailingAnchor, InnerHorizontalMargin),
+                verticalSeparator2.TopAnchor.ConstraintEqualTo(horizontalSeparator2.BottomAnchor, InnerVerticalMargin),
+                verticalSeparator2.BottomAnchor.ConstraintEqualTo(countryTextField.BottomAnchor, InnerVerticalMargin),
+
+                cityTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator2.BottomAnchor, InnerVerticalMargin),
+                cityTextField.LeadingAnchor.ConstraintEqualTo(verticalSeparator2.TrailingAnchor, InnerHorizontalMargin),
+                cityTextField.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
+                cityTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+                cityTextField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
+
             });
         }
 

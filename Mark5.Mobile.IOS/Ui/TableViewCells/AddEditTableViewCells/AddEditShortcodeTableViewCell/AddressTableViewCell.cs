@@ -74,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
             ContentView.AddConstraints(new[]
             {
-                addressTextField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                addressTextField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
                 addressTextField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 addressTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
 
@@ -95,7 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 attentionTextField.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
                 attentionTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
                 attentionTextField.WidthAnchor.ConstraintEqualTo(addressTextField.WidthAnchor),
-                attentionTextField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                attentionTextField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor,  -VerticalMargin),
 
                 typeLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 typeLabel.WidthAnchor.ConstraintEqualTo(27f),

@@ -30,11 +30,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         WeakReference<UIView> activeViewWeakReference;
 
-        protected bool RestoreCriteriaFromStorage = true;
+        protected bool RestoreCriteriaFromStorage;
 
         public override void LoadView()
         {
             base.LoadView();
+
+            RestoreCriteriaFromStorage = true;
 
             Title = Localization.GetString("search");
 
