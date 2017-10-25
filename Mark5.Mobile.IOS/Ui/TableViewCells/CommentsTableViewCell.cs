@@ -69,7 +69,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 commentTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 commentTextView.TopAnchor.ConstraintEqualTo(authorLabel.BottomAnchor, 4f),
                 commentTextView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                commentTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -4f)
+                commentTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -4f),
+                commentTextView.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
+
             });
 
         }

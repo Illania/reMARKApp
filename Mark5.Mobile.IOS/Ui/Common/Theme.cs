@@ -43,6 +43,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #endregion
 
+        #region Cells
+
+        public const float MinimumLabelSize = 18f;
+
+        #endregion
+
         #region Apply theme methods
 
         public static void ApplyTheme(this UIWindow window)
