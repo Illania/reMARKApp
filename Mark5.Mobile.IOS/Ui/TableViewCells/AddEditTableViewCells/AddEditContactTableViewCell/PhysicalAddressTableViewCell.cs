@@ -63,7 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 AutocorrectionType = UITextAutocorrectionType.No,
             };
             addressTextField.EditingDidEnd += AddressTextField_EditingDidEnd;
-            ContentView.Add(addressTextField);
+            ContentView.AddSubview(addressTextField);
 
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
@@ -76,11 +76,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             zipTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             zipTextField.EditingDidEnd += ZipTextField_EditingDidEnd;
-            ContentView.Add(zipTextField);
+            ContentView.AddSubview(zipTextField);
 
             var verticalSeparator = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator);
-
 
             areaTextField = new UITextField
             {
@@ -90,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 AutocorrectionType = UITextAutocorrectionType.No,
             };
             areaTextField.EditingDidEnd += AreaTextField_EditingDidEnd;
-            ContentView.Add(areaTextField);
+            ContentView.AddSubview(areaTextField);
 
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
@@ -105,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 InputAccessoryView = countryPickerToolbar,
             };
             countryTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            ContentView.Add(countryTextField);
+            ContentView.AddSubview(countryTextField);
 
             chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -123,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 AutocorrectionType = UITextAutocorrectionType.No,
             };
             cityTextField.EditingDidEnd += CityTextField_EditingDidEnd;
-            ContentView.Add(cityTextField);
+            ContentView.AddSubview(cityTextField);
 
             ContentView.AddConstraints(new[]
             {
@@ -159,7 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 countryTextField.WidthAnchor.ConstraintEqualTo(65f),
                 countryTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
 
-                chevronButton.LeadingAnchor.ConstraintEqualTo(countryPicker.TrailingAnchor, InnerHorizontalMargin),
+                chevronButton.LeadingAnchor.ConstraintEqualTo(countryTextField.TrailingAnchor, InnerHorizontalMargin),
                 chevronButton.CenterYAnchor.ConstraintEqualTo(countryTextField.CenterYAnchor),
                 chevronButton.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
 
@@ -172,8 +171,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 cityTextField.TrailingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor),
                 cityTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
                 cityTextField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
-
             });
+
         }
 
         public void BindContent(PhysicalAddress pa, bool errorState = false)

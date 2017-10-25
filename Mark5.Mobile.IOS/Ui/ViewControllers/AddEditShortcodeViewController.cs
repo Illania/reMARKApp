@@ -120,7 +120,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SetTitle();
         }
 
-
         void SetTitle()
         {
             string title = string.Empty;
@@ -429,7 +428,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     section.InitializeRows();
                 }
 
-                tableViewWeakReference.Unwrap()?.ReloadData();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Automatic);
             }
 
             protected override void Dispose(bool disposing)

@@ -337,8 +337,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             Dictionary<NSIndexPath, nfloat> cellHeights = new Dictionary<NSIndexPath, nfloat>();
 
-            BirthdateSection birthdateSection;
-
             public DataSource(AddEditContactViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = viewController.Wrap();
@@ -354,7 +352,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     new PhoneNumbersSection(this, CommunicationAddressType.Phone),
                     new PhoneNumbersSection(this, CommunicationAddressType.Mobile),
                     new PhysicalAddressesSection(this),
-                    (birthdateSection = new BirthdateSection(this)),
+                    new BirthdateSection(this),
                     new AdditionalSection(this)
                 };
 
@@ -449,9 +447,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public void Refresh(Contact contact, ContactPreview contactPreview, ContactPreview parentContactPreview,
                                 ContactCreationModeFlag creationMode, bool parentPreselected)
             {
-                if (contactPreview.Type != ContactType.Person)
-                    sections.Remove(birthdateSection);
-
                 foreach (var section in sections)
                 {
                     section.Contact = contact;
@@ -463,7 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     section.InitializeRows();
                 }
 
-                tableViewWeakReference.Unwrap()?.ReloadData();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Automatic);
             }
 
             protected override void Dispose(bool disposing)
@@ -645,6 +640,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void InitializeRows()
                 {
+                    if (ContactPreview.Type != ContactType.Person)
+                        return;
+
                     if (Contact.BirthDateTimestamp != -1)
                     {
                         var row = new BirthdateRow(this, false);

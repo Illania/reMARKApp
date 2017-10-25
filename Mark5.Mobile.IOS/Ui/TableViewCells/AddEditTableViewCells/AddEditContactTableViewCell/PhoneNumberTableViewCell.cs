@@ -151,7 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
                 descriptionTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator.BottomAnchor, InnerVerticalMargin),
                 descriptionTextField.LeadingAnchor.ConstraintEqualTo(prefixTextField.LeadingAnchor),
-                descriptionTextField.TrailingAnchor.ConstraintEqualTo(prefixTextField.TrailingAnchor),
+                descriptionTextField.TrailingAnchor.ConstraintEqualTo(numberTextField.TrailingAnchor),
                 descriptionTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
 
                 horizontalSeparator2.LeadingAnchor.ConstraintEqualTo(prefixTextField.LeadingAnchor),
