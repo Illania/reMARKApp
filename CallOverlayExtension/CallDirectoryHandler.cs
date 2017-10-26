@@ -19,55 +19,50 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
-            System.Collections.Generic.List<Contact> contacts = new System.Collections.Generic.List<Contact>();
-            System.Threading.Tasks.Task.Run(async () =>
+            var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios");
+            var scdp = new Mark5.Mobile.Common.Database.SharedContactsDatabaseProvider(url.Path);
+            /*try
+            {
+                Utilities.AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
+                {
+                    await scdp.RunInConnectionAsync(c =>
+                    {
+                        try
+                        {
+                            var commandString = $"select * from {nameof(Contact)}";
+                            var cmd = c.CreateCommand(commandString);
+                            contacts = cmd.ExecuteQuery<Contact>();
+                        }
+                        catch (Exception ex)
+                        {
+                            
+                        }
+                    });
+
+
+                }).Wait();
+            }
+            catch (Exception ex)
+            {
+                
+            }*/
+
+            scdp.RunInConnectionSynchronous(c =>
             {
                 try
                 {
-                    var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios");
-                    var scdp = new Mark5.Mobile.Common.Database.SharedContactsDatabaseProvider(url.Path);
-                    await scdp.RunInConnectionAsync(c =>
-                    {
-                        var commandString = $"select * from {nameof(Contact)}";
-
-                        var cmd = c.CreateCommand(commandString);
-                        contacts = cmd.ExecuteQuery<Contact>();
-                    });
+                    var commandString = $"select * from {nameof(Contact)}";
+                    var cmd = c.CreateCommand(commandString);
+                    var contacts = cmd.ExecuteQuery<Contact>();
                 }
                 catch (Exception ex)
                 {
-
+                    
                 }
-            }).Wait();
+            });
 
             //cxContext.AddIdentificationEntry(004560443773, contacts.Find(c => c.LastName.Equals("Thomsen")).LastName);
                 
-
-            //var groupPath = NSFileManager.DefaultManager.GetContainerUrl("com.nordic-it.mark5.mobile.ios.extensions.callid");
-
-            //            //initialization
-            //            AsyncHelpers.RunSync(async () =>
-            //            {
-            //                var mainFolder = FileSystem.Current.LocalStorage;
-
-            //                CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
-            //                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
-            //                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
-            //                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
-            //                CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
-            //                CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
-            //                CommonConfig.Logger = new ConsoleLogger();
-
-            //#if !DEBUG
-            //                CommonConfig.Logger.Level = LogLevel.INFO;
-            //#else
-            //                CommonConfig.Logger.Level = LogLevel.DEBUG;
-            //#endif
-            //    var authenticator = AuthenticatorFactory.Create();
-            //    var ci = await authenticator.GetConnectionInfoAsync();
-            //    Managers.Initialize(ci);
-            //    await DatabaseUtils.InitializeDatabases();
-            //});
 
             if (!AddIdentificationPhoneNumbers(cxContext))
             {

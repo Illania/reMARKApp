@@ -22,15 +22,22 @@ namespace Mark5.Mobile.Common.Database
             {
                 try
                 {
-                    sharedLock.WaitOne();
+                    //sharedLock.WaitOne();
 
                     connection.RunInTransaction(() => { action(connection); });
                 }
                 finally
                 {
-                    sharedLock.ReleaseMutex();
+                    //sharedLock.ReleaseMutex();
                 }
             });
+        }
+
+        public void RunInConnectionSynchronous(Action<SQLiteConnection> action)
+        {
+            //sharedLock.WaitOne();
+            connection.RunInTransaction(() => { action(connection); }); 
+            //sharedLock.ReleaseMutex();
         }
     }
 }

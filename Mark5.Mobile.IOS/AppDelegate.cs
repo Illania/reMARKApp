@@ -41,9 +41,10 @@ namespace Mark5.Mobile.IOS
             try
             {
                 Contact test = new Contact();
+                test.Id = 8008;
                 test.FirstName = "Mathias";
                 test.LastName = "Thomsen";
-                
+
                 var cs = new List<Contact>();
                 cs.Add(test);
                 var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios");
@@ -51,16 +52,13 @@ namespace Mark5.Mobile.IOS
                 AsyncHelpers.InvokeOnMainThreadAsync(this, async () => 
                 {
                         await scdp.RunInConnectionAsync(c => {
-                            c.CreateTable<Contact>();
-                            c.Insert(cs);
-
+                            c.InsertOrReplaceAll(cs);
                             var commandString = $"select * from {nameof(Contact)}";
-
                             var cmd = c.CreateCommand(commandString);
                             var contacts = cmd.ExecuteQuery<Contact>();
-
                         });
                 });
+
             } 
             catch (Exception ex)
             {
