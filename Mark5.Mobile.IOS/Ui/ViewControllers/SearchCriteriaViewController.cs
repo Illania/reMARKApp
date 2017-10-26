@@ -31,12 +31,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void ViewWillAppear(bool animated)
         {
-            ViewControllers = new UIViewController[]
+            if (ViewControllers == null || ViewControllers.Length == 0)
             {
-                documentsSearchCriteriaViewController ?? new DocumentsSearchCriteriaViewController(),
-                contactsSearchViewController ?? new ContactsSearchCriteriaViewController(),
-                shortcodesSearchCriteriaViewController ?? new ShortcodesSearchCriteriaViewController()
-            };
+                ViewControllers = new UIViewController[]
+                {
+                    documentsSearchCriteriaViewController ?? new DocumentsSearchCriteriaViewController(),
+                    contactsSearchViewController ?? new ContactsSearchCriteriaViewController(),
+                    shortcodesSearchCriteriaViewController ?? new ShortcodesSearchCriteriaViewController()
+                };
+            }
 
             base.ViewWillAppear(animated);
 
