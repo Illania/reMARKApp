@@ -1001,16 +1001,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var location = tableViewWeakReference.Unwrap()?.ConvertPointFromView(viewLocation, g.View);
                 if (location == null)
                     return;
-                
+
                 var indexPath = tableViewWeakReference.Unwrap()?.IndexPathForRowAtPoint(location.Value);
                 if (indexPath == null)
                     return;
-                
+
                 var f = items[indexPath.LongSection][indexPath.Row];
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     return;
-                
+
                 viewControllerWeakReference.Unwrap()?.FolderExpand(f);
             }
 
@@ -1337,7 +1337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     return;
-                
+
                 viewControllerWeakReference.Unwrap()?.FolderExpand(f);
             }
 

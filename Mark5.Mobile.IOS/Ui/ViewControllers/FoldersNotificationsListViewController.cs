@@ -27,8 +27,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ViewControllers = new UIViewController[]
             {
-                new BrowseFoldersListViewController(moduleType),
-                new NotificationsListViewController(moduleType.ObjectTypes())
+                 new BrowseFoldersListViewController(moduleType),
+                 new NotificationsListViewController(moduleType.ObjectTypes())
             };
         }
 
@@ -89,8 +89,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.EncodeRestorableState(coder);
             coder.Encode((int)moduleType, "moduleType");
             coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
-            coder.Encode(ViewControllers[0], "vc_0");
-            coder.Encode(ViewControllers[1], "vc_1");
         }
 
         public override void DecodeRestorableState(NSCoder coder)
