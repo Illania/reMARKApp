@@ -8,6 +8,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class SearchCriteriaViewController : AbstractMultiViewController, IUIViewControllerRestoration
     {
+        DocumentsSearchCriteriaViewController documentsSearchCriteriaViewController;
+        ContactsSearchCriteriaViewController contactsSearchViewController;
+        ShortcodesSearchCriteriaViewController shortcodesSearchCriteriaViewController;
+
         public override void LoadView()
         {
             base.LoadView();
@@ -15,13 +19,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SegmentedControl.InsertSegment(Localization.GetString("documents"), 0, false);
             SegmentedControl.InsertSegment(Localization.GetString("contacts"), 1, false);
             SegmentedControl.InsertSegment(Localization.GetString("shortcodes"), 2, false);
-
-            ViewControllers = new UIViewController[]
-            {
-                new DocumentsSearchCriteriaViewController(),
-                new ContactsSearchCriteriaViewController(),
-                new ShortcodesSearchCriteriaViewController()
-            };
         }
 
         public override void ViewDidLoad()
@@ -34,11 +31,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void ViewWillAppear(bool animated)
         {
+            ViewControllers = new UIViewController[]
+            {
+                documentsSearchCriteriaViewController ?? new DocumentsSearchCriteriaViewController(),
+                contactsSearchViewController ?? new ContactsSearchCriteriaViewController(),
+                shortcodesSearchCriteriaViewController ?? new ShortcodesSearchCriteriaViewController()
+            };
+
             base.ViewWillAppear(animated);
 
             if (NavigationController != null)
                 NavigationController.NavigationBar.PrefersLargeTitles = false;
             NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
+            documentsSearchCriteriaViewController = null;
+            contactsSearchViewController = null;
+            shortcodesSearchCriteriaViewController = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -64,6 +72,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.DecodeRestorableState(coder);
             SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+            documentsSearchCriteriaViewController = (DocumentsSearchCriteriaViewController)coder.DecodeObject("vc_0");
+            contactsSearchViewController = (ContactsSearchCriteriaViewController)coder.DecodeObject("vc_1");
+            shortcodesSearchCriteriaViewController = (ShortcodesSearchCriteriaViewController)coder.DecodeObject("vc_2");
         }
 
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
