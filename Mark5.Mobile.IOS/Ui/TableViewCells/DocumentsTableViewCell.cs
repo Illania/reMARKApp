@@ -78,6 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
                 topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor, 15f + 8f),
+                topLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
             });
 
             if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == ExternalId)
