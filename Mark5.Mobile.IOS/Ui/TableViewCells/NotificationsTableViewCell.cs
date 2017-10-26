@@ -92,10 +92,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
                     bottomLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
                     bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                    bottomLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                    bottomLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
 
                     dateReceivedLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.TrailingAnchor, 8f),
                     dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(bottomLabel.TrailingAnchor),
-                    dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
                     dateReceivedLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor,8f),
                 });
             }
@@ -117,6 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     topLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
                     topLabel.TrailingAnchor.ConstraintEqualTo(dateReceivedLabel.TrailingAnchor),
                     topLabel.TopAnchor.ConstraintEqualTo(dateReceivedLabel.BottomAnchor, 2f),
+                    topLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
 
                     bottomLabel.TopAnchor.ConstraintEqualTo(topLabel.BottomAnchor, 2)
                 });
