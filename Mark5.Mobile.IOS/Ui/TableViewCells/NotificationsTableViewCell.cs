@@ -15,8 +15,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString DefaultId = new NSString(nameof(NotificationsTableViewCell));
         public static readonly NSString NewObjectCreatedId = new NSString(nameof(NotificationsTableViewCell) + "_NewObjectCreated");
 
-        readonly UILabel firstLineLabel;
-        readonly UILabel secondLineLabel;
+        readonly UILabel topLabel;
+        readonly UILabel bottomLabel;
         readonly UILabel titleLabel;
         readonly UILabel dateReceivedLabel;
         readonly UIImageView readImageView;
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (reuseIdentifier == DefaultId || reuseIdentifier == NewObjectCreatedId)
             {
-                secondLineLabel = new UILabel
+                bottomLabel = new UILabel
                 {
                     Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                     TextColor = Theme.Black,
@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     Lines = 1,
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
-                ContentView.Add(secondLineLabel);
+                ContentView.Add(bottomLabel);
 
                 titleLabel = new UILabel
                 {
@@ -90,11 +90,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     readImageView.HeightAnchor.ConstraintEqualTo(15f),
                     readImageView.WidthAnchor.ConstraintEqualTo(15f),
 
-                    secondLineLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
-                    secondLineLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                    bottomLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
+                    bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
 
                     dateReceivedLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.TrailingAnchor, 8f),
-                    dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(secondLineLabel.TrailingAnchor),
+                    dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(bottomLabel.TrailingAnchor),
                     dateReceivedLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
                     dateReceivedLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor,8f),
                 });
@@ -102,7 +102,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (reuseIdentifier == DefaultId)
             {
-                firstLineLabel = new UILabel
+                topLabel = new UILabel
                 {
                     Font = Theme.DefaultBoldFont,
                     TextColor = Theme.Black,
@@ -110,15 +110,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     Lines = 1,
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
-                ContentView.AddSubview(firstLineLabel);
+                ContentView.AddSubview(topLabel);
 
                 ContentView.AddConstraints(new[]
                 {
-                    firstLineLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
-                    firstLineLabel.TrailingAnchor.ConstraintEqualTo(dateReceivedLabel.TrailingAnchor),
-                    firstLineLabel.TopAnchor.ConstraintEqualTo(dateReceivedLabel.BottomAnchor, 2f),
+                    topLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
+                    topLabel.TrailingAnchor.ConstraintEqualTo(dateReceivedLabel.TrailingAnchor),
+                    topLabel.TopAnchor.ConstraintEqualTo(dateReceivedLabel.BottomAnchor, 2f),
 
-                    secondLineLabel.TopAnchor.ConstraintEqualTo(firstLineLabel.BottomAnchor, 2)
+                    bottomLabel.TopAnchor.ConstraintEqualTo(topLabel.BottomAnchor, 2)
                 });
             }
 
@@ -126,7 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 ContentView.AddConstraints(new[]
                 {
-                    secondLineLabel.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, 2)
+                    bottomLabel.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, 2)
                 });
             }
         }
@@ -157,15 +157,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 titleLabel.Font = Theme.DefaultBoldFont;
 
                 titleLabel.Text = splitMessage.ElementAtOrDefault(0);
-                secondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
+                bottomLabel.Text = splitMessage.ElementAtOrDefault(1);
             }
             else if (ReuseIdentifier == DefaultId)
             {
                 titleLabel.Font = Theme.DefaultFont;
 
                 titleLabel.Text = notification.Title;
-                firstLineLabel.Text = splitMessage.ElementAtOrDefault(0);
-                secondLineLabel.Text = splitMessage.ElementAtOrDefault(1);
+                topLabel.Text = splitMessage.ElementAtOrDefault(0);
+                bottomLabel.Text = splitMessage.ElementAtOrDefault(1);
             }
 
             dateReceivedLabel.Text = notification.DateTimeTimestamp
