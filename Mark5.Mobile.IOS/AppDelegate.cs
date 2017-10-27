@@ -32,21 +32,6 @@ using SQLite;
 
 namespace Mark5.Mobile.IOS
 {
-
-    [Table("SimpleContact")]
-    public class SimpleContact
-    {
-        [Column("Id")]
-        [PrimaryKey]
-        public int Id { get; set; }
-
-        [Column("FirstName")]
-        public string FirstName { get; set; }
-
-        [Column("LastName")]
-        public string LastName { get; set; }
-    }
-
     [Register("AppDelegate")]
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
     {
@@ -54,7 +39,7 @@ namespace Mark5.Mobile.IOS
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            try
+            /*try
             {
                 var test = new SimpleContact();
                 test.Id = 8008;
@@ -74,14 +59,19 @@ namespace Mark5.Mobile.IOS
 
                     using (var connection = new SQLiteConnection(url2.Path, true))
                     {
-                        var tt = connection.Table<SimpleContact>().ToArray();
+                        var tt = connection.Table<SimpleContact>();
+
+                        foreach (var c in tt)
+                        {
+                            
+                        }
                     }
                 }
             } 
             catch (Exception ex)
             {
                 
-            }
+            }*/
            
 
             

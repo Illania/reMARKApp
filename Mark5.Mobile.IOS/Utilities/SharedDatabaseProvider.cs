@@ -4,16 +4,17 @@ using System.Threading.Tasks;
 using SQLite;
 
 
-namespace Mark5.Mobile.Common.Database
+namespace Mark5.Mobile.IOS.Utilities
 {
     public class SharedDatabaseProvider
     {
-        static Mutex sharedLock = new Mutex();
-        readonly SQLiteConnection connection;
+        const string databaseFileName = "sharedcontacts.sqlite3";
+        const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
+        readonly string sharedDatabaseUrl;
 
         public SharedDatabaseProvider(string path, string dbName)
         {
-            connection = new SQLiteConnection(path + $"/" + dbName, true);
+            sharedDatabaseUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId);
         }
 
         public async Task RunInConnectionAsync(Action<SQLiteConnection> action)

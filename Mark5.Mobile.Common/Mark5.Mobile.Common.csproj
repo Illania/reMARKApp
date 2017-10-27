@@ -21,4 +21,7 @@
   <ItemGroup>
     <Folder Include="Model\HubMessages\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Database\SharedContactsDatabaseProvider.cs" />
+  </ItemGroup>
 </Project>

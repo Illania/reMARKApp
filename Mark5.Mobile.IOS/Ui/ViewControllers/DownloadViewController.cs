@@ -776,6 +776,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         {
                             var contact = await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
 
+
+
                             async Task DeepDownload(Contact c)
                             {
                                 foreach (var child in c.Children.Where(cp => cp.Type == ContactType.Department))

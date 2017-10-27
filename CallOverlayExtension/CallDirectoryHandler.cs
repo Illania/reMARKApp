@@ -6,12 +6,16 @@ using SQLite;
 
 namespace CallOverlayExtension
 {
-    [Table("SimpleContact")]
-    public class SimpleContact
+    [Table("ExtensionContact")]
+    public class ExtensionContact
     {
         [Column("Id")]
         [PrimaryKey]
         public int Id { get; set; }
+
+        [Column("ContactId")]
+        [PrimaryKey]
+        public int ContactId { get; set; }
 
         [Column("Name")]
         public string Name { get; set; }
@@ -23,6 +27,8 @@ namespace CallOverlayExtension
     [Register("CallDirectoryHandler")]
     public class CallDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
     {
+        const string databaseFileName = "sharedcontacts.sqlite3";
+
         protected CallDirectoryHandler(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
@@ -35,24 +41,23 @@ namespace CallOverlayExtension
 
             try
             {
-
                 using (var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios"))
                 {
-                    var url2 = url.Append("sharedcontacts.sqlite3", false);
+                    var fullurl = url.Append(databaseFileName, false);
 
-                    var exists = NSFileManager.DefaultManager.FileExists(url2.Path);
+                    var exists = NSFileManager.DefaultManager.FileExists(fullurl.Path);
 
-                    using (var connection = new SQLiteConnection(url2.Path, SQLiteOpenFlags., true))
+                    using (var connection = new SQLiteConnection(fullurl.Path,/*SqliteCOnnectionFlags...???,*/ true))
                     {
-                        connection.CreateTable<SimpleContact>();
+                        connection.CreateTable<ExtensionContact>();
                     }
 
-                    using (var connection = new SQLiteConnection(url2.Path, true))
+                    using (var connection = new SQLiteConnection(fullurl.Path, true))
                     {
-                        var tt = connection.Table<SimpleContact>();
-                        foreach (var c in tt)
+                        var contacts = connection.Table<ExtensionContact>();
+                        foreach (var contact in contacts)
                         {
-                            cxContext.AddIdentificationEntry(c.na);
+                            cxContext.AddIdentificationEntry(contact.Number,contact.Name);
                         }
                     }
                 }
