@@ -513,11 +513,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 listString.Add(Localization.GetString("edit_contact"));
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
-                && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
-                listString.Add(Localization.GetString("add_person"));
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
                 && contactPreview.Type == ContactType.Company)
                 listString.Add(Localization.GetString("add_department"));
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
+                && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
+                listString.Add(Localization.GetString("add_person"));
 
             var index = await Dialogs.ShowListActionSheetAsync(this, listString.ToArray(), editButtonItem);
             if (index < 0)
