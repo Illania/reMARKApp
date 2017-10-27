@@ -89,15 +89,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RefreshData();
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                ni.SearchController = null;
-            });
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
+
+                    ni.SearchController = null;
+                });
+            }
         }
 
         public override void ViewWillDisappear(bool animated)

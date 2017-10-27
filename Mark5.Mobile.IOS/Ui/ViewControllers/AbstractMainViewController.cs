@@ -5,6 +5,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -33,10 +34,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(searchButtonContainer);
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 65f),
-                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 55f),
-                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(searchButtonContainer, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, 2f)
+                searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
+                searchButtonContainer.WidthAnchor.ConstraintEqualTo(55f),
+                searchButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
             searchButton = new UIButton
@@ -54,10 +55,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchButtonContainer.AddSubview(searchButton);
             searchButtonContainer.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 55f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 55f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, searchButtonContainer, NSLayoutAttribute.CenterX, 1f, 0f),
-                searchButtonBottomConstraint = NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, searchButtonContainer, NSLayoutAttribute.Bottom, 1f, -10f)
+                searchButton.HeightAnchor.ConstraintEqualTo(55f),
+                searchButton.WidthAnchor.ConstraintEqualTo(55f),
+                searchButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
+                searchButtonBottomConstraint = searchButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
         }
 
