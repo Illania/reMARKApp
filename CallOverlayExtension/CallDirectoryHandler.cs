@@ -1,11 +1,25 @@
 ﻿using System;
 using Foundation;
 using CallKit;
-using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
+using System.Linq;
+using SQLite;
 
 namespace CallOverlayExtension
 {
+    [Table("SimpleContact")]
+    public class SimpleContact
+    {
+        [Column("Id")]
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Column("Name")]
+        public string Name { get; set; }
+
+        [Column("Number")]
+        public long Number { get; set; }
+    }
+
     [Register("CallDirectoryHandler")]
     public class CallDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
     {
@@ -19,9 +33,41 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
+            try
+            {
+
+                using (var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios"))
+                {
+                    var url2 = url.Append("sharedcontacts.sqlite3", false);
+
+                    var exists = NSFileManager.DefaultManager.FileExists(url2.Path);
+
+                    using (var connection = new SQLiteConnection(url2.Path, SQLiteOpenFlags., true))
+                    {
+                        connection.CreateTable<SimpleContact>();
+                    }
+
+                    using (var connection = new SQLiteConnection(url2.Path, true))
+                    {
+                        var tt = connection.Table<SimpleContact>();
+                        foreach (var c in tt)
+                        {
+                            cxContext.AddIdentificationEntry(c.na);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            #region stuff
+
+            /*CommonConfig.Logger = new Utilities.ConsoleLogger();
             var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios");
             var scdp = new Mark5.Mobile.Common.Database.SharedContactsDatabaseProvider(url.Path);
-            /*try
+            try
             {
                 Utilities.AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
                 {
@@ -46,31 +92,44 @@ namespace CallOverlayExtension
             {
                 
             }*/
-
-            scdp.RunInConnectionSynchronous(c =>
+            /*
+            try
             {
-                try
+                scdp.RunInConnectionSynchronous(c =>
                 {
-                    var commandString = $"select * from {nameof(Contact)}";
-                    var cmd = c.CreateCommand(commandString);
-                    var contacts = cmd.ExecuteQuery<Contact>();
-                }
-                catch (Exception ex)
-                {
-                    
-                }
-            });
+                    try
+                    {
+                        CommonConfig.Logger.Info("-------------------Creating query for db-------------------");
+                        //var commandString = $"select * from {nameof(Contact)}";
+                        //var cmd = c.CreateCommand(commandString);
+                        //CommonConfig.Logger.Info("-------------------Executing query for db------------------");
+                        //var contacts = cmd.ExecuteQuery<Contact>();
+                        var contacts = c.Table<Contact>().ToList();
+                        CommonConfig.Logger.Info("-----------------------Query completed---------------------");
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error(ex);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+            }*/
 
             //cxContext.AddIdentificationEntry(004560443773, contacts.Find(c => c.LastName.Equals("Thomsen")).LastName);
-                
 
-            if (!AddIdentificationPhoneNumbers(cxContext))
-            {
-                Console.WriteLine("Unable to add identification phone numbers");
-                var error = new NSError(new NSString("CallDirectoryHandler"), 2, null);
-                cxContext.CancelRequest(error);
-                return;
-            }
+
+            //if (!AddIdentificationPhoneNumbers(cxContext))
+            //{
+            //    Console.WriteLine("Unable to add identification phone numbers");
+            //    var error = new NSError(new NSString("CallDirectoryHandler"), 2, null);
+            //    cxContext.CancelRequest(error);
+            //    return;
+            //}
+
+            #endregion
 
             cxContext.CompleteRequest(null);
         }
@@ -120,7 +179,7 @@ namespace CallOverlayExtension
             // app may be notified about errors which occured while loading data even if the request to load data was initiated by
             // the user in Settings instead of via the app itself.
 
-            CommonConfig.Logger.Info("Error occurred: " + error.LocalizedFailureReason);
+            //CommonConfig.Logger.Info("Error occurred: " + error.LocalizedFailureReason);
         }
     }
 }

@@ -22,6 +22,7 @@
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_account" android:title="@string/pref_contacts_sub_account_title" android:defaultValue="@bool/pref_contacts_sub_account_default" />
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_vat" android:title="@string/pref_contacts_sub_vat_title" android:defaultValue="@bool/pref_contacts_sub_vat_default" />
 		</android.support.v7.preference.PreferenceScreen>
+		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_account" android:title="@string/pref_contacts_call_id" android:defaultValue="@bool/pref_contacts_call_id" />
 	</android.support.v7.preference.PreferenceScreen>
 	<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_compose" android:title="@string/pref_cat_compose">
 		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_compose_remove_line" android:title="@string/pref_compose_remove_line_title" android:summaryOn="@string/pref_compose_remove_line_summary_on" android:summaryOff="@string/pref_compose_remove_line_summary_off" android:defaultValue="@bool/pref_compose_remove_line_default" />

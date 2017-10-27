@@ -8,12 +8,12 @@ namespace Mark5.Mobile.Common.Database
 {
     public class SharedDatabaseProvider
     {
-        readonly Mutex sharedLock = new Mutex();
+        static Mutex sharedLock = new Mutex();
         readonly SQLiteConnection connection;
 
         public SharedDatabaseProvider(string path, string dbName)
         {
-            connection = new SQLiteConnection(path + $"/" + dbName , true);
+            connection = new SQLiteConnection(path + $"/" + dbName, true);
         }
 
         public async Task RunInConnectionAsync(Action<SQLiteConnection> action)
@@ -36,7 +36,24 @@ namespace Mark5.Mobile.Common.Database
         public void RunInConnectionSynchronous(Action<SQLiteConnection> action)
         {
             //sharedLock.WaitOne();
-            connection.RunInTransaction(() => { action(connection); }); 
+            try
+            {
+                connection.RunInTransaction(() =>
+                {
+                    try
+                    {
+                        action(connection);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+
+            }
             //sharedLock.ReleaseMutex();
         }
     }

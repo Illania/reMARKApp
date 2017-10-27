@@ -28,9 +28,25 @@ using UIKit;
 using UserNotifications;
 using CallKit;
 using System.Collections.Generic;
+using SQLite;
 
 namespace Mark5.Mobile.IOS
 {
+
+    [Table("SimpleContact")]
+    public class SimpleContact
+    {
+        [Column("Id")]
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Column("FirstName")]
+        public string FirstName { get; set; }
+
+        [Column("LastName")]
+        public string LastName { get; set; }
+    }
+
     [Register("AppDelegate")]
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
     {
@@ -40,25 +56,27 @@ namespace Mark5.Mobile.IOS
         {
             try
             {
-                Contact test = new Contact();
+                var test = new SimpleContact();
                 test.Id = 8008;
                 test.FirstName = "Mathias";
                 test.LastName = "Thomsen";
 
-                var cs = new List<Contact>();
-                cs.Add(test);
-                var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios");
-                var scdp = new SharedContactsDatabaseProvider(url.Path);
-                AsyncHelpers.InvokeOnMainThreadAsync(this, async () => 
+                var cs = new List<SimpleContact>{test};
+                using (var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios"))
                 {
-                        await scdp.RunInConnectionAsync(c => {
-                            c.InsertOrReplaceAll(cs);
-                            var commandString = $"select * from {nameof(Contact)}";
-                            var cmd = c.CreateCommand(commandString);
-                            var contacts = cmd.ExecuteQuery<Contact>();
-                        });
-                });
+                    var url2 = url.Append("sharedcontacts.sqlite3", false);
 
+                    using (var connection = new SQLiteConnection(url2.Path, true))
+                    {
+                        connection.CreateTable<SimpleContact>();
+                        connection.InsertOrReplaceAll(cs);
+                    }
+
+                    using (var connection = new SQLiteConnection(url2.Path, true))
+                    {
+                        var tt = connection.Table<SimpleContact>().ToArray();
+                    }
+                }
             } 
             catch (Exception ex)
             {
