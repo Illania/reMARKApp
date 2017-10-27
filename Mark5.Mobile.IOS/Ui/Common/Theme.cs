@@ -1,6 +1,7 @@
 using System;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using WebKit;
@@ -61,11 +62,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 ForegroundColor = DarkerBlue,
                 Font = DefaultFont.WithRelativeSize(1f)
             };
-            UINavigationBar.Appearance.LargeTitleTextAttributes = new UIStringAttributes
+
+            if (Integration.IsRunningAtLeast(11))
             {
-                ForegroundColor = DarkerBlue,
-                Font = DefaultFont.WithRelativeSize(12f)
-            };
+                UINavigationBar.Appearance.LargeTitleTextAttributes = new UIStringAttributes
+                {
+                    ForegroundColor = DarkerBlue,
+                    Font = DefaultFont.WithRelativeSize(12f)
+                };
+                UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).LargeTitleTextAttributes = new UIStringAttributes
+                {
+                    ForegroundColor = LightGray,
+                    Font = DefaultFont.WithRelativeSize(12f)
+                };
+            }
 
             UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = LightGray;
             UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetBackgroundImage(SolidColorImage(DarkerBlue), UIBarMetrics.Default);
@@ -73,11 +83,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 ForegroundColor = LightGray,
                 Font = DefaultFont.WithRelativeSize(1f)
-            };
-            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).LargeTitleTextAttributes = new UIStringAttributes
-            {
-                ForegroundColor = LightGray,
-                Font = DefaultFont.WithRelativeSize(12f)
             };
 
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes

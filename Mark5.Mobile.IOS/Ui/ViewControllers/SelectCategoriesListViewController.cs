@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -18,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         readonly TaskCompletionSource<List<int>> tcs = new TaskCompletionSource<List<int>>();
         public Task<List<int>> Result => tcs.Task;
-        
+
         public ModuleType Module { get; set; }
         public List<int> PreselectedItemIds { get; set; }
 
@@ -38,9 +39,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
         }
@@ -211,7 +215,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (loading)
                     return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
-                
+
                 if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
@@ -265,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.CellAt(indexPath);
                 if (cell == null)
                     return;
-                
+
                 cell.Accessory = UITableViewCellAccessory.None;
             }
 

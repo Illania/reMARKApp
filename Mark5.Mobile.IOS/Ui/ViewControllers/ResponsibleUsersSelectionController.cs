@@ -36,9 +36,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
         }
@@ -257,7 +260,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.CellAt(indexPath);
                 if (cell == null)
                     return;
-                
+
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
             }
 
@@ -266,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.CellAt(indexPath);
                 if (cell == null)
                     return;
-                
+
                 cell.Accessory = UITableViewCellAccessory.None;
             }
 
