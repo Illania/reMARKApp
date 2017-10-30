@@ -91,7 +91,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (Integration.IsRunningAtLeast(11))
             {
-
                 NSOperationQueue.MainQueue.AddOperation(() =>
                 {
                     var ni = NavigationItem;
@@ -161,6 +160,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RefreshControl = new UIRefreshControl();
 
             TableView.Source = new DataSource(this, TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 50f;
             TableView.RefreshControl = RefreshControl;
         }
 

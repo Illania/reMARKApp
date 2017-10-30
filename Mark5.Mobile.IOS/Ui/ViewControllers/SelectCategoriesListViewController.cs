@@ -113,6 +113,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.Source = new DataSource(TableView);
             TableView.AllowsSelection = true;
             TableView.AllowsMultipleSelection = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
         }
 
         void InitializeHandlers()

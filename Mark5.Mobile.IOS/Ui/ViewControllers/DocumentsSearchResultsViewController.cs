@@ -145,6 +145,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.Source = new DataSource(this, TableView, PlatformConfig.Preferences.CompactDocumentsList);
             TableView.AllowsMultipleSelectionDuringEditing = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 60f;
 
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(DocumentPreviewLongPressed));
         }

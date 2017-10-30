@@ -129,6 +129,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.Source = new DataSource(this, tableView);
             tableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.Interactive;
             tableView.TranslatesAutoresizingMaskIntoConstraints = false;
+            tableView.RowHeight = UITableView.AutomaticDimension;
+            tableView.EstimatedRowHeight = 20f;
             View.AddSubview(tableView);
             View.AddConstraints(new[]
             {

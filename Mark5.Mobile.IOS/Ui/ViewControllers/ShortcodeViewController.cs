@@ -144,6 +144,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.Source = new DataSource(this, TableView);
             TableView.BackgroundColor = Theme.White;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
+
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed));
 
             headerView = new UIView(new CGRect(0f, 0f, 0f, 160f))

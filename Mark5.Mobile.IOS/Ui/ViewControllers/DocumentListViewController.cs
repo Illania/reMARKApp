@@ -109,16 +109,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return ((DataSource)TableView.Source).Items.FirstOrDefault(); }, AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
 
-                if (ni.SearchController == null)
-                    ni.SearchController = searchController;
-            });
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
+            else
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -221,6 +228,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
             TableView.RefreshControl = RefreshControl;
             TableView.AllowsMultipleSelectionDuringEditing = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 60f;
 
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(DocumentPreviewLongPressed));
         }

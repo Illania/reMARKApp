@@ -56,9 +56,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (NavigationController != null)
                     NavigationController.NavigationBar.PrefersLargeTitles = true;
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
+                TableView.InsetsContentViewsToSafeArea = true;
             }
 
-            TableView.InsetsContentViewsToSafeArea = true;
 
             RefreshHiddenSettings();
         }

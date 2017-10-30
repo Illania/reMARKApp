@@ -108,7 +108,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f)
             });
 
-            searchButtonBottomConstraint1 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, -8f);
+            if (Integration.IsRunningAtLeast(11))
+                searchButtonBottomConstraint1 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, -8f);
+            else
+                searchButtonBottomConstraint1 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, BottomLayoutGuide, NSLayoutAttribute.Top, 1f, -8f);
+
             searchButtonBottomConstraint2 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0);
             searchButtonBottomConstraint2.Active = false;
 

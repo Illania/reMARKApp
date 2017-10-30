@@ -65,16 +65,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
 
-                if (ni.SearchController == null)
-                    ni.SearchController = searchController;
-            });
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
+            else
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -130,6 +137,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
         }
 
         void InitializeSearchBar()
@@ -186,7 +195,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        public void TemplateSelected(TemplatePreview tp) => tcs.SetResult(tp);
+        public void TemplateSelected(TemplatePreview tp)
+        {
+            tcs.SetResult(tp);
+
+            if (searchController != null && searchController.Active)
+                searchController.Active = false;
+
+            DismissViewController(true, null);
+        }
 
         public void UpdateSearchResultsForSearchController(UISearchController searchController)
         {

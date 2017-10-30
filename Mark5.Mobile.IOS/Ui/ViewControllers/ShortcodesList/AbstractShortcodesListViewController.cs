@@ -91,16 +91,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (((DataSource)TableView.Source).Empty)
                 RefreshData();
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
 
-                if (ni.SearchController == null)
-                    ni.SearchController = searchController;
-            });
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
+            else
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -186,6 +193,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RefreshControl = new UIRefreshControl();
 
             TableView.Source = new DataSource(this, TableView, DisableRowActions, Localization.GetString("folder_empty"));
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
             TableView.RefreshControl = RefreshControl;
             TableView.AllowsMultipleSelectionDuringEditing = true;
 

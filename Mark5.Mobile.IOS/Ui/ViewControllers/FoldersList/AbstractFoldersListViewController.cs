@@ -264,6 +264,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             TableView.Source = IsRootOfFoldersList
                 ? new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource
                 : new DataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 50f;
             TableView.RefreshControl = RefreshControl;
         }
 
