@@ -239,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var searchDataSource = tableViewController?.TableView?.Source as SearchDataSource;
             searchDataSource?.Reset();
 
-            await System.Threading.Tasks.Task.Delay(500);
+            await Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
