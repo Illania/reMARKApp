@@ -104,10 +104,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                         ni.SearchController = searchController;
                 });
             }
-            else
-            {
-                TableView.TableHeaderView = searchController.SearchBar;
-            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -219,6 +215,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 SearchResultsUpdater = this
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         protected virtual void InitializeHandlers()
