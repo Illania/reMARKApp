@@ -137,6 +137,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var searchResultsController = new UITableViewController();
             var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_phonebook_matching"));
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 20f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
             searchController = new UISearchController(searchResultsController)
             {

@@ -276,6 +276,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var searchResultsController = new UITableViewController();
             var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView);
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 50f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
             searchController = new UISearchController(searchResultsController)
             {

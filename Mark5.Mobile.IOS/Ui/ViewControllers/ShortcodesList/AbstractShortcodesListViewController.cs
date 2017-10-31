@@ -208,6 +208,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             var searchResultsController = new UITableViewController();
             var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions, Localization.GetString("no_matching_shortcodes"));
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 40f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
             searchController = new UISearchController(searchResultsController)
             {
