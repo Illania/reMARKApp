@@ -14,6 +14,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
     public abstract class AbstractSearchCriteriaViewController : AbstractViewController
     {
+        const float BottomViewSize = 64f;
+
         UIBarButtonItem closeItem;
         UIBarButtonItem resetItem;
 
@@ -222,28 +224,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         void AdjustViewToKeyboard(UIKeyboardEventArgs e)
         {
             var keyboardOffset = scrollView.Frame.Bottom - e.FrameEnd.Top;
-            var safeAreaOffset = keyboardOffset;
 
-            if (keyboardOffset > 0)
+            if (Integration.IsRunningAtLeast(11))
             {
-                safeAreaOffset += 75f;
+                var safeAreaOffset = keyboardOffset;
 
-                searchButtonBottomConstraint1.Active = false;
-                searchButtonBottomConstraint2.Active = true;
-                searchButtonBottomConstraint2.Constant = -keyboardOffset - 8f;
+                if (keyboardOffset > 0)
+                {
+                    safeAreaOffset += 75f;
+
+                    searchButtonBottomConstraint1.Active = false;
+                    searchButtonBottomConstraint2.Active = true;
+                    searchButtonBottomConstraint2.Constant = -keyboardOffset - 8f;
+                }
+                else
+                {
+                    searchButtonBottomConstraint1.Active = true;
+                    searchButtonBottomConstraint2.Active = false;
+                    searchButtonBottomConstraint2.Constant = 0f;
+                }
+
+                UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
+                {
+                    AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, safeAreaOffset, 0f);
+                    View.LayoutIfNeeded();
+                }, null);
             }
             else
             {
-                searchButtonBottomConstraint1.Active = true;
-                searchButtonBottomConstraint2.Active = false;
-                searchButtonBottomConstraint2.Constant = 0f;
-            }
+                scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardOffset, 0f);
+                scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardOffset, 0f);
 
-            UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
-            {
-                AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, safeAreaOffset, 0f);
-                View.LayoutIfNeeded();
-            }, null);
+                UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
+                {
+                    searchButtonBottomConstraint1.Constant = -keyboardOffset - 8f;
+                    View.LayoutIfNeeded();
+                }, null);
+
+                var activeField = activeViewWeakReference.Unwrap();
+
+                if (activeField != null)
+                {
+                    var difference = activeField.Frame.Bottom - scrollView.ContentOffset.Y - (View.Frame.Height - keyboardOffset - BottomViewSize) + 10;
+
+                    if (difference > 0)
+                    {
+                        var co = scrollView.ContentOffset;
+                        co.Y += difference;
+                        scrollView.ContentOffset = co;
+                    }
+                }
+            }
         }
 
         protected abstract class AbstractSearchView : UIStackView

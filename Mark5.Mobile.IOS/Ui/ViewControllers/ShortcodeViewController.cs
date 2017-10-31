@@ -681,10 +681,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void ScrollChanged(UIScrollView scrollView)
             {
-                var offset = scrollView.ContentOffset.Y;
-                var inset = -scrollView.SafeAreaInsets.Top;
-                var show = offset > inset + 30;
-                viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
+                if (Integration.IsRunningAtLeast(11))
+                {
+                    var offset = scrollView.ContentOffset.Y;
+                    var inset = -scrollView.SafeAreaInsets.Top;
+                    var show = offset > inset + 30;
+                    viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
+                }
             }
 
             public void StartRefresh()
