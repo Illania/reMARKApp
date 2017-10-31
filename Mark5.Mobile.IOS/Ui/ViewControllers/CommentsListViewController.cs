@@ -194,9 +194,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentTextScrollView = new UIScrollView
             {
                 ScrollEnabled = false,
-                ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+
+            if (Integration.IsRunningAtLeast(11))
+                commentTextScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             commentTextScrollView.Layer.BorderColor = Theme.DarkGray.CGColor;
             commentTextScrollView.Layer.BorderWidth = .75f;
             commentTextScrollView.Layer.CornerRadius = 5f;
@@ -405,7 +407,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void AdjustSafeAreaInsets()
         {
             var offset = -commentViewBottomConstraint.Constant + commentView.Frame.Height;
-            AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, offset, 0f);
+            if (Integration.IsRunningAtLeast(11))
+            {
+                AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, offset, 0f);
+            }
+            else
+            {
+                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, offset, 0f);
+            }
         }
 
         void ScrollCommentsToBottom(bool animated)
