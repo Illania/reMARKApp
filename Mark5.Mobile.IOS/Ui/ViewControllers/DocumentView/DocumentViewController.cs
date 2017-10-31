@@ -291,9 +291,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true,
                 ScrollsToTop = true,
-                ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            if (Integration.IsRunningAtLeast(11))
+            {
+                mainScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always;
+            }
             View.AddSubview(mainScrollView);
             View.AddConstraints(new[]
             {
