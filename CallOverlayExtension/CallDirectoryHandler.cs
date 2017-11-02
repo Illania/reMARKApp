@@ -13,15 +13,13 @@ namespace CallOverlayExtension
         [PrimaryKey]
         public int Id { get; set; }
 
-        [Column("ContactId")]
-        [PrimaryKey]
-        public int ContactId { get; set; }
-
         [Column("Name")]
+        [NotNull]
         public string Name { get; set; }
 
         [Column("Number")]
-        public long Number { get; set; }
+        [NotNull]
+        public string Numbers { get; set; }
     }
 
     [Register("CallDirectoryHandler")]
@@ -39,7 +37,7 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
-            try
+            /*try
             {
                 using (var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios"))
                 {
@@ -47,7 +45,7 @@ namespace CallOverlayExtension
 
                     var exists = NSFileManager.DefaultManager.FileExists(fullurl.Path);
 
-                    using (var connection = new SQLiteConnection(fullurl.Path,/*SqliteCOnnectionFlags...???,*/ true))
+                    using (var connection = new SQLiteConnection(fullurl.Path,SQLiteOpenFlags.ReadOnly, true))
                     {
                         connection.CreateTable<ExtensionContact>();
                     }
@@ -65,7 +63,7 @@ namespace CallOverlayExtension
             catch (Exception ex)
             {
 
-            }
+            }*/
 
             #region stuff
 
@@ -135,6 +133,8 @@ namespace CallOverlayExtension
             //}
 
             #endregion
+
+            cxContext.AddIdentificationEntry(4560443773, "its a me");
 
             cxContext.CompleteRequest(null);
         }

@@ -6,7 +6,7 @@ namespace Mark5.Mobile.Common.Database
 {
     public static class DatabaseUtils
     {
-        public static async Task  InitializeDatabases()
+        public static async Task InitializeDatabases()
         {
             await DatabaseConnectionProvider.DocumentsDatabase.RunInConnectionAsync(c =>
             {
