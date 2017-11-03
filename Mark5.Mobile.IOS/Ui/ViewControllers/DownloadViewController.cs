@@ -850,6 +850,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         failedItems.Add(item);
                     }
 
+                    if (leftItemsCount == 77)
+                    {
+                      
+                    }
                     onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
                 } while (!ct.IsCancellationRequested);
 

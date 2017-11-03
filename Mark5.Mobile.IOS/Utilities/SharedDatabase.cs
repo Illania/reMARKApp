@@ -42,8 +42,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void AddContactToExtensionContactsTable(int id, string name, string number)
         {
-            //Format number. Only '|' needs to be removed for the number to be identified by the phone.
-            number = number.Replace("|", String.Empty).Replace("+", "");
+            //Format number. Only '|' and "+" needs to be removed for the number to be identified by the phone.
+            number = number.Replace("|", String.Empty).Replace("+", "").Replace(" ","");
 
             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
             {
@@ -59,11 +59,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
                         if (dbExtContact != null) //If database already contains row with given id, then @number should be appended to the string of numbers stored for that row.
                         {
+                            if (dbExtContact.Numbers.Contains(number))
+                                return;
+                                   
                             StringBuilder sb = new StringBuilder();
                             sb.Append(dbExtContact.Numbers).Append(",").Append(number);
                             dbExtContact.Numbers = sb.ToString();
 
-                            connection.Insert(dbExtContact);
+                            connection.InsertOrReplace(dbExtContact);
                         }
                         else //Otherwise insert contact with just the @number stored in the string of numbers.
                         {
@@ -72,7 +75,7 @@ namespace Mark5.Mobile.IOS.Utilities
                             newExtContact.Name = name;
                             newExtContact.Numbers = number;
 
-                            connection.InsertOrReplace(newExtContact);
+                            connection.Insert(newExtContact);
                         }
                     }
                     finally 
