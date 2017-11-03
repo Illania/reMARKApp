@@ -21,7 +21,7 @@ namespace CallOverlayExtension
             {
                 var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
                
-                using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, SQLiteOpenFlags.FullMutex, true))
+                using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
                 {
                     try
                     {
@@ -45,7 +45,18 @@ namespace CallOverlayExtension
 
         static List<(string name, long number)> ProcessResult(List<ExtensionContact> dbResult)
         {
-            return null;
+            List<(string name, long number)> result = new List<(string name, long number)>();
+
+            foreach(ExtensionContact ec in dbResult)
+            {
+                var name = ec.Name;
+                var numbers = ec.Numbers.Split(',');
+                for (int i = 0; i < numbers.Length; i++)
+                {
+                    result.Add((name,Convert.ToInt64(numbers[i])));
+                }
+            }
+            return result;
         }
 
         static void LockDatabase()

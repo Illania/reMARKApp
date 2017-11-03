@@ -22,11 +22,20 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
             {
-                var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
-
-                using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
+                try 
                 {
-                    connection.CreateTable<ExtensionContact>();
+                    LockDatabase(containerUrl);
+
+                    var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
+
+                    using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
+                    {
+                        connection.CreateTable<ExtensionContact>();
+                    }
+                }
+                finally 
+                {
+                    UnlockDatabase(containerUrl);
                 }
             }
         }
@@ -34,17 +43,17 @@ namespace Mark5.Mobile.IOS.Utilities
         public static void AddContactToExtensionContactsTable(int id, string name, string number)
         {
             //Format number. Only '|' needs to be removed for the number to be identified by the phone.
-            number = number.Replace("|", String.Empty);
+            number = number.Replace("|", String.Empty).Replace("+", "");
 
             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
             {
                 var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
 
-                using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, SQLiteOpenFlags.FullMutex, true))
+                using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
                 {
                     try
                     {
-                        LockDatabase();
+                        LockDatabase(containerUrl);
 
                         var dbExtContact = connection.Find<ExtensionContact>(id);
 
@@ -66,15 +75,17 @@ namespace Mark5.Mobile.IOS.Utilities
                             connection.InsertOrReplace(newExtContact);
                         }
                     }
-                    finally { UnlockDatabase(); }
+                    finally 
+                    {
+                        UnlockDatabase(containerUrl); 
+                    }
                 }
             }
         }
 
-        static void LockDatabase()
+        static void LockDatabase(NSUrl containerUrl)
         {
-            using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
-            {
+
                 var fm = NSFileManager.DefaultManager;
                 var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
@@ -82,13 +93,11 @@ namespace Mark5.Mobile.IOS.Utilities
                     throw new Exception("The database is locked, unable to get lock.");
                 
                 fm.CreateFile(lockPath, new NSData(), new NSFileAttributes());
-            }
+            
         }
 
-        static void UnlockDatabase()
+        static void UnlockDatabase(NSUrl containerUrl)
         {
-            using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
-            {
                 var fm = NSFileManager.DefaultManager;
                 var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
@@ -96,14 +105,14 @@ namespace Mark5.Mobile.IOS.Utilities
                 {
                     NSError error = new NSError();
                     fm.Remove(lockPath, out error);
-                    if(error.LocalizedFailureReason != null)
+                    if(error != null)
                     {
                         throw new Exception("Error database lock file: " + error.LocalizedFailureReason);
                     }
                 }
                 else
-                    throw new Exception("The database is locked, unable to get lock.");
-            }
+                    throw new Exception("The database is not locked, unable unlock.");
+            
         }
     }
 
