@@ -11,11 +11,10 @@ namespace Mark5.Mobile.Common.Service
 {
     public class DocumentsDownloadService : AbstractService, IDocumentsDownloadService
     {
-
         readonly HashSet<int> documentIdSkipList = new HashSet<int>();
 
         public DocumentsDownloadService()
-            : base(15 * 1000)
+            : base(5 * 1000)
         {
         }
 
