@@ -107,7 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
-    <Folder Include="Utilities\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -116,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallDirectoryHandler.cs" />
+    <Compile Include="SharedDatabase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.AppExtension.CSharp.targets" />
 </Project>

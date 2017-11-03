@@ -6,22 +6,6 @@ using SQLite;
 
 namespace CallOverlayExtension
 {
-    [Table("ExtensionContact")]
-    public class ExtensionContact
-    {
-        [Column("Id")]
-        [PrimaryKey]
-        public int Id { get; set; }
-
-        [Column("Name")]
-        [NotNull]
-        public string Name { get; set; }
-
-        [Column("Number")]
-        [NotNull]
-        public string Numbers { get; set; }
-    }
-
     [Register("CallDirectoryHandler")]
     public class CallDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
     {
