@@ -42,6 +42,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void AddContactToExtensionContactsTable(int id, string name, string number)
         {
+            if (number[0] == '|') //If the first char is '|', then the country code isn't specified. The country code must be specified for the number to work with the caller extension.
+                return;
+
             //Format number. Only '|' and "+" needs to be removed for the number to be identified by the phone.
             number = number.Replace("|", String.Empty).Replace("+", "").Replace(" ","");
 

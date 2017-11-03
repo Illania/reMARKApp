@@ -786,8 +786,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         if (folder.Module == ModuleType.Contacts)
                         {
-                            item = contactsQueue.Dequeue().id;
-                            contactName = contactsQueue.Dequeue().name;
+                            (var qId, var qName) = contactsQueue.Dequeue();
+                            item = qId;
+                            contactName = qName;
                         } 
                         else //if (folder.Module == ModuleType.Shortcodes)
                         {
@@ -850,10 +851,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         failedItems.Add(item);
                     }
 
-                    if (leftItemsCount == 77)
-                    {
-                      
-                    }
                     onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
                 } while (!ct.IsCancellationRequested);
 
