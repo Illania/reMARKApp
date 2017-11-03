@@ -13,7 +13,7 @@ namespace CallOverlayExtension
         const string databaseLockName = "sharedcontacts.lock";
         const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
 
-        public static List<(string name, long number)> GetContactsFromSharedDatabase(string name, string number)
+        public static List<(string name, long number)> GetContactsFromSharedDatabase()
         {
             List<ExtensionContact> dbContacts = null;
 
@@ -56,6 +56,8 @@ namespace CallOverlayExtension
                     result.Add((name,Convert.ToInt64(numbers[i])));
                 }
             }
+
+            result.Sort((ec1,ec2) => ec1.number.CompareTo(ec2.number));
             return result;
         }
 
@@ -84,7 +86,7 @@ namespace CallOverlayExtension
                 {
                     NSError error = new NSError();
                     fm.Remove(lockPath, out error);
-                    if (error.LocalizedFailureReason != null)
+                    if (error != null)
                     {
                         throw new Exception("Error database lock file: " + error.LocalizedFailureReason);
                     }

@@ -2,6 +2,7 @@
 using Foundation;
 using SQLite;
 using System.Text;
+using System.Linq;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -40,6 +41,28 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
+        public static void DropExtensionContactsTable()
+        {
+            using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
+            {
+                try
+                {
+                    LockDatabase(containerUrl);
+
+                    var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
+
+                    using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
+                    {
+                        connection.DropTable<ExtensionContact>();
+                    }
+                }
+                finally
+                {
+                    UnlockDatabase(containerUrl);
+                }
+            }
+        }
+
         public static void AddContactToExtensionContactsTable(int id, string name, string number)
         {
             if (number[0] == '|') //If the first char is '|', then the country code isn't specified. The country code must be specified for the number to work with the caller extension.
@@ -47,6 +70,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
             //Format number. Only '|' and "+" needs to be removed for the number to be identified by the phone.
             number = number.Replace("|", String.Empty).Replace("+", "").Replace(" ","");
+
+            if (!number.All(n => Char.IsDigit(n))) //If the number contains letters, then it should not be added.
+                return;
 
             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
             {
