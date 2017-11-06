@@ -51,6 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public ShortcodeViewController()
             : base(UITableViewStyle.Grouped)
         {
+            HidesBottomBarWhenPushed = true;
         }
 
         public override void LoadView()
