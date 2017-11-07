@@ -101,7 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (animated)
                 UIView.TransitionNotify(searchButtonContainer, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, () => searchButtonContainer.Hidden = !hidden, null);
             else
-                searchButtonContainer.LayoutIfNeeded();
+                searchButtonContainer.Hidden = !hidden;
         }
 
         public override void ViewDidLayoutSubviews()

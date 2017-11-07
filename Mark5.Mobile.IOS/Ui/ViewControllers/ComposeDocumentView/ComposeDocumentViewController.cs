@@ -217,7 +217,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 ScrollEnabled = true,
                 ScrollsToTop = true,
                 UserInteractionEnabled = true,
-                ClipsToBounds = false, //TODO Ask Bartosz why it was false, and why otherwise the stuff goes over it
+                ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             View.AddSubview(scrollView);
