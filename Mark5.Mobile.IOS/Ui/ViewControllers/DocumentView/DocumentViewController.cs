@@ -100,6 +100,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        public DocumentViewController()
+        {
+            HidesBottomBarWhenPushed = true;
+        }
+
         #region UIViewController overrides
 
         public override void LoadView()

@@ -21,7 +21,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIView searchButtonContainer;
         UIButton searchButton;
-        NSLayoutConstraint searchButtonBottomConstraint;
 
         public override void ViewDidLoad()
         {
@@ -58,8 +57,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 searchButton.HeightAnchor.ConstraintEqualTo(55f),
                 searchButton.WidthAnchor.ConstraintEqualTo(55f),
                 searchButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
-                searchButtonBottomConstraint = searchButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
+                searchButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
+
         }
 
         public override void ViewWillAppear(bool animated)
@@ -98,12 +98,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetSearchButtonHidden(bool hidden, bool animated)
         {
-            searchButtonBottomConstraint.Constant = hidden ? -10f : 0f;
-
             if (animated)
-                UIView.AnimateNotify(.25d, 0d, UIViewAnimationOptions.BeginFromCurrentState | UIViewAnimationOptions.CurveEaseOut, searchButtonContainer.LayoutIfNeeded, null);
+                UIView.TransitionNotify(searchButtonContainer, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, () => searchButtonContainer.Hidden = !hidden, null);
             else
                 searchButtonContainer.LayoutIfNeeded();
+        }
+
+        public override void ViewDidLayoutSubviews()
+        {
+            base.ViewDidLayoutSubviews();
+            View.BringSubviewToFront(searchButtonContainer);
         }
 
         void SearchButton_TouchUpInside(object sender, EventArgs e)

@@ -117,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField.ResignFirstResponder();
 
             DeinitializeHandlers();
-            
+
             authenticator = null;
 
             didChangeFrameNotificationObserver?.Dispose();
@@ -257,11 +257,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(settingsButton);
-            View.AddConstraints(new[]
+
+            if (Integration.IsRunningAtLeast(11))
             {
-                NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 20f),
-                NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, -5f)
-            });
+                View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal,  View.SafeAreaLayoutGuide, NSLayoutAttribute.Right, 1f, -10f)
+                });
+            }
+            else
+            {
+                View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 20f),
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, -5f)
+                });
+            }
         }
 
         void InitializeSubViews()

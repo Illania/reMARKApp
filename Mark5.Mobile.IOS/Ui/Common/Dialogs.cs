@@ -82,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var tcs = new TaskCompletionSource<bool>();
             var actionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            actionSheet.AddAction(UIAlertAction.Create(destructiveText, UIAlertActionStyle.Destructive, a => tcs.SetResult(false)));
+            actionSheet.AddAction(UIAlertAction.Create(destructiveText, UIAlertActionStyle.Destructive, a => tcs.SetResult(true)));
             actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(false)));
             if (actionSheet.PopoverPresentationController != null)
                 actionSheet.PopoverPresentationController.Delegate = d;

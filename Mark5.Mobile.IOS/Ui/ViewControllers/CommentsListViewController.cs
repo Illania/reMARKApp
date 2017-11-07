@@ -132,13 +132,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.RowHeight = UITableView.AutomaticDimension;
             tableView.EstimatedRowHeight = 20f;
             View.AddSubview(tableView);
+
+            NSLayoutConstraint tableViewBottomConstraint = null;
+
+            if (Integration.IsRunningAtLeast(11))
+                tableViewBottomConstraint = NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, 0f);
+            else
+                tableViewBottomConstraint = NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
+
             View.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                tableViewBottomConstraint
             });
+
         }
 
         void InitializeEditView()
@@ -150,12 +159,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             commentView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+
+            if (Integration.IsRunningAtLeast(11))
+                commentViewBottomConstraint = NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, 0f);
+            else
+                commentViewBottomConstraint = NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
+
             View.AddSubview(commentView);
             View.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                commentViewBottomConstraint = NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                commentViewBottomConstraint,
             });
 
             var borderView = new UIView
@@ -185,11 +200,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             addCommentButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             addCommentButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             commentView.AddSubview(addCommentButton);
-            commentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, -7f),
-                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.CenterY, 1f, 0f)
-            });
 
             commentTextScrollView = new UIScrollView
             {
@@ -210,7 +220,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addCommentButton, NSLayoutAttribute.Left, 1f, -7f),
                 NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -7f),
                 NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
-                commentTextScrollViewHeightConstraint = NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f)
+                commentTextScrollViewHeightConstraint = NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
+
+                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, -7f),
+                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.CenterY, 1f, 0f)
             });
 
             commentTextView = new UITextView
@@ -339,7 +352,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (t.IsFaulted)
                 {
-                    CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                    CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] "
+                                              , t.Exception.InnerException);
                     await Dialogs.ShowErrorAlertAsync(this, t.Exception.InnerException);
                 }
                 else
@@ -355,7 +369,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var height = KeyboardObserverInputAccessoryView.GetVisibleKeyboardHeight(View, frame);
 
-            commentViewBottomConstraint.Constant = -height;
+            if (Integration.IsRunningAtLeast(11))
+                commentViewBottomConstraint.Constant = height == 0 ? 0 : -height + (View.SafeAreaInsets.Bottom);
+            else
+                commentViewBottomConstraint.Constant = -height;
+
             commentView.LayoutIfNeeded();
 
             AdjustSafeAreaInsets();
@@ -407,14 +425,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void AdjustSafeAreaInsets()
         {
             var offset = -commentViewBottomConstraint.Constant + commentView.Frame.Height;
-            if (Integration.IsRunningAtLeast(11))
-            {
-                AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, offset, 0f);
-            }
-            else
-            {
-                tableView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, offset, 0f);
-            }
+            tableView.ContentInset = new UIEdgeInsets(tableView.ContentInset.Top, 0f, offset, 0f);
         }
 
         void ScrollCommentsToBottom(bool animated)

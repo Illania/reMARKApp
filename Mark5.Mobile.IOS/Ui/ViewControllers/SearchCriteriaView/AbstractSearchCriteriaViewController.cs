@@ -81,16 +81,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             scrollView.AddSubview(StackView);
-            scrollView.AddConstraints(new[]
+
+            if (Integration.IsIPad())
             {
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
-                Integration.IsIPad()
-                    ? NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 500f)
-                    : NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
+                scrollView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.CenterX, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 500f)
+                });
+            }
+            else
+            {
+                scrollView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
+
+               });
+            }
 
             SearchButton = new UIButton
             {
