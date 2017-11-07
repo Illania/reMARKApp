@@ -55,6 +55,8 @@ namespace Mark5.Mobile.Common.Service
                             break;
                     }
 
+                    Services.DocumentsDownloadService.Notify();
+
                     try
                     {
                         CommonConfig.Logger.Info("Downloaded all folders. Waiting...");

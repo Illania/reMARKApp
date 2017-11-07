@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Service
         readonly HashSet<int> documentIdSkipList = new HashSet<int>();
 
         public DocumentsDownloadService()
-            : base(5 * 1000)
+            : base(15 * 1000)
         {
         }
 
