@@ -7,7 +7,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class KeyboardObserverInputAccessoryView : UIView
     {
-        public static int GetVisibleKeyboardHeight(UIView view, CGRect frame) => (int)(view.Frame.Height - frame.Top);
+        public static nfloat GetVisibleKeyboardHeight(UIView view, CGRect frame)
+        {
+            var viewConverted = view.ConvertRectToView(view.Frame, UIApplication.SharedApplication.KeyWindow);
+            return viewConverted.Bottom - frame.Top;
+        }
 
         public event EventHandler<CGRect> KeyboardChanged;
         bool added;
@@ -47,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (ofObject != Superview && keyPath != "frame" && keyPath != "center")
                 return;
-            
+
             var f = Superview.Frame;
             KeyboardChanged?.Invoke(this, f);
         }
