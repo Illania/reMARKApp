@@ -67,7 +67,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TabBar.Items[2].Enabled = false;
 
-            ViewControllerSelected += AbstractMainViewController_ViewControllerSelected;
             searchButton.TouchUpInside += SearchButton_TouchUpInside;
         }
 
@@ -82,28 +81,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            ViewControllerSelected -= AbstractMainViewController_ViewControllerSelected;
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
         }
 
-        void AbstractMainViewController_ViewControllerSelected(object sender, UITabBarSelectionEventArgs e)
+        public void SetSearchButtonHidden(bool hidden)
         {
-            var nc = e.ViewController as UINavigationController;
-            if (nc == null)
-                return;
-
-            SetSearchButtonHidden(nc.ToolbarHidden, true);
+            searchButtonContainer.Hidden = hidden;
         }
 
-        public void SetSearchButtonHidden(bool hidden, bool animated)
+        public void SetSearchButtonAlpha(float val)
         {
-            if (animated)
-                UIView.TransitionNotify(searchButtonContainer, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, () => searchButtonContainer.Hidden = !hidden, null);
-            else
-            {
-                searchButtonContainer.Hidden = hidden;
-                searchButtonContainer.LayoutIfNeeded();
-            }
+            searchButton.Alpha = val;
         }
 
         public override void ViewDidLayoutSubviews()
