@@ -210,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (Integration.IsRunningAtLeast(11))
                 commentTextScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             commentTextScrollView.Layer.BorderColor = Theme.DarkGray.CGColor;
-            commentTextScrollView.Layer.BorderWidth = .75f;
+            commentTextScrollView.Layer.BorderWidth = .7f;
             commentTextScrollView.Layer.CornerRadius = 5f;
             commentView.AddSubview(commentTextScrollView);
             commentView.AddConstraints(new[]

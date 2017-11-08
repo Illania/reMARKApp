@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             colorView.Layer.BorderColor = Theme.DarkGray.CGColor;
-            colorView.Layer.BorderWidth = .75f;
+            colorView.Layer.BorderWidth = .7f;
             colorView.Layer.CornerRadius = 10f;
 
             label = new UILabel

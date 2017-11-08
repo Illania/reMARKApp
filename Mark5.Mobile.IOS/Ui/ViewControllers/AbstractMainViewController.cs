@@ -49,7 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             searchButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "search_large.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             searchButton.Layer.BorderColor = Theme.DarkGray.CGColor;
-            searchButton.Layer.BorderWidth = 1f;
+            searchButton.Layer.BorderWidth = .7f;
             searchButton.Layer.CornerRadius = 27.5f;
             searchButtonContainer.AddSubview(searchButton);
             searchButtonContainer.AddConstraints(new[]
@@ -59,7 +59,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 searchButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
                 searchButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
-
         }
 
         public override void ViewWillAppear(bool animated)
@@ -101,7 +100,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (animated)
                 UIView.TransitionNotify(searchButtonContainer, 0.25d, UIViewAnimationOptions.TransitionCrossDissolve, () => searchButtonContainer.Hidden = !hidden, null);
             else
-                searchButtonContainer.Hidden = !hidden;
+            {
+                searchButtonContainer.Hidden = hidden;
+                searchButtonContainer.LayoutIfNeeded();
+            }
         }
 
         public override void ViewDidLayoutSubviews()
