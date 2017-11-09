@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,13 +9,13 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using TinyMessenger;
 using UIKit;
+using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
@@ -63,9 +63,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
 
@@ -83,19 +86,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             CommonConfig.Logger.Info("Appeared");
 
+            NavigationItem.Title = Folder.Name;
+
             if (((DataSource)TableView.Source).Empty)
                 RefreshData();
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
 
-                if (ni.SearchController == null)
-                    ni.SearchController = searchController;
-            });
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -135,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -172,8 +180,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         protected virtual void InitializeNavigationBar()
         {
-            NavigationItem.Title = Folder.Name;
-
             ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
         }
@@ -183,6 +189,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             RefreshControl = new UIRefreshControl();
 
             TableView.Source = new DataSource(this, TableView, DisableRowActions, Localization.GetString("folder_empty"));
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
             TableView.RefreshControl = RefreshControl;
             TableView.AllowsMultipleSelectionDuringEditing = true;
 
@@ -196,6 +204,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             var searchResultsController = new UITableViewController();
             var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions, Localization.GetString("no_matching_shortcodes"));
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 40f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
             searchController = new UISearchController(searchResultsController)
             {
@@ -205,6 +215,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 SearchResultsUpdater = this
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         protected virtual void InitializeHandlers()
@@ -261,6 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 return;
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             var rows = TableView.IndexPathsForSelectedRows.ToArray();
             var selectedShortcodes = rows.Select(ip => ((DataSource)TableView.Source).FindItemAtIndexPath(ip)).ToList();
@@ -291,15 +307,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcodes)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcodes, d)));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => ExitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                eas.PopoverPresentationController.Delegate = d;
 
             ExitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -321,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
             {
-                var result = await Dialogs.ShowYesNoCancelDialogAsync(this,
+                var result = await Dialogs.ShowYesNoCancelAlertAsync(this,
                                                                       Localization.GetString("folder_offline_title"),
                                                                       Localization.GetString("folder_offline_message"),
                                                                       Localization.GetString("folder_offline_go_online"),
@@ -333,7 +349,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 if (result == 0)
                 {
                     var vc = new DownloadViewController { Folder = Folder };
-                    NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
                     await vc.Result;
                 }
                 if (result == -1)
@@ -383,7 +399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                     CommonConfig.Logger.Error($"Could not refresh shortcodes [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
 
                     NavigationController?.PopViewController(true);
                 },
@@ -410,6 +426,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+                return;
+
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
@@ -420,6 +439,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         void ShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
@@ -439,26 +459,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcode)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcode, d)));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => EndEditing()));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
+                eas.PopoverPresentationController.Delegate = d;
 
             PresentViewController(eas, true, null);
         }
 
-        void RemoveFromFolder(ShortcodePreview selectedShortcode) =>
-            RemoveFromFolder(new List<ShortcodePreview> { selectedShortcode });
+        void RemoveFromFolder(ShortcodePreview selectedShortcode, UIPopoverPresentationControllerDelegate d) =>
+            RemoveFromFolder(new List<ShortcodePreview> { selectedShortcode }, d);
 
-        async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes)
+        async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcodes"));
-
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
             {
                 EndEditing();
@@ -484,17 +503,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while removing shortcodes from folder [folderId={Folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
-        void Delete(ShortcodePreview selectedShortcode) =>
-            Delete(new List<ShortcodePreview> { selectedShortcode });
+        void Delete(ShortcodePreview selectedShortcode, UIPopoverPresentationControllerDelegate d) =>
+            Delete(new List<ShortcodePreview> { selectedShortcode }, d);
 
-        async void Delete(List<ShortcodePreview> selectedShortcodes)
+        async void Delete(List<ShortcodePreview> selectedShortcodes, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcodes"));
-
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
             {
                 EndEditing();
@@ -520,7 +538,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting shortcodes", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -541,7 +559,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
-            var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -550,7 +568,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void MoveToFolder(List<ShortcodePreview> shortcodePreviews)
         {
-            var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList(), Folder);
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList(), Folder);
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -734,13 +752,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                 var cp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.DefaultId) as ShortcodesTableViewCell ?? new ShortcodesTableViewCell();
                 cell.Initialize(cp);
-
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ShortcodesTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {
@@ -778,17 +793,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (disableRowActions)
-                    return false;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -821,10 +826,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var sp = items[indexPath.Section][indexPath.Row];

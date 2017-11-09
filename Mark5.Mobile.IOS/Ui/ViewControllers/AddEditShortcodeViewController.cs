@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
@@ -17,26 +16,20 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class AddEditShortcodeViewController : AbstractViewController
+    public class AddEditShortcodeViewController : AbstractTableViewController
     {
         public Shortcode Shortcode { get; set; }
         public ShortcodePreview ShortcodePreview { get; set; }
         public ShortcodeCreationModeFlag CreationModeFlag { get; set; }
 
-        UIBarButtonItem saveButton;
-        UIBarButtonItem cancelButton;
-
-        UITableView tableView;
-
-        NSObject didShowNotificationObserver;
-        NSObject willChangeFrameNotificationObserver;
-        NSObject willHideNotification;
+        UIBarButtonItem saveButtonItem;
+        UIBarButtonItem cancelButtonItem;
 
         UIView activeField;
 
         bool refreshed;
 
-        DataSource dataSource;
+        DataSource TableViewDataSource => (DataSource)TableView.Source;
 
         #region UIViewControllerOverrides
 
@@ -52,8 +45,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
             InitializeHandlers();
-            SubscribeToKeyboardEvents();
         }
 
 
@@ -69,9 +68,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             DeInitializeHandlers();
-            UnsubscribeFromKeyboardEvents();
 
             CommonConfig.Logger.Info($"{nameof(AddEditShortcodeViewController)} will disappear");
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning("Received memory warning!");
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            saveButtonItem = null;
+            cancelButtonItem = null;
+            activeField = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         #endregion
@@ -80,81 +107,69 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            cancelButton = new UIBarButtonItem();
-            cancelButton.Title = Localization.GetString("cancel");
-            NavigationItem.SetLeftBarButtonItem(cancelButton, false);
+            cancelButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("cancel")
+            };
+            NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
 
-            saveButton = new UIBarButtonItem();
-            saveButton.Title = Localization.GetString("save");
-            saveButton.Enabled = true;
-            NavigationItem.SetRightBarButtonItem(saveButton, false);
+            saveButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("save"),
+                Enabled = true
+            };
+            NavigationItem.SetRightBarButtonItem(saveButtonItem, false);
+
+            SetTitle();
+        }
+
+        void SetTitle()
+        {
+            string title = string.Empty;
+            if (CreationModeFlag == ShortcodeCreationModeFlag.New)
+            {
+                title = Localization.GetString("edit_shortcode_create");
+            }
+            else if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
+            {
+                title = Localization.GetString("edit_shortcode_edit");
+            }
+
+            NavigationItem.Title = title;
         }
 
         void InitializeView()
         {
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Plain);
-
-            dataSource = new DataSource(this, tableView);
-            tableView.Source = dataSource;
-            tableView.TableFooterView = new UIView();
-            tableView.EstimatedRowHeight = 60f;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            tableView.ClipsToBounds = false;
-            tableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
-            tableView.Editing = true;
-            tableView.AllowsSelectionDuringEditing = true;
-            tableView.CellLayoutMarginsFollowReadableWidth = true;
-            View.AddSubview(tableView);
-
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
-            });
+            TableView.Source = new DataSource(this, TableView);
+            TableView.TableFooterView = new UIView();
+            TableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
+            TableView.Editing = true;
+            TableView.AllowsSelectionDuringEditing = true;
+            TableView.CellLayoutMarginsFollowReadableWidth = true;
         }
 
         void InitializeHandlers()
         {
-            if (cancelButton != null)
-                cancelButton.Clicked += CancelButton_Clicked;
+            if (cancelButtonItem != null)
+                cancelButtonItem.Clicked += CancelButton_Clicked;
 
-            if (saveButton != null)
-                saveButton.Clicked += SaveButton_Clicked;
+            if (saveButtonItem != null)
+                saveButtonItem.Clicked += SaveButton_Clicked;
 
-            if (dataSource != null)
-                dataSource.ViewIsActivated += DataSource_ViewIsActivated;
+            if (TableViewDataSource != null)
+                TableViewDataSource.ViewIsActivated += DataSource_ViewIsActivated;
         }
 
         void DeInitializeHandlers()
         {
-            if (cancelButton != null)
-                cancelButton.Clicked -= CancelButton_Clicked;
+            if (cancelButtonItem != null)
+                cancelButtonItem.Clicked -= CancelButton_Clicked;
 
-            if (saveButton != null)
-                saveButton.Clicked -= SaveButton_Clicked;
+            if (saveButtonItem != null)
+                saveButtonItem.Clicked -= SaveButton_Clicked;
 
-            if (dataSource != null)
-                dataSource.ViewIsActivated -= DataSource_ViewIsActivated;
-        }
-
-        void SubscribeToKeyboardEvents()
-        {
-            didShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.DidShowNotification, OnKeyboardDidShowNotification);
-            willChangeFrameNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillChangeFrameNotification, OnKeyboardWillChangeFrameNotification);
-            willHideNotification = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardWillHideNotification);
-        }
-
-        void UnsubscribeFromKeyboardEvents()
-        {
-            NSNotificationCenter.DefaultCenter.RemoveObservers(new[]
-            {
-                didShowNotificationObserver,
-                willChangeFrameNotificationObserver,
-                willHideNotification
-            });
+            if (TableViewDataSource != null)
+                TableViewDataSource.ViewIsActivated -= DataSource_ViewIsActivated;
         }
 
         #endregion
@@ -164,7 +179,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (refreshed)
                 return;
 
-            var ds = (DataSource)tableView.Source;
+            var ds = (DataSource)TableView.Source;
 
             if (CreationModeFlag == ShortcodeCreationModeFlag.New)
             {
@@ -190,7 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void SaveButton_Clicked(object sender, EventArgs e)
         {
-            if (!dataSource.IsFormCorrect())
+            if (!TableViewDataSource.IsFormCorrect())
                 return;
 
             var contentString = CreationModeFlag == ShortcodeCreationModeFlag.New ? Localization.GetString("adding_shortcode___") : Localization.GetString("editing_shortcode___");
@@ -198,7 +213,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                tableView.EndEditing(true);
+                TableView.EndEditing(true);
                 await Managers.ShortcodesManager.CreateOrUpdateShortcodeAsync(Shortcode, ShortcodePreview);
 
                 dismissAction();
@@ -207,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             catch (Exception ex)
             {
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
                 CommonConfig.Logger.Error($"Error while sending/editing shortcode [creationMode = {CreationModeFlag}, shortcodeId = {Shortcode?.Id}]", ex);
             }
         }
@@ -216,7 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var strings = new[] { Localization.GetString("add_from_contact"), Localization.GetString("add_empty") };
 
-            var choiceIndex = await Dialogs.ShowListDialogAsync(this, null, strings, tableView, cell);
+            var choiceIndex = await Dialogs.ShowListActionSheetAsync(this, strings, TableView, cell);
 
             if (choiceIndex == 0)
             {
@@ -240,19 +255,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Keyboard
 
-        void OnKeyboardDidShowNotification(NSNotification notification)
+        void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
         {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, true, true);
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(e.Notification), e.Notification, true, true);
         }
 
-        void OnKeyboardWillChangeFrameNotification(NSNotification notification)
+        void OnKeyboardWillChangeFrameNotification(object sender, UIKeyboardEventArgs e)
         {
-            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(notification), notification, false, false);
+            AdjustViewToKeyboard(UI.KeyboardHeightFromNotification(e.Notification), e.Notification, false, false);
         }
 
-        void OnKeyboardWillHideNotification(NSNotification notification)
+        void OnKeyboardWillHideNotification(object sender, UIKeyboardEventArgs e)
         {
-            AdjustViewToKeyboard(0f, notification, false, true);
+            AdjustViewToKeyboard(0f, e.Notification, false, true);
         }
 
         void AdjustViewToKeyboard(float keyboardHeight, NSNotification notification, bool adjustContentOffset, bool adjustInsets)
@@ -265,25 +280,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (adjustContentOffset && activeField != null)
             {
-                var difference = activeField.Frame.Bottom - tableView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
+                var difference = activeField.Frame.Bottom - TableView.ContentOffset.Y - (View.Frame.Height - keyboardHeight) + 10;
 
                 if (difference > 0)
                 {
-                    var co = tableView.ContentOffset;
+                    var co = TableView.ContentOffset;
                     co.Y += difference;
-                    tableView.SetContentOffset(co, true);
+                    TableView.SetContentOffset(co, true);
                 }
             }
 
             if (adjustInsets)
             {
-                var ci = tableView.ContentInset;
+                var ci = TableView.ContentInset;
                 ci.Bottom = keyboardHeight;
-                tableView.ContentInset = ci;
+                TableView.ContentInset = ci;
 
-                ci = tableView.ScrollIndicatorInsets;
+                ci = TableView.ScrollIndicatorInsets;
                 ci.Bottom = keyboardHeight;
-                tableView.ScrollIndicatorInsets = ci;
+                TableView.ScrollIndicatorInsets = ci;
             }
         }
 
@@ -291,18 +306,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
-            AddEditShortcodeViewController ViewController
-            {
-                get
-                {
-                    weakParentViewController.TryGetTarget(out AddEditShortcodeViewController controller);
-                    return controller;
-                }
-            }
-
-            WeakReference<AddEditShortcodeViewController> weakParentViewController;
-
-            public UITableView TableView;
+            WeakReference<AddEditShortcodeViewController> viewControllerWeakReference;
+            WeakReference<UITableView> tableViewWeakReference;
 
             public event EventHandler ViewIsActivated = delegate { };
 
@@ -312,8 +317,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public DataSource(AddEditShortcodeViewController viewController, UITableView tableView)
             {
-                weakParentViewController = new WeakReference<AddEditShortcodeViewController>(viewController);
-                TableView = tableView;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
                 InitializeSections();
             }
 
@@ -426,14 +431,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     section.InitializeRows();
                 }
 
-                TableView.ReloadData();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromNSRange(new NSRange(0, sections.Count)), UITableViewRowAnimation.Automatic);
             }
 
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
 
-                TableView = null;
+                tableViewWeakReference = null;
 
                 sections = null;
             }
@@ -451,7 +456,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             async Task<DocumentAddress> HeaderCellClicked(UITableViewCell cell)
             {
-                return ViewController == null ? null : await ViewController.ChooseAddress(cell);
+                var vc = viewControllerWeakReference.Unwrap();
+                return vc == null ? null : await vc.ChooseAddress(cell);
             }
 
             public int IndexForSection(AbstractSection section)
@@ -461,7 +467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             AbstractRow RowAtIndexPath(NSIndexPath indexPath)
             {
-                return sections[indexPath.Section].Rows[indexPath.Row];
+                return sections[indexPath.Section].Rows.ElementAtOrDefault(indexPath.Row);
             }
 
             [Export("gestureRecognizer:shouldReceiveTouch:")]
@@ -477,6 +483,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return true;
             }
 
+            public void Reset()
+            {
+                sections.Clear();
+
+                tableViewWeakReference.Unwrap()?.ReloadData();
+            }
+
             #region Support classes
 
             class SectionCollection : List<AbstractSection> { }
@@ -485,7 +498,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 public DataSource DataSource;
 
-                public UITableView TableView { get => DataSource.TableView; }
+                public UITableView TableView { get => DataSource.tableViewWeakReference.Unwrap(); }
                 public Shortcode Shortcode { get; set; }
                 public ShortcodePreview ShortcodePreview { get; set; }
                 public ShortcodeCreationModeFlag CreationModeFlag { get; set; }
@@ -508,7 +521,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         {
                             var sectionIndex = DataSource.IndexForSection(this);
                             var indexPath = NSIndexPath.FromRowSection(i, sectionIndex);
-                            TableView.ScrollToRow(indexPath, UITableViewScrollPosition.Middle, true);
+                            TableView?.ScrollToRow(indexPath, UITableViewScrollPosition.Middle, true);
                         }
 
                         valid &= isRowValid;
@@ -574,7 +587,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Shortcode.Addresses.Add(da);
                     Rows.Insert(Rows.Count - 1, new AddressRow(this, da));
-                    TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
                 public override void DeleteRow(NSIndexPath indexPath, AbstractRow row)
@@ -583,8 +596,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var ca = pnRow.Content;
                     Shortcode.Addresses.Remove(ca);
                     Rows.Remove(row);
-                    TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
-                    TableView.EndEditing(true);
+                    TableView?.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                    TableView?.EndEditing(true);
                 }
 
                 public async void HeaderCellClicked(UITableViewCell cell, NSIndexPath indexPath)
@@ -605,7 +618,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 protected AbstractSection Section;
 
                 public DataSource DataSource { get => Section.DataSource; }
-                public UITableView TableView { get => Section.DataSource.TableView; }
+                public UITableView TableView { get => Section.DataSource.tableViewWeakReference.Unwrap(); }
                 public Shortcode Shortcode { get => Section.Shortcode; }
                 public ShortcodePreview ShortcodePreview { get => Section.ShortcodePreview; }
                 public ShortcodeCreationModeFlag CreationMode { get => Section.CreationModeFlag; }
@@ -645,9 +658,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (Cell == null)
                         return;
 
-                    var indexPath = TableView.IndexPathForCell(Cell);
+                    var indexPath = TableView?.IndexPathForCell(Cell);
                     if (indexPath != null)
-                        TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                        TableView?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
                 public void SetErrorState(bool errorState, bool animate = true)

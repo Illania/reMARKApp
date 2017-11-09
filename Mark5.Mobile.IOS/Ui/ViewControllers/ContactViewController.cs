@@ -25,8 +25,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ContactViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
-        public bool Modal { get; set; }
-
         public bool Empty => folderId == null && folder == null && contactId == null && contactPreview == null && contact == null;
 
         int? folderId;
@@ -61,6 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public ContactViewController()
             : base(UITableViewStyle.Grouped)
         {
+            HidesBottomBarWhenPushed = true;
         }
 
         public override void LoadView()
@@ -83,9 +82,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            }
 
             InitializeHandlers();
             SubscribeToMessages();
@@ -127,7 +129,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -150,6 +152,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
             TableView.BackgroundColor = Theme.White;
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed));
 
@@ -314,12 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            if (Modal)
-            {
-                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
-            }
-            else
+            if (PresentingViewController == null)
             {
                 if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
                 {
@@ -330,6 +329,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     };
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
+            }
+            else
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
         }
 
@@ -418,7 +422,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactId = contactPreview.Id;
             contactPreview = null;
 
-            if (SplitViewController == null)
+            if (SplitViewController == null || SplitViewController.Collapsed)
                 refreshDataOnAppear = true;
             else
                 RefreshData();
@@ -472,7 +476,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("call"), formattedNumbers, (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, formattedNumbers, (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
@@ -500,7 +504,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListDialogAsync(this, Localization.GetString("show_on_map"), physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
             if (selectedItem < 0)
                 return;
 
@@ -515,13 +519,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 listString.Add(Localization.GetString("edit_contact"));
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
-                && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
-                listString.Add(Localization.GetString("add_person"));
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
                 && contactPreview.Type == ContactType.Company)
                 listString.Add(Localization.GetString("add_department"));
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
+                && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
+                listString.Add(Localization.GetString("add_person"));
 
-            var index = await Dialogs.ShowListDialogAsync(this, null, listString.ToArray(), editButtonItem);
+            var index = await Dialogs.ShowListActionSheetAsync(this, listString.ToArray(), editButtonItem);
             if (index < 0)
                 return;
 
@@ -531,6 +535,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = new AddEditContactViewController
                 {
+                    ContactType = contactPreview.Type,
                     ContactPreview = contactPreview,
                     Contact = contact,
                     CreationModeFlag = ContactCreationModeFlag.Edit
@@ -573,7 +578,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                UIAlertActionStyle.Default,
                                                a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview });
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, new List<IBusinessEntity> { contactPreview });
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
@@ -582,7 +587,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { contactPreview }, folder);
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, new List<IBusinessEntity> { contactPreview }, folder);
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
@@ -614,7 +619,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("links")
             };
 
-            var result = await Dialogs.ShowListDialogAsync(this, null, actionLinksListString, actionsLinksButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, actionsLinksButton);
             if (result < 0)
                 return;
 
@@ -658,13 +663,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
-            var vc = new ContactViewController
-            {
-                Modal = Modal
-            };
+            var vc = new ContactViewController();
             vc.SetData(contactPreview);
             vc.SetRefreshDataOnAppear();
-            NavigationController.PushViewController(vc, true);
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
@@ -815,7 +817,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     actionsLinksButton.Enabled = true;
 
                 if (editButtonItem != null)
+                {
                     editButtonItem.Enabled = true;
+                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                }
+
+                if (doneButtonItem != null)
+                    NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
 
                 ds.EndRefresh(this.contactPreview, contact);
             }
@@ -828,10 +836,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ds.Clear();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                if (SplitViewController == null)
-                    NavigationController.PopViewController(true);
+                if (SplitViewController == null || SplitViewController.Collapsed)
+                {
+                    if (PresentingViewController == null)
+                        NavigationController?.PopViewController(true);
+                    else
+                        DismissViewController(true, null);
+                }
             }
         }
 
@@ -877,12 +890,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (actionsLinksButton != null)
                 actionsLinksButton.Enabled = false;
 
+            NavigationItem.SetRightBarButtonItem(null, false);
+
             ((DataSource)TableView.Source)?.Clear();
         }
 
         async void RemoveFromFolder(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_contact"));
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
                 return;
 
@@ -901,21 +917,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while removing contact from folder [contactId={contact.Id}, folderId={folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
         async void Delete(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contact"));
-
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
                 return;
 
@@ -932,14 +948,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting contact [contactId={contact.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -1020,11 +1036,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void ScrollChanged(UIScrollView scrollView)
             {
-                var offset = scrollView.ContentOffset.Y;
-                var inset = -scrollView.SafeAreaInsets.Top;
-                var show = offset > inset + 30;
+                if (Integration.IsRunningAtLeast(11))
+                {
+                    var offset = scrollView.ContentOffset.Y;
+                    var inset = -scrollView.SafeAreaInsets.Top;
+                    var show = offset > inset + 30;
 
-                viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
+                    viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
+                }
             }
 
             public void StartRefresh()
@@ -1580,7 +1599,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
 
-            coder.Encode(Modal, "modal");
+            coder.Encode(PresentingViewController != null, "doNotRestore");
 
             if (folderId.HasValue)
                 coder.Encode(folderId.Value, "folderId");
@@ -1615,7 +1634,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
-            if (coder.DecodeBool("modal"))
+            if (coder.DecodeBool("doNotRestore"))
                 return null;
 
             return new ContactViewController();

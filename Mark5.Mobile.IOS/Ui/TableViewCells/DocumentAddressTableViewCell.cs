@@ -20,6 +20,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public DocumentAddressTableViewCell(NSString reuseIdentifier)
             : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
+
             typeLabel = new UILabel
             {
                 Font = Theme.DefaultFont.WithSize(11f),
@@ -63,23 +66,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     typeLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     typeLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     typeLabel.WidthAnchor.ConstraintEqualTo(27f),
-                    typeLabel.HeightAnchor.ConstraintEqualTo(17f),
 
                     topLabel.LeadingAnchor.ConstraintEqualTo(typeLabel.TrailingAnchor, 8f),
                     topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
-                    topLabel.HeightAnchor.ConstraintEqualTo(22f),
 
                     bottomLabel.LeadingAnchor.ConstraintEqualTo(typeLabel.TrailingAnchor, 8f),
                     bottomLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     bottomLabel.TopAnchor.ConstraintEqualTo(topLabel.BottomAnchor, 4f),
                     bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
-                    bottomLabel.HeightAnchor.ConstraintEqualTo(18f),
 
                     iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                    iconImage.WidthAnchor.ConstraintEqualTo(20f),
-                    iconImage.HeightAnchor.ConstraintEqualTo(20f)
+                    iconImage.WidthAnchor.ConstraintEqualTo(20f)
                 });
             }
             else
@@ -89,19 +88,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     typeLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     typeLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     typeLabel.WidthAnchor.ConstraintEqualTo(27f),
-                    typeLabel.HeightAnchor.ConstraintEqualTo(17f),
 
                     topLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     topLabel.LeadingAnchor.ConstraintEqualTo(typeLabel.TrailingAnchor, 8f),
                     topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 11f),
                     topLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -11f),
-                    topLabel.HeightAnchor.ConstraintEqualTo(22f),
 
                     iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                    iconImage.WidthAnchor.ConstraintEqualTo(20f),
-                    iconImage.HeightAnchor.ConstraintEqualTo(20f)
+                    iconImage.WidthAnchor.ConstraintEqualTo(20f)
                 });
             }
         }

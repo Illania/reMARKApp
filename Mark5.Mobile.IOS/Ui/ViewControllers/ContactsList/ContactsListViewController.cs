@@ -11,8 +11,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 {
     public class ContactsListViewController : AbstractContactsListViewController, IUIViewControllerRestoration
     {
-        protected UIBarButtonItem CreateContactItem;
-
         public ContactsListViewController()
             : base(false)
         {
@@ -32,10 +30,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
-                CreateContactItem = new UIBarButtonItem();
-                CreateContactItem.Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"));
-                NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
-                RightButton = CreateContactItem;
+                RightButton = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
+                };
+                NavigationItem.SetRightBarButtonItem(RightButton, false);
             }
         }
 
@@ -43,47 +42,44 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             base.InitializeHandlers();
 
-            if (CreateContactItem != null)
-                CreateContactItem.Clicked += CreateContactItem_Clicked;
+            if (RightButton != null)
+                RightButton.Clicked += RightButton_Clicked;
         }
 
         protected override void DeinitializeHandlers()
         {
             base.DeinitializeHandlers();
 
-            if (CreateContactItem != null)
-                CreateContactItem.Clicked -= CreateContactItem_Clicked;
+            if (RightButton != null)
+                RightButton.Clicked -= RightButton_Clicked;
         }
 
-        async void CreateContactItem_Clicked(object sender, EventArgs e)
+        async void RightButton_Clicked(object sender, EventArgs e)
         {
-            var choices = new[] { Localization.GetString("company"), Localization.GetString("department"), Localization.GetString("person") };
-            var choice = await Dialogs.ShowListDialogAsync(this, Localization.GetString("add_contact"), choices, CreateContactItem);
+            var choice = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("add_company"), Localization.GetString("add_department"), Localization.GetString("add_person") }, RightButton);
+            if (choice < 0)
+                return;
 
-            if (choice >= 0)
+            ContactType type = ContactType.None;
+            switch (choice)
             {
-                ContactType type = ContactType.None;
-                switch (choice)
-                {
-                    case 0:
-                        type = ContactType.Company;
-                        break;
-                    case 1:
-                        type = ContactType.Department;
-                        break;
-                    case 2:
-                        type = ContactType.Person;
-                        break;
-                }
-
-                var vc = new AddEditContactViewController
-                {
-                    CreationModeFlag = ContactCreationModeFlag.New,
-                    ContactType = type,
-                };
-
-                PresentViewController(new NavigationController(vc), true, null);
+                case 0:
+                    type = ContactType.Company;
+                    break;
+                case 1:
+                    type = ContactType.Department;
+                    break;
+                case 2:
+                    type = ContactType.Person;
+                    break;
             }
+
+            var vc = new AddEditContactViewController
+            {
+                CreationModeFlag = ContactCreationModeFlag.New,
+                ContactType = type,
+            };
+            PresentViewController(new NavigationController(vc), true, null);
         }
 
         protected override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)

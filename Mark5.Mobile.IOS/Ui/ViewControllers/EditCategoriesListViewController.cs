@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -36,9 +37,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
         }
@@ -70,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -107,6 +111,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.Source = new DataSource(TableView);
             TableView.AllowsSelection = true;
             TableView.AllowsMultipleSelection = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
         }
 
         void InitializeHandlers()
@@ -156,7 +162,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while retrieving available categories [businessEntity.id={BusinessEntityPreview.Id}, businessEntity.objectType={BusinessEntityPreview.ObjectType}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -193,7 +199,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 dismissAction();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -249,7 +255,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var c = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.Key) as CategoriesTableViewCell ?? CategoriesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
                 cell.Initialize(c);
 
                 cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
@@ -279,23 +285,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => CategoriesTableViewCell.Height;
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
-                
+
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
-                
+
                 cell.Accessory = UITableViewCellAccessory.None;
             }
 

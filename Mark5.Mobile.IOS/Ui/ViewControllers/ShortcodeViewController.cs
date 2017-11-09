@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,8 +25,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ShortcodeViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
-        public bool Modal { get; set; }
-
         public bool Empty => folderId == null && folder == null && shortcodeId == null && shortcodePreview == null && shortcode == null;
 
         int? folderId;
@@ -53,6 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public ShortcodeViewController()
             : base(UITableViewStyle.Grouped)
         {
+            HidesBottomBarWhenPushed = true;
         }
 
         public override void LoadView()
@@ -75,9 +74,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            }
 
             InitializeHandlers();
             SubscribeToMessages();
@@ -119,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -143,6 +145,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.Source = new DataSource(this, TableView);
             TableView.BackgroundColor = Theme.White;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
+
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(RowLongPressed));
 
             headerView = new UIView(new CGRect(0f, 0f, 0f, 160f))
@@ -213,12 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            if (Modal)
-            {
-                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
-            }
-            else
+            if (PresentingViewController == null)
             {
                 if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.EditAllowed)
                 {
@@ -229,6 +229,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     };
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
+            }
+            else
+            {
+                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
             }
         }
 
@@ -280,7 +285,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodeId = shortcodePreview.Id;
             shortcodePreview = null;
 
-            if (SplitViewController == null)
+            if (SplitViewController == null || SplitViewController.Collapsed)
                 refreshDataOnAppear = true;
             else
                 RefreshData();
@@ -345,7 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                UIAlertActionStyle.Default,
                                                a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview });
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, new List<IBusinessEntity> { shortcodePreview });
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
@@ -354,7 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
             {
-                var vc = new CopyMoveToFolderListViewController(new List<IBusinessEntity> { shortcodePreview }, folder);
+                var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, new List<IBusinessEntity> { shortcodePreview }, folder);
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
             }));
 
@@ -482,7 +487,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     fileToButton.Enabled = true;
 
                 if (editButtonItem != null)
+                {
                     editButtonItem.Enabled = true;
+                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                }
+
+                if (doneButtonItem != null)
+                    NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
 
                 ds.EndRefresh(this.shortcodePreview, shortcode);
             }
@@ -495,10 +506,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ds.Clear();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                if (SplitViewController == null)
-                    NavigationController.PopViewController(true);
+                if (SplitViewController == null || SplitViewController.Collapsed)
+                {
+                    if (PresentingViewController == null)
+                        NavigationController?.PopViewController(true);
+                    else
+                        DismissViewController(true, null);
+                }
             }
         }
 
@@ -522,12 +538,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (fileToButton != null)
                 fileToButton.Enabled = false;
 
+            NavigationItem.SetRightBarButtonItem(null, false);
+
             ((DataSource)TableView.Source)?.Clear();
         }
 
         async void RemoveFromFolder(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcode"));
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
                 return;
 
@@ -544,20 +563,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while removing shortcode from folder [shortcodeId={shortcode.Id}, folderId={folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
         async void Delete(UIAlertAction a)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcode"));
+            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
                 return;
 
@@ -574,14 +594,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                     ClearData();
                 else
-                    NavigationController.PopViewController(true);
+                    NavigationController?.PopViewController(true);
             }
             catch (Exception ex)
             {
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting shortcode [shortcodeId={shortcode.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -662,10 +682,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void ScrollChanged(UIScrollView scrollView)
             {
-                var offset = scrollView.ContentOffset.Y;
-                var inset = -scrollView.SafeAreaInsets.Top;
-                var show = offset > inset + 30;
-                viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
+                if (Integration.IsRunningAtLeast(11))
+                {
+                    var offset = scrollView.ContentOffset.Y;
+                    var inset = -scrollView.SafeAreaInsets.Top;
+                    var show = offset > inset + 30;
+                    viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
+                }
             }
 
             public void StartRefresh()
@@ -907,7 +930,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
 
-            coder.Encode(Modal, "modal");
+            coder.Encode(PresentingViewController != null, "doNotRestore");
 
             if (folderId.HasValue)
                 coder.Encode(folderId.Value, "folderId");
@@ -942,7 +965,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
-            if (coder.DecodeBool("modal"))
+            if (coder.DecodeBool("doNotRestore"))
                 return null;
 
             return new ShortcodeViewController();

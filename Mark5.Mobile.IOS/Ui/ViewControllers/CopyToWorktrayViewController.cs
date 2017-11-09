@@ -38,9 +38,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
         }
@@ -72,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -109,6 +112,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.Source = new DataSource(this, TableView);
             TableView.AllowsSelection = true;
             TableView.AllowsMultipleSelection = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
         }
 
         void InitializeHandlers()
@@ -131,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async void DoneItem_Clicked(object sender, EventArgs e)
@@ -150,7 +155,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Error("Could not copy to own worktray", ex);
 
                     dismissAction();
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
             }
 
@@ -169,11 +174,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Error("Could not copy to users' worktrays", ex);
 
                     dismissAction();
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
             }
 
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async Task RefreshData()
@@ -193,7 +198,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Could not refresh list of users", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -237,6 +242,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ownCell = tableView.DequeueReusableCell("ownCell") ?? UITableViewCellUtilities.CreateDefault("ownCell", UITableViewCellSelectionStyle.None);
                     ownCell.TextLabel.Text = Localization.GetString("own_worktray");
+
                     ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
                         ? UITableViewCellAccessory.Checkmark
                         : UITableViewCellAccessory.None;
@@ -285,7 +291,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
 
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
@@ -299,7 +305,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return;
 
                 cell.Accessory = UITableViewCellAccessory.None;

@@ -1,5 +1,6 @@
 ﻿using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
@@ -51,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             CurrentViewController = vc;
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -74,6 +75,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             CurrentViewController.View.RemoveFromSuperview();
             vc.View.Frame = View.Bounds;
             View.AddSubview(vc.View);
+            if (!Integration.IsRunningAtLeast(11))
+                NavigationController.View.SetNeedsLayout();
             if (vc.NavigationItem.LeftBarButtonItems != null)
                 NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
             else

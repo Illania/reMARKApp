@@ -20,6 +20,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
         protected async override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_contact___"));
@@ -35,24 +43,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 var emailAddresses = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email).Select(ca => ca.Address).ToArray();
                 if (emailAddresses.Any())
                 {
-                    var index = await Dialogs.ShowListDialogAsync(this, null, emailAddresses, cell);
+                    var index = await Dialogs.ShowListActionSheetAsync(this, emailAddresses, tableView, cell);
                     if (index < 0)
                         return;
 
                     var address = emailAddresses[index];
 
                     tcs.SetResult(new Recipient(contactPreview.Name, address, RecipientType.Contact));
+                    DismissViewController(true, null);
                 }
                 else
-                {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
-                }
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
             }
             catch (Exception ex)
             {
                 dismissAction();
                 CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {

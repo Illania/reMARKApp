@@ -13,7 +13,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         protected UILabel ContentLabel { get; set; }
 
         NSLayoutConstraint leftContentConstraint;
-        NSLayoutConstraint leftTitleConstraint;
 
         readonly UIButton chevronButton;
 
@@ -31,13 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             TitleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             TitleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(TitleLabel);
-            leftTitleConstraint = NSLayoutConstraint.Create(TitleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(TitleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(TitleLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
-                leftTitleConstraint,
-            });
 
             ContentLabel = new UILabel
             {
@@ -46,24 +38,26 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 Lines = 0,
             };
             ContentView.AddSubview(ContentLabel);
-            leftContentConstraint = NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, TitleLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.Height, 1f, 20f),
-                NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(ContentLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
-                leftContentConstraint,
-            });
 
             chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(chevronButton);
+
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentLabel, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, ContentLabel, NSLayoutAttribute.CenterY, 1f, 0f),
-                NSLayoutConstraint.Create(chevronButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
+                TitleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                TitleLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
+                TitleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+
+                ContentLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f),
+                ContentLabel.TopAnchor.ConstraintEqualTo(TitleLabel.TopAnchor),
+                ContentLabel.BottomAnchor.ConstraintEqualTo(TitleLabel.BottomAnchor),
+                leftContentConstraint = ContentLabel.LeadingAnchor.ConstraintEqualTo(TitleLabel.TrailingAnchor, InnerHorizontalMargin),
+
+                chevronButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                chevronButton.LeadingAnchor.ConstraintEqualTo(ContentLabel.TrailingAnchor, InnerHorizontalMargin),
+                chevronButton.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
             });
         }
 
@@ -71,12 +65,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         {
             if (string.IsNullOrEmpty(title))
             {
-                leftTitleConstraint.Constant = 0;
-                leftContentConstraint.Constant = HorizontalMargin;
+                leftContentConstraint.Constant = 0;
             }
             else
             {
-                leftTitleConstraint.Constant = HorizontalMargin;
                 leftContentConstraint.Constant = InnerHorizontalMargin;
                 TitleLabel.Text = title;
             }

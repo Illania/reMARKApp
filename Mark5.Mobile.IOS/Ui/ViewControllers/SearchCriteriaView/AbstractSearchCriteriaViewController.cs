@@ -14,6 +14,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 {
     public abstract class AbstractSearchCriteriaViewController : AbstractViewController
     {
+        const float BottomViewSize = 64f;
+
         UIBarButtonItem closeItem;
         UIBarButtonItem resetItem;
 
@@ -30,11 +32,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         WeakReference<UIView> activeViewWeakReference;
 
-        protected bool RestoreCriteriaFromStorage = true;
+        protected bool RestoreCriteriaFromStorage;
 
         public override void LoadView()
         {
             base.LoadView();
+
+            RestoreCriteriaFromStorage = true;
 
             Title = Localization.GetString("search");
 
@@ -77,16 +81,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             scrollView.AddSubview(StackView);
-            scrollView.AddConstraints(new[]
+
+            if (Integration.IsIPad())
             {
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
-                Integration.IsIPad()
-                    ? NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 500f)
-                    : NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
+                scrollView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.CenterX, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 500f)
+                });
+            }
+            else
+            {
+                scrollView.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
+                    NSLayoutConstraint.Create(StackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
+
+               });
+            }
 
             SearchButton = new UIButton
             {
@@ -106,7 +123,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f)
             });
 
-            searchButtonBottomConstraint1 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, -8f);
+            if (Integration.IsRunningAtLeast(11))
+                searchButtonBottomConstraint1 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, -8f);
+            else
+                searchButtonBottomConstraint1 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, BottomLayoutGuide, NSLayoutAttribute.Top, 1f, -8f);
+
             searchButtonBottomConstraint2 = NSLayoutConstraint.Create(SearchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0);
             searchButtonBottomConstraint2.Active = false;
 
@@ -121,9 +142,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = false;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = false;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             closeItem.Clicked += CloseItem_Clicked;
             resetItem.Clicked += ResetItem_Clicked;
@@ -161,7 +185,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             willHideNotificationObserver?.Dispose();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -190,7 +214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             if (NavigationController != null)
                 NavigationController.ModalTransitionStyle = UIModalTransitionStyle.CoverVertical;
-            
+
             DismissViewController(true, null);
         }
 
@@ -213,28 +237,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         void AdjustViewToKeyboard(UIKeyboardEventArgs e)
         {
             var keyboardOffset = scrollView.Frame.Bottom - e.FrameEnd.Top;
-            var safeAreaOffset = keyboardOffset;
 
-            if (keyboardOffset > 0)
+            if (Integration.IsRunningAtLeast(11))
             {
-                safeAreaOffset += 75f;
+                var safeAreaOffset = keyboardOffset;
 
-                searchButtonBottomConstraint1.Active = false;
-                searchButtonBottomConstraint2.Active = true;
-                searchButtonBottomConstraint2.Constant = -keyboardOffset - 8f;
+                if (keyboardOffset > 0)
+                {
+                    safeAreaOffset += 75f;
+
+                    searchButtonBottomConstraint1.Active = false;
+                    searchButtonBottomConstraint2.Active = true;
+                    searchButtonBottomConstraint2.Constant = -keyboardOffset - 8f;
+                }
+                else
+                {
+                    searchButtonBottomConstraint1.Active = true;
+                    searchButtonBottomConstraint2.Active = false;
+                    searchButtonBottomConstraint2.Constant = 0f;
+                }
+
+                UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
+                {
+                    AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, safeAreaOffset, 0f);
+                    View.LayoutIfNeeded();
+                }, null);
             }
             else
             {
-                searchButtonBottomConstraint1.Active = true;
-                searchButtonBottomConstraint2.Active = false;
-                searchButtonBottomConstraint2.Constant = 0f;
-            }
+                scrollView.ContentInset = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardOffset, 0f);
+                scrollView.ScrollIndicatorInsets = new UIEdgeInsets(NavigationController.NavigationBar.Frame.Bottom, 0f, BottomViewSize + keyboardOffset, 0f);
 
-            UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
-            {
-                AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, safeAreaOffset, 0f);
-                View.LayoutIfNeeded();
-            }, null);
+                UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
+                {
+                    searchButtonBottomConstraint1.Constant = -keyboardOffset - 8f;
+                    View.LayoutIfNeeded();
+                }, null);
+
+                var activeField = activeViewWeakReference.Unwrap();
+
+                if (activeField != null)
+                {
+                    var difference = activeField.Frame.Bottom - scrollView.ContentOffset.Y - (View.Frame.Height - keyboardOffset - BottomViewSize) + 10;
+
+                    if (difference > 0)
+                    {
+                        var co = scrollView.ContentOffset;
+                        co.Y += difference;
+                        scrollView.ContentOffset = co;
+                    }
+                }
+            }
         }
 
         protected abstract class AbstractSearchView : UIStackView

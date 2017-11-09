@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -44,9 +45,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = false;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
 
@@ -85,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -120,6 +124,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.Source = new DataSource(this, TableView);
             TableView.AllowsMultipleSelectionDuringEditing = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
 
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(ShortcodePreviewLongPressed));
         }
@@ -154,6 +160,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             var rows = TableView.IndexPathsForSelectedRows.ToArray();
             var selectedShortcodes = rows.Select(ip => ((DataSource)TableView.Source).FindItemAtIndexPath(ip)).ToList();
@@ -175,12 +182,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                eas.PopoverPresentationController.Delegate = d;
 
             exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -207,7 +214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Could not refresh shortcodes list [criteria={Criteria}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
                 NavigationController?.PopViewController(true);
             }
@@ -234,6 +241,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
+
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+                return;
 
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
@@ -272,6 +282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void ShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
                 UIAlertActionStyle.Default,
@@ -290,12 +301,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
+                eas.PopoverPresentationController.Delegate = d;
 
             exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -313,13 +324,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void Delete(ShortcodePreview selectedShortcode) =>
-            Delete(new List<ShortcodePreview> { selectedShortcode });
+        void Delete(ShortcodePreview selectedShortcode, UIPopoverPresentationControllerDelegate d) =>
+            Delete(new List<ShortcodePreview> { selectedShortcode }, d);
 
-        async void Delete(List<ShortcodePreview> selectedShortcodes)
+        async void Delete(List<ShortcodePreview> selectedShortcodes, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcodes"));
-
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
             {
                 EndEditing();
@@ -345,7 +355,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting shortcodes", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -354,7 +364,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
-            var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -405,12 +415,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var cp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.DefaultId) as ShortcodesTableViewCell ?? new ShortcodesTableViewCell();
                 cell.Initialize(cp);
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ShortcodesTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {
@@ -448,14 +456,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -488,10 +489,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var cp = items[indexPath.Section][indexPath.Row];

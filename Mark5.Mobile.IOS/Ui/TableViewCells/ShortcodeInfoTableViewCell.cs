@@ -15,6 +15,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public ShortcodeInfoTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
+
             topLabel = new UILabel
             {
                 Font = Theme.DefaultFont.WithRelativeSize(-2f),
@@ -25,12 +28,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             bottomTextView = new UITextView
             {
+                Selectable = false,
                 Editable = false,
                 ScrollEnabled = false,
                 ClipsToBounds = false,
                 TextContainerInset = UIEdgeInsets.Zero,
+                UserInteractionEnabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            bottomTextView.ApplyTheme();
             bottomTextView.TextContainer.LineFragmentPadding = 0f;
 
             ContentView.Add(topLabel);
@@ -41,7 +47,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 topLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
                 topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
-                topLabel.HeightAnchor.ConstraintEqualTo(22f),
 
                 bottomTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 bottomTextView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
@@ -52,14 +57,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(string type, string info, bool enableDataDetection = false)
         {
-            Initialize(type, new NSAttributedString(info, new UIStringAttributes { Font = Theme.DefaultFont }), enableDataDetection);
-        }
-
-        public void Initialize(string type, NSAttributedString info, bool dataDetection = false)
-        {
             topLabel.Text = type.ToUpper();
-            bottomTextView.AttributedText = info;
-            bottomTextView.DataDetectorTypes = dataDetection ? UIDataDetectorType.All : UIDataDetectorType.None;
+            bottomTextView.Text = info;
+            bottomTextView.DataDetectorTypes = enableDataDetection ? UIDataDetectorType.All : UIDataDetectorType.None;
         }
     }
 }

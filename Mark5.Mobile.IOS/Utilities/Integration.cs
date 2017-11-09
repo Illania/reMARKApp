@@ -125,7 +125,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -181,7 +181,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -209,7 +209,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -239,7 +239,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -269,7 +269,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -317,7 +317,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -365,7 +365,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -397,7 +397,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 

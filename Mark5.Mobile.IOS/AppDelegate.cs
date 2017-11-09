@@ -99,10 +99,9 @@ namespace Mark5.Mobile.IOS
 
                     if (n != null && n.ObjectType == ObjectType.Document)
                     {
-                        var vc = new DocumentViewController { Modal = true };
+                        var vc = new DocumentViewController();
                         vc.SetRefreshDataOnAppear();
                         vc.SetData(n.ObjectId);
-
                         Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                     }
                 }
@@ -154,7 +153,7 @@ namespace Mark5.Mobile.IOS
                 return Window.RootViewController;
 
             if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))
-                return new NavigationController
+                return new DarkNavigationController
                 {
                     ModalPresentationStyle = UIModalPresentationStyle.FullScreen,
                     ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
@@ -257,7 +256,7 @@ namespace Mark5.Mobile.IOS
 
                 if (n.ObjectType == ObjectType.Document)
                 {
-                    var vc = new DocumentViewController { Modal = true };
+                    var vc = new DocumentViewController();
                     vc.SetRefreshDataOnAppear();
                     vc.SetData(n.ObjectId);
 

@@ -3,6 +3,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -27,8 +28,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ViewControllers = new UIViewController[]
             {
-                new BrowseFoldersListViewController(moduleType),
-                new NotificationsListViewController(moduleType.ObjectTypes())
+                 new BrowseFoldersListViewController(moduleType),
+                 new NotificationsListViewController(moduleType.ObjectTypes())
             };
         }
 
@@ -44,25 +45,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
         }
 
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
 
-                if (ni.SearchController == null)
-                    ni.SearchController = CurrentViewController?.NavigationItem?.SearchController;
-            });
+                    if (ni.SearchController == null)
+                        ni.SearchController = CurrentViewController?.NavigationItem?.SearchController;
+                });
+            }
         }
 
         static string GetTitleForModule(ModuleType moduleType)
@@ -89,8 +96,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.EncodeRestorableState(coder);
             coder.Encode((int)moduleType, "moduleType");
             coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
-            coder.Encode(ViewControllers[0], "vc_0");
-            coder.Encode(ViewControllers[1], "vc_1");
         }
 
         public override void DecodeRestorableState(NSCoder coder)

@@ -51,11 +51,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
-            TableView.InsetsContentViewsToSafeArea = true;
+                TableView.InsetsContentViewsToSafeArea = true;
+            }
+
 
             RefreshHiddenSettings();
         }
@@ -117,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
                 if (cell == null)
                 {
-                    cell = (EditTextViewCell)EditTextViewCell.Nib.Instantiate(null, null)[0];
+                    cell = new EditTextViewCell();
                     cell.ContentChanged += (sender, e) => PlatformConfig.Preferences.LocalTemplate = cell.Content;
                 }
                 cell.Content = PlatformConfig.Preferences.LocalTemplate;
@@ -197,7 +201,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     if (!SystemReportCollector.CanMailReport)
                     {
-                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
                         return;
                     }
 
@@ -214,7 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Error("Could not mail system report", ex);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 }
 
 
@@ -240,7 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Error("Could not share system report", ex);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 }
 
                 return;
@@ -265,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     CommonConfig.Logger.Error("Could not retrieve system settings!", ex);
 
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
 
                 return;
@@ -289,7 +293,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 dismissAction();
 
-                Dialogs.ShowBlockingDialog(this, Localization.GetString("please_restart"));
+                Dialogs.ShowBlockingAlert(this, Localization.GetString("please_restart"));
 
                 return;
             }
@@ -308,7 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var key = n.Object.ToString();
 
             if (key == UseServerTimezoneKey)
-                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
 
             if (key == DocumentsToDownloadKey)
             {
@@ -345,7 +349,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cell.TextLabel.Font = Theme.DefaultFont;
                 if (cell.DetailTextLabel != null)
                     cell.DetailTextLabel.Font = Theme.DefaultLightFont;
-                
+
                 return cell;
             }
         }

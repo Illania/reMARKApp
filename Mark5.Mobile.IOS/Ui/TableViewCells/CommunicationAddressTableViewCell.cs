@@ -21,6 +21,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public CommunicationAddressTableViewCell(NSString reuseIdentifier)
             : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
+
             topLabel = new UILabel
             {
                 Font = Theme.DefaultFont.WithRelativeSize(-2f),
@@ -63,18 +66,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
                     topLabel.BottomAnchor.ConstraintEqualTo(middleLabel.TopAnchor, -4f),
-                    topLabel.HeightAnchor.ConstraintEqualTo(20f),
 
                     middleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     middleLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     middleLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                    middleLabel.HeightAnchor.ConstraintEqualTo(22f),
 
                     bottomLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     bottomLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     bottomLabel.TopAnchor.ConstraintEqualTo(middleLabel.BottomAnchor, 2f),
                     bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
-                    bottomLabel.HeightAnchor.ConstraintEqualTo(18f),
 
                     iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
@@ -90,12 +90,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
                     topLabel.BottomAnchor.ConstraintEqualTo(middleLabel.TopAnchor, -4f),
-                    topLabel.HeightAnchor.ConstraintEqualTo(20f),
-                    
+
                     middleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     middleLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
                     middleLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
-                    middleLabel.HeightAnchor.ConstraintEqualTo(22f),
 
                     iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                     iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
@@ -108,27 +106,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public void Initialize(CommunicationAddress ca)
         {
             topLabel.Text = GetTypeText(ca.Type).ToUpper();
+            middleLabel.Text = GetAddressFormatted(ca);
 
             switch (ca.Type)
             {
                 case CommunicationAddressType.Email:
-                    middleLabel.Text = ca.Address;
                     iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case CommunicationAddressType.Mobile:
-                    middleLabel.Text = GetAddressFormatted(ca);
                     iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case CommunicationAddressType.Phone:
-                    middleLabel.Text = GetAddressFormatted(ca);
                     iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
-                case CommunicationAddressType.Fax:
-                    middleLabel.Text = GetAddressFormatted(ca);
-                    iconImage.Image = null;
-                    break;
                 default:
-                    middleLabel.Text = ca.Address;
                     iconImage.Image = null;
                     break;
             }

@@ -45,9 +45,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
 
             InitializeHandlers();
         }
@@ -61,16 +65,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
 
-                if (ni.SearchController == null)
-                    ni.SearchController = searchController;
-            });
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -90,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -126,6 +133,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
         }
 
         void InitializeSearchBar()
@@ -135,6 +144,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var searchResultsController = new UITableViewController();
             var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView);
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 40f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
             searchController = new UISearchController(searchResultsController)
             {
@@ -144,6 +155,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SearchResultsUpdater = this
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         void InitializeHandlers()
@@ -176,12 +192,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Error while retrieving template previews", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
                 tcs.SetResult(null);
+                DismissViewController(true, null);
             }
         }
 
-        public void TemplateSelected(TemplatePreview tp) => tcs.SetResult(tp);
+        public void TemplateSelected(TemplatePreview tp)
+        {
+            tcs.SetResult(tp);
+
+            if (searchController != null && searchController.Active)
+                searchController.Active = false;
+
+            DismissViewController(true, null);
+        }
 
         public void UpdateSearchResultsForSearchController(UISearchController searchController)
         {
@@ -217,7 +242,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var searchDataSource = tableViewController?.TableView?.Source as SearchDataSource;
             searchDataSource?.Reset();
 
-            await System.Threading.Tasks.Task.Delay(500);
+            await Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
@@ -405,10 +430,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var tp = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.TemplateSelected(tp);
             }

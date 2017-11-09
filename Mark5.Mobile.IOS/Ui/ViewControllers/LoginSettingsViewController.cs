@@ -96,11 +96,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!sslEnabled)
                 {
-                    SetHiddenKeys(new[]
-                        {
-                            AcceptSelfSignedKey
-                        },
-                        true);
+                    SetHiddenKeys(new[] { AcceptSelfSignedKey }, true);
                     SettingsStore.SetBool(false, AcceptSelfSignedKey);
                 }
                 else

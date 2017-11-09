@@ -23,12 +23,26 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Awaitable dialogs
 
-        public static Task<bool> ShowYesNoDialogAsync(UIViewController vc, string title, string content)
+        public static Task ShowConfirmAlertAsync(UIViewController vc, string title, string content)
         {
-            return ShowYesNoDialogAsync(vc, title, content, Localization.GetString("yes"), Localization.GetString("no"));
+            return ShowConfirmAlertAsync(vc, title, content, Localization.GetString("ok"));
         }
 
-        public static Task<bool> ShowYesNoDialogAsync(UIViewController vc, string title, string content, string positiveText, string negativeText)
+        public static Task ShowConfirmAlertAsync(UIViewController vc, string title, string content, string confirmationText)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
+            alert.AddAction(UIAlertAction.Create(confirmationText, UIAlertActionStyle.Default, a => tcs.SetResult(true)));
+            vc.PresentViewController(alert, true, null);
+            return tcs.Task;
+        }
+
+        public static Task<bool> ShowYesNoAlertAsync(UIViewController vc, string title, string content)
+        {
+            return ShowYesNoAlertAsync(vc, title, content, Localization.GetString("yes"), Localization.GetString("no"));
+        }
+
+        public static Task<bool> ShowYesNoAlertAsync(UIViewController vc, string title, string content, string positiveText, string negativeText)
         {
             var tcs = new TaskCompletionSource<bool>();
             var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
@@ -38,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowYesNoCancelDialogAsync(UIViewController vc, string title, string content, string yesText, string noText, string cancelText)
+        public static Task<int> ShowYesNoCancelAlertAsync(UIViewController vc, string title, string content, string yesText, string noText, string cancelText)
         {
             var tcs = new TaskCompletionSource<int>();
             var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
@@ -49,70 +63,72 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content) =>
-            ShowConfirmDialogAsync(vc, title, content, Localization.GetString("ok"));
+        public static Task<bool> ShowDestructiveActionSheetAsync(UIViewController vc, string destructiveText, UIView anchorView)
+        {
+            return ShowDestructiveActionSheetAsync(vc, destructiveText, new PopoverPresentationControllerDelegate(anchorView));
+        }
 
-        public static Task ShowConfirmDialogAsync(UIViewController vc, string title, string content, string confirmationText)
+        public static Task<bool> ShowDestructiveActionSheetAsync(UIViewController vc, string destructiveText, UIBarButtonItem anchorBarButtonItem)
+        {
+            return ShowDestructiveActionSheetAsync(vc, destructiveText, new PopoverPresentationControllerDelegate(anchorBarButtonItem));
+        }
+
+        public static Task<bool> ShowDestructiveActionSheetAsync(UIViewController vc, string destructiveText, UITableView tableView, UITableViewCell anchorCell)
+        {
+            return ShowDestructiveActionSheetAsync(vc, destructiveText, new PopoverPresentationControllerDelegate(tableView, anchorCell));
+        }
+
+        public static Task<bool> ShowDestructiveActionSheetAsync(UIViewController vc, string destructiveText, UIPopoverPresentationControllerDelegate d)
         {
             var tcs = new TaskCompletionSource<bool>();
-            var alert = UIAlertController.Create(title, content, UIAlertControllerStyle.Alert);
-            alert.AddAction(UIAlertAction.Create(confirmationText, UIAlertActionStyle.Default, a => tcs.SetResult(true)));
-            vc.PresentViewController(alert, true, null);
-            return tcs.Task;
-        }
-
-        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIView anchorView)
-        {
-            var tcs = new TaskCompletionSource<int>();
-            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            var actionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            actionSheet.AddAction(UIAlertAction.Create(destructiveText, UIAlertActionStyle.Destructive, a => tcs.SetResult(true)));
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(false)));
             if (actionSheet.PopoverPresentationController != null)
-                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorView);
+                actionSheet.PopoverPresentationController.Delegate = d;
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UIBarButtonItem anchorBarButtonItem)
+        public static Task<int> ShowListActionSheetAsync(UIViewController vc, string[] listStrings, UIView anchorView)
+        {
+            return ShowListActionSheetAsync(vc, listStrings, new PopoverPresentationControllerDelegate(anchorView));
+        }
+
+        public static Task<int> ShowListActionSheetAsync(UIViewController vc, string[] listStrings, UIBarButtonItem anchorBarButtonItem)
+        {
+            return ShowListActionSheetAsync(vc, listStrings, new PopoverPresentationControllerDelegate(anchorBarButtonItem));
+        }
+
+        public static Task<int> ShowListActionSheetAsync(UIViewController vc, string[] listStrings, UITableView tableView, UITableViewCell anchorCell)
+        {
+            return ShowListActionSheetAsync(vc, listStrings, new PopoverPresentationControllerDelegate(tableView, anchorCell));
+        }
+
+        public static Task<int> ShowListActionSheetAsync(UIViewController vc, string[] listStrings, UIPopoverPresentationControllerDelegate d)
         {
             var tcs = new TaskCompletionSource<int>();
-            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
+            var actionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            for (var i = 0; i < listStrings.Length; i++)
+            {
+                var ii = i;
+                actionSheet.AddAction(UIAlertAction.Create(listStrings[ii], UIAlertActionStyle.Default, a => tcs.SetResult(ii)));
+            }
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
             if (actionSheet.PopoverPresentationController != null)
-                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(anchorBarButtonItem);
+                actionSheet.PopoverPresentationController.Delegate = d;
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
         }
 
-        public static Task<int> ShowListDialogAsync(UIViewController vc, string message, string[] listStrings, UITableView tableView, UITableViewCell anchorCell)
-        {
-            var tcs = new TaskCompletionSource<int>();
-            var actionSheet = PrepareLisDialogActionSheet(tcs, message, listStrings);
-            if (actionSheet.PopoverPresentationController != null)
-                actionSheet.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(tableView, anchorCell);
-            vc.PresentViewController(actionSheet, true, null);
-            return tcs.Task;
-        }
-
-        public static Task<T[]> ShowMultiSelectDialogAsync<T>(UIViewController vc, string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
+        public static Task<T[]> ShowMultiSelectViewControllerAsync<T>(UIViewController vc, string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
         {
             var msvc = new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer);
             vc.PresentViewController(new NavigationController(msvc, UIModalPresentationStyle.FormSheet), true, null);
             return msvc.Result;
         }
 
-        static UIAlertController PrepareLisDialogActionSheet(TaskCompletionSource<int> tcs, string message, string[] listStrings)
-        {
-            var actionSheet = UIAlertController.Create(null, message, UIAlertControllerStyle.ActionSheet);
-
-            for (var i = 0; i < listStrings.Length; i++)
-            {
-                var ab = i;
-                actionSheet.AddAction(UIAlertAction.Create(listStrings[ab], UIAlertActionStyle.Default, a => tcs.SetResult(ab)));
-            }
-
-            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
-            return actionSheet;
-        }
-
-        public static void ShowBlockingDialog(UIViewController vc, string content)
+        public static void ShowBlockingAlert(UIViewController vc, string content)
         {
             var alert = UIAlertController.Create(null, content, UIAlertControllerStyle.Alert);
             vc.PresentViewController(alert, true, null);
@@ -132,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Error dialogs
 
-        public static Task ShowErrorDialogAsync(UIViewController vc, Exception ex)
+        public static Task ShowErrorAlertAsync(UIViewController vc, Exception ex)
         {
             var hapticGenerator = new UINotificationFeedbackGenerator();
             hapticGenerator.Prepare();
@@ -141,28 +157,28 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
             if (ShouldShowCreateReport(ex))
+            {
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"),
-                    UIAlertActionStyle.Cancel,
-                    a =>
+                                                     UIAlertActionStyle.Cancel,
+                                                     a =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
                     {
-                        var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                            .ContinueWith(t =>
-                                {
-                                    dismissAction();
+                        dismissAction();
 
-                                    if (!t.IsFaulted)
-                                        vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
-                                    else
-                                        tcs.SetResult(true);
-                                },
-                                TaskScheduler.FromCurrentSynchronizationContext());
-                    }));
+                        if (!t.IsFaulted)
+                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                        else
+                            tcs.SetResult(true);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
             return tcs.Task;
         }
 
-        public static void ShowErrorDialog(UIViewController vc, Exception ex)
+        public static void ShowErrorAlert(UIViewController vc, Exception ex)
         {
             var hapticGenerator = new UINotificationFeedbackGenerator();
             hapticGenerator.Prepare();
@@ -170,21 +186,21 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, null));
             if (ShouldShowCreateReport(ex))
+            {
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("report"),
-                    UIAlertActionStyle.Cancel,
-                    a =>
+                                                     UIAlertActionStyle.Cancel,
+                                                     a =>
+                {
+                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
                     {
-                        var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                            .ContinueWith(t =>
-                                {
-                                    dismissAction();
+                        dismissAction();
 
-                                    if (!t.IsFaulted)
-                                        vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
-                                },
-                                TaskScheduler.FromCurrentSynchronizationContext());
-                    }));
+                        if (!t.IsFaulted)
+                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
+            }
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
         }
 

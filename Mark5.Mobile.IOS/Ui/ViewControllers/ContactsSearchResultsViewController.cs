@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -44,9 +45,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = false;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
 
@@ -85,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -117,6 +121,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.Source = new DataSource(this, TableView);
             TableView.AllowsMultipleSelectionDuringEditing = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
 
             TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(ContactPreviewLongPressed));
         }
@@ -151,6 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             var rows = TableView.IndexPathsForSelectedRows.ToArray();
             var selectedContacts = rows.Select(ip => ((DataSource)TableView.Source).FindItemAtIndexPath(ip)).ToList();
@@ -172,12 +179,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContacts)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContacts, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                eas.PopoverPresentationController.Delegate = d;
 
             exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -204,7 +211,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Could not refresh contacts list [criteria={Criteria}]", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
                 NavigationController?.PopViewController(true);
             }
@@ -232,6 +239,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+                return;
+
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
@@ -242,6 +252,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void ShowMoreActionSheet(NSIndexPath indexPath, ContactPreview selectedContact)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
                 UIAlertActionStyle.Default,
@@ -260,12 +271,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContact)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContact, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
+                eas.PopoverPresentationController.Delegate = d;
 
             exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -288,17 +299,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CopyToFolder(List<ContactPreview> selectedContacts)
         {
-            var vc = new CopyMoveToFolderListViewController(selectedContacts.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, selectedContacts.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void Delete(ContactPreview selectedContact) =>
-            Delete(new List<ContactPreview> { selectedContact });
+        void Delete(ContactPreview selectedContact, UIPopoverPresentationControllerDelegate d) =>
+            Delete(new List<ContactPreview> { selectedContact }, d);
 
-        async void Delete(List<ContactPreview> selectedContacts)
+        async void Delete(List<ContactPreview> selectedContacts, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_contacts"));
-
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
             {
                 EndEditing();
@@ -324,7 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting contacts", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -387,12 +397,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var cp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ContactsTableViewCell.Key) as ContactsTableViewCell ?? ContactsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ContactsTableViewCell.DefaultId) as ContactsTableViewCell ?? new ContactsTableViewCell();
                 cell.Initialize(cp);
                 return cell;
             }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ContactsTableViewCell.Height;
 
             public override nint NumberOfSections(UITableView tableView)
             {
@@ -430,14 +438,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return false;
-
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -470,10 +471,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
-                    return;
-
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
                 var cp = items[indexPath.Section][indexPath.Row];

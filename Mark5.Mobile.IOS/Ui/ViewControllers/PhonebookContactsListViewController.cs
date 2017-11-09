@@ -39,9 +39,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
         }
@@ -87,7 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -123,6 +126,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView, Localization.GetString("phonebook_contacts_empty"));
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 20f;
         }
 
         void InitializeSearchBar()
@@ -132,6 +137,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var searchResultsController = new UITableViewController();
             var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_phonebook_matching"));
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 20f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
             searchController = new UISearchController(searchResultsController)
             {
@@ -166,14 +173,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var ex = t.Exception.InnerException;
                     CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                     tcs.SetResult(null);
                     return;
                 }
 
                 if (t.Result == null)
                 {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("phonebook_contacts_no_access_title"),
                                                          Localization.GetString("phonebook_contacts_no_access_content"));
                     tcs.SetResult(null);
                 }
@@ -182,9 +189,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void ExitItem_Clicked(object sender, EventArgs e) => tcs.SetResult(null);
+        void ExitItem_Clicked(object sender, EventArgs e)
+        {
+            tcs.SetResult(null);
+            DismissViewController(true, null);
+        }
 
-        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell) => tcs.SetResult(pb);
+        public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell)
+        {
+            tcs.SetResult(pb);
+            DismissViewController(true, null);
+        }
 
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {
@@ -311,16 +326,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var ra = items[indexPath.Section][indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.PhonebookAddressSelected(ra, tableView.CellAt(indexPath));
             }
 
             public override string[] SectionIndexTitles(UITableView tableView) => items.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper())
-                                                                                                         .ToArray();
+                                                                                       .ToArray();
 
             public void SetItems(List<Recipient> phonebookContacts)
             {

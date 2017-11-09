@@ -33,9 +33,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
         }
@@ -67,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -95,6 +98,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 20f;
         }
 
         void InitializeHandlers()
@@ -119,7 +124,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while retrieving recent addresses", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
                 tcs.SetResult(null);
             }
             finally
@@ -131,11 +136,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void RecentAddressSelected(RecentAddress ra)
         {
             tcs.SetResult(new Recipient(ra));
+            DismissViewController(true, null);
         }
 
         void ExitEditItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
+            DismissViewController(true, null);
         }
 
         class DataSource : UITableViewSource
@@ -193,10 +200,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var ra = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.RecentAddressSelected(ra);
             }

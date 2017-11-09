@@ -58,10 +58,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(dateTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(dateTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(dateTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(dateTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
+                dateTextField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                dateTextField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, - VerticalMargin),
+                dateTextField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                dateTextField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
             });
         }
 

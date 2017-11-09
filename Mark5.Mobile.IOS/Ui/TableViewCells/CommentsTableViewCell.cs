@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -11,45 +10,85 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class CommentsTableViewCell : UITableViewCell
+    public class CommentsTableViewCell : UITableViewCell
     {
-        public const float Height = 68f;
+        public static readonly NSString DefaultId = new NSString(nameof(CommentsTableViewCell));
 
-        public static readonly NSString Key = new NSString("CommentsTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("CommentsTableViewCell", NSBundle.MainBundle);
+        readonly UILabel authorLabel;
+        readonly UILabel dateLabel;
+        readonly UITextView commentTextView;
 
-        public Comment Comment { get; private set; }
-
-        protected CommentsTableViewCell(IntPtr handle)
-            : base(handle)
+        public CommentsTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
-        }
+            SelectionStyle = UITableViewCellSelectionStyle.None;
+            Accessory = UITableViewCellAccessory.None;
 
-        public static CommentsTableViewCell Create()
-        {
-            var cell = (CommentsTableViewCell) Nib.Instantiate(null, null)[0];
+            authorLabel = new UILabel
+            {
+                Font = Theme.DefaultBoldFont,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
 
-            cell.CommentAuthorLabel.Font = Theme.DefaultBoldFont;
-            cell.DateAddedLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-2f);
-            cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+            dateLabel = new UILabel
+            {
+                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                TextColor = Theme.DarkGray,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            dateLabel.SetContentHuggingPriority(1000f, UILayoutConstraintAxis.Horizontal);
+            dateLabel.SetContentCompressionResistancePriority(1000f, UILayoutConstraintAxis.Horizontal);
 
-            return cell;
-        }
+            commentTextView = new UITextView
+            {
+                Selectable = false,
+                Editable = false,
+                ScrollEnabled = false,
+                ClipsToBounds = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            commentTextView.ApplyTheme();
+            commentTextView.TextContainer.LineFragmentPadding = 0f;
 
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
+            ContentView.AddSubview(authorLabel);
+            ContentView.AddSubview(dateLabel);
+            ContentView.AddSubview(commentTextView);
 
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
+            ContentView.AddConstraints(new[]
+            {
+                authorLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                authorLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
+
+                dateLabel.LeadingAnchor.ConstraintEqualTo(authorLabel.TrailingAnchor, 8f),
+                dateLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                dateLabel.CenterYAnchor.ConstraintEqualTo(authorLabel.CenterYAnchor),
+
+                commentTextView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                commentTextView.TopAnchor.ConstraintEqualTo(authorLabel.BottomAnchor, 4f),
+                commentTextView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                commentTextView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -4f),
+                commentTextView.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
+
+            });
+
         }
 
         public void Initialize(Comment comment)
         {
-            Comment = comment;
+            authorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id
+                ? Localization.GetString("me")
+                : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
 
-            CommentAuthorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id ? Localization.GetString("me") : comment.UserName.ToUpper(CultureInfo.CurrentCulture);
-            DateAddedLabel.Text = comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
-            CommentContentLabel.Text = comment.Content;
+            dateLabel.Text = comment.DateAddedTimestamp
+                .ConvertTimestampMillisecondsToDateTime()
+                .ConvertUtcToUserTime()
+                .ConvertDateTimeToTimestampMilliseconds()
+                .FormatUserTimestampAsCompactLongDateTimeString();
+
+            commentTextView.Text = comment.Content;
         }
     }
 }

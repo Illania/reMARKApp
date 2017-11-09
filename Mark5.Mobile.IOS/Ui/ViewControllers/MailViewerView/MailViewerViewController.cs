@@ -17,6 +17,7 @@ using Mark5.Mobile.IOS.Model.Exceptions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using Attachment = MailBee.Mime.Attachment;
 
@@ -142,9 +143,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            }
 
             closeItem.Clicked += CloseItem_Clicked;
             shareItem.Clicked += ShareItem_Clicked;
@@ -174,7 +178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -314,7 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                     CommonConfig.Logger.Error(ex);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 }
                 else
                 {
@@ -390,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                         {
                             CommonConfig.Logger.Warning("Failed to present open in view - there is no app that can open this type of attachment installed");
 
-                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
                     }
                 }
@@ -403,7 +407,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                 dismissAction();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 

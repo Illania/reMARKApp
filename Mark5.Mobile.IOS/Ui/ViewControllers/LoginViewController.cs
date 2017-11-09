@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using CoreAnimation;
 using CoreGraphics;
@@ -117,13 +117,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField.ResignFirstResponder();
 
             DeinitializeHandlers();
-            
+
             authenticator = null;
 
             didChangeFrameNotificationObserver?.Dispose();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -257,11 +257,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(settingsButton);
-            View.AddConstraints(new[]
+
+            if (Integration.IsRunningAtLeast(11))
             {
-                NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 20f),
-                NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, -5f)
-            });
+                View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal,  View.SafeAreaLayoutGuide, NSLayoutAttribute.Right, 1f, -10f)
+                });
+            }
+            else
+            {
+                View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 20f),
+                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, -5f)
+                });
+            }
         }
 
         void InitializeSubViews()
@@ -529,7 +541,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Invalid username was entered: {username}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_username_title"), Localization.GetString("wrong_username_summary"));
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_username_title"), Localization.GetString("wrong_username_summary"));
 
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
@@ -538,7 +550,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Invalid password was entered: {password}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_password_title"), Localization.GetString("wrong_password_summary"));
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_password_title"), Localization.GetString("wrong_password_summary"));
 
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
@@ -547,7 +559,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_hostname_title"), Localization.GetString("wrong_hostname_summary"));
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_hostname_title"), Localization.GetString("wrong_hostname_summary"));
 
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
@@ -556,7 +568,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Invalid port was entered: {port}");
 
                     errors = true;
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("wrong_port_title"), Localization.GetString("wrong_port_summary"));
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_port_title"), Localization.GetString("wrong_port_summary"));
 
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
                 }
@@ -571,7 +583,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
 
-                    if (!await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                    if (!await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
                     {
                         loginButton.TouchUpInside += LoginButton_TouchUpInside;
                         return;
@@ -582,7 +594,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
 
-                    if (!await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                    if (!await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
                     {
                         loginButton.TouchUpInside += LoginButton_TouchUpInside;
                         return;
@@ -664,7 +676,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (ex.InnerException != null)
                     CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
 
-                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
 
                 hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error);
 

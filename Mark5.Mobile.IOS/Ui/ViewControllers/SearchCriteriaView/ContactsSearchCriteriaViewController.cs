@@ -876,7 +876,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                         Module = ModuleType.Contacts,
                         PreselectedItemIds = Criteria.CategoryIds
                     };
-                    parentViewControllerWeakReference.Unwrap().PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    parentViewControllerWeakReference.Unwrap().PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
 
                     var result = await vc.Result;
                     if (result == null)

@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 
@@ -38,9 +39,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
@@ -77,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -107,6 +111,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.Source = new DataSource(this, TableView);
             TableView.AllowsMultipleSelectionDuringEditing = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 60f;
         }
 
         #endregion
@@ -141,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Could not refresh outgoing document list", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -151,10 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void FailedDocumentSelected(Guid guid)
         {
-            var vc = new DocumentViewController
-            {
-                Modal = true
-            };
+            var vc = new DocumentViewController();
             vc.SetData(guid);
             vc.SetRefreshDataOnAppear();
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -233,8 +236,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var dp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(DocumentToUploadTableViewCell.Key) as DocumentToUploadTableViewCell ?? DocumentToUploadTableViewCell.Create();
-                cell.Initialize(dp, indexPath.Section);
+                var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.UploadId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.UploadId);
+                cell.Initialize(dp.DocumentPreview);// TODO , indexPath.Section);
+
+                cell.SelectionStyle = indexPath.Section == Section.Failed
+                    ? UITableViewCellSelectionStyle.Default
+                    : UITableViewCellSelectionStyle.None;
+
                 return cell;
             }
 
@@ -261,8 +269,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => DocumentToUploadTableViewCell.Height;
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
@@ -272,17 +278,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                if (indexPath.Section == Section.Failed)
-                    viewControllerWeakReference.Unwrap()?.FailedDocumentSelected(items[Section.Failed][indexPath.Row].Guid);
+                viewControllerWeakReference.Unwrap()?.FailedDocumentSelected(items[Section.Failed][indexPath.Row].Guid);
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (cell == null)
                     return false;
-                
-                return indexPath.Section == Section.Failed;
+                if (!cell.UserInteractionEnabled)
+                    return false;
+                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return false;
+
+                return true;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)

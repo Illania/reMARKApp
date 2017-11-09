@@ -34,21 +34,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             addressTextField.EditingChanged += AddressTextField_EditingChanged;
             ContentView.Add(addressTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, 0f),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(addressTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-            });
 
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Width, 1f, 0f),
-            });
 
             nameTextField = new UITextField
             {
@@ -58,22 +46,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             nameTextField.EditingChanged += NameTextField_EditingChanged;
             ContentView.Add(nameTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-                NSLayoutConstraint.Create(nameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Width, 1f, 0f),
-            });
 
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameTextField, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(horizontalSeparator2, NSLayoutAttribute.Width, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Width, 1f, 0f),
-            });
 
             attentionTextField = new UITextField
             {
@@ -83,34 +58,50 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             attentionTextField.EditingChanged += AttentionTextField_EditingChanged; ;
             ContentView.Add(attentionTextField);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, horizontalSeparator2, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
-                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, addressTextField, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(attentionTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, 0f),
-            });
 
             typeLabel = new UILabel
             {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2),
+                Font = Theme.DefaultFont.WithSize(11f),
                 TextColor = Theme.White,
-                BackgroundColor = Theme.DarkGray,
                 TextAlignment = UITextAlignment.Center,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
-            typeLabel.Layer.CornerRadius = 10;
-            typeLabel.Layer.MasksToBounds = true;
+            typeLabel.Layer.BackgroundColor = Theme.DarkGray.CGColor;
+            typeLabel.Layer.CornerRadius = 3f;
             typeLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             typeLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             ContentView.Add(typeLabel);
+
             ContentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, nameTextField, NSLayoutAttribute.CenterY, 1f, 0f),
-                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 38f),
-                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -2f),
-                NSLayoutConstraint.Create(typeLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, horizontalSeparator, NSLayoutAttribute.Right, 1f, InnerHorizontalMargin),
+                addressTextField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                addressTextField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                addressTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+
+                horizontalSeparator.TopAnchor.ConstraintEqualTo(addressTextField.BottomAnchor, InnerVerticalMargin),
+                horizontalSeparator.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                horizontalSeparator.WidthAnchor.ConstraintEqualTo(addressTextField.WidthAnchor),
+
+                nameTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator.BottomAnchor, InnerVerticalMargin),
+                nameTextField.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                nameTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+                nameTextField.WidthAnchor.ConstraintEqualTo(addressTextField.WidthAnchor),
+
+                horizontalSeparator2.TopAnchor.ConstraintEqualTo(nameTextField.BottomAnchor, InnerVerticalMargin),
+                horizontalSeparator2.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                horizontalSeparator2.WidthAnchor.ConstraintEqualTo(addressTextField.WidthAnchor),
+
+                attentionTextField.TopAnchor.ConstraintEqualTo(horizontalSeparator2.BottomAnchor, InnerVerticalMargin),
+                attentionTextField.LeadingAnchor.ConstraintEqualTo(addressTextField.LeadingAnchor),
+                attentionTextField.HeightAnchor.ConstraintEqualTo(InnerRowHeight),
+                attentionTextField.WidthAnchor.ConstraintEqualTo(addressTextField.WidthAnchor),
+                attentionTextField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor,  -VerticalMargin),
+
+                typeLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                typeLabel.WidthAnchor.ConstraintEqualTo(27f),
+                typeLabel.LeadingAnchor.ConstraintEqualTo(addressTextField.TrailingAnchor, InnerHorizontalMargin),
+                typeLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+
             });
         }
 

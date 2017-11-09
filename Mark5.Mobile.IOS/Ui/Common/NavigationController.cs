@@ -1,14 +1,13 @@
-﻿using Mark5.Mobile.IOS.Ui.ViewControllers;
+﻿using Foundation;
+using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    public class NavigationController : UINavigationController, ITaggedViewController
+    public class NavigationController : UINavigationController, ITaggedViewController, IUINavigationControllerDelegate
     {
         public string Tag { get; set; }
-
-        int searchButtonCounter;
 
         public NavigationController()
         {
@@ -33,20 +32,60 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public override void LoadView()
         {
+            Delegate = this;
             base.LoadView();
             View.BackgroundColor = Theme.White;
         }
 
-        public override void SetToolbarHidden(bool hidden, bool animated)
+        [Export("navigationController:willShowViewController:animated:")]
+        public void WillShowViewController(UINavigationController navigationController, UIViewController viewController, bool animated)
         {
-            base.SetToolbarHidden(hidden, animated);
+            var tc = navigationController.TopViewController.GetTransitionCoordinator();
 
-            if (SplitViewController == null)
+            if (tc == null)
+                return;
+
+            var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
+            var root = del?.Window?.RootViewController as AbstractMainViewController;
+
+            if (root == null)
+                return;
+
+            tc.AnimateAlongsideTransitionInView(root.View, animationContext =>
             {
-                var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
-                var root = del?.Window?.RootViewController as AbstractMainViewController;
-                root?.SetSearchButtonHidden(hidden, true);
+                var fromVc = animationContext.GetViewControllerForKey(UITransitionContext.FromViewControllerKey);
+                var toVc = animationContext.GetViewControllerForKey(UITransitionContext.ToViewControllerKey);
+
+                if (fromVc.HidesBottomBarWhenPushed && (SplitViewController == null || SplitViewController.Collapsed))
+                {
+                    root?.SetSearchButtonHidden(false);
+                    root?.SetSearchButtonAlpha(1f);
+                }
+                if (toVc.HidesBottomBarWhenPushed && (SplitViewController == null || SplitViewController.Collapsed))
+                    root?.SetSearchButtonAlpha(0f);
+
+            }, completionContext =>
+            {
+                var toVc = completionContext.GetViewControllerForKey(UITransitionContext.ToViewControllerKey);
+                if (toVc.HidesBottomBarWhenPushed && (SplitViewController == null || SplitViewController.Collapsed))
+                    root?.SetSearchButtonHidden(true);
+            });
+        }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+
+            if (IsBeingDismissed
+                || IsMovingFromParentViewController)
+            {
+                foreach (var vc in ViewControllers)
+                {
+                    (vc as AbstractViewController)?.RecycleIfNeeded();
+                    (vc as AbstractTableViewController)?.RecycleIfNeeded();
+                }
             }
         }
+
     }
 }

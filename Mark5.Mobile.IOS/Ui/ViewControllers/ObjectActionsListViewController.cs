@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -37,9 +38,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
         }
@@ -71,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -99,6 +103,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             TableView.Source = new DataSource(TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
             TableView.AllowsSelection = false;
         }
 
@@ -114,7 +120,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 doneItem.Clicked -= DoneItem_Clicked;
         }
 
-        void DoneItem_Clicked(object sender, EventArgs e) => NavigationController.DismissViewController(true, null);
+        void DoneItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         async Task RefreshData()
         {
@@ -130,9 +136,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Could not refresh list of actions", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                NavigationController.DismissViewController(true, null);
+                DismissViewController(true, null);
             }
         }
 
@@ -166,8 +172,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var section = objectActionsSections[indexPath.Section];
                 var oa = items[section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.Key) as ObjectActionsTableViewCell ?? ObjectActionsTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ObjectActionsTableViewCell.DefaultId) as ObjectActionsTableViewCell ?? new ObjectActionsTableViewCell();
                 cell.Initialize(oa);
+                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
                 return cell;
             }
@@ -198,8 +205,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => ObjectActionsTableViewCell.Height;
 
             public void SetItems(Dictionary<string, ObjectAction[]> objectActions)
             {

@@ -16,6 +16,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -36,7 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         WKWebView newContentWebView;
         WKWebView oldContentWebView;
 
-        UIScrollView externalScrollView;
+        WeakReference<UIScrollView> externalScrollViewWeakReference;
 
         SeparatorSubView separatorBeforeExpand;
         SeparatorSubView separatorAfterExpand;
@@ -75,10 +76,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public ContentView(UIScrollView externalScrollView)
         {
-            this.externalScrollView = externalScrollView;
+            externalScrollViewWeakReference = externalScrollView.Wrap();
 
             InitializeNewContentControls();
             InitializeOldContentControls();
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                newContentHeightConstraint = null;
+                oldContentHeightConstraint = null;
+                oldContentZeroHeightConstraint = null;
+
+                if (newContentWebView != null)
+                {
+                    newContentWebView.RemoveFromSuperview();
+                    newContentWebView.NavigationDelegate = null;
+                    newContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("sizeNotification");
+                    newContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("mutation");
+                    newContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("keypress");
+                    newContentWebView = null;
+                }
+
+                if (oldContentWebView != null)
+                {
+                    oldContentWebView.RemoveFromSuperview();
+                    oldContentWebView.NavigationDelegate = null;
+                    oldContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("sizeNotification");
+                    oldContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("keypress");
+                    oldContentWebView = null;
+                }
+
+                if (separatorBeforeExpand != null)
+                {
+                    separatorBeforeExpand.RemoveFromSuperview();
+                    separatorBeforeExpand = null;
+                }
+
+                if (separatorAfterExpand != null)
+                {
+                    separatorAfterExpand.RemoveFromSuperview();
+                    separatorAfterExpand = null;
+                }
+
+                if (expandButton != null)
+                {
+                    expandButton.RemoveFromSuperview();
+                    expandButton = null;
+                }
+            }
         }
 
         void InitializeNewContentControls()
@@ -155,7 +203,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 NSLayoutConstraint.Create(separatorBeforeExpand, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f)
             });
 
-            expandButton = new UIButton();
+            expandButton = new UIButton(UIButtonType.System);
             expandButton.SetTitle(Localization.GetString("show_original_message"), UIControlState.Normal);
             expandButton.TranslatesAutoresizingMaskIntoConstraints = false;
             expandButton.TitleLabel.Font = Theme.DefaultFont;
@@ -265,6 +313,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (tapLocation == default(CGPoint))
                 return;
 
+            var externalScrollView = externalScrollViewWeakReference.Unwrap();
+            if (externalScrollView == null)
+                return;
+
             var oldY = ConvertRectToView(webview.Frame, null).Y; //Position in current window
 
             if (oldY - UIApplication.SharedApplication.KeyWindow.Frame.Bottom + keyboardHeight + 20 > 0)
@@ -284,6 +336,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void ScrollForEnterPressed()
         {
+            var externalScrollView = externalScrollViewWeakReference.Unwrap();
+            if (externalScrollView == null)
+                return;
+
             var co = externalScrollView.ContentOffset;
             co.Y += 20;
             externalScrollView.SetContentOffset(co, true);
@@ -341,7 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         async Task LoadOldContent()
         {
-            if (!oldContentLoaded && DocumentCreationModeFlag != DocumentCreationModeFlag.Edit && DocumentCreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
+            if (!RestoreWorkingCopy && !oldContentLoaded && DocumentCreationModeFlag != DocumentCreationModeFlag.Edit && DocumentCreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
             {
                 await oldContentWebView.EvaluateJavaScriptAsync("");
 

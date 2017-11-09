@@ -23,31 +23,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
         protected async override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
             ContactPreview selectedContactPreview = null;
 
             if (contactPreview.Type == ContactType.Person)
             {
-                var content = ChildrenType == ContactType.Person ? Localization.GetString("parent_contact_selector_invalid_person_content") : Localization.GetString("parent_contact_selector_invalid_department_content");
+                var content = ChildrenType == ContactType.Person
+                                                         ? Localization.GetString("parent_contact_selector_invalid_person_content")
+                                                         : Localization.GetString("parent_contact_selector_invalid_department_content");
 
-                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_person_title"), content);
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("parent_contact_selector_invalid_person_title"), content);
             }
             else if (contactPreview.Type == ContactType.Department)
             {
                 if (ChildrenType == ContactType.Department)
-                {
-                    await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("parent_contact_selector_invalid_department_title"), Localization.GetString("parent_contact_selector_invalid_department_content"));
-                }
-
-                selectedContactPreview = contactPreview;
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("parent_contact_selector_invalid_department_title"), Localization.GetString("parent_contact_selector_invalid_department_content"));
+                else
+                    selectedContactPreview = contactPreview;
             }
             else if (contactPreview.Type == ContactType.Company)
             {
                 if (ChildrenType == ContactType.Department)
-                {
                     selectedContactPreview = contactPreview;
-                }
                 else
                 {
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
@@ -60,28 +66,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                         var deparments = contact.Children.Where(c => c.Type == ContactType.Department);
 
                         if (!deparments.Any())
-                        {
                             selectedContactPreview = contactPreview;
-                        }
                         else
                         {
                             var choices = new List<ContactPreview> { contactPreview };
                             choices.AddRange(deparments);
-                            var strings = choices.Select(DisplayText).ToArray();
 
-                            var index = await Dialogs.ShowListDialogAsync(this, Localization.GetString("parent_contact_selector_choose"), strings, tableView.CellAt(indexPath));
-
+                            var index = await Dialogs.ShowListActionSheetAsync(this, choices.Select(DisplayText).ToArray(), tableView, tableView.CellAt(indexPath));
                             if (index >= 0)
-                            {
                                 selectedContactPreview = choices[index];
-                            }
                         }
                     }
                     catch (Exception ex)
                     {
                         dismissAction();
                         CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
-                        await Dialogs.ShowErrorDialogAsync(this, ex);
+                        await Dialogs.ShowErrorAlertAsync(this, ex);
                     }
                 }
             }
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (selectedContactPreview != null)
             {
                 tcs.SetResult(selectedContactPreview);
-                NavigationController.PopViewController(true);
+                DismissViewController(true, null);
             }
         }
 

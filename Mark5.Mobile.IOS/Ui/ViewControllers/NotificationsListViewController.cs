@@ -55,9 +55,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
 
@@ -86,15 +89,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             RefreshData();
 
-            NSOperationQueue.MainQueue.AddOperation(() =>
+            if (Integration.IsRunningAtLeast(11))
             {
-                var ni = NavigationItem;
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
 
-                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                    ni = ParentViewController?.NavigationItem;
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
 
-                ni.SearchController = null;
-            });
+                    ni.SearchController = null;
+                });
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -116,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DidReceiveMemoryWarning();
         }
 
-        public override void Recycle()
+        protected override void Recycle()
         {
             base.Recycle();
 
@@ -154,8 +160,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RefreshControl = new UIRefreshControl();
 
             TableView.Source = new DataSource(this, TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 50f;
             TableView.RefreshControl = RefreshControl;
-            TableView.EstimatedRowHeight = NotificationsTableViewCell.Height;
         }
 
         void InitializeHandlers()
@@ -189,7 +196,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Marking notifications as read failed", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -223,7 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error($"Could not refresh list of notifications", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
 
             RefreshControl.EndRefreshing();
@@ -251,13 +258,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PresentDocumentViewController(int documentId, Guid notificationGuid)
         {
-            var vc = new DocumentViewController
-            {
-                Modal = true
-            };
+            var vc = new DocumentViewController();
             vc.SetRefreshDataOnAppear();
             vc.SetData(documentId, notificationGuid);
-
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -295,7 +298,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var n = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(NotificationsTableViewCell.Key) as NotificationsTableViewCell ?? NotificationsTableViewCell.Create();
+                var reuseIdentifier = n.Type == EventType.NewObjectCreated ? NotificationsTableViewCell.NewObjectCreatedId : NotificationsTableViewCell.DefaultId;
+
+                var cell = tableView.DequeueReusableCell(reuseIdentifier) as NotificationsTableViewCell ?? new NotificationsTableViewCell(reuseIdentifier);
                 cell.Initialize(n);
 
                 return cell;
@@ -303,10 +308,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
-                    return;
-
                 var n = items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.NotificationSelected(n, indexPath);
             }

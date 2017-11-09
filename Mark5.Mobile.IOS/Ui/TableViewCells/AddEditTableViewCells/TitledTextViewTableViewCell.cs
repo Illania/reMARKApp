@@ -30,12 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             titleLabel.AddGestureRecognizer(new UITapGestureRecognizer(HandlTitleTap));
             ContentView.AddSubview(titleLabel);
-            ContentView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.TopMargin, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-            });
 
             textView = new UITextView
             {
@@ -50,15 +44,21 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             textView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             textView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             ContentView.AddSubview(textView);
+
             ContentView.AddConstraints(new[]
-                        {
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerVerticalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.LeftMargin, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.RightMargin, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContentView, NSLayoutAttribute.BottomMargin, 1f, -VerticalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, InnerRowHeight),
+            {
+                titleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                titleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                titleLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+
+                textView.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, InnerVerticalMargin),
+                textView.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
+                textView.TrailingAnchor.ConstraintEqualTo(titleLabel.TrailingAnchor),
+                textView.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
+                textView.HeightAnchor.ConstraintGreaterThanOrEqualTo(InnerRowHeight),
             });
         }
+
         CGRect previous = CGRect.Empty;
 
         [Export("textView:shouldChangeTextInRange:replacementText:")]
