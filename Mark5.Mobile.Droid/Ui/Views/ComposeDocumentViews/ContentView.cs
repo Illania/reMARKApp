@@ -18,6 +18,7 @@ using Java.Interop;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -31,6 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly AppCompatButton showOldContentButton;
         readonly CustomWebView oldContentWebView;
         readonly Context context;
+
+        bool oldContentShown;
 
         public SemaphoreSlim NewSetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
         SemaphoreSlim newGetHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
@@ -113,6 +116,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void ShowOldContentButton_Click(object sender, EventArgs e)
         {
+            if (!oldContentShown)
+            {
+                oldContentShown = true;
+                Analytics.LogEvent(new ComposeShowPreviousEmailEvent());
+            }
+
             if (oldContentWebView.Visibility == ViewStates.Gone)
             {
                 showOldContentButton.SetText(Resource.String.hide_previous_message);

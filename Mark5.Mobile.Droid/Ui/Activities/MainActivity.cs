@@ -20,6 +20,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -101,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ss = AsyncHelpers.RunSync(() => Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local));
                 navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
- 
+
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
             else
@@ -212,7 +213,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             drawer?.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
         }
-        
+
         public void UnlockDrawer()
         {
             drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
@@ -229,7 +230,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                             stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
                         if (SupportFragmentManager.BackStackEntryCount > 0)
-                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) Android.App.PopBackStackFlags.Inclusive);
+                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
 
                         stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
@@ -270,10 +271,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
                 if (shouldRecover)
                 {
+                    Analytics.LogEvent(new EmailRecoveredEvent(true));
                     StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.None, CopyToNewOption.None, true));
                 }
                 else
                 {
+                    Analytics.LogEvent(new EmailRecoveredEvent(false));
                     await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
                 }
             }
@@ -347,7 +350,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     (f, tag) = FoldersNotificationsListFragment.NewInstance(Folder.RootForModule(ModuleType));
                 else //(ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
                     (f, tag) = FoldersListFragment.NewInstance(Folder.RootForModule(ModuleType));
-                
+
                 var ft = fm.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, f, tag);

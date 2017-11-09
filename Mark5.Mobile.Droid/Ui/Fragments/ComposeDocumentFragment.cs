@@ -16,6 +16,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -374,21 +375,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void DoOpenRecentAddresses()
         {
+            Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Recents));
+
             StartActivityForResult(RecentAddressesListActivity.CreateIntent(Context), RequestCodes.RecentAddressesRequestCode);
         }
 
         void DoOpenContacts()
         {
+            Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Contacts));
+
             StartActivityForResult(PickerContactFolderListActivity.CreateIntent(Context), RequestCodes.ContactsRequestCode);
         }
 
         void DoOpenShortcodes()
         {
+            Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Shortcodes));
+
             StartActivityForResult(PickerShortcodesFolderListActivity.CreateIntent(Context), RequestCodes.ShortcodesRequestCode);
         }
 
         void DoOpenPhonebook()
         {
+            Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Phonebook));
+
             StartActivityForResult(PhonebookContactsListActivity.CreateIntent(Context), RequestCodes.PhonebookRequestCode);
         }
 
@@ -421,6 +430,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 0) //Open attachment
             {
+                Analytics.LogEvent(new ComposeOpenAttachment());
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
                 string path = null;
@@ -480,6 +491,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1) //Remove attachment
             {
+                Analytics.LogEvent(new ComposeRemoveAttachmentEvent());
+
                 try
                 {
                     if (e.AttachmentDescription != null)
@@ -562,6 +575,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SendDocument(bool saveDraft = false)
         {
+            if (saveDraft)
+                Analytics.LogEvent(new ComposeSaveDraftEvent());
+
             Action sendAction = async () =>
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
@@ -711,6 +727,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void AddAttachment()
         {
+            Analytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
             var intent = new Intent(Intent.ActionGetContent);
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
@@ -796,6 +813,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void GetAllTemplates()
         {
+            Analytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
+
             StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
         }
 
@@ -842,6 +861,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case 2:
                         GetAllTemplates();
                         break;
+                    default:
+                        Analytics.LogEvent(new ComposeAddTemplateEvent(null));
+                        break;
                 }
             }
 
@@ -850,6 +872,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetLocalTemplate()
         {
+            Analytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
+
             var localTemplate = PlatformConfig.Preferences.LocalTemplate;
             localTemplate = "\n\n\n" + localTemplate;
             await contentView.InsertLocalTemplate(localTemplate);
@@ -857,6 +881,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetDefaultTemplate(bool errorMessageIfNull = false)
         {
+            Analytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
             try

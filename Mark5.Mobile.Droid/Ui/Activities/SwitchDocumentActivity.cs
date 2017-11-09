@@ -10,9 +10,11 @@ using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -41,19 +43,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (folderId != null)
                 intent.PutExtra(FolderIdIntentKey, folderId.Value);
-            
+
             if (folder != null)
                 intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
-            
+
             if (documentId != null)
                 intent.PutExtra(DocumentIdIntentKey, documentId.Value);
-            
+
             if (documentPreview != null)
                 intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
-            
+
             if (guid != null)
                 intent.PutExtra(NotificationGuidIntentKey, Serializer.Serialize(guid.Value));
-            
+
             return intent;
         }
 
@@ -141,11 +143,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public void GoToPrevious(int documentId)
         {
+            Analytics.LogEvent(new DocumentQuickSwitchEvent());
+
             var previousId = GetPreviousId(documentId);
             if (previousId == null)
                 return;
 
-            var (df,tag) = DocumentFragment.NewInstance(folder, docId: previousId);
+            var (df, tag) = DocumentFragment.NewInstance(folder, docId: previousId);
 
             var ft = SupportFragmentManager.BeginTransaction();
 
@@ -156,11 +160,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public void GoToNext(int documentId)
         {
+            Analytics.LogEvent(new DocumentQuickSwitchEvent());
+
             var nextId = GetNextId(documentId);
             if (nextId == null)
                 return;
 
-            var (df,tag) = DocumentFragment.NewInstance(folder, docId: nextId);
+            var (df, tag) = DocumentFragment.NewInstance(folder, docId: nextId);
 
             var ft = SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);

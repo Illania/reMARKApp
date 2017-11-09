@@ -334,7 +334,7 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         public override string Name => "compose_new_document";
     }
 
-    public class ComposeEditDraft : AnalyticsEvent
+    public class ComposeEditDraftEvent : AnalyticsEvent
     {
         public override string Name => "compose_edit_draft";
     }
@@ -343,9 +343,9 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
     #region Documents
 
-    public class ComposeAddAttachment : AnalyticsEvent
+    public class ComposeAddAttachmentEvent : AnalyticsEvent
     {
-        public ComposeAddAttachment(AddAttachmentType type)
+        public ComposeAddAttachmentEvent(AddAttachmentType type)
         {
             Name = "compose_add_attachment_" + type.ToString().ToLowerInvariant();
         }
@@ -354,6 +354,11 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
     public class ComposeRemoveAttachmentEvent : AnalyticsEvent
     {
         public override string Name => "compose_remove_attachment";
+    }
+
+    public class ComposeOpenAttachment : AnalyticsEvent
+    {
+        public override string Name => "compose_open_attachment";
     }
 
     public class ComposeShowPreviousEmailEvent : AnalyticsEvent
@@ -366,11 +371,6 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         public override string Name => "compose_edited_previous_email";
     }
 
-    public class ComposeEmailRecoveredEvent : AnalyticsEvent
-    {
-        public override string Name => "compose_email_recovered_event";
-    }
-
     public class ComposeSaveDraftEvent : AnalyticsEvent
     {
         public override string Name => "compose_save_draft";
@@ -378,9 +378,9 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
     public class ComposeAddTemplateEvent : AnalyticsEvent
     {
-        public ComposeAddTemplateEvent(TemplateType type)
+        public ComposeAddTemplateEvent(TemplateType? type)
         {
-            Name = "compose_add_template_" + type.ToString().ToLowerInvariant();
+            Name = "compose_add_template_" + type == null ? "_none" : type.ToString().ToLowerInvariant();
         }
     }
 
@@ -550,6 +550,16 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
             }
         }
     }
+
+    public class EmailRecoveredEvent : AnalyticsEvent
+    {
+        public EmailRecoveredEvent(bool edit)
+        {
+            Name = "email_recovered_event" + (edit ? "_edit" : "");
+        }
+
+    }
+
 
     #endregion
 }
