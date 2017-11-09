@@ -22,6 +22,8 @@ using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -74,6 +76,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += (sender, e) =>
             {
+                Analytics.LogEvent(new PullToRefreshEvent(module: ModuleType.Shortcodes));
+
                 ActionMode?.Finish();
                 ActionMode = null;
 
@@ -494,6 +498,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                Analytics.LogEvent(new FilterEvent(module: ModuleType.Shortcodes));
+
                 menu?.FindItem(10)?.SetVisible(false);
 
                 refreshLayout.Enabled = false;

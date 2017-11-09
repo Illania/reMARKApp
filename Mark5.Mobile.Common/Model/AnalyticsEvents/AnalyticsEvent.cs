@@ -33,6 +33,11 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
                     return "_none";
             }
         }
+
+        protected string GetObjectTypeString(ObjectType type)
+        {
+            return $"_{type.ToString().ToLowerInvariant()}";
+        }
     }
 
     public abstract class AnalyticsParameter
@@ -479,7 +484,10 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
     public class NotificationClickedEvent : AnalyticsEvent
     {
-        public override string Name => "notification_clicked";
+        public NotificationClickedEvent(ObjectType objectType)
+        {
+            Name = "notification_clicked" + GetObjectTypeString(objectType);
+        }
     }
     public class NotificationMarkAllAsReadEvent : AnalyticsEvent
     {
@@ -505,12 +513,15 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
     public class ExpandFolderEvent : AnalyticsEvent
     {
-        public override string Name => "expand_folder";
+        public ExpandFolderEvent(ModuleType module)
+        {
+            Name = "expand_folder" + GetModuleString(module);
+        }
     }
 
     public class PullToRefreshEvent : AnalyticsEvent
     {
-        public PullToRefreshEvent(bool fromFolder = false, ModuleType type = ModuleType.None)
+        public PullToRefreshEvent(bool fromFolder = false, ModuleType module = ModuleType.None)
         {
             Name = "pull_to_refresh";
             if (fromFolder == true)
@@ -519,14 +530,14 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
             }
             else
             {
-                Name += GetModuleString(type);
+                Name += GetModuleString(module);
             }
         }
     }
 
     public class FilterEvent : AnalyticsEvent
     {
-        public FilterEvent(bool fromFolder = false, ModuleType type = ModuleType.None)
+        public FilterEvent(bool fromFolder = false, ModuleType module = ModuleType.None)
         {
             Name = "filter";
             if (fromFolder == true)
@@ -535,7 +546,7 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
             }
             else
             {
-                Name += GetModuleString(type);
+                Name += GetModuleString(module);
             }
         }
     }

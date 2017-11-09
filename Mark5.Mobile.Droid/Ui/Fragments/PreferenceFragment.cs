@@ -16,6 +16,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -40,8 +41,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var title = GetString(Resource.String.settings);
             var subtitle = PreferenceScreen.Title == title ? string.Empty : PreferenceScreen.Title;
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = subtitle;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
 
             PreferenceManager.SharedPreferences.RegisterOnSharedPreferenceChangeListener(this);
         }
@@ -55,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int) Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
+            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
             {
                 var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
                 PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
@@ -113,7 +114,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
             {
                 var i = new Intent(RingtoneManager.ActionRingtonePicker);
-                i.PutExtra(RingtoneManager.ExtraRingtoneType, (int) RingtoneType.Notification);
+                i.PutExtra(RingtoneManager.ExtraRingtoneType, (int)RingtoneType.Notification);
                 i.PutExtra(RingtoneManager.ExtraRingtoneTitle, GetString(Resource.String.pref_notification_ringtone_title));
                 i.PutExtra(RingtoneManager.ExtraRingtoneDefaultUri, Settings.System.DefaultNotificationUri);
                 if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
@@ -150,6 +151,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_update_config))
             {
+                Analytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
                 {
@@ -192,11 +195,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Resource.String.dialog_logout_content,
                     async () =>
                     {
+                        Analytics.LogEvent(new SettingsLogOut());
+
                         Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
                         if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                                await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
-               
+                            await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+
                         Integration.ClearDataAndStop();
                     });
                 return true;
@@ -233,13 +238,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var args = new Bundle();
             args.PutString(ArgPreferenceRoot, pref.Key);
-            var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
+            var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
             ft.Replace(Resource.Id.fragment_container, new PreferenceFragment
             {
                 Arguments = args
             });
-            
+
             ft.AddToBackStack(pref.Key);
             ft.Commit();
             return true;

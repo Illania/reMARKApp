@@ -14,6 +14,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -185,6 +186,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.CreateNewDocument)
             {
+                Analytics.LogEvent(new ShortcodeComposeDocumentEvent());
+
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
@@ -358,6 +361,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (e.Type == CommunicationAddressType.Email)
             {
+                Analytics.LogEvent(new ShortcodeClickEmailEvent());
+
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
