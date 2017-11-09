@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -12,6 +13,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class PreferenceActivity : BaseAppCompatActivity
     {
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(PreferenceActivity)); 
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -31,8 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var paf = new PreferenceFragment();
-                ft.Replace(Resource.Id.fragment_container, paf, nameof(PreferenceFragment));
+                var (paf, tag) = PreferenceFragment.NewInstance();
+                ft.Replace(Resource.Id.fragment_container, paf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PreferenceFragment)}");

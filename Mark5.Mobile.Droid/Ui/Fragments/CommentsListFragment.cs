@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Content;
@@ -18,11 +18,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CommentsListFragment : RetainableStateFragment
     {
+        public List<Comment> Comments => adapter.Items;
+
+        const string BusinessEntityBundleKey = "BusinessEntity_d475f087-b641-494d-b56b-152e945b0823";
+
         const int SecondsToEdit = 60;
 
-        public BusinessEntity Entity { get; set; }
-
-        public List<Comment> Comments => adapter.Items;
+        BusinessEntity entity;
 
         RecyclerView recyclerView;
         CommentsListAdapter adapter;
@@ -30,9 +32,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         AppCompatEditText addCommentEditText;
         AppCompatImageButton addCommentButton;
 
+        public static (CommentsListFragment fragment, string tag) NewInstance(BusinessEntity be)
+        {
+            var args = new Bundle();
+
+            if (be != null)
+                args.PutString(BusinessEntityBundleKey, Serializer.Serialize(be));
+
+            var fragment = new CommentsListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(CommentsListFragment)} [businessEntity.Id={be.Id}]";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]...");
+            if (Arguments.ContainsKey(BusinessEntityBundleKey))
+                entity = Serializer.Deserialize<BusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
+
+            CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_comments, container, false);
 
@@ -78,14 +98,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.comments);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
+            CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(CommentsListFragment)} [entity.Id={Entity?.Id}]");
+            CommonConfig.Logger.Info($"Resuming {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]");
 
             if (adapter.ItemCount < 1)
             {
@@ -97,13 +117,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void RefreshView()
         {
-            switch (Entity.ObjectType)
+            switch (entity.ObjectType)
             {
                 case ObjectType.Document:
-                    adapter.AppendItems((Entity as Document).Comments);
+                    adapter.AppendItems((entity as Document).Comments);
                     break;
                 case ObjectType.Contact:
-                    adapter.AppendItems((Entity as Contact).Comments);
+                    adapter.AppendItems((entity as Contact).Comments);
                     break;
                 default:
                     throw new ArgumentException("The input business entity does not have comments defined in the model");
@@ -113,26 +133,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #region Options menu
-
-        static class MenuItemActions
-        {
-            public const int EditComment = 10;
-            public const int DeleteComment = 20;
-        }
-
-        public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
-        {
-            var position = recyclerView.GetChildAdapterPosition(view);
-            adapter.SelectedPosition = position;
-
-            var comment = adapter.GetSelectedItem();
-            var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
-
-            if (isEditable)
-                menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
-
-            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
-        }
 
         public override bool OnContextItemSelected(IMenuItem item)
         {
@@ -153,9 +153,107 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
+        public void CreateContextMenu(IContextMenu menu, View view, IContextMenuContextMenuInfo menuInfo)
+        {
+            var position = recyclerView.GetChildAdapterPosition(view);
+            adapter.SelectedPosition = position;
+
+            var comment = adapter.GetSelectedItem();
+            var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
+
+            if (isEditable)
+                menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
+
+            menu.Add(Menu.None, MenuItemActions.DeleteComment, MenuItemActions.DeleteComment, Resource.String.delete);
+        }
+
+        static class MenuItemActions
+        {
+            public const int EditComment = 10;
+            public const int DeleteComment = 20;
+        }
+
         #endregion
 
         #region Event handlers
+
+        async void DeleteComment(Comment comment)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
+            Task t;
+
+            switch (entity.ObjectType)
+            {
+                case ObjectType.Document:
+                    var document = entity as Document;
+                    t = Managers.DocumentsManager.DeleteComment(document, comment);
+                    await t;
+                    break;
+                case ObjectType.Contact:
+                    var contact = entity as Contact;
+                    t = Managers.ContactsManager.DeleteComment(contact, comment);
+                    await t;
+                    break;
+
+                default:
+                    throw new ArgumentException("The input business entity does not have comments defined in the model");
+            }
+
+            dismissAction();
+
+            if (t.IsFaulted)
+            {
+                CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+            }
+            else
+            {
+                adapter.RemoveItem(comment);
+            }
+        }
+
+        async void EditComment(Comment comment, string newContent)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.editing_comment, Resource.String.please_wait);
+            var newComment = comment.ShallowCopy();
+            newComment.Content = newContent;
+
+            Task<bool> t;
+
+            switch (entity.ObjectType)
+            {
+                case ObjectType.Document:
+                    var document = entity as Document;
+                    t = Managers.DocumentsManager.EditComment(document, newComment);
+                    await t;
+                    break;
+                case ObjectType.Contact:
+                    var contact = entity as Contact;
+                    t = Managers.ContactsManager.EditComment(contact, newComment);
+                    await t;
+                    break;
+
+                default:
+                    throw new ArgumentException("The input business entity does not have comments defined in the model");
+            }
+
+            dismissAction();
+
+            if (t.IsFaulted)
+            {
+                CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+            }
+            else
+            {
+                adapter.EditItem(newComment);
+            }
+        }
+
+        void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            addCommentButton.Enabled = !string.IsNullOrEmpty(addCommentEditText.Text);
+        }
 
         async void AddCommentButton_Click(object sender, EventArgs e)
         {
@@ -166,14 +264,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Comment newComment;
 
-                switch (Entity.ObjectType)
+                switch (entity.ObjectType)
                 {
                     case ObjectType.Document:
-                        var document = Entity as Document;
+                        var document = entity as Document;
                         newComment = await Managers.DocumentsManager.AddComment(document, newCommentContent);
                         break;
                     case ObjectType.Contact:
-                        var contact = Entity as Contact;
+                        var contact = entity as Contact;
                         newComment = await Managers.ContactsManager.AddComment(contact, newCommentContent);
                         break;
                     default:
@@ -186,7 +284,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={Entity?.Id}, commentContent={newCommentContent}] ", ex);
+                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={entity?.Id}, commentContent={newCommentContent}] ", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -197,98 +295,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void DeleteComment(Comment comment)
-        {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
-
-            Task.Run(async () =>
-                {
-                    switch (Entity.ObjectType)
-                    {
-                        case ObjectType.Document:
-                            var document = Entity as Document;
-                            await Managers.DocumentsManager.DeleteComment(document, comment);
-                            break;
-                        case ObjectType.Contact:
-                            var contact = Entity as Contact;
-                            await Managers.ContactsManager.DeleteComment(contact, comment);
-                            break;
-                        default:
-                            throw new ArgumentException("The input business entity does not have comments defined in the model");
-                    }
-                })
-                .ContinueWith(async t =>
-                    {
-                        dismissAction();
-
-                        if (t.IsFaulted)
-                        {
-                            CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                        }
-                        else
-                        {
-                            adapter.RemoveItem(comment);
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
-        void EditComment(Comment comment, string newContent)
-        {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.editing_comment, Resource.String.please_wait);
-            var newComment = comment.ShallowCopy();
-            newComment.Content = newContent;
-
-            Task.Run(async () =>
-                {
-                    switch (Entity.ObjectType)
-                    {
-                        case ObjectType.Document:
-                            var document = Entity as Document;
-                            await Managers.DocumentsManager.EditComment(document, newComment);
-                            break;
-                        case ObjectType.Contact:
-                            var contact = Entity as Contact;
-                            await Managers.ContactsManager.EditComment(contact, newComment);
-                            break;
-                        default:
-                            throw new ArgumentException("The input business entity does not have comments defined in the model");
-                    }
-                })
-                .ContinueWith(async t =>
-                    {
-                        dismissAction();
-
-                        if (t.IsFaulted)
-                        {
-                            CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={Entity?.ObjectType}, entity.Id={Entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", t.Exception.InnerException);
-                            await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
-                        }
-                        else
-                        {
-                            adapter.EditItem(newComment);
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
-        void AddCommentEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
-        {
-            addCommentButton.Enabled = !string.IsNullOrEmpty(addCommentEditText.Text);
-        }
-
         #endregion
 
         #region Retained State methods
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [entity.Id={Entity?.Id}, addCommentText={addCommentEditText?.Text}");
+            CommonConfig.Logger.Info($"Retaining state [entity.Id={entity?.Id}, addCommentText={addCommentEditText?.Text}");
 
             return new CommentsFragmentState
             {
-                Entity = Entity,
+                Entity = entity,
                 AddCommentText = addCommentEditText.Text
             };
         }
@@ -297,16 +314,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (restoredState is CommentsFragmentState cfs)
             {
-                Entity = cfs.Entity;
+                entity = cfs.Entity;
                 addCommentEditText.Text = cfs.AddCommentText;
 
                 RefreshView();
             }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(CommentsListFragment)} [businessEntity.Id={Entity.Id}]";
         }
 
         class CommentsFragmentState : IRetainableState
@@ -321,9 +333,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentsListAdapter : RecyclerView.Adapter
         {
-            public List<Comment> Items { get; } = new List<Comment>();
-
             public override int ItemCount => Items.Count;
+
+            public List<Comment> Items { get; } = new List<Comment>();
 
             public int SelectedPosition { get; set; }
 
@@ -405,15 +417,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class CommentViewHolder : RecyclerView.ViewHolder
         {
+
+            public string Username { set => usernameTextView.Text = value; }
+            public string Date { set => dateTextView.Text = value; }
+            public string Content { set => contentTextView.Text = value; }
+
             readonly AppCompatTextView usernameTextView;
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView contentTextView;
-
-            public string Username { set => usernameTextView.Text = value; }
-
-            public string Date { set => dateTextView.Text = value; }
-
-            public string Content { set => contentTextView.Text = value; }
 
             public CommentViewHolder(View itemView)
                 : base(itemView)

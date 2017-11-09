@@ -34,6 +34,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AbstractSearchView<SearchDocumentsCriteria>> subviews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
 
+        public static (DocumentSearchCriteriaFragment Fragment, string tag) NewInstance()
+        {
+            var fragment = new DocumentSearchCriteriaFragment();
+            var tag = $"{nameof(DocumentSearchCriteriaFragment)}";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");
@@ -116,6 +124,75 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+
+            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
+        }
+
+        public override async void OnResume()
+        {
+            base.OnResume();
+
+            fab.Visibility = ViewStates.Visible;
+
+            try
+            {
+                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchDocumentsCriteriaAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
+
+                searchCriteria = new SearchDocumentsCriteria();
+            }
+
+            RefreshViews();
+        }
+
+        public override void OnPause()
+        {
+            fab.Visibility = ViewStates.Gone;
+
+            base.OnPause();
+        }
+
+        public override async void OnStop()
+        {
+            base.OnStop();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
+            item.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                Reset();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
         public void PrepareEditableTextRow()
         {
             var ll = new LinearLayoutCompat(Context)
@@ -173,55 +250,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(ll);
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        public void ReplaceFragment(Fragment f, string tag)
         {
-            base.OnViewCreated(view, savedInstanceState);
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
-
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
-        }
-
-        public override async void OnResume()
-        {
-            base.OnResume();
-
-            fab.Visibility = ViewStates.Visible;
-
-            try
-            {
-                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchDocumentsCriteriaAsync();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
-
-                searchCriteria = new SearchDocumentsCriteria();
-            }
-
-            RefreshViews();
-        }
-
-        public override void OnPause()
-        {
-            fab.Visibility = ViewStates.Gone;
-
-            base.OnPause();
-        }
-
-        public override async void OnStop()
-        {
-            base.OnStop();
-
-            try
-            {
-                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(searchCriteria);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
-            }
+            fragmentManager.BeginTransaction()
+                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                           .Replace(Resource.Id.fragment_container, f, tag)
+                           .AddToBackStack(tag)
+                           .Commit();
         }
 
         void RefreshViews()
@@ -231,6 +268,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 c.Criteria = searchCriteria;
                 c.Refresh();
             });
+        }
+
+        void HandleSearchButtonClicked()
+        {
+            GetCriteria();
+
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Documents, documentCriteria: GetCriteria()));
+        }
+
+        SearchDocumentsCriteria GetCriteria()
+        {
+            subviews.ForEach(v => v.UpdateCriteria());
+
+            searchCriteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
+            searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxDocumentsToSearch;
+
+            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
+
+            return searchCriteria;
         }
 
         async void Reset()
@@ -250,54 +306,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            menu.Clear();
-            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
-            item.SetShowAsAction(ShowAsAction.Always);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                Reset();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-
-        public void ReplaceFragment(Fragment f, string tag)
-        {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
-
-            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
-        }
-
-        void HandleSearchButtonClicked()
-        {
-            GetCriteria();
-
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
-            StartActivity(i);
-        }
-
-        SearchDocumentsCriteria GetCriteria()
-        {
-            subviews.ForEach(v => v.UpdateCriteria());
-
-            searchCriteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
-            searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxDocumentsToSearch;
-
-            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
-
-            return searchCriteria;
-        }
-
         #region Retained State
 
         public override IRetainableState OnRetainInstanceState()
@@ -312,11 +320,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (restoredState is DocumentSearchCriteriaFragmentState df)
                 searchCriteria = df.Criteria;
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentSearchCriteriaFragment)}";
         }
 
         class DocumentSearchCriteriaFragmentState : IRetainableState

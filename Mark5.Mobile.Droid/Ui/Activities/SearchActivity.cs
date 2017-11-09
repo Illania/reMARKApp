@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -16,6 +17,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ModuleIntentKey = "Module_0775cdc7-e733-4dea-a291-19c719bfb546";
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, ModuleType moduleType)
+        {
+            var intent = new Intent(context, typeof(SearchActivity));
+            intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -40,21 +49,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (moduleType == ModuleType.Documents)
                 {
-                    var f = new DocumentSearchCriteriaFragment();
-                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    var (f, tag) = DocumentSearchCriteriaFragment.NewInstance();
+                    ft.Replace(Resource.Id.fragment_container, f, tag);
                     ft.Commit();
                 }
                 if (moduleType == ModuleType.Contacts)
                 {
-                    var f = new ContactsSearchCriteriaFragment();
-                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    var (f, tag) = ContactsSearchCriteriaFragment.NewInstance();
+                    ft.Replace(Resource.Id.fragment_container, f, tag);
                     ft.Commit();
                 }
 
                 if (moduleType == ModuleType.Shortcodes)
                 {
-                    var f = new ShortcodesSearchCriteriaFragment();
-                    ft.Replace(Resource.Id.fragment_container, f, f.GenerateTag());
+                    var (f,tag) = ShortcodesSearchCriteriaFragment.NewInstance();
+                    ft.Replace(Resource.Id.fragment_container, f, tag);
                     ft.Commit();
                 }
 

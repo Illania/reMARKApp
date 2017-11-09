@@ -13,42 +13,53 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public abstract class AbstractUserSelectionFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public List<int> PreselectedUserIds { get; set; }
-
         UserSelectionAdapter CurrentAdapter => (UserSelectionAdapter)recyclerView.GetAdapter();
-
-        SwipeRefreshLayout refreshLayout;
-        RecyclerView recyclerView;
-        SearchView searchView;
-        protected UserSelectionAdapter Adapter;
-        protected UserSelectionAdapter SearchAdapter;
-        AppCompatButton actionButton;
 
         protected readonly Dictionary<int, SystemUser> SelectedSystemUsers = new Dictionary<int, SystemUser>();
 
         readonly Handler searchHandler = new Handler();
 
-        int actionButtonTextResId;
-        bool includeCurrentUser;
-        bool allowNoUserSelected;
+        protected const string PreselectedUserIdsBundleKey = "PreselectedUserIds_a8a78647-2a7f-4e36-9ada-b9ff9b727b80";
+        protected const string ActionButtonTextResIdBundleKey = "ActionButtonTextResId_0482d7d6-a109-4a78-8075-f69455052af2";
+        protected const string IncludeCurrentUserBundleKey = "IncludeCurrentUser_470297d6-812a-4ae8-8528-e85355aa7da7";
+        protected const string AllowNoUserSelectedBundleKey = "AllowNoUserSelected_fca35857-47a0-45c7-b8e1-d5bd4ff8bf39";
+        
+        protected UserSelectionAdapter Adapter;
+        protected UserSelectionAdapter SearchAdapter;
 
-        protected AbstractUserSelectionFragment(int actionButtonTextResId, bool includeCurrentUser, bool allowNoUserSelected = false)
-        {
-            this.actionButtonTextResId = actionButtonTextResId;
-            this.includeCurrentUser = includeCurrentUser;
-            this.allowNoUserSelected = allowNoUserSelected;
-        }
+        SwipeRefreshLayout refreshLayout;
+        RecyclerView recyclerView;
+        SearchView searchView;
+        AppCompatButton actionButton;
+
+        protected List<int> preselectedUserIds;
+        protected int actionButtonTextResId;
+        protected bool includeCurrentUser;
+        protected bool allowNoUserSelected;
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(PreselectedUserIdsBundleKey))
+                preselectedUserIds = Serializer.Deserialize<List<int>>(Arguments.GetString(PreselectedUserIdsBundleKey));
+
+            if (Arguments.ContainsKey(ActionButtonTextResIdBundleKey))
+                actionButtonTextResId = Arguments.GetInt(ActionButtonTextResIdBundleKey);
+
+            if (Arguments.ContainsKey(IncludeCurrentUserBundleKey))
+                includeCurrentUser = Arguments.GetBoolean(IncludeCurrentUserBundleKey);
+
+            if (Arguments.ContainsKey(AllowNoUserSelectedBundleKey))
+                allowNoUserSelected = Arguments.GetBoolean(AllowNoUserSelectedBundleKey);
+
             CommonConfig.Logger.Info($"Creating {nameof(AbstractUserSelectionFragment)} {GetInfo()}");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
@@ -141,9 +152,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else
                     Adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
 
-                if (PreselectedUserIds != null && PreselectedUserIds.Any())
+                if (preselectedUserIds != null && preselectedUserIds.Any())
                 {
-                    foreach (var userId in PreselectedUserIds)
+                    foreach (var userId in preselectedUserIds)
                     {
                         var user = Adapter.Items.FirstOrDefault(u => u.Id == userId);
                         if (user != null)

@@ -25,24 +25,25 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentFragment : RetainableStateFragment
+    public class DocumentFragment : BaseFragment
     {
-        static class RequestCodes
-        {
-            public static int CommentsRequest = 1;
-            public static int CategoriesRequest = 2;
-        }
+        const string FolderIdBundleKey = "FolderId_7215e56b-5ec3-436d-b4e3-900449cb1ad0";
+        const string FolderBundleKey = "Folder_592db8d9-d212-4476-ac83-fd4bb11cc8d9";
+        const string DocumentPreviewBundleKey = "DocumentPreview_83a5daa4-7ede-453b-9b19-07362f644ad1";
+        const string DocumentIdBundleKey = "DocumentId_e9409d8a-9212-4483-b819-ff5ac3487c87";
+        const string CloseRequestBundleKey = "CloseRequest_d45a15b4-dadb-40ae-aab1-c565e9446bd0";
+        const string NotificationGuidBundleKey = "NotificationGuid_fb411b05-9d4b-46db-aa81-7348bf069a38";
+        const string FailedDocumentToUploadGuidBundleKey = "FailedDocumentToUploadGuid_7bf6c332-083d-4f2b-950e-d3bdc3992e2b";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
-        public Guid FailedDocumentToUploadGuid { get; set; }
-        public int? FolderId { get; set; }
-        public Folder Folder { get; set; }
-        public int? DocumentId { get; set; }
-        public DocumentPreview DocumentPreview { get; set; }
-        public Document Document { get; set; }
-        public Action CloseRequest { get; set; }
-        public Guid NotificationGuid { get; set; }
+        Guid FailedDocumentToUploadGuid;
+        int? FolderId;
+        Folder Folder;
+        int? DocumentId;
+        DocumentPreview DocumentPreview;
+        Document Document;
+        Guid NotificationGuid;
 
         ProgressBar progress;
         RelativeLayout relativeLayout;
@@ -53,8 +54,56 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CancellationTokenSource setReadStatusCancellationTokenSource;
 
+        public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
+        {
+            var args = new Bundle();
+
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            if (folderId != null)
+                args.PutInt(FolderIdBundleKey, folderId.Value);
+
+            if (dp != null)
+                args.PutString(DocumentPreviewBundleKey, Serializer.Serialize(dp));
+
+            if (docId != null)
+                args.PutInt(DocumentIdBundleKey, docId.Value);
+
+            if (notificationGuid != null)
+                args.PutString(NotificationGuidBundleKey, Serializer.Serialize(notificationGuid));
+
+            if (failDocToUploadGuid != null)
+                args.PutString(FailedDocumentToUploadGuidBundleKey, Serializer.Serialize(failDocToUploadGuid));
+
+            var fragment = new DocumentFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(DocumentFragment)} [DocumentId={dp?.Id ?? docId}]";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(FolderBundleKey))
+                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
+            if (Arguments.ContainsKey(FolderIdBundleKey))
+                FolderId = Arguments.GetInt(FolderIdBundleKey);
+
+            if (Arguments.ContainsKey(DocumentPreviewBundleKey))
+                DocumentPreview = Serializer.Deserialize<DocumentPreview>(Arguments.GetString(DocumentPreviewBundleKey));
+
+            if (Arguments.ContainsKey(DocumentIdBundleKey))
+                DocumentId = Arguments.GetInt(DocumentIdBundleKey);
+
+            if (Arguments.ContainsKey(NotificationGuidBundleKey))
+                NotificationGuid = Serializer.Deserialize<Guid>(Arguments.GetString(NotificationGuidBundleKey));
+
+            if (Arguments.ContainsKey(FailedDocumentToUploadGuidBundleKey))
+                FailedDocumentToUploadGuid = Serializer.Deserialize<Guid>(Arguments.GetString(FailedDocumentToUploadGuidBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_buttons_and_progress, container, false);
@@ -178,30 +227,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if ((Activity is SwipeDocumentActivity) && !UserVisibleHint)
                 return;
 
-            MarkAsReadIfNecessary();
+            await MarkAsReadIfNecessary();
         }
 
-        public override void OnUserVisibilityHintChanged()
+        public override async void OnUserVisibilityHintChanged()
         {
             base.OnUserVisibilityHintChanged();
 
             if (UserVisibleHint)
             {
-                MarkAsReadIfNecessary();
+                await MarkAsReadIfNecessary();
             }
             else
             {
                 setReadStatusCancellationTokenSource?.Cancel();
                 setReadStatusCancellationTokenSource = null;
             }
-        }
-
-        public override void OnDestroyedByUser()
-        {
-            base.OnDestroyedByUser();
-
-            setReadStatusCancellationTokenSource?.Cancel();
-            setReadStatusCancellationTokenSource = null;
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -217,25 +258,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var categories = Serializer.Deserialize<List<Category>>(data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                     UpdateCategories(categories);
                 }
-        }
-
-        static class MenuItemActions
-        {
-            public const int GoToPrevious = 5;
-            public const int GoToNext = 6;
-            public const int MarkAsRead = 10;
-            public const int MarkAsUnread = 11;
-            public const int CopyToNew = 20;
-            public const int CopyToWorktray = 30;
-            public const int CopyToFolder = 40;
-            public const int MoveToFolder = 41;
-            public const int SetPriority = 50;
-            public const int Categories = 60;
-            public const int Comments = 70;
-            public const int Actions = 80;
-            public const int Links = 90;
-            public const int DeleteFromFolder = 100;
-            public const int Delete = 101;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -340,32 +362,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    Serializer.Serialize(new List<IBusinessEntity>
-                    {
-                        DocumentPreview
-                    }));
-                StartActivity(i);
-
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context,
+                                                                        CopyMoveToFolderListActivity.ModeType.Copy,
+                                                                        ModuleType.Documents,
+                                                                        new List<IBusinessEntity>
+                                                                        {
+                                                                            DocumentPreview
+                                                                        }));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey,
-                    Serializer.Serialize(new List<IBusinessEntity>
-                    {
-                        DocumentPreview
-                    }));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
-                StartActivity(i);
-
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context,
+                                                                        CopyMoveToFolderListActivity.ModeType.Move,
+                                                                        ModuleType.Documents,
+                                                                        new List<IBusinessEntity>
+                                                                        {
+                                                                            DocumentPreview
+                                                                        },
+                                                                        Folder));
                 return true;
             }
 
@@ -377,37 +393,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Categories)
             {
-                var i = new Intent(Activity, typeof(CategoriesListActivity));
-                i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(DocumentPreview));
-                StartActivityForResult(i, RequestCodes.CategoriesRequest);
-
+                StartActivityForResult(CategoriesListActivity.CreateIntent(Context, DocumentPreview), RequestCodes.CategoriesRequest);
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Comments)
             {
-                var i = new Intent(Activity, typeof(CommentsListActivity));
-                i.PutExtra(CommentsListActivity.EntityIntentKey, Serializer.Serialize(Document));
-                StartActivityForResult(i, RequestCodes.CommentsRequest);
-
+                StartActivityForResult(CommentsListActivity.CreateIntent(Context, Document), RequestCodes.CommentsRequest);
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Actions)
             {
-                var i = new Intent(Activity, typeof(ObjectActionsActivity));
-                i.PutExtra(ObjectActionsActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
-                StartActivity(i);
-
+                StartActivity(ObjectActionsActivity.CreateIntent(Context, DocumentPreview as IBusinessEntity));
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Links)
             {
-                var i = new Intent(Activity, typeof(ObjectLinksActivity));
-                i.PutExtra(ObjectLinksActivity.BusinessEntityIntentKey, Serializer.Serialize(DocumentPreview as IBusinessEntity));
-                StartActivity(i);
-
+                StartActivity(ObjectLinksActivity.CreateIntent(Context, DocumentPreview as IBusinessEntity));
                 return true;
             }
 
@@ -430,6 +434,143 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        void RefreshView()
+        {
+            var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;
+            if (activateButtons)
+            {
+                button1.Enabled = true;
+                button2.Enabled = true;
+                button3.Enabled = true;
+                button1.Alpha = 1f;
+                button2.Alpha = 1f;
+                button3.Alpha = 1f;
+            }
+            else
+            {
+                button1.Enabled = false;
+                button2.Enabled = false;
+                button3.Enabled = false;
+                button1.Alpha = .5f;
+                button2.Alpha = .5f;
+                button3.Alpha = .5f;
+            }
+
+            progress.Visibility = ViewStates.Gone;
+            relativeLayout.Visibility = ViewStates.Visible;
+
+            for (var i = 0; i < linearLayout.ChildCount; i++)
+            {
+                if (linearLayout.GetChildAt(i) is DocumentView dv)
+                {
+                    dv.DocumentPreview = DocumentPreview;
+                    dv.Document = Document;
+                    dv.RefreshView();
+
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
+                    {
+                        d.Visibility = dv.Visibility;
+                        i++;
+                    }
+                }
+            }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
+
+            Activity?.InvalidateOptionsMenu();
+        }
+
+        void RefreshView<T>() where T : DocumentView
+        {
+            progress.Visibility = ViewStates.Gone;
+            relativeLayout.Visibility = ViewStates.Visible;
+
+            for (var i = 0; i < linearLayout.ChildCount; i++)
+            {
+                if (linearLayout.GetChildAt(i) is T dv)
+                {
+                    dv.DocumentPreview = DocumentPreview;
+                    dv.Document = Document;
+                    dv.RefreshView();
+
+                    if (linearLayout.GetChildAt(i + 1) is Divider d)
+                    {
+                        d.Visibility = dv.Visibility;
+                        i++;
+                    }
+                }
+            }
+
+            linearLayout.Invalidate();
+            linearLayout.RequestLayout();
+
+            Activity?.InvalidateOptionsMenu();
+        }
+
+        async Task MarkAsReadIfNecessary()
+        {
+            setReadStatusCancellationTokenSource?.Cancel();
+            setReadStatusCancellationTokenSource = new CancellationTokenSource();
+
+            var d = Document;
+            var dp = DocumentPreview;
+            var token = setReadStatusCancellationTokenSource.Token;
+
+            try
+            {
+                if (dp == null || d == null)
+                    return;
+
+                if (dp.IsReadByCurrent)
+                    return;
+
+                var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
+                if (delaySeconds < 0)
+                    return;
+
+                await Task.Delay(delaySeconds * 1000);
+
+                if (token.IsCancellationRequested)
+                    return;
+
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+
+                if (token.IsCancellationRequested)
+                    return;
+
+                if (!IsAdded || IsDetached || IsRemoving)
+                    return;
+
+                if (dp == null)
+                    return;
+
+                RefreshView<RecipentsView>();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
+            }
+        }
+
+        void UpdateCategories(List<Category> categories)
+        {
+            DocumentPreview?.Categories.Clear();
+            DocumentPreview?.Categories.AddRange(categories);
+        }
+
+        void UpdateComments(List<Comment> comments)
+        {
+            if (Document != null)
+            {
+                Document.Comments.Clear();
+                Document.Comments.AddRange(comments);
+            }
+
+            if (DocumentPreview != null)
+                DocumentPreview.CommentsCount = comments.Count;
         }
 
         async void MarkAsRead()
@@ -511,9 +652,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
-                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(new List<IBusinessEntity> { DocumentPreview }));
-                StartActivity(i);
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, new List<IBusinessEntity> { DocumentPreview }));
             }
         }
 
@@ -603,7 +742,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 });
 
                 dismissAction();
-                CloseRequest?.Invoke();
+                Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -770,189 +909,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                CloseRequest?.Invoke();
+                Activity?.OnBackPressed();
             }
         }
 
-        void RefreshView()
+        static class MenuItemActions
         {
-            var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;
-            if (activateButtons)
-            {
-                button1.Enabled = true;
-                button2.Enabled = true;
-                button3.Enabled = true;
-                button1.Alpha = 1f;
-                button2.Alpha = 1f;
-                button3.Alpha = 1f;
-            }
-            else
-            {
-                button1.Enabled = false;
-                button2.Enabled = false;
-                button3.Enabled = false;
-                button1.Alpha = .5f;
-                button2.Alpha = .5f;
-                button3.Alpha = .5f;
-            }
-
-            progress.Visibility = ViewStates.Gone;
-            relativeLayout.Visibility = ViewStates.Visible;
-
-            for (var i = 0; i < linearLayout.ChildCount; i++)
-            {
-                if (linearLayout.GetChildAt(i) is DocumentView dv)
-                {
-                    dv.DocumentPreview = DocumentPreview;
-                    dv.Document = Document;
-                    dv.RefreshView();
-
-                    if (linearLayout.GetChildAt(i + 1) is Divider d)
-                    {
-                        d.Visibility = dv.Visibility;
-                        i++;
-                    }
-                }
-            }
-
-            linearLayout.Invalidate();
-            linearLayout.RequestLayout();
-
-            Activity?.InvalidateOptionsMenu();
+            public const int GoToPrevious = 5;
+            public const int GoToNext = 6;
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int CopyToNew = 20;
+            public const int CopyToWorktray = 30;
+            public const int CopyToFolder = 40;
+            public const int MoveToFolder = 41;
+            public const int SetPriority = 50;
+            public const int Categories = 60;
+            public const int Comments = 70;
+            public const int Actions = 80;
+            public const int Links = 90;
+            public const int DeleteFromFolder = 100;
+            public const int Delete = 101;
         }
 
-        void RefreshView<T>() where T : DocumentView
+        static class RequestCodes
         {
-            progress.Visibility = ViewStates.Gone;
-            relativeLayout.Visibility = ViewStates.Visible;
-
-            for (var i = 0; i < linearLayout.ChildCount; i++)
-            {
-                if (linearLayout.GetChildAt(i) is T dv)
-                {
-                    dv.DocumentPreview = DocumentPreview;
-                    dv.Document = Document;
-                    dv.RefreshView();
-
-                    if (linearLayout.GetChildAt(i + 1) is Divider d)
-                    {
-                        d.Visibility = dv.Visibility;
-                        i++;
-                    }
-                }
-            }
-
-            linearLayout.Invalidate();
-            linearLayout.RequestLayout();
-
-            Activity?.InvalidateOptionsMenu();
-        }
-
-        void MarkAsReadIfNecessary()
-        {
-            setReadStatusCancellationTokenSource?.Cancel();
-            setReadStatusCancellationTokenSource = new CancellationTokenSource();
-
-            Task.Run(async () =>
-            {
-                var d = Document;
-                var dp = DocumentPreview;
-                var token = setReadStatusCancellationTokenSource.Token;
-
-                try
-                {
-                    if (dp == null || d == null)
-                        return;
-
-                    if (dp.IsReadByCurrent)
-                        return;
-
-                    var delaySeconds = PlatformConfig.Preferences.MarkAsReadDelaySeconds;
-                    if (delaySeconds < 0)
-                        return;
-
-                    await Task.Delay(delaySeconds * 1000);
-
-                    if (token.IsCancellationRequested)
-                        return;
-
-                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
-
-                    Activity?.RunOnUiThread(() =>
-                    {
-                        if (token.IsCancellationRequested)
-                            return;
-
-                        if (!IsAdded || IsDetached || IsRemoving)
-                            return;
-
-                        if (dp == null)
-                            return;
-
-                        RefreshView<RecipentsView>();
-                    });
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error($"Marking document as read failed [documentPreviewId={dp?.Id}]", ex);
-                }
-            });
-        }
-
-        void UpdateCategories(List<Category> categories)
-        {
-            DocumentPreview?.Categories.Clear();
-            DocumentPreview?.Categories.AddRange(categories);
-        }
-
-        void UpdateComments(List<Comment> comments)
-        {
-            if (Document != null)
-            {
-                Document.Comments.Clear();
-                Document.Comments.AddRange(comments);
-            }
-
-            if (DocumentPreview != null)
-                DocumentPreview.CommentsCount = comments.Count;
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new DocumentFragmentState
-            {
-                FolderId = FolderId,
-                Folder = Folder,
-                DocumentId = DocumentId,
-                DocumentPreview = DocumentPreview
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is DocumentFragmentState dfs)
-            {
-                FolderId = dfs.FolderId;
-                Folder = dfs.Folder;
-                DocumentId = dfs.DocumentId;
-                DocumentPreview = dfs.DocumentPreview;
-            }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentFragment)} [DocumentId={DocumentPreview?.Id ?? Document?.Id ?? DocumentId}]";
-        }
-
-        class DocumentFragmentState : IRetainableState
-        {
-            public int? FolderId { get; set; }
-
-            public Folder Folder { get; set; }
-
-            public int? DocumentId { get; set; }
-
-            public DocumentPreview DocumentPreview { get; set; }
+            public static int CommentsRequest = 1;
+            public static int CategoriesRequest = 2;
         }
     }
 }

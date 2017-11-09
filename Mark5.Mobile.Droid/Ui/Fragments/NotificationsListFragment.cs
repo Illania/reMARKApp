@@ -23,7 +23,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class NotificationsListFragment : RetainableStateFragment
     {
-        public ObjectType[] ObjectTypes { get; set; }
+        const string ObjectTypesBundleKey = "ObjectTypes_0df8f79a-884b-4d2b-93ce-8141f1111cc5";
+
+        ObjectType[] objectTypes;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -33,10 +35,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Func<Notification, bool> unreadFilter = (n) => !n.IsRead;
 
+        public static (NotificationsListFragment fragment, string tag) NewInstance(ObjectType[] objectTypes)
+        {
+            var args = new Bundle();
+
+            if (objectTypes != null)
+                args.PutString(ObjectTypesBundleKey, Serializer.Serialize(objectTypes));
+
+            var fragment = new NotificationsListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(NotificationsListFragment)}]";
+
+            return (fragment, tag);
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(ObjectTypesBundleKey))
+                objectTypes = Serializer.Deserialize<ObjectType[]>(Arguments.GetString(ObjectTypesBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(NotificationsListFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -107,11 +127,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Options menu
 
-        static class MenuItemActions
-        {
-            public const int MarkAllAsRead = 10;
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Add(Menu.None, MenuItemActions.MarkAllAsRead, MenuItemActions.MarkAllAsRead, Resource.String.mark_all_as_read);
@@ -133,6 +148,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
+        static class MenuItemActions
+        {
+            public const int MarkAllAsRead = 10;
+        }
+
         #endregion
 
         #region RetainableStateFragment overrides
@@ -143,7 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return new NotificationsFragmentState
             {
-                ObjectTypes = ObjectTypes,
+                ObjectTypes = objectTypes,
                 Notifications = adapter.Items
             };
         }
@@ -155,14 +175,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.items.count={dlfs.Notifications?.Count}]...");
 
-                ObjectTypes = dlfs.ObjectTypes;
+                objectTypes = dlfs.ObjectTypes;
                 adapter.AppendItems(dlfs.Notifications);
             }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(NotificationsListFragment)}]";
         }
 
         #endregion
@@ -178,7 +193,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 refreshLayout.Refreshing = true;
 
                 var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
-                notifications = notifications.Where(n => ObjectTypes.Contains(n.ObjectType)).ToList();
+                notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
 
                 adapter.Clear();
                 adapter.AppendItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
@@ -211,24 +226,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (notification.ObjectType == ObjectType.Document)
             {
-                var i = new Intent(Activity, typeof(DocumentActivity));
-                i.PutExtra(DocumentActivity.FolderIdIntentKey, notification.FolderId);
-                i.PutExtra(DocumentActivity.DocumentIdIntentKey, notification.ObjectId);
-                StartActivity(i);
+                StartActivity(DocumentActivity.CreateIntent(Context, folderId: notification.FolderId, documentId: notification.ObjectId));
             }
             if (notification.ObjectType == ObjectType.Contact)
             {
-                var i = new Intent(Activity, typeof(ContactActivity));
-                i.PutExtra(ContactActivity.FolderIdIntentKey, notification.FolderId);
-                i.PutExtra(ContactActivity.ContactIdIntentKey, notification.ObjectId);
-                StartActivity(i);
+                StartActivity(ContactActivity.CreateIntent(Context, notification.FolderId, contactId: notification.ObjectId));
             }
             if (notification.ObjectType == ObjectType.Shortcode)
             {
-                var i = new Intent(Activity, typeof(ShortcodeActivity));
-                i.PutExtra(ShortcodeActivity.FolderIdIntentKey, notification.FolderId);
-                i.PutExtra(ShortcodeActivity.ShortcodeIdIntentKey, notification.ObjectId);
-                StartActivity(i);
+                StartActivity(ShortcodeActivity.CreateIntent(Context, notification.FolderId, shortcodeId: notification.ObjectId));
             }
         }
 
@@ -268,13 +274,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class NotificationsAdapter : RecyclerView.Adapter
         {
-            public List<Notification> Items { get; } = new List<Notification>(200);
-
             public override int ItemCount => Items.Count;
 
-            readonly Context context;
+            public List<Notification> Items { get; } = new List<Notification>(200);
 
             public event EventHandler<Notification> ItemClicked = delegate { };
+
+            readonly Context context;
 
             public NotificationsAdapter(Context context)
             {

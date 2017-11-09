@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Android.Content;
 using Android.Content.Res;
@@ -31,6 +31,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FloatingActionButton fab;
 
         List<AbstractSearchView<SearchShortcodesCriteria>> subviews = new List<AbstractSearchView<SearchShortcodesCriteria>>();
+
+        public static (ShortcodesSearchCriteriaFragment Fragment, string tag) NewInstance()
+        {
+            var fragment = new ShortcodesSearchCriteriaFragment();
+            var tag = $"{nameof(ShortcodesSearchCriteriaFragment)}";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -137,6 +145,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
+            item.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                Reset();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        public void ReplaceFragment(Fragment f, string tag)
+        {
+            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
+
+            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
+        }
+
+        public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
+        {
+            var parent = containerLinearLayout?.Parent?.Parent?.Parent?.Parent?.Parent as CoordinatorLayout;
+
+            if (parent == null)
+                return;
+
+            var distance = parent.Bottom - v.Bottom;
+            var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
+
+            v.Visibility = distance > bottomMargin * 2 ? ViewStates.Invisible : ViewStates.Visible;
+        }
+
         void RefreshViews()
         {
             subviews.ForEach(c =>
@@ -163,39 +209,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            menu.Clear();
-            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
-            item.SetShowAsAction(ShowAsAction.Always);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                Reset();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-        public void ReplaceFragment(Fragment f, string tag)
-        {
-            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
-
-            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
-        }
-
         void HandleSearchButtonClicked()
         {
             GetCriteria();
 
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
-            StartActivity(i);
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Shortcodes, shortcodeCriteria: GetCriteria()));
         }
 
         SearchShortcodesCriteria GetCriteria()
@@ -207,19 +225,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
 
             return searchCriteria;
-        }
-
-        public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
-        {
-            var parent = containerLinearLayout?.Parent?.Parent?.Parent?.Parent?.Parent as CoordinatorLayout;
-
-            if (parent == null)
-                return;
-
-            var distance = parent.Bottom - v.Bottom;
-            var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
-
-            v.Visibility = distance > bottomMargin * 2 ? ViewStates.Invisible : ViewStates.Visible;
         }
 
         #region Retained State
@@ -237,11 +242,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var df = restoredState as ShortcodeSearchCriteriaFragmentState;
             if (df != null)
                 searchCriteria = df.Criteria;
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ShortcodesSearchCriteriaFragment)}";
         }
 
         class ShortcodeSearchCriteriaFragmentState : IRetainableState

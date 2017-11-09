@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,29 +13,57 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
-namespace Mark5.Mobile.Droid
+namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickCategoriesListFragment : RetainableStateFragment
     {
-        public ObjectType ObjectType { get; set; }
-        public int[] PreselectedCategoryIds { get; set; }
-        public Action<List<Category>> CloseRequest { get; set; }
+        public Task<List<Category>> Task => tcs.Task;
 
-        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter)recyclerView.GetAdapter();
+
+        readonly TaskCompletionSource<List<Category>> tcs = new TaskCompletionSource<List<Category>>();
+
+        readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
+
+        const string ObjectTypeBundleKey = "ObjectType_cae47797-624e-48a2-a472-1758023b0e40";
+        const string PreselectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
+
+        ObjectType objectType;
+        int[] preselectedCategoryIds;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         CategoriesListAdapter adapter;
 
-        readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
+        public static (PickCategoriesListFragment fragment, string tag) NewInstance(ObjectType objectType, int[] preselectedCategoryIds)
+        {
+            var args = new Bundle();
+            args.PutInt(ObjectTypeBundleKey, (int)objectType);
 
+            if (preselectedCategoryIds != null)
+                args.PutIntArray(PreselectedCategoryIdsBundleKey, preselectedCategoryIds);
+
+            var fragment = new PickCategoriesListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(PickCategoriesListFragment)} [objectType={objectType}]";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
+            if (Arguments.ContainsKey(ObjectTypeBundleKey))
+                objectType = (ObjectType)Arguments.GetInt(ObjectTypeBundleKey);
+
+            if (Arguments.ContainsKey(PreselectedCategoryIdsBundleKey))
+                preselectedCategoryIds = Arguments.GetIntArray(PreselectedCategoryIdsBundleKey);
+
+            CommonConfig.Logger.Info($"Creating {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -60,9 +88,9 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.categories);
 
-            CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
         }
 
         public override async void OnResume()
@@ -71,7 +99,7 @@ namespace Mark5.Mobile.Droid
 
             if (adapter.ItemCount < 1)
             {
-                CommonConfig.Logger.Info($"Refreshing {nameof(PickCategoriesListFragment)} [objectType={ObjectType}]");
+                CommonConfig.Logger.Info($"Refreshing {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
                 await RefreshData();
             }
         }
@@ -101,9 +129,8 @@ namespace Mark5.Mobile.Droid
 
         void CloseFragment()
         {
-            if (CloseRequest != null)
-                CloseRequest(selectedCategories.Values.ToList());
-            ((AppCompatActivity) Activity).OnBackPressed();
+            tcs.SetResult(selectedCategories.Values.ToList());
+            ((AppCompatActivity)Activity).OnBackPressed();
         }
 
         #region Refresh methods
@@ -117,7 +144,7 @@ namespace Mark5.Mobile.Droid
                 refreshLayout.Refreshing = true;
 
                 List<Category> availableCategories;
-                switch (ObjectType)
+                switch (objectType)
                 {
                     case ObjectType.Document:
                         availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
@@ -130,14 +157,14 @@ namespace Mark5.Mobile.Droid
                 }
 
                 foreach (var category in availableCategories)
-                    if (PreselectedCategoryIds.Contains(category.Id))
+                    if (preselectedCategoryIds.Contains(category.Id))
                         ToggleSelected(category);
 
                 adapter.SetItems(availableCategories);
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while retrieving available categories [objectType={ObjectType}]", ex);
+                CommonConfig.Logger.Error($"Error while retrieving available categories [objectType={objectType}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -192,11 +219,6 @@ namespace Mark5.Mobile.Droid
             }
         }
 
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickCategoriesListFragment)} [objectType={ObjectType}]";
-        }
-
         class AvailableCategoriesListFragmentState : IRetainableState
         {
             public Dictionary<int, Category> SelectedCategories { get; set; }
@@ -210,13 +232,13 @@ namespace Mark5.Mobile.Droid
 
         class CategoriesListAdapter : RecyclerView.Adapter
         {
-            readonly Dictionary<int, Category> selectedCategoriesInView;
-
             public override int ItemCount => Items.Count;
 
             public List<Category> Items { get; } = new List<Category>(200);
 
             public event EventHandler<Category> ItemClicked = delegate { };
+
+            readonly Dictionary<int, Category> selectedCategoriesInView;
 
             public CategoriesListAdapter(Dictionary<int, Category> selectedCategoriesInView)
             {
@@ -336,7 +358,17 @@ namespace Mark5.Mobile.Droid
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
         }
-
         #endregion
+
+    }
+    //Used to add the closerequest in a bundle to the fragment.
+    public class CategoriesCloseRequest : Java.Lang.Object
+    {
+        public Action<List<Category>> CloseRequest { get; set; }
+
+        public CategoriesCloseRequest(Action<List<Category>> closeRequest)
+        {
+            CloseRequest = closeRequest;
+        }
     }
 }

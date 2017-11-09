@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -14,10 +14,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickCountryFragment : RetainableStateFragment
     {
+        public Task<int> Task => tcs.Task;
+       
         RecyclerView recyclerView;
         CountriesListViewAdapter adapter;
 
-        public Action<int> CloseRequest { get; set; }
+        readonly TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
+
+        public static (PickCountryFragment fragment, string tag) NewInstance()
+        {
+            var fragment = new PickCountryFragment();
+            var tag = $"{nameof(PickCountryFragment)}";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -64,19 +74,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void CountrySelected(CountryInfo c)
         {
-            if (CloseRequest != null)
-                CloseRequest(c.FaxPrefix);
+            tcs.SetResult(c.FaxPrefix);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
-
-        #region Retained State
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickLinesListFragment)}";
-        }
-
-        #endregion
 
         class CountriesListViewAdapter : RecyclerView.Adapter
         {

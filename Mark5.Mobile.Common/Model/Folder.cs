@@ -110,7 +110,7 @@ namespace Mark5.Mobile.Common.Model
             ContactsRootFolder,
             ShortcodesRootFolder,
             CalendarRootFolder
-        }.Contains(this);
+        }.Select(f => f.Id).Contains(Id);
 
         static readonly Folder DocumentsRootFolder = new Folder
         {
