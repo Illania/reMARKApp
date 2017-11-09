@@ -68,15 +68,29 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var splitNumber = number.Split('|');
 
-            if (splitNumber[0] == "") //No country code is defined, so the number will not be handled.
+            var countryNumber = splitNumber[0];
+
+            if (countryNumber == "") //No country code is defined, so the number will not be handled.
                 return;
+
+            var regCode = splitNumber[1];
+            var baseNumber = splitNumber[2];
+
+            if (regCode != String.Empty) //If there actually is a regional code, then this will be appended with the base number.
+                baseNumber = regCode + baseNumber;
 
             var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
-            //Get region code for parsing the number. Parsing will remove any char's like '(' or '-'.
-            var regCode = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(splitNumber[0]));
-            PhoneNumber nmber = phoneNumberUtil.Parse(splitNumber[2],regCode);
-            number = phoneNumberUtil.Format(nmber, PhoneNumberFormat.E164);
+            //Get  for parsing the number. Parsing will remove any char's like '(' or '-'.
+            var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(splitNumber[0]));
+            try
+            {
+                PhoneNumber nmber = phoneNumberUtil.Parse(splitNumber[2],countryString);
+                number = phoneNumberUtil.Format(nmber, PhoneNumberFormat.E164);
+            } catch (NumberParseException ex)
+            {
+                return; //Number has been stored incorrectly, e.g. contains letters, so it is ignored.
+            }
 
             number = number.Replace("+", String.Empty);
 

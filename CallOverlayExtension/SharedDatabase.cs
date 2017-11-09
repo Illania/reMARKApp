@@ -8,8 +8,7 @@ namespace CallOverlayExtension
 {
     public static class SharedDatabase
     {
-        //Retrieves all contacts stored in the database in the shared container.
-
+        //Retrieves all contacts stored in the database in the shared container by a deferred query.
         const string databaseFileName = "sharedcontacts.sqlite3";
         const string databaseLockName = "sharedcontacts.lock";
         const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
@@ -32,17 +31,19 @@ namespace CallOverlayExtension
                             var commandString = $"select * "
                                 + $"from {nameof(ExtensionContact)} ";
 
-                            var cmd = connection.CreateCommand(commandString);
-                            var result = cmd.ExecuteQuery<ExtensionContact>();
-                            dbContacts = result;
+                            var row = connection.DeferredQuery<ExtensionContact>(commandString);
+                            while (row.GetEnumerator().MoveNext()) ;
+                            {
+                                ProcessAndStoreContact(row.GetEnumerator().Current, cxContext);
+                            }
+
                         });
                     }
                     finally { UnlockDatabase(); }
                 }
             }
 
-            //return ProcessResult(dbContacts);
-            ProcessAndStoreContacts(dbContacts,cxContext);
+
         }
 
         /*static List<(string name, long number)> ProcessResult(List<ExtensionContact> dbResult)
@@ -63,22 +64,20 @@ namespace CallOverlayExtension
             return result;
         }*/
 
-        static void ProcessAndStoreContacts(List<ExtensionContact> dbResult, CXCallDirectoryExtensionContext cxContext)
+        static void ProcessAndStoreContact(ExtensionContact dbResult, CXCallDirectoryExtensionContext cxContext)
         {
             List<(string name, long number)> result = new List<(string name, long number)>();
 
-            foreach (ExtensionContact ec in dbResult)
+            var extName = dbResult.Name;
+            var numbers = dbResult.Numbers.Split(',');
+            for (int i = 0; i < numbers.Length; i++)
             {
-                var name = ec.Name;
-                var numbers = ec.Numbers.Split(',');
-                for (int i = 0; i < numbers.Length; i++)
-                {
-                    result.Add((name, Convert.ToInt64(numbers[i])));
-                }
+                result.Add((extName, Convert.ToInt64(numbers[i])));
             }
+            
 
             result.Sort((ec1, ec2) => ec1.number.CompareTo(ec2.number));
-
+           
             foreach ((string name, long number) in result){
                 cxContext.AddIdentificationEntry(number,name);
             }

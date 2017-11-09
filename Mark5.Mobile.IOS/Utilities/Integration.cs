@@ -402,7 +402,9 @@ namespace Mark5.Mobile.IOS.Utilities
         public static void CopyToClipboard(UIViewController viewController, UITableView tableView, UITableViewCell cell, string text)
         {
             var browserChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_clipboard"), UIAlertActionStyle.Default, a => UIPasteboard.General.String = text));
+            browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_clipboard"), UIAlertActionStyle.Default, a => { 
+                UIPasteboard.General.String = text;
+            }));
             browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (browserChooser.PopoverPresentationController != null)
