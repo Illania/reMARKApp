@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -176,26 +177,31 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                     SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
             }
-            
+
             if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
                 AddEmails(PreconfiguredEmailAddresses[AddressType]);
 
             return Task.CompletedTask;
         }
 
-        public override Task UpdateDocument()
+        public override async Task UpdateDocument()
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
-            foreach (var email in GetEmails())
+
+            await AsyncHelpers.RunOnUiThreadSync((Activity)Context, () =>
             {
-                DocumentPreview.Addresses.Add(new DocumentAddress
+                foreach (var email in GetEmails())
                 {
-                    Address = email,
-                    AddressType = AddressType,
-                    Type = CommunicationAddressType.Email
-                });
-            }
-            return Task.CompletedTask;
+                    DocumentPreview.Addresses.Add(new DocumentAddress
+                    {
+                        Address = email,
+                        AddressType = AddressType,
+                        Type = CommunicationAddressType.Email
+                    });
+                }
+            });
+
+            return;
         }
 
         public void SetEmails(IEnumerable<string> emails)

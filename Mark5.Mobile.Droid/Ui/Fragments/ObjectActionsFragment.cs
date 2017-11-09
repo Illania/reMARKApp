@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -20,9 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectActionsFragment : RetainableStateFragment
     {
-        public IBusinessEntity BusinessEntity { get; set; }
+        const string BusinessEntityBundleKey = "BusinessEntity_4330331f-58a2-458e-839a-48ace9b11c38";
 
-        public Action CloseRequest { get; set; }
+        IBusinessEntity businessEntity;
 
         List<ObjectAction> objectActions;
 
@@ -30,9 +31,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
+        public static (ObjectActionsFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
+        {
+            var args = new Bundle();
+
+            if (businessEntity != null)
+                args.PutString(BusinessEntityBundleKey, Serializer.Serialize(businessEntity));
+
+            var fragment = new ObjectActionsFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            if (Arguments.ContainsKey(BusinessEntityBundleKey))
+                businessEntity = Serializer.Deserialize<IBusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
+
+            CommonConfig.Logger.Info($"Creating {nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
@@ -53,7 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.actions);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            CommonConfig.Logger.Info($"Created {nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
         }
 
         public override async void OnResume()
@@ -63,23 +82,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new ObjectActionsFragmentState
+            {
+                BusinessEntity = businessEntity,
+                ObjectActions = objectActions
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            var oafs = restoredState as ObjectActionsFragmentState;
+            if (oafs != null)
+            {
+                businessEntity = oafs.BusinessEntity;
+                objectActions = oafs.ObjectActions;
+            }
+        }
+
         async Task RefreshData()
         {
             try
             {
                 if (objectActions == null)
-                    objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(BusinessEntity);
+                    objectActions = await Managers.CommonActionsManager.GetObjectActionsAsync(businessEntity);
 
                 RefreshView();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading object actions failed [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]", ex);
+                CommonConfig.Logger.Error($"Downloading object actions failed [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
-                if (CloseRequest != null)
-                    CloseRequest();
             }
         }
 
@@ -97,30 +132,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ObjectActionsFragmentState
-            {
-                BusinessEntity = BusinessEntity,
-                ObjectActions = objectActions
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var oafs = restoredState as ObjectActionsFragmentState;
-            if (oafs != null)
-            {
-                BusinessEntity = oafs.BusinessEntity;
-                objectActions = oafs.ObjectActions;
-            }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ObjectActionsFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]";
         }
 
         class ObjectActionsFragmentState : IRetainableState

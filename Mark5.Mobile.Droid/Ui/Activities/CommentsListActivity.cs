@@ -19,6 +19,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         CommentsListFragment cf;
 
+        public static Intent CreateIntent(Context context, IBusinessEntity be = null)
+        {
+            var intent = new Intent(context, typeof(CommentsListActivity));
+
+            if (be != null)
+                intent.PutExtra(EntityIntentKey, Serializer.Serialize(be));
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -36,20 +46,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var businessEntity = Serializer.Deserialize<BusinessEntity>(Intent.Extras.GetString(EntityIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                cf = new CommentsListFragment
-                {
-                    Entity = businessEntity
-                };
-                ft.Replace(Resource.Id.fragment_container, cf, cf.GenerateTag());
+                (cf, tag) = CommentsListFragment.NewInstance(businessEntity);
+                ft.Replace(Resource.Id.fragment_container, cf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CommentsListActivity)}");
             }
             else
             {
-                cf = (CommentsListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                cf = (CommentsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CommentsListActivity)}");
             }
         }

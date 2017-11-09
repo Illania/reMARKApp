@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Common.Service
 
                     foreach (var documentToUploadGuid in documentToUploadGuids)
                     {
-                        CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSending, documentToUploadGuid));
+                        CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSending, documentToUploadGuid));
 
                         try
                         {
@@ -124,7 +124,7 @@ namespace Mark5.Mobile.Common.Service
 
                             CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
 
-                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSent, documentToUploadGuid));
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid));
                         }
                         catch (Exception ex)
                         {
@@ -132,7 +132,7 @@ namespace Mark5.Mobile.Common.Service
 
                             await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid);
 
-                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChanged(this, DocumentUploadStatusChanged.Status.DocumentSentFailed, documentToUploadGuid));
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSentFailed, documentToUploadGuid));
                         }
                     }
                 }

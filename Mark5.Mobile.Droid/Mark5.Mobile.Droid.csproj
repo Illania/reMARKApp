@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Mark5.Mobile.Droid</RootNamespace>
     <AssemblyName>Mark5.Mobile.Droid</AssemblyName>
-    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -234,7 +234,6 @@
     <Compile Include="Ui\Activities\MainActivity.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
-    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
@@ -379,51 +378,51 @@
     <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
     <Compile Include="Ui\Activities\DownloadActivity.cs" />
     <Compile Include="Ui\Fragments\DownloadFragment.cs" />
-    <Compile Include="Model\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityRemovedMessage.cs" />
-    <Compile Include="Model\HubMessages\NewNotificationsReceived.cs" />
     <Compile Include="Ui\Activities\TemplatesListActivity.cs" />
     <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
     <Compile Include="Model\FileDescription.cs" />
     <Compile Include="Utilities\Extensions\ViewGroupExtensions.cs" />
     <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
     <Compile Include="Ui\Activities\AddEditContactActivity.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractMultipleRowsView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractPhoneNumberView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractSimpleFieldView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AccountView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\BirthdateView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\DescriptionView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\EmailsView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\FaxView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\LedgerView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\MobileView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\NameView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\ParentContactView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PersonNameView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PhoneView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PhysicalAddressesView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PositionView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\ResponsibleUsersView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\ShortIdView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\TelexView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\VatView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\WebpageView.cs" />
     <Compile Include="Ui\Activities\ParentContactSelectorActivity.cs" />
     <Compile Include="Ui\Activities\ParentContactSelectorFoldersListActivity.cs" />
     <Compile Include="Ui\Fragments\AbstractUserSelectionFragment.cs" />
     <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
-    <Compile Include="Model\HubMessages\ContactPreviewChanged.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Ui\Activities\AddEditShortcodeActivity.cs" />
+    <Compile Include="Ui\Fragments\AddEditShortcodeFragment.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AccountView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AddEditContactView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\BirthdateView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\EmailsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\FaxView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\LedgerView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\MobileView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ParentContactView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PersonNameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PhoneView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PhysicalAddressesView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PositionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ResponsibleUsersView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ShortIdView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\TelexView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\VatView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\WebpageView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractPhoneNumberView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AddEditShortcodeView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
+    <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
     <Compile Include="Utilities\Analytics.cs" />
   </ItemGroup>
@@ -436,8 +435,10 @@
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
     <Folder Include="Model\HubMessages\" />
-    <Folder Include="Ui\Activities\Activities\" />
     <Folder Include="Utilities\Extensions\" />
+    <Folder Include="Ui\Views\AddEditViews\" />
+    <Folder Include="Ui\Views\AddEditViews\AddEditContactViews\" />
+    <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -724,20 +725,20 @@
     <AndroidResource Include="Resources\drawable\icon_download_done.xml" />
     <AndroidResource Include="Resources\drawable\icon_download_download.xml" />
     <AndroidResource Include="Resources\drawable\icon_download_warning.xml" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-hdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-hdpi\remove.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\remove.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\remove.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\remove.png" />
     <AndroidResource Include="Resources\layout\countries_dropdown.axml" />

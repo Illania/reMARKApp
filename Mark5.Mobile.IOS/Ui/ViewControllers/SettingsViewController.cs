@@ -14,8 +14,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class SettingsViewController : AppSettingsViewController, ISettingsDelegate
     {
-        const string Value1CellId = "Value1CellId";
-
         const string UseServerTimezoneKey = "UseServerTimezone";
         const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
@@ -46,8 +44,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            ExtendedLayoutIncludesOpaqueBars = true;
-
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), SettingsChanged);
         }
 
@@ -55,10 +51,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            RefreshHiddenSettings();
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
-            ReachabilityBar.Attach(View.Superview, TableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+                TableView.InsetsContentViewsToSafeArea = true;
+            }
+
+
+            RefreshHiddenSettings();
         }
+
+        public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
         {
@@ -68,10 +74,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return 0f;
 
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
-
-            var attributes = new UIStringAttributes();
-            attributes.Font = Theme.DefaultFont;
-            var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue), NSStringDrawingOptions.UsesLineFragmentOrigin, attributes, null);
+            var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue),
+                                                                NSStringDrawingOptions.UsesLineFragmentOrigin,
+                                                                new UIStringAttributes { Font = Theme.DefaultFont },
+                                                                null);
 
             return size.Height + 10f;
         }
@@ -93,17 +99,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var specifier = SettingsReader.GetSpecifier(indexPath);
             if (specifier.Type == "PSMultiValueSpecifier")
             {
-                var vc = new CustomSpecifierValuesViewController();
-                vc.CurrentSpecifier = specifier;
-                vc.SettingsReader = SettingsReader;
-                vc.SettingsStore = SettingsStore;
+                var vc = new CustomSpecifierValuesViewController
+                {
+                    CurrentSpecifier = specifier,
+                    SettingsReader = SettingsReader,
+                    SettingsStore = SettingsStore
+                };
                 vc.View.TintColor = View.TintColor;
-
-                // Compared to original code, assignment of currentChildViewController
-                // was skipped, because it is not in the binding and is not very important
-
                 NavigationController.PushViewController(vc, true);
-
                 return;
             }
 
@@ -115,10 +118,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == LocalTemplateKey)
             {
-                var cell = (EditTextViewCell) tableView.DequeueReusableCell(EditTextViewCell.Key);
+                var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
                 if (cell == null)
                 {
-                    cell = (EditTextViewCell) EditTextViewCell.Nib.Instantiate(null, null)[0];
+                    cell = new EditTextViewCell();
                     cell.ContentChanged += (sender, e) => PlatformConfig.Preferences.LocalTemplate = cell.Content;
                 }
                 cell.Content = PlatformConfig.Preferences.LocalTemplate;
@@ -128,48 +131,44 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UsernameKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
+                var ci = Managers.ActiveConnectionInfo;
 
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = Managers.ActiveConnectionInfo?.Username;
-                cell.DetailTextLabel.TextColor = UIColor.Gray;
-                cell.DetailTextLabel.Font = UIFont.SystemFontOfSize(17f);
-
+                cell.DetailTextLabel.Text = ci?.Username;
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
 
             if (specifier.Key == ServerAddressKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
-
                 var ci = Managers.ActiveConnectionInfo;
 
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
-
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
 
             if (specifier.Key == SslEnabledKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
+                var ci = Managers.ActiveConnectionInfo;
+                var sslEnabled = ci?.SslMode != SslMode.Off;
 
-                var sslOff = Managers.ActiveConnectionInfo?.SslMode != SslMode.Off;
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = sslOff ? Localization.GetString("enabled") : Localization.GetString("disabled");
-                cell.DetailTextLabel.TextColor = sslOff ? UIColor.Gray : Theme.Brown;
-
+                cell.DetailTextLabel.Text = sslEnabled ? Localization.GetString("enabled") : Localization.GetString("disabled");
+                cell.DetailTextLabel.TextColor = sslEnabled ? Theme.DarkGray : Theme.Brown;
                 return cell;
             }
 
             if (specifier.Key == VersionKey)
             {
-                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = string.Format("{0} ({1})", NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"], NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]);
-
+                cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
 
@@ -196,36 +195,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("settingsViewController:buttonTappedForSpecifier:")]
         public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
         {
-            if (specifier.Key == LogoutKey)
-            {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
-
-                try
-                {
-                    if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                        await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error(ex);
-                }
-
-                PlatformConfig.Preferences.ResetOnLaunch = true;
-
-                dismissAction();
-
-                Dialogs.ShowBlockingDialog(this, Localization.GetString("please_restart"));
-
-                return;
-            }
-
             if (specifier.Key == SendFeedbackKey)
             {
                 try
                 {
                     if (!SystemReportCollector.CanMailReport)
                     {
-                        await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
                         return;
                     }
 
@@ -242,7 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Error("Could not mail system report", ex);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 }
 
 
@@ -268,7 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Error("Could not share system report", ex);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 }
 
                 return;
@@ -293,8 +269,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     CommonConfig.Logger.Error("Could not retrieve system settings!", ex);
 
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
+
+                return;
+            }
+
+            if (specifier.Key == LogoutKey)
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
+
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                        await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error(ex);
+                }
+
+                PlatformConfig.Preferences.ResetOnLaunch = true;
+
+                dismissAction();
+
+                Dialogs.ShowBlockingAlert(this, Localization.GetString("please_restart"));
 
                 return;
             }
@@ -308,18 +307,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             // Nothing to do
         }
 
-
         async void SettingsChanged(NSNotification n)
         {
             var key = n.Object.ToString();
 
             if (key == UseServerTimezoneKey)
-                await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
 
             if (key == DocumentsToDownloadKey)
             {
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-
                 return;
             }
 
@@ -328,7 +325,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
                 return;
             }
 
@@ -339,12 +335,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void RefreshHiddenSettings()
         {
             SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
-                    ? null
-                    : new[]
-                    {
-                        LocalTemplateKey
-                    },
-                false);
+                          ? null
+                          : new[] { LocalTemplateKey }, false);
         }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController

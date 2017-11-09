@@ -22,7 +22,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
         UILabel titleLabel;
         UITextView textView;
-        UITapGestureRecognizer textViewTapGestureRecognizer;
 
         bool expanded;
 
@@ -31,20 +30,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         public RecipientsView(DocumentAddressType addressType)
         {
             this.addressType = addressType;
-            Initialize();
-        }
 
-        void Initialize()
-        {
-            titleLabel = new UILabel();
-            titleLabel.Text = GetTitle() + ":";
-            titleLabel.Font = Theme.DefaultFont;
-            titleLabel.TextColor = UIColor.LightGray;
-            titleLabel.Opaque = false;
-            titleLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            titleLabel.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            titleLabel = new UILabel
+            {
+                Text = GetTitle() + ":",
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkGray,
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            titleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            titleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            titleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
             {
@@ -59,14 +56,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            textView = new UITextView(CGRect.Empty, textContainer);
-            textView.Font = Theme.DefaultFont;
-            textView.Opaque = false;
+            textView = new UITextView(CGRect.Empty, textContainer)
+            {
+                Font = Theme.DefaultFont,
+                Opaque = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             textView.TextContainer.LineFragmentPadding = 0f;
-            textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.ClipsToBounds = false;
-            textView.ScrollEnabled = false;
-            textView.TranslatesAutoresizingMaskIntoConstraints = false;
             textView.TextContainer.MaximumNumberOfLines = 1;
             textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
             ContainerView.AddSubview(textView);
@@ -78,13 +77,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
             });
 
-            textViewTapGestureRecognizer = new UITapGestureRecognizer();
-            textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
-            textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
-            textView.AddGestureRecognizer(textViewTapGestureRecognizer);
+            textView.AddGestureRecognizer(new UITapGestureRecognizer(HandleTextTapped));
         }
 
-        #region DocumentSubView overrides
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                titleLabel?.RemoveFromSuperview();
+                titleLabel = null;
+
+                textView?.RemoveFromSuperview();
+                textView.GestureRecognizers.ForEach(textView.RemoveGestureRecognizer);
+                textView = null;
+            }
+        }
 
         public override void RefreshView()
         {
@@ -124,11 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             Hidden = !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
         }
 
-        #endregion
-
-        #region Event handlers and delegate
-
-        void HandleTextTapped()
+        void HandleTextTapped(UITapGestureRecognizer gestureRecognizer)
         {
             if (!expanded && textView.IsTruncated())
             {
@@ -136,23 +139,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
             }
 
-            var tapPosition = textView.GetClosestPositionToPoint(textViewTapGestureRecognizer.LocationInView(textView));
+            var tapPosition = textView.GetClosestPositionToPoint(gestureRecognizer.LocationInView(textView));
             var offset = textView.GetOffsetFromPosition(textView.BeginningOfDocument, tapPosition);
 
-            var beforeSubstring = textView.Text.SafeSubstring(0, (int) offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
-            var afterSubstring = textView.Text.SafeSubstring((int) offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var beforeSubstring = textView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = textView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
             if (CommonConfig.Logger.IsTraceEnabled())
                 CommonConfig.Logger.Trace(string.Format("Tapped recipent. [recipent={0}]", tappedRecipent));
 
-            RecipientTapped(this, new RecipientTappedEventArgs(tappedRecipent));
+            RecipientTapped?.Invoke(this, new RecipientTappedEventArgs(tappedRecipent));
         }
-
-        #endregion
-
-        #region Helper methods
 
         string GetTitle()
         {
@@ -201,20 +200,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             textView.TextStorage.DeleteRange(new NSRange(0, 1));
             textView.TextStorage.EndEditing();
 
-            Animate(0.2d,
-                () =>
-                {
-                    textView.TextContainer.MaximumNumberOfLines = 0;
-                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+            AnimateNotify(0.2d, () =>
+            {
+                textView.TextContainer.MaximumNumberOfLines = 0;
+                textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                Superview.SetNeedsLayout();
+                Superview.LayoutIfNeeded();
 
-                    expanded = true;
-                });
+                expanded = true;
+            }, null);
         }
-
-        #endregion
     }
 
     public class RecipientTappedEventArgs : EventArgs

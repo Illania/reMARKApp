@@ -1,11 +1,12 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
@@ -23,6 +24,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityMovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
+        TinyMessageSubscriptionToken shortcodePreviewChangedToken;
+
+        public static Intent CreateIntent(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(ShortcodesListActivity));
+            intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -41,27 +51,25 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                slf = new ShortcodesListFragment
-                {
-                    Folder = folder,
-                    CloseRequest = OnBackPressed
-                };
-                ft.Replace(Resource.Id.fragment_container, slf, slf.GenerateTag());
+                (slf, tag) = ShortcodesListFragment.NewInstance(folder);
+                ft.Replace(Resource.Id.fragment_container, slf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ShortcodesListActivity)}");
             }
             else
             {
-                slf = (ShortcodesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                slf = (ShortcodesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ShortcodesListActivity)}");
             }
 
             entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(slf.UpdateMovedEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
             entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(slf.UpdateRemovedFromFolderEntities, m => slf != null && m.Sender != slf && slf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Shortcode);
             entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(slf.UpdateRemovedEntities, m => slf != null && m.Sender != slf && m.ObjectType == ObjectType.Shortcode);
+            shortcodePreviewChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(slf.UpdateShortcodePreview, m => slf != null && m.EntityPreview.ObjectType == ObjectType.Shortcode && m.Sender != slf);
         }
 
         public override void Finish()
@@ -78,6 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             entityMovedFromFolderToken?.Dispose();
             entityRemovedFromFolderToken?.Dispose();
             entityRemovedToken?.Dispose();
+            shortcodePreviewChangedToken?.Dispose();
         }
     }
 }

@@ -33,6 +33,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             RestorationClass = Class;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         protected override async void ResetItem_Clicked(object sender, EventArgs e)
         {
             base.ResetItem_Clicked(sender, e);
@@ -51,10 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new ShortcodesSearchResultsViewController
-            {
-                Criteria = criteria
-            }, true);
+            NavigationController.PushViewController(new ShortcodesSearchResultsViewController { Criteria = criteria }, true);
         }
 
         protected override async Task SaveCriteria()
@@ -65,7 +70,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+                CommonConfig.Logger.Error("Failed to save last search criteria", ex);
             }
         }
 
@@ -130,11 +135,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -181,7 +185,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             {
                 Criteria.Name = textField.Text;
             }
-
 
             [Export("textFieldShouldReturn:")]
             bool TextFieldShouldReturn(UITextField textField)
@@ -230,11 +233,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -330,11 +332,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -421,5 +422,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         }
 
         #endregion
+
     }
 }

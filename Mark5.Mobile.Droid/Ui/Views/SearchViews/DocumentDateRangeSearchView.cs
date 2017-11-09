@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -92,35 +93,32 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             UpdateText();
         }
 
-        void OpenDateRangeFragment(bool startWithTo)
+        async Task OpenDateRangeFragment(bool startWithTo)
         {
-            var f = new PickDateRangeFragment
-            {
-                FromTimestamp = fromTimestamp,
-                ToTimestamp = toTimestamp,
-                StartWithToDate = startWithTo,
-                CloseRequest = UpdateTimestamps,
-            };
-            parentFragment.ReplaceFragment(f, f.GenerateTag());
+            var (f, tag) = PickDateRangeFragment.NewInstance(fromTimestamp, toTimestamp, startWithTo);
+            parentFragment.ReplaceFragment(f, tag);
+
+            var (fromTimeStamp, toTimeStamp) = await f.Task;
+            UpdateTimestamps(fromTimeStamp, toTimeStamp);
         }
 
-        void UpdateTimestamps(long fromTimestamp, long toTimestamp)
+        void UpdateTimestamps(long fromTimeStamp, long toTimeStamp)
         {
-            this.fromTimestamp = fromTimestamp;
-            this.toTimestamp = toTimestamp;
+            fromTimestamp = fromTimeStamp;
+            toTimestamp = toTimeStamp;
 
             UpdateText();
             UpdateCriteria();
         }
 
-        void From_Click(object sender, EventArgs e)
+        async void From_Click(object sender, EventArgs e)
         {
-            OpenDateRangeFragment(false);
+            await OpenDateRangeFragment(false);
         }
 
-        void To_Click(object sender, EventArgs e)
+        async void To_Click(object sender, EventArgs e)
         {
-            OpenDateRangeFragment(true);
+            await OpenDateRangeFragment(true);
         }
 
         void UpdateText()

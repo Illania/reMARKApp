@@ -13,9 +13,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void Initialize()
         {
-            var line = new UIView();
-            line.BackgroundColor = backgroundColor;
-            line.TranslatesAutoresizingMaskIntoConstraints = false;
+            var line = new UIView
+            {
+                BackgroundColor = backgroundColor,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             AddSubview(line);
             var constraints = new[]
             {

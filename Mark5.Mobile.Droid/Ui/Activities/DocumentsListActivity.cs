@@ -1,11 +1,12 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
@@ -16,6 +17,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class DocumentsListActivity : BaseAppCompatActivity
     {
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
+
+        const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
+        const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
 
         Toolbar toolbar;
 
@@ -30,11 +34,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityRemovedFromFolderToken;
         TinyMessageSubscriptionToken entityRemovedToken;
 
-        const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
-        const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
-
         string dlfFragmentTag;
         string dtuFragmentTag;
+
+        public static Intent CreateIntent(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(DocumentsListActivity));
+            intent.PutExtra(FolderIntentKey,Serializer.Serialize(folder));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -57,21 +66,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var ft = SupportFragmentManager.BeginTransaction();
                 if (folder.Local && folder.Id == Folder.LocalRootForModule(ModuleType.Documents).SubFolders[0].Id)
                 {
-                    odlf = new DocumentsToUploadListFragment
-                    {
-                        CloseRequest = OnBackPressed
-                    };
-                    dtuFragmentTag = odlf.GenerateTag();
+                    (odlf, dtuFragmentTag) = DocumentsToUploadListFragment.NewInstance();
                     ft.Replace(Resource.Id.fragment_container, odlf, dtuFragmentTag);
                 }
                 else
                 {
-                    dlf = new DocumentsListFragment
-                    {
-                        Folder = folder,
-                        CloseRequest = OnBackPressed
-                    };
-                    dlfFragmentTag = dlf.GenerateTag();
+                    (dlf, dlfFragmentTag) = DocumentsListFragment.NewInstance(folder);
                     ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                 }
                 ft.Commit();
@@ -101,8 +101,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 readStatusToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
                 priorityToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewPriorityChangedMessage>(dlf.UpdatePriority, m => dlf != null && m.Sender != dlf);
-                categoriesToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewCategoriesChangedMessage>(dlf.UpdateCategories, m => dlf != null && m.Sender != dlf);
-                commentCountToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewCommentCountChangedMessage>(dlf.UpdateCommentsCount, m => dlf != null && m.Sender != dlf);
+                categoriesToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(dlf.UpdateCategories, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
+                commentCountToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(dlf.UpdateCommentsCount, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
                 entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(dlf.UpdateMovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
                 entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(dlf.UpdateRemovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
                 entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(dlf.UpdateRemovedEntities, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);

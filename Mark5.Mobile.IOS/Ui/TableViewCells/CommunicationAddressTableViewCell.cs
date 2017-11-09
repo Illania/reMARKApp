@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using Foundation;
@@ -9,68 +8,124 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class CommunicationAddressTableViewCell : UITableViewCell
+    public class CommunicationAddressTableViewCell : UITableViewCell
     {
-        public static readonly NSString Key = new NSString("CommunicationAddressTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("CommunicationAddressTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString DefaultId = new NSString(nameof(CommunicationAddressTableViewCell));
+        public static readonly NSString CompactId = new NSString(nameof(CommunicationAddressTableViewCell) + "_Compact");
 
-        public CommunicationAddressTableViewCell(IntPtr handle)
-            : base(handle)
+        readonly UILabel topLabel;
+        readonly UILabel middleLabel;
+        readonly UILabel bottomLabel;
+        readonly UIImageView iconImage;
+
+        public CommunicationAddressTableViewCell(NSString reuseIdentifier)
+            : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
-        }
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
 
-        public static CommunicationAddressTableViewCell Create()
-        {
-            var cell = (CommunicationAddressTableViewCell) Nib.Instantiate(null, null)[0];
-            cell.TypeLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-3f);
-            cell.NameLabel.Font = Theme.DefaultFont;
-            cell.AddressLabel.Font = Theme.DefaultLightFont.WithRelativeSize(-1f);
-            return cell;
-        }
-
-        public void Initialize(CommunicationAddress communicationAddress)
-        {
-            TypeLabel.Text = GetTypeText(communicationAddress.Type).ToUpper();
-            NameLabel.Text = communicationAddress.Description;
-
-            switch (communicationAddress.Type)
+            topLabel = new UILabel
             {
-                case CommunicationAddressType.Email:
-                    AddressLabel.Text = communicationAddress.Address;
-                    IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case CommunicationAddressType.Mobile:
-                    AddressLabel.Text = GetAddressFormatted(communicationAddress);
-                    IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case CommunicationAddressType.Phone:
-                    AddressLabel.Text = GetAddressFormatted(communicationAddress);
-                    IconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case CommunicationAddressType.Fax:
-                    AddressLabel.Text = GetAddressFormatted(communicationAddress);
-                    IconImage.Image = null;
-                    break;
-                default:
-                    AddressLabel.Text = communicationAddress.Address;
-                    IconImage.Image = null;
-                    break;
+                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                TextColor = Theme.DarkGray,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            middleLabel = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            iconImage = new UIImageView
+            {
+                Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            ContentView.Add(topLabel);
+            ContentView.Add(middleLabel);
+            ContentView.Add(iconImage);
+
+            if (ReuseIdentifier == DefaultId)
+            {
+                bottomLabel = new UILabel
+                {
+                    Font = Theme.DefaultFont.WithRelativeSize(-1f),
+                    TextColor = Theme.DarkGray,
+                    Lines = 1,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                ContentView.Add(bottomLabel);
+
+                ContentView.AddConstraints(new[]
+                {
+                    topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                    topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
+                    topLabel.BottomAnchor.ConstraintEqualTo(middleLabel.TopAnchor, -4f),
+
+                    middleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    middleLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                    middleLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+
+                    bottomLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    bottomLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                    bottomLabel.TopAnchor.ConstraintEqualTo(middleLabel.BottomAnchor, 2f),
+                    bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
+
+                    iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                    iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                    iconImage.WidthAnchor.ConstraintEqualTo(20f),
+                    iconImage.HeightAnchor.ConstraintEqualTo(20f),
+                });
+            }
+            else
+            {
+                ContentView.AddConstraints(new[]
+                {
+                    topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    topLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                    topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
+                    topLabel.BottomAnchor.ConstraintEqualTo(middleLabel.TopAnchor, -4f),
+
+                    middleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    middleLabel.TrailingAnchor.ConstraintEqualTo(iconImage.LeadingAnchor, -8f),
+                    middleLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
+
+                    iconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                    iconImage.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                    iconImage.WidthAnchor.ConstraintEqualTo(20f),
+                    iconImage.HeightAnchor.ConstraintEqualTo(20f),
+                });
             }
         }
 
-        static string GetAddressFormatted(CommunicationAddress ca)
+        public void Initialize(CommunicationAddress ca)
         {
-            if (ca.Address.Contains("|"))
-                if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
-                {
-                    var addressParts = ca.Address.Split('|');
-                    if (addressParts[0].Length > 0)
-                        addressParts[0] = "+" + addressParts[0];
+            topLabel.Text = GetTypeText(ca.Type).ToUpper();
+            middleLabel.Text = GetAddressFormatted(ca);
 
-                    return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
-                }
+            switch (ca.Type)
+            {
+                case CommunicationAddressType.Email:
+                    iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case CommunicationAddressType.Mobile:
+                    iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                case CommunicationAddressType.Phone:
+                    iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    break;
+                default:
+                    iconImage.Image = null;
+                    break;
+            }
 
-            return ca.Address;
+            if (ReuseIdentifier == DefaultId)
+                bottomLabel.Text = ca.Description;
         }
 
         static string GetTypeText(CommunicationAddressType type)
@@ -95,6 +150,21 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 return Localization.GetString("telex");
 
             return string.Empty;
+        }
+
+        static string GetAddressFormatted(CommunicationAddress ca)
+        {
+            if (ca.Address.Contains("|"))
+                if (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Fax)
+                {
+                    var addressParts = ca.Address.Split('|');
+                    if (addressParts[0].Length > 0)
+                        addressParts[0] = "+" + addressParts[0];
+
+                    return string.Join(" ", addressParts.Where(s => !string.IsNullOrWhiteSpace(s)));
+                }
+
+            return ca.Address;
         }
     }
 }

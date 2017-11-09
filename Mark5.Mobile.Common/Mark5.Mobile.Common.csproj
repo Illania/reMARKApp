@@ -21,5 +21,6 @@
   <ItemGroup>
     <Folder Include="Model\HubMessages\" />
     <Folder Include="Model\AnalyticsEvents\" />
+    <Folder Include="Utilities\Extensions\" />
   </ItemGroup>
 </Project>

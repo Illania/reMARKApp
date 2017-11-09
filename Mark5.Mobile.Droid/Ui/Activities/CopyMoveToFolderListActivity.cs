@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -14,12 +15,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class CopyMoveToFolderListActivity : BaseAppCompatActivity
     {
-        public enum ModeType
-        {
-            Copy = 1,
-            Move = 2,
-        }
-
         public const string ModuleIntentKey = "ModuleIntent_79a3dba4-bdad-4b11-be42-af6acdf31b4e";
         public const string ModeIntentKey = "ModeIntent_418bec8d-f44d-41b4-bff0-e286dea3d705";
         public const string BusinessEntitiesIntentKey = "BusinessEntitiesIntent_d6047bae-dc5e-4c3e-a302-e33931531baa";
@@ -27,6 +22,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string FoldersResultKey = "FoldersResult_32e7327a-f02e-4628-850a-6d86e2109b3e";
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, ModeType modeType, ModuleType moduleType, List<IBusinessEntity> be, Folder folder = null)
+        {
+            var intent = new Intent(context, typeof(CopyMoveToFolderListActivity));
+            intent.PutExtra(ModeIntentKey, (int)modeType);
+            intent.PutExtra(ModuleIntentKey, Serializer.Serialize(moduleType));
+            intent.PutExtra(BusinessEntitiesIntentKey, Serializer.Serialize(be));
+
+            if (folder != null)
+                intent.PutExtra(FromFolderIntentKey, Serializer.Serialize(folder));
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -44,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var listMode = (ModeType) Intent.Extras.GetInt(ModeIntentKey);
+                var listMode = (ModeType)Intent.Extras.GetInt(ModeIntentKey);
                 var moduleType = Serializer.Deserialize<ModuleType>(Intent.Extras.GetString(ModuleIntentKey));
                 var be = Intent.HasExtra(BusinessEntitiesIntentKey) ? Serializer.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey)) : null;
                 var fromFolder = Intent.HasExtra(FromFolderIntentKey) ? Serializer.Deserialize<Folder>(Intent.Extras.GetString(FromFolderIntentKey)) : null;
@@ -55,24 +63,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     case ModeType.Copy:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
-                        var cmflf = new CopyMoveToFolderListFragment
-                        {
-                            RemoteFolder = Folder.RootForModule(moduleType),
-                            BusinessEntities = be,
-                            Type = CopyMoveToFolderListFragment.ActionType.Copy
-                        };
-                        ft.Replace(Resource.Id.fragment_container, cmflf, cmflf.GenerateTag());
+                        var (cmflf, tag) = CopyMoveToFolderListFragment.NewInstance(Folder.RootForModule(moduleType), be, actionType: CopyMoveToFolderListFragment.ActionType.Copy, loadRemoteFromCache: true);
+                        ft.Replace(Resource.Id.fragment_container, cmflf, tag);
                         break;
                     case ModeType.Move:
                         SupportActionBar.SetTitle(Resource.String.select_folder);
-                        var cmflf2 = new CopyMoveToFolderListFragment
-                        {
-                            RemoteFolder = Folder.RootForModule(moduleType),
-                            BusinessEntities = be,
-                            FromFolder = fromFolder,
-                            Type = CopyMoveToFolderListFragment.ActionType.Move
-                        };
-                        ft.Replace(Resource.Id.fragment_container, cmflf2, cmflf2.GenerateTag());
+                        var (cmflf2, tag2) = CopyMoveToFolderListFragment.NewInstance(Folder.RootForModule(moduleType), be, fromFolder, CopyMoveToFolderListFragment.ActionType.Move, true);
+                        ft.Replace(Resource.Id.fragment_container, cmflf2, tag2);
                         break;
                 }
 
@@ -91,6 +88,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.Finish();
 
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
+        }
+
+        public enum ModeType
+        {
+            Copy = 1,
+            Move = 2,
         }
     }
 }

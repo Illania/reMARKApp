@@ -8,6 +8,8 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
+using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -149,6 +151,35 @@ namespace Mark5.Mobile.Common.Manager
                 return await shortcodesDataAccess.GetShortcodeWithPreviewAsync(shortcodeId);
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<bool> CreateOrUpdateShortcodeAsync(Shortcode shortcode, ShortcodePreview shortcodePreview, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.CreateOrUpdateShortcodeAsync(new DataContract.CreateOrUpdateShortcodeParameters
+                {
+                    Token = Token,
+                    Shortcode = shortcode.Convert(),
+                    ShortcodePreview = shortcodePreview.Convert(),
+                });
+
+                shortcode.Id = shortcodePreview.Id = result.Id;
+                shortcode.Guid = shortcodePreview.Guid = result.Guid;
+
+                if (result.Updated)
+                    CommonConfig.MessengerHub.Publish(new EntityPreviewChangedMessage(this, shortcodePreview));
+
+                return result.Updated;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+
+            throw new ArgumentException("Invalid sourceType provided");
         }
     }
 }

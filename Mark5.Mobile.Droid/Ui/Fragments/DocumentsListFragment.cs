@@ -24,22 +24,25 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Common.Service;
+using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
-
         public Folder Folder { get; set; }
-        public Action CloseRequest { get; set; }
 
         DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
+
+        readonly Handler searchHandler = new Handler();
+
+        const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
+
+        const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         bool refreshing;
 
@@ -58,14 +61,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
-        readonly Handler searchHandler = new Handler();
-
         AutoRefreshWorker autoRefreshWorker;
+
+        public static (DocumentsListFragment fragment, string tag) NewInstance(Folder folder)
+        {
+            var args = new Bundle();
+
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            var fragment = new DocumentsListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(DocumentsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
+
+            return (fragment, tag);
+        }
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(FolderBundleKey))
+                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -112,7 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchAdapter.ItemClicked += Adapter_ItemClicked;
             searchAdapter.ItemLongClicked += Adapter_ItemLongClicked;
 
-            fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_new);
             fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
             fab.Visibility = ViewStates.Visible;
@@ -205,10 +224,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == 10)
             {
-                var i = new Intent(Activity, typeof(SearchActivity));
-                i.PutExtra(SearchActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-                StartActivity(i);
-
+                StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Documents));
                 return true;
             }
 
@@ -251,11 +267,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     actionMode.Invalidate();
                 }
             }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentsListFragment)} [folder.id={Folder.Id}, folder.name={Folder.Name}]";
         }
 
         #endregion
@@ -350,8 +361,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                Activity?.OnBackPressed();
             }
             finally
             {
@@ -378,19 +388,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
                     }
 
-	                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                    StartActivity(ComposeDocumentActivity.CreateIntent(Context,
                                                                        DocumentCreationModeFlag.Edit,
-	                                                                   CopyToNewOption.None,
-	                                                                   previousDocumentDirection: documentPreview.Direction,
-	                                                                   previousDocumentFolderId: Folder.Id,
-	                                                                   previousDocumentId: documentPreview.Id));
+                                                                       CopyToNewOption.None,
+                                                                       previousDocumentDirection: documentPreview.Direction,
+                                                                       previousDocumentFolderId: Folder.Id,
+                                                                       previousDocumentId: documentPreview.Id));
                 }
                 else
                 {
-                    var i = new Intent(Activity, typeof(SwipeDocumentActivity));
-                    i.PutExtra(SwipeDocumentActivity.FolderIntentKey, Serializer.Serialize(Folder));
-                    i.PutExtra(SwipeDocumentActivity.DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
-                    StartActivity(i);
+                    StartActivity(SwipeDocumentActivity.CreateIntent(Context, Folder, documentPreview));
                 }
             }
             else
@@ -421,17 +428,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Action mode
 
-        static class MenuItemActions
+        public void ShowCategories(DocumentPreview documentPreview)
         {
-            public const int MarkAsRead = 10;
-            public const int MarkAsUnread = 11;
-            public const int CopyToWorktray = 20;
-            public const int CopyToFolder = 30;
-            public const int MoveToFolder = 31;
-            public const int SetPriority = 40;
-            public const int Categories = 50;
-            public const int DeleteFromFolder = 60;
-            public const int Delete = 61;
+            StartActivity(CategoriesListActivity.CreateIntent(Context, documentPreview));
         }
 
         bool ActionMode.ICallback.OnCreateActionMode(ActionMode mode, IMenu menu)
@@ -497,25 +496,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Copy);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                StartActivity(i);
-
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Documents,
+                                                                        CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 actionMode?.Finish();
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MoveToFolder)
             {
-                var i = new Intent(Activity, typeof(CopyMoveToFolderListActivity));
-                i.PutExtra(CopyMoveToFolderListActivity.ModeIntentKey, (int)CopyMoveToFolderListActivity.ModeType.Move);
-                i.PutExtra(CopyMoveToFolderListActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-                i.PutExtra(CopyMoveToFolderListActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
-                i.PutExtra(CopyMoveToFolderListActivity.FromFolderIntentKey, Serializer.Serialize(Folder));
-                StartActivity(i);
-
+                StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
+                                                                        CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), Folder));
                 actionMode?.Finish();
                 return true;
             }
@@ -559,6 +549,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CurrentAdapter.ClearSelections();
             actionMode = null;
+        }
+
+        public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
+        {
+            CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={documentPreviews.Count}]...");
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.CommonActionsManager.CopyToWorktray(documentPreviews.OfType<IBusinessEntity>().ToList());
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         async void MarkAsRead()
@@ -620,9 +633,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 1)
             {
-                var i = new Intent(Activity, typeof(CopyToUserWorktrayActivity));
-                i.PutExtra(CopyToUserWorktrayActivity.BusinessEntitiesIntentKey, Serializer.Serialize(CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
-                StartActivity(i);
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
             }
         }
 
@@ -632,36 +643,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 documentPreview
             });
-        }
-
-        public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
-        {
-            CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={documentPreviews.Count}]...");
-
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
-
-            try
-            {
-                await Managers.CommonActionsManager.CopyToWorktray(documentPreviews.OfType<IBusinessEntity>().ToList());
-
-                dismissAction();
-                actionMode?.Finish();
-            }
-            catch (Exception ex)
-            {
-                dismissAction();
-
-                CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
-
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
-        }
-
-        public void ShowCategories(DocumentPreview documentPreview)
-        {
-            var i = new Intent(Activity, typeof(CategoriesListActivity));
-            i.PutExtra(CategoriesListActivity.BusinessEntityPreviewIntentKey, Serializer.Serialize(documentPreview));
-            StartActivity(i);
         }
 
         async void SetPriority()
@@ -758,6 +739,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
+        }
+
+        static class MenuItemActions
+        {
+            public const int MarkAsRead = 10;
+            public const int MarkAsUnread = 11;
+            public const int CopyToWorktray = 20;
+            public const int CopyToFolder = 30;
+            public const int MoveToFolder = 31;
+            public const int SetPriority = 40;
+            public const int Categories = 50;
+            public const int DeleteFromFolder = 60;
+            public const int Delete = 61;
         }
 
         #endregion
@@ -904,9 +898,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void UpdateCategories(DocumentPreviewCategoriesChangedMessage m)
+        public void UpdateCategories(EntityCategoriesChangedMessage m)
         {
-            var position = adapter.GetPosition(m.DocumentPreviewId);
+            var position = adapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifyAdapter = true;
@@ -915,7 +909,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dp.Categories.AddRange(m.Categories);
             }
 
-            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            position = searchAdapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifySearchAdapter = true;
@@ -925,9 +919,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void UpdateCommentsCount(DocumentPreviewCommentCountChangedMessage m)
+        public void UpdateCommentsCount(EntityPreviewCommentCountChangedMessage m)
         {
-            var position = adapter.GetPosition(m.DocumentPreviewId);
+            var position = adapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifyAdapter = true;
@@ -935,7 +929,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dp.CommentsCount = m.CommentsCount;
             }
 
-            position = searchAdapter.GetPosition(m.DocumentPreviewId);
+            position = searchAdapter.GetPosition(m.EntityId);
             if (position >= 0)
             {
                 shouldNotifySearchAdapter = true;
@@ -1010,29 +1004,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class DocumentsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public static class ViewType
-            {
-                public const int DocumentView = 0;
-                public const int ExternalDocumentView = 1;
-            }
+            public override int ItemCount => Items.Count;
 
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
 
             public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
-            public override int ItemCount => Items.Count;
-
             public int SelectedItemCount => selectedDocumentsInView.Count;
 
             public bool EnableLoadMore { get; set; }
+
+            public event EventHandler<DocumentPreview> ItemClicked = delegate { };
+            public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
 
             readonly Dictionary<int, DocumentPreview> selectedDocumentsInView = new Dictionary<int, DocumentPreview>();
             readonly Context context;
             readonly RecyclerView recyclerView;
             readonly Action<int> loadMoreAction;
-
-            public event EventHandler<DocumentPreview> ItemClicked = delegate { };
-            public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
 
             bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
             bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
@@ -1271,17 +1259,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
+                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
 
-                var dpvh = vh as DocumentPreviewViewHolder;
-                if (dpvh != null)
-                    return dpvh.BubbleDate;
+                if (vh != null)
+                {
+                    var dpvh = vh as DocumentPreviewViewHolder;
+                    if (dpvh != null)
+                        return dpvh.BubbleDate;
 
-                var edpvh = vh as ExternalDocumentPreviewViewHolder;
-                if (edpvh != null)
-                    return edpvh.BubbleDate;
+                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                    if (edpvh != null)
+                        return edpvh.BubbleDate;
+                }
 
                 return string.Empty;
+            }
+
+            public static class ViewType
+            {
+                public const int DocumentView = 0;
+                public const int ExternalDocumentView = 1;
             }
         }
 
@@ -1329,35 +1326,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 base.OnSelectedChanged(viewHolder, actionState);
 
                 refreshLayout.Enabled = actionState == ItemTouchHelper.ActionStateIdle;
-            }
-
-            public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
-            {
-                if (direction == ItemTouchHelper.Left)
-                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
-                else if (direction == ItemTouchHelper.Right)
-                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
-
-                ResetViewHolder(viewHolder, direction);
-            }
-
-            void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
-            {
-                var position = viewHolder.AdapterPosition;
-                var view = viewHolder.ItemView;
-
-                viewHolder.ItemView.TranslationX = 0;
-                viewHolder.ItemView.TranslationY = 0;
-
-                adapter.SetSwipedState(position, direction);
-                adapter.NotifyItemChanged(position);
-
-                viewHolder.ItemView.PostDelayed(() =>
-                    {
-                        adapter.ResetSwipedState();
-                        adapter.NotifyItemChanged(position);
-                    },
-                    400);
             }
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
@@ -1424,6 +1392,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+            public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                if (direction == ItemTouchHelper.Left)
+                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
+                else if (direction == ItemTouchHelper.Right)
+                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
+
+                ResetViewHolder(viewHolder, direction);
+            }
+
+            void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                var position = viewHolder.AdapterPosition;
+                var view = viewHolder.ItemView;
+
+                viewHolder.ItemView.TranslationX = 0;
+                viewHolder.ItemView.TranslationY = 0;
+
+                adapter.SetSwipedState(position, direction);
+                adapter.NotifyItemChanged(position);
+
+                viewHolder.ItemView.PostDelayed(() =>
+                    {
+                        adapter.ResetSwipedState();
+                        adapter.NotifyItemChanged(position);
+                    },
+                    400);
             }
         }
 

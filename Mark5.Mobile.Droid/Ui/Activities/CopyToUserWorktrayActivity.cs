@@ -19,6 +19,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context, List<IBusinessEntity> be)
+        {
+            var intent = new Intent(context, typeof(CopyToUserWorktrayActivity));
+            intent.PutExtra(BusinessEntitiesIntentKey,Serializer.Serialize(be));
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -38,12 +46,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var be = Serializer.Deserialize<List<IBusinessEntity>>(Intent.Extras.GetString(BusinessEntitiesIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                var dlf = new CopyToUserWorktrayFragment
-                {
-                    BusinessEntities = be,
-                    CloseRequest = OnBackPressed
-                };
-                ft.Replace(Resource.Id.fragment_container, dlf, dlf.GenerateTag());
+                var (dlf, tag) = CopyToUserWorktrayFragment.NewInstance(be);
+                ft.Replace(Resource.Id.fragment_container, dlf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayActivity)}");

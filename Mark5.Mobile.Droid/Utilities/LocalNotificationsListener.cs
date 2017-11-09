@@ -19,12 +19,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static void Initialize()
         {
-            CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(m =>
             {
                 try
                 {
-                    var i = new Intent(Application.Context, typeof(DocumentsListActivity));
-                    i.PutExtra(DocumentsListActivity.FolderIntentKey, Serializer.Serialize(Folder.LocalRootForModule(ModuleType.Documents).SubFolders[0]));
+                    var i = DocumentsListActivity.CreateIntent(Application.Context, Folder.LocalRootForModule(ModuleType.Documents).SubFolders[0]);
+
                     var pi = PendingIntent.GetActivity(Application.Context, 0, i, PendingIntentFlags.UpdateCurrent);
 
                     var title = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_title);
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 }
             }, m =>
             {
-                return m.Change == DocumentUploadStatusChanged.Status.DocumentSentFailed;
+                return m.Change == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed;
             });
         }
     }

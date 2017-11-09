@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -14,6 +15,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string TemplatePreviewResultKey = "TemplatePreviewResult_92796943-fe6c-44d1-a999-1d19286a97f6";
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(TemplatesListActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -33,8 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var tlf = new TemplatesListFragment();
-                ft.Replace(Resource.Id.fragment_container, tlf, tlf.GenerateTag());
+                var (tlf,tag) = TemplatesListFragment.NewInstance();
+                ft.Replace(Resource.Id.fragment_container, tlf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(TemplatesListActivity)}");

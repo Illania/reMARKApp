@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -7,6 +8,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -15,14 +17,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickPrioritiesListFragment : RetainableStateFragment
     {
+        public Task<List<Priority>> Task => tcs.Task;
+
+        readonly TaskCompletionSource<List<Priority>> tcs = new TaskCompletionSource<List<Priority>>();
+
+        const string SelectedPrioritiesBundleKey = "SeletedPriorities_040c0b28-9f4e-4d89-b376-e81b94a8f26c";
+
         RecyclerView recyclerView;
         PrioritiesListViewAdapter adapter;
 
-        public List<Priority> SelectedPriorities { get; set; }
-        public Action<List<Priority>> CloseRequest { get; set; }
+        List<Priority> selectedPriorities;
+
+        public static (PickPrioritiesListFragment fragment, string tag) NewInstance(List<Priority> selectedPriorities)
+        {
+            var args = new Bundle();
+
+            if (selectedPriorities != null)
+                args.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(selectedPriorities));
+
+            var fragment = new PickPrioritiesListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(PickPrioritiesListFragment)}";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (Arguments.ContainsKey(SelectedPrioritiesBundleKey))
+                selectedPriorities = Serializer.Deserialize<List<Priority>>(Arguments.GetString(SelectedPrioritiesBundleKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(PickPrioritiesListFragment)}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -59,18 +84,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public void RefreshData()
-        {
-            var priorities = new List<Priority>
-            {
-                Priority.Urgent,
-                Priority.Normal,
-                Priority.Low
-            };
-            adapter.SetSelectedPriorities(SelectedPriorities);
-            adapter.SetItems(priorities);
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -89,10 +102,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
+        public void RefreshData()
+        {
+            var priorities = new List<Priority>
+            {
+                Priority.Urgent,
+                Priority.Normal,
+                Priority.Low
+            };
+            adapter.SetSelectedPriorities(selectedPriorities);
+            adapter.SetItems(priorities);
+        }
+
         void CloseFragment()
         {
-            if (CloseRequest != null)
-                CloseRequest(adapter.SelectedPriorities);
+            tcs.SetResult(adapter.SelectedPriorities);
             ((AppCompatActivity) Activity).OnBackPressed();
         }
 
@@ -110,12 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var clfs = restoredState as PickLinesListFragmentState;
             if (clfs != null)
-                SelectedPriorities = clfs.SelectedPriorities;
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(PickLinesListFragment)}";
+                selectedPriorities = clfs.SelectedPriorities;
         }
 
         class PickLinesListFragmentState : IRetainableState
@@ -127,9 +146,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PrioritiesListViewAdapter : RecyclerView.Adapter
         {
-            public List<Priority> SelectedPriorities { get; } = new List<Priority>(3);
-
             public override int ItemCount => Items.Count;
+
+            public List<Priority> SelectedPriorities { get; } = new List<Priority>(3);
 
             public List<Priority> Items { get; } = new List<Priority>(3);
 

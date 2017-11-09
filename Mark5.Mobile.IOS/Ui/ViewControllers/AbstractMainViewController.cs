@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -17,11 +19,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         protected UINavigationController Dummy { get; } = new UINavigationController(new UIViewController());
 
+        UIView searchButtonContainer;
         UIButton searchButton;
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            searchButtonContainer = new TouchTransparentView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            View.AddSubview(searchButtonContainer);
+            View.AddConstraints(new[]
+            {
+                searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
+                searchButtonContainer.WidthAnchor.ConstraintEqualTo(55f),
+                searchButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
+            });
 
             searchButton = new UIButton
             {
@@ -32,16 +48,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f)
             };
             searchButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "search_large.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            searchButton.Layer.BorderColor = UIColor.FromRGB(167f / 255f, 167f / 255f, 170f / 255f).CGColor;
-            searchButton.Layer.BorderWidth = 1f;
+            searchButton.Layer.BorderColor = Theme.DarkGray.CGColor;
+            searchButton.Layer.BorderWidth = .7f;
             searchButton.Layer.CornerRadius = 27.5f;
-            View.AddSubview(searchButton);
-            View.AddConstraints(new[]
+            searchButtonContainer.AddSubview(searchButton);
+            searchButtonContainer.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 55f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 55f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, -8f),
-                NSLayoutConstraint.Create(searchButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f)
+                searchButton.HeightAnchor.ConstraintEqualTo(55f),
+                searchButton.WidthAnchor.ConstraintEqualTo(55f),
+                searchButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
+                searchButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
         }
 
@@ -68,9 +84,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
         }
 
+        public void SetSearchButtonHidden(bool hidden)
+        {
+            searchButtonContainer.Hidden = hidden;
+        }
+
+        public void SetSearchButtonAlpha(float val)
+        {
+            searchButton.Alpha = val;
+        }
+
+        public override void ViewDidLayoutSubviews()
+        {
+            base.ViewDidLayoutSubviews();
+            View.BringSubviewToFront(searchButtonContainer);
+        }
+
         void SearchButton_TouchUpInside(object sender, EventArgs e)
         {
-            var nc = new NavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
+            var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
             {
                 ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
                 RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
@@ -86,7 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (!isAvailable)
                     return;
 
-                var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("autosave_recover_title"), Localization.GetString("autosave_recover_content"));
+                var shouldRecover = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("autosave_recover_title"), Localization.GetString("autosave_recover_content"));
                 if (shouldRecover)
                 {
                     var vc = new ComposeDocumentViewController { RestoreWorkingCopy = true };

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -19,8 +20,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class CopyToUserWorktrayFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        public List<IBusinessEntity> BusinessEntities { get; set; }
-        public Action CloseRequest { get; set; }
+        readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
+        
+        readonly Handler searchHandler = new Handler();
+
+        const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
+
+        List<IBusinessEntity> businessEntities;
 
         CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
 
@@ -31,15 +37,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CopyToUserWorktrayAdapter searchAdapter;
         AppCompatButton copyButton;
 
-        readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
+        public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<IBusinessEntity> be)
+        {
+            var args = new Bundle();
 
-        readonly Handler searchHandler = new Handler();
+            if (be != null)
+                args.PutString(BusinessEntitiesBundleKey, Serializer.Serialize(be));
+
+            var fragment = new CopyToUserWorktrayFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(CopyToUserWorktrayFragment)}]";
+
+            return (fragment, tag);
+        }
 
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
+            if (Arguments.ContainsKey(BusinessEntitiesBundleKey))
+                businessEntities = Serializer.Deserialize<List<IBusinessEntity>>(Arguments.GetString(BusinessEntitiesBundleKey));
+
+            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
@@ -63,22 +83,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             copyButton.Enabled = false;
             copyButton.Click += async (sender, e) =>
             {
-                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={BusinessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={businessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
-                    await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, selectedSystemUsers.Values.ToList());
+                    await Managers.CommonActionsManager.CopyToUserWorktray(businessEntities, selectedSystemUsers.Values.ToList());
 
-                    if (CloseRequest != null)
-                        CloseRequest();
+                    Activity?.OnBackPressed();
                 }
                 catch (Exception ex)
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={BusinessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]", ex);
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={businessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
@@ -96,14 +115,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
             ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={BusinessEntities?.Count}]");
+            CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={businessEntities?.Count}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={BusinessEntities?.Count}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -136,11 +155,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={BusinessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Count={selectedSystemUsers.Count}]...");
+            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={businessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Count={selectedSystemUsers.Count}]...");
 
             return new CopyToUserWorktrayFragmentState
             {
-                BusinessEntities = BusinessEntities,
+                BusinessEntities = businessEntities,
                 SystemUsers = adapter.Items,
                 SelectedSystemUsers = selectedSystemUsers
             };
@@ -153,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.businessEntities.Count={dlfs.BusinessEntities?.Count}, dlfs.systemUsers.Count={dlfs.SystemUsers?.Count}, dlfs.selectedSystemUsers.Cound={dlfs.SelectedSystemUsers?.Count}]...");
 
-                BusinessEntities = dlfs.BusinessEntities;
+                businessEntities = dlfs.BusinessEntities;
                 adapter.SetItems(dlfs.SystemUsers);
 
                 selectedSystemUsers.Clear();
@@ -162,11 +181,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 UpdateControls();
             }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(CopyToUserWorktrayFragment)}]";
         }
 
         #endregion
@@ -236,6 +250,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
+        static bool MatchesQuery(SystemUser su, string query)
+        {
+            if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+            if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                return true;
+
+            return false;
+        }
+
         bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
@@ -277,20 +305,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
-            return false;
-        }
-
-        static bool MatchesQuery(SystemUser su, string query)
-        {
-            if (su.Username.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (su.FirstName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (su.LastName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-            if (su.PatronymicName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                return true;
-
             return false;
         }
 

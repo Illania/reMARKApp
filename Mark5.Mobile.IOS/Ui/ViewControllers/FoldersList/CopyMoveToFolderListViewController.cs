@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -19,8 +19,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         UIBarButtonItem cancelModeItem;
 
-        public CopyMoveToFolderListViewController(List<IBusinessEntity> businessEntities, Folder fromFolder = null)
-            : base(businessEntities.FirstOrDefault().ModuleType, true, true, true)
+        public CopyMoveToFolderListViewController(ModuleType module, List<IBusinessEntity> businessEntities, Folder fromFolder = null)
+            : base(module, true, true, true)
         {
             this.businessEntities = businessEntities;
             this.fromFolder = fromFolder;
@@ -33,9 +33,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             this.fromFolder = fromFolder;
         }
 
-        protected override void InitializeNavigationBarTitle()
+        protected override void InitializeNavigationBar()
         {
-            Func<string> getTitle = () =>
+            string GetTitle()
             {
                 switch (ParentFolder.Module)
                 {
@@ -52,26 +52,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             };
 
-            UIView.AnimationsEnabled = false;
             if (IsRootOfFoldersList)
-            {
-                NavigationItem.Title = fromFolder == null ? Localization.GetString("copy_to_folder") : Localization.GetString("move_to_folder");
-                NavigationItem.Prompt = getTitle();
-            }
+                NavigationItem.Title = GetTitle();
             else
-            {
                 NavigationItem.Title = ParentFolder.Name;
-                NavigationItem.Prompt = getTitle();
-            }
-            UIView.AnimationsEnabled = true;
-        }
 
-        protected override void InitializeNavigationBar()
-        {
             if (IsRootOfFoldersList)
             {
-                cancelModeItem = new UIBarButtonItem();
-                cancelModeItem.Title = Localization.GetString("cancel");
+                cancelModeItem = new UIBarButtonItem
+                {
+                    Title = Localization.GetString("cancel")
+                };
                 NavigationItem.SetLeftBarButtonItem(cancelModeItem, false);
             }
         }
@@ -92,14 +83,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 cancelModeItem.Clicked -= CancelModeItem_Clicked;
         }
 
-        protected override void FolderSelected(Folder folder)
+        protected override async void FolderSelected(Folder folder)
         {
             base.FolderSelected(folder);
 
             if (fromFolder == null)
-                CopyBusinessEntityToFolder(folder);
+                await CopyBusinessEntityToFolder(folder);
             else
-                MoveBusinessEntityToFolder(folder);
+                await MoveBusinessEntityToFolder(folder);
+            
+            if (TableView?.IndexPathForSelectedRow != null)
+                TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
         }
 
         protected override void FolderExpand(Folder folder)
@@ -121,31 +115,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             return false;
         }
 
-        void CancelModeItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
+        void CancelModeItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
-        async void CopyBusinessEntityToFolder(Folder folder)
+        async Task CopyBusinessEntityToFolder(Folder folder)
         {
-            string key;
-            switch (businessEntities.First().ObjectType)
-            {
-                case ObjectType.Document:
-                    key = "confirm_copy_to_folder_documents";
-                    break;
-                case ObjectType.Contact:
-                    key = "confirm_copy_to_folder_contacts";
-                    break;
-                case ObjectType.Shortcode:
-                    key = "confirm_copy_to_folder_shortcodes";
-                    break;
-                default:
-                    throw new ArgumentException("Object type not supported!");
-            }
-
-            var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_copy_to_folder"), Localization.GetString(key));
-            if (!confirmed)
+            var confirmed = await Dialogs.ShowListActionSheetAsync(this, new [] {Localization.GetString("copy")}, View);
+            if (confirmed < 0)
                 return;
 
             CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
@@ -161,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {
@@ -169,26 +144,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        async void MoveBusinessEntityToFolder(Folder folder)
+        async Task MoveBusinessEntityToFolder(Folder folder)
         {
-            string key;
-            switch (businessEntities.First().ObjectType)
-            {
-                case ObjectType.Document:
-                    key = "confirm_move_to_folder_documents";
-                    break;
-                case ObjectType.Contact:
-                    key = "confirm_move_to_folder_contacts";
-                    break;
-                case ObjectType.Shortcode:
-                    key = "confirm_move_to_folder_shortcodes";
-                    break;
-                default:
-                    throw new ArgumentException("Object type not supported!");
-            }
-
-            var confirmed = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("confirm_move_to_folder"), Localization.GetString(key));
-            if (!confirmed)
+            var confirmed = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("move") }, View);
+            if (confirmed < 0)
                 return;
 
             CommonConfig.Logger.Info($"Moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
@@ -197,7 +156,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             try
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, folder);
-                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
                 dismissAction();
             }
             catch (Exception ex)
@@ -205,7 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.Logger.Error($"Error while moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {

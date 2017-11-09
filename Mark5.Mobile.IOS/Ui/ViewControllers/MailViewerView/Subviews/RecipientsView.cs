@@ -1,6 +1,7 @@
 ﻿using System;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -19,7 +20,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         }
 
         readonly Type type;
-        readonly UITextView textView;
+
+        UILabel label;
+        UITextView textView;
 
         bool expanded;
 
@@ -27,12 +30,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         {
             this.type = type;
 
-            var titleLabel = new UILabel();
-            titleLabel.Text = GetTitle() + ":";
-            titleLabel.Font = Theme.DefaultFont;
-            titleLabel.TextColor = UIColor.LightGray;
-            titleLabel.Opaque = false;
-            titleLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            var titleLabel = new UILabel
+            {
+                Text = GetTitle() + ":",
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkGray,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             titleLabel.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             titleLabel.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -50,15 +54,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            textView = new UITextView(CGRect.Empty, textContainer);
-            textView.Font = Theme.DefaultFont;
-            textView.Opaque = false;
-            textView.TextContainer.LineFragmentPadding = 0f;
-            textView.TextContainerInset = UIEdgeInsets.Zero;
-            textView.ClipsToBounds = false;
-            textView.ScrollEnabled = false;
-            textView.TranslatesAutoresizingMaskIntoConstraints = false;
+            textView = new UITextView(CGRect.Empty, textContainer)
+            {
+                Font = Theme.DefaultFont,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ClipsToBounds = false,
+                ScrollEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
             textView.TextContainer.MaximumNumberOfLines = 1;
+            textView.TextContainer.LineFragmentPadding = 0f;
             textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
@@ -69,10 +74,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin)
             });
 
-            var textViewTapGestureRecognizer = new UITapGestureRecognizer();
-            textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
-            textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
-            textView.AddGestureRecognizer(textViewTapGestureRecognizer);
+            textView.AddGestureRecognizer(new UITapGestureRecognizer(HandleTextTapped));
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                label?.RemoveFromSuperview();
+                label = null;
+
+                textView?.RemoveFromSuperview();
+                textView.GestureRecognizers.ForEach(textView.RemoveGestureRecognizer);
+                textView = null;
+            }
         }
 
         public override void RefreshView()

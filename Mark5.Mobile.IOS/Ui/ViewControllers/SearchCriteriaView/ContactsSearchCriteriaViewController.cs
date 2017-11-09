@@ -7,6 +7,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using UIKit;
@@ -36,6 +37,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             RestorationClass = Class;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         protected override async void ResetItem_Clicked(object sender, EventArgs e)
         {
             base.ResetItem_Clicked(sender, e);
@@ -54,10 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new ContactsSearchResultsViewController
-            {
-                Criteria = criteria
-            }, true);
+            NavigationController.PushViewController(new ContactsSearchResultsViewController { Criteria = criteria }, true);
         }
 
         protected override async Task SaveCriteria()
@@ -68,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+                CommonConfig.Logger.Error("Failed to save last search criteria", ex);
             }
         }
 
@@ -166,12 +172,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var types = Criteria.ContactTypes;
 
                 if (!types.Any())
-                    types.UnionWith(new[]
-                    {
-                        ContactType.Person,
-                        ContactType.Department,
-                        ContactType.Company
-                    });
+                    types.UnionWith(new[] { ContactType.Person, ContactType.Department, ContactType.Company });
 
                 SetLabelActive(personView, types.Contains(ContactType.Person));
                 SetLabelActive(departmentView, types.Contains(ContactType.Department));
@@ -236,11 +237,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -336,11 +336,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 text = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -442,11 +441,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 shortIdTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -496,11 +494,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 descriptionTextField = new UITextField
                 {
-                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
-                        new UIStringAttributes
-                        {
-                            ForegroundColor = Theme.LightGray
-                        }),
+                    AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
+                    {
+                        ForegroundColor = Theme.LightGray
+                    }),
                     TextColor = InactiveTextColor,
                     Font = Font,
                     TintColor = Theme.LightGray,
@@ -699,7 +696,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
         class CountryCategoriesView : AbstractContactsSearchView
         {
-            readonly UIViewController parentViewController;
+            readonly WeakReference<UIViewController> parentViewControllerWeakReference;
 
             readonly UIView countryView;
             readonly UILabel countryLabel;
@@ -714,7 +711,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
             public CountryCategoriesView(UIViewController parentViewController)
             {
-                this.parentViewController = parentViewController;
+                parentViewControllerWeakReference = parentViewController.Wrap();
 
                 countryView = new UIView
                 {
@@ -764,7 +761,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
-                    TintColor = UIColor.Clear,
+                    TintColor = Theme.Clear,
                     TextAlignment = UITextAlignment.Center,
                     InputView = countryPicker,
                     InputAccessoryView = countryPickerToolbar,
@@ -874,15 +871,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 if (recognizer.View == categoriesView)
                 {
-                    var vc = new SelectCategoriesListViewController(ModuleType.Contacts, Criteria.CategoryIds);
-                    parentViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    var vc = new SelectCategoriesListViewController
+                    {
+                        Module = ModuleType.Contacts,
+                        PreselectedItemIds = Criteria.CategoryIds
+                    };
+                    parentViewControllerWeakReference.Unwrap().PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
 
-                    var result = await vc.Task;
-
+                    var result = await vc.Result;
                     if (result == null)
                         return;
 
-                    Criteria.CategoryIds = result.Select(c => c.Id).ToList();
+                    Criteria.CategoryIds = result;
                 }
 
                 UpdateRow();
@@ -981,5 +981,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         }
 
         #endregion
+
     }
 }

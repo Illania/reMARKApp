@@ -1,27 +1,28 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using UIKit;
-using CoreGraphics;
-using System.Linq;
-using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentsToUploadListViewController : AbstractViewController, IPrimaryViewController
+    public class DocumentsToUploadListViewController : AbstractTableViewController, IPrimaryViewController
     {
-        UITableView tableView;
-
-        bool refreshing;
-
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
+
+        public DocumentsToUploadListViewController()
+            : base(UITableViewStyle.Grouped)
+        {
+        }
 
         #region UIViewController overrides
 
@@ -29,49 +30,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
+            InitializeNavigationBar();
             InitializeView();
-        }
-
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            ExtendedLayoutIncludesOpaqueBars = true;
+            SubscribeToMessages();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
-            if (tableView?.IndexPathForSelectedRow != null)
-                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+            if (TableView?.IndexPathForSelectedRow != null)
+                TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
 
-            if (tableView?.IndexPathsForSelectedRows?.Length > 0)
-                foreach (var selectedIndexPath in tableView?.IndexPathsForSelectedRows)
-                    tableView.DeselectRow(selectedIndexPath, true);
-
-            ReachabilityBar.Attach(View, tableView, (float)NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
+            if (TableView?.IndexPathsForSelectedRows?.Length > 0)
+                foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
+                    TableView.DeselectRow(selectedIndexPath, true);
         }
 
         public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(DocumentsToUploadListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
             await RefreshData();
-
-            if (IsBeingDismissed)
-                return;
-
-            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
-            {
-                BeginInvokeOnMainThread(async () =>
-                {
-                    await RefreshData();
-                });
-            });
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -83,62 +71,101 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(DocumentsListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = tableView?.DataSource as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            documentUploadStatusChangedToken?.Dispose();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         #endregion
 
-        #region Initialization
+        #region Initialize/deinitialize
+
+        void InitializeNavigationBar()
+        {
+            NavigationItem.Title = Localization.GetString("outgoing");
+        }
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped)
-            {
-                ClipsToBounds = false,
-                RowHeight = UITableView.AutomaticDimension,
-                EstimatedRowHeight = 75f,
-                AllowsSelectionDuringEditing = false,
-                AllowsMultipleSelectionDuringEditing = true,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_documents_pending"), Localization.GetString("no_documents_failed"));
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
+            TableView.Source = new DataSource(this, TableView);
+            TableView.AllowsMultipleSelectionDuringEditing = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 60f;
         }
 
-        void InitializeNavigationBarTitle()
+        #endregion
+
+        #region Subscribe/unsubscribe
+
+        void SubscribeToMessages()
         {
-            UIView.AnimationsEnabled = false;
-            NavigationItem.Title = Localization.GetString("outgoing");
-            NavigationItem.Prompt = null;
-            UIView.AnimationsEnabled = true;
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(DocumentUploadStatusChanged);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            documentUploadStatusChangedToken?.Dispose();
+        }
+
+        #endregion
+
+        #region Refreshing
+
+        async Task RefreshData()
+        {
+            CommonConfig.Logger.Info($"Refreshing outgoing documents list");
+
+            try
+            {
+                var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
+                var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
+                ((DataSource)TableView.Source).ReplaceItems(pendingDocs, failedDocs);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not refresh outgoing document list", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        #endregion
+
+        #region List handlers
+
+        void FailedDocumentSelected(Guid guid)
+        {
+            var vc = new DocumentViewController();
+            vc.SetData(guid);
+            vc.SetRefreshDataOnAppear();
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         #endregion
 
         #region Actions
-
-        void FailedDocumentSelected(Guid guid)
-        {
-            var vc = new DocumentViewController { Modal = true };
-            vc.SetData(guid);
-            vc.SetRefreshDataOnAppear();
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
 
         async void ResendFailedDocumentToUpload((Guid Guid, DocumentPreview DocumentPreview) data)
         {
@@ -154,38 +181,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Refreshing
+        #region Message handlers
 
-        async Task RefreshData()
+        void DocumentUploadStatusChanged(DocumentUploadStatusChangedMessage m)
         {
-            if (refreshing)
-                return;
-
-            refreshing = true;
-
-            CommonConfig.Logger.Info($"Refreshing outgoing documents list");
-
-            try
+            BeginInvokeOnMainThread(async () =>
             {
-                var ds = (DataSource)tableView.Source;
-
-                var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
-                var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
-                ds.ReplaceItems(pendingDocs, failedDocs);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Could not refresh outgoing document list", ex);
-
-                await Dialogs.ShowErrorDialogAsync(this, ex);
-            }
-
-            refreshing = false;
+                await RefreshData();
+            });
         }
 
         #endregion
 
-        class DataSource : UITableViewSource, IDisposable
+        #region DataSource
+
+        class DataSource : UITableViewSource
         {
             public static class Section
             {
@@ -193,50 +203,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public static readonly nint Failed = 1;
             }
 
-            static readonly nfloat Height = 68f;
+            readonly WeakReference<DocumentsToUploadListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
-            public bool Empty => !Items.SelectMany(kv => kv.Value).Any();
-
-            public Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>> Items { get; } = new Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>>
+            bool loading = true;
+            readonly Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>> items = new Dictionary<nint, List<(Guid Guid, DocumentPreview DocumentPreview)>>
             {
                 { Section.Pending, new List<(Guid, DocumentPreview)>(25) },
                 { Section.Failed, new List<(Guid, DocumentPreview)>(25) }
             };
 
-            DocumentsToUploadListViewController viewController;
-            UITableView tableView;
-            readonly string pendingEmptyText;
-            readonly string failedEmptyText;
-
-            bool loading = true;
-
-            public DataSource(DocumentsToUploadListViewController viewController, UITableView tableView, string pendingEmptyText, string failedEmptyText)
+            public DataSource(DocumentsToUploadListViewController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.pendingEmptyText = pendingEmptyText;
-                this.failedEmptyText = failedEmptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (Items[indexPath.Section].Count < 1)
+                if (items[indexPath.Section].Count < 1)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     if (indexPath.Section == Section.Pending)
-                        emptyCell.Initialize(pendingEmptyText);
+                        emptyCell.Initialize(Localization.GetString("no_documents_pending"));
                     if (indexPath.Section == Section.Failed)
-                        emptyCell.Initialize(failedEmptyText);
+                        emptyCell.Initialize(Localization.GetString("no_documents_failed"));
                     return emptyCell;
                 }
 
-                var dp = Items[indexPath.Section][indexPath.Row];
+                var dp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(DocumentToUploadTableViewCell.Key) as DocumentToUploadTableViewCell ?? DocumentToUploadTableViewCell.Create();
-                cell.Initialize(dp, indexPath.Section);
+                var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.UploadId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.UploadId);
+                cell.Initialize(dp.DocumentPreview);// TODO , indexPath.Section);
+
+                cell.SelectionStyle = indexPath.Section == Section.Failed
+                    ? UITableViewCellSelectionStyle.Default
+                    : UITableViewCellSelectionStyle.None;
+
                 return cell;
             }
 
@@ -244,13 +250,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || items[section].Count < 1)
                     return 1;
 
-                if (Items[section].Count < 1)
-                    return 1;
-
-                return Items[section].Count;
+                return items[section].Count;
             }
 
             public override string TitleForHeader(UITableView tableView, nint section)
@@ -264,28 +267,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return null;
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => Height;
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (indexPath.Section == Section.Failed)
-                    viewController.FailedDocumentSelected(Items[Section.Failed][indexPath.Row].Guid);
+                if (tableView.Editing)
+                    return;
+
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return;
+
+                viewControllerWeakReference.Unwrap()?.FailedDocumentSelected(items[Section.Failed][indexPath.Row].Guid);
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return indexPath.Section == Section.Failed;
+                var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return false;
+                if (!cell.UserInteractionEnabled)
+                    return false;
+                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None)
+                    return false;
+
+                return true;
             }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (indexPath.Section == Section.Pending)
-                    return new UITableViewRowAction[0];
-
                 var actions = new UITableViewRowAction[2];
-                actions[0] = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, "Delete", (a, nsip) => { viewController.DeleteFailedDocumentToUpload(Items[indexPath.Section][indexPath.Row]); });
+                actions[0] = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
+                                                         Localization.GetString("delete"),
+                                                         (a, nsip) =>
+                {
+                    viewControllerWeakReference.Unwrap()?.DeleteFailedDocumentToUpload(items[indexPath.Section][indexPath.Row]);
+                });
                 actions[0].BackgroundColor = Theme.Brown;
-                actions[1] = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, "Resend", (a, nsip) => { viewController.ResendFailedDocumentToUpload(Items[indexPath.Section][indexPath.Row]); });
+                actions[1] = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                                         Localization.GetString("resend"),
+                                                         (a, nsip) =>
+                {
+                    viewControllerWeakReference.Unwrap()?.ResendFailedDocumentToUpload(items[indexPath.Section][indexPath.Row]);
+                });
                 actions[1].BackgroundColor = Theme.DarkBlue;
                 return actions;
             }
@@ -294,37 +318,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                Items[Section.Pending].Clear();
-                Items[Section.Pending].AddRange(queue);
-                Items[Section.Failed].Clear();
-                Items[Section.Failed].AddRange(failed);
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Pending), UITableViewRowAnimation.Fade);
-                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Failed), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
+                items[Section.Pending].Clear();
+                items[Section.Pending].AddRange(queue);
+                items[Section.Failed].Clear();
+                items[Section.Failed].AddRange(failed);
+
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Pending), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Failed), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public void Reset()
             {
                 loading = true;
 
-                Items[Section.Pending].Clear();
-                Items[Section.Failed].Clear();
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Pending), UITableViewRowAnimation.Fade);
-                tableView.ReloadSections(NSIndexSet.FromIndex(Section.Failed), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
-            }
+                items[Section.Pending].Clear();
+                items[Section.Failed].Clear();
 
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                Items[Section.Pending].Clear();
-                Items[Section.Failed].Clear();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Pending), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Failed), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
         }
+
+        #endregion
+
     }
 }

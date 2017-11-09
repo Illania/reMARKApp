@@ -6,6 +6,8 @@ using Foundation;
 using HtmlAgilityPack;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 using WebKit;
 
@@ -15,35 +17,53 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
     {
         static readonly NSString script1 = new NSString("window.onload = function () {window.webkit.messageHandlers.sizeNotification.postMessage({justLoaded:true});};");
         static readonly NSString script2 = new NSString("window.onresize = function () {window.webkit.messageHandlers.sizeNotification.postMessage({resized:true});};");
-
         static readonly NSString script3 = new NSString("document.addEventListener(\"DOMContentLoaded\", function () {window.webkit.messageHandlers.sizeNotification.postMessage({domLoaded:true});});");
 
+        readonly WeakReference<DocumentViewController> viewControllerWeakReference;
+
+        UIActivityIndicatorView spinner;
+        WKUserContentController userContentController;
+        WKWebViewConfiguration configuration;
         WKWebView webView;
         NSLayoutConstraint webViewHeightConstraint;
 
-        Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate;
-
-        UIActivityIndicatorView spinner;
-
         CancellationTokenSource cts;
 
-        public ContentView(Func<WKNavigationAction, WKNavigationActionPolicy> navigationActionDelegate)
+        public ContentView(DocumentViewController viewController)
         {
-            this.navigationActionDelegate = navigationActionDelegate;
+            viewControllerWeakReference = viewController.Wrap();
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                spinner?.RemoveFromSuperview();
+                spinner = null;
+
+                webView?.RemoveFromSuperview();
+                if (webView != null)
+                    webView.NavigationDelegate = null;
+                webView = null;
+                userContentController?.RemoveScriptMessageHandler("sizeNotification");
+                userContentController = null;
+                configuration = null;
+
+                webViewHeightConstraint = null;
+            }
         }
 
         void CreateWebView()
         {
-            if (spinner != null)
-            {
-                spinner.RemoveFromSuperview();
-            }
-
+            spinner?.RemoveFromSuperview();
             spinner = null;
 
-            spinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
-            spinner.TranslatesAutoresizingMaskIntoConstraints = false;
-            spinner.HidesWhenStopped = true;
+            spinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                HidesWhenStopped = true
+            };
+            spinner.StartAnimating();
             ContainerView.AddSubview(spinner);
             ContainerView.AddConstraints(new[]
             {
@@ -51,15 +71,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 NSLayoutConstraint.Create(spinner, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
             });
 
-            spinner.StartAnimating();
-
+            webView?.RemoveFromSuperview();
             if (webView != null)
-            {
-                webView.RemoveFromSuperview();
                 webView.NavigationDelegate = null;
-            }
-
             webView = null;
+            userContentController?.RemoveScriptMessageHandler("sizeNotification");
+            userContentController = null;
+            configuration = null;
+
+            webViewHeightConstraint = null;
 
             var preferences = new WKPreferences
             {
@@ -71,13 +91,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
 
-            var userContentController = new WKUserContentController();
+            userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
             userContentController.AddUserScript(wkscript3);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
 
-            var configuration = new WKWebViewConfiguration
+            configuration = new WKWebViewConfiguration
             {
                 SuppressesIncrementalRendering = true,
                 AllowsInlineMediaPlayback = false,
@@ -89,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             {
                 NavigationDelegate = this,
                 Opaque = false,
-                BackgroundColor = UIColor.White
+                BackgroundColor = Theme.White
             };
             webView.ScrollView.Bounces = false;
             webView.ScrollView.BouncesZoom = false;
@@ -111,7 +131,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
         void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
         {
-            decisionHandler(navigationActionDelegate(navigationAction));
+            var policy = viewControllerWeakReference.Unwrap()?.DecidePolicyForNavigationAction(navigationAction) ?? WKNavigationActionPolicy.Cancel;
+            decisionHandler(policy);
         }
 
         #endregion
@@ -134,39 +155,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
             var domLoaded = domLoadedNumber != null && domLoadedNumber.BoolValue;
 
             Action<CancellationToken, WKWebView, UIActivityIndicatorView, NSLayoutConstraint> resizeAction = null;
-            resizeAction = (ct, wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)),
-                () =>
+            resizeAction = (ct, wv, sv, nslc) => DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(100)), () =>
+            {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                if (wv.IsLoading)
                 {
-                    if (ct.IsCancellationRequested)
-                        return;
+                    resizeAction(ct, wv, sv, nslc);
+                }
+                else if (nslc.Constant != wv.ScrollView.ContentSize.Height && wv.ScrollView.ContentSize.Height > 1)
+                {
+                    sv.RemoveFromSuperview();
 
-                    if (wv.IsLoading)
-                    {
-                        resizeAction(ct, wv, sv, nslc);
-                    }
-                    else if (nslc.Constant != wv.ScrollView.ContentSize.Height && wv.ScrollView.ContentSize.Height > 1)
-                    {
-                        sv.RemoveFromSuperview();
-
-                        nslc.Constant = wv.ScrollView.ContentSize.Height;
-                        SetNeedsLayout();
-                    }
-                });
+                    nslc.Constant = wv.ScrollView.ContentSize.Height;
+                    SetNeedsLayout();
+                }
+            });
 
             Action<CancellationToken, WKWebView, UIActivityIndicatorView, NSLayoutConstraint> stopLoadingAction = null;
             stopLoadingAction = (ct, wv, sv, nslc) =>
-            DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)),
-                                                  () =>
-                                                  {
-                                                      if (ct.IsCancellationRequested)
-                                                          return;
+            DispatchQueue.MainQueue.DispatchAfter(new DispatchTime(DispatchTime.Now, TimeSpan.FromMilliseconds(3500)), () =>
+            {
+                if (ct.IsCancellationRequested)
+                    return;
 
-                                                      if (wv.IsLoading)
-                                                      {
-                                                          wv.StopLoading();
-                                                          resizeAction(ct, wv, sv, nslc);
-                                                      }
-                                                  });
+                if (wv.IsLoading)
+                {
+                    wv.StopLoading();
+                    resizeAction(ct, wv, sv, nslc);
+                }
+            });
 
             if (domLoaded)
             {
@@ -218,7 +237,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
         void SetContent(ContentType contentType, string content)
         {
             Action<CancellationToken, WKWebView> setContentAction;
-
             setContentAction = (ct, wv) => DispatchQueue.MainQueue.DispatchAsync(async () =>
              {
                  if (ct.IsCancellationRequested)

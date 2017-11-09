@@ -14,12 +14,23 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class ParentContactSelectorFoldersListActivity : BaseAppCompatActivity
     {
-        public const string ChildrenTypeIntentKey = "ChildrenTypeKey_09ed9796-4e13-42ff-8848-df5ca3731c25";
         public const string ParentContactResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
 
         public const int ContactRequestCode = 123;
 
+        const string ChildrenTypeIntentKey = "ChildrenTypeKey_09ed9796-4e13-42ff-8848-df5ca3731c25";
+
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, ContactType childrenType)
+        {
+            var intent = new Intent(context, typeof(ParentContactSelectorFoldersListActivity));
+
+            if (childrenType != ContactType.None)
+                intent.PutExtra(ChildrenTypeIntentKey, (int)childrenType);
+
+            return intent;
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -40,9 +51,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var childrenType = (ContactType)Intent.Extras.GetInt(ChildrenTypeIntentKey);
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                var pcflf = new ParentContactSelectorFoldersListFragment(childrenType);
+                var (pcflf, tag) = ParentContactSelectorFoldersListFragment.NewInstance(childrenType, Folder.RootForModule(ModuleType.Contacts), true, true, true);
 
-                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PickerContactFolderListActivity)}");

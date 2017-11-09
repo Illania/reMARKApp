@@ -8,16 +8,18 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using ObjCRuntime;
+using TinyMessenger;
 using UIKit;
+using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
-    public abstract class AbstractShortcodesListViewController : AbstractViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIGestureRecognizerDelegate
+    public abstract class AbstractShortcodesListViewController : AbstractTableViewController, IPrimaryViewController, IUISearchResultsUpdating
     {
         protected readonly bool DisableRowActions;
 
@@ -25,19 +27,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         protected UIBarButtonItem ExitEditItem;
         protected UIBarButtonItem EditItem;
+        protected UIBarButtonItem LeftButton;
+        protected UIBarButtonItem RightButton;
 
-        protected UIRefreshControl RefreshControl;
-        protected UITableView TableView;
-        protected UISearchController SearchController;
-        protected UITableViewController SearchResultsController;
-        protected DataSource SearchResultsDataSource;
-
+        bool refreshing;
+        UISearchController searchController;
         protected CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
-        bool refreshing;
+        CancellationTokenSource cts;
 
-        protected CancellationTokenSource cts;
+        TinyMessageSubscriptionToken shortcodeChangedToken;
+        TinyMessageSubscriptionToken removedFromFolderToken;
+        TinyMessageSubscriptionToken movedFromFolderToken;
+        TinyMessageSubscriptionToken deletedToken;
 
         protected AbstractShortcodesListViewController(bool disableRowActions)
         {
@@ -56,18 +59,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             SubscribeToMessages();
         }
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            ExtendedLayoutIncludesOpaqueBars = true;
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
             InitializeHandlers();
 
             if (TableView?.IndexPathForSelectedRow != null)
@@ -76,19 +78,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (TableView?.IndexPathsForSelectedRows?.Length > 0)
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
-
-            ReachabilityBar.Attach(View, TableView, (float) NavigationController.BottomLayoutGuide.Length, UITextAlignment.Left);
         }
 
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(AbstractShortcodesListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource) TableView.Source;
-            if (ds.Empty)
+            NavigationItem.Title = Folder.Name;
+
+            if (((DataSource)TableView.Source).Empty)
                 RefreshData();
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
+
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
+
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -98,6 +113,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             DeinitializeHandlers();
 
             cts?.Cancel();
+
+            if (searchController != null && searchController.Active)
+                searchController.Active = false;
         }
 
         public override void WillMoveToParentViewController(UIViewController parent)
@@ -106,30 +124,61 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (ShortcodeViewController) nc.ViewControllers[0];
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
                 vc.ClearData();
             }
         }
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(AbstractShortcodesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = TableView?.Source as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            ExitEditItem = null;
+            EditItem = null;
+            LeftButton = null;
+            RightButton = null;
+
+            UnsubscribeFromMessages();
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
+            TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
+            ((DataSource)TableView.Source)?.Reset();
+
+            searchController.SearchResultsUpdater = null;
+            searchController = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         #endregion
 
-        #region Initialization
+        #region Initialize/deinitialize
 
-        void InitializeNavigationBar()
+        protected virtual void InitializeNavigationBar()
         {
             ExitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             EditItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -137,75 +186,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
+            RefreshControl = new UIRefreshControl();
 
-            TableView = new UITableView
-            {
-                ClipsToBounds = false,
-                AllowsSelectionDuringEditing = false,
-                AllowsMultipleSelectionDuringEditing = true,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), DisableRowActions);
-            View.AddSubview(TableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(TableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
+            TableView.Source = new DataSource(this, TableView, DisableRowActions, Localization.GetString("folder_empty"));
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
+            TableView.RefreshControl = RefreshControl;
+            TableView.AllowsMultipleSelectionDuringEditing = true;
 
-            var longPressRecognizer = new UILongPressGestureRecognizer(this, new Selector("longPressed:"))
-            {
-                MinimumPressDuration = 1f,
-                Delegate = this
-            };
-            TableView.AddGestureRecognizer(longPressRecognizer);
-
-            RefreshControl = new UIRefreshControl
-            {
-                BackgroundColor = UIColor.White
-            };
-            TableView.AddSubview(RefreshControl);
+            TableView.AddGestureRecognizer(new UILongPressGestureRecognizer(ShortcodePreviewLongPressed));
         }
 
         void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
 
-            SearchResultsController = new UITableViewController();
-            SearchResultsDataSource = new DataSource(this, SearchResultsController.TableView, Localization.GetString("no_matching_shortcodes"), DisableRowActions);
-            SearchResultsController.TableView.Source = SearchResultsDataSource;
+            var searchResultsController = new UITableViewController();
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, DisableRowActions, Localization.GetString("no_matching_shortcodes"));
+            searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 40f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
 
-            SearchController = new UISearchController(SearchResultsController)
+            searchController = new UISearchController(searchResultsController)
             {
                 HidesNavigationBarDuringPresentation = true,
                 DimsBackgroundDuringPresentation = true,
                 ObscuresBackgroundDuringPresentation = true,
                 SearchResultsUpdater = this
             };
-            SearchController.SearchBar.Placeholder = Localization.GetString("filter");
+            searchController.SearchBar.Placeholder = Localization.GetString("filter");
 
-            TableView.TableHeaderView = SearchController.SearchBar;
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
-        void SubscribeToMessages()
-        {
-            CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
-            CommonConfig.MessengerHub.Subscribe<EntityDeletedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            UIView.AnimationsEnabled = false;
-            NavigationItem.Title = Folder.Name;
-            NavigationItem.Prompt = null;
-            UIView.AnimationsEnabled = true;
-        }
-
-        void InitializeHandlers()
+        protected virtual void InitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked += ExitEditItem_Clicked;
@@ -213,11 +230,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (EditItem != null)
                 EditItem.Clicked += EditItem_Clicked;
 
-            if (RefreshControl != null)
-                RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+            RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        void DeinitializeHandlers()
+        protected virtual void DeinitializeHandlers()
         {
             if (ExitEditItem != null)
                 ExitEditItem.Clicked -= ExitEditItem_Clicked;
@@ -225,66 +241,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (EditItem != null)
                 EditItem.Clicked -= EditItem_Clicked;
 
-            if (RefreshControl != null)
-                RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
+            RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
 
         #endregion
 
-        #region Actions
+        #region Subscribe/unsubscribe
 
-        public virtual void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
+        void SubscribeToMessages()
         {
-
+            shortcodeChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(HandleShortcodeChanged, m => m.EntityPreview.ObjectType == ObjectType.Shortcode);
+            removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Shortcode);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Shortcode);
         }
 
-        [Export("longPressed:")]
-        public void LongPressed(UILongPressGestureRecognizer recognizer)
+        void UnsubscribeFromMessages()
         {
-            if (TableView.Editing)
-                return;
-
-            StartEditing();
-
-            var point = recognizer.LocationInView(TableView);
-            var indexPath = TableView.IndexPathForRowAtPoint(point);
-
-            TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
+            shortcodeChangedToken?.Dispose();
+            removedFromFolderToken?.Dispose();
+            movedFromFolderToken?.Dispose();
+            deletedToken?.Dispose();
         }
 
-        void StartEditing()
-        {
-            TableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
-            NavigationItem.SetLeftBarButtonItem(EditItem, true);
+        #endregion
 
-            SearchController.SearchBar.UserInteractionEnabled = false;
-            SearchController.SearchBar.Alpha = .5f;
+        #region NavigationBar handlerster
 
-            if (SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
-                nc.PopToRootViewController(false);
-
-                var vc = (ShortcodeViewController) nc.ViewControllers[0];
-                vc.ClearData();
-            }
-        }
-
-        void ExitEditItem_Clicked(object sender, EventArgs e)
-        {
-            EndEditing();
-        }
-
-        void EndEditing()
-        {
-            TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(null, true);
-            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
-
-            SearchController.SearchBar.UserInteractionEnabled = true;
-            SearchController.SearchBar.Alpha = 1f;
-        }
+        void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
 
         void EditItem_Clicked(object sender, EventArgs e)
         {
@@ -292,9 +276,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 return;
 
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             var rows = TableView.IndexPathsForSelectedRows.ToArray();
-            var selectedShortcodes = rows.Select(ip => ((DataSource) TableView.Source).FindItemAtIndexPath(ip)).ToList();
+            var selectedShortcodes = rows.Select(ip => ((DataSource)TableView.Source).FindItemAtIndexPath(ip)).ToList();
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
                 UIAlertActionStyle.Default,
@@ -322,15 +307,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     }));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcodes)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcodes, d)));
 
             if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => ExitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem) sender);
+                eas.PopoverPresentationController.Delegate = d;
 
             ExitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
@@ -340,10 +325,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e)
-        {
-            RefreshData(forceClear: true);
-        }
+        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
 
         async void RefreshData(int startRowId = -1, bool forceClear = false)
         {
@@ -355,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
             if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
             {
-                var result = await Dialogs.ShowYesNoCancelDialogAsync(this,
+                var result = await Dialogs.ShowYesNoCancelAlertAsync(this,
                                                                       Localization.GetString("folder_offline_title"),
                                                                       Localization.GetString("folder_offline_message"),
                                                                       Localization.GetString("folder_offline_go_online"),
@@ -367,8 +349,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 if (result == 0)
                 {
                     var vc = new DownloadViewController { Folder = Folder };
-                    NavigationController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
-                    await vc.DidDisappear;
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
+                    await vc.Result;
                 }
                 if (result == -1)
                 {
@@ -387,10 +369,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             cts = new CancellationTokenSource();
 
             if (forceClear)
-            {
-                var ds = (DataSource) TableView.Source;
-                ds.Reset();
-            }
+                ((DataSource)TableView.Source).Reset();
 
             var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
 
@@ -399,8 +378,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 {
                     InvokeOnMainThread(() =>
                     {
-                        var ds = (DataSource) TableView.Source;
-                        ds.AppendItems(sps);
+                        ((DataSource)TableView.Source).AppendItems(sps);
                     });
                 },
                 () =>
@@ -421,7 +399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
                     CommonConfig.Logger.Error($"Could not refresh shortcodes [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
 
                     NavigationController?.PopViewController(true);
                 },
@@ -432,79 +410,74 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         #endregion
 
-        #region Searching
+        #region List handlers
 
-        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
+        public virtual void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
-            var searchText = searchController.SearchBar.Text;
-
-            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
-            {
-                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
-                searchCancellationTokenSourceList.Clear();
-                SearchResultsDataSource.Reset();
-            }
-            else
-            {
-                if (searchCancellationTokenSource != null)
-                {
-                    searchCancellationTokenSource.Cancel();
-                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
-                    searchCancellationTokenSource = null;
-                }
-
-                searchCancellationTokenSource = new CancellationTokenSource();
-                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
-
-                DoSearchShortcodes(searchText, searchCancellationTokenSource.Token);
-            }
         }
 
-        async void DoSearchShortcodes(string searchText, CancellationToken ct)
+        public void ShortcodePreviewLongPressed(UILongPressGestureRecognizer recognizer)
         {
-            SearchResultsDataSource.Reset();
-
-            await Task.Delay(500);
-
-            if (ct.IsCancellationRequested)
+            if (TableView.Editing || ((DataSource)TableView.Source).Empty)
                 return;
 
-            var ds = (DataSource) TableView.Source;
-            var filteredShortcodes = ds.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
+            StartEditing();
 
-            if (ct.IsCancellationRequested)
+            var point = recognizer.LocationInView(TableView);
+            var indexPath = TableView.IndexPathForRowAtPoint(point);
+
+            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
                 return;
 
-            SearchResultsDataSource.AppendItems(filteredShortcodes);
-        }
-
-        static bool MatchesQuery(ShortcodePreview sp, string query)
-        {
-            if (sp.Name?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (sp.Description?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            return false;
+            TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
         }
 
         #endregion
 
         #region Actions
 
-        void RemoveFromFolder(ShortcodePreview selectedShortcode)
+        void ShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
         {
-            RemoveFromFolder(new List<ShortcodePreview>
-            {
-                selectedShortcode
-            });
+            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedShortcode);
+                    EndEditing();
+                }));
+
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MoveToFolder(selectedShortcode);
+                        EndEditing();
+                    }));
+
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcode, d)));
+
+            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode, d)));
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => EndEditing()));
+
+            if (eas.PopoverPresentationController != null)
+                eas.PopoverPresentationController.Delegate = d;
+
+            PresentViewController(eas, true, null);
         }
 
-        async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes)
-        {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete_from_folder"), Localization.GetString("confirm_delete_from_folder_shortcodes"));
+        void RemoveFromFolder(ShortcodePreview selectedShortcode, UIPopoverPresentationControllerDelegate d) =>
+            RemoveFromFolder(new List<ShortcodePreview> { selectedShortcode }, d);
 
+        async void RemoveFromFolder(List<ShortcodePreview> selectedShortcodes, UIPopoverPresentationControllerDelegate d)
+        {
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
             {
                 EndEditing();
@@ -530,22 +503,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while removing shortcodes from folder [folderId={Folder.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
-        void Delete(ShortcodePreview selectedShortcode)
-        {
-            Delete(new List<ShortcodePreview>
-            {
-                selectedShortcode
-            });
-        }
+        void Delete(ShortcodePreview selectedShortcode, UIPopoverPresentationControllerDelegate d) =>
+            Delete(new List<ShortcodePreview> { selectedShortcode }, d);
 
-        async void Delete(List<ShortcodePreview> selectedShortcodes)
+        async void Delete(List<ShortcodePreview> selectedShortcodes, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("delete"), Localization.GetString("confirm_delete_shortcodes"));
-
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
             {
                 EndEditing();
@@ -571,17 +538,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting shortcodes", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
-        void CopyToWorktray(ShortcodePreview shortcodePreview)
-        {
-            CopyToWorktray(new List<ShortcodePreview>
-            {
-                shortcodePreview
-            });
-        }
+        void CopyToWorktray(ShortcodePreview shortcodePreview) =>
+            CopyToWorktray(new List<ShortcodePreview> { shortcodePreview });
 
         void CopyToWorktray(List<ShortcodePreview> shortcodePreviews)
         {
@@ -592,184 +554,235 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToFolder(ShortcodePreview shortcodePreview)
-        {
-            CopyToFolder(new List<ShortcodePreview>
-            {
-                shortcodePreview
-            });
-        }
+        void CopyToFolder(ShortcodePreview shortcodePreview) =>
+            CopyToFolder(new List<ShortcodePreview> { shortcodePreview });
 
         void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
         {
-            var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList());
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList());
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MoveToFolder(ShortcodePreview shortcodePreview)
-        {
-            MoveToFolder(new List<ShortcodePreview>
-            {
-                shortcodePreview
-            });
-        }
+        void MoveToFolder(ShortcodePreview shortcodePreview) =>
+            MoveToFolder(new List<ShortcodePreview> { shortcodePreview });
 
         void MoveToFolder(List<ShortcodePreview> shortcodePreviews)
         {
-            var vc = new CopyMoveToFolderListViewController(shortcodePreviews.Cast<IBusinessEntity>().ToList(), Folder);
+            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList(), Folder);
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void DoShowMoreActionSheet(NSIndexPath indexPath, ShortcodePreview selectedShortcode)
+        #endregion
+
+        #region Searching
+
+        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {
-            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var searchText = searchController.SearchBar.Text;
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
-                UIAlertActionStyle.Default,
-                a =>
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
+                ((DataSource)dataSource)?.Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
                 {
-                    CopyToFolder(selectedShortcode);
-                    EndEditing();
-                }));
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
-                    UIAlertActionStyle.Default,
-                    a =>
-                    {
-                        MoveToFolder(selectedShortcode);
-                        EndEditing();
-                    }));
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedShortcode)));
+                DoSearchShortcodes(searchText, searchCancellationTokenSource.Token);
+            }
+        }
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode)));
+        async void DoSearchShortcodes(string searchText, CancellationToken ct)
+        {
+            var tableViewController = searchController?.SearchResultsController as UITableViewController;
+            var dataSource = tableViewController?.TableView?.Source as DataSource;
+            dataSource?.Reset();
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => EndEditing()));
+            await Task.Delay(500);
 
-            if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
+            if (ct.IsCancellationRequested)
+                return;
 
-            PresentViewController(eas, true, null);
+            var ds = (DataSource)TableView.Source;
+            var filteredShortcodes = ds.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            dataSource?.AppendItems(filteredShortcodes);
+        }
+
+        static bool MatchesQuery(ShortcodePreview sp, string query)
+        {
+            if (sp.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (sp.Description?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
         }
 
         #endregion
 
         #region Messages handlers
 
-        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m)
-        {
-            RemoveShortcodesFromList(m.EntitiesId);
-        }
+        void HandleShortcodeChanged(EntityPreviewChangedMessage m) => UpdateShortcodeOnList((ShortcodePreview)m.EntityPreview);
 
-        void HandleMovedFromFolder(EntityMovedFromFolderMessage m)
-        {
-            RemoveShortcodesFromList(m.EntitiesId);
-        }
+        void HandleRemovedFromFolder(EntityRemovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
 
-        void HandleDeleted(EntityDeletedMessage m)
-        {
-            RemoveShortcodesFromList(m.EntitiesId);
-        }
+        void HandleMovedFromFolder(EntityMovedFromFolderMessage m) => RemoveShortcodesFromList(m.EntitiesId);
+
+        void HandleDeleted(EntityRemovedMessage m) => RemoveShortcodesFromList(m.EntitiesId);
 
         #endregion
 
         #region Utilities
 
-        void RemoveShortcodesFromList(IEnumerable<int> ids)
+        void StartEditing()
         {
-            if (SearchController.Active)
-                SearchResultsDataSource.RemoveItems(ids.ToList());
+            TableView.SetEditing(true, true);
+            NavigationItem.SetRightBarButtonItem(ExitEditItem, true);
+            NavigationItem.SetLeftBarButtonItem(EditItem, true);
 
-            var ds = (DataSource) TableView.Source;
-            ds.RemoveItems(ids.ToList());
+            searchController.SearchBar.UserInteractionEnabled = false;
+            searchController.SearchBar.Alpha = .5f;
+
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-                var nc = (UINavigationController) SplitViewController.ViewControllers[1];
-                var vc = (ShortcodeViewController) nc.ViewControllers[0];
-                if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v))
-                    vc.ClearData();
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToRootViewController(false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                vc.ClearData();
             }
+        }
+
+        void EndEditing()
+        {
+            TableView.SetEditing(false, true);
+            NavigationItem.SetRightBarButtonItem(null, true);
+            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+
+            searchController.SearchBar.UserInteractionEnabled = true;
+            searchController.SearchBar.Alpha = 1f;
+        }
+
+        void UpdateShortcodeOnList(ShortcodePreview sp)
+        {
+            if (searchController.Active)
+            {
+                var tableViewController = searchController?.SearchResultsController as UITableViewController;
+                var dataSource = tableViewController?.TableView?.Source as DataSource;
+                dataSource?.UpdateItem(sp);
+            }
+
+            ((DataSource)TableView.Source).UpdateItem(sp);
+        }
+
+        void RemoveShortcodesFromList(IEnumerable<int> ids)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                if (searchController.Active)
+                {
+                    var tableViewController = searchController?.SearchResultsController as UITableViewController;
+                    var dataSource = tableViewController?.TableView?.Source as DataSource;
+                    dataSource?.RemoveItems(ids);
+                }
+
+                ((DataSource)TableView.Source).RemoveItems(ids);
+
+                if (SplitViewController != null && !SplitViewController.Collapsed)
+                {
+                    var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                    var vc = (ShortcodeViewController)nc.ViewControllers[0];
+                    if (ids.Select(id => vc.IsShowingShortcodeWithId(id)).Any(v => v))
+                        vc.ClearData();
+                }
+            });
         }
 
         #endregion
 
-        protected class DataSource : UITableViewSource, IDisposable
+        protected class DataSource : UITableViewSource
         {
-            public bool Empty { get { return !shortcodePreviewsInView.SelectMany(v => v).Any(); } }
+            public bool Empty => !items.SelectMany(v => v).Any();
+            public IEnumerable<ShortcodePreview> Items => items.SelectMany(i => i);
 
-            public IEnumerable<ShortcodePreview> Items { get { return shortcodePreviewsInView.SelectMany(i => i); } }
-
-            AbstractShortcodesListViewController viewController;
-            UITableView tableView;
+            readonly WeakReference<AbstractShortcodesListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
+            readonly bool disableRowActions;
             readonly string emptyText;
 
             bool loading = true;
-            bool disableRowActions;
-            List<List<ShortcodePreview>> shortcodePreviewsInView = new List<List<ShortcodePreview>>(25);
+            readonly List<List<ShortcodePreview>> items = new List<List<ShortcodePreview>>(25);
 
-            public DataSource(AbstractShortcodesListViewController viewController, UITableView tableView, string emptyText, bool disableRowActions)
+            public DataSource(AbstractShortcodesListViewController viewController, UITableView tableView, bool disableRowActions, string emptyText)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
                 this.disableRowActions = disableRowActions;
+                this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (!shortcodePreviewsInView.SelectMany(v => v).Any())
+                if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
                     emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
-                var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
+                var cp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.Key) as ShortcodesTableViewCell ?? ShortcodesTableViewCell.Create();
+                var cell = tableView.DequeueReusableCell(ShortcodesTableViewCell.DefaultId) as ShortcodesTableViewCell ?? new ShortcodesTableViewCell();
                 cell.Initialize(cp);
-
                 return cell;
             }
 
             public override nint NumberOfSections(UITableView tableView)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (!shortcodePreviewsInView.SelectMany(v => v).Any())
-                    return 1;
-
-                return shortcodePreviewsInView.Count;
+                return items.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (!shortcodePreviewsInView.SelectMany(v => v).Any())
-                    return 1;
-
-                return shortcodePreviewsInView[(int) section].Count;
+                return items[(int)section].Count;
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView)
-            {
-                return shortcodePreviewsInView.SelectMany(i => i).Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper()).Distinct().ToArray();
-            }
+            public override string[] SectionIndexTitles(UITableView tableView) => items.SelectMany(i => i)
+                                                                                       .Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
+                                                                                       .Distinct()
+                                                                                       .ToArray();
 
             public override nint SectionFor(UITableView tableView, string title, nint atIndex)
             {
-                for (var section = 0; section < shortcodePreviewsInView.Count; section++)
+                for (var section = 0; section < items.Count; section++)
                 {
-                    var row = shortcodePreviewsInView[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
+                    var row = items[section].FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
                     if (row >= 0)
                     {
                         tableView.ScrollToRow(NSIndexPath.FromRowSection(row, section), UITableViewScrollPosition.Top, true);
@@ -780,35 +793,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 return -1;
             }
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return ShortcodesTableViewCell.Height;
-            }
-
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return !disableRowActions;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var actions = new List<UITableViewRowAction>();
 
-                var shortcodePreview = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
-
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("more"), (a, ip) => { viewController.DoShowMoreActionSheet(indexPath, shortcodePreview); });
-                moreAction.BackgroundColor = Theme.DarkerBlue;
-                actions.Add(moreAction);
+                var shortcodePreview = items[indexPath.Section][indexPath.Row];
 
                 var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                     Localization.GetString("copy_to_worktray_ml"),
                     (a, ip) =>
                     {
-                        viewController.CopyToWorktray(shortcodePreview);
-                        viewController.EndEditing();
+                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(shortcodePreview);
+                        viewControllerWeakReference.Unwrap()?.EndEditing();
                     });
                 copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(copyToWorktrayAction);
+
+                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                                             Localization.GetString("more"),
+                                                             (a, ip) =>
+                {
+                    viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, shortcodePreview);
+                });
+                moreAction.BackgroundColor = Theme.DarkerBlue;
+                actions.Add(moreAction);
 
                 return actions.ToArray();
             }
@@ -818,99 +828,86 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 if (tableView.Editing)
                     return;
 
-                var cp = shortcodePreviewsInView[indexPath.Section][indexPath.Row];
-                viewController.ShortcodeSelected(tableView, cp);
+                var sp = items[indexPath.Section][indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.ShortcodeSelected(tableView, indexPath, sp);
             }
 
-            public void AppendItems(List<ShortcodePreview> shortcodePreviews)
+            public void AppendItems(IEnumerable<ShortcodePreview> shortcodePreviews)
             {
                 loading = false;
 
-                var count = shortcodePreviewsInView.Count;
+                var count = items.Count;
                 var isInputListPopulated = shortcodePreviews.Any();
 
                 if (isInputListPopulated)
-                    shortcodePreviewsInView.Add(shortcodePreviews);
+                    items.Add(shortcodePreviews.ToList());
 
                 if (count == 0)
-                    tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 else if (isInputListPopulated)
-                    tableView.InsertSections(NSIndexSet.FromIndex(shortcodePreviewsInView.Count - 1), UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(items.Count - 1), UITableViewRowAnimation.Fade);
             }
 
-            public void RemoveItems(List<int> shortcodeIds)
+            public void RemoveItems(IEnumerable<int> shortcodeIds)
             {
-                tableView.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
 
                 var indexPaths = shortcodeIds.Select(id => FindItemIndexPath(id)).Where(idx => idx != null).OrderByDescending(idx => idx.Section).ThenByDescending(idx => idx.Row).ToList();
                 foreach (var indexPath in indexPaths)
                 {
-                    shortcodePreviewsInView[indexPath.Section].RemoveAt(indexPath.Row);
-                    if (!shortcodePreviewsInView[indexPath.Section].Any())
+                    items[indexPath.Section].RemoveAt(indexPath.Row);
+                    if (!items[indexPath.Section].Any())
                     {
-                        shortcodePreviewsInView.RemoveAt(indexPath.Section);
-                        if (shortcodePreviewsInView.Count == 0)
-                            tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                        items.RemoveAt(indexPath.Section);
+                        if (items.Count == 0)
+                            tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                         else
-                            tableView.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
+                            tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromIndex(indexPath.Section), UITableViewRowAnimation.Automatic);
                     }
                     else
-                    {
-                        tableView.DeleteRows(new NSIndexPath[]
-                            {
-                                indexPath
-                            },
-                            UITableViewRowAnimation.Automatic);
-                    }
+                        tableViewWeakReference.Unwrap()?.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
                 }
 
-                tableView.EndUpdates();
+                tableViewWeakReference.Unwrap()?.EndUpdates();
+            }
+
+            public void UpdateItem(ShortcodePreview sp)
+            {
+                var indexPath = FindItemIndexPath(sp);
+                if (indexPath != null)
+                {
+                    items[indexPath.Section][indexPath.Row] = sp;
+                    tableViewWeakReference.Unwrap()?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+                }
             }
 
             public void Reset()
             {
                 loading = true;
 
-                var count = shortcodePreviewsInView.Count;
+                items.Clear();
 
-                shortcodePreviewsInView.Clear();
+                var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-
-                if (count > 1)
-                    tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, count - 1)), UITableViewRowAnimation.Fade);
-
-                tableView.EndUpdates();
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                if (sectionsCount > 1)
+                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
-            public NSIndexPath FindItemIndexPath(ShortcodePreview sp)
-            {
-                return FindItemIndexPath(sp.Id);
-            }
+            public ShortcodePreview FindItemAtIndexPath(NSIndexPath indexPath) => items[indexPath.Section][indexPath.Row];
+
+            public NSIndexPath FindItemIndexPath(ShortcodePreview sp) => FindItemIndexPath(sp.Id);
 
             public NSIndexPath FindItemIndexPath(int id)
             {
-                for (var section = 0; section < shortcodePreviewsInView.Count; section++)
-                    for (var row = 0; row < shortcodePreviewsInView[section].Count; row++)
-                        if (shortcodePreviewsInView[section][row].Id == id)
+                for (var section = 0; section < items.Count; section++)
+                    for (var row = 0; row < items[section].Count; row++)
+                        if (items[section][row].Id == id)
                             return NSIndexPath.FromRowSection(row, section);
 
                 return null;
-            }
-
-            public ShortcodePreview FindItemAtIndexPath(NSIndexPath indexPath)
-            {
-                return shortcodePreviewsInView[indexPath.Section][indexPath.Row];
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                shortcodePreviewsInView = null;
             }
         }
     }
