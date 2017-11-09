@@ -18,6 +18,21 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         {
             return $"_{(quantity == 1 ? "single" : "multiple")}";
         }
+
+        protected string GetOptionString(CopyToNewOption option)
+        {
+            switch (option)
+            {
+                case CopyToNewOption.KeepOnlyAddresses:
+                    return "_keep_only_addresses";
+                case CopyToNewOption.KeepOnlyAttachments:
+                    return "_keep_only_attachments";
+                case CopyToNewOption.KeepTextAndAttachments:
+                    return "_keep_text_and_attachments";
+                default:
+                    return "_none";
+            }
+        }
     }
 
     public abstract class AnalyticsParameter
@@ -179,7 +194,7 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
     {
         public CopyToNewEvent(CopyToNewOption option)
         {
-            Name = "copy_to_new_" + option.ToString(); //The only one for which we have capital letters
+            Name = "copy_to_new_" + GetOptionString(option);
         }
     }
 
@@ -237,19 +252,19 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
         }
     }
 
-    public class OpenCommentsEvent : AnalyticsEvent
-    {
-        public OpenCommentsEvent(ModuleType module)
-        {
-            Name = "open_comments" + GetModuleString(module);
-        }
-    }
-
     public class OpenActionsEvent : AnalyticsEvent
     {
         public OpenActionsEvent(ModuleType module)
         {
             Name = "open_actions" + GetModuleString(module);
+        }
+    }
+
+    public class OpenCommentsEvent : AnalyticsEvent
+    {
+        public OpenCommentsEvent(ModuleType module)
+        {
+            Name = "open_comments" + GetModuleString(module);
         }
     }
 
@@ -487,10 +502,12 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
             }
         }
     }
+
     public class ExpandFolderEvent : AnalyticsEvent
     {
         public override string Name => "expand_folder";
     }
+
     public class PullToRefreshEvent : AnalyticsEvent
     {
         public PullToRefreshEvent(bool fromFolder = false, ModuleType type = ModuleType.None)
