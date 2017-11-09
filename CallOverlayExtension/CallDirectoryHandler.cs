@@ -27,11 +27,12 @@ namespace CallOverlayExtension
 
         void AddIdentificationPhoneNumbers(CXCallDirectoryExtensionContext context)
         {
-            var contacts = SharedDatabase.GetContactsFromSharedDatabase();
+            /*var contacts = SharedDatabase.GetContactsFromSharedDatabase();
             foreach ((string name, long number) in contacts) 
             {
                 context.AddIdentificationEntry(number,name);
-            }
+            }*/
+            SharedDatabase.GetContactsFromSharedDatabase(context);
         }
 
         public void RequestFailed(CXCallDirectoryExtensionContext extensionContext, NSError error)

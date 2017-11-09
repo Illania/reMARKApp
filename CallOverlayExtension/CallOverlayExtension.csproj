@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="CallDirectoryHandler.cs" />
     <Compile Include="SharedDatabase.cs" />
+    <Compile Include="ErrorLogger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.AppExtension.CSharp.targets" />
 </Project>

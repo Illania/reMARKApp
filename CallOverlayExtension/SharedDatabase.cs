@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CallKit;
 using Foundation;
 using SQLite;
 
@@ -13,7 +14,7 @@ namespace CallOverlayExtension
         const string databaseLockName = "sharedcontacts.lock";
         const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
 
-        public static List<(string name, long number)> GetContactsFromSharedDatabase()
+        public static void GetContactsFromSharedDatabase(CXCallDirectoryExtensionContext cxContext)
         {
             List<ExtensionContact> dbContacts = null;
 
@@ -40,10 +41,11 @@ namespace CallOverlayExtension
                 }
             }
 
-            return ProcessResult(dbContacts);
+            //return ProcessResult(dbContacts);
+            ProcessAndStoreContacts(dbContacts,cxContext);
         }
 
-        static List<(string name, long number)> ProcessResult(List<ExtensionContact> dbResult)
+        /*static List<(string name, long number)> ProcessResult(List<ExtensionContact> dbResult)
         {
             List<(string name, long number)> result = new List<(string name, long number)>();
 
@@ -59,7 +61,30 @@ namespace CallOverlayExtension
 
             result.Sort((ec1,ec2) => ec1.number.CompareTo(ec2.number));
             return result;
+        }*/
+
+        static void ProcessAndStoreContacts(List<ExtensionContact> dbResult, CXCallDirectoryExtensionContext cxContext)
+        {
+            List<(string name, long number)> result = new List<(string name, long number)>();
+
+            foreach (ExtensionContact ec in dbResult)
+            {
+                var name = ec.Name;
+                var numbers = ec.Numbers.Split(',');
+                for (int i = 0; i < numbers.Length; i++)
+                {
+                    result.Add((name, Convert.ToInt64(numbers[i])));
+                }
+            }
+
+            result.Sort((ec1, ec2) => ec1.number.CompareTo(ec2.number));
+
+            foreach ((string name, long number) in result){
+                cxContext.AddIdentificationEntry(number,name);
+            }
         }
+
+
 
         static void LockDatabase()
         {

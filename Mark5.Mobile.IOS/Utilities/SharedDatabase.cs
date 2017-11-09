@@ -3,6 +3,7 @@ using Foundation;
 using SQLite;
 using System.Text;
 using System.Linq;
+using PhoneNumbers;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -65,11 +66,19 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void AddContactToExtensionContactsTable(int id, string name, string number)
         {
-            if (number[0] == '|') //If the first char is '|', then the country code isn't specified. The country code must be specified for the number to work with the caller extension.
+            var splitNumber = number.Split('|');
+
+            if (splitNumber[0] == "") //No country code is defined, so the number will not be handled.
                 return;
 
-            //Format number. Only '|' and "+" needs to be removed for the number to be identified by the phone.
-            number = number.Replace("|", String.Empty).Replace("+", "").Replace(" ","");
+            var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+
+            //Get region code for parsing the number. Parsing will remove any char's like '(' or '-'.
+            var regCode = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(splitNumber[0]));
+            PhoneNumber nmber = phoneNumberUtil.Parse(splitNumber[2],regCode);
+            number = phoneNumberUtil.Format(nmber, PhoneNumberFormat.E164);
+
+            number = number.Replace("+", String.Empty);
 
             if (!number.All(n => Char.IsDigit(n))) //If the number contains letters, then it should not be added.
                 return;
