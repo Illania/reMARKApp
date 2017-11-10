@@ -1,8 +1,6 @@
 ﻿using System;
 using Foundation;
 using CallKit;
-using System.Linq;
-using SQLite;
 
 namespace CallOverlayExtension
 {
@@ -20,19 +18,9 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
-            AddIdentificationPhoneNumbers(cxContext);
+            SharedDatabase.GetContactsFromSharedDatabase(cxContext);
 
             cxContext.CompleteRequest(null);
-        }
-
-        void AddIdentificationPhoneNumbers(CXCallDirectoryExtensionContext context)
-        {
-            /*var contacts = SharedDatabase.GetContactsFromSharedDatabase();
-            foreach ((string name, long number) in contacts) 
-            {
-                context.AddIdentificationEntry(number,name);
-            }*/
-            SharedDatabase.GetContactsFromSharedDatabase(context);
         }
 
         public void RequestFailed(CXCallDirectoryExtensionContext extensionContext, NSError error)
@@ -44,7 +32,7 @@ namespace CallOverlayExtension
             // app may be notified about errors which occured while loading data even if the request to load data was initiated by
             // the user in Settings instead of via the app itself.
 
-            //CommonConfig.Logger.Info("Error occurred: " + error.LocalizedFailureReason);
+            Console.WriteLine("hur");
         }
     }
 }

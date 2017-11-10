@@ -15,8 +15,6 @@ namespace CallOverlayExtension
 
         public static void GetContactsFromSharedDatabase(CXCallDirectoryExtensionContext cxContext)
         {
-            List<ExtensionContact> dbContacts = null;
-
             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
             {
                 var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
@@ -27,17 +25,17 @@ namespace CallOverlayExtension
                     {
                         LockDatabase();
 
-                        connection.RunInTransaction(() => {
-                            var commandString = $"select * "
-                                + $"from {nameof(ExtensionContact)} ";
+                        var commandString = $"select {nameof(ExtensionContact.Name)},{nameof(ExtensionContact.Number)} "
+                            + $"from {nameof(ExtensionContact)} group by {nameof(ExtensionContact.Number)} order by {nameof(ExtensionContact.Number)} asc";
 
-                            var row = connection.DeferredQuery<ExtensionContact>(commandString);
-                            while (row.GetEnumerator().MoveNext()) ;
-                            {
-                                ProcessAndStoreContact(row.GetEnumerator().Current, cxContext);
-                            }
+                        var ydoe = connection.Query<ExtensionContact>(commandString);
+                        var row = connection.DeferredQuery<ExtensionContact>(commandString);
+                        var enumerator = row.GetEnumerator();
 
-                        });
+                        while (enumerator.MoveNext())
+                        {
+                            cxContext.AddIdentificationEntry(enumerator.Current.Number,enumerator.Current.Name);
+                        }
                     }
                     finally { UnlockDatabase(); }
                 }
@@ -64,24 +62,17 @@ namespace CallOverlayExtension
             return result;
         }*/
 
-        static void ProcessAndStoreContact(ExtensionContact dbResult, CXCallDirectoryExtensionContext cxContext)
+        /*static void ProcessAndStoreContact((string name, long number) dbResult, CXCallDirectoryExtensionContext cxContext)
         {
             List<(string name, long number)> result = new List<(string name, long number)>();
 
-            var extName = dbResult.Name;
-            var numbers = dbResult.Numbers.Split(',');
-            for (int i = 0; i < numbers.Length; i++)
-            {
-                result.Add((extName, Convert.ToInt64(numbers[i])));
-            }
-            
+            var extName = dbResult.name;
+            var numbers = dbResult.number;
 
-            result.Sort((ec1, ec2) => ec1.number.CompareTo(ec2.number));
-           
             foreach ((string name, long number) in result){
                 cxContext.AddIdentificationEntry(number,name);
             }
-        }
+        }*/
 
 
 
@@ -122,11 +113,15 @@ namespace CallOverlayExtension
     }
 
     [Table("ExtensionContact")]
-    public class ExtensionContact
+    class ExtensionContact
     {
         [Column("Id")]
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
+
+        [Column("FolderId")]
+        [NotNull]
+        public int FolderId { get; set; }
 
         [Column("Name")]
         [NotNull]
@@ -134,6 +129,6 @@ namespace CallOverlayExtension
 
         [Column("Number")]
         [NotNull]
-        public string Numbers { get; set; }
+        public long Number { get; set; }
     }
 }

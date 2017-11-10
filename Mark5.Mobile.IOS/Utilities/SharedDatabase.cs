@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
             {
-                try 
+                try
                 {
                     LockDatabase(containerUrl);
 
@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Utilities
                         connection.CreateTable<ExtensionContact>();
                     }
                 }
-                finally 
+                finally
                 {
                     UnlockDatabase(containerUrl);
                 }
@@ -64,7 +64,34 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public static void AddContactToExtensionContactsTable(int id, string name, string number)
+        public static void CleanExtensionContactsTable(int folderId)
+        {
+            using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
+            {
+                var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
+
+                using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
+                {
+                    try
+                    {
+                        LockDatabase(containerUrl);
+
+                        connection.RunInTransaction(() => {
+                            var cmd = connection.CreateCommand($"delete from {nameof(ExtensionContact)} where {nameof(ExtensionContact.FolderId)} = @folderId");
+                            cmd.Bind("@folderId", folderId);
+                            cmd.ExecuteNonQuery();
+                        });
+                    }
+                    finally
+                    {
+                        UnlockDatabase(containerUrl);
+                    }
+                }
+            }
+            
+        }
+
+        public static void AddContactToExtensionContactsTable(int folderId, string name, string number)
         {
             var splitNumber = number.Split('|');
 
@@ -85,9 +112,10 @@ namespace Mark5.Mobile.IOS.Utilities
             var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(splitNumber[0]));
             try
             {
-                PhoneNumber nmber = phoneNumberUtil.Parse(splitNumber[2],countryString);
+                PhoneNumber nmber = phoneNumberUtil.Parse(splitNumber[2], countryString);
                 number = phoneNumberUtil.Format(nmber, PhoneNumberFormat.E164);
-            } catch (NumberParseException ex)
+            }
+            catch (NumberParseException ex)
             {
                 return; //Number has been stored incorrectly, e.g. contains letters, so it is ignored.
             }
@@ -106,33 +134,17 @@ namespace Mark5.Mobile.IOS.Utilities
                     try
                     {
                         LockDatabase(containerUrl);
+                     
+                        var contactName = new ExtensionContact();
+                        contactName.FolderId = folderId;
+                        contactName.Name = name;
+                        contactName.Number = Convert.ToInt64(number);
 
-                        var dbExtContact = connection.Find<ExtensionContact>(id);
-
-                        if (dbExtContact != null) //If database already contains row with given id, then @number should be appended to the string of numbers stored for that row.
-                        {
-                            if (dbExtContact.Numbers.Contains(number))
-                                return;
-                                   
-                            StringBuilder sb = new StringBuilder();
-                            sb.Append(dbExtContact.Numbers).Append(",").Append(number);
-                            dbExtContact.Numbers = sb.ToString();
-
-                            connection.InsertOrReplace(dbExtContact);
-                        }
-                        else //Otherwise insert contact with just the @number stored in the string of numbers.
-                        {
-                            var newExtContact = new ExtensionContact();
-                            newExtContact.Id = id;
-                            newExtContact.Name = name;
-                            newExtContact.Numbers = number;
-
-                            connection.Insert(newExtContact);
-                        }
+                        connection.Insert(contactName);
                     }
-                    finally 
+                    finally
                     {
-                        UnlockDatabase(containerUrl); 
+                        UnlockDatabase(containerUrl);
                     }
                 }
             }
@@ -141,42 +153,45 @@ namespace Mark5.Mobile.IOS.Utilities
         static void LockDatabase(NSUrl containerUrl)
         {
 
-                var fm = NSFileManager.DefaultManager;
-                var lockPath = containerUrl.Append(databaseLockName, false).Path;
+            var fm = NSFileManager.DefaultManager;
+            var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
-                if (fm.FileExists(lockPath))
-                    throw new Exception("The database is locked, unable to get lock.");
-                
-                fm.CreateFile(lockPath, new NSData(), new NSFileAttributes());
-            
+            if (fm.FileExists(lockPath))
+                throw new Exception("The database is locked, unable to get lock.");
+
+            fm.CreateFile(lockPath, new NSData(), new NSFileAttributes());
+
         }
 
         static void UnlockDatabase(NSUrl containerUrl)
         {
-                var fm = NSFileManager.DefaultManager;
-                var lockPath = containerUrl.Append(databaseLockName, false).Path;
+            var fm = NSFileManager.DefaultManager;
+            var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
-                if (fm.FileExists(lockPath))
+            if (fm.FileExists(lockPath))
+            {
+                NSError error = new NSError();
+                fm.Remove(lockPath, out error);
+                if (error != null)
                 {
-                    NSError error = new NSError();
-                    fm.Remove(lockPath, out error);
-                    if(error != null)
-                    {
-                        throw new Exception("Error database lock file: " + error.LocalizedFailureReason);
-                    }
+                    throw new Exception("Error database lock file: " + error.LocalizedFailureReason);
                 }
-                else
-                    throw new Exception("The database is not locked, unable unlock.");
-            
+            }
+            else
+                throw new Exception("The database is not locked, unable unlock.");
         }
     }
 
     [Table("ExtensionContact")]
-    public class ExtensionContact
+    class ExtensionContact
     {
         [Column("Id")]
-        [PrimaryKey]
+        [PrimaryKey,AutoIncrement]
         public int Id { get; set; }
+
+        [Column("FolderId")]
+        [NotNull]
+        public int FolderId { get; set; }
 
         [Column("Name")]
         [NotNull]
@@ -184,6 +199,6 @@ namespace Mark5.Mobile.IOS.Utilities
 
         [Column("Number")]
         [NotNull]
-        public string Numbers { get; set; }
+        public long Number { get; set; }
     }
 }
