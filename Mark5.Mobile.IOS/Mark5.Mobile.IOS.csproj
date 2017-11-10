@@ -251,6 +251,9 @@
 		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
+		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\ComposeDocumentViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\AbstractComposeDocumentView.cs" />
+		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\ContentView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -497,6 +500,7 @@
 		<BundleResource Include="Resources\icons\warning%403x.png" />
 		<BundleResource Include="Resources\icons\add_action%402x.png" />
 		<BundleResource Include="Resources\icons\add_action%403x.png" />
+		<BundleResource Include="Resources\html\editor.html" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
@@ -510,6 +514,8 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
+	  <Folder Include="Ui\ViewControllers\ModernComposeDocumentView\" />
+	  <Folder Include="Resources\html\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

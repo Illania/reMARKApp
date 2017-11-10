@@ -15,7 +15,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;

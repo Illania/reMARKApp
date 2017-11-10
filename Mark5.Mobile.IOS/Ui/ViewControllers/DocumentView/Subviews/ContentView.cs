@@ -285,7 +285,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                              {
                                  var metaElement = htmlDoc.CreateElement("meta");
                                  metaElement.SetAttributeValue("name", "viewport");
-                                 metaElement.SetAttributeValue("content", $"initial-scale=0.75, minimum-scale=0.5, maximum-scale=2");
+                                 metaElement.SetAttributeValue("content", "initial-scale=0.75, minimum-scale=0.5, maximum-scale=3");//=device-width, shrink-to-fit=yes");// $"initial-scale=0.75, minimum-scale=0.5, maximum-scale=2");
                                  headNode.AppendChild(metaElement);
                                  content = htmlDoc.DocumentNode.OuterHtml;
                              }
