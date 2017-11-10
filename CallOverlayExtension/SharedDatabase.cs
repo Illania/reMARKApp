@@ -27,8 +27,7 @@ namespace CallOverlayExtension
 
                         var commandString = $"select {nameof(ExtensionContact.Name)},{nameof(ExtensionContact.Number)} "
                             + $"from {nameof(ExtensionContact)} group by {nameof(ExtensionContact.Number)} order by {nameof(ExtensionContact.Number)} asc";
-
-                        var ydoe = connection.Query<ExtensionContact>(commandString);
+                        
                         var row = connection.DeferredQuery<ExtensionContact>(commandString);
                         var enumerator = row.GetEnumerator();
 
@@ -40,41 +39,7 @@ namespace CallOverlayExtension
                     finally { UnlockDatabase(); }
                 }
             }
-
-
         }
-
-        /*static List<(string name, long number)> ProcessResult(List<ExtensionContact> dbResult)
-        {
-            List<(string name, long number)> result = new List<(string name, long number)>();
-
-            foreach(ExtensionContact ec in dbResult)
-            {
-                var name = ec.Name;
-                var numbers = ec.Numbers.Split(',');
-                for (int i = 0; i < numbers.Length; i++)
-                {
-                    result.Add((name,Convert.ToInt64(numbers[i])));
-                }
-            }
-
-            result.Sort((ec1,ec2) => ec1.number.CompareTo(ec2.number));
-            return result;
-        }*/
-
-        /*static void ProcessAndStoreContact((string name, long number) dbResult, CXCallDirectoryExtensionContext cxContext)
-        {
-            List<(string name, long number)> result = new List<(string name, long number)>();
-
-            var extName = dbResult.name;
-            var numbers = dbResult.number;
-
-            foreach ((string name, long number) in result){
-                cxContext.AddIdentificationEntry(number,name);
-            }
-        }*/
-
-
 
         static void LockDatabase()
         {
