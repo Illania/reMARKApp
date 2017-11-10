@@ -64,6 +64,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ContactFragment fragment, string tag) NewInstance(int? folderId = null, Folder folder = null, int? contactId = null, ContactPreview contactPreview = null, Guid? notificationGuid = null)
         {
+            Analytics.LogEvent(new OpenContactEvent());
+
             var args = new Bundle();
 
             if (folderId != null)

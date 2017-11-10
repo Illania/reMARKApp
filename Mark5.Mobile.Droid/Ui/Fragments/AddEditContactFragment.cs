@@ -14,6 +14,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -60,6 +61,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (AddEditContactFragment fragment, string tag) NewInstance(Contact contact, ContactPreview contactPreview, int? contactId, ContactType? contactType, ContactCreationModeFlag? creationModeFlag,
                                                                                 ContactPreview parentContactPreview, bool? parentPreselected)
         {
+            if (parentPreselected != null)
+                Analytics.LogEvent(new AddSubContactEvent());
+            else
+            {
+                if (creationModeFlag == ContactCreationModeFlag.Edit)
+                    Analytics.LogEvent(new EditContactEvent());
+                if (creationModeFlag == ContactCreationModeFlag.New)
+                    Analytics.LogEvent(new AddContactEvent());
+            }
+
             Bundle args = new Bundle();
 
             if (contact != null)

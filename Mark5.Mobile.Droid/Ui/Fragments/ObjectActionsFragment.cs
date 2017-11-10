@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -33,6 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ObjectActionsFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
         {
+            Analytics.LogEvent(new OpenActionsEvent(businessEntity.ModuleType));
+
             var args = new Bundle();
 
             if (businessEntity != null)
@@ -69,8 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.actions);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.actions);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ObjectActionsFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
         }

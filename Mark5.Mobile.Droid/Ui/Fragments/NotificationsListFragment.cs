@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (NotificationsListFragment fragment, string tag) NewInstance(ObjectType[] objectTypes)
         {
+            Analytics.LogEvent(new OpenNotificationListEvent());
+
             var args = new Bundle();
 
             if (objectTypes != null)

@@ -10,6 +10,7 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -34,6 +35,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (CommentsListFragment fragment, string tag) NewInstance(BusinessEntity be)
         {
+            Analytics.LogEvent(new OpenCommentsEvent(be.ModuleType));
+
             var args = new Bundle();
 
             if (be != null)

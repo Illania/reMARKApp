@@ -17,6 +17,8 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views;
+using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -34,6 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ObjectLinksFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
         {
+            Analytics.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
+
             var args = new Bundle();
 
             if (businessEntity != null)

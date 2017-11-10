@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PreferenceFragment fragment, string tag) NewInstance()
         {
+            Analytics.LogEvent(new OpenSettingsEvent());
+
             var fragment = new PreferenceFragment();
             var tag = $"{nameof(PreferenceFragment)}";
 

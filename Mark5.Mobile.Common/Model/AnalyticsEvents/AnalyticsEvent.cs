@@ -398,12 +398,12 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
     }
 
 
-    public class DocumentOpenAttachment : AnalyticsEvent
+    public class DocumentOpenAttachmentEvent : AnalyticsEvent
     {
         public override string Name => "document_open_attachment";
     }
 
-    public class DocumentShowDetail : AnalyticsEvent
+    public class DocumentShowDetailEvent : AnalyticsEvent
     {
         public override string Name => "document_show_detail";
     }

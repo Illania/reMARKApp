@@ -51,6 +51,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodeFragment fragment, string tag) NewInstance(int? folderId, Folder folder, int? shortcodeId, ShortcodePreview shortcodePreview, Guid? notificationGuid)
         {
+            Analytics.LogEvent(new OpenShortcodeEvent());
+
             var args = new Bundle();
 
             if (folderId != null)

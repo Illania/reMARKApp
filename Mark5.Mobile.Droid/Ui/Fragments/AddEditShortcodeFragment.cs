@@ -11,6 +11,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -52,6 +53,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, Shortcode shortcode, ShortcodePreview shortcodePreview)
         {
+            if (flag == ShortcodeCreationModeFlag.Edit)
+                Analytics.LogEvent(new EditShortcodeEvent());
+            if (flag == ShortcodeCreationModeFlag.New)
+                Analytics.LogEvent(new AddShortcodeEvent());
+
             Bundle args = new Bundle();
 
             if (shortcode != null)

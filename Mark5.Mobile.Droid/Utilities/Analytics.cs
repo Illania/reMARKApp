@@ -16,8 +16,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static void LogEvent(AnalyticsEvent analyticsEvent)
         {
+            //TODO need to put a try catch
             Bundle bundle = null;
-            if (analyticsEvent.Parameters.Any())
+            if (analyticsEvent.Parameters?.Any() == true)
             {
                 bundle = new Bundle();
                 foreach (var parameter in analyticsEvent.Parameters)
