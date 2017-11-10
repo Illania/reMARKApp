@@ -109,21 +109,19 @@ namespace Mark5.Mobile.IOS.Utilities
             var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
             //Get  for parsing the number. Parsing will remove any char's like '(' or '-'.
-            var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(splitNumber[0]));
+            var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(countryNumber));
             try
             {
-                PhoneNumber nmber = phoneNumberUtil.Parse(splitNumber[2], countryString);
-                number = phoneNumberUtil.Format(nmber, PhoneNumberFormat.E164);
+                PhoneNumber phoneNumber = phoneNumberUtil.Parse(baseNumber, countryString);
+                number = phoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.E164);
             }
             catch (NumberParseException ex)
             {
                 return; //Number has been stored incorrectly, e.g. contains letters, so it is ignored.
             }
 
+            //'+' will be in the number, since it's part of the E164 format.
             number = number.Replace("+", String.Empty);
-
-            if (!number.All(n => Char.IsDigit(n))) //If the number contains letters, then it should not be added.
-                return;
 
             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
             {
