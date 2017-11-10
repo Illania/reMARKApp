@@ -17,6 +17,7 @@ using Android.Views.InputMethods;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.AnalyticsEvents;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -36,6 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentSearchCriteriaFragment Fragment, string tag) NewInstance()
         {
+            Analytics.LogEvent(new OpenSearchEvent(ModuleType.Documents));
+
             var fragment = new DocumentSearchCriteriaFragment();
             var tag = $"{nameof(DocumentSearchCriteriaFragment)}";
 

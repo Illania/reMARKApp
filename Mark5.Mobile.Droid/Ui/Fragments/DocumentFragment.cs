@@ -57,6 +57,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
         {
+            if (dp?.Direction == DocumentDirection.External)
+                Analytics.LogEvent(new OpenDocumentEvent(true)); //TODO this will not work for notificaiton list
+            else
+                Analytics.LogEvent(new OpenDocumentEvent(false));
 
             var args = new Bundle();
 

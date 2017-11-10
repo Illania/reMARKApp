@@ -100,25 +100,25 @@ namespace Mark5.Mobile.Common.Model.AnalyticsEvents
 
     #region Actions Events
 
-    public class SetFavoriteEvent : AnalyticsEvent
+    public class SetFolderFavoriteEvent : AnalyticsEvent
     {
-        public SetFavoriteEvent(ModuleType module, int quantity)
+        public SetFolderFavoriteEvent(ModuleType module, int quantity)
         {
             Name = "set_favorite" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
-    public class SetSyncEvent : AnalyticsEvent
+    public class SetFolderSyncEvent : AnalyticsEvent
     {
-        public SetSyncEvent(ModuleType module, int quantity)
+        public SetFolderSyncEvent(ModuleType module, int quantity)
         {
             Name = "set_sync" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
-    public class SetNotifyEvent : AnalyticsEvent
+    public class SetFolderNotifyEvent : AnalyticsEvent
     {
-        public SetNotifyEvent(ModuleType module, int quantity)
+        public SetFolderNotifyEvent(ModuleType module, int quantity)
         {
             Name = "set_notify" + GetModuleString(module) + GetQuantityString(quantity);
         }

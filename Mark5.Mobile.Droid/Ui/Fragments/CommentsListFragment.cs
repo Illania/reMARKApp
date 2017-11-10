@@ -182,6 +182,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void DeleteComment(Comment comment)
         {
+            Analytics.LogEvent(new RemoveCommentEvent(entity.ModuleType));
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
             Task t;
 
@@ -217,6 +219,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void EditComment(Comment comment, string newContent)
         {
+            Analytics.LogEvent(new EditCommentEvent(entity.ModuleType));
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.editing_comment, Resource.String.please_wait);
             var newComment = comment.ShallowCopy();
             newComment.Content = newContent;
@@ -260,6 +264,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AddCommentButton_Click(object sender, EventArgs e)
         {
+            Analytics.LogEvent(new AddCommentEvent(entity.ModuleType));
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.adding_comment, Resource.String.please_wait);
             var newCommentContent = addCommentEditText.Text;
 

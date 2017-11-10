@@ -85,7 +85,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses)
         {
-            Analytics.LogEvent(new ComposeNewDocumentEvent());
+            if (copyToNewOption != null && copyToNewOption != CopyToNewOption.None)
+                Analytics.LogEvent(new CopyToNewEvent(copyToNewOption.Value));
+            else if (documentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                Analytics.LogEvent(new ComposeEditDraftEvent());
+            else if (documentCreationModeFlag == DocumentCreationModeFlag.Reply)
+                Analytics.LogEvent(new ReplyEvent());
+            else if (documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+                Analytics.LogEvent(new ReplyAllEvent());
+            else if (documentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                Analytics.LogEvent(new ForwardEvent());
+            else if (documentCreationModeFlag == DocumentCreationModeFlag.New)
+                Analytics.LogEvent(new ComposeNewDocumentEvent());
 
             var args = new Bundle();
 

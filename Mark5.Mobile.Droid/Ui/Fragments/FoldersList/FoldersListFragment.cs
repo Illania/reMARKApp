@@ -647,6 +647,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!selectedFolders.Any())
                 return;
 
+            Analytics.LogEvent(new SetFolderNotifyEvent(selectedFolders.First().Module, selectedFolders.Count()));
+
             CommonConfig.Logger.Info($"Setting subscription status of {selectedFolders.Count} folders to {enabled}");
 
             var token = PlatformConfig.Preferences.PushNotificationToken;
@@ -685,6 +687,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!selectedFolders.Any())
                 return;
 
+            Analytics.LogEvent(new SetFolderSyncEvent(selectedFolders.First().Module, selectedFolders.Count()));
+
             CommonConfig.Logger.Info($"Setting offline status of {selectedFolders.Count} folders to {offline}");
 
             Task t = null;
@@ -717,6 +721,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
                 return;
+
+            Analytics.LogEvent(new SetFolderFavoriteEvent(selectedFolders.First().Module, selectedFolders.Count()));
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
