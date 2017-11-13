@@ -228,19 +228,24 @@ namespace Mark5.Mobile.Common.Analytics
         }
     }
 
-    public class DeleteCommentEvent : AnalyticsEvent
-    {
-        public DeleteCommentEvent(ModuleType module)
-        {
-            Name = "delete_comment" + GetModuleString(module);
-        }
-    }
-
     public class EditCommentEvent : AnalyticsEvent
     {
         public EditCommentEvent(ModuleType module)
         {
             Name = "edit_comment" + GetModuleString(module);
+        }
+    }
+
+    public class GetMoreDocumentsEvent : AnalyticsEvent
+    {
+        public override string Name => "get_more_documents";
+    }
+
+    public class DeleteCommentEvent : AnalyticsEvent
+    {
+        public DeleteCommentEvent(ModuleType module)
+        {
+            Name = "delete_comment" + GetModuleString(module);
         }
     }
 
@@ -422,11 +427,6 @@ namespace Mark5.Mobile.Common.Analytics
     public class DocumentShowDetailEvent : AnalyticsEvent
     {
         public override string Name => "document_show_detail";
-    }
-
-    public class GetMoreDocumentsEvent : AnalyticsEvent
-    {
-        public override string Name => "get_more_documents";
     }
 
     #endregion
