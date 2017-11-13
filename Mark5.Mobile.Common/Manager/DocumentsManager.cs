@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -208,6 +209,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
+            AnalyticsManager.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -240,6 +243,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetDocumentsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
         {
+            AnalyticsManager.LogEvent(new SetPriorityEvent(documentPreviews.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -423,6 +428,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
+            AnalyticsManager.LogEvent(new SetCategories(ModuleType.Documents));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -454,6 +461,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<Comment> AddComment(Document document, string content, SourceType sourceType = SourceType.Auto)
         {
+            AnalyticsManager.LogEvent(new AddCommentEvent(ModuleType.Documents));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -486,6 +495,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<bool> EditComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto)
         {
+            AnalyticsManager.LogEvent(new EditCommentEvent(ModuleType.Documents));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -520,6 +531,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto)
         {
+            AnalyticsManager.LogEvent(new DeleteCommentEvent(ModuleType.Documents));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 

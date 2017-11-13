@@ -141,11 +141,27 @@ namespace Mark5.Mobile.Common.Analytics
         }
     }
 
+    public class CopyToUserWorktrayEvent : AnalyticsEvent
+    {
+        public CopyToUserWorktrayEvent(ModuleType module, int quantity)
+        {
+            Name = "copy_to_user_worktray" + GetModuleString(module) + GetQuantityString(quantity);
+        }
+    }
+
     public class CopyToFolderEvent : AnalyticsEvent
     {
         public CopyToFolderEvent(ModuleType module, int quantity)
         {
             Name = "copy_to_folder" + GetModuleString(module) + GetQuantityString(quantity);
+        }
+    }
+
+    public class MoveToFolderEvent : AnalyticsEvent
+    {
+        public MoveToFolderEvent(ModuleType module, int quantity)
+        {
+            Name = "move_to_folder" + GetModuleString(module) + GetQuantityString(quantity);
         }
     }
 
@@ -212,11 +228,11 @@ namespace Mark5.Mobile.Common.Analytics
         }
     }
 
-    public class RemoveCommentEvent : AnalyticsEvent
+    public class DeleteCommentEvent : AnalyticsEvent
     {
-        public RemoveCommentEvent(ModuleType module)
+        public DeleteCommentEvent(ModuleType module)
         {
-            Name = "remove_comment" + GetModuleString(module);
+            Name = "delete_comment" + GetModuleString(module);
         }
     }
 

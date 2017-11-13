@@ -1,6 +1,6 @@
 ﻿namespace Mark5.Mobile.Common.Analytics
 {
-    public static class AnalyticsManager
+    public static class AnalyticsManager //TODO need a different name
     {
         static IAnalyticsImplementation implementation;
 
