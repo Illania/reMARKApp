@@ -197,8 +197,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Resource.String.dialog_logout_content,
                     async () =>
                     {
-                        AnalyticsManager.LogEvent(new SettingsLogOut());
-
                         Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
                         if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
