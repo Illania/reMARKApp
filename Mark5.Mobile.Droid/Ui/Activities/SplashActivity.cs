@@ -100,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     if (PlatformConfig.Preferences.ClearCache)
                     {
-                        Analytics.LogEvent(new SettingsCacheCleanUpEvent());
+                        AnalyticsManager.LogEvent(new SettingsCacheCleanUpEvent());
 
                         CommonConfig.Logger.Info("Clearing cache...");
 

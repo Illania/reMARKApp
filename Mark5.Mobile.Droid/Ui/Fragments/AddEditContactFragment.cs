@@ -62,13 +62,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                                 ContactPreview parentContactPreview, bool? parentPreselected)
         {
             if (parentPreselected != null)
-                Analytics.LogEvent(new AddSubContactEvent());
+                AnalyticsManager.LogEvent(new AddSubContactEvent());
             else
             {
                 if (creationModeFlag == ContactCreationModeFlag.Edit)
-                    Analytics.LogEvent(new EditContactEvent());
+                    AnalyticsManager.LogEvent(new EditContactEvent());
                 if (creationModeFlag == ContactCreationModeFlag.New)
-                    Analytics.LogEvent(new AddContactEvent());
+                    AnalyticsManager.LogEvent(new AddContactEvent());
             }
 
             Bundle args = new Bundle();

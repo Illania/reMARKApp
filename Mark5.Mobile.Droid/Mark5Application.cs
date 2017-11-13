@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
 
-                    Analytics.Initialize(new AnalyticsImplementation(FirebaseAnalytics.GetInstance(this)));
+                    AnalyticsManager.Initialize(new AnalyticsImplementation(FirebaseAnalytics.GetInstance(this)));
 
 #if !DEBUG
                     CommonConfig.Logger.Level = LogLevel.INFO;

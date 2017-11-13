@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ContactFragment fragment, string tag) NewInstance(int? folderId = null, Folder folder = null, int? contactId = null, ContactPreview contactPreview = null, Guid? notificationGuid = null)
         {
-            Analytics.LogEvent(new OpenContactEvent());
+            AnalyticsManager.LogEvent(new OpenContactEvent());
 
             var args = new Bundle();
 
@@ -686,7 +686,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Button1Layout_Click(object sender, EventArgs e)
         {
-            Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Email));
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Email));
 
             var communicationAddress = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
             if (communicationAddress == null)
@@ -712,7 +712,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Button2Layout_Click(object sender, EventArgs e)
         {
-            Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Call));
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Call));
 
             var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
@@ -736,7 +736,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Button3Layout_Click(object sender, EventArgs e)
         {
-            Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Text));
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Text));
 
             var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
             if (communicationAddresses == null)
@@ -750,7 +750,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Button4Layout_Click(object sender, EventArgs e)
         {
-            Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Map));
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Map));
 
             var physicalAddress = contact.PhysicalAddresses.ToArray();
             if (physicalAddress.Length == 0)
@@ -774,14 +774,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void PhysicalAddressClicked(object sender, PhysicalAddress e)
         {
-            Analytics.LogEvent(new ContactClickPhysicalAddressEvent());
+            AnalyticsManager.LogEvent(new ContactClickPhysicalAddressEvent());
 
             Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(e));
         }
 
         void ContactClicked(object sender, ContactPreview cp)
         {
-            Analytics.LogEvent(new ContactNavigateSubContactEvent());
+            AnalyticsManager.LogEvent(new ContactNavigateSubContactEvent());
 
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var ft = fragmentManager.BeginTransaction();
@@ -797,7 +797,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (e.Type == CommunicationAddressType.Email)
             {
-                Analytics.LogEvent(new ContactClickEmailEvent());
+                AnalyticsManager.LogEvent(new ContactClickEmailEvent());
 
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {
@@ -818,7 +818,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (e.Type == CommunicationAddressType.Mobile)
             {
-                Analytics.LogEvent(new ContactCallNumberEvent());
+                AnalyticsManager.LogEvent(new ContactCallNumberEvent());
 
                 var formattedAddress = AddressFormatter.FormatCommunicationAddress(e);
 
@@ -835,7 +835,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (e.Type == CommunicationAddressType.Phone)
             {
-                Analytics.LogEvent(new ContactCallNumberEvent());
+                AnalyticsManager.LogEvent(new ContactCallNumberEvent());
                 Integration.DialNumber(Context, AddressFormatter.FormatCommunicationAddress(e));
             }
         }

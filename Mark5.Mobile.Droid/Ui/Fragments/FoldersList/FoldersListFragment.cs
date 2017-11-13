@@ -355,7 +355,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void NavigateToFolder(Folder folder)
         {
-            Analytics.LogEvent(new ExpandFolderEvent(folder.Module));
+            AnalyticsManager.LogEvent(new ExpandFolderEvent(folder.Module));
 
             var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
             var (foldersListFragment, tag) = GetFolderFragment(folder);
@@ -451,9 +451,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var (folder, section) = CurrentAdapter.GetItemAtPosition(position);
 
                 if (folder.Local)
-                    Analytics.LogEvent(new OpenLocalFolderEvent());
+                    AnalyticsManager.LogEvent(new OpenLocalFolderEvent());
                 else
-                    Analytics.LogEvent(new OpenFolderEvent(folder.Module, section == Section.Favourites));
+                    AnalyticsManager.LogEvent(new OpenFolderEvent(folder.Module, section == Section.Favourites));
 
                 if (folder.Module == ModuleType.Documents)
                     StartActivity(DocumentsListActivity.CreateIntent(Context, folder.ShallowCopy()));
@@ -647,7 +647,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!selectedFolders.Any())
                 return;
 
-            Analytics.LogEvent(new SetFolderNotifyEvent(selectedFolders.First().Module, selectedFolders.Count()));
+            AnalyticsManager.LogEvent(new SetFolderNotifyEvent(selectedFolders.First().Module, selectedFolders.Count()));
 
             CommonConfig.Logger.Info($"Setting subscription status of {selectedFolders.Count} folders to {enabled}");
 
@@ -687,7 +687,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!selectedFolders.Any())
                 return;
 
-            Analytics.LogEvent(new SetFolderSyncEvent(selectedFolders.First().Module, selectedFolders.Count()));
+            AnalyticsManager.LogEvent(new SetFolderSyncEvent(selectedFolders.First().Module, selectedFolders.Count()));
 
             CommonConfig.Logger.Info($"Setting offline status of {selectedFolders.Count} folders to {offline}");
 
@@ -722,7 +722,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!selectedFolders.Any())
                 return;
 
-            Analytics.LogEvent(new SetFolderFavoriteEvent(selectedFolders.First().Module, selectedFolders.Count()));
+            AnalyticsManager.LogEvent(new SetFolderFavoriteEvent(selectedFolders.First().Module, selectedFolders.Count()));
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
@@ -788,7 +788,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshLayout_Refresh(object sender, EventArgs e)
         {
-            Analytics.LogEvent(new PullToRefreshEvent(true));
+            AnalyticsManager.LogEvent(new PullToRefreshEvent(true));
             RefreshData(true);
         }
 
@@ -805,7 +805,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                Analytics.LogEvent(new FilterEvent(true));
+                AnalyticsManager.LogEvent(new FilterEvent(true));
 
                 menu?.FindItem(10)?.SetVisible(false);
 

@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentSearchCriteriaFragment Fragment, string tag) NewInstance()
         {
-            Analytics.LogEvent(new OpenSearchEvent(ModuleType.Documents));
+            AnalyticsManager.LogEvent(new OpenSearchEvent(ModuleType.Documents));
 
             var fragment = new DocumentSearchCriteriaFragment();
             var tag = $"{nameof(DocumentSearchCriteriaFragment)}";

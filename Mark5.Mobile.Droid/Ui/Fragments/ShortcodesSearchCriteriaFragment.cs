@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodesSearchCriteriaFragment Fragment, string tag) NewInstance()
         {
-            Analytics.LogEvent(new OpenSearchEvent(ModuleType.Shortcodes));
+            AnalyticsManager.LogEvent(new OpenSearchEvent(ModuleType.Shortcodes));
 
             var fragment = new ShortcodesSearchCriteriaFragment();
             var tag = $"{nameof(ShortcodesSearchCriteriaFragment)}";

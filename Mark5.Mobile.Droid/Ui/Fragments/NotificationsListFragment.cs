@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (NotificationsListFragment fragment, string tag) NewInstance(ObjectType[] objectTypes)
         {
-            Analytics.LogEvent(new OpenNotificationListEvent());
+            AnalyticsManager.LogEvent(new OpenNotificationListEvent());
 
             var args = new Bundle();
 
@@ -144,7 +144,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.MarkAllAsRead)
             {
-                Analytics.LogEvent(new NotificationMarkAllAsReadEvent());
+                AnalyticsManager.LogEvent(new NotificationMarkAllAsReadEvent());
                 MarkAllAsRead();
                 return true;
             }
@@ -221,7 +221,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Adapter_ItemClicked(object sender, Notification notification)
         {
-            Analytics.LogEvent(new NotificationClickedEvent(notification.ObjectType));
+            AnalyticsManager.LogEvent(new NotificationClickedEvent(notification.ObjectType));
 
             await Managers.NotificationsManager.MarkAsRead(notification);
 

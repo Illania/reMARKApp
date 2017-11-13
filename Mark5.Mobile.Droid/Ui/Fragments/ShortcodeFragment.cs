@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodeFragment fragment, string tag) NewInstance(int? folderId, Folder folder, int? shortcodeId, ShortcodePreview shortcodePreview, Guid? notificationGuid)
         {
-            Analytics.LogEvent(new OpenShortcodeEvent());
+            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
 
             var args = new Bundle();
 
@@ -188,7 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.CreateNewDocument)
             {
-                Analytics.LogEvent(new ShortcodeComposeDocumentEvent());
+                AnalyticsManager.LogEvent(new ShortcodeComposeDocumentEvent());
 
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {
@@ -363,7 +363,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (e.Type == CommunicationAddressType.Email)
             {
-                Analytics.LogEvent(new ShortcodeClickEmailEvent());
+                AnalyticsManager.LogEvent(new ShortcodeClickEmailEvent());
 
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {

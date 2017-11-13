@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid
 
         public static (CategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
         {
-            Analytics.LogEvent(new OpenCategoriesEvent(businessEntity.ModuleType));
+            AnalyticsManager.LogEvent(new OpenCategoriesEvent(businessEntity.ModuleType));
 
             var args = new Bundle();
 

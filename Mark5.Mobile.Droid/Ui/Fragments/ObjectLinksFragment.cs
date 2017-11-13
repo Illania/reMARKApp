@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ObjectLinksFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
         {
-            Analytics.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
+            AnalyticsManager.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
 
             var args = new Bundle();
 

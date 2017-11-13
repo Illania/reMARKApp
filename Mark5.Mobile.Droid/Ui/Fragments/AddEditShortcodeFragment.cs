@@ -54,9 +54,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, Shortcode shortcode, ShortcodePreview shortcodePreview)
         {
             if (flag == ShortcodeCreationModeFlag.Edit)
-                Analytics.LogEvent(new EditShortcodeEvent());
+                AnalyticsManager.LogEvent(new EditShortcodeEvent());
             if (flag == ShortcodeCreationModeFlag.New)
-                Analytics.LogEvent(new AddShortcodeEvent());
+                AnalyticsManager.LogEvent(new AddShortcodeEvent());
 
             Bundle args = new Bundle();
 

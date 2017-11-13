@@ -58,9 +58,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
         {
             if (dp?.Direction == DocumentDirection.External)
-                Analytics.LogEvent(new OpenDocumentEvent(true)); //TODO this will not work for notificaiton list
+                AnalyticsManager.LogEvent(new OpenDocumentEvent(true)); //TODO this will not work for notificaiton list
             else
-                Analytics.LogEvent(new OpenDocumentEvent(false));
+                AnalyticsManager.LogEvent(new OpenDocumentEvent(false));
 
             var args = new Bundle();
 
@@ -797,7 +797,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
         {
-            Analytics.LogEvent(new DocumentOpenAttachmentEvent());
+            AnalyticsManager.LogEvent(new DocumentOpenAttachmentEvent());
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
