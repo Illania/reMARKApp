@@ -7,6 +7,7 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -168,6 +169,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
         {
+            AnalyticsManager.LogEvent(new DocumentQuickSwitchEvent());
+
             state.Position = position;
         }
 

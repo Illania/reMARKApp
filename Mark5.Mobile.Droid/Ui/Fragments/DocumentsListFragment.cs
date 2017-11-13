@@ -1125,7 +1125,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
+                {
+                    AnalyticsManager.LogEvent(new GetMoreDocumentsEvent());
+
                     loadMoreAction(dp.Id);
+                }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)

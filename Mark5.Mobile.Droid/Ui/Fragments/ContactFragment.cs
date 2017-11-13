@@ -818,8 +818,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (e.Type == CommunicationAddressType.Mobile)
             {
-                AnalyticsManager.LogEvent(new ContactCallNumberEvent());
-
                 var formattedAddress = AddressFormatter.FormatCommunicationAddress(e);
 
                 var selection = await Dialogs.ShowListDialog(Context, formattedAddress, Resource.Array.call_or_text, true);
@@ -827,10 +825,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 if (selection == 0)
+                {
+                    AnalyticsManager.LogEvent(new ContactCallNumberEvent());
                     Integration.DialNumber(Context, formattedAddress);
+                }
 
                 if (selection == 1)
+                {
                     Integration.TextNumber(Context, formattedAddress);
+                    AnalyticsManager.LogEvent(new ContactSendTextEvent());
+                }
             }
 
             if (e.Type == CommunicationAddressType.Phone)

@@ -193,7 +193,7 @@ namespace Mark5.Mobile.Common.Analytics
     {
         public SetCategories(ModuleType module)
         {
-            Name = "set_priority" + GetModuleString(module);
+            Name = "set_categories" + GetModuleString(module);
         }
     }
 
@@ -216,7 +216,7 @@ namespace Mark5.Mobile.Common.Analytics
     {
         public CopyToNewEvent(CopyToNewOption option)
         {
-            Name = "copy_to_new_" + GetOptionString(option);
+            Name = "copy_to_new" + GetOptionString(option);
         }
     }
 
@@ -252,7 +252,7 @@ namespace Mark5.Mobile.Common.Analytics
     {
         public OpenDocumentEvent(bool isExternal)
         {
-            Name = "open_document" + $"{(isExternal ? "_is_external" : "")}";
+            Name = "open_document" + $"{(isExternal ? "_external" : "")}";
         }
     }
 
@@ -397,7 +397,7 @@ namespace Mark5.Mobile.Common.Analytics
     {
         public ComposeAddTemplateEvent(TemplateType? type)
         {
-            Name = "compose_add_template_" + type == null ? "_none" : type.ToString().ToLowerInvariant();
+            Name = "compose_add_template_" + (type == null ? "_none" : type.ToString().ToLowerInvariant());
         }
     }
 
@@ -414,7 +414,6 @@ namespace Mark5.Mobile.Common.Analytics
         public override string Name => "document_quick_switch";
     }
 
-
     public class DocumentOpenAttachmentEvent : AnalyticsEvent
     {
         public override string Name => "document_open_attachment";
@@ -427,7 +426,7 @@ namespace Mark5.Mobile.Common.Analytics
 
     public class GetMoreDocumentsEvent : AnalyticsEvent
     {
-        public override string Name => "filtering";
+        public override string Name => "get_more_documents";
     }
 
     #endregion
@@ -445,6 +444,11 @@ namespace Mark5.Mobile.Common.Analytics
     public class ContactCallNumberEvent : AnalyticsEvent
     {
         public override string Name => "contact_call_number";
+    }
+
+    public class ContactSendTextEvent : AnalyticsEvent
+    {
+        public override string Name => "contact_send_text";
     }
 
     public class ContactClickEmailEvent : AnalyticsEvent
@@ -473,7 +477,7 @@ namespace Mark5.Mobile.Common.Analytics
 
     public class ShortcodeComposeDocumentEvent : AnalyticsEvent
     {
-        public override string Name => "ShortcodeComposeDocumentEvent";
+        public override string Name => "shortcode_compose_document_event";
     }
 
     #endregion
