@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Mark5.Mobile.Common.Model;
 
-namespace Mark5.Mobile.Common.Model.AnalyticsEvents
+namespace Mark5.Mobile.Common.Analytics
 {
     #region Abstract classes
 

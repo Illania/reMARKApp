@@ -1,20 +1,20 @@
 ﻿using System.Linq;
 using Android.OS;
 using Firebase.Analytics;
-using Mark5.Mobile.Common.Model.AnalyticsEvents;
+using Mark5.Mobile.Common.Analytics;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public static class Analytics
+    public class AnalyticsImplementation : IAnalyticsImplementation
     {
-        static FirebaseAnalytics firebaseAnalytics;
+        readonly FirebaseAnalytics firebaseAnalytics;
 
-        public static void Initialize(FirebaseAnalytics fa)
+        public AnalyticsImplementation(FirebaseAnalytics firebaseAnalytics)
         {
-            firebaseAnalytics = fa;
+            this.firebaseAnalytics = firebaseAnalytics;
         }
 
-        public static void LogEvent(AnalyticsEvent analyticsEvent)
+        public void LogEvent(AnalyticsEvent analyticsEvent)
         {
             //TODO need to put a try catch
             Bundle bundle = null;

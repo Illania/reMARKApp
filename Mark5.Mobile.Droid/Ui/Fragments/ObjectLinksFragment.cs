@@ -11,14 +11,13 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views;
-using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.Common.Model.AnalyticsEvents;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
