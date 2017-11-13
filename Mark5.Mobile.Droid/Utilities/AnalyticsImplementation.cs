@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Android.OS;
 using Firebase.Analytics;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Analytics;
 
 namespace Mark5.Mobile.Droid.Utilities
@@ -16,24 +18,31 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void LogEvent(AnalyticsEvent analyticsEvent)
         {
-            //TODO need to put a try catch
-            Bundle bundle = null;
-            if (analyticsEvent.Parameters?.Any() == true)
+            try
             {
-                bundle = new Bundle();
-                foreach (var parameter in analyticsEvent.Parameters)
+                Bundle bundle = null;
+                if (analyticsEvent.Parameters?.Any() == true)
                 {
-                    if (parameter is StringAnalyticsParameter stringParameter)
+                    bundle = new Bundle();
+                    foreach (var parameter in analyticsEvent.Parameters)
                     {
-                        bundle.PutString(stringParameter.Name, stringParameter.Value);
-                    }
-                    else if (parameter is NumberAnalyticsParameter numberParameter)
-                    {
-                        bundle.PutLong(numberParameter.Name, numberParameter.Value);
+                        if (parameter is StringAnalyticsParameter stringParameter)
+                        {
+                            bundle.PutString(stringParameter.Name, stringParameter.Value);
+                        }
+                        else if (parameter is NumberAnalyticsParameter numberParameter)
+                        {
+                            bundle.PutLong(numberParameter.Name, numberParameter.Value);
+                        }
                     }
                 }
+                firebaseAnalytics.LogEvent(analyticsEvent.Name, bundle);
             }
-            firebaseAnalytics.LogEvent(analyticsEvent.Name, bundle);
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while logging analytics event", ex);
+            }
+
         }
     }
 }
