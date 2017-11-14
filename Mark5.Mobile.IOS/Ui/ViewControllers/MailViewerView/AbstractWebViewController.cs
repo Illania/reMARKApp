@@ -3,14 +3,11 @@ using System.IO;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
+using HtmlAgilityPack;
 using MailBee.Html;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
-using System.Linq;
-using HtmlAgilityPack;
-using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
@@ -170,6 +167,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             webView?.LoadHtmlString(html, null);
         }
 
+        protected void LoadEmpty()
+        {
+            webView?.StopLoading();
+            webView?.LoadHtmlString("", null);
+        }
+
         protected void StopLoading() => webView?.StopLoading();
 
         Task<string> MakeHtmlSafe(string html)
@@ -246,9 +249,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             }
         }
 
-        void DecidePolicy(WKWebView wkWebView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
+        [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
+        void DecidePolicy(WKWebView webView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
         {
             decisionHandler(CanNavigate(navigationAction) ? WKNavigationActionPolicy.Allow : WKNavigationActionPolicy.Cancel);
+        }
+
+        [Export("webView:didCommitNavigation:")]
+        void DidCommitNavigation(WKWebView webView, WKNavigation navigation)
+        {
+        }
+
+        [Export("webView:didFinishNavigation:")]
+        void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+        {
+        }
+
+        [Export("webView:didFailNavigation:withError:")]
+        void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error)
+        {
         }
 
         void IWKScriptMessageHandler.DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
@@ -288,6 +307,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         protected virtual void OnWebViewEnterPressed() { }
 
-        protected virtual bool CanNavigate(WKNavigationAction action) => false;
+        protected virtual bool CanNavigate(WKNavigationAction action) => true;
     }
 }

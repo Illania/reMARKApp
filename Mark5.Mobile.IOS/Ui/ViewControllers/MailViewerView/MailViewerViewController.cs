@@ -147,10 +147,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         void ShareItem_Clicked(object sender, EventArgs e)
         {
-            var avc = new UIActivityViewController(new NSObject[] { url }, null);
-            if (avc.PopoverPresentationController != null)
-                avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-            PresentViewController(avc, true, null);
+            StopLoading();
+            // TODO
+            //var avc = new UIActivityViewController(new NSObject[] { url }, null);
+            //if (avc.PopoverPresentationController != null)
+            //    avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            //PresentViewController(avc, true, null);
         }
 
         void LoadFromUrl()
@@ -196,7 +198,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                         };
                         mm.LoadMessage(bytes);
                         bytes = null;
-                        MakeHtmlSafe(mm);
                         InlineImages(mm);
                         return mm;
                     }
@@ -230,7 +231,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                                     };
                                     mm.LoadMessage(emlStream.ToArray());
                                     emlStream.Dispose();
-                                    MakeHtmlSafe(mm);
                                     InlineImages(mm);
                                     return mm;
                                 }
@@ -267,6 +267,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         async Task RefreshView()
         {
+            foreach (var sv in headerStackView.Subviews.OfType<MailViewerSubview>())
+            {
+                sv.MailMessage = mailMessage;
+                sv.RefreshView();
+                sv.UpdateVisibility();
+            }
+
             if (mailMessage != null)
             {
                 if (!string.IsNullOrWhiteSpace(mailMessage.BodyHtmlText))
@@ -276,13 +283,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 else
                     LoadNoContentString();
             }
-
-            foreach (var sv in headerStackView.Subviews.OfType<MailViewerSubview>())
-            {
-                sv.MailMessage = mailMessage;
-                sv.RefreshView();
-                sv.UpdateVisibility();
-            }
+            else
+                LoadEmpty();
         }
 
         public void OpenComposeDocumentView(string[] preconfiguredEmailAddresses)
@@ -386,14 +388,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
         }
-
-        static void MakeHtmlSafe(MailMessage mm)
-        {
-            var p = new Processor();
-            p.Dom.OuterHtml = mm.BodyHtmlText;
-            mm.BodyHtmlText = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
-        }
-
         static byte[] ReadToEnd(Stream input)
         {
             var buffer = new byte[16 * 1024];
