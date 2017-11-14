@@ -6,6 +6,7 @@ using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -448,6 +449,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Email));
+
             var primaryEmail = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
             if (primaryEmail == null)
                 return;
@@ -465,6 +468,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Call));
+
             var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
                                           .Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
@@ -485,6 +490,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button3_TouchUpInside(object sender, EventArgs e)
         {
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Text));
+
             var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
             if (communicationAddresses == null)
                 return;
@@ -494,6 +501,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button4_TouchUpInside(object sender, EventArgs e)
         {
+            AnalyticsManager.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Map));
+
             var physicalAddress = contact.PhysicalAddresses.ToArray();
             if (physicalAddress.Length == 0)
                 return;
@@ -643,6 +652,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
+                AnalyticsManager.LogEvent(new ContactClickEmailEvent());
+
                 var vc = new ComposeDocumentViewController
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag.New,
@@ -655,26 +666,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (ca.Type == CommunicationAddressType.Phone)
+            {
+                AnalyticsManager.LogEvent(new ContactCallNumberEvent());
                 Integration.Call(this, tv, cell, ca.Address);
+            }
 
             if (ca.Type == CommunicationAddressType.Mobile)
-                Integration.CallOrText(this, tv, cell, ca.Address);
+            {
+                var isCall = Integration.CallOrText(this, tv, cell, ca.Address);
+                if (isCall)
+                    AnalyticsManager.LogEvent(new ContactCallNumberEvent());
+                else
+                    AnalyticsManager.LogEvent(new ContactSendTextEvent());
+            }
+
         }
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
+            AnalyticsManager.LogEvent(new ContactNavigateSubContactEvent());
+
             var vc = new ContactViewController();
             vc.SetData(contactPreview);
             vc.SetRefreshDataOnAppear();
             PresentViewController(new NavigationController(vc), true, null);
         }
 
-        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
+        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
+        {
+            AnalyticsManager.LogEvent(new ContactNavigateSubContactEvent());
+            Integration.ShowOnMap(this, tv, cell, pa);
+        }
+
         public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress) => Integration.OpenUrl(this, tableView, cell, webPageAddress);
         public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
 
         public void SetData(int folderId, int contactId)
         {
+            AnalyticsManager.LogEvent(new OpenContactEvent()); //TODO Ask B.
+
             folder = null;
             contactPreview = null;
             contact = null;
@@ -685,6 +715,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, ContactPreview contactPreview)
         {
+            AnalyticsManager.LogEvent(new OpenContactEvent());
+
             folderId = null;
             contactId = null;
             contact = null;
@@ -695,6 +727,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(ContactPreview contactPreview)
         {
+            AnalyticsManager.LogEvent(new OpenContactEvent());
+
             folderId = null;
             folder = null;
             contactId = null;
@@ -705,6 +739,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int contactId)
         {
+            AnalyticsManager.LogEvent(new OpenContactEvent());
+
             folderId = null;
             folder = null;
             contactPreview = null;

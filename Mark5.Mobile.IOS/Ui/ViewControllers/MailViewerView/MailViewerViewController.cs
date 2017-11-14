@@ -10,6 +10,7 @@ using MailBee.Html;
 using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -52,6 +53,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         public override void LoadView()
         {
             base.LoadView();
+
+            AnalyticsManager.LogEvent(new OpenMailViewerEvent());
 
             Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";
 

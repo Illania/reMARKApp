@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -38,6 +39,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void LoadView()
         {
             base.LoadView();
+
+            AnalyticsManager.LogEvent(new OpenNotificationListEvent());
 
             InitializeNavigationBar();
             InitializeView();
@@ -187,6 +190,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void MarkAsReadItem_Clicked(object sender, EventArgs e)
         {
+            AnalyticsManager.LogEvent(new NotificationMarkAllAsReadEvent());
+
             try
             {
                 await Managers.NotificationsManager.MarkAllAsRead();
@@ -245,6 +250,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public async void NotificationSelected(Notification notification, NSIndexPath row)
         {
+            AnalyticsManager.LogEvent(new NotificationClickedEvent(notification.ObjectType));
+
             await Managers.NotificationsManager.MarkAsRead(notification);
             TableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
 

@@ -4,6 +4,7 @@ using System.Text;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using PCLStorage;
@@ -213,10 +214,13 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public static void CallOrText(UIViewController viewController, UITableView tableView, UITableViewCell cell, string number)
+        public static bool CallOrText(UIViewController viewController, UITableView tableView, UITableViewCell cell, string number)
         {
+            bool isCall = false;
+
             try
             {
+
                 var processedNumber = new string(number.Where(c => char.IsDigit(c)).ToArray());
 
                 if (number.Split('|').FirstOrDefault()?.Length > 0)
@@ -226,8 +230,16 @@ namespace Mark5.Mobile.IOS.Utilities
                 var textUrl = new NSUrl("sms://" + processedNumber);
 
                 var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a =>
+                {
+                    isCall = true;
+                    UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null);
+                }));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a =>
+                {
+                    isCall = false;
+                    UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null);
+                }));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
@@ -241,10 +253,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 Dialogs.ShowErrorAlert(viewController, ex);
             }
+
+            return isCall;
         }
 
-        public static void CallOrText(UIViewController viewController, UIView view, string number)
+        public static bool CallOrText(UIViewController viewController, UIView view, string number)
         {
+            bool isCall = false;
+
             try
             {
                 var processedNumber = new string(number.Where(c => char.IsDigit(c)).ToArray());
@@ -256,8 +272,16 @@ namespace Mark5.Mobile.IOS.Utilities
                 var textUrl = new NSUrl("sms://" + processedNumber);
 
                 var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a =>
+                {
+                    isCall = true;
+                    UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null);
+                }));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a =>
+                {
+                    isCall = false;
+                    UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null);
+                }));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
@@ -271,6 +295,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 Dialogs.ShowErrorAlert(viewController, ex);
             }
+
+            return isCall;
         }
 
         public static void ShowOnMap(UIViewController viewController, UITableView tableView, UITableViewCell cell, PhysicalAddress physicalAddress)

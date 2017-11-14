@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -532,6 +533,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            AnalyticsManager.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             documentId = null;
             document = null;
@@ -546,6 +549,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId)
         {
+            AnalyticsManager.LogEvent(new OpenDocumentEvent(false));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
@@ -560,6 +565,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId, Guid notificationGuid)
         {
+            AnalyticsManager.LogEvent(new OpenDocumentEvent(false));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
@@ -574,6 +581,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            AnalyticsManager.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
@@ -588,6 +597,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview)
         {
+            AnalyticsManager.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
@@ -600,6 +611,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Guid failedDocumentToUploadGuid)
         {
+            AnalyticsManager.LogEvent(new OpenDocumentEvent(false));
+
             document = null;
             documentPreview = null;
             folder = null;

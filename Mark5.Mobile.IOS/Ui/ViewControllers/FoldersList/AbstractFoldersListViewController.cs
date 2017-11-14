@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
@@ -428,6 +429,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async void RefreshData(bool forceRefresh = false)
         {
+            AnalyticsManager.LogEvent(new PullToRefreshEvent(true));
+
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
             CommonConfig.Logger.Info($"Refreshing folders list [parentFolder={ParentFolder}]");
@@ -577,6 +580,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void FolderSelected(Folder folder)
         {
+            if (folder == null)
+                return;
+
+            if (folder.Local)
+                AnalyticsManager.LogEvent(new OpenLocalFolderEvent());
+            else
+            {
+                var isFavorite = (((TableView?.Source as GrouppedDataSource)?.FavoriteStatus.ContainsKey(folder.Id) ?? false)
+                                  || ((TableView?.Source as DataSource)?.FavoriteStatus.ContainsKey(folder.Id) ?? false));
+
+                AnalyticsManager.LogEvent(new OpenFolderEvent(folder.Module, isFavorite));
+            }
         }
 
         protected virtual void FolderDeselected(Folder folder)
@@ -585,6 +600,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void FolderExpand(Folder folder)
         {
+            if (folder == null)
+                return;
+
+            AnalyticsManager.LogEvent(new ExpandFolderEvent(folder.Module));
         }
 
         protected virtual bool ShouldDisableFolder(Folder folder)
@@ -814,6 +833,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
+                AnalyticsManager.LogEvent(new FilterEvent(true));
+
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 

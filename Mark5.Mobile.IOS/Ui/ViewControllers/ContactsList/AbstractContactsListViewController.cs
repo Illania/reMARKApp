@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -329,8 +330,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            AnalyticsManager.LogEvent(new PullToRefreshEvent(false, ModuleType.Contacts));
 
+            RefreshData(forceClear: true);
+        }
         async void RefreshData(int startRowId = -1, bool forceClear = false)
         {
             if (refreshing)
@@ -603,6 +608,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
+                AnalyticsManager.LogEvent(new FilterEvent(false, ModuleType.Contacts));
+
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 

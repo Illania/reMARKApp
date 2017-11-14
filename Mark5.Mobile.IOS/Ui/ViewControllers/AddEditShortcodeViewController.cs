@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -39,6 +40,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
+
+            if (CreationModeFlag == ShortcodeCreationModeFlag.New)
+                AnalyticsManager.LogEvent(new AddShortcodeEvent());
+            if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
+                AnalyticsManager.LogEvent(new EditShortcodeEvent());
         }
 
         public override void ViewWillAppear(bool animated)
@@ -54,7 +60,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
         }
-
 
         public override void ViewDidAppear(bool animated)
         {

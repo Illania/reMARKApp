@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -19,6 +20,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         public override void LoadView()
         {
             base.LoadView();
+
+            AnalyticsManager.LogEvent(new OpenSearchEvent(ModuleType.Shortcodes));
 
             StackView.AddArrangedSubview(new NameSearchView());
             StackView.AddArrangedSubview(new DescritpionSearchView());

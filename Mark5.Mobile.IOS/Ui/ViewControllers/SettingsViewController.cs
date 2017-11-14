@@ -3,6 +3,7 @@ using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -43,6 +44,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            AnalyticsManager.LogEvent(new OpenSettingsEvent());
 
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), SettingsChanged);
         }
@@ -252,6 +255,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UpdateConfigKey)
             {
+                AnalyticsManager.LogEvent(new SettingsUpdateSystemConfigurationEvent());
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_config___"));
 
                 try
@@ -277,6 +282,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == LogoutKey)
             {
+                AnalyticsManager.LogEvent(new SettingsLogOut());
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 
                 try

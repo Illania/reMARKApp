@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Foundation;
 using HockeyApp.iOS;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
@@ -92,6 +93,8 @@ namespace Mark5.Mobile.IOS
 
             try
             {
+                Firebase.Core.App.Configure(); //Firebase Analytics
+
                 var userInfo = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
                 if (userInfo != null)
                 {
@@ -377,6 +380,8 @@ namespace Mark5.Mobile.IOS
 
                 if (PlatformConfig.Preferences.ClearCache)
                 {
+                    AnalyticsManager.LogEvent(new SettingsCacheCleanUpEvent());
+
                     CommonConfig.Logger.Info("Clearing cache...");
                     await DatabaseUtils.ResetDatabases();
                     PlatformConfig.Preferences.ClearCache = false;

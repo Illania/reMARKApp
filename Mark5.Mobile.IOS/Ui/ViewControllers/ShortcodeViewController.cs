@@ -6,6 +6,7 @@ using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -311,6 +312,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
+            AnalyticsManager.LogEvent(new ShortcodeComposeDocumentEvent());
+
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
@@ -381,6 +384,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
+            AnalyticsManager.LogEvent(new ShortcodeClickEmailEvent());
+
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
@@ -396,6 +401,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int folderId, int shortcodeId)
         {
+            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+
             folder = null;
             shortcodePreview = null;
             shortcode = null;
@@ -406,6 +413,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, ShortcodePreview shortcodePreview)
         {
+            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+
             folderId = null;
             shortcodeId = null;
             shortcode = null;
@@ -416,6 +425,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(ShortcodePreview shortcodePreview)
         {
+            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+
             folderId = null;
             folder = null;
             shortcodeId = null;
@@ -426,6 +437,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int shortcodeId)
         {
+            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+
             folderId = null;
             folder = null;
             shortcode = null;
