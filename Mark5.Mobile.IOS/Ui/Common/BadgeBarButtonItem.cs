@@ -237,7 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         void RemoveBadge()
         {
             if (badge != null)
-                UIView.AnimateNotify(0.15f,
+                UIView.AnimateNotify(.15d,
                     0f,
                     UIViewAnimationOptions.CurveEaseIn,
                     () => { badge.Transform = CGAffineTransform.MakeScale(0.1f, 0.1f); },

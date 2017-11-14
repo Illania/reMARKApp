@@ -176,7 +176,6 @@
 		<Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\ContentView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateReceivedView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
@@ -254,6 +253,7 @@
 		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\ComposeDocumentViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\AbstractComposeDocumentView.cs" />
 		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\ContentView.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\AbstractWebViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -281,26 +281,11 @@
 		<Reference Include="PreMailer.Net">
 			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
 		</Reference>
-		<Reference Include="MailBee.NET">
-		  <HintPath>..\packages\MailBee.NET.11.1.0\lib\netstandard1.3\MailBee.NET.dll</HintPath>
-		</Reference>
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
 		</Reference>
 		<Reference Include="SQLite-net">
 		  <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.core">
-		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.provider.sqlite3">
-		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_green">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_v2">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
 		<Reference Include="HockeySDK">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
@@ -308,8 +293,23 @@
 		<Reference Include="HockeySDK.iOSBindings">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
 		</Reference>
+		<Reference Include="MailBee.NET">
+		  <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.core">
+		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.6.0\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.4\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.provider.sqlite3">
+		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_green">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_v2">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -501,6 +501,10 @@
 		<BundleResource Include="Resources\icons\add_action%402x.png" />
 		<BundleResource Include="Resources\icons\add_action%403x.png" />
 		<BundleResource Include="Resources\html\editor.html" />
+		<BundleResource Include="Resources\html\scriptsAtStart.js" />
+		<BundleResource Include="Resources\html\scriptsAtEnd.js" />
+		<BundleResource Include="Resources\html\empty.html" />
+		<BundleResource Include="Resources\html\test.html" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">

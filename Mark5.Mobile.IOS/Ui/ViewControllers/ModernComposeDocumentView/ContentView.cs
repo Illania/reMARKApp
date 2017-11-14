@@ -5,6 +5,7 @@ using CoreGraphics;
 using Foundation;
 using System.IO;
 using UIKit;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
 {
@@ -14,7 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
 
         UIView headerView;
 
-        WKWebView wv;
+        WKWebView webView;
 
         public ContentView()
         {
@@ -35,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
             userContentController.AddScriptMessageHandler(this, "resized");
             userContentController.AddScriptMessageHandler(this, "domloaded");
             userContentController.AddScriptMessageHandler(this, "mutated");
+            userContentController.AddScriptMessageHandler(this, "keypressed");
             userContentController.AddScriptMessageHandler(this, "enterpressed");
 
             var configuration = new WKWebViewConfiguration
@@ -45,33 +47,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
                 UserContentController = userContentController
             };
 
-            wv = new WKWebView(CGRect.Empty, configuration);
-            wv.ScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always;
-            wv.TranslatesAutoresizingMaskIntoConstraints = false;
-            AddSubview(wv);
+            webView = new WKWebView(CGRect.Empty, configuration);
+            webView.ScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always;
+            webView.TranslatesAutoresizingMaskIntoConstraints = false;
+            AddSubview(webView);
             AddConstraints(new[]
             {
-                wv.TopAnchor.ConstraintEqualTo(TopAnchor),
-                wv.BottomAnchor.ConstraintEqualTo(BottomAnchor),
-                wv.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
-                wv.TrailingAnchor.ConstraintEqualTo(TrailingAnchor)
+                webView.TopAnchor.ConstraintEqualTo(TopAnchor),
+                webView.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+                webView.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
+                webView.TrailingAnchor.ConstraintEqualTo(TrailingAnchor)
             });
 
             headerView = new UIView();
             headerView.BackgroundColor = UIColor.Red;
             headerView.TranslatesAutoresizingMaskIntoConstraints = false;
-            wv.ScrollView.AddSubview(headerView);
+            webView.ScrollView.AddSubview(headerView);
 
-            var c1 = headerView.TopAnchor.ConstraintEqualTo(wv.ScrollView.TopAnchor, -HeaderHeight);
+            var c1 = headerView.TopAnchor.ConstraintEqualTo(webView.ScrollView.TopAnchor, -HeaderHeight);
             c1.SetIdentifier("c1");
 
             var c2 = headerView.HeightAnchor.ConstraintEqualTo(HeaderHeight);
             c2.SetIdentifier("c2");
-            wv.AddConstraints(new []
+
+            webView.AddConstraints(new []
             {
                 c1,
-                headerView.LeadingAnchor.ConstraintEqualTo(wv.ScrollView.LeadingAnchor),
-                headerView.WidthAnchor.ConstraintEqualTo(wv.WidthAnchor),
+                headerView.LeadingAnchor.ConstraintEqualTo(webView.ScrollView.LeadingAnchor),
+                headerView.WidthAnchor.ConstraintEqualTo(webView.WidthAnchor),
                 c2
             });
 
@@ -80,7 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
             headerButton.TouchUpInside += (sender, e) => {
                 HeaderHeight += 50f;
 
-                foreach (var c in wv.Constraints)
+                foreach (var c in webView.Constraints)
                 {
                     if (c.GetIdentifier() == "c1")
                         c.Constant = -HeaderHeight;
@@ -89,11 +92,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
                         c.Constant = HeaderHeight;
                 }
 
-                wv.ScrollView.ContentInset = new UIEdgeInsets(HeaderHeight, 0f, 0f, 0f);
+                webView.ScrollView.ContentInset = new UIEdgeInsets(HeaderHeight, 0f, 0f, 0f);
 
-                var co = wv.ScrollView.ContentOffset;
+                var co = webView.ScrollView.ContentOffset;
                 co.Y -= 50f;
-                wv.ScrollView.ContentOffset = co;
+                webView.ScrollView.ContentOffset = co;
             };
             headerButton.TranslatesAutoresizingMaskIntoConstraints = false;
             headerView.AddSubview(headerButton);
@@ -105,15 +108,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
                 headerButton.RightAnchor.ConstraintEqualTo(headerView.RightAnchor)
             });
 
-            wv.ScrollView.ContentInset = new UIEdgeInsets(HeaderHeight, 0f, 0f, 0f);
+            webView.ScrollView.ContentInset = new UIEdgeInsets(HeaderHeight, 0f, 0f, 0f);
         }
 
         internal override Task InitializeView()
         {
             var editor = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/editor", "html"));
-            //wv.LoadHtmlString(editor, null);
+            webView.LoadHtmlString(editor, null);
             //wv.LoadRequest(new NSUrlRequest(new NSUrl("http://google.pl")));
-            wv.LoadHtmlString(PreviousDocument.HtmlBody, null);
+            //wv.LoadHtmlString(PreviousDocument.HtmlBody, null);
 
             return Task.CompletedTask;
         }
@@ -124,33 +127,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ModernComposeDocumentView
         [Export("userContentController:didReceiveScriptMessage:")]
         public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
-            var responseDict = message.Body as NSDictionary;
-            if (responseDict == null)
+            var messageName = message?.Name;
+            if (messageName == null)
                 return;
 
-            var loadedValue = responseDict["loaded"] as NSNumber;
-            var resizedValue = responseDict["resized"] as NSNumber;
-            var domLoadedValue = responseDict["domloaded"] as NSNumber;
-            var mutatedValue = responseDict["mutated"] as NSNumber;
-            var enterPressedValue = responseDict["enterpressed"] as NSNumber;
+            CommonConfig.Logger.Debug("JSMsg: " + messageName);
 
-            var loaded = loadedValue != null && loadedValue.BoolValue;
-            var resized = resizedValue != null && resizedValue.BoolValue;
-            var domLoaded = domLoadedValue != null && domLoadedValue.BoolValue;
-            var mutated = mutatedValue != null && mutatedValue.BoolValue;
-            var enterPressed = enterPressedValue != null && enterPressedValue.BoolValue;
-
-            if (enterPressed)
-            {
-
-            }
-
-            if (loaded || resized || mutated)
+            if (messageName == "loaded")
             {
             }
-
-            wv.SetNeedsLayout();
-            wv.LayoutIfNeeded();
+            if (messageName == "resized")
+            {
+            }
+            if (messageName == "domloaded")
+            {
+            }
+            if (messageName == "mutated")
+            {
+            }
+            if (messageName == "keypressed")
+            {
+            }
+            if (messageName == "enterpressed")
+            {
+            }
         }
     }
 }
