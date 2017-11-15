@@ -508,6 +508,7 @@
 		<BundleResource Include="Resources\icons\warning%403x.png" />
 		<BundleResource Include="Resources\icons\add_action%402x.png" />
 		<BundleResource Include="Resources\icons\add_action%403x.png" />
+		<BundleResource Include="GoogleService-Info.plist" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
