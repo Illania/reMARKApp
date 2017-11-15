@@ -42,11 +42,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             if (ParentPreselected)
-                AnalyticsManager.LogEvent(new AddSubContactEvent());
+                CommonConfig.Analytics.LogEvent(new AddSubContactEvent());
             else if (CreationModeFlag == ContactCreationModeFlag.New)
-                AnalyticsManager.LogEvent(new AddContactEvent());
+                CommonConfig.Analytics.LogEvent(new AddContactEvent());
             else if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                AnalyticsManager.LogEvent(new EditContactEvent());
+                CommonConfig.Analytics.LogEvent(new EditContactEvent());
 
             InitializeNavigationBar();
             InitializeView();

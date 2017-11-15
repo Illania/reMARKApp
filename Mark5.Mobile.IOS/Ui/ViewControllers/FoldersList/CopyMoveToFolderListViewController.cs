@@ -83,15 +83,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 cancelModeItem.Clicked -= CancelModeItem_Clicked;
         }
 
-        protected override async void FolderSelected(Folder folder)
+        protected override async void FolderSelected(Folder folder, bool isFromFavorite)
         {
-            base.FolderSelected(folder);
+            base.FolderSelected(folder, isFromFavorite);
 
             if (fromFolder == null)
                 await CopyBusinessEntityToFolder(folder);
             else
                 await MoveBusinessEntityToFolder(folder);
-            
+
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
         }
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async Task CopyBusinessEntityToFolder(Folder folder)
         {
-            var confirmed = await Dialogs.ShowListActionSheetAsync(this, new [] {Localization.GetString("copy")}, View);
+            var confirmed = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("copy") }, View);
             if (confirmed < 0)
                 return;
 

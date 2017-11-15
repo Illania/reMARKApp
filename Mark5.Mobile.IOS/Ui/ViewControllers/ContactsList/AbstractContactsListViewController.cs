@@ -332,7 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            AnalyticsManager.LogEvent(new PullToRefreshEvent(false, ModuleType.Contacts));
+            CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Contacts));
 
             RefreshData(forceClear: true);
         }
@@ -606,10 +606,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         {
             var searchText = searchController.SearchBar.Text;
 
+            if (!searchController.Active)
+                CommonConfig.Analytics.LogEvent(new FilterEvent(false, ModuleType.Contacts));
+
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
-                AnalyticsManager.LogEvent(new FilterEvent(false, ModuleType.Contacts));
-
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 

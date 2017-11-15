@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            AnalyticsManager.LogEvent(new OpenNotificationListEvent());
+            CommonConfig.Analytics.LogEvent(new OpenNotificationListEvent());
 
             InitializeNavigationBar();
             InitializeView();
@@ -190,7 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void MarkAsReadItem_Clicked(object sender, EventArgs e)
         {
-            AnalyticsManager.LogEvent(new NotificationMarkAllAsReadEvent());
+            CommonConfig.Analytics.LogEvent(new NotificationMarkAllAsReadEvent());
 
             try
             {
@@ -250,7 +250,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public async void NotificationSelected(Notification notification, NSIndexPath row)
         {
-            AnalyticsManager.LogEvent(new NotificationClickedEvent(notification.ObjectType));
+            CommonConfig.Analytics.LogEvent(new NotificationClickedEvent(notification.ObjectType));
 
             await Managers.NotificationsManager.MarkAsRead(notification);
             TableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);

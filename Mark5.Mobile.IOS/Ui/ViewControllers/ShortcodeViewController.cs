@@ -312,7 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
-            AnalyticsManager.LogEvent(new ShortcodeComposeDocumentEvent());
+            CommonConfig.Analytics.LogEvent(new ShortcodeComposeDocumentEvent());
 
             var vc = new ComposeDocumentViewController
             {
@@ -384,7 +384,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
-            AnalyticsManager.LogEvent(new ShortcodeClickEmailEvent());
+            CommonConfig.Analytics.LogEvent(new ShortcodeClickEmailEvent());
 
             var vc = new ComposeDocumentViewController
             {
@@ -401,7 +401,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int folderId, int shortcodeId)
         {
-            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
 
             folder = null;
             shortcodePreview = null;
@@ -413,7 +413,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, ShortcodePreview shortcodePreview)
         {
-            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
 
             folderId = null;
             shortcodeId = null;
@@ -425,7 +425,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(ShortcodePreview shortcodePreview)
         {
-            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
 
             folderId = null;
             folder = null;
@@ -437,7 +437,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int shortcodeId)
         {
-            AnalyticsManager.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
 
             folderId = null;
             folder = null;

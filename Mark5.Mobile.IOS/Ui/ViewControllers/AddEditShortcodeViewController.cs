@@ -42,9 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
 
             if (CreationModeFlag == ShortcodeCreationModeFlag.New)
-                AnalyticsManager.LogEvent(new AddShortcodeEvent());
+                CommonConfig.Analytics.LogEvent(new AddShortcodeEvent());
             if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
-                AnalyticsManager.LogEvent(new EditShortcodeEvent());
+                CommonConfig.Analytics.LogEvent(new EditShortcodeEvent());
         }
 
         public override void ViewWillAppear(bool animated)

@@ -122,13 +122,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var shouldRecover = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("autosave_recover_title"), Localization.GetString("autosave_recover_content"));
                 if (shouldRecover)
                 {
-                    AnalyticsManager.LogEvent(new EmailRecoveredEvent(true));
+                    CommonConfig.Analytics.LogEvent(new EmailRecoveredEvent(true));
                     var vc = new ComposeDocumentViewController { RestoreWorkingCopy = true };
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }
                 else
                 {
-                    AnalyticsManager.LogEvent(new EmailRecoveredEvent(false));
+                    CommonConfig.Analytics.LogEvent(new EmailRecoveredEvent(false));
                     await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
                 }
             }

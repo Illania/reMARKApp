@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             if (Entity != null)
-                AnalyticsManager.LogEvent(new OpenCommentsEvent(Entity.ModuleType));
+                CommonConfig.Analytics.LogEvent(new OpenCommentsEvent(Entity.ModuleType));
 
             InitializeNavigationBar();
             InitializeView();

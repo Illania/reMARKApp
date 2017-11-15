@@ -328,7 +328,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            AnalyticsManager.LogEvent(new PullToRefreshEvent(false, ModuleType.Shortcodes));
+            CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Shortcodes));
 
             RefreshData(forceClear: true);
         }
@@ -586,10 +586,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         {
             var searchText = searchController.SearchBar.Text;
 
+            if (!searchController.Active)
+                CommonConfig.Analytics.LogEvent(new FilterEvent(false, ModuleType.Shortcodes));
+
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
-                AnalyticsManager.LogEvent(new FilterEvent(false, ModuleType.Shortcodes));
-
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 

@@ -71,7 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             tcs.SetResult(null);
         }
 
-        protected async override void FolderSelected(Folder folder)
+        protected async override void FolderSelected(Folder folder, bool isFromFavorite)
         {
             var vc = new PickerContactsListViewController
             {

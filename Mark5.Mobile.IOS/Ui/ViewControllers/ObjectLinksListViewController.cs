@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             if (businessEntity != null)
-                AnalyticsManager.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
+                CommonConfig.Analytics.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
 
             InitializeNavigationBar();
             InitializeView();

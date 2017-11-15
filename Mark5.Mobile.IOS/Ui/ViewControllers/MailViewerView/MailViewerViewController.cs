@@ -54,7 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         {
             base.LoadView();
 
-            AnalyticsManager.LogEvent(new OpenMailViewerEvent());
+            CommonConfig.Analytics.LogEvent(new OpenMailViewerEvent());
 
             Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";
 

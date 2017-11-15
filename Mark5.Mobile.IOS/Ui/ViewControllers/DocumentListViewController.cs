@@ -399,7 +399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            AnalyticsManager.LogEvent(new PullToRefreshEvent(false, ModuleType.Documents));
+            CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Documents));
             await RefreshData(forceClear: true);
         }
 
@@ -849,10 +849,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var searchText = searchController.SearchBar.Text;
 
+            if (!searchController.Active)
+                CommonConfig.Analytics.LogEvent(new FilterEvent(false, ModuleType.Documents));
+
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
-                AnalyticsManager.LogEvent(new FilterEvent(false, ModuleType.Documents));
-
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 

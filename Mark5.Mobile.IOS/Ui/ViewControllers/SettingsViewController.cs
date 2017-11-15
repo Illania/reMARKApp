@@ -45,14 +45,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            AnalyticsManager.LogEvent(new OpenSettingsEvent());
-
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), SettingsChanged);
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            CommonConfig.Analytics.LogEvent(new OpenSettingsEvent());
 
             if (Integration.IsRunningAtLeast(11))
             {
@@ -255,7 +255,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UpdateConfigKey)
             {
-                AnalyticsManager.LogEvent(new SettingsUpdateSystemConfigurationEvent());
+                CommonConfig.Analytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_config___"));
 
@@ -282,7 +282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == LogoutKey)
             {
-                AnalyticsManager.LogEvent(new SettingsLogOut());
+                CommonConfig.Analytics.LogEvent(new SettingsLogOut());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 

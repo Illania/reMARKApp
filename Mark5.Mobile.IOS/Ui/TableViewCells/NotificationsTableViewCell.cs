@@ -83,6 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     iconImageView.WidthAnchor.ConstraintEqualTo(15f),
 
                     titleLabel.LeadingAnchor.ConstraintEqualTo(iconImageView.TrailingAnchor, 8f),
+                    titleLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(8f),
                     titleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
 
                     readImageView.TopAnchor.ConstraintEqualTo(iconImageView.BottomAnchor, 4f),
