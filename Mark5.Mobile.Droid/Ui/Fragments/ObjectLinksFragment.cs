@@ -172,6 +172,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ol.IsReverse)
             {
+                CommonConfig.Analytics.LogEvent(new LinkClickedEvent(ol.FromObjectType));
+
                 if (ol.FromObjectType == ObjectType.Document)
                 {
                     StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.FromObjectId));
@@ -187,6 +189,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
+                CommonConfig.Analytics.LogEvent(new LinkClickedEvent(ol.ToObjectType));
+
                 if (ol.ToObjectType == ObjectType.Document)
                 {
                     StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.ToObjectId));

@@ -148,6 +148,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 objectId = link.FromObjectId;
             }
 
+            CommonConfig.Analytics.LogEvent(new LinkClickedEvent(switchObjectType));
+
             switch (switchObjectType)
             {
                 case ObjectType.Document:

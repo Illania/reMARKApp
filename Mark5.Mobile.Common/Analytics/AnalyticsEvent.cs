@@ -586,6 +586,13 @@ namespace Mark5.Mobile.Common.Analytics
 
     }
 
+    public class LinkClickedEvent : AnalyticsEvent
+    {
+        public LinkClickedEvent(ObjectType type)
+        {
+            Name = "link_clicked" + GetObjectTypeString(type);
+        }
+    }
 
     #endregion
 }
