@@ -209,8 +209,6 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count)); //TODO can we be sure it's not used automatically?
-
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 

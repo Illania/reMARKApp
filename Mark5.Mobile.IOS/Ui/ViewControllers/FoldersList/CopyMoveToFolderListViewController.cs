@@ -85,8 +85,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected override async void FolderSelected(Folder folder, bool isFromFavorite)
         {
-            base.FolderSelected(folder, isFromFavorite);
-
             if (fromFolder == null)
                 await CopyBusinessEntityToFolder(folder);
             else

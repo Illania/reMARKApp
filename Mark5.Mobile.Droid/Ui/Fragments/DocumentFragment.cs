@@ -587,6 +587,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(1));
+
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
 
                 RefreshView<RecipentsView>();
@@ -611,6 +613,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(1));
+
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, false, ServerConfig.SystemSettings.UserInfo.User);
 
                 RefreshView<RecipentsView>();

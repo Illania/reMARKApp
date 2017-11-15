@@ -648,7 +648,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
-        void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
+        async void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
@@ -673,11 +673,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (ca.Type == CommunicationAddressType.Mobile)
             {
-                var isCall = Integration.CallOrText(this, tv, cell, ca.Address);
-                if (isCall)
+                var choices = new string[] { Localization.GetString("call"), Localization.GetString("send_text") };
+                var result = await Dialogs.ShowListActionSheetAsync(this, choices, tv, cell);
+
+                if (result == 0)
+                {
                     CommonConfig.Analytics.LogEvent(new ContactCallNumberEvent());
-                else
+                    Integration.Call(this, tv, cell, ca.Address);
+                }
+                if (result == 1)
+                {
                     CommonConfig.Analytics.LogEvent(new ContactSendTextEvent());
+                    Integration.Text(this, tv, cell, ca.Address);
+                }
             }
 
         }
@@ -694,7 +702,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
         {
-            CommonConfig.Analytics.LogEvent(new ContactNavigateSubContactEvent());
+            CommonConfig.Analytics.LogEvent(new ContactClickPhysicalAddressEvent());
             Integration.ShowOnMap(this, tv, cell, pa);
         }
 

@@ -44,6 +44,8 @@ namespace Mark5.Mobile.IOS
 
                 InitializeCommon();
 
+                Firebase.Core.App.Configure(); //Firebase Analytics
+
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("MARK5 initialized");
@@ -93,8 +95,6 @@ namespace Mark5.Mobile.IOS
 
             try
             {
-                Firebase.Core.App.Configure(); //Firebase Analytics
-
                 var userInfo = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
                 if (userInfo != null)
                 {
@@ -302,6 +302,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Phonebook = new Phonebook();
                 CommonConfig.Reachability = new Reachability();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
+                CommonConfig.Analytics = new AnalyticsImplementation();
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>
@@ -380,7 +381,7 @@ namespace Mark5.Mobile.IOS
 
                 if (PlatformConfig.Preferences.ClearCache)
                 {
-                    AnalyticsManager.LogEvent(new SettingsCacheCleanUpEvent());
+                    CommonConfig.Analytics.LogEvent(new SettingsCacheCleanUpEvent());
 
                     CommonConfig.Logger.Info("Clearing cache...");
                     await DatabaseUtils.ResetDatabases();

@@ -585,6 +585,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, true);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
                 searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
@@ -610,6 +612,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, false);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
                 searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);

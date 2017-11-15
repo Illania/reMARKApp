@@ -1167,6 +1167,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(1));
+
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
 
                 dismissAction();

@@ -810,6 +810,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
@@ -830,6 +832,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
@@ -1175,7 +1179,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var dp = Items[indexPath.Row];
 
                 if (LoadMoreEnabled && dp.Id == Items.Last().Id)
+                {
+                    CommonConfig.Analytics.LogEvent(new GetMoreDocumentsEvent());
                     AsyncHelpers.FireAndForget(viewControllerWeakReference.Unwrap()?.RefreshData(dp.Id));
+                }
 
                 if (dp.Direction == DocumentDirection.External)
                 {
