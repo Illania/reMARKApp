@@ -218,7 +218,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
-            AnalyticsManager.LogEvent(new SetCategories(ModuleType.Contacts));
+            CommonConfig.Analytics.LogEvent(new SetCategories(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -251,7 +251,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto)
         {
-            AnalyticsManager.LogEvent(new AddCommentEvent(ModuleType.Contacts));
+            CommonConfig.Analytics.LogEvent(new AddCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -282,7 +282,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
-            AnalyticsManager.LogEvent(new EditCommentEvent(ModuleType.Contacts));
+            CommonConfig.Analytics.LogEvent(new EditCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -318,7 +318,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task DeleteComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
-            AnalyticsManager.LogEvent(new DeleteCommentEvent(ModuleType.Contacts));
+            CommonConfig.Analytics.LogEvent(new DeleteCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;

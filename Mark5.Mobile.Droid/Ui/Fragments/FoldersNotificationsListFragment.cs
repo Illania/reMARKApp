@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
         {
             if (position == 1)
-                AnalyticsManager.LogEvent(new OpenNotificationListEvent());
+                CommonConfig.Analytics.LogEvent(new OpenNotificationListEvent());
         }
 
         class FoldersNotificationsRetainableState : IRetainableState

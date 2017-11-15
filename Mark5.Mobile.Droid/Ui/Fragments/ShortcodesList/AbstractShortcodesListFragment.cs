@@ -74,7 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += (sender, e) =>
             {
-                AnalyticsManager.LogEvent(new PullToRefreshEvent(module: ModuleType.Shortcodes));
+                CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(module: ModuleType.Shortcodes));
 
                 ActionMode?.Finish();
                 ActionMode = null;
@@ -496,7 +496,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                AnalyticsManager.LogEvent(new FilterEvent(module: ModuleType.Shortcodes));
+                CommonConfig.Analytics.LogEvent(new FilterEvent(module: ModuleType.Shortcodes));
 
                 menu?.FindItem(10)?.SetVisible(false);
 

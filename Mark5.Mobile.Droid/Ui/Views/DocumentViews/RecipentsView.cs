@@ -64,7 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             Clickable = true;
             Click += (sender, e) =>
             {
-                AnalyticsManager.LogEvent(new DocumentShowDetailEvent());
+                CommonConfig.Analytics.LogEvent(new DocumentShowDetailEvent());
 
                 extendedLayout.Visibility = extendedLayout.Visibility == ViewStates.Visible ? ViewStates.Gone : ViewStates.Visible;
                 showHideButton.Text = extendedLayout.Visibility == ViewStates.Visible ? Context.GetString(Resource.String.hide_details) : Context.GetString(Resource.String.show_details);

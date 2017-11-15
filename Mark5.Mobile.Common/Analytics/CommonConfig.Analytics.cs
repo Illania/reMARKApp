@@ -2,9 +2,9 @@
 {
     public static class AnalyticsManager //TODO need a different name
     {
-        static IAnalyticsImplementation implementation;
+        static IAnalytics implementation;
 
-        public static void Initialize(IAnalyticsImplementation im)
+        public static void Initialize(IAnalytics im)
         {
             implementation = im;
         }
@@ -15,8 +15,5 @@
         }
     }
 
-    public interface IAnalyticsImplementation
-    {
-        void LogEvent(AnalyticsEvent analyticsEvent);
-    }
+
 }

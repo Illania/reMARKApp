@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Utilities;
 using PCLStorage;
 using TinyMessenger;
@@ -24,5 +25,6 @@ namespace Mark5.Mobile.Common
         public static IReachability Reachability { get; set; }
         public static Type ConcurrentQueueType { get; set; }
         public static Func<string, string> Utf8Normalizer { get; set; }
+        public static IAnalytics Analytics { get; set; }
     }
 }

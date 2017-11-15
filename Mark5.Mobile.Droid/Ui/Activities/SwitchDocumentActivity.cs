@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public void GoToPrevious(int documentId)
         {
-            AnalyticsManager.LogEvent(new DocumentQuickSwitchEvent());
+            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
 
             var previousId = GetPreviousId(documentId);
             if (previousId == null)
@@ -159,7 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public void GoToNext(int documentId)
         {
-            AnalyticsManager.LogEvent(new DocumentQuickSwitchEvent());
+            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
 
             var nextId = GetNextId(documentId);
             if (nextId == null)

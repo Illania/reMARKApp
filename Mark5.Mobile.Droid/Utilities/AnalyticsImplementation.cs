@@ -7,7 +7,7 @@ using Mark5.Mobile.Common.Analytics;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public class AnalyticsImplementation : IAnalyticsImplementation
+    public class AnalyticsImplementation : IAnalytics
     {
         readonly FirebaseAnalytics firebaseAnalytics;
 

@@ -3,6 +3,11 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Analytics
 {
+    public interface IAnalytics
+    {
+        void LogEvent(AnalyticsEvent analyticsEvent);
+    }
+
     #region Abstract classes
 
     public abstract class AnalyticsEvent

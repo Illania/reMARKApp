@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += async (sender, e) =>
             {
-                AnalyticsManager.LogEvent(new PullToRefreshEvent(module: ModuleType.Documents));
+                CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(module: ModuleType.Documents));
 
                 actionMode?.Finish();
                 actionMode = null;
@@ -765,7 +765,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                AnalyticsManager.LogEvent(new FilterEvent(module: ModuleType.Documents));
+                CommonConfig.Analytics.LogEvent(new FilterEvent(module: ModuleType.Documents));
 
                 menu?.FindItem(10)?.SetVisible(false);
 
@@ -1126,7 +1126,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
                 {
-                    AnalyticsManager.LogEvent(new GetMoreDocumentsEvent());
+                    CommonConfig.Analytics.LogEvent(new GetMoreDocumentsEvent());
 
                     loadMoreAction(dp.Id);
                 }

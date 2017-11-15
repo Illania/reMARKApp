@@ -169,7 +169,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
         {
-            AnalyticsManager.LogEvent(new DocumentQuickSwitchEvent());
+            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
 
             state.Position = position;
         }

@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PreferenceFragment fragment, string tag) NewInstance()
         {
-            AnalyticsManager.LogEvent(new OpenSettingsEvent());
+            CommonConfig.Analytics.LogEvent(new OpenSettingsEvent());
 
             var fragment = new PreferenceFragment();
             var tag = $"{nameof(PreferenceFragment)}";
@@ -153,7 +153,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_update_config))
             {
-                AnalyticsManager.LogEvent(new SettingsUpdateSystemConfigurationEvent());
+                CommonConfig.Analytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
