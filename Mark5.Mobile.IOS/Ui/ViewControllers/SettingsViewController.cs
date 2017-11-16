@@ -20,6 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string DocumentsToDownloadKey = "DocumentsToDownload";
+        const string CallerIdentificationEnabled = "CallerIdentificationEnabled";
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
         const string OpenSettingsAppKey = "openSettingsApp";
@@ -49,6 +50,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ExtendedLayoutIncludesOpaqueBars = true;
 
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), SettingsChanged);
+
+            var callerIdKey = new NSString(CallerIdentificationEnabled);
+
+            if (OverlayExtensionStatus.IsEnabled())
+                NSNotificationCenter.DefaultCenter.SetValueForKey(new NSNumber(1), callerIdKey);
+            else
+                NSNotificationCenter.DefaultCenter.SetValueForKey(new NSNumber(0), callerIdKey);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -169,6 +177,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = string.Format("{0} ({1})", NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"], NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]);
+              
+                return cell;
+            }
+
+            if (specifier.Key == CallerIdentificationEnabled)
+            {
+                var cell = tableView.DequeueReusableCell(Value1CellId) ?? new UITableViewCell(UITableViewCellStyle.Value1, Value1CellId);
+
+                var callExtensionEnabled = OverlayExtensionStatus.IsEnabled();
+
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = callExtensionEnabled ? Localization.GetString("enabled") : Localization.GetString("disabled");
+                cell.DetailTextLabel.TextColor = callExtensionEnabled ? UIColor.Gray : Theme.Brown;
 
                 return cell;
             }
@@ -186,6 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 case UsernameKey:
                 case ServerAddressKey:
                 case SslEnabledKey:
+                case CallerIdentificationEnabled:
                 case VersionKey:
                     return 44f;
                 default:
@@ -334,6 +356,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (key == UseTemplateKey)
                 RefreshHiddenSettings();
+
+            if (key == CallerIdentificationEnabled)
+            {
+                if (((NSNumber)n.UserInfo.ValueForKey(new NSString(CallerIdentificationEnabled))).Int32Value == 1)
+                {   
+                    Dialogs.ShowBlockingDialog(this, "To enable the caller indentification you must save the folders of the contacts you want to be indentified locally. Then enable the extension manually in settings.");
+                }
+                else
+                    return;
+            }
         }
 
         void RefreshHiddenSettings()

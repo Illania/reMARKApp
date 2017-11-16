@@ -27,8 +27,6 @@ using TinyMessenger;
 using UIKit;
 using UserNotifications;
 using CallKit;
-using System.Collections.Generic;
-using SQLite;
 
 namespace Mark5.Mobile.IOS
 {
@@ -39,80 +37,13 @@ namespace Mark5.Mobile.IOS
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            /*try
-            {
-                var test = new SimpleContact();
-                test.Id = 8008;
-                test.FirstName = "Mathias";
-                test.LastName = "Thomsen";
-
-                var cs = new List<SimpleContact>{test};
-                using (var url = NSFileManager.DefaultManager.GetContainerUrl("group.com.nordic-it.mark5.mobile.ios"))
-                {
-                    var url2 = url.Append("sharedcontacts.sqlite3", false);
-
-                    using (var connection = new SQLiteConnection(url2.Path, true))
-                    {
-                        connection.CreateTable<SimpleContact>();
-                        connection.InsertOrReplaceAll(cs);
-                    }
-
-                    using (var connection = new SQLiteConnection(url2.Path, true))
-                    {
-                        var tt = connection.Table<SimpleContact>();
-
-                        foreach (var c in tt)
-                        {
-                            
-                        }
-                    }
-                }
-            } 
-            catch (Exception ex)
-            {
-                
-            }*/
-           
-
-            
-            CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension("com.nordic-it.mark5.mobile.ios.extensions.callid",
-                                                                               (CXCallDirectoryEnabledStatus status, NSError statuserror) => 
-            {
-                if(statuserror == null)
-                {
-                    if(status == CXCallDirectoryEnabledStatus.Enabled)
-                    {
-                        CXCallDirectoryManager.SharedInstance.ReloadExtension("com.nordic-it.mark5.mobile.ios.extensions.callid",
-                                                                  error =>
-                                                                  {
-                                                                      if (error == null)
-                                                                      {
-                                                                          // Reloaded extension successfully 
-                                                                          CommonConfig.Logger.Info("NO ERROR");
-
-                                                                      }
-                                                                      else
-                                                                      {
-                                                                          // Extension failed, see error.Code 
-                                                                          // and error.Description for more 
-                                                                          // information 
-                                                                          CommonConfig.Logger.Info("NO ERROR");
-                                                                      }
-                                                                  });
-                    }
-                    else
-                        return;
-                    
-                }
-            }); 
-
-
             try
             {
                 var startupTime = new Stopwatch();
                 startupTime.Start();
 
                 InitializeCommon();
+                OverlayExtensionStatus.RefreshExtension();
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);

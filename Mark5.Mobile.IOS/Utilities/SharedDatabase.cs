@@ -108,7 +108,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
             var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
-            //Get  for parsing the number. Parsing will remove any char's like '(' or '-'.
+            //Get region code for parsing the number. Parsing will remove any char's like '(' or '-'.
             var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(countryNumber));
             try
             {
@@ -117,7 +117,7 @@ namespace Mark5.Mobile.IOS.Utilities
             }
             catch (NumberParseException ex)
             {
-                return; //Number has been stored incorrectly, e.g. contains letters, so it is ignored.
+                return; //Number has been stored incorrectly, e.g. it contains letters, so it is ignored.
             }
 
             //'+' will be in the number, since it's part of the E164 format.

@@ -4,6 +4,8 @@
 <dict>
 	<key>StringsTable</key>
 	<string>Root</string>
+	<key>Custom Property</key>
+	<string></string>
 	<key>PreferenceSpecifiers</key>
 	<array>
 		<dict>
@@ -159,6 +161,22 @@
 			<string>hide_read_notifications</string>
 			<key>Key</key>
 			<string>HideReadNotifications</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>caller_identification</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>caller_identification_enabled</string>
+			<key>Key</key>
+			<string>CallerIdentificationEnabled</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
