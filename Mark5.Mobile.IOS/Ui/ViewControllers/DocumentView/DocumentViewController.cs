@@ -863,6 +863,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
+            CommonConfig.Analytics.LogEvent(new DocumentOpenAttachmentEvent());
+
             try
             {
                 var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
@@ -1106,6 +1108,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void NextDocumentButton_Clicked(object sender, EventArgs args)
         {
+            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
+
             document = null;
             documentId = null;
 
@@ -1123,6 +1127,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PreviousDocumentButton_Clicked(object sender, EventArgs args)
         {
+            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
+
             document = null;
             documentId = null;
 

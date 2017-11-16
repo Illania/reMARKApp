@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -81,6 +82,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public override void LoadView()
         {
             base.LoadView();
+
+            if (CopyToNewOption != CopyToNewOption.None)
+                CommonConfig.Analytics.LogEvent(new CopyToNewEvent(CopyToNewOption));
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                CommonConfig.Analytics.LogEvent(new ComposeEditDraftEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
+                CommonConfig.Analytics.LogEvent(new ReplyEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+                CommonConfig.Analytics.LogEvent(new ReplyAllEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                CommonConfig.Analytics.LogEvent(new ForwardEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+                CommonConfig.Analytics.LogEvent(new ComposeNewDocumentEvent());
 
             InitNavigationBar();
             InitializeView();
@@ -464,6 +478,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 0)
             {
+                CommonConfig.Analytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Photo));
+
                 var picker = new UIImagePickerController
                 {
                     AllowsEditing = false,
@@ -495,6 +511,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 2)
             {
+                CommonConfig.Analytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
+
                 var picker = new UIDocumentPickerViewController(new[]
                         {
                             "public.content",
@@ -623,6 +641,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(saveDraft ? Localization.GetString("saving_draft___") : Localization.GetString("sending_document___"));
+
+            if (saveDraft)
+                CommonConfig.Analytics.LogEvent(new ComposeSaveDraftEvent());
 
             try
             {
@@ -795,6 +816,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
+            CommonConfig.Analytics.LogEvent(new ComposeOpenAttachment());
+
             try
             {
                 string path = null;
@@ -865,6 +888,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void AttachmentsView_DeleteTapped(object sender, AttachmentsView.DeleteTappedEventArgs e)
         {
+            CommonConfig.Analytics.LogEvent(new ComposeRemoveAttachmentEvent());
+
             try
             {
                 if (e.AttachmentDescription != null)
@@ -889,6 +914,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenPhonebook(RecipientsView recipientsView)
         {
+            CommonConfig.Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Phonebook));
+
             var vc = new PhonebookContactsListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -899,6 +926,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenShortcodes()
         {
+            CommonConfig.Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Shortcodes));
+
             var vc = new PickerShortcodesFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -914,6 +943,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenContacts(RecipientsView recipientsView)
         {
+            CommonConfig.Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Contacts));
+
             var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -924,6 +955,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenRecents(RecipientsView recipientsView)
         {
+            CommonConfig.Analytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Recents));
+
             var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -996,6 +1029,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task GetAllTemplates()
         {
+            CommonConfig.Analytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
+
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
 
@@ -1006,6 +1041,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task GetLocalTemplate()
         {
+            CommonConfig.Analytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
+
             var localTemplate = PlatformConfig.Preferences.LocalTemplate;
             await contentView.InsertLocalTemplate(localTemplate);
         }
@@ -1013,6 +1050,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async Task GetDefaultTemplate(bool errorMessageIfNull = false)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_template___"));
+
+            CommonConfig.Analytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
 
             try
             {
