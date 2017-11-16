@@ -51,6 +51,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 #if !DEBUG
             CrashManager.Register(this, Config.HockeyId, new CustomCrashManagerListener());
             CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
+
+            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
+#else
+            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false); //TODO testing!
 #endif
 
             Task.Run(async () =>

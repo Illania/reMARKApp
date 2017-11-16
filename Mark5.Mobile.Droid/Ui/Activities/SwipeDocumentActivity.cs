@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         const int MaxNeighbours = 500;
 
+        int initialPosition;
+
         Toolbar toolbar;
         ViewPager pager;
 
@@ -120,7 +122,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 state = activityState;
                 pager.Adapter = new PagerAdapter(SupportFragmentManager, activityState);
-                pager.SetCurrentItem(activityState.Position, false);
+
+                initialPosition = activityState.Position;
+
+                pager.SetCurrentItem(initialPosition, false);
 
                 // We need to call OnPageSelected manually due to a possible bug in ViewPager
                 if (pager.CurrentItem == 0)
@@ -169,7 +174,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
         {
-            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
+            if (position != initialPosition)
+                CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
+
+            var dp = state.FragmentStates[position].DocumentPreview;
+            if (dp?.Direction == DocumentDirection.External)
+                CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(true));
+            else
+                CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(false));
 
             state.Position = position;
         }

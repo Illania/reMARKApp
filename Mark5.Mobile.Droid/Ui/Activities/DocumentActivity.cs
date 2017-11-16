@@ -5,6 +5,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -87,6 +88,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+
+                if (documentPreview?.Direction == DocumentDirection.External)
+                    CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(true));
+                else
+                    CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(false));
 
                 var (df, tag) = DocumentFragment.NewInstance(folder, folderId, documentPreview, documentId, notificationGuid, failedDocumentToUploadGuid);
 

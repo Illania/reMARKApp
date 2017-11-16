@@ -7,7 +7,6 @@ using Android.Runtime;
 using Android.Support.V7.App;
 using Firebase.Analytics;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
