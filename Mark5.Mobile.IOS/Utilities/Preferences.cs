@@ -44,6 +44,8 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string PushNotificationTokenKey = "PushNotificationToken";
 
             public const string ResetOnLaunchKey = "ResetOnLaunch";
+            public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled"; //TODO sdsada
+
         }
 
         readonly NSUserDefaults ud;
@@ -114,6 +116,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.CallerIdentificationEnabledKey), NSNumber.FromBoolean(false)
                 }
             };
             ud.RegisterDefaults(defaultsDictionary);
@@ -205,6 +210,16 @@ namespace Mark5.Mobile.IOS.Utilities
             set
             {
                 ud.SetBool(value, Keys.ResetOnLaunchKey);
+                ud.Synchronize();
+            }
+        }
+
+        public bool CallerIdentificationEnabled
+        {
+            get => ud.BoolForKey(Keys.CallerIdentificationEnabledKey);
+            set
+            {
+                ud.SetBool(value, Keys.CallerIdentificationEnabledKey);
                 ud.Synchronize();
             }
         }
