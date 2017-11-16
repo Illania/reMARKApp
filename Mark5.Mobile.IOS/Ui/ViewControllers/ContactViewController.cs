@@ -711,7 +711,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int folderId, int contactId)
         {
-            CommonConfig.Analytics.LogEvent(new OpenContactEvent()); //TODO Ask B.
+            CommonConfig.Analytics.LogEvent(new OpenContactEvent());
 
             folder = null;
             contactPreview = null;
