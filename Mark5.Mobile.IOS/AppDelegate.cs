@@ -304,7 +304,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Phonebook = new Phonebook();
                 CommonConfig.Reachability = new Reachability();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
-                CommonConfig.Analytics = new AnalyticsImplementation();
+                CommonConfig.Analytics = new Analytics();
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>

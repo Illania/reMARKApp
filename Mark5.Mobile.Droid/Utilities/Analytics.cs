@@ -7,11 +7,11 @@ using Mark5.Mobile.Common.Analytics;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public class AnalyticsImplementation : IAnalytics
+    public class Analytics : IAnalytics
     {
         readonly FirebaseAnalytics firebaseAnalytics;
 
-        public AnalyticsImplementation(FirebaseAnalytics firebaseAnalytics)
+        public Analytics(FirebaseAnalytics firebaseAnalytics)
         {
             this.firebaseAnalytics = firebaseAnalytics;
         }

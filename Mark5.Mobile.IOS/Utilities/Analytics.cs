@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Firebase.Analytics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Analytics;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public class AnalyticsImplementation : IAnalytics
+    public class Analytics : IAnalytics
     {
         public void LogEvent(AnalyticsEvent analyticsEvent)
         {
@@ -31,7 +30,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     }
                     parameters = new NSDictionary<NSString, NSObject>(parametersDic.Keys.ToArray(), parametersDic.Values.ToArray());
                 }
-                Analytics.LogEvent(new NSString(analyticsEvent.Name), parameters);
+                Firebase.Analytics.Analytics.LogEvent(new NSString(analyticsEvent.Name), parameters);
             }
             catch (Exception ex)
             {
