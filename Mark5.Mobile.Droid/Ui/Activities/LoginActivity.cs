@@ -5,10 +5,10 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -235,6 +235,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
+
+                CommonConfig.Analytics.SetUserProperty(UserProperties.Hostname, hostname);
+                CommonConfig.Analytics.SetUserProperty(UserProperties.Username, username);
+                CommonConfig.Analytics.SetUserProperty(UserProperties.SSL, sslMode.ToString());
 
                 StartActivity(MainActivity.CreateIntent(this));
                 Finish();

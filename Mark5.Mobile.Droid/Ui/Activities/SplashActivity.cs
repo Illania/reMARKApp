@@ -81,6 +81,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     var ci = await authenticator.GetConnectionInfoAsync();
 
+                    CommonConfig.Analytics.SetUserProperty(UserProperties.Hostname, ci.Hostname);
+                    CommonConfig.Analytics.SetUserProperty(UserProperties.Username, ci.Username);
+                    CommonConfig.Analytics.SetUserProperty(UserProperties.SSL, ci.SslMode.ToString());
+
                     CommonConfig.Logger.Info($"Current connection info: {ci}");
                     CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
 

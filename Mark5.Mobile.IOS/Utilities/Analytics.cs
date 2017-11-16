@@ -37,5 +37,10 @@ namespace Mark5.Mobile.IOS.Utilities
                 CommonConfig.Logger.Error("Error while logging analytics event", ex);
             }
         }
+
+        public void SetUserProperty(UserProperties property, string value)
+        {
+            Firebase.Analytics.Analytics.SetUserProperty(new NSString(value), new NSString(property.ToString()));
+        }
     }
 }

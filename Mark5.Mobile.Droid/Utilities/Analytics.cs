@@ -44,5 +44,10 @@ namespace Mark5.Mobile.Droid.Utilities
             }
 
         }
+
+        public void SetUserProperty(UserProperties property, string value)
+        {
+            firebaseAnalytics.SetUserProperty(property.ToString(), value);
+        }
     }
 }
