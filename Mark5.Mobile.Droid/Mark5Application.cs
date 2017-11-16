@@ -52,8 +52,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.Reachability = new Reachability();
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
-
-                    CommonConfig.Analytics.Initialize(new AnalyticsImplementation(FirebaseAnalytics.GetInstance(this)));
+                    CommonConfig.Analytics = new AnalyticsImplementation(FirebaseAnalytics.GetInstance(this));
 
 #if !DEBUG
                     CommonConfig.Logger.Level = LogLevel.INFO;
