@@ -53,10 +53,12 @@ namespace Mark5.Mobile.IOS
                 BITHockeyManager.SharedHockeyManager.Configure(Config.HockeyId);
 #if DEBUG
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
+                Firebase.Core.AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(true); //TODO for testing!!!!
 #else
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = PlatformConfig.Preferences.EnableReporting
                     ? BITCrashManagerStatus.AutoSend
                     : BITCrashManagerStatus.Disabled;
+                Firebase.Core.AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
 #endif
                 BITHockeyManager.SharedHockeyManager.StartManager();
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
