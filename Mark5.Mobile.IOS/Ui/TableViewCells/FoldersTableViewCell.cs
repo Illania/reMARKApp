@@ -94,8 +94,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
                 nameLabel.LeadingAnchor.ConstraintEqualTo(offlineIndicatorImage.TrailingAnchor, 8f),
                 nameLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                nameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
-                nameLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
+                nameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 4f),
+                nameLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -4f),
 
                 expandButton.LeadingAnchor.ConstraintEqualTo(nameLabel.TrailingAnchor, 8f),
                 expandButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
