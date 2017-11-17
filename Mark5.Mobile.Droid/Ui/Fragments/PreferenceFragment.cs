@@ -37,8 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var title = GetString(Resource.String.settings);
             var subtitle = PreferenceScreen.Title == title ? string.Empty : PreferenceScreen.Title;
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = title;
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = subtitle;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = title;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
 
             PreferenceManager.SharedPreferences.RegisterOnSharedPreferenceChangeListener(this);
         }
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int) Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
+            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
             {
                 var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
                 PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
@@ -66,6 +66,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var versionPreference = FindPreference(GetString(Resource.String.pref_key_about_version));
             if (versionPreference != null)
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
+
+            var callerIdPreference = FindPreference(GetString(Resource.String.pref_key_callidentification_identification_enabled));
+            if (callerIdPreference != null)
+                callerIdPreference.Enabled = Settings.CanDrawOverlays(Activity);
 
             Task.Run(() => { return AuthenticatorFactory.Create().GetConnectionInfoAsync(); })
                 .ContinueWith(t =>
@@ -113,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (preference.Key == GetString(Resource.String.pref_key_notification_ringtone))
             {
                 var i = new Intent(RingtoneManager.ActionRingtonePicker);
-                i.PutExtra(RingtoneManager.ExtraRingtoneType, (int) RingtoneType.Notification);
+                i.PutExtra(RingtoneManager.ExtraRingtoneType, (int)RingtoneType.Notification);
                 i.PutExtra(RingtoneManager.ExtraRingtoneTitle, GetString(Resource.String.pref_notification_ringtone_title));
                 i.PutExtra(RingtoneManager.ExtraRingtoneDefaultUri, Settings.System.DefaultNotificationUri);
                 if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
@@ -233,13 +237,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
+            if (key == GetString(Resource.String.pref_key_callidentification_identification_enabled))
+            {
+                Dialogs.ShowYesNoDialog(Activity, Resource.String.redirect_to_draw_settings_title, Resource.String.redirect_to_draw_settings_content,
+                                        () =>
+                                        {
+                                            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && !Settings.CanDrawOverlays(Activity))
+                                            {
+                                                var intent = new Intent(Settings.ActionManageOverlayPermission);
+                                                StartActivity(intent);
+                                            }
+                                        },
+                                        () =>
+                                        {
+                                            var callerIdPreference = FindPreference(GetString(Resource.String.pref_key_callidentification_identification_enabled));
+                                            if (callerIdPreference != null)
+                                                callerIdPreference.Enabled = Settings.CanDrawOverlays(Activity);
+                                        });
+            }
         }
 
         public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)
         {
             var args = new Bundle();
             args.PutString(ArgPreferenceRoot, pref.Key);
-            var ft = ((AppCompatActivity) Activity).SupportFragmentManager.BeginTransaction();
+            var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
             ft.SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right);
             ft.Replace(Resource.Id.fragment_container,
                 new PreferenceFragment

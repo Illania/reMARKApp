@@ -131,12 +131,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (permissionsAsked)
                 return;
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && !Settings.CanDrawOverlays(this))
-            {
-                var intent = new Intent(Settings.ActionManageOverlayPermission);
-                StartActivity(intent);
-            }
-
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted 
                                                                 || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadPhoneState) != Permission.Granted))
             {

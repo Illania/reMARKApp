@@ -39,7 +39,7 @@
 	<bool name="pref_documents_sub_creator_default">true</bool>
 	<bool name="pref_documents_sub_originator_default">true</bool>
 	<bool name="pref_documents_download_as_plaintext_default">false</bool>
-	<bool name="pref_contacts_call_id">false</bool>
+	<bool name="pref_callidentification_enabled_default">false</bool>
 	<bool name="pref_contacts_sub_comm_fax_default">true</bool>
 	<bool name="pref_contacts_sub_comm_telex_default">true</bool>
 	<bool name="pref_contacts_sub_comm_im_default">true</bool>

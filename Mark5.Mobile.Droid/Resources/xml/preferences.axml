@@ -22,7 +22,6 @@
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_account" android:title="@string/pref_contacts_sub_account_title" android:defaultValue="@bool/pref_contacts_sub_account_default" />
 			<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_vat" android:title="@string/pref_contacts_sub_vat_title" android:defaultValue="@bool/pref_contacts_sub_vat_default" />
 		</android.support.v7.preference.PreferenceScreen>
-		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_account" android:title="@string/pref_contacts_call_id" android:defaultValue="@bool/pref_contacts_call_id" />
 	</android.support.v7.preference.PreferenceScreen>
 	<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_compose" android:title="@string/pref_cat_compose">
 		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_compose_remove_line" android:title="@string/pref_compose_remove_line_title" android:summaryOn="@string/pref_compose_remove_line_summary_on" android:summaryOff="@string/pref_compose_remove_line_summary_off" android:defaultValue="@bool/pref_compose_remove_line_default" />
@@ -44,6 +43,9 @@
 		<android.support.v7.preference.Preference android:key="@string/pref_key_notification_ringtone" android:title="@string/pref_notification_ringtone_title" android:dependency="@string/pref_key_notification_silence" />
 		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_notification_vibrate" android:title="@string/pref_notification_vibrate_title" android:defaultValue="@bool/pref_notification_vibrate_default" android:dependency="@string/pref_key_notification_silence" />
 	</android.support.v7.preference.PreferenceScreen>
+	<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_callidentification" android:title="@string/pref_cat_callidentification">
+        <android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_callidentification_identification_enabled" android:title="@string/pref_callidentification_title" android:summaryOn="@string/pref_callidentification_summary_on" android:summaryOff="@string/pref_callidentification_summary_off" android:defaultValue="@bool/pref_callidentification_enabled_default" />
+     </android.support.v7.preference.PreferenceScreen>
 	<android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_cache" android:title="@string/pref_cat_cache">
 		<android.support.v7.preference.ListPreference android:key="@string/pref_key_cache_auto_clean" android:title="@string/pref_cache_auto_clean_title" android:summary="@string/pref_cache_auto_clean_summary" android:dialogTitle="@string/pref_cache_auto_clean_dialog_title" android:entries="@array/pref_cache_auto_clean_entries" android:entryValues="@array/pref_cache_auto_clean_entryvalues" android:defaultValue="@string/pref_cache_auto_clean_default" />
 		<android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_cache_clear" android:title="@string/pref_cache_clear_title" android:summaryOn="@string/pref_cache_clear_summary_on" android:summaryOff="@string/pref_cache_clear_summary_off" android:defaultValue="@bool/pref_cache_clear_default" />
