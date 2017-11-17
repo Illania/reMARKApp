@@ -67,9 +67,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (versionPreference != null)
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
 
+
             var callerIdPreference = FindPreference(GetString(Resource.String.pref_key_callidentification_identification_enabled));
+            var canDraw = Settings.CanDrawOverlays(Activity);
             if (callerIdPreference != null)
-                callerIdPreference.Enabled = Settings.CanDrawOverlays(Activity);
+                callerIdPreference.Enabled = canDraw;
 
             Task.Run(() => { return AuthenticatorFactory.Create().GetConnectionInfoAsync(); })
                 .ContinueWith(t =>
