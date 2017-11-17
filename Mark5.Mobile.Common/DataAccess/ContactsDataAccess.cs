@@ -472,36 +472,6 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<ContactPhoneNumber>> GetContactPhoneNumbers()
-        {
-            try
-            {
-                List<ContactPhoneNumber> phoneNumbers = null;
-
-                await contactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var commandString = $"select {nameof(ContactPreview.Name)} as {nameof(ContactPhoneNumber.Name)}, "
-                        + $"{nameof(ContactCommunicationAddress.Address)} as {nameof(ContactPhoneNumber.Number)} "
-                        + $"from {nameof(ContactPhoneNumber)} "
-                        + $"where (({nameof(ContactCommunicationAddress.Type)} = @addressTypePhone) or ({nameof(ContactCommunicationAddress.Type)} = @addressTypeMobile)) "
-                        + $"order by {nameof(ContactPhoneNumber.Number)} asc";
-                    
-                    var cmd = c.CreateCommand(commandString);
-                    cmd.Bind("@addressTypePhone", (int)CommunicationAddressType.Phone);
-                    cmd.Bind("@addressTypeMobile", (int)CommunicationAddressType.Mobile);
-                    var result = cmd.ExecuteQuery<ContactPhoneNumber>();
-                    phoneNumbers = result;
-                });
-
-                return phoneNumbers;
-            }
-            catch (Exception ex) when (!(ex is DataAccessException))
-            {
-                throw new DataAccessException("Error fetching contact phone numbers.", ex);
-            }
-        }
-
-
         public async Task DeleteAllAsync()
         {
             await contactsDatabase.RunInConnectionAsync(c =>

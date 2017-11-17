@@ -29,29 +29,6 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<Category>();
                 c.CreateTable<ContactCommunicationAddress>();
             });
-            try
-            {
-                await DatabaseConnectionProvider.ContactsDatabase.RunInConnectionAsync(c =>
-                {
-                    var commandString = $"create temp view {nameof(ContactPhoneNumber)} ({nameof(ContactPreview.Name)},{nameof(ContactCommunicationAddress.Address)},{nameof(ContactCommunicationAddress.Type)}) "
-                        + $"as "
-                        + $"select C.{nameof(ContactPreview.Name)}, "
-                        + $"replace(CA.{nameof(ContactCommunicationAddress.Address)},'|',''), "
-                        + $"CA.{nameof(ContactCommunicationAddress.Type)} "
-                        + $"from {nameof(ContactPreview)} C "
-                        + $"inner join "
-                        + $"{nameof(ContactCommunicationAddress)} CA "
-                        + $"on C.{nameof(ContactPreview.Id)} = CA.{nameof(ContactCommunicationAddress.ContactId)} "
-                        + $"collate nocase";
-                    var cmd = c.CreateCommand(commandString);
-                    cmd.ExecuteNonQuery();
-                });
-            }
-            catch (System.Exception ex)
-            {
-                
-            }
-
             await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionAsync(c =>
             {
                 c.CreateTable<Folder>();

@@ -7,7 +7,6 @@ namespace CallOverlayExtension
     [Register("CallDirectoryHandler")]
     public class CallDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
     {
-        
         protected CallDirectoryHandler(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
@@ -18,8 +17,14 @@ namespace CallOverlayExtension
             var cxContext = (CXCallDirectoryExtensionContext)context;
             cxContext.Delegate = this;
 
-            SharedDatabase.GetContactsFromSharedDatabase(cxContext);
-
+            try
+            {
+                SharedDatabase.GetContactsFromSharedDatabase(cxContext);
+            } 
+            catch (Exception ex)
+            {
+                new ErrorLogger().WriteToLog(ex);
+            }
             cxContext.CompleteRequest(null);
         }
 
@@ -31,8 +36,7 @@ namespace CallOverlayExtension
             // This may be used to store the error details in a location accessible by the extension's containing app, so that the
             // app may be notified about errors which occured while loading data even if the request to load data was initiated by
             // the user in Settings instead of via the app itself.
-
-            Console.WriteLine("hur");
+            new ErrorLogger().WriteToLog(new NSErrorException(error));
         }
     }
 }

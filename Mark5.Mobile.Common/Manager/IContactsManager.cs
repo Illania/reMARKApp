@@ -36,7 +36,5 @@ namespace Mark5.Mobile.Common.Manager
         Task DeleteComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto);
 
         Task<List<Recipient>> GetSuggestions(string phrase);
-
-        Task<List<ContactPhoneNumber>> GetContactPhoneNumbers();
     }
 }

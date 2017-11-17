@@ -333,11 +333,5 @@ namespace Mark5.Mobile.Common.Manager
             var result = await contactsDataAccess.GetSuggestions(phrase);
             return result;
         }
-
-        public async Task<List<ContactPhoneNumber>> GetContactPhoneNumbers()
-        {
-            var result = await contactsDataAccess.GetContactPhoneNumbers();
-            return result;
-        }
     }
 }
