@@ -423,8 +423,6 @@
     <Compile Include="Config.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
     <Compile Include="Service\CallStateBroadcastReceiver.cs" />
-    <Compile Include="Service\CallActivity.cs" />
-    <Compile Include="Service\IncomingCallFragmentOverlay.cs" />
     <Compile Include="Utilities\CallerIdDatabaseProvider.cs" />
   </ItemGroup>
   <ItemGroup>

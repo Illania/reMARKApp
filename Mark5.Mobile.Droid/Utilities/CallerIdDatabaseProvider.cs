@@ -22,7 +22,6 @@ namespace Mark5.Mobile.Droid.Utilities
         CallerIdDatabaseProvider()
         {
             connection = new SQLiteConnection(CommonConfig.DatabaseFolder.Path + CommonConfig.PathSeparator + dbFileName, true);
-
 #if DEBUG
             connection.Trace = true;
 #endif
@@ -125,9 +124,6 @@ namespace Mark5.Mobile.Droid.Utilities
                 return; //Number has been stored incorrectly, e.g. it contains letters, so it is ignored.
             }
 
-            //'+' will be in the number, since it's part of the E164 format.
-            number = number.Replace("+", String.Empty);
-
             await Task.Run(() =>
             {
                 try
@@ -137,7 +133,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     var contactName = new ContactIdentification();
                     contactName.FolderId = folderId;
                     contactName.Name = name;
-                    contactName.Number = Convert.ToInt64(number);
+                    contactName.Number = number;
 
                     connection.Insert(contactName);
                 }
@@ -150,31 +146,26 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public async Task<ContactIdentification> GetContactsFromSharedDatabase(string number)
         {
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
-                ContactIdentification contact = null;
+                ContactIdentification c = null;
                 try
                 {
-                    
                     connectionSemaphore.Wait();
                     connection.RunInTransaction(() => {
                         var commandString = $"select distinct {nameof(ContactIdentification.Name)},{nameof(ContactIdentification.Number)} "
                             + $"from {nameof(ContactIdentification)} where {nameof(ContactIdentification.Number)} = ?";
 
-                        contact = connection.FindWithQuery<ContactIdentification>(commandString, number);
-                        /*var cmd = connection.CreateCommand(commandString);
-                        cmd.Bind("@number", number);
-                        var result = cmd.ExecuteQuery<ContactIdentification>();*/
+                        c = connection.FindWithQuery<ContactIdentification>(commandString, number);
                     });
                 }
                 finally
                 {
                     connectionSemaphore.Release();
                 }
-                return contact;
+                return c;
             });
         }
-
     }
 
     [Table("ContactIdentification")]
@@ -194,9 +185,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         [Column("Number")]
         [NotNull]
-        public long Number { get; set; }
+        public string Number { get; set; }
     }
 }
-
-
-

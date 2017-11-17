@@ -9,6 +9,8 @@ using Android.Runtime;
 using Android.OS;
 using System.Threading.Tasks;
 using Mark5.Mobile.Droid.Utilities;
+using System;
+using PhoneNumbers;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -66,45 +68,58 @@ namespace Mark5.Mobile.Droid.Service
                 };
                 if (state == TelephonyManager.ExtraStateRinging)
                 {
-                    var incomingNumber = intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber);
-                    ContactIdentification contact = null;
+                    var incomingNumber = FormatNumber(intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber));
+
                     Task.Run(async () =>
                     {
-                        contact = await CallerIdDatabaseProvider.CallerIdDatabase.GetContactsFromSharedDatabase(incomingNumber);
-                    });
+                        return await CallerIdDatabaseProvider.CallerIdDatabase.GetContactsFromSharedDatabase(incomingNumber);
+                    }).ContinueWith((t) => {
+                        var contact = t.Result;
 
-                    if(contact != null)
-                    {
-                        var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
-                        if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked
+                        if(contact != null && PhoneNumberUtils.Compare(incomingNumber,contact.Number))
                         {
-                            incomingCallLayout = LayoutNewContext(context);
-                            wm.AddView(incomingCallLayout, overlayParams);
+                            var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
+                            if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked
+                            {
+                                incomingCallLayout = LayoutNewContext(context);
+                                wm.AddView(incomingCallLayout, overlayParams);
+                            }
+                            else //Screen is locked
+                            {
+                                incomingCallLayout = LayoutNewContext(context);
+                                wm.AddView(incomingCallLayout, overlayParams);
+                            }
                         }
-                        else //Screen is locked
-                        {
-                            incomingCallLayout = LayoutNewContext(context);
-                            wm.AddView(incomingCallLayout, overlayParams);
-                        }
-                    }
+                    },TaskScheduler.FromCurrentSynchronizationContext());
+
                 }
                 else if (state == TelephonyManager.ExtraStateOffhook) //Call started
                 {
-                    if(incomingCallLayout.IsShown)
+                    if(incomingCallLayout != null && incomingCallLayout.IsShown)
                         wm.RemoveView(incomingCallLayout);
                     onGoingCallLayout = LayoutNewContext(context);
                     wm.AddView(onGoingCallLayout, overlayParams);
                 }
                 else if (state == TelephonyManager.ExtraStateIdle) //Call stopped
                 {
-                    if(incomingCallLayout.IsShown)
+                    if(incomingCallLayout != null && incomingCallLayout.IsShown)
                         wm.RemoveView(incomingCallLayout);
 
-                    if(onGoingCallLayout.IsShown)
+                    if(onGoingCallLayout != null && onGoingCallLayout.IsShown)
                         wm.RemoveView(onGoingCallLayout);
                 }
             }
             GoAsync();
+        }
+
+        String FormatNumber(string number)
+        {
+            var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+
+            //Number must start with '+' for this to work.
+            PhoneNumber phoneNumber = phoneNumberUtil.Parse(number, "");
+
+            return phoneNumberUtil.Format(phoneNumber, PhoneNumbers.PhoneNumberFormat.E164);
         }
 
         LinearLayout LayoutNewContext(Context context)
@@ -116,8 +131,4 @@ namespace Mark5.Mobile.Droid.Service
             return layout;
         }
     }
-
-
-
 }
- 
