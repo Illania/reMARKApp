@@ -259,7 +259,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
                 {
-                    AdditionalSafeAreaInsets = new UIEdgeInsets(0f, 0f, safeAreaOffset, 0f);
+                    var asai = AdditionalSafeAreaInsets;
+                    asai = new UIEdgeInsets(asai.Top, asai.Left, safeAreaOffset, asai.Right);
+                    AdditionalSafeAreaInsets = asai;
                     View.LayoutIfNeeded();
                 }, null);
             }
