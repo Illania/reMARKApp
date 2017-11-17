@@ -250,9 +250,6 @@
 		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
-		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\ComposeDocumentViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\AbstractComposeDocumentView.cs" />
-		<Compile Include="Ui\ViewControllers\ModernComposeDocumentView\ContentView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\AbstractWebViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
@@ -299,9 +296,6 @@
 		<Reference Include="SQLitePCLRaw.core">
 		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
 		</Reference>
-		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.6.4\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-		</Reference>
 		<Reference Include="SQLitePCLRaw.provider.sqlite3">
 		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
 		</Reference>
@@ -311,6 +305,10 @@
 		<Reference Include="SQLitePCLRaw.batteries_v2">
 		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
+		<Reference Include="HtmlAgilityPack">
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.5\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Web.Services" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
@@ -504,7 +502,7 @@
 		<BundleResource Include="Resources\html\scriptsAtStart.js" />
 		<BundleResource Include="Resources\html\scriptsAtEnd.js" />
 		<BundleResource Include="Resources\html\empty.html" />
-		<BundleResource Include="Resources\html\test.html" />
+		<BundleResource Include="Resources\html\plain.html" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
@@ -518,7 +516,6 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
-	  <Folder Include="Ui\ViewControllers\ModernComposeDocumentView\" />
 	  <Folder Include="Resources\html\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web;
 using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
@@ -13,13 +14,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
     public abstract class AbstractWebViewController : AbstractViewController, IWKNavigationDelegate, IWKScriptMessageHandler
     {
-        UIView headerContainer;
         WKWebView webView;
-        UIProgressView progressView;
+        UIView headerContainerView;
+        UIProgressView webViewProgressView;
 
         public override void LoadView()
         {
             base.LoadView();
+
+            View.BackgroundColor = Theme.LightGray;
+
+            var loadIndicatorView = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray)
+            {
+                Hidden = true,
+                BackgroundColor = Theme.White,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            loadIndicatorView.StartAnimating();
+            View.AddSubview(loadIndicatorView);
+            View.AddConstraints(new[]
+            {
+                loadIndicatorView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                loadIndicatorView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                loadIndicatorView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                loadIndicatorView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+            });
 
             var preferences = new WKPreferences
             {
@@ -52,8 +71,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             webView = new WKWebView(CGRect.Empty, configuration)
             {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                NavigationDelegate = this
+                Hidden = true,
+                NavigationDelegate = this,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
             webView.AddObserver(this, new NSString("estimatedProgress"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             webView.AddObserver(this, new NSString("loading"), NSKeyValueObservingOptions.New, IntPtr.Zero);
@@ -66,32 +86,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 webView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
 
-            progressView = new UIProgressView(UIProgressViewStyle.Bar)
+            webViewProgressView = new UIProgressView(UIProgressViewStyle.Bar)
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            View.AddSubview(progressView);
+            View.AddSubview(webViewProgressView);
             View.AddConstraints(new[]
             {
-                progressView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
-                progressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                progressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+                webViewProgressView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                webViewProgressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
 
-            headerContainer = new UIView
+            headerContainerView = new UIView
             {
-                Opaque = true,
+                BackgroundColor = Theme.White,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            webView.ScrollView.AddSubview(headerContainer);
+            webView.ScrollView.AddSubview(headerContainerView);
 
-            var c1 = headerContainer.TopAnchor.ConstraintEqualTo(webView.ScrollView.TopAnchor);
+            var c1 = headerContainerView.TopAnchor.ConstraintEqualTo(webView.ScrollView.TopAnchor);
             c1.SetIdentifier("headerContainer.topAnchor");
-            var c2 = headerContainer.LeadingAnchor.ConstraintEqualTo(webView.ScrollView.LeadingAnchor);
+            var c2 = headerContainerView.LeadingAnchor.ConstraintEqualTo(webView.ScrollView.LeadingAnchor);
             c2.SetIdentifier("headerContainer.leadingAnchor");
-            var c3 = headerContainer.WidthAnchor.ConstraintEqualTo(webView.WidthAnchor);
+            var c3 = headerContainerView.WidthAnchor.ConstraintEqualTo(webView.WidthAnchor);
             c3.SetIdentifier("headerContainer.widthAnchor");
-            var c4 = headerContainer.HeightAnchor.ConstraintGreaterThanOrEqualTo(0);
+            var c4 = headerContainerView.HeightAnchor.ConstraintGreaterThanOrEqualTo(0);
             c4.SetIdentifier("headerContainer.height");
 
             webView.AddConstraints(new[] { c1, c2, c3, c4 });
@@ -101,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         {
             base.ViewDidLayoutSubviews();
 
-            var desireHeaderSize = headerContainer.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
+            var desireHeaderSize = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
             var desiredHeaderHeight = desireHeaderSize.Height;
 
             if (desiredHeaderHeight < 1)
@@ -123,17 +143,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         protected void SetHeaderView(UIView headerView)
         {
-            foreach (var subview in headerContainer.Subviews)
+            foreach (var subview in headerContainerView.Subviews)
                 subview.RemoveFromSuperview();
 
             headerView.TranslatesAutoresizingMaskIntoConstraints = false;
-            headerContainer.AddSubview(headerView);
-            headerContainer.AddConstraints(new[]
+            headerContainerView.AddSubview(headerView);
+            headerContainerView.AddConstraints(new[]
             {
-                headerView.TopAnchor.ConstraintEqualTo(headerContainer.TopAnchor),
-                headerView.BottomAnchor.ConstraintEqualTo(headerContainer.BottomAnchor),
-                headerView.LeadingAnchor.ConstraintEqualTo(headerContainer.LeadingAnchor),
-                headerView.TrailingAnchor.ConstraintEqualTo(headerContainer.TrailingAnchor)
+                headerView.TopAnchor.ConstraintEqualTo(headerContainerView.TopAnchor),
+                headerView.BottomAnchor.ConstraintEqualTo(headerContainerView.BottomAnchor),
+                headerView.LeadingAnchor.ConstraintEqualTo(headerContainerView.LeadingAnchor),
+                headerView.TrailingAnchor.ConstraintEqualTo(headerContainerView.TrailingAnchor)
             });
         }
 
@@ -156,8 +176,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         protected void LoadPlainString(string plain)
         {
+            var escapedPlain = HttpUtility.HtmlEncode(plain);
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id=plaintext]");
+            preNode.InnerHtml = escapedPlain;
+            var plainHtml = htmlDocument.DocumentNode.OuterHtml;
+
             webView?.StopLoading();
-            webView?.LoadData(NSData.FromString(plain), "text/plain", "UTF-8", new NSUrl("/"));
+            webView?.LoadHtmlString(plainHtml, null);
         }
 
         protected void LoadNoContentString()
@@ -210,7 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                 var viewportElement = htmlDocument.CreateElement("meta");
                 viewportElement.SetAttributeValue("name", "viewport");
-                viewportElement.SetAttributeValue("content", "initial-scale=0.8, minimum-scale=0.5, maximum-scale=3, user-scalable=yes");
+                viewportElement.SetAttributeValue("content", "initial-scale=1");
                 headNode.PrependChild(viewportElement);
 
                 var scaledHtml = htmlDocument.DocumentNode.OuterHtml;
@@ -233,20 +261,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
         {
             if (ofObject == webView && keyPath == "estimatedProgress")
-            {
-                progressView.SetProgress((float)webView.EstimatedProgress, true);
-            }
+                webViewProgressView.SetProgress((float)webView.EstimatedProgress, true);
+
             if (ofObject == webView && keyPath == "loading")
-            {
                 UIView.AnimateNotify(.2d, () =>
                 {
-                    progressView.Alpha = webView.IsLoading ? 1f : 0f;
+                    webViewProgressView.Alpha = webView.IsLoading ? 1f : 0f;
                 }, (finished) =>
                 {
                     if (finished && !webView.IsLoading)
-                        progressView.SetProgress(0f, false);
+                        webViewProgressView.SetProgress(0f, false);
                 });
-            }
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]

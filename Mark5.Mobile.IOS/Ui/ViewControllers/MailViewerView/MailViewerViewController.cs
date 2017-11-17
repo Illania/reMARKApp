@@ -61,7 +61,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             shareItem = new UIBarButtonItem(UIBarButtonSystemItem.Action);
             NavigationItem.SetRightBarButtonItem(shareItem, false);
 
-
             headerStackView = new UIStackView
             {
                 Axis = UILayoutConstraintAxis.Vertical,
@@ -277,7 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             if (mailMessage != null)
             {
                 if (!string.IsNullOrWhiteSpace(mailMessage.BodyHtmlText))
-                    await LoadHtmlString(mailMessage.BodyHtmlText, true, true, false);
+                    await LoadHtmlString(mailMessage.BodyHtmlText, true, false, false);
                 else if (!string.IsNullOrWhiteSpace(mailMessage.BodyPlainText))
                     LoadPlainString(mailMessage.BodyPlainText);
                 else

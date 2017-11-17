@@ -8,15 +8,11 @@
             outline: 0px solid transparent;
             -webkit-tap-highlight-color: rgba(0,0,0,0);
             -webkit-touch-callout: none;
-            -webkit-user-select: none;
         }
         html, body {
             padding: 10px 0;
             margin: 0;
-            font-family: arial;
             font-size: 12pt;
-            font-style: italic;
-            color: gray;
         }
         html {
             height: 100%;
@@ -25,9 +21,14 @@
             padding: 10px;
             min-height: 100%;
         }
+        pre {
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
-    <div id="empty">This email has no content</div>
+    <div id="text">
+        <pre id="text-container"></pre>
+    </div>
 </body>
 </html>
