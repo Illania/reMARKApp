@@ -251,6 +251,7 @@
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\AbstractWebViewController.cs" />
+		<Compile Include="Ui\Common\ReachabilityBar.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
