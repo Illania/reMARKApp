@@ -288,7 +288,7 @@
 		<Compile Include="Model\HubMessages\ContactPreviewCommentsCountChangedMessage.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
-		<Compile Include="Utilities\SharedDatabase.cs" />
+		<Compile Include="Utilities\CallerIdSharedDatabase.cs" />
 		<Compile Include="Utilities\OverlayExtensionStatus.cs" />
 	</ItemGroup>
 	<ItemGroup>

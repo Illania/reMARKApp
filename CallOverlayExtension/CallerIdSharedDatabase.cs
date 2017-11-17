@@ -6,7 +6,7 @@ using SQLite;
 
 namespace CallOverlayExtension
 {
-    public static class SharedDatabase
+    public static class CallerIdSharedDatabase
     {
         //Retrieves all contacts stored in the database in the shared container by a deferred query.
         const string databaseFileName = "sharedcontacts.sqlite3";

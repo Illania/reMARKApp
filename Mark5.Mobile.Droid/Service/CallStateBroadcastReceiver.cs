@@ -7,6 +7,8 @@ using Android.Views;
 using Android.Widget;
 using Android.Runtime;
 using Android.OS;
+using System.Threading.Tasks;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -64,19 +66,27 @@ namespace Mark5.Mobile.Droid.Service
                 };
                 if (state == TelephonyManager.ExtraStateRinging)
                 {
-                    var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
-                    if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked
+                    var incomingNumber = intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber);
+                    ContactIdentification contact = null;
+                    Task.Run(async () =>
                     {
-                        incomingCallLayout = LayoutNewContext(context);
-                        wm.AddView(incomingCallLayout, overlayParams);
-                        var incomingNumber = intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber);
-                    }
-                    else //Screen is locked
-                    {
-                        incomingCallLayout = LayoutNewContext(context);
-                        wm.AddView(incomingCallLayout, overlayParams);
-                    }
+                        contact = await CallerIdDatabaseProvider.CallerIdDatabase.GetContactsFromSharedDatabase(incomingNumber);
+                    });
 
+                    if(contact != null)
+                    {
+                        var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
+                        if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked
+                        {
+                            incomingCallLayout = LayoutNewContext(context);
+                            wm.AddView(incomingCallLayout, overlayParams);
+                        }
+                        else //Screen is locked
+                        {
+                            incomingCallLayout = LayoutNewContext(context);
+                            wm.AddView(incomingCallLayout, overlayParams);
+                        }
+                    }
                 }
                 else if (state == TelephonyManager.ExtraStateOffhook) //Call started
                 {

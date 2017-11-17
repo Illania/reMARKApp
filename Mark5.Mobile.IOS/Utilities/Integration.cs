@@ -70,7 +70,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var localStorage = FileSystem.Current.LocalStorage;
             var dataFolder = PortablePath.Combine(localStorage.Path, "v2");
             var cacheFolder = PortablePath.Combine(localStorage.Path, "Caches", "v2");
-            SharedDatabase.DropExtensionContactsTable();
+            CallerIdSharedDatabase.DropExtensionContactsTable();
 
             NSFileManager.DefaultManager.Remove(dataFolder, out NSError _error);
             NSFileManager.DefaultManager.Remove(cacheFolder, out _error);

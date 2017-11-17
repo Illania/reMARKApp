@@ -19,7 +19,7 @@ namespace CallOverlayExtension
 
             try
             {
-                SharedDatabase.GetContactsFromSharedDatabase(cxContext);
+                CallerIdSharedDatabase.GetContactsFromSharedDatabase(cxContext);
             } 
             catch (Exception ex)
             {

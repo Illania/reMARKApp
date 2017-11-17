@@ -771,8 +771,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 try
                 {
-                    SharedDatabase.CreateExtensionContactsTable();
-                    SharedDatabase.CleanExtensionContactsTable(folder.Id);
+                    CallerIdSharedDatabase.CreateExtensionContactsTable();
+                    CallerIdSharedDatabase.CleanExtensionContactsTable(folder.Id);
                 }
                 catch (Exception ex)
                 {
@@ -783,6 +783,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     int item;
                     string contactName = null;
+
                     try
                     {
                         if (folder.Module == ModuleType.Contacts)
@@ -817,7 +818,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                     {
                                         foreach (CommunicationAddress ca in caList)
                                         {
-                                            SharedDatabase.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
+                                            CallerIdSharedDatabase.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
                                         }
                                     }
                                 }
