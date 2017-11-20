@@ -137,6 +137,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
             SubscribeToMessages();
+
+            if (NavigationController != null)
+                NavigationController.ToolbarHidden = false;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -150,9 +153,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
-
-            if (NavigationController != null)
-                NavigationController.ToolbarHidden = false;
         }
 
         public override void ViewWillDisappear(bool animated)
