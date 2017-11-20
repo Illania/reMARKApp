@@ -4,6 +4,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList;
 using UIKit;
+using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
@@ -25,6 +26,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             RestorationIdentifier = nameof(BrowseFoldersListViewController);
             RestorationClass = Class;
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            ReachabilityBar.Attach(this);
+        }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+
+            ReachabilityBar.Detach(this);
         }
 
         protected override void FolderSelected(Folder folder, bool isFromFavorite)

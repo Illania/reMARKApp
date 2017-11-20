@@ -73,6 +73,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (TableView?.IndexPathsForSelectedRows?.Length > 0)
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
+
+            ReachabilityBar.Attach(this);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -113,6 +115,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             newNotificationsMessageToken?.Dispose();
 
             DeinitializeHandlers();
+        }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+
+            ReachabilityBar.Detach(this);
         }
 
         public override void DidReceiveMemoryWarning()
