@@ -53,18 +53,16 @@ namespace Mark5.Mobile.Common.Utilities
 
     public abstract class AnalyticsEvent
     {
-        public string EventName => eventName;
-
-        protected readonly string eventName;
+        public string EventName { get; }
 
         protected AnalyticsEvent(string eventName)
         {
-            this.eventName = eventName;
+            EventName = eventName;
         }
 
         protected AnalyticsEvent(ModuleType module, string eventName)
         {
-            this.eventName = module.ToString().ToLowerInvariant() + "_" + eventName;
+            EventName = module.ToString().ToLowerInvariant() + "_" + eventName;
         }
 
         protected AnalyticsEvent(ModuleType module, string eventName, int quantity)
@@ -77,7 +75,7 @@ namespace Mark5.Mobile.Common.Utilities
             else
                 quantityString = "many";
 
-            this.eventName = module.ToString().ToLowerInvariant() + "_" + eventName + "_" + quantityString;
+            EventName = module.ToString().ToLowerInvariant() + "_" + eventName + "_" + quantityString;
         }
     }
 
