@@ -6,7 +6,6 @@ using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -449,7 +448,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Email));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Email));
 
             var primaryEmail = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
             if (primaryEmail == null)
@@ -468,7 +467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Call));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Call));
 
             var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
                                           .Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
@@ -490,7 +489,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button3_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Text));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Text));
 
             var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
             if (communicationAddresses == null)
@@ -501,7 +500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button4_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Map));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Map));
 
             var physicalAddress = contact.PhysicalAddresses.ToArray();
             if (physicalAddress.Length == 0)
@@ -652,7 +651,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
-                CommonConfig.Analytics.LogEvent(new ContactClickEmailEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ContactClickEmailEvent());
 
                 var vc = new ComposeDocumentViewController
                 {
@@ -667,7 +666,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (ca.Type == CommunicationAddressType.Phone)
             {
-                CommonConfig.Analytics.LogEvent(new ContactCallNumberEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ContactCallNumberEvent());
                 Integration.Call(this, tv, cell, ca.Address);
             }
 
@@ -678,12 +677,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (result == 0)
                 {
-                    CommonConfig.Analytics.LogEvent(new ContactCallNumberEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactCallNumberEvent());
                     Integration.Call(this, tv, cell, ca.Address);
                 }
                 if (result == 1)
                 {
-                    CommonConfig.Analytics.LogEvent(new ContactSendTextEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactSendTextEvent());
                     Integration.Text(this, tv, cell, ca.Address);
                 }
             }
@@ -692,7 +691,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
-            CommonConfig.Analytics.LogEvent(new ContactNavigateSubContactEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new ContactNavigateSubContactEvent());
 
             var vc = new ContactViewController();
             vc.SetData(contactPreview);
@@ -702,7 +701,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
         {
-            CommonConfig.Analytics.LogEvent(new ContactClickPhysicalAddressEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new ContactClickPhysicalAddressEvent());
             Integration.ShowOnMap(this, tv, cell, pa);
         }
 
@@ -711,7 +710,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int folderId, int contactId)
         {
-            CommonConfig.Analytics.LogEvent(new OpenContactEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
             folder = null;
             contactPreview = null;
@@ -723,7 +722,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, ContactPreview contactPreview)
         {
-            CommonConfig.Analytics.LogEvent(new OpenContactEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
             folderId = null;
             contactId = null;
@@ -735,7 +734,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(ContactPreview contactPreview)
         {
-            CommonConfig.Analytics.LogEvent(new OpenContactEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
             folderId = null;
             folder = null;
@@ -747,7 +746,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int contactId)
         {
-            CommonConfig.Analytics.LogEvent(new OpenContactEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
             folderId = null;
             folder = null;

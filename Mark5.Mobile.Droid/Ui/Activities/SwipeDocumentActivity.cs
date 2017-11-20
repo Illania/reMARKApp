@@ -175,13 +175,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
         {
             if (position != initialPosition)
-                CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
 
             var dp = state.FragmentStates[position].DocumentPreview;
             if (dp?.Direction == DocumentDirection.External)
-                CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(true));
+                CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(true));
             else
-                CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(false));
+                CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
             state.Position = position;
         }

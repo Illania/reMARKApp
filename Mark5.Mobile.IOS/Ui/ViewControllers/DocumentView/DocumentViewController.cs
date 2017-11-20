@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -533,7 +532,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
-            CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
 
             failedDocumentToUploadGuid = Guid.Empty;
             documentId = null;
@@ -549,7 +548,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId)
         {
-            CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(false));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
@@ -565,7 +564,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId, Guid notificationGuid)
         {
-            CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(false));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
@@ -581,7 +580,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
-            CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
 
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
@@ -597,7 +596,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview)
         {
-            CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
 
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
@@ -611,7 +610,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Guid failedDocumentToUploadGuid)
         {
-            CommonConfig.Analytics.LogEvent(new OpenDocumentEvent(false));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
             document = null;
             documentPreview = null;
@@ -863,7 +862,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
-            CommonConfig.Analytics.LogEvent(new DocumentOpenAttachmentEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentOpenAttachmentEvent());
 
             try
             {
@@ -1108,7 +1107,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void NextDocumentButton_Clicked(object sender, EventArgs args)
         {
-            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
 
             document = null;
             documentId = null;
@@ -1127,7 +1126,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PreviousDocumentButton_Clicked(object sender, EventArgs args)
         {
-            CommonConfig.Analytics.LogEvent(new DocumentQuickSwitchEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
 
             document = null;
             documentId = null;
@@ -1173,7 +1172,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(1));
 
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
 

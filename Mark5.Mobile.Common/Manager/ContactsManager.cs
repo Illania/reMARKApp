@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -11,6 +10,7 @@ using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -218,7 +218,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.Analytics.LogEvent(new SetCategories(ModuleType.Contacts));
+            CommonConfig.UsageAnalytics.LogEvent(new SetCategories(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -251,7 +251,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.Analytics.LogEvent(new AddCommentEvent(ModuleType.Contacts));
+            CommonConfig.UsageAnalytics.LogEvent(new AddCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -282,7 +282,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.Analytics.LogEvent(new EditCommentEvent(ModuleType.Contacts));
+            CommonConfig.UsageAnalytics.LogEvent(new EditCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -318,7 +318,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task DeleteComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.Analytics.LogEvent(new DeleteCommentEvent(ModuleType.Contacts));
+            CommonConfig.UsageAnalytics.LogEvent(new DeleteCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;

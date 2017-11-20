@@ -236,9 +236,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
-                CommonConfig.Analytics.SetUserProperty(UserProperties.Hostname, hostname);
-                CommonConfig.Analytics.SetUserProperty(UserProperties.Username, username);
-                CommonConfig.Analytics.SetUserProperty(UserProperties.SSL, sslMode.ToString());
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, username);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
 
                 StartActivity(MainActivity.CreateIntent(this));
                 Finish();

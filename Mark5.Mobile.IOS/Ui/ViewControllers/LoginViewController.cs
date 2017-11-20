@@ -4,7 +4,6 @@ using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -660,9 +659,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => { });
 
-                CommonConfig.Analytics.SetUserProperty(UserProperties.Hostname, hostname);
-                CommonConfig.Analytics.SetUserProperty(UserProperties.Username, username);
-                CommonConfig.Analytics.SetUserProperty(UserProperties.SSL, sslMode.ToString());
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, username);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
 
                 UIViewController vc;
                 if (Integration.IsIPad())

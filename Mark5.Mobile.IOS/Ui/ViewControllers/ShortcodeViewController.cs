@@ -6,7 +6,6 @@ using System.Threading;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -312,7 +311,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new ShortcodeComposeDocumentEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new ShortcodeComposeDocumentEvent());
 
             var vc = new ComposeDocumentViewController
             {
@@ -384,7 +383,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
-            CommonConfig.Analytics.LogEvent(new ShortcodeClickEmailEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new ShortcodeClickEmailEvent());
 
             var vc = new ComposeDocumentViewController
             {
@@ -401,7 +400,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int folderId, int shortcodeId)
         {
-            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
 
             folder = null;
             shortcodePreview = null;
@@ -413,7 +412,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, ShortcodePreview shortcodePreview)
         {
-            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
 
             folderId = null;
             shortcodeId = null;
@@ -425,7 +424,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(ShortcodePreview shortcodePreview)
         {
-            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
 
             folderId = null;
             folder = null;
@@ -437,7 +436,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int shortcodeId)
         {
-            CommonConfig.Analytics.LogEvent(new OpenShortcodeEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
 
             folderId = null;
             folder = null;

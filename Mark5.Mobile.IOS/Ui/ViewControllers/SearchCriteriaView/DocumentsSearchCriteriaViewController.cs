@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -24,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         {
             base.LoadView();
 
-            CommonConfig.Analytics.LogEvent(new OpenSearchEvent(ModuleType.Documents));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent(ModuleType.Documents));
 
             StackView.AddArrangedSubview(new DocumentDirectionSearchView());
             StackView.AddArrangedSubview(new MessageSubjectView());

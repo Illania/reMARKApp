@@ -13,7 +13,6 @@ using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -702,7 +701,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (!buttonExpanded)
             {
                 buttonExpanded = true;
-                CommonConfig.Analytics.LogEvent(new ComposeShowPreviousEmailEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeShowPreviousEmailEvent());
             }
 
             if (oldContentWebView.Hidden)
@@ -799,7 +798,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 if (mutated && !oldContentEdited && userContentController == oldContentWebView.Configuration.UserContentController)
                 {
                     oldContentEdited = true;
-                    CommonConfig.Analytics.LogEvent(new ComposeEditedPreviousEmailEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeEditedPreviousEmailEvent());
                 }
                 else if (userContentController == newContentWebView.Configuration.UserContentController)
                 {

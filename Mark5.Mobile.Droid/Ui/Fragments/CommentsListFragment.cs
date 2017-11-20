@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (CommentsListFragment fragment, string tag) NewInstance(BusinessEntity be)
         {
-            CommonConfig.Analytics.LogEvent(new OpenCommentsEvent(be.ModuleType));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenCommentsEvent(be.ModuleType));
 
             var args = new Bundle();
 

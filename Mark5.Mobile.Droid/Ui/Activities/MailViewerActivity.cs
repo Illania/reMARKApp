@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            CommonConfig.Analytics.LogEvent(new OpenMailViewerEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenMailViewerEvent());
 
             base.OnCreate(savedInstanceState);
 

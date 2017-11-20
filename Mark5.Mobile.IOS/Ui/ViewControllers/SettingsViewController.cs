@@ -3,9 +3,9 @@ using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            CommonConfig.Analytics.LogEvent(new OpenSettingsEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSettingsEvent());
 
             if (Integration.IsRunningAtLeast(11))
             {
@@ -255,7 +255,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UpdateConfigKey)
             {
-                CommonConfig.Analytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_config___"));
 
@@ -282,7 +282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == LogoutKey)
             {
-                CommonConfig.Analytics.LogEvent(new SettingsLogOut());
+                CommonConfig.UsageAnalytics.LogEvent(new SettingsLogOut());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 

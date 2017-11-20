@@ -270,12 +270,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
                 if (shouldRecover)
                 {
-                    CommonConfig.Analytics.LogEvent(new EmailRecoveredEvent(true));
+                    CommonConfig.UsageAnalytics.LogEvent(new EmailRecoveredEvent(true));
                     StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.None, CopyToNewOption.None, true));
                 }
                 else
                 {
-                    CommonConfig.Analytics.LogEvent(new EmailRecoveredEvent(false));
+                    CommonConfig.UsageAnalytics.LogEvent(new EmailRecoveredEvent(false));
                     await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
                 }
             }

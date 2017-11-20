@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             if (businessEntity != null)
-                CommonConfig.Analytics.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
+                CommonConfig.UsageAnalytics.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
 
             InitializeNavigationBar();
             InitializeView();
@@ -148,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 objectId = link.FromObjectId;
             }
 
-            CommonConfig.Analytics.LogEvent(new LinkClickedEvent(switchObjectType));
+            CommonConfig.UsageAnalytics.LogEvent(new LinkClickedEvent(switchObjectType));
 
             switch (switchObjectType)
             {

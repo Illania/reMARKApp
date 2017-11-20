@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -408,7 +407,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Documents));
+            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Documents));
             await RefreshData(forceClear: true);
         }
 
@@ -819,7 +818,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
@@ -841,7 +840,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
@@ -863,7 +862,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var searchText = searchController.SearchBar.Text;
 
             if (!searchController.Active)
-                CommonConfig.Analytics.LogEvent(new FilterEvent(false, ModuleType.Documents));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, ModuleType.Documents));
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
@@ -1189,7 +1188,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (LoadMoreEnabled && dp.Id == Items.Last().Id)
                 {
-                    CommonConfig.Analytics.LogEvent(new GetMoreDocumentsEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new GetMoreDocumentsEvent());
                     AsyncHelpers.FireAndForget(viewControllerWeakReference.Unwrap()?.RefreshData(dp.Id));
                 }
 

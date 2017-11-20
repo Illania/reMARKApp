@@ -252,7 +252,7 @@
 		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
-		<Compile Include="Utilities\Analytics.cs" />
+		<Compile Include="Utilities\UsageAnalytics.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
 	</ItemGroup>
 	<ItemGroup>

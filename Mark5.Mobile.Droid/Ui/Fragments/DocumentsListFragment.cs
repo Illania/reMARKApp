@@ -99,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += async (sender, e) =>
             {
-                CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(module: ModuleType.Documents));
+                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(module: ModuleType.Documents));
 
                 actionMode?.Finish();
                 actionMode = null;
@@ -585,7 +585,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, true);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
@@ -612,7 +612,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, false);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
@@ -769,7 +769,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                CommonConfig.Analytics.LogEvent(new FilterEvent(module: ModuleType.Documents));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(module: ModuleType.Documents));
 
                 menu?.FindItem(10)?.SetVisible(false);
 
@@ -1130,7 +1130,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
                 {
-                    CommonConfig.Analytics.LogEvent(new GetMoreDocumentsEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new GetMoreDocumentsEvent());
 
                     loadMoreAction(dp.Id);
                 }

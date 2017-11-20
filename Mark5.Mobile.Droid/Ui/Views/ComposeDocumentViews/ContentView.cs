@@ -119,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (!oldContentShown)
             {
                 oldContentShown = true;
-                CommonConfig.Analytics.LogEvent(new ComposeShowPreviousEmailEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeShowPreviousEmailEvent());
             }
 
             if (oldContentWebView.Visibility == ViewStates.Gone)

@@ -8,15 +8,15 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
-using Mark5.Mobile.IOS.Utilities;
-using Mark5.Mobile.Common.Analytics;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 {
@@ -328,7 +328,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Shortcodes));
+            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Shortcodes));
 
             RefreshData(forceClear: true);
         }
@@ -587,7 +587,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             var searchText = searchController.SearchBar.Text;
 
             if (!searchController.Active)
-                CommonConfig.Analytics.LogEvent(new FilterEvent(false, ModuleType.Shortcodes));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, ModuleType.Shortcodes));
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {

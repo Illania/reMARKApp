@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.MarkAllAsRead)
             {
-                CommonConfig.Analytics.LogEvent(new NotificationMarkAllAsReadEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new NotificationMarkAllAsReadEvent());
                 MarkAllAsRead();
                 return true;
             }
@@ -219,7 +219,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Adapter_ItemClicked(object sender, Notification notification)
         {
-            CommonConfig.Analytics.LogEvent(new NotificationClickedEvent(notification.ObjectType));
+            CommonConfig.UsageAnalytics.LogEvent(new NotificationClickedEvent(notification.ObjectType));
 
             await Managers.NotificationsManager.MarkAsRead(notification);
 

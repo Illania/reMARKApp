@@ -7,11 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -427,7 +427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new PullToRefreshEvent(true));
+            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(true));
             RefreshData(true);
         }
 
@@ -586,10 +586,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 return;
 
             if (folder.Local)
-                CommonConfig.Analytics.LogEvent(new OpenLocalFolderEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new OpenLocalFolderEvent());
             else
             {
-                CommonConfig.Analytics.LogEvent(new OpenFolderEvent(folder.Module, isFromFavorite));
+                CommonConfig.UsageAnalytics.LogEvent(new OpenFolderEvent(folder.Module, isFromFavorite));
             }
         }
 
@@ -602,7 +602,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (folder == null)
                 return;
 
-            CommonConfig.Analytics.LogEvent(new ExpandFolderEvent(folder.Module));
+            CommonConfig.UsageAnalytics.LogEvent(new ExpandFolderEvent(folder.Module));
         }
 
         protected virtual bool ShouldDisableFolder(Folder folder)
@@ -618,7 +618,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
@@ -656,7 +656,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 
@@ -694,7 +694,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
 
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.IOS,
                     PlatformConfig.Preferences.PushNotificationToken,
@@ -733,7 +733,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
 
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.IOS,
                     PlatformConfig.Preferences.PushNotificationToken,
@@ -769,7 +769,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetFolderSyncEvent(folder.Module, 1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderSyncEvent(folder.Module, 1));
 
                 await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
@@ -801,7 +801,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetFolderSyncEvent(folder.Module, 1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderSyncEvent(folder.Module, 1));
 
                 await Managers.FoldersManager.RemoveSavedFolderInfo(folder);
 
@@ -843,7 +843,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var searchText = searchController.SearchBar.Text;
 
             if (!searchController.Active)
-                CommonConfig.Analytics.LogEvent(new FilterEvent(true));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(true));
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {

@@ -81,9 +81,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     var ci = await authenticator.GetConnectionInfoAsync();
 
-                    CommonConfig.Analytics.SetUserProperty(UserProperties.Hostname, ci.Hostname);
-                    CommonConfig.Analytics.SetUserProperty(UserProperties.Username, ci.Username);
-                    CommonConfig.Analytics.SetUserProperty(UserProperties.SSL, ci.SslMode.ToString());
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username);
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
                     CommonConfig.Logger.Info($"Current connection info: {ci}");
                     CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
@@ -108,7 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     if (PlatformConfig.Preferences.ClearCache)
                     {
-                        CommonConfig.Analytics.LogEvent(new SettingsCacheCleanUpEvent());
+                        CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
 
                         CommonConfig.Logger.Info("Clearing cache...");
 

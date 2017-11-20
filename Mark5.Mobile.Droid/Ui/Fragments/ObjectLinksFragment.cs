@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ObjectLinksFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
         {
-            CommonConfig.Analytics.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenLinksEvent(businessEntity.ModuleType));
 
             var args = new Bundle();
 
@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ol.IsReverse)
             {
-                CommonConfig.Analytics.LogEvent(new LinkClickedEvent(ol.FromObjectType));
+                CommonConfig.UsageAnalytics.LogEvent(new LinkClickedEvent(ol.FromObjectType));
 
                 if (ol.FromObjectType == ObjectType.Document)
                 {
@@ -189,7 +189,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
             {
-                CommonConfig.Analytics.LogEvent(new LinkClickedEvent(ol.ToObjectType));
+                CommonConfig.UsageAnalytics.LogEvent(new LinkClickedEvent(ol.ToObjectType));
 
                 if (ol.ToObjectType == ObjectType.Document)
                 {

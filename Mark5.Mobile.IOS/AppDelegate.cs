@@ -9,7 +9,6 @@ using Firebase.Core;
 using Foundation;
 using HockeyApp.iOS;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
@@ -304,8 +303,8 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.MessengerHub = new TinyMessengerHub();
                 CommonConfig.Phonebook = new Phonebook();
                 CommonConfig.Reachability = new Reachability();
+                CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
-                CommonConfig.Analytics = new Analytics();
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>
@@ -326,7 +325,7 @@ namespace Mark5.Mobile.IOS
 #if !DEBUG
                 CommonConfig.Logger.Level = LogLevel.INFO;
 #else
-                CommonConfig.Logger.Level = LogLevel.DEBUG;
+                CommonConfig.Logger.Level = Common.Utilities.LogLevel.DEBUG;
 #endif
 
                 Dialogs.Initialize();
@@ -365,9 +364,9 @@ namespace Mark5.Mobile.IOS
                 var ci = await authenticator.GetConnectionInfoAsync();
                 CommonConfig.Logger.Info($"Current connection info: {ci}");
 
-                CommonConfig.Analytics.SetUserProperty(UserProperties.Username, ci.Username);
-                CommonConfig.Analytics.SetUserProperty(UserProperties.Hostname, ci.Hostname);
-                CommonConfig.Analytics.SetUserProperty(UserProperties.SSL, ci.SslMode.ToString());
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
                 switch (ci.SslMode)
                 {
@@ -388,7 +387,7 @@ namespace Mark5.Mobile.IOS
 
                 if (PlatformConfig.Preferences.ClearCache)
                 {
-                    CommonConfig.Analytics.LogEvent(new SettingsCacheCleanUpEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
 
                     CommonConfig.Logger.Info("Clearing cache...");
                     await DatabaseUtils.ResetDatabases();

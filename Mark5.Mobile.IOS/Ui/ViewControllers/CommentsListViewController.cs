@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             if (Entity != null)
-                CommonConfig.Analytics.LogEvent(new OpenCommentsEvent(Entity.ModuleType));
+                CommonConfig.UsageAnalytics.LogEvent(new OpenCommentsEvent(Entity.ModuleType));
 
             InitializeNavigationBar();
             InitializeView();

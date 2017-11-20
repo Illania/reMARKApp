@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -355,7 +354,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(selectedDocuments.Count));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(selectedDocuments.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(selectedDocuments, true);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
@@ -377,7 +376,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);

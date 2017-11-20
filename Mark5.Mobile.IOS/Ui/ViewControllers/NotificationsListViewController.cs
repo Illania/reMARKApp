@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            CommonConfig.Analytics.LogEvent(new OpenNotificationListEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenNotifications());
 
             InitializeNavigationBar();
             InitializeView();
@@ -199,7 +199,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void MarkAsReadItem_Clicked(object sender, EventArgs e)
         {
-            CommonConfig.Analytics.LogEvent(new NotificationMarkAllAsReadEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new NotificationMarkAllAsReadEvent());
 
             try
             {
@@ -259,7 +259,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public async void NotificationSelected(Notification notification, NSIndexPath row)
         {
-            CommonConfig.Analytics.LogEvent(new NotificationClickedEvent(notification.ObjectType));
+            CommonConfig.UsageAnalytics.LogEvent(new NotificationClickedEvent(notification.ObjectType));
 
             await Managers.NotificationsManager.MarkAsRead(notification);
             TableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -42,11 +41,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             if (ParentPreselected)
-                CommonConfig.Analytics.LogEvent(new AddSubContactEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new AddSubContactEvent());
             else if (CreationModeFlag == ContactCreationModeFlag.New)
-                CommonConfig.Analytics.LogEvent(new AddContactEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new AddContactEvent());
             else if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                CommonConfig.Analytics.LogEvent(new EditContactEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new EditContactEvent());
 
             InitializeNavigationBar();
             InitializeView();

@@ -582,7 +582,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(1));
 
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
 
@@ -608,7 +608,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                CommonConfig.Analytics.LogEvent(new SetReadStatusEvent(1));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(1));
 
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, false, ServerConfig.SystemSettings.UserInfo.User);
 
@@ -796,7 +796,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentClicked(object sender, AttachmentDescription attachmentDescription)
         {
-            CommonConfig.Analytics.LogEvent(new DocumentOpenAttachmentEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentOpenAttachmentEvent());
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
