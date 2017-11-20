@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Firebase.Core;
 using Foundation;
 using HockeyApp.iOS;
 using Mark5.Mobile.Common;
@@ -44,7 +45,7 @@ namespace Mark5.Mobile.IOS
 
                 InitializeCommon();
 
-                Firebase.Core.App.Configure(); //Firebase Analytics
+                App.Configure(); //Firebase Analytics
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);
@@ -53,12 +54,12 @@ namespace Mark5.Mobile.IOS
                 BITHockeyManager.SharedHockeyManager.Configure(Config.HockeyId);
 #if DEBUG
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
-                Firebase.Core.AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(false);
+                AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(false);
 #else
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = PlatformConfig.Preferences.EnableReporting
                     ? BITCrashManagerStatus.AutoSend
                     : BITCrashManagerStatus.Disabled;
-                Firebase.Core.AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
+                AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
 #endif
                 BITHockeyManager.SharedHockeyManager.StartManager();
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();

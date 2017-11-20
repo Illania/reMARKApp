@@ -30,6 +30,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     }
                     parameters = new NSDictionary<NSString, NSObject>(parametersDic.Keys.ToArray(), parametersDic.Values.ToArray());
                 }
+
                 Firebase.Analytics.Analytics.LogEvent(new NSString(analyticsEvent.Name), parameters);
             }
             catch (Exception ex)
