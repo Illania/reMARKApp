@@ -651,6 +651,8 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 

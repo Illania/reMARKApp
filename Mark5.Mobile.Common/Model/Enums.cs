@@ -107,6 +107,14 @@
         HtmlAndPlainText = 3,
     }
 
+    public enum TemplateUsageMode
+    {
+        DontUse = 0,
+        Default = 1,
+        Local = 2,
+        AlwaysAsk = 3,
+    }
+
     #endregion
 
     #region Contacts

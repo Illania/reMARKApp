@@ -83,15 +83,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.LoadView();
 
             if (CopyToNewOption != CopyToNewOption.None)
-                CommonConfig.UsageAnalytics.LogEvent(new CopyToNewEvent(CopyToNewOption));
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent(CopyToNewOption));
             else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeEditDraftEvent());
             else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
-                CommonConfig.UsageAnalytics.LogEvent(new ReplyEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyEvent());
             else if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
-                CommonConfig.UsageAnalytics.LogEvent(new ReplyAllEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyAllEvent());
             else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
-                CommonConfig.UsageAnalytics.LogEvent(new ForwardEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeForwardEvent());
             else if (DocumentCreationModeFlag == DocumentCreationModeFlag.New)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeNewDocumentEvent());
 
@@ -477,7 +477,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 0)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Photo));
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
 
                 var picker = new UIImagePickerController
                 {
@@ -495,7 +495,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 1)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Photo));
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.ChoosePhoto));
 
                 var picker = new UIImagePickerController
                 {

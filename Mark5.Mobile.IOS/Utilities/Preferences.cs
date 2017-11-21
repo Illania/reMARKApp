@@ -1,20 +1,11 @@
 ﻿using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
-using System;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
     public class Preferences
     {
-        public enum TemplateUsageMode
-        {
-            DontUse = 0,
-            Default = 1,
-            Local = 2,
-            AlwaysAsk = 3,
-        }
-
         class Keys
         {
             public const string ShowCreatorOutgoing = "ShowCreatorOutgoing";

@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿using System.Collections.Generic;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
 {
@@ -34,16 +35,10 @@ namespace Mark5.Mobile.Common.Utilities
         Phonebook,
     }
 
-    public enum TemplateType
+    public enum AddAttachmentType
     {
-        Local,
-        Default,
-        Another
-    }
-
-    public enum AddAttachmentType //TODO need another kind
-    {
-        Photo,
+        TakePhoto,
+        ChoosePhoto,
         Local
     }
 
@@ -54,6 +49,8 @@ namespace Mark5.Mobile.Common.Utilities
     public abstract class AnalyticsEvent
     {
         public string EventName { get; }
+
+        public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
 
         protected AnalyticsEvent(string eventName)
         {
@@ -99,7 +96,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class CopyToWorktrayEvent : AnalyticsEvent
+    internal class CopyToWorktrayEvent : AnalyticsEvent
     {
         public CopyToWorktrayEvent(ModuleType module, int quantity)
             : base(module, "copy_to_worktray", quantity)
@@ -107,7 +104,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class CopyToUserWorktrayEvent : AnalyticsEvent
+    internal class CopyToUserWorktrayEvent : AnalyticsEvent
     {
         public CopyToUserWorktrayEvent(ModuleType module, int quantity)
             : base(module, "copy_to_user_worktray", quantity)
@@ -115,7 +112,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class CopyToFolderEvent : AnalyticsEvent
+    internal class CopyToFolderEvent : AnalyticsEvent
     {
         public CopyToFolderEvent(ModuleType module, int quantity)
             : base(module, "copy_to_folder", quantity)
@@ -123,7 +120,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class MoveToFolderEvent : AnalyticsEvent
+    internal class MoveToFolderEvent : AnalyticsEvent
     {
         public MoveToFolderEvent(ModuleType module, int quantity)
             : base(module, "move_to_folder", quantity)
@@ -131,7 +128,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class DeleteEvent : AnalyticsEvent
+    internal class DeleteEvent : AnalyticsEvent
     {
         public DeleteEvent(ModuleType module, int quantity)
             : base(module, "delete", quantity)
@@ -139,7 +136,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class DeleteFromFolderEvent : AnalyticsEvent
+    internal class DeleteFromFolderEvent : AnalyticsEvent
     {
         public DeleteFromFolderEvent(ModuleType module, int quantity)
             : base(module, "delete_from_folder", quantity)
@@ -147,7 +144,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class SetCategoriesEvent : AnalyticsEvent //TODO to
+    internal class SetCategoriesEvent : AnalyticsEvent
     {
         public SetCategoriesEvent(ModuleType module, int quantity)
             : base(module, "set_categories", quantity)
@@ -155,7 +152,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class AddCommentEvent : AnalyticsEvent
+    internal class AddCommentEvent : AnalyticsEvent
     {
         public AddCommentEvent(ModuleType module)
             : base(module, "add_comment")
@@ -163,7 +160,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class DeleteCommentEvent : AnalyticsEvent
+    internal class DeleteCommentEvent : AnalyticsEvent
     {
         public DeleteCommentEvent(ModuleType module)
             : base(module, "delete_comment")
@@ -186,7 +183,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenOutgoingFolderEvent : AnalyticsEvent
     {
         public OpenOutgoingFolderEvent()
-            : base("open_outgoing_folder")
+            : base(ModuleType.Documents, "open_outgoing_folder")
         {
         }
     }
@@ -239,38 +236,6 @@ namespace Mark5.Mobile.Common.Utilities
     {
         public DocumentOpenAttachmentEvent()
             : base(ModuleType.Documents, "open_attachment")
-        {
-        }
-    }
-
-    public class ReplyEvent : AnalyticsEvent
-    {
-        public ReplyEvent()
-            : base(ModuleType.Documents, "reply")
-        {
-        }
-    }
-
-    public class ReplyAllEvent : AnalyticsEvent
-    {
-        public ReplyAllEvent()
-            : base(ModuleType.Documents, "reply_all")
-        {
-        }
-    }
-
-    public class ForwardEvent : AnalyticsEvent
-    {
-        public ForwardEvent()
-            : base(ModuleType.Documents, "forward")
-        {
-        }
-    }
-
-    public class CopyToNewEvent : AnalyticsEvent
-    {
-        public CopyToNewEvent(CopyToNewOption option)
-            : base(ModuleType.Documents, "copy_to_new_" + option.ToString().ToLowerInvariant())
         {
         }
     }
@@ -349,9 +314,10 @@ namespace Mark5.Mobile.Common.Utilities
 
     public class ComposeAddTemplateEvent : AnalyticsEvent
     {
-        public ComposeAddTemplateEvent(TemplateType? type)
-            : base(ModuleType.Documents, "compose_add_template_" + (type == null ? "_none" : type.ToString().ToLowerInvariant()))
+        public ComposeAddTemplateEvent(TemplateUsageMode? type)
+            : base(ModuleType.Documents, "compose_add_template")
         {
+            Parameters.Add("usage_mode", type.ToString().ToLowerInvariant());
         }
     }
 
@@ -366,7 +332,78 @@ namespace Mark5.Mobile.Common.Utilities
     public class DocumentRecoveredEvent : AnalyticsEvent
     {
         public DocumentRecoveredEvent()
-            : base(ModuleType.Documents, "documents_recovered")
+            : base(ModuleType.Documents, "recovered")
+        {
+        }
+    }
+
+    internal class DocumentSentEvent : AnalyticsEvent
+    {
+        public DocumentSentEvent(DocumentCreationModeFlag flag)
+            : base(ModuleType.Documents, "sent")
+        {
+            Parameters.Add("creation_flag", flag.ToString().ToLowerInvariant());
+
+        }
+    }
+
+    #endregion
+
+    #region Compose opening events
+
+    public class ComposeEvent : AnalyticsEvent
+    {
+        protected ComposeEvent(string mode)
+            : base(ModuleType.Documents, "compose")
+        {
+            Parameters.Add("mode", mode);
+        }
+    }
+
+    public class ComposeReplyEvent : ComposeEvent
+    {
+        public ComposeReplyEvent()
+            : base("reply")
+        {
+        }
+    }
+
+    public class ComposeReplyAllEvent : ComposeEvent
+    {
+        public ComposeReplyAllEvent()
+            : base("reply_all")
+        {
+        }
+    }
+
+    public class ComposeForwardEvent : ComposeEvent
+    {
+        public ComposeForwardEvent()
+            : base("forward")
+        {
+        }
+    }
+
+    public class ComposeCopyToNewEvent : ComposeEvent
+    {
+        public ComposeCopyToNewEvent()
+            : base("copy_to_new")
+        {
+        }
+    }
+
+    public class ComposeNewDocumentEvent : ComposeEvent
+    {
+        public ComposeNewDocumentEvent()
+            : base("new")
+        {
+        }
+    }
+
+    public class ComposeEditDraftEvent : ComposeEvent
+    {
+        public ComposeEditDraftEvent()
+            : base("edit_draft")
         {
         }
     }
@@ -579,6 +616,14 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
+    public class OpenEditCategoriesEvent : AnalyticsEvent
+    {
+        public OpenEditCategoriesEvent(ModuleType module)
+            : base(module, "edit_categories_open")
+        {
+        }
+    }
+
     public class OpenSearchEvent : AnalyticsEvent
     {
         public OpenSearchEvent()
@@ -647,22 +692,6 @@ namespace Mark5.Mobile.Common.Utilities
     {
         public OpenEditShortcodeEvent()
             : base(ModuleType.Shortcodes, "edit_open")
-        {
-        }
-    }
-
-    public class ComposeNewDocumentEvent : AnalyticsEvent  //TODO add event when it happens
-    {
-        public ComposeNewDocumentEvent()
-            : base(ModuleType.Documents, "compose_new_document")
-        {
-        }
-    }
-
-    public class ComposeEditDraftEvent : AnalyticsEvent
-    {
-        public ComposeEditDraftEvent()
-            : base(ModuleType.Documents, "compose_edit_draft")
         {
         }
     }

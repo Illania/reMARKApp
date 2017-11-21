@@ -86,15 +86,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses)
         {
             if (copyToNewOption != null && copyToNewOption != CopyToNewOption.None)
-                CommonConfig.UsageAnalytics.LogEvent(new CopyToNewEvent(copyToNewOption.Value));
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent(copyToNewOption.Value));
             else if (documentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeEditDraftEvent());
             else if (documentCreationModeFlag == DocumentCreationModeFlag.Reply)
-                CommonConfig.UsageAnalytics.LogEvent(new ReplyEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyEvent());
             else if (documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
-                CommonConfig.UsageAnalytics.LogEvent(new ReplyAllEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyAllEvent());
             else if (documentCreationModeFlag == DocumentCreationModeFlag.Forward)
-                CommonConfig.UsageAnalytics.LogEvent(new ForwardEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeForwardEvent());
             else if (documentCreationModeFlag == DocumentCreationModeFlag.New)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeNewDocumentEvent());
 
