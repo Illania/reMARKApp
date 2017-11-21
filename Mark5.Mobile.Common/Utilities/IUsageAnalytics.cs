@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Common.Utilities
         Username
     }
 
-    public enum ContactFastActionChoice
+    public enum ContactActionChoice
     {
         Email,
         Call,
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Common.Utilities
         Another
     }
 
-    public enum AddAttachmentType
+    public enum AddAttachmentType //TODO need another kind
     {
         Photo,
         Local
@@ -147,9 +147,9 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class SetCategories : AnalyticsEvent
+    public class SetCategoriesEvent : AnalyticsEvent //TODO to
     {
-        public SetCategories(ModuleType module, int quantity)
+        public SetCategoriesEvent(ModuleType module, int quantity)
             : base(module, "set_categories", quantity)
         {
         }
@@ -183,10 +183,10 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class OpenLocalFolderEvent : AnalyticsEvent
+    public class OpenOutgoingFolderEvent : AnalyticsEvent
     {
-        public OpenLocalFolderEvent(ModuleType module)
-            : base(module, "open_local_folder")
+        public OpenOutgoingFolderEvent()
+            : base("open_outgoing_folder")
         {
         }
     }
@@ -238,7 +238,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class DocumentOpenAttachmentEvent : AnalyticsEvent
     {
         public DocumentOpenAttachmentEvent()
-            : base(ModuleType.Documents, "document_open_attachment")
+            : base(ModuleType.Documents, "open_attachment")
         {
         }
     }
@@ -299,10 +299,10 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class ComposeAddAttachmentEvent : AnalyticsEvent
+    public class ComposeAddAttachmentEvent : AnalyticsEvent //TODO check if all the events names are shorter than 40 characters
     {
         public ComposeAddAttachmentEvent(AddAttachmentType type)
-            : base("compose_add_attachment_" + type.ToString().ToLowerInvariant())
+            : base(ModuleType.Documents, "compose_add_attachment_" + type.ToString().ToLowerInvariant())
         {
         }
     }
@@ -310,15 +310,15 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeRemoveAttachmentEvent : AnalyticsEvent
     {
         public ComposeRemoveAttachmentEvent()
-            : base("compose_remove_attachment")
+            : base(ModuleType.Documents, "compose_remove_attachment")
         {
         }
     }
 
-    public class ComposeOpenAttachment : AnalyticsEvent
+    public class ComposeOpenAttachmentEvent : AnalyticsEvent
     {
-        public ComposeOpenAttachment()
-            : base("compose_open_attachment")
+        public ComposeOpenAttachmentEvent()
+            : base(ModuleType.Documents, "compose_open_attachment")
         {
         }
     }
@@ -326,7 +326,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeShowPreviousEmailEvent : AnalyticsEvent
     {
         public ComposeShowPreviousEmailEvent()
-            : base("compose_show_previous_email")
+            : base(ModuleType.Documents, "compose_show_previous_email")
         {
         }
     }
@@ -334,7 +334,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeEditedPreviousEmailEvent : AnalyticsEvent
     {
         public ComposeEditedPreviousEmailEvent()
-            : base("compose_edited_previous_email")
+            : base(ModuleType.Documents, "compose_edited_previous_email")
         {
         }
     }
@@ -342,7 +342,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeSaveDraftEvent : AnalyticsEvent
     {
         public ComposeSaveDraftEvent()
-            : base("compose_save_draft")
+            : base(ModuleType.Documents, "compose_save_draft")
         {
         }
     }
@@ -350,7 +350,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeAddTemplateEvent : AnalyticsEvent
     {
         public ComposeAddTemplateEvent(TemplateType? type)
-            : base("compose_add_template_" + (type == null ? "_none" : type.ToString().ToLowerInvariant()))
+            : base(ModuleType.Documents, "compose_add_template_" + (type == null ? "_none" : type.ToString().ToLowerInvariant()))
         {
         }
     }
@@ -358,7 +358,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeContactPickerEvent : AnalyticsEvent
     {
         public ComposeContactPickerEvent(ContactPickerChoice type)
-            : base("compose_contact_picker_" + type.ToString().ToLowerInvariant())
+            : base(ModuleType.Documents, "compose_contact_picker_" + type.ToString().ToLowerInvariant())
         {
         }
     }
@@ -366,7 +366,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class DocumentRecoveredEvent : AnalyticsEvent
     {
         public DocumentRecoveredEvent()
-            : base("documents_recovered")
+            : base(ModuleType.Documents, "documents_recovered")
         {
         }
     }
@@ -377,40 +377,16 @@ namespace Mark5.Mobile.Common.Utilities
 
     public class ContactFastActionEvent : AnalyticsEvent
     {
-        public ContactFastActionEvent(ContactFastActionChoice type)
-            : base("contact_fast_action_" + type.ToString().ToLowerInvariant())
+        public ContactFastActionEvent(ContactActionChoice type)
+            : base(ModuleType.Contacts, "fast_action_" + type.ToString().ToLowerInvariant())
         {
         }
     }
 
-    public class ContactCallNumberEvent : AnalyticsEvent
+    public class ContactActionEvent : AnalyticsEvent
     {
-        public ContactCallNumberEvent()
-            : base("contact_call_number")
-        {
-        }
-    }
-
-    public class ContactSendTextEvent : AnalyticsEvent
-    {
-        public ContactSendTextEvent()
-            : base("contact_send_text")
-        {
-        }
-    }
-
-    public class ContactClickEmailEvent : AnalyticsEvent
-    {
-        public ContactClickEmailEvent()
-            : base("contact_click_email")
-        {
-        }
-    }
-
-    public class ContactClickPhysicalAddressEvent : AnalyticsEvent
-    {
-        public ContactClickPhysicalAddressEvent()
-            : base("contact_click_physical_address")
+        public ContactActionEvent(ContactActionChoice type)
+            : base(ModuleType.Contacts, "action_" + type.ToString().ToLowerInvariant())
         {
         }
     }
@@ -418,7 +394,31 @@ namespace Mark5.Mobile.Common.Utilities
     public class ContactNavigateSubContactEvent : AnalyticsEvent
     {
         public ContactNavigateSubContactEvent()
-            : base("contact_navigate_subcontact")
+            : base(ModuleType.Contacts, "navigate_subcontact")
+        {
+        }
+    }
+
+    internal class AddContactEvent : AnalyticsEvent
+    {
+        public AddContactEvent()
+            : base(ModuleType.Contacts, "add")
+        {
+        }
+    }
+
+    internal class EditContactEvent : AnalyticsEvent
+    {
+        public EditContactEvent()
+            : base(ModuleType.Contacts, "edit")
+        {
+        }
+    }
+
+    internal class AddSubContactEvent : AnalyticsEvent
+    {
+        public AddSubContactEvent()
+            : base(ModuleType.Contacts, "add_subcontact")
         {
         }
     }
@@ -430,7 +430,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ShortcodeClickEmailEvent : AnalyticsEvent
     {
         public ShortcodeClickEmailEvent()
-            : base("shortcode_click_email")
+            : base(ModuleType.Shortcodes, "click_email")
         {
         }
     }
@@ -438,7 +438,23 @@ namespace Mark5.Mobile.Common.Utilities
     public class ShortcodeComposeDocumentEvent : AnalyticsEvent
     {
         public ShortcodeComposeDocumentEvent()
-            : base("shortcode_compose_document_event")
+            : base(ModuleType.Shortcodes, "compose_document_event")
+        {
+        }
+    }
+
+    internal class AddShortcodeEvent : AnalyticsEvent
+    {
+        public AddShortcodeEvent()
+            : base(ModuleType.Shortcodes, "add")
+        {
+        }
+    }
+
+    internal class EditShortcodeEvent : AnalyticsEvent
+    {
+        public EditShortcodeEvent()
+            : base(ModuleType.Shortcodes, "edit")
         {
         }
     }
@@ -483,10 +499,22 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class SettingsLogOut : AnalyticsEvent
+    public class SettingsLogOutEvent : AnalyticsEvent
     {
-        public SettingsLogOut()
+        public SettingsLogOutEvent()
             : base("settings_log_out")
+        {
+        }
+    }
+
+    #endregion
+
+    #region Search
+
+    public class DoSearchEvent : AnalyticsEvent
+    {
+        public DoSearchEvent(ModuleType module)
+            : base(module, "search")
         {
         }
     }
@@ -498,7 +526,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenDocumentEvent : AnalyticsEvent
     {
         public OpenDocumentEvent()
-            : base("open_document")
+            : base(ModuleType.Documents, "open")
         {
         }
     }
@@ -506,7 +534,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenContactEvent : AnalyticsEvent
     {
         public OpenContactEvent()
-            : base("open_contact")
+            : base(ModuleType.Contacts, "open")
         {
         }
     }
@@ -514,7 +542,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenShortcodeEvent : AnalyticsEvent
     {
         public OpenShortcodeEvent()
-            : base("open_shortcode")
+            : base(ModuleType.Shortcodes, "open")
         {
         }
     }
@@ -522,7 +550,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenLinksEvent : AnalyticsEvent
     {
         public OpenLinksEvent(ModuleType module)
-            : base(module, "open_links")
+            : base(module, "links_open")
         {
         }
     }
@@ -530,7 +558,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenActionsEvent : AnalyticsEvent
     {
         public OpenActionsEvent(ModuleType module)
-            : base(module, "open_actions")
+            : base(module, "actions_open")
         {
         }
     }
@@ -538,7 +566,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenCommentsEvent : AnalyticsEvent
     {
         public OpenCommentsEvent(ModuleType module)
-            : base(module, "open_comments")
+            : base(module, "comments_open")
         {
         }
     }
@@ -546,7 +574,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenCategoriesEvent : AnalyticsEvent
     {
         public OpenCategoriesEvent(ModuleType module)
-            : base(module, "open_categories")
+            : base(module, "categories_open")
         {
         }
     }
@@ -554,7 +582,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenSearchEvent : AnalyticsEvent
     {
         public OpenSearchEvent()
-            : base("open_search")
+            : base("search_open")
         {
         }
     }
@@ -562,7 +590,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenMailViewerEvent : AnalyticsEvent
     {
         public OpenMailViewerEvent()
-            : base("open_mail_viewer")
+            : base("mail_viewer_open")
         {
         }
     }
@@ -570,63 +598,63 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenSettingsEvent : AnalyticsEvent
     {
         public OpenSettingsEvent()
-            : base("open_settings")
+            : base("settings_open")
         {
         }
     }
 
-    public class OpenNotifications : AnalyticsEvent
+    public class OpenNotificationsEvent : AnalyticsEvent
     {
-        public OpenNotifications(ModuleType module)
-            : base(module, "open_notification")
+        public OpenNotificationsEvent(ModuleType module)
+            : base(module, "notifications_open")
         {
         }
     }
 
-    public class AddContactEvent : AnalyticsEvent
+    public class OpenAddContactEvent : AnalyticsEvent
     {
-        public AddContactEvent()
-            : base("add_contact")
+        public OpenAddContactEvent()
+            : base(ModuleType.Contacts, "add_open")
         {
         }
     }
 
-    public class EditContactEvent : AnalyticsEvent
+    public class OpenEditContactEvent : AnalyticsEvent
     {
-        public EditContactEvent()
-            : base("edit_contact")
+        public OpenEditContactEvent()
+            : base(ModuleType.Contacts, "edit_open")
         {
         }
     }
 
-    public class AddSubContactEvent : AnalyticsEvent
+    public class OpenAddSubContactEvent : AnalyticsEvent
     {
-        public AddSubContactEvent()
-            : base("add_subcontact")
+        public OpenAddSubContactEvent()
+            : base(ModuleType.Contacts, "add_subcontact_open")
         {
         }
     }
 
-    public class AddShortcodeEvent : AnalyticsEvent
+    public class OpenAddShortcodeEvent : AnalyticsEvent
     {
-        public AddShortcodeEvent()
-            : base("add_shortcode")
+        public OpenAddShortcodeEvent()
+            : base(ModuleType.Shortcodes, "add_open")
         {
         }
     }
 
-    public class EditShortcodeEvent : AnalyticsEvent
+    public class OpenEditShortcodeEvent : AnalyticsEvent
     {
-        public EditShortcodeEvent()
-            : base("edit_shortcode")
+        public OpenEditShortcodeEvent()
+            : base(ModuleType.Shortcodes, "edit_open")
         {
         }
     }
 
-    public class ComposeNewDocumentEvent : AnalyticsEvent
+    public class ComposeNewDocumentEvent : AnalyticsEvent  //TODO add event when it happens
     {
         public ComposeNewDocumentEvent()
-            : base("compose_new_document")
+            : base(ModuleType.Documents, "compose_new_document")
         {
         }
     }
@@ -634,7 +662,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeEditDraftEvent : AnalyticsEvent
     {
         public ComposeEditDraftEvent()
-            : base("compose_edit_draft")
+            : base(ModuleType.Documents, "compose_edit_draft")
         {
         }
     }

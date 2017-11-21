@@ -450,8 +450,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var (folder, section) = CurrentAdapter.GetItemAtPosition(position);
 
-                if (folder.Local)
-                    CommonConfig.UsageAnalytics.LogEvent(new OpenLocalFolderEvent());
+                if (folder.IsOutgoing)
+                    CommonConfig.UsageAnalytics.LogEvent(new OpenOutgoingFolderEvent());
                 else
                     CommonConfig.UsageAnalytics.LogEvent(new OpenFolderEvent(folder.Module, section == Section.Favourites));
 

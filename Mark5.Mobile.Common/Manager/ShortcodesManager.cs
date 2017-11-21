@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -171,7 +172,14 @@ namespace Mark5.Mobile.Common.Manager
                 shortcode.Guid = shortcodePreview.Guid = result.Guid;
 
                 if (result.Updated)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new EditShortcodeEvent());
                     CommonConfig.MessengerHub.Publish(new EntityPreviewChangedMessage(this, shortcodePreview));
+                }
+                else
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new AddShortcodeEvent());
+                }
 
                 return result.Updated;
             }

@@ -817,7 +817,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachment());
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
 
             try
             {

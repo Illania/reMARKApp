@@ -425,7 +425,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new SetCategories(ModuleType.Documents));
+            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;

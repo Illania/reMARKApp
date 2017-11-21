@@ -443,7 +443,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 0) //Open attachment
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachment());
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 

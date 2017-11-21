@@ -585,8 +585,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (folder == null)
                 return;
 
-            if (folder.Local)
-                CommonConfig.UsageAnalytics.LogEvent(new OpenLocalFolderEvent());
+            if (folder.IsOutgoing)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenOutgoingFolderEvent());
             else
             {
                 CommonConfig.UsageAnalytics.LogEvent(new OpenFolderEvent(folder.Module, isFromFavorite));

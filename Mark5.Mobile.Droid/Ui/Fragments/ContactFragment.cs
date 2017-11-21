@@ -686,7 +686,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Button1Layout_Click(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Email));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Email));
 
             var communicationAddress = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
             if (communicationAddress == null)
@@ -712,7 +712,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Button2Layout_Click(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Call));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Call));
 
             var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary).Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
@@ -736,7 +736,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Button3Layout_Click(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Text));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Text));
 
             var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
             if (communicationAddresses == null)
@@ -750,7 +750,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Button4Layout_Click(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Map));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Map));
 
             var physicalAddress = contact.PhysicalAddresses.ToArray();
             if (physicalAddress.Length == 0)

@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            CommonConfig.UsageAnalytics.LogEvent(new OpenNotifications());
+            CommonConfig.UsageAnalytics.LogEvent(new OpenNotificationsEvent());
 
             InitializeNavigationBar();
             InitializeView();

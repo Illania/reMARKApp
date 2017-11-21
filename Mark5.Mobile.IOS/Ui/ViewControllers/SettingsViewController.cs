@@ -282,7 +282,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == LogoutKey)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new SettingsLogOut());
+                CommonConfig.UsageAnalytics.LogEvent(new SettingsLogOutEvent());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 

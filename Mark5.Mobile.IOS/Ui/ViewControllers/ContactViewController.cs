@@ -448,7 +448,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Email));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Email));
 
             var primaryEmail = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
             if (primaryEmail == null)
@@ -467,7 +467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Call));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Call));
 
             var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
                                           .Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
@@ -489,7 +489,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button3_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Text));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Text));
 
             var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
             if (communicationAddresses == null)
@@ -500,7 +500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button4_TouchUpInside(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactFastActionChoice.Map));
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Map));
 
             var physicalAddress = contact.PhysicalAddresses.ToArray();
             if (physicalAddress.Length == 0)

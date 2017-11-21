@@ -176,7 +176,17 @@ namespace Mark5.Mobile.Common.Manager
                 contactPreview.Guid = result.Guid;
 
                 if (result.Updated)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new EditContactEvent());
                     CommonConfig.MessengerHub.Publish(new EntityPreviewChangedMessage(this, contactPreview));
+                }
+                else
+                {
+                    if (parentObjectId > 0)
+                        CommonConfig.UsageAnalytics.LogEvent(new AddSubContactEvent());
+                    else
+                        CommonConfig.UsageAnalytics.LogEvent(new AddContactEvent());
+                }
 
                 if (parentObjectId > 0)
                     CommonConfig.MessengerHub.Publish(new EntityChangedMessage(this, ObjectType.Contact, parentObjectId));
@@ -218,7 +228,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new SetCategories(ModuleType.Contacts));
+            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
