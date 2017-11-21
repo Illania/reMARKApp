@@ -9,36 +9,28 @@ using MailBee.Html;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 using WebKit;
+using System.Threading;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
+namespace Mark5.Mobile.IOS.Ui.Common
 {
     public abstract class AbstractWebViewController : AbstractViewController, IWKNavigationDelegate, IWKScriptMessageHandler
     {
+        public int LoadTimeoutMiliseconds { get; set; } = 2000;
+
+        protected bool IsLoading => webView?.IsLoading ?? false;
+
+        UIActivityIndicatorView loadIndicatorView;
         WKWebView webView;
         UIView headerContainerView;
         UIProgressView webViewProgressView;
+
+        TaskCompletionSource<bool> loadTcs;
 
         public override void LoadView()
         {
             base.LoadView();
 
             View.BackgroundColor = Theme.LightGray;
-
-            var loadIndicatorView = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray)
-            {
-                Hidden = true,
-                BackgroundColor = Theme.White,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            loadIndicatorView.StartAnimating();
-            View.AddSubview(loadIndicatorView);
-            View.AddConstraints(new[]
-            {
-                loadIndicatorView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-                loadIndicatorView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-                loadIndicatorView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                loadIndicatorView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
-            });
 
             var preferences = new WKPreferences
             {
@@ -86,18 +78,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 webView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
 
-            webViewProgressView = new UIProgressView(UIProgressViewStyle.Bar)
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            View.AddSubview(webViewProgressView);
-            View.AddConstraints(new[]
-            {
-                webViewProgressView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
-                webViewProgressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
-            });
-
             headerContainerView = new UIView
             {
                 BackgroundColor = Theme.White,
@@ -115,6 +95,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             c4.SetIdentifier("headerContainer.height");
 
             webView.AddConstraints(new[] { c1, c2, c3, c4 });
+
+            loadIndicatorView = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray)
+            {
+                HidesWhenStopped = true,
+                BackgroundColor = Theme.White,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            View.AddSubview(loadIndicatorView);
+            View.AddConstraints(new[]
+            {
+                loadIndicatorView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                loadIndicatorView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                loadIndicatorView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                loadIndicatorView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+            });
+
+            webViewProgressView = new UIProgressView(UIProgressViewStyle.Bar)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            View.AddSubview(webViewProgressView);
+            View.AddConstraints(new[]
+            {
+                webViewProgressView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                webViewProgressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+            });
         }
 
         public override void ViewDidLayoutSubviews()
@@ -157,7 +164,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             });
         }
 
-        protected bool IsLoading => webView?.IsLoading ?? false;
+        protected async Task StartRefreshing()
+        {
+            webView.Hidden = true;
+            loadIndicatorView.StartAnimating();
+
+            if (loadTcs != null)
+                await loadTcs.Task;
+
+            loadTcs = new TaskCompletionSource<bool>();
+        }
+
+        protected async Task EndRefreshing()
+        {
+            var loadTask = loadTcs.Task;
+            var timeoutTask = Task.Delay(LoadTimeoutMiliseconds);
+
+            var finishedTask = await Task.WhenAny(loadTask, timeoutTask);
+
+            if (finishedTask == timeoutTask)
+            {
+                if (webView.IsLoading)
+                    webView.StopLoading();
+                await loadTcs.Task;
+            }
+
+            webView.Hidden = false;
+            loadIndicatorView.StopAnimating();
+        }
+
+        protected async Task Clear()
+        {
+            webView.Hidden = true;
+            loadIndicatorView.StopAnimating();
+
+            if (loadTcs != null)
+                await loadTcs.Task;
+        }
 
         protected async Task LoadHtmlString(string html, bool makeHtmlSafe, bool correctScale, bool inlineCss)
         {
@@ -200,8 +243,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             webView?.StopLoading();
             webView?.LoadHtmlString("", null);
         }
-
-        protected void StopLoading() => webView?.StopLoading();
 
         Task<string> MakeHtmlSafe(string html)
         {
@@ -280,20 +321,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             decisionHandler(CanNavigate(navigationAction) ? WKNavigationActionPolicy.Allow : WKNavigationActionPolicy.Cancel);
         }
 
-        [Export("webView:didCommitNavigation:")]
-        void DidCommitNavigation(WKWebView webView, WKNavigation navigation)
-        {
-        }
-
         [Export("webView:didFinishNavigation:")]
-        void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
-        {
-        }
+        void DidFinishNavigation(WKWebView webView, WKNavigation navigation) => loadTcs.SetResult(true);
 
         [Export("webView:didFailNavigation:withError:")]
-        void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error)
-        {
-        }
+        void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error) => loadTcs.SetResult(false);
 
         void IWKScriptMessageHandler.DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {

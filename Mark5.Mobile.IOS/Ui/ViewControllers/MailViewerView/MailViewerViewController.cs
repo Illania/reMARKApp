@@ -141,23 +141,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 CommonConfig.Logger.Debug("Disposed");
         }
 
-        void CloseItem_Clicked(object sender, EventArgs e) =>
-            DismissViewController(true, null);
+        void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         void ShareItem_Clicked(object sender, EventArgs e)
         {
-            StopLoading();
-            // TODO
-            //var avc = new UIActivityViewController(new NSObject[] { url }, null);
-            //if (avc.PopoverPresentationController != null)
-            //    avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-            //PresentViewController(avc, true, null);
+            var avc = new UIActivityViewController(new NSObject[] { url }, null);
+            if (avc.PopoverPresentationController != null)
+                avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            PresentViewController(avc, true, null);
         }
 
         void LoadFromUrl()
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
-
             Task.Run(async () =>
             {
                 var auth = AuthenticatorFactory.Create();
@@ -244,8 +239,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 throw new MailViewerException("Unsupported file.");
             }).ContinueWith(async t =>
             {
-                dismissAction();
-
                 if (t.IsFaulted)
                 {
                     var ex = t.Exception.InnerException;
@@ -266,6 +259,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         async Task RefreshView()
         {
+            await StartRefreshing();
+
             foreach (var sv in headerStackView.Subviews.OfType<MailViewerSubview>())
             {
                 sv.MailMessage = mailMessage;
@@ -276,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             if (mailMessage != null)
             {
                 if (!string.IsNullOrWhiteSpace(mailMessage.BodyHtmlText))
-                    await LoadHtmlString(mailMessage.BodyHtmlText, true, false, false);
+                    await LoadHtmlString(mailMessage.BodyHtmlText, true, true, false);
                 else if (!string.IsNullOrWhiteSpace(mailMessage.BodyPlainText))
                     LoadPlainString(mailMessage.BodyPlainText);
                 else
@@ -284,6 +279,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             }
             else
                 LoadEmpty();
+
+            await EndRefreshing();
         }
 
         public void OpenComposeDocumentView(string[] preconfiguredEmailAddresses)
