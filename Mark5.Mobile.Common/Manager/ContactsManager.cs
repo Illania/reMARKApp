@@ -228,7 +228,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Contacts));
+            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Contacts, 1));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -292,7 +292,6 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new EditCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;

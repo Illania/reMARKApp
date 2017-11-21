@@ -42,6 +42,13 @@ namespace Mark5.Mobile.Common.Utilities
         Local
     }
 
+    public enum TemplateType
+    {
+        Local,
+        Default,
+        Another
+    }
+
     #endregion
 
     #region Abstract
@@ -174,8 +181,8 @@ namespace Mark5.Mobile.Common.Utilities
 
     public class OpenFolderEvent : AnalyticsEvent
     {
-        public OpenFolderEvent(ModuleType module)
-            : base(module, "open_folder")
+        public OpenFolderEvent(ModuleType module, bool isFromFavourite = false)
+            : base(module, "open_folder" + (isFromFavourite ? "_favourite" : ""))
         {
         }
     }
@@ -314,7 +321,7 @@ namespace Mark5.Mobile.Common.Utilities
 
     public class ComposeAddTemplateEvent : AnalyticsEvent
     {
-        public ComposeAddTemplateEvent(TemplateUsageMode? type)
+        public ComposeAddTemplateEvent(TemplateType? type)
             : base(ModuleType.Documents, "compose_add_template")
         {
             Parameters.Add("usage_mode", type.ToString().ToLowerInvariant());
@@ -331,8 +338,8 @@ namespace Mark5.Mobile.Common.Utilities
 
     public class DocumentRecoveredEvent : AnalyticsEvent
     {
-        public DocumentRecoveredEvent()
-            : base(ModuleType.Documents, "recovered")
+        public DocumentRecoveredEvent(bool continueEditing)
+            : base(ModuleType.Documents, "recovered" + (continueEditing ? "_editing" : ""))
         {
         }
     }
@@ -562,8 +569,8 @@ namespace Mark5.Mobile.Common.Utilities
 
     public class OpenDocumentEvent : AnalyticsEvent
     {
-        public OpenDocumentEvent()
-            : base(ModuleType.Documents, "open")
+        public OpenDocumentEvent(bool external)
+            : base(ModuleType.Documents, "open" + (external ? "_external" : ""))
         {
         }
     }

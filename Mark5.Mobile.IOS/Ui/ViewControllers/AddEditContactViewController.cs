@@ -45,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else if (CreationModeFlag == ContactCreationModeFlag.New)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenAddContactEvent());
             else if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                CommonConfig.UsageAnalytics.LogEvOpenent(new EditContactEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new OpenEditContactEvent());
 
             InitializeNavigationBar();
             InitializeView();

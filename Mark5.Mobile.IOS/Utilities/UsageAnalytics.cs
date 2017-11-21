@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Firebase.Analytics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -12,6 +14,29 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
+                if (analyticsEvent.EventName.Length >= 40)
+                {
+                    CommonConfig.Logger.Debug("Event name is too long!");
+                }
+
+                NSDictionary<NSString, NSObject> parameters = null;
+                if (analyticsEvent.Parameters?.Any() == true)
+                {
+                    var parametersDic = new Dictionary<NSString, NSObject>();
+                    foreach (var parameter in analyticsEvent.Parameters)
+                    {
+                        if (parameter.Value is string stringParameter)
+                        {
+                            parametersDic.Add(new NSString(parameter.Key), new NSString(stringParameter));
+                        }
+                        if (parameter.Value is long numberParameter)
+                        {
+                            parametersDic.Add(new NSString(parameter.Key), new NSNumber(numberParameter));
+                        }
+                    }
+                    parameters = new NSDictionary<NSString, NSObject>(parametersDic.Keys.ToArray(), parametersDic.Values.ToArray());
+                }
+
                 Analytics.LogEvent(new NSString(analyticsEvent.EventName), null);
             }
             catch (Exception ex)

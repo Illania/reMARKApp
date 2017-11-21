@@ -427,7 +427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(true));
+            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(true, ParentFolder.Module));
             RefreshData(true);
         }
 
@@ -843,7 +843,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             var searchText = searchController.SearchBar.Text;
 
             if (!searchController.Active)
-                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(true));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(true, ParentFolder.Module));
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {

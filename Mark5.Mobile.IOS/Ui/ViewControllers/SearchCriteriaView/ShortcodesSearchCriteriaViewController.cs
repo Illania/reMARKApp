@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         {
             base.LoadView();
 
-            CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent(ModuleType.Shortcodes));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent());
 
             StackView.AddArrangedSubview(new NameSearchView());
             StackView.AddArrangedSubview(new DescritpionSearchView());

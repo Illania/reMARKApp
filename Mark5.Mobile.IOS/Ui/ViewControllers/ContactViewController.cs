@@ -651,7 +651,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ContactClickEmailEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Email));
 
                 var vc = new ComposeDocumentViewController
                 {
@@ -666,7 +666,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (ca.Type == CommunicationAddressType.Phone)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ContactCallNumberEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
                 Integration.Call(this, tv, cell, ca.Address);
             }
 
@@ -677,12 +677,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (result == 0)
                 {
-                    CommonConfig.UsageAnalytics.LogEvent(new ContactCallNumberEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
                     Integration.Call(this, tv, cell, ca.Address);
                 }
                 if (result == 1)
                 {
-                    CommonConfig.UsageAnalytics.LogEvent(new ContactSendTextEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Text));
                     Integration.Text(this, tv, cell, ca.Address);
                 }
             }
@@ -701,7 +701,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactClickPhysicalAddressEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Map));
             Integration.ShowOnMap(this, tv, cell, pa);
         }
 

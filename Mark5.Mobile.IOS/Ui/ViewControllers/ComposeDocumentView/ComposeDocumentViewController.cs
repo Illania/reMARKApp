@@ -83,7 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.LoadView();
 
             if (CopyToNewOption != CopyToNewOption.None)
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent(CopyToNewOption));
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent());
             else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeEditDraftEvent());
             else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
