@@ -163,14 +163,6 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class EditCommentEvent : AnalyticsEvent
-    {
-        public EditCommentEvent(ModuleType module)
-            : base(module, "edit_comment")
-        {
-        }
-    }
-
     public class DeleteCommentEvent : AnalyticsEvent
     {
         public DeleteCommentEvent(ModuleType module)
@@ -238,7 +230,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class DocumentQuickSwitchEvent : AnalyticsEvent
     {
         public DocumentQuickSwitchEvent()
-            : base("document_quick_switch")
+            : base(ModuleType.Documents, "quick_switch")
         {
         }
     }
@@ -246,7 +238,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class DocumentOpenAttachmentEvent : AnalyticsEvent
     {
         public DocumentOpenAttachmentEvent()
-            : base("document_open_attachment")
+            : base(ModuleType.Documents, "document_open_attachment")
         {
         }
     }
@@ -561,8 +553,8 @@ namespace Mark5.Mobile.Common.Utilities
 
     public class OpenSearchEvent : AnalyticsEvent
     {
-        public OpenSearchEvent(ModuleType module)
-            : base(module, "open_search")
+        public OpenSearchEvent()
+            : base("open_search")
         {
         }
     }
