@@ -14,7 +14,6 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -86,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses)
         {
             if (copyToNewOption != null && copyToNewOption != CopyToNewOption.None)
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent(copyToNewOption.Value));
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent());
             else if (documentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeEditDraftEvent());
             else if (documentCreationModeFlag == DocumentCreationModeFlag.Reply)

@@ -20,7 +20,6 @@ using Android.Util;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -99,7 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += async (sender, e) =>
             {
-                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(module: ModuleType.Documents));
+                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, module: ModuleType.Documents));
 
                 actionMode?.Finish();
                 actionMode = null;

@@ -11,7 +11,6 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;

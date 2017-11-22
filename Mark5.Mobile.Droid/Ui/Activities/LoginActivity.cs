@@ -8,7 +8,6 @@ using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
