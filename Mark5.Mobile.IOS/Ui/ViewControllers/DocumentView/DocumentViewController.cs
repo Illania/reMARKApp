@@ -272,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 editDocumentButtonItem = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "pencil.png"))
+                    Image = UIImage.FromBundle(Path.Combine("icons", "edit.png"))
                 };
 
                 var rightButtons = new UIBarButtonItem[2];
