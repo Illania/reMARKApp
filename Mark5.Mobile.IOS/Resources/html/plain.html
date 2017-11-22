@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
     <style type="text/css">
         * {
@@ -12,7 +12,11 @@
         html, body {
             padding: 10px 0;
             margin: 0;
+            font-family: monospace;
             font-size: 12pt;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
         }
         html {
             height: 100%;
@@ -21,14 +25,9 @@
             padding: 10px;
             min-height: 100%;
         }
-        pre {
-            word-wrap: break-word;
-        }
     </style>
 </head>
 <body>
-    <div id="text">
-        <pre id="plaintext"></pre>
-    </div>
+    <div id="plaintext"></div>
 </body>
 </html>
