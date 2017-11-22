@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
@@ -66,7 +68,7 @@ namespace Mark5.Mobile.Common.Utilities
 
         protected AnalyticsEvent(ModuleType module, string eventName)
         {
-            EventName = module.ToString().ToLowerInvariant() + "_" + eventName;
+            EventName = GetModuleString(module) + "_" + eventName;
         }
 
         protected AnalyticsEvent(ModuleType module, string eventName, int quantity)
@@ -79,7 +81,12 @@ namespace Mark5.Mobile.Common.Utilities
             else
                 quantityString = "many";
 
-            EventName = module.ToString().ToLowerInvariant() + "_" + eventName + "_" + quantityString;
+            EventName = GetModuleString(module) + "_" + eventName + "_" + quantityString;
+        }
+
+        string GetModuleString(ModuleType module)
+        {
+            return module.ToString().ToLowerInvariant().SafeSubstring(0, 3);
         }
     }
 
@@ -190,7 +197,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenOutgoingFolderEvent : AnalyticsEvent
     {
         public OpenOutgoingFolderEvent()
-            : base(ModuleType.Documents, "open_outgoing_folder")
+            : base(ModuleType.Documents, "open_outgoing")
         {
         }
     }
@@ -271,7 +278,7 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
-    public class ComposeAddAttachmentEvent : AnalyticsEvent //TODO check if all the events names are shorter than 40 characters
+    public class ComposeAddAttachmentEvent : AnalyticsEvent
     {
         public ComposeAddAttachmentEvent(AddAttachmentType type)
             : base(ModuleType.Documents, "compose_add_attachment_" + type.ToString().ToLowerInvariant())
@@ -298,7 +305,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeShowPreviousEmailEvent : AnalyticsEvent
     {
         public ComposeShowPreviousEmailEvent()
-            : base(ModuleType.Documents, "compose_show_previous_email")
+            : base(ModuleType.Documents, "compose_show_previous")
         {
         }
     }
@@ -306,7 +313,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ComposeEditedPreviousEmailEvent : AnalyticsEvent
     {
         public ComposeEditedPreviousEmailEvent()
-            : base(ModuleType.Documents, "compose_edited_previous_email")
+            : base(ModuleType.Documents, "compose_edited_previous")
         {
         }
     }
@@ -324,15 +331,16 @@ namespace Mark5.Mobile.Common.Utilities
         public ComposeAddTemplateEvent(TemplateType? type)
             : base(ModuleType.Documents, "compose_add_template")
         {
-            Parameters.Add("usage_mode", type.ToString().ToLowerInvariant());
+            Parameters.Add("type", type.ToString().ToLowerInvariant());
         }
     }
 
     public class ComposeContactPickerEvent : AnalyticsEvent
     {
         public ComposeContactPickerEvent(ContactPickerChoice type)
-            : base(ModuleType.Documents, "compose_contact_picker_" + type.ToString().ToLowerInvariant())
+            : base(ModuleType.Documents, "compose_picker")
         {
+            Parameters.Add("choice", type.ToString().ToLowerInvariant());
         }
     }
 
@@ -482,7 +490,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class ShortcodeComposeDocumentEvent : AnalyticsEvent
     {
         public ShortcodeComposeDocumentEvent()
-            : base(ModuleType.Shortcodes, "compose_document_event")
+            : base(ModuleType.Shortcodes, "compose_document")
         {
         }
     }
@@ -567,6 +575,13 @@ namespace Mark5.Mobile.Common.Utilities
 
     #region View Opening events
 
+    public class OpenModuleEvent : AnalyticsEvent
+    {
+        public OpenModuleEvent(ModuleType module)
+            : base(module, "module_open") //TODO ask B
+        {
+        }
+    }
     public class OpenDocumentEvent : AnalyticsEvent
     {
         public OpenDocumentEvent(bool external)

@@ -37,7 +37,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     parameters = new NSDictionary<NSString, NSObject>(parametersDic.Keys.ToArray(), parametersDic.Values.ToArray());
                 }
 
-                Analytics.LogEvent(new NSString(analyticsEvent.EventName), null);
+                Analytics.LogEvent(new NSString(analyticsEvent.EventName), parameters);
             }
             catch (Exception ex)
             {
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                Analytics.SetUserProperty(new NSString(value), new NSString(property.ToString()));
+                Analytics.SetUserProperty(new NSString(value), new NSString(property.ToString().ToLowerInvariant()));
             }
             catch (Exception ex)
             {
