@@ -6,16 +6,16 @@ using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
 using MailBee.Html;
-using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 using WebKit;
-using System.Threading;
+using Mark5.Mobile.Common;
+using System.Diagnostics;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    public abstract class AbstractWebViewController : AbstractViewController, IWKNavigationDelegate, IWKScriptMessageHandler
+    public abstract class AbstractWebViewController : AbstractViewController, IWKNavigationDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
-        public int LoadTimeoutMiliseconds { get; set; } = 2000;
+        public int LoadTimeoutMiliseconds { get; set; } = 2500;
 
         protected bool IsLoading => webView?.IsLoading ?? false;
 
@@ -67,6 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 NavigationDelegate = this,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            webView.ScrollView.Delegate = this;
             webView.AddObserver(this, new NSString("estimatedProgress"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             webView.AddObserver(this, new NSString("loading"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             View.AddSubview(webView);
@@ -153,6 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             base.Recycle();
 
             webView.NavigationDelegate = null;
+            webView.ScrollView.Delegate = null;
 
             var userContentController = webView?.Configuration?.UserContentController;
             if (userContentController != null)
@@ -175,6 +177,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             loadIndicatorView?.RemoveFromSuperview();
             headerContainerView?.RemoveFromSuperview();
             webView?.RemoveFromSuperview();
+
+            webViewProgressView = null;
+            loadIndicatorView = null;
+            headerContainerView = null;
+            webView = null;
         }
 
         protected void SetHeaderView(UIView headerView)
@@ -222,17 +229,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
             loadIndicatorView.StopAnimating();
         }
 
-        protected async Task Clear()
+        protected void Clear()
         {
             webView.Hidden = true;
             loadIndicatorView.StopAnimating();
-
-            if (loadTcs != null)
-                await loadTcs.Task;
         }
 
         protected async Task LoadHtmlString(string html, bool makeHtmlSafe, bool correctScale, bool inlineCss)
         {
+            if (CommonConfig.Logger.IsInfoEnabled())
+                CommonConfig.Logger.Info("Starting processing of the document...");
+
+            var processingStopwatch = Stopwatch.StartNew();
+
             if (makeHtmlSafe)
                 html = await MakeHtmlSafe(html);
 
@@ -241,6 +250,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             if (inlineCss)
                 html = await InlineCss(html);
+
+            processingStopwatch.Stop();
+
+            if (CommonConfig.Logger.IsInfoEnabled())
+                CommonConfig.Logger.Info($"Processing document took: {processingStopwatch.ElapsedMilliseconds}ms.");
 
             webView?.StopLoading();
             webView?.LoadHtmlString(html, null);
@@ -252,7 +266,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
-            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id=plaintext]");
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id='plaintext']");
             preNode.InnerHtml = escapedPlain;
             var plainHtml = htmlDocument.DocumentNode.OuterHtml;
 
@@ -301,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 if (headNode == null)
                     return html;
 
-                var existingViewportNodes = headNode.SelectNodes("/meta[@name=viewport]");
+                var existingViewportNodes = headNode.SelectNodes("/meta[@name='viewport']");
                 if (existingViewportNodes != null)
                     foreach (var existingViewportNode in existingViewportNodes)
                         existingViewportNode.Remove();
@@ -342,6 +356,25 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     if (finished && !webView.IsLoading)
                         webViewProgressView.SetProgress(0f, false);
                 });
+        }
+
+        [Export("scrollViewDidScroll:")]
+        public void Scrolled(UIScrollView scrollView)
+        {
+            NSLayoutConstraint leadingAnchorConstraint = null;
+            foreach (var constraint in webView.Constraints)
+            {
+                if (constraint.GetIdentifier() == "headerContainer.leadingAnchor")
+                {
+                    leadingAnchorConstraint = constraint;
+                    break;
+                }
+            }
+
+            if (leadingAnchorConstraint == null)
+                return;
+
+            leadingAnchorConstraint.Constant = scrollView.ContentOffset.X;
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
@@ -393,6 +426,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected virtual void OnWebViewEnterPressed() { }
 
-        protected virtual bool CanNavigate(WKNavigationAction action) => true;
+        protected virtual bool CanNavigate(WKNavigationAction action) 
+        {
+            switch(action.NavigationType)
+            {
+                case WKNavigationType.LinkActivated:
+                case WKNavigationType.BackForward:
+                case WKNavigationType.FormSubmitted:
+                case WKNavigationType.FormResubmitted:
+                case WKNavigationType.Reload:
+                    return false;
+                default:
+                    return true;
+            }
+        }
     }
 }

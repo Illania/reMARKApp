@@ -157,7 +157,6 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\AttachmentsView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\BccView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\CcView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ContentView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\CreatorView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\DateReceivedView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\DocumentSubView.cs" />

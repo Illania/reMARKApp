@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -25,7 +24,7 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentViewController : AbstractViewController, ISecondaryViewController, IUIViewControllerRestoration
+    public class DocumentViewController : AbstractWebViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
 
@@ -44,9 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem nextDocumentButtonItem;
         UIBarButtonItem editDocumentButtonItem;
 
-        UIScrollView mainScrollView;
-        UIStackView stackViewBeforeContent;
-        UIStackView stackViewAfterContent;
+        UIStackView headerStackView;
 
         FromView fromView;
         ToView toView;
@@ -57,14 +54,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         SubjectView subjectView;
         DateReceivedView dateReceivedView;
         PriorityView priorityView;
-        ContentView contentView;
         AttachmentsView attachmentsListView;
         CreatorView creatorView;
         ReadByView readByView;
         ReferenceNumberView referenceNumberView;
-
-        UIView backgroundView;
-        UIActivityIndicatorView spinner;
 
         UIBarButtonItem flagButton;
         UIBarButtonItem fileToButton;
@@ -88,18 +81,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
 
-        IEnumerable<DocumentSubView> DocumentSubViews
-        {
-            get
-            {
-                foreach (var ds in stackViewBeforeContent.OfType<DocumentSubView>())
-                    yield return ds;
-                yield return contentView;
-                foreach (var ds in stackViewAfterContent.OfType<DocumentSubView>())
-                    yield return ds;
-            }
-        }
-
         public DocumentViewController()
         {
             HidesBottomBarWhenPushed = true;
@@ -112,10 +93,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             InitNavigationBar();
-            InitStackViews();
-            InitSubViews();
+            InitHeaderView();
             InitToolbar();
-            InitBackgroundView();
         }
 
         public override void ViewDidLoad()
@@ -194,9 +173,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             GetPreviousDocumentPreview = null;
             GetNextDocumentPreview = null;
 
-            mainScrollView.RemoveFromSuperview();
-            stackViewBeforeContent.RemoveFromSuperview();
-            stackViewAfterContent.RemoveFromSuperview();
+            headerStackView.RemoveFromSuperview();
 
             fromView.RemoveFromSuperview();
             toView.RemoveFromSuperview();
@@ -207,18 +184,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subjectView.RemoveFromSuperview();
             dateReceivedView.RemoveFromSuperview();
             priorityView.RemoveFromSuperview();
-            contentView.RemoveFromSuperview();
             attachmentsListView.RemoveFromSuperview();
             creatorView.RemoveFromSuperview();
             readByView.RemoveFromSuperview();
             referenceNumberView.RemoveFromSuperview();
 
-            backgroundView.RemoveFromSuperview();
-            spinner.RemoveFromSuperview();
-
-            mainScrollView = null;
-            stackViewBeforeContent = null;
-            stackViewAfterContent = null;
+            headerStackView = null;
 
             fromView = null;
             toView = null;
@@ -229,14 +200,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             subjectView = null;
             dateReceivedView = null;
             priorityView = null;
-            contentView = null;
             attachmentsListView = null;
             creatorView = null;
             readByView = null;
             referenceNumberView = null;
-
-            backgroundView = null;
-            spinner = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -287,91 +254,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void InitStackViews()
+        void InitHeaderView()
         {
-            mainScrollView = new UIScrollView
-            {
-                BackgroundColor = Theme.White,
-                ShowsVerticalScrollIndicator = true,
-                ShowsHorizontalScrollIndicator = false,
-                ScrollEnabled = true,
-                ScrollsToTop = true,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            if (Integration.IsRunningAtLeast(11))
-            {
-                mainScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always;
-            }
-            View.AddSubview(mainScrollView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f),
-            });
-
-            stackViewBeforeContent = new UIStackView
+            headerStackView = new UIStackView
             {
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
                 Spacing = 0f,
-                TranslatesAutoresizingMaskIntoConstraints = false
             };
-            mainScrollView.AddSubview(stackViewBeforeContent);
-            mainScrollView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
 
-            contentView = new ContentView(this);
-            mainScrollView.AddSubview(contentView);
-            mainScrollView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
+            headerStackView.AddArrangedSubview(subjectView = new SubjectView());
+            headerStackView.AddArrangedSubview(referenceNumberView = new ReferenceNumberView());
+            headerStackView.AddArrangedSubview(fromView = new FromView());
+            headerStackView.AddArrangedSubview(toView = new ToView());
+            headerStackView.AddArrangedSubview(ccView = new CcView());
+            headerStackView.AddArrangedSubview(bccView = new BccView());
+            headerStackView.AddArrangedSubview(dateReceivedView = new DateReceivedView());
+            headerStackView.AddArrangedSubview(priorityView = new PriorityView());
+            headerStackView.AddArrangedSubview(creatorView = new CreatorView());
+            headerStackView.AddArrangedSubview(originatorView = new OriginatorView());
+            headerStackView.AddArrangedSubview(readByView = new ReadByView());
+            headerStackView.AddArrangedSubview(extraFieldsView = new ExtraFieldsView());
+            headerStackView.AddArrangedSubview(attachmentsListView = new AttachmentsView());
 
-            stackViewAfterContent = new UIStackView
-            {
-                Axis = UILayoutConstraintAxis.Vertical,
-                Alignment = UIStackViewAlignment.Fill,
-                Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0f,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            mainScrollView.AddSubview(stackViewAfterContent);
-            mainScrollView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-        }
-
-        void InitSubViews()
-        {
-            stackViewBeforeContent.AddArrangedSubview(subjectView = new SubjectView());
-            stackViewBeforeContent.AddArrangedSubview(fromView = new FromView());
-            stackViewBeforeContent.AddArrangedSubview(toView = new ToView());
-            stackViewBeforeContent.AddArrangedSubview(ccView = new CcView());
-            stackViewBeforeContent.AddArrangedSubview(bccView = new BccView());
-            stackViewBeforeContent.AddArrangedSubview(dateReceivedView = new DateReceivedView());
-            stackViewBeforeContent.AddArrangedSubview(extraFieldsView = new ExtraFieldsView());
-            stackViewBeforeContent.AddArrangedSubview(priorityView = new PriorityView());
-            stackViewBeforeContent.AddArrangedSubview(attachmentsListView = new AttachmentsView());
-            stackViewAfterContent.AddArrangedSubview(referenceNumberView = new ReferenceNumberView());
-            stackViewAfterContent.AddArrangedSubview(readByView = new ReadByView());
-            stackViewAfterContent.AddArrangedSubview(creatorView = new CreatorView());
-            stackViewAfterContent.AddArrangedSubview(originatorView = new OriginatorView());
-
-            DocumentSubViews.ForEach(v => v.UpdateVisibility());
+            SetHeaderView(headerStackView);
         }
 
         void InitToolbar()
@@ -414,36 +321,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Enabled = false
                 }
             };
-        }
-
-        void InitBackgroundView()
-        {
-            backgroundView = new UIView
-            {
-                BackgroundColor = UIColor.GroupTableViewBackgroundColor,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            View.AddSubview(backgroundView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(backgroundView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-            View.BringSubviewToFront(backgroundView);
-
-            spinner = new UIActivityIndicatorView
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
-            };
-            backgroundView.AddSubview(spinner);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(spinner, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, backgroundView, NSLayoutAttribute.CenterY, 1f, 0f)
-            });
         }
 
         void InitializeHandlers()
@@ -640,7 +517,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentsButton.Enabled = false;
             userActionsButton.Enabled = false;
 
-            RefreshView();
+            Clear();
         }
 
         public bool IsShowingDocumentWithId(int documentId)
@@ -665,7 +542,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                StartRefreshing();
+                await StartRefreshing();
 
                 if (notificationGuid != default(Guid))
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
@@ -689,14 +566,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested)
                     return;
 
-                RefreshView();
-                EndRefreshing();
+                foreach (var dv in headerStackView.Subviews.OfType<DocumentSubView>())
+                {
+                    dv.Document = document;
+                    dv.DocumentPreview = documentPreview;
+                    dv.RefreshView();
+                    dv.UpdateVisibility();
+                };
+
+                if (document != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(document.HtmlBody))
+                        await LoadHtmlString(document.HtmlBody, true, true, false);
+                    else if (!string.IsNullOrWhiteSpace(document.PlainTextBody))
+                        LoadPlainString(document.PlainTextBody);
+                    else
+                        LoadNoContentString();
+                }
+                else
+                    LoadEmpty();
+
+                await EndRefreshing();
+
+                RefreshNavigationBar();
+                RefreshToolbar();
+
                 MarkAsReadIfNecessary();
             }
             catch (Exception ex)
             {
-                EndRefreshing(true);
-
                 CommonConfig.Logger.Error($"Downloading document failed [folder.name={folder?.Name}, folder.id={folderId ?? folder?.Id}, documentId={documentId ?? documentPreview?.Id}]", ex);
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
@@ -709,33 +607,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         DismissViewController(true, null);
                 }
             }
-        }
-
-        void StartRefreshing()
-        {
-            spinner.StartAnimating();
-
-            View.BringSubviewToFront(backgroundView);
-            UIView.Animate(0.25, () =>
-            {
-                backgroundView.Alpha = 1f;
-                mainScrollView.Alpha = 0f;
-            });
-        }
-
-        void EndRefreshing(bool withError = false)
-        {
-            spinner.StopAnimating();
-
-            if (withError)
-                return;
-
-            View.SendSubviewToBack(backgroundView);
-            UIView.Animate(0.25, () =>
-            {
-                backgroundView.Alpha = 0f;
-                mainScrollView.Alpha = 1f;
-            });
         }
 
         void MarkAsReadIfNecessary()
@@ -776,36 +647,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-        void RefreshView()
-        {
-            DocumentSubViews.ForEach(v =>
-            {
-                v.Document = document;
-                v.DocumentPreview = documentPreview;
-                v.RefreshView();
-            });
-            DocumentSubViews.ForEach(v => v.UpdateVisibility());
-
-            RefreshNavigationBar();
-
-            var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
-            if (enableBottomActions)
-            {
-                flagButton.Enabled = document != null;
-                fileToButton.Enabled = document != null;
-                replyActionsButton.Enabled = document != null;
-                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
-                commentsBadgeButton.Enabled = document != null;
-                commentsButton.Enabled = document != null;
-                userActionsButton.Enabled = document != null;
-            }
-
-            UIView.Animate(0.075d, stackViewBeforeContent.LayoutIfNeeded);
-            UIView.Animate(0.1d, () => stackViewBeforeContent.Alpha = 1f);
-            UIView.Animate(0.075d, stackViewAfterContent.LayoutIfNeeded);
-            UIView.Animate(0.1d, () => stackViewAfterContent.Alpha = 1f);
-        }
-
         public void RefreshNavigationBar()
         {
             if (PresentingViewController == null)
@@ -838,6 +679,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     rightButtons[2] = editDocumentButtonItem;
                     NavigationItem.SetRightBarButtonItems(rightButtons, true);
                 }
+            }
+        }
+
+        public void RefreshToolbar()
+        {
+            var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
+            if (enableBottomActions)
+            {
+                flagButton.Enabled = document != null;
+                fileToButton.Enabled = document != null;
+                replyActionsButton.Enabled = document != null;
+                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
+                commentsBadgeButton.Enabled = document != null;
+                commentsButton.Enabled = document != null;
+                userActionsButton.Enabled = document != null;
             }
         }
 
@@ -1093,34 +949,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void NextDocumentButton_Clicked(object sender, EventArgs args)
         {
+            nextDocumentButtonItem.Enabled = false;
+            previousDocumentButtonItem.Enabled = false;
+
             document = null;
             documentId = null;
 
             documentPreview = GetNextDocumentPreview(documentPreview, out bool previousAvailable, out bool nextAvailable, true);
 
             if (documentPreview == null)
-            {
-                nextDocumentButtonItem.Enabled = false;
-                previousDocumentButtonItem.Enabled = false;
                 return;
-            }
 
             RefreshData();
         }
 
         void PreviousDocumentButton_Clicked(object sender, EventArgs args)
         {
+            nextDocumentButtonItem.Enabled = false;
+            previousDocumentButtonItem.Enabled = false;
+
             document = null;
             documentId = null;
 
             documentPreview = GetPreviousDocumentPreview(documentPreview, out bool previousAvailable, out bool nextAvailable, true);
 
             if (documentPreview == null)
-            {
-                nextDocumentButtonItem.Enabled = false;
-                previousDocumentButtonItem.Enabled = false;
                 return;
-            }
 
             RefreshData();
         }
@@ -1345,29 +1199,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #endregion
 
-        #region Utilities 
+        #region Utilities
 
-        public WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
+        protected override bool CanNavigate(WKNavigationAction action)
         {
-            if (navigationAction.NavigationType == WKNavigationType.LinkActivated || navigationAction.NavigationType == WKNavigationType.BackForward || navigationAction.NavigationType == WKNavigationType.FormSubmitted || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
+            if (action.NavigationType == WKNavigationType.LinkActivated
+                || action.NavigationType == WKNavigationType.BackForward
+                || action.NavigationType == WKNavigationType.FormSubmitted
+                || action.NavigationType == WKNavigationType.FormResubmitted)
             {
-                if (navigationAction.Request.Url.Scheme == "mailto")
+                if (action.Request.Url.Scheme == "mailto")
                 {
-                    var address = navigationAction.Request.Url.ResourceSpecifier;
+                    var address = action.Request.Url.ResourceSpecifier;
                     PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
                 }
                 else
-                {
-                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
-                }
+                    Integration.OpenLink(action.Request.Url,
+                                         async () => await Dialogs.ShowConfirmAlertAsync(this,
+                                                                                         Localization.GetString("unable_open_link_title"),
+                                                                                         Localization.GetString("unable_open_link_content") + action.Request.Url.Scheme));
 
-                return WKNavigationActionPolicy.Cancel;
+                return false;
             }
 
-            if (navigationAction.NavigationType == WKNavigationType.Reload)
-                return WKNavigationActionPolicy.Cancel;
+            if (action.NavigationType == WKNavigationType.Reload)
+                return false;
 
-            return WKNavigationActionPolicy.Allow;
+            return true;
         }
 
         #endregion
