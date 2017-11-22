@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             weakViewController = viewController.Wrap();
 
-            Layer.ZPosition = nfloat.MaxValue;
+            Layer.ZPosition = float.MaxValue;
             TextAlignment = UITextAlignment.Center;
             Font = Theme.DefaultFont.WithSize(12f);
         }

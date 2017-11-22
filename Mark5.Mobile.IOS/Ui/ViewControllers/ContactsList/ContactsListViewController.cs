@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             {
                 RightButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
+                    Image = UIImage.FromBundle(Path.Combine("icons", "create.png"))
                 };
                 NavigationItem.SetRightBarButtonItem(RightButton, false);
             }

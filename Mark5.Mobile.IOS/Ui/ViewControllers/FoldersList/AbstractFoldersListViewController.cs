@@ -206,7 +206,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 ComposeDocumentItem = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"))
+                    Image = UIImage.FromBundle(Path.Combine("icons", "create.png"))
                 };
                 NavigationItem.SetRightBarButtonItem(ComposeDocumentItem, false);
 
@@ -225,7 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CreateContactItem = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
+                    Image = UIImage.FromBundle(Path.Combine("icons", "create.png"))
                 };
                 NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
             }
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CreateShortcodeItem = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "add_action.png"))
+                    Image = UIImage.FromBundle(Path.Combine("icons", "create.png"))
                 };
                 NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
             }
