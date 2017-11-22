@@ -8,8 +8,8 @@ namespace Mark5.Mobile.Common.Utilities
     public interface IUsageAnalytics
     {
         void LogEvent(AnalyticsEvent analyticsEvent);
-
         void SetUserProperty(UserProperty property, string value);
+        void SetScreen(string screenClass);
     }
 
     #region Enums
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Common.Utilities
     public enum AddAttachmentType
     {
         TakePhoto,
-        ChoosePhoto,
+        PickPhoto,
         Local
     }
 
@@ -358,7 +358,6 @@ namespace Mark5.Mobile.Common.Utilities
             : base(ModuleType.Documents, "sent")
         {
             Parameters.Add("creation_flag", flag.ToString().ToLowerInvariant());
-
         }
     }
 
