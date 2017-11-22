@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.LoadView();
 
-            View.BackgroundColor = Theme.LightGray;
+            View.BackgroundColor = Theme.White;
 
             var preferences = new WKPreferences
             {
@@ -146,6 +146,35 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var contentInset = webView.ScrollView.ContentInset;
             contentInset.Top = desiredHeaderHeight;
             webView.ScrollView.ContentInset = contentInset;
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            webView.NavigationDelegate = null;
+
+            var userContentController = webView?.Configuration?.UserContentController;
+            if (userContentController != null)
+            {
+                userContentController.RemoveScriptMessageHandler("loaded");
+                userContentController.RemoveScriptMessageHandler("resized");
+                userContentController.RemoveScriptMessageHandler("domloaded");
+                userContentController.RemoveScriptMessageHandler("mutated");
+                userContentController.RemoveScriptMessageHandler("keypressed");
+                userContentController.RemoveScriptMessageHandler("enterpressed");
+            }
+
+            webView.RemoveObserver(this, new NSString("estimatedProgress"));
+            webView.RemoveObserver(this, new NSString("loading"));
+
+            if (webView.IsLoading)
+                webView.StopLoading();
+
+            webViewProgressView?.RemoveFromSuperview();
+            loadIndicatorView?.RemoveFromSuperview();
+            headerContainerView?.RemoveFromSuperview();
+            webView?.RemoveFromSuperview();
         }
 
         protected void SetHeaderView(UIView headerView)
