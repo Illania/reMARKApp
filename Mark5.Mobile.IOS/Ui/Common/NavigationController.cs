@@ -1,4 +1,5 @@
 ﻿using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -41,6 +42,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public void WillShowViewController(UINavigationController navigationController, UIViewController viewController, bool animated)
         {
             var tc = navigationController.TopViewController.GetTransitionCoordinator();
+
+            CommonConfig.UsageAnalytics.SetScreen(viewController.GetType().Name); //TODO debug
 
             if (tc == null)
                 return;

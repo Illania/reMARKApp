@@ -16,7 +16,6 @@ using AngleSharp.Html;
 using AngleSharp.Parser.Html;
 using Java.Interop;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;

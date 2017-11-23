@@ -5,6 +5,7 @@ using Firebase.Analytics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -14,10 +15,8 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                if (analyticsEvent.EventName.Length >= 40)
-                {
-                    CommonConfig.Logger.Debug("Event name is too long!");
-                }
+                if (analyticsEvent.EventName.Length > 40)
+                    CommonConfig.Logger.Error($"Event name is too long! [{analyticsEvent.EventName}]");
 
                 NSDictionary<NSString, NSObject> parameters = null;
                 if (analyticsEvent.Parameters?.Any() == true)
@@ -37,7 +36,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     parameters = new NSDictionary<NSString, NSObject>(parametersDic.Keys.ToArray(), parametersDic.Values.ToArray());
                 }
 
-                Analytics.LogEvent(new NSString(analyticsEvent.EventName), parameters);
+                Analytics.LogEvent(new NSString(analyticsEvent.EventName.SafeSubstring(0, 40)), parameters);
             }
             catch (Exception ex)
             {
@@ -55,6 +54,12 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error("Error while setting user property", ex);
             }
+        }
+
+        public void SetScreen(string screenClass)
+        {
+            CommonConfig.Logger.Error($"SCREEN CLASS {screenClass}"); //TODO debug
+            Analytics.SetScreenNameAndClass(new NSString(screenClass), new NSString(screenClass));
         }
     }
 }

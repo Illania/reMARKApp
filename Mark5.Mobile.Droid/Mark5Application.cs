@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Runtime;
 using Android.Support.V7.App;
-using Firebase.Analytics;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Utilities;
@@ -51,7 +50,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.Reachability = new Reachability();
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
-                    CommonConfig.UsageAnalytics = new Analytics(FirebaseAnalytics.GetInstance(this));
+                    CommonConfig.UsageAnalytics = new UsageAnalytics(FirebaseAnalytics.GetInstance(this));
 
 #if !DEBUG
                     CommonConfig.Logger.Level = LogLevel.INFO;

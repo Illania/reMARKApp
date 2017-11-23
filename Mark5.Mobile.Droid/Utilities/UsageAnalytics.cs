@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Linq;
 using Android.OS;
-using Firebase.Analytics;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Analytics;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public class Analytics : IAnalytics
+    public class UsageAnalytics : IUsageAnalytics
     {
         readonly FirebaseAnalytics firebaseAnalytics;
 
-        public Analytics(FirebaseAnalytics firebaseAnalytics)
+        public UsageAnalytics(FirebaseAnalytics firebaseAnalytics)
         {
             this.firebaseAnalytics = firebaseAnalytics;
         }
@@ -20,6 +19,9 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             try
             {
+                if (analyticsEvent.EventName.Length > 40)
+                    CommonConfig.Logger.Error($"Event name is too long! [{analyticsEvent.EventName}]");
+
                 Bundle bundle = null;
                 if (analyticsEvent.Parameters?.Any() == true)
                 {
@@ -45,7 +47,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         }
 
-        public void SetUserProperty(UserProperties property, string value)
+        public void SetScreen(string screenClass)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetUserProperty(UserProperty property, string value)
         {
             firebaseAnalytics.SetUserProperty(property.ToString(), value);
         }
