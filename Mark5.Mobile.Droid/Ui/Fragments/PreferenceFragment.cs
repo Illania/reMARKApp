@@ -271,7 +271,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         Dialogs.ShowConfirmDialog(Context,Resource.String.must_save_persons_companies_offline_title,Resource.String.must_save_persons_companies_offline_content,null);
                         PlatformConfig.CallStateBroadcastReceiver.Register();
                     }
-
                 }
                 else 
                 {

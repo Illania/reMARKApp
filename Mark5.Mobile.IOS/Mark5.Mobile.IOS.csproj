@@ -289,7 +289,7 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
 		<Compile Include="Utilities\CallerIdSharedDatabase.cs" />
-		<Compile Include="Utilities\OverlayExtensionStatus.cs" />
+		<Compile Include="Utilities\OverlayExtensionUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

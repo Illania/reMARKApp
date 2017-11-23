@@ -1,5 +1,4 @@
-﻿using System;
-using CallKit;
+﻿using CallKit;
 using Foundation;
 using Mark5.Mobile.Common;
 
@@ -7,35 +6,34 @@ namespace Mark5.Mobile.IOS.Utilities
 {
     public static class OverlayExtensionStatus
     {
-        public static bool IsEnabled()
-        {
-            bool isEnabled = false;
+        static readonly string extensionId = "com.nordic-it.mark5.mobile.ios.extensions.callid";
 
-            CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension("com.nordic-it.mark5.mobile.ios.extensions.callid",
+        public static void SetCallerIdPreference()
+        {
+            CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension(extensionId,
                                                                                (CXCallDirectoryEnabledStatus status, NSError statuserror) =>
             {
                 if (statuserror == null)
                 {
-                    isEnabled = status == CXCallDirectoryEnabledStatus.Enabled;
+                    PlatformConfig.Preferences.CallerIdentificationEnabled = (status == CXCallDirectoryEnabledStatus.Enabled);
                 } 
                 else 
                 {
                     throw new NSErrorException(statuserror);
                 }
             });
-            return isEnabled;
         }
 
         public static void RefreshExtension()
         {
-            CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension("com.nordic-it.mark5.mobile.ios.extensions.callid",
+            CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension(extensionId,
                                                                                (CXCallDirectoryEnabledStatus status, NSError statuserror) => 
             {
                 if(statuserror == null)
                 {
                     if (status == CXCallDirectoryEnabledStatus.Enabled)
                     {
-                        CXCallDirectoryManager.SharedInstance.ReloadExtension("com.nordic-it.mark5.mobile.ios.extensions.callid",
+                        CXCallDirectoryManager.SharedInstance.ReloadExtension(extensionId,
                         error =>
                         {
                             if (error == null)

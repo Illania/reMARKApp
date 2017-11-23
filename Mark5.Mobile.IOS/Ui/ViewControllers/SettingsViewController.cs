@@ -41,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NeverShowPrivacySettings = false;
             ShowCreditsFooter = false;
             Delegate = this;
+            OverlayExtensionStatus.SetCallerIdPreference();
         }
 
         public override void ViewDidLoad()
@@ -50,8 +51,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ExtendedLayoutIncludesOpaqueBars = true;
 
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), SettingsChanged);
-
-            PlatformConfig.Preferences.CallerIdentificationEnabled = OverlayExtensionStatus.IsEnabled();
         }
 
         public override void ViewWillAppear(bool animated)
