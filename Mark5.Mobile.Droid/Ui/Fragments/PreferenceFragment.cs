@@ -26,6 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         static class RequestCodes
         {
             public const int NotificationRingtoneRequest = 1;
+            public const int DrawOnTopRequest = 5469;
         }
 
         public override Fragment CallbackFragment => this;
@@ -52,10 +53,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
+            if (resultCode == (int)Android.App.Result.Ok) 
             {
-                var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
-                PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
+                if (requestCode == RequestCodes.NotificationRingtoneRequest)
+                {
+                    var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
+                    PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
+                } 
+            }
+            //The only way the user can return from the settings screen is by pressing back, hence requestCode = canceled.
+            if (resultCode == (int)Android.App.Result.Canceled)
+            {
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.M && requestCode == RequestCodes.DrawOnTopRequest) //Only relevant if version is M or above.
+                {
+                    PlatformConfig.Preferences.CallerIdentificationEnabled = Settings.CanDrawOverlays(Context); //Sets the preference based on what the user selected in the settings screen for drawing overlays.
+                    if (Settings.CanDrawOverlays(Context))
+                    {
+                        PlatformConfig.CallStateBroadcastReceiver.Register();
+                    }
+
+                    Activity.OnBackPressed();
+                }
             }
         }
 
@@ -66,12 +84,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var versionPreference = FindPreference(GetString(Resource.String.pref_key_about_version));
             if (versionPreference != null)
                 versionPreference.Summary = CommonConfig.DeviceInfoProvider.GetAppVersionString();
-
-
-            var callerIdPreference = FindPreference(GetString(Resource.String.pref_key_callidentification_identification_enabled));
-            var canDraw = Settings.CanDrawOverlays(Activity);
-            if (callerIdPreference != null)
-                callerIdPreference.Enabled = canDraw;
 
             Task.Run(() => { return AuthenticatorFactory.Create().GetConnectionInfoAsync(); })
                 .ContinueWith(t =>
@@ -241,21 +253,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (key == GetString(Resource.String.pref_key_callidentification_identification_enabled))
             {
-                Dialogs.ShowYesNoDialog(Activity, Resource.String.redirect_to_draw_settings_title, Resource.String.redirect_to_draw_settings_content,
-                                        () =>
-                                        {
-                                            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && !Settings.CanDrawOverlays(Activity))
-                                            {
-                                                var intent = new Intent(Settings.ActionManageOverlayPermission);
-                                                StartActivity(intent);
-                                            }
-                                        },
-                                        () =>
-                                        {
-                                            var callerIdPreference = FindPreference(GetString(Resource.String.pref_key_callidentification_identification_enabled));
-                                            if (callerIdPreference != null)
-                                                callerIdPreference.Enabled = Settings.CanDrawOverlays(Activity);
-                                        });
+                var valueChangedTo = PlatformConfig.Preferences.CallerIdentificationEnabled;
+                if(valueChangedTo)
+                {             
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.M) //If version is api 22 or above
+                    {
+                        Dialogs.ShowConfirmDialog(Context, Resource.String.redirect_to_draw_settings_title, Resource.String.redirect_to_draw_settings_content,
+                                                () =>
+                        {
+                            
+                            var intent = new Intent(Settings.ActionManageOverlayPermission, Android.Net.Uri.Parse("package:"+Context.PackageName));
+                            StartActivityForResult(intent, RequestCodes.DrawOnTopRequest);
+                        });
+                    }
+                    else 
+                    {
+                        Dialogs.ShowConfirmDialog(Context,Resource.String.must_save_persons_companies_offline_title,Resource.String.must_save_persons_companies_offline_content,null);
+                        PlatformConfig.CallStateBroadcastReceiver.Register();
+                    }
+
+                }
+                else 
+                {
+                    PlatformConfig.CallStateBroadcastReceiver.Unregister();
+                }
             }
         }
 

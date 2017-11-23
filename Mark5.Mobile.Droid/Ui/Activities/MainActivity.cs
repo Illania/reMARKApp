@@ -7,7 +7,6 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
-using Android.Provider;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
@@ -141,7 +140,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         {
                             Manifest.Permission.ReadExternalStorage,
                             Manifest.Permission.ReadContacts,
-                            Manifest.Permission.ReadPhoneState
+                            Manifest.Permission.ReadPhoneState  
                         },
                         769);
 #pragma warning restore XA0001 // Find issues with Android API usage

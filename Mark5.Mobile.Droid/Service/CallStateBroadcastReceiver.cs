@@ -35,13 +35,6 @@ namespace Mark5.Mobile.Droid.Service
 
         public void Unregister()
         {
-            var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
-            if (incomingCallLayout.IsShown)
-                wm.RemoveView(incomingCallLayout);
-
-            if (onGoingCallLayout.IsShown)
-                wm.RemoveView(onGoingCallLayout);
-            
             if (!registered)
                 return;
             
@@ -59,6 +52,7 @@ namespace Mark5.Mobile.Droid.Service
                 var state = intent.GetStringExtra(TelephonyManager.ExtraState);
 
                 var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
+                //Temp overlay
                 var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, WindowManagerTypes.SystemOverlay,
                                                                   WindowManagerFlags.NotTouchModal | WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent)
                 {
@@ -76,7 +70,7 @@ namespace Mark5.Mobile.Droid.Service
                     }).ContinueWith((t) => {
                         var contact = t.Result;
 
-                        if(contact != null && PhoneNumberUtils.Compare(incomingNumber,contact.Number))
+                        if(contact != null && PhoneNumberUtils.Compare(incomingNumber,contact.Number)) //If contact from database is calling, show overlay.
                         {
                             var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
                             if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked

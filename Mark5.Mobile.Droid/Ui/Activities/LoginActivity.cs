@@ -234,9 +234,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                 PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
-                CommonConfig.Logger.Info($"Registering {nameof(CallStateBroadcastReceiver)}...");
-                PlatformConfig.CallStateBroadcastReceiver.Register();
-
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
                 StartActivity(new Intent(this, typeof(MainActivity)));

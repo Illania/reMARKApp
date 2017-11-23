@@ -37,6 +37,20 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #endregion
 
+        #region Caller Identification
+
+        public bool CallerIdentificationEnabled {
+            get => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_callidentification_enabled_default));
+            set 
+            {
+                var e = sp.Edit();
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled),value);
+                e.Commit();
+            }
+        }
+
+        #endregion
+
         #region Contacts
 
         public bool ContactCommunicationFaxNumbersEnabled => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_contacts_sub_comm_fax), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_contacts_sub_comm_fax_default));
