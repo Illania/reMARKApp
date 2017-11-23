@@ -37,6 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         RetainedFragment<MainActivityState> stateFragment;
 
+        bool firstSelection = true;
         bool permissionsAsked;
 
         public static Intent CreateIntent(Context context)
@@ -231,6 +232,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         if (SupportFragmentManager.BackStackEntryCount > 0)
                             SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
 
+                        if (firstSelection)
+                            firstSelection = false;
+                        else
+                            CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(stateFragment.State.MenuItemContents[menuItem.ItemId].ModuleType));
+
                         stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
                         lastSelectedItem = menuItem;
@@ -309,7 +315,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
             protected readonly List<string> SavedTags = new List<string>();
 
-            protected ModuleType ModuleType { get; }
+            public ModuleType ModuleType { get; }
 
             public MenuItemContent(ModuleType moduleType)
             {
