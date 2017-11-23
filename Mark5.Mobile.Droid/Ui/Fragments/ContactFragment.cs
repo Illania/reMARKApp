@@ -831,8 +831,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (selection == 1)
                 {
-                    Integration.TextNumber(Context, formattedAddress);
                     CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Text));
+                    Integration.TextNumber(Context, formattedAddress);
                 }
             }
 

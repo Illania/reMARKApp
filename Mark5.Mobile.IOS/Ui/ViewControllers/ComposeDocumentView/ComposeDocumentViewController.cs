@@ -990,7 +990,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
 
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
                 return;
+            }
 
             if (useTemplate == Preferences.TemplateUsageMode.Local)
             {
@@ -1012,6 +1015,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 switch (result)
                 {
                     case -1:
+                        CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
                         break;
                     case 0:
                         await GetDefaultTemplate(true);

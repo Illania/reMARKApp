@@ -330,7 +330,8 @@ namespace Mark5.Mobile.Common.Utilities
         public ComposeAddTemplateEvent(TemplateType? type)
             : base(ModuleType.Documents, "compose_add_template")
         {
-            Parameters.Add("type", type.ToString().ToLowerInvariant());
+            var parameterString = type == null ? "null" : type.ToString().ToLowerInvariant();
+            Parameters.Add("type", parameterString);
         }
     }
 

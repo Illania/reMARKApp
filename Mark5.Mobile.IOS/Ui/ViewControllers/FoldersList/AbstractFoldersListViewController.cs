@@ -588,9 +588,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (folder.IsOutgoing)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenOutgoingFolderEvent());
             else
-            {
                 CommonConfig.UsageAnalytics.LogEvent(new OpenFolderEvent(folder.Module, isFromFavorite));
-            }
         }
 
         protected virtual void FolderDeselected(Folder folder)

@@ -825,7 +825,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void GetAllTemplates()
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
 
             StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
         }
@@ -849,7 +849,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
                 return;
+            }
 
             if (useTemplate == Preferences.TemplateUsageMode.Local)
             {
