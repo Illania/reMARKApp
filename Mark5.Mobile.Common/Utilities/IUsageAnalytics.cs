@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 
@@ -577,7 +576,7 @@ namespace Mark5.Mobile.Common.Utilities
     public class OpenModuleEvent : AnalyticsEvent
     {
         public OpenModuleEvent(ModuleType module)
-            : base(module, "module_open") //TODO ask B
+            : base(module, "module_open")
         {
         }
     }
