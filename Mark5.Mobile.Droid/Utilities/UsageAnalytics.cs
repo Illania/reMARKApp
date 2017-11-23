@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Android.OS;
+using Firebase.Analytics;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -28,17 +30,18 @@ namespace Mark5.Mobile.Droid.Utilities
                     bundle = new Bundle();
                     foreach (var parameter in analyticsEvent.Parameters)
                     {
-                        if (parameter is StringAnalyticsParameter stringParameter)
+                        if (parameter.Value is string stringParameter)
                         {
-                            bundle.PutString(stringParameter.Name, stringParameter.Value);
+                            bundle.PutString(parameter.Key, stringParameter);
                         }
-                        else if (parameter is NumberAnalyticsParameter numberParameter)
+                        if (parameter.Value is long numberParameter)
                         {
-                            bundle.PutLong(numberParameter.Name, numberParameter.Value);
+                            bundle.PutLong(parameter.Key, numberParameter);
                         }
                     }
                 }
-                firebaseAnalytics.LogEvent(analyticsEvent.Name, bundle);
+
+                firebaseAnalytics.LogEvent(analyticsEvent.EventName.SafeSubstring(0, 40), bundle);
             }
             catch (Exception ex)
             {
@@ -49,7 +52,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void SetScreen(string screenClass)
         {
-            throw new NotImplementedException();
+            //Not implemented for Android 
         }
 
         public void SetUserProperty(UserProperty property, string value)
