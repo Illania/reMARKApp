@@ -58,7 +58,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 SuppressesIncrementalRendering = false,
                 AllowsInlineMediaPlayback = false,
                 Preferences = preferences,
-                UserContentController = userContentController
+                UserContentController = userContentController,
+                DataDetectorTypes = WKDataDetectorTypes.All
             };
 
             webView = new WKWebView(CGRect.Empty, configuration)
@@ -235,7 +236,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             loadIndicatorView.StopAnimating();
         }
 
-        protected async Task LoadHtmlString(string html, bool makeHtmlSafe, bool correctScale, bool inlineCss)
+        protected async Task LoadHtmlString(string html, bool makeHtmlSafe, bool correctScale, bool inlineCss, bool injectFonts)
         {
             if (CommonConfig.Logger.IsInfoEnabled())
                 CommonConfig.Logger.Info("Starting processing of the document...");
@@ -245,11 +246,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (makeHtmlSafe)
                 html = await MakeHtmlSafe(html);
 
+            if (inlineCss)
+                html = await InlineCss(html);
+
             if (correctScale)
                 html = await CorrectScale(html);
 
-            if (inlineCss)
-                html = await InlineCss(html);
+            if (injectFonts)
+                html = await InjectFonts(html);
 
             processingStopwatch.Stop();
 
@@ -257,7 +261,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 CommonConfig.Logger.Info($"Processing document took: {processingStopwatch.ElapsedMilliseconds}ms.");
 
             webView?.StopLoading();
-            webView?.LoadHtmlString(html, null);
+            webView?.LoadHtmlString(html, NSBundle.MainBundle.BundleUrl);
         }
 
         protected void LoadPlainString(string plain)
@@ -301,6 +305,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
+        Task<String> InlineCss(string html)
+        {
+            return Task.Run(() =>
+            {
+                if (html == null)
+                    return null;
+
+                var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
+                return inlineResult.Html;
+            });
+        }
+
         Task<String> CorrectScale(string html)
         {
             return Task.Run(() =>
@@ -330,15 +346,25 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
-        Task<String> InlineCss(string html)
+        Task<String> InjectFonts(string html)
         {
             return Task.Run(() =>
             {
-                if (html == null)
-                    return null;
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(html);
 
-                var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
-                return inlineResult.Html;
+                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
+                if (headNode == null)
+                    return html;
+
+                var cssLinkElement = htmlDocument.CreateElement("link");
+                cssLinkElement.SetAttributeValue("rel", "stylesheet");
+                cssLinkElement.SetAttributeValue("type", "text/css");
+                cssLinkElement.SetAttributeValue("href", "html/fonts.css");
+                headNode.PrependChild(cssLinkElement);
+
+                var htmlWithFonts = htmlDocument.DocumentNode.OuterHtml;
+                return htmlWithFonts;
             });
         }
 
@@ -426,9 +452,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected virtual void OnWebViewEnterPressed() { }
 
-        protected virtual bool CanNavigate(WKNavigationAction action) 
+        protected virtual bool CanNavigate(WKNavigationAction action)
         {
-            switch(action.NavigationType)
+            switch (action.NavigationType)
             {
                 case WKNavigationType.LinkActivated:
                 case WKNavigationType.BackForward:

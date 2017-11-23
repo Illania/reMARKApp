@@ -503,6 +503,13 @@
 		<BundleResource Include="Resources\html\plain.html" />
 		<BundleResource Include="Resources\html\scriptsAtEnd.js" />
 		<BundleResource Include="Resources\html\scriptsAtStart.js" />
+		<BundleResource Include="Resources\html\fonts.css" />
+		<BundleResource Include="Resources\html\fonts\calibri.ttf" />
+		<BundleResource Include="Resources\html\fonts\tahoma.ttf" />
+		<BundleResource Include="Resources\html\fonts\cambria.ttf" />
+		<BundleResource Include="Resources\html\fonts\trebuchetms.ttf" />
+		<BundleResource Include="Resources\html\fonts\couriernew.ttf" />
+		<BundleResource Include="Resources\html\fonts\opensans.ttf" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
@@ -516,6 +523,7 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
+	  <Folder Include="Resources\html\fonts\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

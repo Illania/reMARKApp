@@ -271,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             if (mailMessage != null)
             {
                 if (!string.IsNullOrWhiteSpace(mailMessage.BodyHtmlText))
-                    await LoadHtmlString(mailMessage.BodyHtmlText, true, true, false);
+                    await LoadHtmlString(mailMessage.BodyHtmlText, true, true, false, true);
                 else if (!string.IsNullOrWhiteSpace(mailMessage.BodyPlainText))
                     LoadPlainString(mailMessage.BodyPlainText);
                 else

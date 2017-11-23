@@ -577,7 +577,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (document != null)
                 {
                     if (!string.IsNullOrWhiteSpace(document.HtmlBody))
-                        await LoadHtmlString(document.HtmlBody, true, true, false);
+                        await LoadHtmlString(document.HtmlBody, true, true, false, true);
                     else if (!string.IsNullOrWhiteSpace(document.PlainTextBody))
                         LoadPlainString(document.PlainTextBody);
                     else
