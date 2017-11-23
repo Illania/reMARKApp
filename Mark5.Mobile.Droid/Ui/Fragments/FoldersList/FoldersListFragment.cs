@@ -787,7 +787,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void RefreshLayout_Refresh(object sender, EventArgs e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(true));
+            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(true, RemoteFolder.Module));
             RefreshData(true);
         }
 
@@ -804,7 +804,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(true));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(true, RemoteFolder.Module));
 
                 menu?.FindItem(10)?.SetVisible(false);
 

@@ -773,7 +773,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void PhysicalAddressClicked(object sender, PhysicalAddress e)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactClickPhysicalAddressEvent());
+            CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Map));
 
             Integration.OpenMap(Context, AddressFormatter.FormatPhysicalAddress(e));
         }
@@ -796,7 +796,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (e.Type == CommunicationAddressType.Email)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ContactClickEmailEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Email));
 
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {
@@ -825,20 +825,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (selection == 0)
                 {
-                    CommonConfig.UsageAnalytics.LogEvent(new ContactCallNumberEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
                     Integration.DialNumber(Context, formattedAddress);
                 }
 
                 if (selection == 1)
                 {
                     Integration.TextNumber(Context, formattedAddress);
-                    CommonConfig.UsageAnalytics.LogEvent(new ContactSendTextEvent());
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Text));
                 }
             }
 
             if (e.Type == CommunicationAddressType.Phone)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ContactCallNumberEvent());
+                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
                 Integration.DialNumber(Context, AddressFormatter.FormatCommunicationAddress(e));
             }
         }

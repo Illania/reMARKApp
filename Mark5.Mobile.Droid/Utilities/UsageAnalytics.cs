@@ -57,7 +57,15 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void SetUserProperty(UserProperty property, string value)
         {
-            firebaseAnalytics.SetUserProperty(property.ToString(), value);
+            try
+            {
+                firebaseAnalytics.SetUserProperty(property.ToString().ToLowerInvariant(), value);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while setting user property", ex);
+            }
+
         }
     }
 }

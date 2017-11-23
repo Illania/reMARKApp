@@ -171,36 +171,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ol.IsReverse)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new LinkClickedEvent(ol.FromObjectType));
-
-                if (ol.FromObjectType == ObjectType.Document)
+                switch (ol.FromObjectType)
                 {
-                    StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.FromObjectId));
-                }
-                else if (ol.FromObjectType == ObjectType.Contact)
-                {
-                    StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.FromObjectId));
-                }
-                else if (ol.FromObjectType == ObjectType.Shortcode)
-                {
-                    StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.FromObjectId));
+                    case ObjectType.Document:
+                        StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.FromObjectId));
+                        break;
+                    case ObjectType.Contact:
+                        StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.FromObjectId));
+                        break;
+                    case ObjectType.Shortcode:
+                        StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.FromObjectId));
+                        break;
                 }
             }
             else
             {
-                CommonConfig.UsageAnalytics.LogEvent(new LinkClickedEvent(ol.ToObjectType));
-
-                if (ol.ToObjectType == ObjectType.Document)
+                switch (ol.ToObjectType)
                 {
-                    StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.ToObjectId));
-                }
-                else if (ol.ToObjectType == ObjectType.Contact)
-                {
-                    StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.ToObjectId));
-                }
-                else if (ol.ToObjectType == ObjectType.Shortcode)
-                {
-                    StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.ToObjectId));
+                    case ObjectType.Document:
+                        StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.ToObjectId));
+                        break;
+                    case ObjectType.Contact:
+                        StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.ToObjectId));
+                        break;
+                    case ObjectType.Shortcode:
+                        StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.ToObjectId));
+                        break;
                 }
             }
         }

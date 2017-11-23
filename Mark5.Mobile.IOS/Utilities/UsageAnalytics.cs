@@ -58,8 +58,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public void SetScreen(string screenClass)
         {
-            CommonConfig.Logger.Error($"SCREEN CLASS {screenClass}"); //TODO debug
-            Analytics.SetScreenNameAndClass(new NSString(screenClass), new NSString(screenClass));
+            Analytics.SetScreenNameAndClass(null, new NSString(screenClass));
         }
     }
 }

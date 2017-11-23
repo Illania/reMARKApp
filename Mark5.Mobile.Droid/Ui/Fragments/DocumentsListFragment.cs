@@ -768,7 +768,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(module: ModuleType.Documents));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Documents));
 
                 menu?.FindItem(10)?.SetVisible(false);
 

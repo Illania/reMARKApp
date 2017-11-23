@@ -69,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += (sender, e) =>
             {
-                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(module: ModuleType.Contacts));
+                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, module: ModuleType.Contacts));
 
                 ActionMode?.Finish();
                 ActionMode = null;
@@ -542,7 +542,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(module: ModuleType.Contacts));
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Contacts));
 
                 menu?.FindItem(10)?.SetVisible(false);
 
