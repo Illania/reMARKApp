@@ -27,11 +27,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         TaskCompletionSource<bool> loadTcs;
 
-        string headerPaddingJsTemplate = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/headerpadding", "js"));
+        string headerPaddingJsTemplate;
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            headerPaddingJsTemplate = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/headerpadding", "js"));
 
             View.BackgroundColor = Theme.White;
 
