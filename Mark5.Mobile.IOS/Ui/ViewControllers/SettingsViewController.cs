@@ -13,7 +13,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class SettingsViewController : AppSettingsViewController, ISettingsDelegate
+    public class SettingsViewController : AbstractAppSettingsViewController, ISettingsDelegate
     {
         const string UseServerTimezoneKey = "UseServerTimezone";
         const string CreateSystemReportKey = "createSystemReport";

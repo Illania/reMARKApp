@@ -254,6 +254,7 @@
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Utilities\UsageAnalytics.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
+		<Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
