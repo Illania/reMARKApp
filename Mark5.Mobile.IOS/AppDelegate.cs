@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS
                 startupTime.Start();
 
                 InitializeCommon();
-                OverlayExtensionStatus.RefreshExtension();
+                OverlayExtensionUtilities.RefreshExtension();
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);

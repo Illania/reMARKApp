@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NeverShowPrivacySettings = false;
             ShowCreditsFooter = false;
             Delegate = this;
-            OverlayExtensionStatus.SetCallerIdPreference();
+            OverlayExtensionUtilities.SetCallerIdPreference();
         }
 
         public override void ViewDidLoad()
@@ -338,7 +338,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (((NSNumber)n.UserInfo.ValueForKey(new NSString(CallerIdentificationEnabled))).Int32Value == 1)
                 {   
-                    await Dialogs.ShowConfirmDialogAsync(this, "Extension Enabling", "To enable the caller indentification you must save the folders of the contacts you want to be indentified locally. Then enable the extension manually in settings.");
+                    await Dialogs.ShowConfirmAlertAsync(this, "Extension Enabling", "To enable the caller indentification you must save the folders of the contacts you want to be indentified locally. Then enable the extension manually in settings.");
                 }
                 else
                     return;

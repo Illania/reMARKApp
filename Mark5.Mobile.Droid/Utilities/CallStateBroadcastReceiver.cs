@@ -7,12 +7,11 @@ using Android.Views;
 using Android.Widget;
 using Android.Runtime;
 using Android.OS;
-using System.Threading.Tasks;
-using Mark5.Mobile.Droid.Utilities;
-using System;
 using PhoneNumbers;
+using System.Threading.Tasks;
+using System;
 
-namespace Mark5.Mobile.Droid.Service
+namespace Mark5.Mobile.Droid.Utilities
 {
     public class CallStateBroadcastReceiver : BroadcastReceiver
     {
@@ -37,22 +36,31 @@ namespace Mark5.Mobile.Droid.Service
         {
             if (!registered)
                 return;
-            
+
             registered = false;
 
             Application.Context.UnregisterReceiver(this);
         }
 
+        string oldState;
+
         public override void OnReceive(Context context, Intent intent)
         {
             this.context = context;
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && Settings.CanDrawOverlays(context))
+            if (Build.VERSION.SdkInt == BuildVersionCodes.LollipopMr1 || (Build.VERSION.SdkInt >= BuildVersionCodes.M && Settings.CanDrawOverlays(context)))
             {
                 var state = intent.GetStringExtra(TelephonyManager.ExtraState);
 
+                if (state == oldState) 
+                    return;
+
+                //On LollipopMR1, the onReceive gets invoked twice instead of once for every change of the call state. In other viersion this doesn't happen.
+                //Que pasa?
+                oldState = state;
+
                 var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
-                //Temp overlay
+                //TODO: REPLACE WITH PROPER OVERLAY
                 var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, WindowManagerTypes.SystemOverlay,
                                                                   WindowManagerFlags.NotTouchModal | WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent)
                 {
@@ -67,43 +75,44 @@ namespace Mark5.Mobile.Droid.Service
                     Task.Run(async () =>
                     {
                         return await CallerIdDatabaseProvider.CallerIdDatabase.GetContactsFromSharedDatabase(incomingNumber);
-                    }).ContinueWith((t) => {
+                    }).ContinueWith((t) =>
+                    {
                         var contact = t.Result;
 
-                        if(contact != null && PhoneNumberUtils.Compare(incomingNumber,contact.Number)) //If contact from database is calling, show overlay.
+                        if (contact != null && PhoneNumberUtils.Compare(incomingNumber, contact.Number)) //If contact from database is calling, show overlay.
                         {
                             var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
                             if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked
                             {
-                                incomingCallLayout = LayoutNewContext(context);
+                                incomingCallLayout = LayoutNewContext(Color.Peru);
                                 wm.AddView(incomingCallLayout, overlayParams);
                             }
                             else //Screen is locked
                             {
-                                incomingCallLayout = LayoutNewContext(context);
+                                incomingCallLayout = LayoutNewContext(Color.HotPink);
                                 wm.AddView(incomingCallLayout, overlayParams);
                             }
                         }
-                    },TaskScheduler.FromCurrentSynchronizationContext());
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 }
                 else if (state == TelephonyManager.ExtraStateOffhook) //Call started
                 {
-                    if(incomingCallLayout != null && incomingCallLayout.IsShown)
+                    if (incomingCallLayout != null && incomingCallLayout.IsShown)
                         wm.RemoveView(incomingCallLayout);
-                    onGoingCallLayout = LayoutNewContext(context);
+                    onGoingCallLayout = LayoutNewContext( Color.Bisque);
                     wm.AddView(onGoingCallLayout, overlayParams);
                 }
                 else if (state == TelephonyManager.ExtraStateIdle) //Call stopped
                 {
-                    if(incomingCallLayout != null && incomingCallLayout.IsShown)
+                    if (incomingCallLayout != null && incomingCallLayout.IsShown)
                         wm.RemoveView(incomingCallLayout);
 
-                    if(onGoingCallLayout != null && onGoingCallLayout.IsShown)
+                    if (onGoingCallLayout != null && onGoingCallLayout.IsShown)
                         wm.RemoveView(onGoingCallLayout);
                 }
+                GoAsync();
             }
-            GoAsync();
         }
 
         String FormatNumber(string number)
@@ -116,13 +125,13 @@ namespace Mark5.Mobile.Droid.Service
             return phoneNumberUtil.Format(phoneNumber, PhoneNumbers.PhoneNumberFormat.E164);
         }
 
-        LinearLayout LayoutNewContext(Context context)
+        LinearLayout LayoutNewContext(Color color)
         {
             var layout = new LinearLayout(context);
-            layout.SetBackgroundColor(Color.Black);
+            layout.SetBackgroundColor(color);
             layout.Orientation = Orientation.Vertical;
 
             return layout;
         }
-    }
+    }   
 }

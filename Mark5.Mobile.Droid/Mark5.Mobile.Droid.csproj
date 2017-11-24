@@ -196,7 +196,7 @@
       <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v14.Preference.dll</HintPath>
     </Reference>
     <Reference Include="PhoneNumbers">
-      <HintPath>..\packages\libphonenumber-csharp.8.8.5\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+      <HintPath>..\packages\libphonenumber-csharp.8.8.6\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -430,8 +430,8 @@
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
     <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
-    <Compile Include="Service\CallStateBroadcastReceiver.cs" />
     <Compile Include="Utilities\CallerIdDatabaseProvider.cs" />
+    <Compile Include="Utilities\CallStateBroadcastReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -4,7 +4,7 @@ using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public static class OverlayExtensionStatus
+    public static class OverlayExtensionUtilities
     {
         static readonly string extensionId = "com.nordic-it.mark5.mobile.ios.extensions.callid";
 

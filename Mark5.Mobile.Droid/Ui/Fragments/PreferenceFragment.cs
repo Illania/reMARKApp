@@ -69,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.M && requestCode == RequestCodes.DrawOnTopRequest) //Only relevant if version is M or above.
                 {
                     PlatformConfig.Preferences.CallerIdentificationEnabled = Settings.CanDrawOverlays(Context); //Sets the preference based on what the user selected in the settings screen for drawing overlays.
-                    if (Settings.CanDrawOverlays(Context))
+                    if (PlatformConfig.Preferences.CallerIdentificationEnabled)
                     {
                         PlatformConfig.CallStateBroadcastReceiver.Register();
                     }
@@ -291,7 +291,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         static class RequestCodes
         {
             public const int NotificationRingtoneRequest = 1;
-            public const int DrawOnTopRequest = 5469;
+            public const int DrawOnTopRequest = 2;
         }
     }
 }
