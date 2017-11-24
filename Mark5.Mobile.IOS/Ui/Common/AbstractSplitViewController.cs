@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using UIKit;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -14,6 +15,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             SeparateSecondaryViewController = HandleSeparateSecondaryViewController;
             CollapseSecondViewController = HandleCollapseSecondViewController;
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+            CommonConfig.UsageAnalytics.SetScreen(GetType().Name);
         }
 
         public override void LoadView()
@@ -33,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         UIViewController HandleSeparateSecondaryViewController(UISplitViewController splitViewController, UIViewController primaryViewController)
         {
-            var primaryNavigationController = (NavigationController) primaryViewController;
+            var primaryNavigationController = (NavigationController)primaryViewController;
             var lastPrimaryViewController = primaryNavigationController.ViewControllers.LastOrDefault(vc => vc is IPrimaryViewController);
 
             if (lastPrimaryViewController == null)
@@ -54,11 +61,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         bool HandleCollapseSecondViewController(UISplitViewController splitViewController, UIViewController secondaryViewController, UIViewController primaryViewController)
         {
-            var secondaryNavigationController = (NavigationController) secondaryViewController;
-            if (((ISecondaryViewController) secondaryNavigationController.ViewControllers[0]).Empty)
+            var secondaryNavigationController = (NavigationController)secondaryViewController;
+            if (((ISecondaryViewController)secondaryNavigationController.ViewControllers[0]).Empty)
                 return true;
 
-            var primaryNavigationController = (NavigationController) primaryViewController;
+            var primaryNavigationController = (NavigationController)primaryViewController;
             secondaryNavigationController.ViewControllers.ForEach(vc => primaryNavigationController.PushViewController(vc, false));
 
             return true;

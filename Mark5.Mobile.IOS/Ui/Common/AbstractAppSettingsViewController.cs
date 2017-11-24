@@ -9,7 +9,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
-            CommonConfig.UsageAnalytics.SetScreen(GetType().Name); //TODO testing
+            CommonConfig.UsageAnalytics.SetScreen(GetType().Name);
         }
     }
 }
