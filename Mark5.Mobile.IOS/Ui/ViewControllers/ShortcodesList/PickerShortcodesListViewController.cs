@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -11,15 +12,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
     public class PickerShortcodesListViewController : AbstractShortcodesListViewController
     {
         readonly TaskCompletionSource<Shortcode> tcs = new TaskCompletionSource<Shortcode>();
-
-        public Task<Shortcode> Task => tcs.Task;
+        public Task<Shortcode> Result => tcs.Task;
 
         public PickerShortcodesListViewController()
             : base(true)
         {
         }
 
-        public async override void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(null);
+        }
+
+        public async override void ShortcodeSelected(UITableView tableView, NSIndexPath indexPath, ShortcodePreview shortcodePreview)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_shortcode___"));
 
@@ -27,15 +35,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             {
                 var shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(Folder, shortcodePreview.Id);
                 dismissAction();
-
                 tcs.SetResult(shortcode);
-
+                DismissViewController(true, null);
             }
             catch (Exception ex)
             {
                 dismissAction();
                 CommonConfig.Logger.Error($"Error while retrieving shortcode [FolderId = {Folder?.Id}, ShortcodeId = {shortcodePreview.Id}]");
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
             {

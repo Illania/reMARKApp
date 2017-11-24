@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 Text = Localization.GetString("subject"),
                 Font = Theme.DefaultFont,
-                TextColor = UIColor.LightGray,
+                TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };

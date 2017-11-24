@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,6 +11,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -20,36 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DownloadFragment : RetainableStateFragment
     {
+        const string FolderBundleKey = "Folder_3a0c4202-ba8e-457d-9db7-025692ad0b35";
 
-        struct ProgressInfo
-        {
-            public bool Preparing { get; }
-            public int TotalItemsCount { get; }
-            public int LeftItemsCount { get; }
-            public int FailedItemsCount { get; }
-
-            public ProgressInfo(bool preparing, int totalItemsCount, int leftItemsCount, int failedItemsCount)
-            {
-                Preparing = preparing;
-                TotalItemsCount = totalItemsCount;
-                LeftItemsCount = leftItemsCount;
-                FailedItemsCount = failedItemsCount;
-            }
-        }
-
-        struct FinishedInfo
-        {
-            public int DownloadedItemsCount { get; }
-            public int FailedItemsCount { get; }
-
-            public FinishedInfo(int downloadedItemsCount, int failedItemsCount)
-            {
-                DownloadedItemsCount = downloadedItemsCount;
-                FailedItemsCount = failedItemsCount;
-            }
-        }
-
-        public Folder Folder { get; set; }
+        Folder folder;
 
         LinearLayout startLayout;
         LinearLayout progressLayout;
@@ -68,9 +42,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         PowerManager.WakeLock wakelock;
         bool downloadRunning;
 
+        public static (DownloadFragment fragment, string tag) NewInstance(Folder folder)
+        {
+            var args = new Bundle();
+
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            var fragment = new DownloadFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DownloadFragment)} [folder.Id={Folder?.Id}]...");
+            if (Arguments.ContainsKey(FolderBundleKey))
+                folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+            
+            CommonConfig.Logger.Info($"Creating {nameof(DownloadFragment)} [folder.Id={folder?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.download, container, false);
 
@@ -98,7 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.download);
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder.Name;
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = folder.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(DownloadFragment)}");
         }
@@ -107,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnResume();
 
-            var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(Folder);
+            var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(folder);
             if (info != null)
                 lastDownloadedOn.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString(Context);
             else
@@ -133,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        void StartButton_Click(object sender, EventArgs e)
+        async void StartButton_Click(object sender, EventArgs e)
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
@@ -143,13 +135,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             void OnStart()
             {
-                CommonConfig.Logger.Info($"Starting download... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}]");
+                CommonConfig.Logger.Info($"Starting download... [folder.Id={folder.Id}, folder.Module={folder.Module}, folder.Name={folder.Name}]");
 
                 wakelock?.Release();
                 wakelock = null;
 
                 var pm = (PowerManager)Context.GetSystemService(Context.PowerService);
-                wakelock = pm.NewWakeLock(WakeLockFlags.ScreenDim, GenerateTag());
+                wakelock = pm.NewWakeLock(WakeLockFlags.ScreenDim, $"{nameof(DownloadFragment)} [folder.Id={folder.Id}]");
                 wakelock.Acquire();
 
                 Activity.RunOnUiThread(() =>
@@ -170,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             void OnProgress(ProgressInfo pi)
             {
                 if (pi.Preparing || pi.LeftItemsCount % 10 == 0)
-                    CommonConfig.Logger.Info($"Downloading... [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
+                    CommonConfig.Logger.Info($"Downloading... [folder.Id={folder.Id}, folder.Module={folder.Module}, folder.Name={folder.Name}, preparing={pi.Preparing}, totalItemsCount={pi.TotalItemsCount}, leftItemsCount={pi.LeftItemsCount}, failedItemsCount={pi.FailedItemsCount}]");
 
                 if (!pi.Preparing && pi.LeftItemsCount == pi.TotalItemsCount)
                     sw.Start();
@@ -208,7 +200,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             void OnFinished(FinishedInfo fi)
             {
-                CommonConfig.Logger.Info($"Finished [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}, downloadedItemsCount={fi.DownloadedItemsCount}, failedItemsCount={fi.FailedItemsCount}]");
+                CommonConfig.Logger.Info($"Finished [folder.Id={folder.Id}, folder.Module={folder.Module}, folder.Name={folder.Name}, downloadedItemsCount={fi.DownloadedItemsCount}, failedItemsCount={fi.FailedItemsCount}]");
 
                 wakelock?.Release();
                 wakelock = null;
@@ -232,7 +224,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             void OnException(Exception ex)
             {
-                CommonConfig.Logger.Error($"Error occured when downloading! [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}]", ex);
+                CommonConfig.Logger.Error($"Error occured when downloading! [folder.Id={folder.Id}, folder.Module={folder.Module}, folder.Name={folder.Name}]", ex);
 
                 wakelock?.Release();
                 wakelock = null;
@@ -254,7 +246,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             void OnCancelled()
             {
-                CommonConfig.Logger.Info($"Cancelled download [folder.Id={Folder.Id}, folder.Module={Folder.Module}, folder.Name={Folder.Name}]");
+                CommonConfig.Logger.Info($"Cancelled download [folder.Id={folder.Id}, folder.Module={folder.Module}, folder.Name={folder.Name}]");
 
                 wakelock?.Release();
                 wakelock = null;
@@ -275,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
+            await Download(folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token);
         }
 
         async void CancelButton_Click(object sender, EventArgs e)
@@ -290,11 +282,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         void CloseButton_Click(object sender, EventArgs e) => Activity?.Finish();
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DownloadFragment)} [folder.Id={Folder.Id}]";
-        }
 
         async Task Download(Folder folder,
                             Action onStartedAction,
@@ -477,6 +464,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Unexpected exception when downloading a folder. [folder.id={folder.Id}, folder.name={folder.Name}, folder.module={folder.Module}]", ex);
 
                 onException(ex);
+            }
+        }
+
+        struct ProgressInfo
+        {
+            public bool Preparing { get; }
+            public int TotalItemsCount { get; }
+            public int LeftItemsCount { get; }
+            public int FailedItemsCount { get; }
+
+            public ProgressInfo(bool preparing, int totalItemsCount, int leftItemsCount, int failedItemsCount)
+            {
+                Preparing = preparing;
+                TotalItemsCount = totalItemsCount;
+                LeftItemsCount = leftItemsCount;
+                FailedItemsCount = failedItemsCount;
+            }
+        }
+
+        struct FinishedInfo
+        {
+            public int DownloadedItemsCount { get; }
+            public int FailedItemsCount { get; }
+
+            public FinishedInfo(int downloadedItemsCount, int failedItemsCount)
+            {
+                DownloadedItemsCount = downloadedItemsCount;
+                FailedItemsCount = failedItemsCount;
             }
         }
     }

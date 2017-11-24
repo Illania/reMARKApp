@@ -1,9 +1,10 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -13,10 +14,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class PickerContactFolderListActivity : BaseAppCompatActivity
     {
         public const string RecipientResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
-
         public const int ContactRequestCode = 321;
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(PickerContactFolderListActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -35,9 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-
-                var pcflf = new PickerContactFolderListFragment();
-                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                var (pcflf,tag) = PickerContactFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Contacts),true,true,true);
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PickerContactFolderListActivity)}");

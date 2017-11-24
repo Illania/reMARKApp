@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -15,6 +16,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
         RecentAddressesListFragment ralf;
+        string ralfFragmentTag;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(RecentAddressesListActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -34,8 +41,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                ralf = new RecentAddressesListFragment();
-                ft.Replace(Resource.Id.fragment_container, ralf, ralf.GenerateTag());
+                (ralf, ralfFragmentTag) = RecentAddressesListFragment.NewInstance();
+                ft.Replace(Resource.Id.fragment_container, ralf, ralfFragmentTag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(RecentAddressesListActivity)}");

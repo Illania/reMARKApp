@@ -3,57 +3,55 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class TemplatesListViewController : AbstractViewController, IUISearchResultsUpdating
+    public class TemplatesListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
-        public Task<TemplatePreview> ResultTask => tcs.Task;
+        readonly TaskCompletionSource<TemplatePreview> tcs = new TaskCompletionSource<TemplatePreview>();
+        public Task<TemplatePreview> Result => tcs.Task;
 
-        UIBarButtonItem cancelButtonItem;
+        UIBarButtonItem cancelItem;
 
-        UITableView tableView;
-        DataSource dataSource;
         UISearchController searchController;
-        UITableViewController searchResultsController;
-        FilterDataSource searchResultsDataSource;
-
-        CancellationTokenSource cts;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
-        bool refreshing;
-
-        TaskCompletionSource<TemplatePreview> tcs = new TaskCompletionSource<TemplatePreview>();
-
         public TemplatesListViewController()
+            : base(UITableViewStyle.Grouped)
         {
-            Title = Localization.GetString("templates");
         }
-
-        #region Lifecycle methods
 
         public override void LoadView()
         {
             base.LoadView();
 
             InitializeNavigationBar();
-            InitializeListView();
+            InitializeView();
             InitializeSearchBar();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
 
             InitializeHandlers();
         }
@@ -62,70 +60,92 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(TemplatesListViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            if (dataSource.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
+
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
+
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
 
-            DeInitializeHandlers();
-
-            cts?.Cancel();
+            DeinitializeHandlers();
         }
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(TemplatesListViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            dataSource?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
-        #endregion
+        protected override void Recycle()
+        {
+            base.Recycle();
 
-        #region Init methods
+            cancelItem = null;
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            searchController.SearchResultsUpdater = null;
+            searchController = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
 
         void InitializeNavigationBar()
         {
-            cancelButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
-            NavigationItem.SetLeftBarButtonItem(cancelButtonItem, false);
+            Title = Localization.GetString("templates");
+
+            cancelItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            NavigationItem.SetLeftBarButtonItem(cancelItem, false);
         }
 
-        void InitializeListView()
+        void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.Source = dataSource = new DataSource(this, tableView, Localization.GetString("no_templates"));
-            tableView.EstimatedRowHeight = 40f;
-            tableView.RowHeight = UITableView.AutomaticDimension;
-            tableView.ClipsToBounds = false;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
+            TableView.Source = new DataSource(this, TableView);
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
         }
 
         void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
 
-            searchResultsController = new UITableViewController();
-            searchResultsDataSource = new FilterDataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_templates"));
+            var searchResultsController = new UITableViewController();
+            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView);
             searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 40f;
             searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
-            searchResultsController.TableView.EstimatedRowHeight = 50f;
 
             searchController = new UISearchController(searchResultsController)
             {
@@ -136,70 +156,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
 
-            tableView.TableHeaderView = searchController.SearchBar;
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         void InitializeHandlers()
         {
-            if (cancelButtonItem != null)
-                cancelButtonItem.Clicked += DismissButtonItem_Clicked;
+            if (cancelItem != null)
+                cancelItem.Clicked += CancelItem_Clicked;
         }
 
-        void DeInitializeHandlers()
+        void DeinitializeHandlers()
         {
-            if (cancelButtonItem != null)
-                cancelButtonItem.Clicked -= DismissButtonItem_Clicked;
+            if (cancelItem != null)
+                cancelItem.Clicked -= CancelItem_Clicked;
         }
 
-        void DismissButtonItem_Clicked(object sender, EventArgs e)
+        void CancelItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
             DismissViewController(true, null);
         }
 
-        #endregion
-
-        #region Refreshing
-
         async Task RefreshData()
         {
-            if (refreshing)
-                return;
-
             CommonConfig.Logger.Info("Refreshing templates list");
-
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
 
             try
             {
                 var previews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
-
-                dataSource.SetItems(previews);
-                refreshing = false;
+                ((DataSource)TableView.Source).SetItems(previews);
             }
             catch (Exception ex)
             {
-                refreshing = false;
-
                 CommonConfig.Logger.Error("Error while retrieving template previews", ex);
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
                 tcs.SetResult(null);
+                DismissViewController(true, null);
             }
         }
-
-        #endregion
-
-        #region Selection
 
         public void TemplateSelected(TemplatePreview tp)
         {
             tcs.SetResult(tp);
+
+            if (searchController != null && searchController.Active)
+                searchController.Active = false;
+
+            DismissViewController(true, null);
         }
-
-        #endregion
-
-        #region Search
 
         public void UpdateSearchResultsForSearchController(UISearchController searchController)
         {
@@ -209,7 +216,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
-                searchResultsDataSource.Reset();
+
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
+                ((SearchDataSource)dataSource)?.Reset();
             }
             else
             {
@@ -229,19 +238,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void DoSearchTemplate(string searchText, CancellationToken ct)
         {
-            searchResultsDataSource.Reset();
+            var tableViewController = searchController?.SearchResultsController as UITableViewController;
+            var searchDataSource = tableViewController?.TableView?.Source as SearchDataSource;
+            searchDataSource?.Reset();
 
             await Task.Delay(500);
 
             if (ct.IsCancellationRequested)
                 return;
 
-            var filteredShortcodes = dataSource.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
+            var ds = (DataSource)TableView.Source;
+            var filteredTemplates = ds.Items.Where(sp => MatchesQuery(sp, searchText)).ToList();
 
             if (ct.IsCancellationRequested)
                 return;
 
-            searchResultsDataSource.SetItems(filteredShortcodes);
+            searchDataSource?.SetItems(filteredTemplates);
         }
 
         static bool MatchesQuery(TemplatePreview tp, string query)
@@ -252,44 +264,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return false;
         }
 
-        #endregion
-
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
-            public bool Empty { get { return !templatesInView.SelectMany(v => v).Any(); } }
+            public bool Empty => !Items.Any();
+            public IEnumerable<TemplatePreview> Items => items.SelectMany(i => i);
 
-            public IEnumerable<TemplatePreview> Items { get { return templatesInView.SelectMany(i => i); } }
-
-            List<List<TemplatePreview>> templatesInView = new List<List<TemplatePreview>>(2);
-
-            UITableView tableView;
-            string emptyText;
-            TemplatesListViewController viewController;
+            readonly WeakReference<TemplatesListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
+            readonly List<List<TemplatePreview>> items = new List<List<TemplatePreview>>(2);
 
-            public DataSource(TemplatesListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(TemplatesListViewController viewController, UITableView tableView)
             {
-                this.tableView = tableView;
-                this.emptyText = emptyText;
-                this.viewController = viewController;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
                 if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_templates"));
                     return emptyCell;
                 }
 
-                if (templatesInView[indexPath.Section].Count < 1)
+                if (items[indexPath.Section].Count < 1)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(WaitTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
 
                     if (indexPath.Section == 0)
                         emptyCell.Initialize(Localization.GetString("no_private_templates"));
@@ -299,175 +305,153 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var tp = templatesInView[indexPath.Section][indexPath.Row];
+                var tp = items[indexPath.Section][indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(TemplatesTableViewCell.Key) as TemplatesTableViewCell ?? TemplatesTableViewCell.Create();
-                cell.Initialize(tp);
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell");
+                cell.TextLabel.Text = tp.Name;
                 return cell;
             }
 
-            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-            {
-                var tp = templatesInView[indexPath.Section][indexPath.Row];
-                viewController.TemplateSelected(tp);
-            }
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 44f;
 
             public override nint NumberOfSections(UITableView tableView)
             {
                 if (loading || Empty)
                     return 1;
 
-                return templatesInView.Count;
+                return items.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading || templatesInView[(int)section].Count < 1)
+                if (loading || items[(int)section].Count < 1)
                     return 1;
 
-                return templatesInView[(int)section].Count;
+                return items[(int)section].Count;
             }
 
             public override string TitleForHeader(UITableView tableView, nint section)
             {
-                if (Empty)
-                    return string.Empty;
+                if (loading || Empty)
+                    return null;
 
                 return section == 0 ? Localization.GetString("private") : Localization.GetString("public");
             }
 
-            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section)
+            public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var v = headerView as UITableViewHeaderFooterView;
-                if (v == null)
+                var cell = tableView.CellAt(indexPath);
+                if (cell?.SelectionStyle == UITableViewCellSelectionStyle.None)
                     return;
 
-                v.TextLabel.TextColor = Theme.DarkerBlue;
+                var tp = items[indexPath.Section][indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.TemplateSelected(tp);
             }
 
             public void SetItems(List<TemplatePreview> templatePreviews)
             {
                 loading = false;
 
-                templatesInView.Clear();
+                items.Clear();
 
-                templatesInView.Add(templatePreviews.Where(t => t.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
-                templatesInView.Add(templatePreviews.Where(t => !t.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
+                items.Add(templatePreviews.Where(t => t.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
+                items.Add(templatePreviews.Where(t => !t.Private).OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
 
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 if (!Empty)
-                    tableView.InsertSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
+                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
             public void Reset()
             {
                 loading = true;
 
-                var empty = Empty;
-                templatesInView.Clear();
+                items.Clear();
 
-                tableView.BeginUpdates();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                if (!empty)
-                    tableView.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, 1)), UITableViewRowAnimation.Fade);
-                tableView.EndUpdates();
-            }
+                var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
 
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                templatesInView = null;
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                if (sectionsCount > 1)
+                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
         }
 
-        class FilterDataSource : UITableViewSource, IDisposable
+        class SearchDataSource : UITableViewSource, IDisposable
         {
-            public bool Empty { get { return !templatesInView.Any(); } }
+            public bool Empty => !items.Any();
 
-            List<TemplatePreview> templatesInView = new List<TemplatePreview>(25);
-
-            UITableView tableView;
-            string emptyText;
-            TemplatesListViewController viewController;
+            readonly WeakReference<TemplatesListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
+            readonly List<TemplatePreview> items = new List<TemplatePreview>(25);
 
-            public FilterDataSource(TemplatesListViewController viewController, UITableView tableView, string emptyText)
+            public SearchDataSource(TemplatesListViewController viewController, UITableView tableView)
             {
-                this.tableView = tableView;
-                this.emptyText = emptyText;
-                this.viewController = viewController;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
                 if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_matching_templates"));
                     return emptyCell;
                 }
 
-                var tp = templatesInView[indexPath.Row];
+                var tp = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(TemplatesSearchResultsTableViewCell.Key) as TemplatesSearchResultsTableViewCell ?? TemplatesSearchResultsTableViewCell.Create();
-                cell.Initialize(tp);
-
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell");
+                cell.TextLabel.Text = tp.Name;
+                cell.DetailTextLabel.Text = tp.Private ? Localization.GetString("private") : Localization.GetString("public");
                 return cell;
             }
 
-            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-            {
-                var tp = templatesInView[indexPath.Row];
-                viewController.TemplateSelected(tp);
-            }
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading || Empty)
                     return 1;
 
-                return templatesInView.Count;
+                return items.Count;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var tp = items[indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.TemplateSelected(tp);
             }
 
             public void SetItems(List<TemplatePreview> templatePreviews)
             {
                 loading = false;
 
-                templatesInView.Clear();
+                items.Clear();
 
-                templatesInView.AddRange(templatePreviews.OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                items.AddRange(templatePreviews.OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase).ToList());
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
             {
                 loading = true;
 
-                var empty = Empty;
-                templatesInView.Clear();
+                items.Clear();
 
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                templatesInView = null;
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }
-
     }
 }

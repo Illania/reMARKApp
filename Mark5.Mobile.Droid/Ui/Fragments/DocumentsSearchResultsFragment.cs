@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,15 +18,16 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentsSearchResultsFragment : RetainableStateFragment
     {
-        public SearchDocumentsCriteria Criteria { get; set; }
-        public Action CloseRequest { get; set; }
+        const string SearchDocumentsCriteriaBundleKey = "SearchDocumentsCriteria_273f369b-8818-4944-9dfc-5193a7bd542a";
+
+        SearchDocumentsCriteria criteria;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -34,11 +35,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool shouldNotifyAdapter;
 
+        public static (DocumentsSearchResultsFragment fragment, string var) NewInstance(SearchDocumentsCriteria criteria)
+        {
+            var args = new Bundle();
+
+            if (criteria != null)
+                args.PutString(SearchDocumentsCriteriaBundleKey, Serializer.Serialize(criteria));
+
+            var fragment = new DocumentsSearchResultsFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(DocumentsSearchResultsFragment)}]";
+
+            return (fragment, tag);
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
+            if (Arguments.ContainsKey(SearchDocumentsCriteriaBundleKey))
+                criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Arguments.GetString(SearchDocumentsCriteriaBundleKey));
+
+            CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -64,14 +83,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]");
+            CommonConfig.Logger.Info($"Created {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
 
             if (adapter.ItemCount < 1)
             {
@@ -91,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnPause();
 
-            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsSearchResultsFragment)} [criteria={Criteria}]...");
+            CommonConfig.Logger.Info($"Pausing {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
         }
 
         #endregion
@@ -100,11 +119,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override IRetainableState OnRetainInstanceState()
         {
-            CommonConfig.Logger.Info($"Retaining state [criteria={Criteria}, documentPreviews.Count={adapter?.ItemCount}]...");
+            CommonConfig.Logger.Info($"Retaining state [criteria={criteria}, documentPreviews.Count={adapter?.ItemCount}]...");
 
             return new DocumentSearchResultsFragmentState
             {
-                Criteria = Criteria,
+                Criteria = criteria,
                 DocumentPreviews = adapter.Items
             };
         }
@@ -116,14 +135,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.DocumentPreviews?.Count}]...");
 
-                Criteria = dlfs.Criteria;
+                criteria = dlfs.Criteria;
                 adapter.AppendItems(dlfs.DocumentPreviews);
             }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentsSearchResultsFragment)}]";
         }
 
         #endregion
@@ -138,13 +152,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                var documentPreviews = await Managers.SearchManager.SearchDocumentsAsync(Criteria);
+                var documentPreviews = await Managers.SearchManager.SearchDocumentsAsync(criteria);
 
                 if (documentPreviews.Count < 1)
                 {
                     await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.no_results, Resource.String.no_results_documents);
-                    if (CloseRequest != null)
-                        CloseRequest();
+                    Activity?.OnBackPressed();
                     return;
                 }
 
@@ -155,12 +168,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading documents failed [criteria={Criteria}]", ex);
+                CommonConfig.Logger.Error($"Downloading documents failed [criteria={criteria}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                if (CloseRequest != null)
-                    CloseRequest();
+                Activity?.OnBackPressed();
             }
             finally
             {
@@ -192,9 +204,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
-            var i = new Intent(Activity, typeof(DocumentActivity));
-            i.PutExtra(DocumentActivity.DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
-            StartActivity(i);
+            StartActivity(DocumentActivity.CreateIntent(Context, Serializer.Serialize(documentPreview)));
         }
 
         #endregion
@@ -214,15 +224,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public static class ViewType
-            {
-                public const int DocumentView = 0;
-                public const int ExternalDocumentView = 1;
-            }
+            public override int ItemCount => Items.Count;
 
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
-
-            public override int ItemCount => Items.Count;
 
             readonly Context context;
             readonly RecyclerView recyclerView;
@@ -309,6 +313,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeInserted(count, items.Count);
             }
 
+            public int GetPosition(int documentPreviewId)
+            {
+                var position = -1;
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == documentPreviewId)
+                    {
+                        position = i;
+                        break;
+                    }
+
+                return position;
+            }
+
             string ISectionedAdapter.GetSectionName(int position)
             {
                 var vh = recyclerView.FindViewHolderForAdapterPosition(position);
@@ -322,17 +339,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return string.Empty;
             }
 
-            public int GetPosition(int documentPreviewId)
+            public static class ViewType
             {
-                var position = -1;
-                for (var i = 0; i < Items.Count; i++)
-                    if (Items[i].Id == documentPreviewId)
-                    {
-                        position = i;
-                        break;
-                    }
-
-                return position;
+                public const int DocumentView = 0;
+                public const int ExternalDocumentView = 1;
             }
         }
 

@@ -1,13 +1,13 @@
-﻿using Android.App;
+using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Common.HubMessages;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using TinyMessenger;
 
@@ -27,6 +27,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TinyMessageSubscriptionToken entityRemovedToken;
         TinyMessageSubscriptionToken contactPreviewChangedToken;
 
+        public static Intent CreateIntent(Context context, Folder folder)
+        {
+            var intent = new Intent(context, typeof(ContactsListActivity));
+            intent.PutExtra(FolderIntentKey,Serializer.Serialize(folder));
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -44,29 +52,27 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
+                string tag;
                 var folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                clf = new ContactsListFragment
-                {
-                    Folder = folder,
-                    CloseRequest = OnBackPressed
-                };
-                ft.Replace(Resource.Id.fragment_container, clf, clf.GenerateTag());
+                (clf, tag) = ContactsListFragment.NewInstance(folder);
+
+                ft.Replace(Resource.Id.fragment_container, clf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ContactsListActivity)}");
             }
             else
             {
-                clf = (ContactsListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                clf = (ContactsListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(ContactsListActivity)}");
             }
 
-            categoriesToken = CommonConfig.MessengerHub.Subscribe<ContactPreviewCategoriesChangedMessage>(clf.UpdateCategories, m => clf != null && m.Sender != clf);
+            categoriesToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(clf.UpdateCategories, m => clf != null && m.Sender != clf && m.ObjectType == ObjectType.Contact);
             entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(clf.UpdateMovedEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
             entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(clf.UpdateRemovedFromFolderEntities, m => clf != null && m.Sender != clf && clf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Contact);
             entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(clf.UpdateRemovedEntities, m => clf != null && m.Sender != clf && m.ObjectType == ObjectType.Contact);
-            contactPreviewChangedToken = CommonConfig.MessengerHub.Subscribe<ContactPreviewChanged>(clf.UpdateContactPreview, m => clf != null && m.Sender != clf);
+            contactPreviewChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewChangedMessage>(clf.UpdateContactPreview, m => clf != null && m.Sender != clf && m.EntityPreview.ObjectType == ObjectType.Contact);
         }
 
         public override void Finish()

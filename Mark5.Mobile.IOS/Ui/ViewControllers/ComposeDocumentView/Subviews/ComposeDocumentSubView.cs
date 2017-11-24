@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
-            BackgroundColor = UIColor.White;
+            BackgroundColor = Theme.White;
             Opaque = false;
             Axis = UILayoutConstraintAxis.Vertical;
             Alignment = UIStackViewAlignment.Fill;

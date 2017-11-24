@@ -4,6 +4,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -13,10 +14,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class PickerShortcodesFolderListActivity : BaseAppCompatActivity
     {
         public const string ShortcodesResultKey = "ShortcodesResult_3e9d47b4-4d50-401e-ac1c-7ae03dedfb4f";
-
         public const int ShortcodesRequestCode = 123;
 
         Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(PickerShortcodesFolderListActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -35,9 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-
-                var pcflf = new PickerShortcodesFolderListFragment();
-                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                var (pcflf,tag) = PickerShortcodesFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Shortcodes),true,true,true);
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PickerShortcodesFolderListActivity)}");

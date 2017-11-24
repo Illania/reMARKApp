@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent Create(Context context, Folder folder)
+        public static Intent CreateIntent(Context context, Folder folder)
         {
             var intent = new Intent(context, typeof(PickerContactsListActivity));
             intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
@@ -47,11 +47,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                var pcflf = new PickerContactsListFragment
-                {
-                    Folder = folder,
-                };
-                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                var (pcflf,tag) = PickerContactsListFragment.NewInstance(folder);
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(PickerContactsListActivity)}");

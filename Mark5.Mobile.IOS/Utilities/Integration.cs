@@ -14,16 +14,21 @@ namespace Mark5.Mobile.IOS.Utilities
     public static class Integration
     {
 
-        #region iOS version
+        #region General
 
         public static bool IsRunningAtLeast(int major) => UIDevice.CurrentDevice.CheckSystemVersion(major, 0);
+
+        public static void ClearNotificationBadge()
+        {
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+        }
 
         #endregion
 
         #region iPhone/iPad recognition
 
         public static bool IsIPhone() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
-
         public static bool IsIPad() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
 
         #endregion
@@ -55,14 +60,14 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber) dict.FreeSize).LongValue;
+            return ((NSNumber)dict.FreeSize).LongValue;
         }
 
         public static long GetTotalDiskSpace()
         {
             var paths = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User, true);
             var dict = NSFileManager.DefaultManager.GetFileSystemAttributes(paths.Last());
-            return ((NSNumber) dict.Size).LongValue;
+            return ((NSNumber)dict.Size).LongValue;
         }
 
         public static void ClearData()
@@ -83,16 +88,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #region Apple apps
 
-        public static void OpenLink(NSUrl url, Action failureCompletionHandler)
+        public static void OpenLink(NSUrl url, Action failureCompletionHandler = null)
         {
             var options = new UIApplicationOpenUrlOptions();
-            UIApplication.SharedApplication.OpenUrl(url,
-                options,
-                (result) =>
-                {
-                    if (!result)
-                        failureCompletionHandler();
-                });
+            UIApplication.SharedApplication.OpenUrl(url, options, (result) =>
+            {
+                if (!result)
+                    failureCompletionHandler?.Invoke();
+            });
         }
 
         #endregion
@@ -123,7 +126,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -151,7 +154,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -179,7 +182,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -207,7 +210,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -237,7 +240,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -267,7 +270,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -315,7 +318,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -363,7 +366,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 
@@ -395,7 +398,7 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 CommonConfig.Logger.Error(ex);
 
-                Dialogs.ShowErrorDialog(viewController, ex);
+                Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
 

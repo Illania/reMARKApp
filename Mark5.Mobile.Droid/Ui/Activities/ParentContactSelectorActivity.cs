@@ -22,11 +22,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent Create(Context context, Folder folder, ContactType childrenType)
+        public static Intent CreateIntent(Context context, Folder folder, ContactType childrenType)
         {
             var intent = new Intent(context, typeof(ParentContactSelectorActivity));
-            intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
-            intent.PutExtra(ChildrenTypeIntentKey, (int)childrenType);
+
+            if (folder != null)
+                intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+
+            if (childrenType != ContactType.None)
+                intent.PutExtra(ChildrenTypeIntentKey, (int)childrenType);
 
             return intent;
         }
@@ -52,12 +56,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                var pcflf = new ParentContactSelectorFragment
-                {
-                    Folder = folder,
-                    ChildrenType = childrenType,
-                };
-                ft.Replace(Resource.Id.fragment_container, pcflf, pcflf.GenerateTag());
+                var (pcflf, tag) = ParentContactSelectorFragment.NewInstance(childrenType, folder);
+
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(ParentContactSelectorActivity)}");

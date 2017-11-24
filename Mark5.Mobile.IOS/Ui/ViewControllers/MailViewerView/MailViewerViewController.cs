@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
 using MailBee;
@@ -20,7 +19,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
-using WebKit;
+using Attachment = MailBee.Mime.Attachment;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
@@ -32,11 +31,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         UIBarButtonItem closeItem;
         UIBarButtonItem shareItem;
+
         UIScrollView mainScrollView;
         UIStackView stackViewBeforeContent;
         ContentView contentView;
         UIStackView stackViewAfterContent;
-        UIDocumentInteractionController attachmentInteractionController;
 
         MailMessage mailMessage;
 
@@ -56,18 +55,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";
 
-            closeItem = new UIBarButtonItem();
-            closeItem.Title = Localization.GetString("close");
+            closeItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("close")
+            };
             NavigationItem.SetLeftBarButtonItem(closeItem, false);
 
             shareItem = new UIBarButtonItem(UIBarButtonSystemItem.Action);
             NavigationItem.SetRightBarButtonItem(shareItem, false);
 
-            AutomaticallyAdjustsScrollViewInsets = true;
-
             mainScrollView = new UIScrollView
             {
-                BackgroundColor = UIColor.White,
                 ShowsVerticalScrollIndicator = true,
                 ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true,
@@ -101,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
             });
 
-            contentView = new ContentView(DecidePolicyForNavigationAction);
+            contentView = new ContentView(this);
             mainScrollView.AddSubview(contentView);
             mainScrollView.AddConstraints(new[]
             {
@@ -136,9 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.ReplyTo));
             stackViewBeforeContent.AddArrangedSubview(new DateReceivedView());
             stackViewBeforeContent.AddArrangedSubview(new PriorityView());
-            var av = new AttachmentsView();
-            av.AttachmentTapped += AttachmentsView_AttachmentTapped;
-            stackViewBeforeContent.AddArrangedSubview(av);
+            stackViewBeforeContent.AddArrangedSubview(new AttachmentsView(this));
 
             RefreshView();
         }
@@ -146,6 +142,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            }
 
             closeItem.Clicked += CloseItem_Clicked;
             shareItem.Clicked += ShareItem_Clicked;
@@ -167,18 +170,48 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             shareItem.Clicked -= ShareItem_Clicked;
         }
 
-        void CloseItem_Clicked(object sender, EventArgs e)
+        public override void DidReceiveMemoryWarning()
         {
-            DismissViewController(true, null);
+            CommonConfig.Logger.Warning("Received memory warning!");
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
         }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            closeItem = null;
+            shareItem = null;
+
+            mainScrollView.RemoveFromSuperview();
+            stackViewBeforeContent.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
+            stackViewBeforeContent.RemoveFromSuperview();
+            contentView.RemoveFromSuperview();
+            stackViewAfterContent.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
+            stackViewAfterContent.RemoveFromSuperview();
+
+            mainScrollView = null;
+            stackViewBeforeContent = null;
+            contentView = null;
+            stackViewAfterContent = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
+        void CloseItem_Clicked(object sender, EventArgs e) =>
+            DismissViewController(true, null);
 
         void ShareItem_Clicked(object sender, EventArgs e)
         {
-            var avc = new UIActivityViewController(new NSObject[]
-                {
-                    url
-                },
-                null);
+            var avc = new UIActivityViewController(new NSObject[] { url }, null);
             if (avc.PopoverPresentationController != null)
                 avc.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
             PresentViewController(avc, true, null);
@@ -189,112 +222,111 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
             Task.Run(async () =>
+            {
+                var auth = AuthenticatorFactory.Create();
+                if (!await auth.IsAuthenticatedAsync())
+                    throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
+
+                if (url == null)
+                    throw new MailViewerException("File could not be loaded.");
+
+                var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
+                if (!result)
+                    throw new MailViewerException(_error.ToString());
+
+                var name = url.LastPathComponent;
+                var size = int.Parse(sizeObject.ToString());
+
+                if (size > MaxSize)
                 {
-                    var auth = AuthenticatorFactory.Create();
-                    if (!await auth.IsAuthenticatedAsync())
-                        throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
+                    CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
 
-                    if (url == null)
-                        throw new MailViewerException("File could not be loaded.");
+                    throw new MailViewerException("File too large.");
+                }
 
-                    NSObject sizeObject;
-                    NSError _error;
-                    var result = url.TryGetResource(NSUrl.FileSizeKey, out sizeObject, out _error);
-
-                    if (!result)
-                        throw new MailViewerException(_error.ToString());
-
-                    var name = url.LastPathComponent;
-                    var size = int.Parse(sizeObject.ToString());
-
-                    if (size > MaxSize)
+                if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    byte[] bytes;
+                    using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
                     {
-                        CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
-
-                        throw new MailViewerException("File too large.");
+                        bytes = ReadToEnd(stream);
                     }
 
-                    if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
+                    try
                     {
-                        byte[] bytes;
-                        using (var stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                        var mm = new MailMessage
                         {
-                            bytes = ReadToEnd(stream);
-                        }
-
-                        try
-                        {
-                            var mm = new MailMessage();
-                            mm.ThrowExceptions = true;
-                            mm.LoadMessage(bytes);
-                            bytes = null;
-                            MakeHtmlSafe(mm);
-                            InlineImages(mm);
-                            return mm;
-                        }
-                        catch (MailBeeException ex)
-                        {
-                            throw new MailViewerException("File could not be loaded.", ex);
-                        }
+                            ThrowExceptions = true
+                        };
+                        mm.LoadMessage(bytes);
+                        bytes = null;
+                        MakeHtmlSafe(mm);
+                        InlineImages(mm);
+                        return mm;
                     }
+                    catch (MailBeeException ex)
+                    {
+                        throw new MailViewerException("File could not be loaded.", ex);
+                    }
+                }
 
-                    if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
-                        using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                if (name.EndsWith(".msg", StringComparison.CurrentCultureIgnoreCase))
+                    using (var inputStream = new FileStream(url.Path, FileMode.Open, FileAccess.Read))
+                    {
+                        using (var msgStream = new MemoryStream())
                         {
-                            using (var msgStream = new MemoryStream())
+                            inputStream.CopyTo(msgStream);
+                            inputStream.Dispose();
+
+                            using (var emlStream = new MemoryStream())
                             {
-                                inputStream.CopyTo(msgStream);
-                                inputStream.Dispose();
-
-                                using (var emlStream = new MemoryStream())
+                                try
                                 {
-                                    try
-                                    {
-                                        var msgConverter = new MsgConvert();
-                                        msgConverter.MsgToEml(msgStream, emlStream);
-                                        msgStream.Dispose();
+                                    var msgConverter = new MsgConvert();
+                                    msgConverter.MsgToEml(msgStream, emlStream);
+                                    msgStream.Dispose();
 
-                                        emlStream.Position = 0;
+                                    emlStream.Position = 0;
 
-                                        var mm = new MailMessage();
-                                        mm.ThrowExceptions = true;
-                                        mm.LoadMessage(emlStream.ToArray());
-                                        emlStream.Dispose();
-                                        MakeHtmlSafe(mm);
-                                        InlineImages(mm);
-                                        return mm;
-                                    }
-                                    catch (MailBeeException ex)
+                                    var mm = new MailMessage
                                     {
-                                        throw new MailViewerException("File could not be loaded.", ex);
-                                    }
+                                        ThrowExceptions = true
+                                    };
+                                    mm.LoadMessage(emlStream.ToArray());
+                                    emlStream.Dispose();
+                                    MakeHtmlSafe(mm);
+                                    InlineImages(mm);
+                                    return mm;
+                                }
+                                catch (MailBeeException ex)
+                                {
+                                    throw new MailViewerException("File could not be loaded.", ex);
                                 }
                             }
                         }
+                    }
 
-                    throw new MailViewerException("Unsupported file.");
-                })
-                .ContinueWith(t =>
-                    {
-                        dismissAction();
+                throw new MailViewerException("Unsupported file.");
+            }).ContinueWith(t =>
+            {
+                dismissAction();
 
-                        if (t.IsFaulted)
-                        {
-                            var ex = t.Exception.InnerException;
-                            mailMessage = null;
+                if (t.IsFaulted)
+                {
+                    var ex = t.Exception.InnerException;
+                    mailMessage = null;
 
-                            CommonConfig.Logger.Error(ex);
+                    CommonConfig.Logger.Error(ex);
 
-                            Dialogs.ShowErrorDialog(this, ex);
-                        }
-                        else
-                        {
-                            mailMessage = t.Result;
+                    Dialogs.ShowErrorAlert(this, ex);
+                }
+                else
+                {
+                    mailMessage = t.Result;
 
-                            RefreshView();
-                        }
-                    },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+                    RefreshView();
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         void RefreshView()
@@ -318,30 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             }
         }
 
-        WKNavigationActionPolicy DecidePolicyForNavigationAction(WKNavigationAction navigationAction)
-        {
-            if (navigationAction.NavigationType == WKNavigationType.LinkActivated || navigationAction.NavigationType == WKNavigationType.BackForward || navigationAction.NavigationType == WKNavigationType.FormSubmitted || navigationAction.NavigationType == WKNavigationType.FormResubmitted)
-            {
-                if (navigationAction.Request.Url.Scheme == "mailto")
-                {
-                    var address = navigationAction.Request.Url.ResourceSpecifier;
-                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
-                }
-                else
-                {
-                    Integration.OpenLink(navigationAction.Request.Url, async () => await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("unable_open_link_title"), Localization.GetString("unable_open_link_content") + navigationAction.Request.Url.Scheme));
-                }
-
-                return WKNavigationActionPolicy.Cancel;
-            }
-
-            if (navigationAction.NavigationType == WKNavigationType.Reload)
-                return WKNavigationActionPolicy.Cancel;
-
-            return WKNavigationActionPolicy.Allow;
-        }
-
-        void PresentComposeViewWithPreconfiguredAddresses(string[] preconfiguredEmailAddresses)
+        public void OpenComposeDocumentView(string[] preconfiguredEmailAddresses)
         {
             var vc = new ComposeDocumentViewController
             {
@@ -355,23 +364,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        async void AttachmentsView_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+        public async void OpenAttachment(Attachment attachment)
         {
-            var att = e.Attachment;
-
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
             try
             {
-                var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
+                var filename = attachment.FilenameOriginal;
+                if (string.IsNullOrEmpty(filename))
+                    filename = attachment.Filename;
 
-                if (CanOpen(attFile))
-                {
-                    PresentViewController(new NavigationController(new MailViewerViewController(attFile), UIModalPresentationStyle.PageSheet), true, null);
-                }
+                var tempFile = await CreateTempFile(filename, attachment.GetData());
+
+                if (CanOpen(tempFile))
+                    PresentViewController(new NavigationController(new MailViewerViewController(tempFile), UIModalPresentationStyle.PageSheet), true, null);
                 else
                 {
-                    attachmentInteractionController = UIDocumentInteractionController.FromUrl(attFile);
+                    var attachmentInteractionController = UIDocumentInteractionController.FromUrl(tempFile);
                     attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
 
                     var previewSuccessful = attachmentInteractionController.PresentPreview(true);
@@ -385,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                         {
                             CommonConfig.Logger.Warning("Failed to present open in view - there is no app that can open this type of attachment installed");
 
-                            await Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
                         }
                     }
                 }
@@ -394,11 +403,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [attachment={att}]", ex);
+                CommonConfig.Logger.Error($"Failed to view attachment [attachment={attachment}]", ex);
 
                 dismissAction();
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
@@ -470,45 +479,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             var tempDir = fm.GetTemporaryDirectory();
             var specificDir = tempDir.Append("mailviewer", true).Append(Guid.NewGuid().ToString(), true);
 
-            NSError _error;
-            fm.CreateDirectory(specificDir, true, null, out _error);
+            fm.CreateDirectory(specificDir, true, null, out NSError _error);
 
             if (_error != null)
                 throw new MailViewerException(_error.ToString());
 
             var cacheFile = specificDir.Append(filename, false);
 
-            using (var stream = new FileStream(cacheFile.Path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, 4096, true))
-            {
+            using (var stream = new FileStream(cacheFile.Path, FileMode.OpenOrCreate))
                 await stream.WriteAsync(bytes, 0, bytes.Length);
-            }
 
             return cacheFile;
-        }
-
-        class DocumentInteractionControllerDelegate : UIDocumentInteractionControllerDelegate
-        {
-            readonly UIViewController parentController;
-
-            public DocumentInteractionControllerDelegate(UIViewController parentController)
-            {
-                this.parentController = parentController;
-            }
-
-            public override UIViewController ViewControllerForPreview(UIDocumentInteractionController controller)
-            {
-                return parentController;
-            }
-
-            public override UIView ViewForPreview(UIDocumentInteractionController controller)
-            {
-                return parentController.View;
-            }
-
-            public override CGRect RectangleForPreview(UIDocumentInteractionController controller)
-            {
-                return parentController.View.Frame;
-            }
         }
     }
 }

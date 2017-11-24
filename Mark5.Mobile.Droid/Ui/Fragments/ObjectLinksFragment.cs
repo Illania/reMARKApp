@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -12,6 +11,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -22,9 +22,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ObjectLinksFragment : RetainableStateFragment
     {
-        public IBusinessEntity BusinessEntity { get; set; }
+        const string BusinessEntityBundleKey = "BusinessEntity_0dd3cb9b-f178-4b02-b7d3-e1bb3428c913";
 
-        public Action CloseRequest { get; set; }
+        IBusinessEntity businessEntity;
 
         List<ObjectLink> objectLinks;
 
@@ -32,9 +32,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
+        public static (ObjectLinksFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
+        {
+            var args = new Bundle();
+
+            if (businessEntity != null)
+                args.PutString(BusinessEntityBundleKey, Serializer.Serialize(businessEntity));
+
+            var fragment = new ObjectLinksFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity.Id}, businessEntity?.objectType={businessEntity.ObjectType}]";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            if (Arguments.ContainsKey(BusinessEntityBundleKey))
+                businessEntity = Serializer.Deserialize<IBusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
+
+            CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
@@ -42,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
-            var padding = (int) (TypedValue.ApplyDimension(ComplexUnitType.Dip, 10f, Resources.DisplayMetrics) + 0.5f);
+            var padding = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 10f, Resources.DisplayMetrics) + 0.5f);
             linearLayout.SetPadding(padding, padding, padding, padding);
 
             return rootView;
@@ -52,10 +70,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.links);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.links);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity?.Id}, businessEntity.objectType={BusinessEntity?.ObjectType}]...");
+            CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
         }
 
         public override async void OnResume()
@@ -65,13 +83,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
+        public override IRetainableState OnRetainInstanceState()
+        {
+            return new ObjectLinksFragmentState
+            {
+                BusinessEntity = businessEntity,
+                ObjectLinks = objectLinks
+            };
+        }
+
+        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
+        {
+            var oafs = restoredState as ObjectLinksFragmentState;
+            if (oafs != null)
+            {
+                businessEntity = oafs.BusinessEntity;
+                objectLinks = oafs.ObjectLinks;
+            }
+        }
+
         async Task RefreshData()
         {
             try
             {
                 if (objectLinks == null)
                 {
-                    objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(BusinessEntity);
+                    objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(businessEntity);
                     ProcessObjectLinks(objectLinks);
                 }
 
@@ -79,12 +116,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Downloading object actions failed [businessEntity.id={BusinessEntity.Id}, businessEntity.objectType={BusinessEntity.ObjectType}]", ex);
+                CommonConfig.Logger.Error($"Downloading object actions failed [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
-                if (CloseRequest != null)
-                    CloseRequest();
             }
         }
 
@@ -137,68 +171,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (ol.FromObjectType == ObjectType.Document)
                 {
-                    var i = new Intent(Activity, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.DocumentIdIntentKey, ol.FromObjectId);
-                    StartActivity(i);
+                    StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.FromObjectId));
                 }
                 else if (ol.FromObjectType == ObjectType.Contact)
                 {
-                    var i = new Intent(Activity, typeof(ContactActivity));
-                    i.PutExtra(ContactActivity.ContactIdIntentKey, ol.FromObjectId);
-                    StartActivity(i);
+                    StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.FromObjectId));
                 }
                 else if (ol.FromObjectType == ObjectType.Shortcode)
                 {
-                    var i = new Intent(Activity, typeof(ShortcodeActivity));
-                    i.PutExtra(ShortcodeActivity.ShortcodeIdIntentKey, ol.FromObjectId);
-                    StartActivity(i);
+                    StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.FromObjectId));
                 }
             }
             else
             {
                 if (ol.ToObjectType == ObjectType.Document)
                 {
-                    var i = new Intent(Activity, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.DocumentIdIntentKey, ol.ToObjectId);
-                    StartActivity(i);
+                    StartActivity(DocumentActivity.CreateIntent(Context, documentId: ol.ToObjectId));
                 }
                 else if (ol.ToObjectType == ObjectType.Contact)
                 {
-                    var i = new Intent(Activity, typeof(ContactActivity));
-                    i.PutExtra(ContactActivity.ContactIdIntentKey, ol.ToObjectId);
-                    StartActivity(i);
+                    StartActivity(ContactActivity.CreateIntent(Context, contactId: ol.ToObjectId));
                 }
                 else if (ol.ToObjectType == ObjectType.Shortcode)
                 {
-                    var i = new Intent(Activity, typeof(ShortcodeActivity));
-                    i.PutExtra(ShortcodeActivity.ShortcodeIdIntentKey, ol.ToObjectId);
-                    StartActivity(i);
+                    StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodeId: ol.ToObjectId));
                 }
             }
-        }
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ObjectLinksFragmentState
-            {
-                BusinessEntity = BusinessEntity,
-                ObjectLinks = objectLinks
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var oafs = restoredState as ObjectLinksFragmentState;
-            if (oafs != null)
-            {
-                BusinessEntity = oafs.BusinessEntity;
-                objectLinks = oafs.ObjectLinks;
-            }
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ObjectLinksFragment)} [businessEntity.id={BusinessEntity.Id}, businessEntity?.objectType={BusinessEntity.ObjectType}]";
         }
 
         class ObjectLinksFragmentState : IRetainableState

@@ -102,89 +102,98 @@
       <HintPath>..\packages\PCLStorage.1.0.2\lib\monoandroid\PCLStorage.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Android.Export" />
-    <Reference Include="MailBee.NET">
-      <HintPath>..\packages\MailBee.NET.11.1.0\lib\netstandard1.3\MailBee.NET.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="HockeySDK.AndroidBindings">
-      <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
-    </Reference>
-    <Reference Include="HockeySDK">
-      <HintPath>..\packages\HockeySDK.Xamarin.4.1.5\lib\MonoAndroid403\HockeySDK.dll</HintPath>
     </Reference>
     <Reference Include="SQLite-net">
       <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
     </Reference>
+    <Reference Include="HockeySDK.AndroidBindings">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\MonoAndroid403\HockeySDK.dll</HintPath>
+    </Reference>
+    <Reference Include="MailBee.NET">
+      <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
+    </Reference>
     <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.8\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.9\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.8\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.9\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.8\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.9\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.5.5\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\packages\HtmlAgilityPack.1.6.5\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Annotations">
-      <HintPath>..\packages\Xamarin.Android.Support.Annotations.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Annotations.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Arch.Core.Common">
+      <HintPath>..\packages\Xamarin.Android.Arch.Core.Common.1.0.0\lib\MonoAndroid80\Xamarin.Android.Arch.Core.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Arch.Lifecycle.Common">
+      <HintPath>..\packages\Xamarin.Android.Arch.Lifecycle.Common.1.0.1\lib\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Arch.Lifecycle.Runtime">
+      <HintPath>..\packages\Xamarin.Android.Arch.Lifecycle.Runtime.1.0.0\lib\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Compat">
-      <HintPath>..\packages\Xamarin.Android.Support.Compat.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Compat.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Compat.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Compat.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Core.UI">
-      <HintPath>..\packages\Xamarin.Android.Support.Core.UI.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Core.UI.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Core.UI.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Core.UI.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Core.Utils">
-      <HintPath>..\packages\Xamarin.Android.Support.Core.Utils.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Core.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Android.Support.Media.Compat">
-      <HintPath>..\packages\Xamarin.Android.Support.Media.Compat.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Media.Compat.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Core.Utils.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Core.Utils.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Fragment">
-      <HintPath>..\packages\Xamarin.Android.Support.Fragment.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Fragment.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Fragment.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Fragment.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Media.Compat">
+      <HintPath>..\packages\Xamarin.Android.Support.Media.Compat.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Media.Compat.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Transition">
-      <HintPath>..\packages\Xamarin.Android.Support.Transition.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Transition.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Transition.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Transition.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v13">
-      <HintPath>..\packages\Xamarin.Android.Support.v13.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v13.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v13.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v13.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v4">
-      <HintPath>..\packages\Xamarin.Android.Support.v4.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v4.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v4.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v4.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.CardView">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v7.CardView.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.CardView.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.RecyclerView">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.RecyclerView.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v7.RecyclerView.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Vector.Drawable">
-      <HintPath>..\packages\Xamarin.Android.Support.Vector.Drawable.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Vector.Drawable.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable">
-      <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.AppCompat">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Design">
-      <HintPath>..\packages\Xamarin.Android.Support.Design.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.Design.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.Design.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Design.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.Preference">
-      <HintPath>..\packages\Xamarin.Android.Support.v7.Preference.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v7.Preference.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v7.Preference.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.Preference.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v14.Preference">
-      <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.25.4.0.2\lib\MonoAndroid70\Xamarin.Android.Support.v14.Preference.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v14.Preference.dll</HintPath>
     </Reference>
     <Reference Include="PhoneNumbers">
       <HintPath>..\packages\libphonenumber-csharp.8.8.5\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
@@ -231,7 +240,6 @@
     <Compile Include="Ui\Activities\MainActivity.cs" />
     <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
     <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
-    <Compile Include="Ui\Activities\PIckCategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
     <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
@@ -376,51 +384,51 @@
     <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
     <Compile Include="Ui\Activities\DownloadActivity.cs" />
     <Compile Include="Ui\Fragments\DownloadFragment.cs" />
-    <Compile Include="Model\HubMessages\ContactPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewCategoriesChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewCommentCountChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewPriorityChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\DocumentPreviewReadStatusChangedMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityMovedFromFolderMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityRemovedFromFolderMessage.cs" />
-    <Compile Include="Model\HubMessages\EntityRemovedMessage.cs" />
-    <Compile Include="Model\HubMessages\NewNotificationsReceived.cs" />
     <Compile Include="Ui\Activities\TemplatesListActivity.cs" />
     <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
     <Compile Include="Model\FileDescription.cs" />
     <Compile Include="Utilities\Extensions\ViewGroupExtensions.cs" />
     <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
     <Compile Include="Ui\Activities\AddEditContactActivity.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractMultipleRowsView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractPhoneNumberView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AbstractSimpleFieldView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AccountView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\AddEditContactView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\BirthdateView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\DescriptionView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\EmailsView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\FaxView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\LedgerView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\MobileView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\NameView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\ParentContactView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PersonNameView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PhoneView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PhysicalAddressesView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\PositionView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\ResponsibleUsersView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\ShortIdView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\TelexView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\VatView.cs" />
-    <Compile Include="Ui\Views\AddEdtiContactViews\WebpageView.cs" />
     <Compile Include="Ui\Activities\ParentContactSelectorActivity.cs" />
     <Compile Include="Ui\Activities\ParentContactSelectorFoldersListActivity.cs" />
     <Compile Include="Ui\Fragments\AbstractUserSelectionFragment.cs" />
     <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
-    <Compile Include="Model\HubMessages\ContactPreviewChanged.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Ui\Activities\AddEditShortcodeActivity.cs" />
+    <Compile Include="Ui\Fragments\AddEditShortcodeFragment.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AccountView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AddEditContactView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\BirthdateView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\EmailsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\FaxView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\LedgerView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\MobileView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ParentContactView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PersonNameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PhoneView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PhysicalAddressesView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PositionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ResponsibleUsersView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ShortIdView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\TelexView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\VatView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\WebpageView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractPhoneNumberView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AddEditShortcodeView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
+    <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
     <Compile Include="Service\CallStateBroadcastReceiver.cs" />
     <Compile Include="Utilities\CallerIdDatabaseProvider.cs" />
@@ -434,8 +442,10 @@
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
     <Folder Include="Model\HubMessages\" />
-    <Folder Include="Ui\Activities\Activities\" />
     <Folder Include="Utilities\Extensions\" />
+    <Folder Include="Ui\Views\AddEditViews\" />
+    <Folder Include="Ui\Views\AddEditViews\AddEditContactViews\" />
+    <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -722,20 +732,20 @@
     <AndroidResource Include="Resources\drawable\icon_download_done.xml" />
     <AndroidResource Include="Resources\drawable\icon_download_download.xml" />
     <AndroidResource Include="Resources\drawable\icon_download_warning.xml" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-hdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-hdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-hdpi\remove.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\remove.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-xxhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\remove.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\action_add_contact.png" />
-    <AndroidResource Include="Resources\drawable-xxxhdpi\action_save_contact.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_save.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\remove.png" />
     <AndroidResource Include="Resources\layout\countries_dropdown.axml" />
@@ -769,22 +779,26 @@
   <Import Project="..\packages\Xamarin.Firebase.Common.42.1021.1\build\MonoAndroid70\Xamarin.Firebase.Common.targets" Condition="Exists('..\packages\Xamarin.Firebase.Common.42.1021.1\build\MonoAndroid70\Xamarin.Firebase.Common.targets')" />
   <Import Project="..\packages\Xamarin.Firebase.Iid.42.1021.1\build\MonoAndroid70\Xamarin.Firebase.Iid.targets" Condition="Exists('..\packages\Xamarin.Firebase.Iid.42.1021.1\build\MonoAndroid70\Xamarin.Firebase.Iid.targets')" />
   <Import Project="..\packages\Xamarin.Firebase.Messaging.42.1021.1\build\MonoAndroid70\Xamarin.Firebase.Messaging.targets" Condition="Exists('..\packages\Xamarin.Firebase.Messaging.42.1021.1\build\MonoAndroid70\Xamarin.Firebase.Messaging.targets')" />
-  <Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Compat.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Core.UI.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.UI.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.UI.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.UI.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Core.Utils.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.Utils.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.Utils.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Core.Utils.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Media.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Media.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Media.Compat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Media.Compat.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Fragment.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Fragment.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Fragment.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Fragment.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Transition.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Transition.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Transition.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Transition.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v13.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v13.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v13.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v13.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v4.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v4.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v4.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v4.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.CardView.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.CardView.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.CardView.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.RecyclerView.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.RecyclerView.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.RecyclerView.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Vector.Drawable.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.AppCompat.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.AppCompat.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.Design.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.Design.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v7.Preference.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.Preference.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v7.Preference.targets')" />
-  <Import Project="..\packages\Xamarin.Android.Support.v14.Preference.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v14.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v14.Preference.25.4.0.2\build\MonoAndroid70\Xamarin.Android.Support.v14.Preference.targets')" />
+  <Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Annotations.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Arch.Core.Common.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Core.Common.targets" Condition="Exists('..\packages\Xamarin.Android.Arch.Core.Common.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Core.Common.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Arch.Lifecycle.Common.1.0.1\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Common.targets" Condition="Exists('..\packages\Xamarin.Android.Arch.Lifecycle.Common.1.0.1\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Common.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Arch.Lifecycle.Runtime.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Runtime.targets" Condition="Exists('..\packages\Xamarin.Android.Arch.Lifecycle.Runtime.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Runtime.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.UI.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.UI.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.UI.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.UI.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.Utils.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.Utils.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.Utils.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.Utils.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Fragment.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Fragment.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Fragment.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Fragment.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Media.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Media.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Media.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Media.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Transition.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Transition.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Transition.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Transition.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v13.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v13.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v13.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v13.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v4.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v4.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v4.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v4.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.CardView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.CardView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.CardView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.CardView.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.RecyclerView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.RecyclerView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.RecyclerView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.RecyclerView.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Animated.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Animated.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Design.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Design.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.Preference.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v14.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v14.Preference.targets')" />
 </Project>

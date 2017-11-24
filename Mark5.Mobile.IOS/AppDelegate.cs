@@ -13,10 +13,10 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
 
                 Window = new UIWindow(UIScreen.MainScreen.Bounds);
-                Theme.ApplyTheme(Window);
+                Window.ApplyTheme();
 
                 UIViewController vc;
                 if (!isLoggedIn)
@@ -101,10 +101,9 @@ namespace Mark5.Mobile.IOS
 
                     if (n != null && n.ObjectType == ObjectType.Document)
                     {
-                        var vc = new DocumentViewController { Modal = true };
+                        var vc = new DocumentViewController();
                         vc.SetRefreshDataOnAppear();
                         vc.SetData(n.ObjectId);
-
                         Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                     }
                 }
@@ -156,7 +155,7 @@ namespace Mark5.Mobile.IOS
                 return Window.RootViewController;
 
             if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))
-                return new NavigationController
+                return new DarkNavigationController
                 {
                     ModalPresentationStyle = UIModalPresentationStyle.FullScreen,
                     ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
@@ -227,7 +226,7 @@ namespace Mark5.Mobile.IOS
                 if (n.ObjectType == ObjectType.Document)
                 {
                     if (notification.Request.Identifier != LocalNotificationsListener.DocumentFailedToSendIdentifier)
-                        CommonConfig.MessengerHub.Publish(new NewNotificationsMessage(this));
+                        CommonConfig.MessengerHub.Publish(new NewNotificationsReceivedMessage(this));
 
                     options(UNNotificationPresentationOptions.Alert);
                 }
@@ -259,7 +258,7 @@ namespace Mark5.Mobile.IOS
 
                 if (n.ObjectType == ObjectType.Document)
                 {
-                    var vc = new DocumentViewController { Modal = true };
+                    var vc = new DocumentViewController();
                     vc.SetRefreshDataOnAppear();
                     vc.SetData(n.ObjectId);
 

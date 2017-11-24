@@ -1,9 +1,8 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Android.Content;
 using Android.Support.Design.Widget;
 using Android.Views;
+using Android.OS;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -17,12 +16,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         FloatingActionButton fab;
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Android.OS.Bundle savedInstanceState)
+        public static (ContactsListFragment fragment, string tag) NewInstance(Folder folder)
+        {
+            var args = new Bundle();
+
+            if (folder != null)
+                args.PutString(FolderBundleKey, Serializer.Serialize(folder));
+
+            var fragment = new ContactsListFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(ContactsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
+
+            return (fragment, tag);
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
             {
-                fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
-                fab.SetImageResource(Resource.Drawable.action_add_contact);
+                fab = ((BaseAppCompatActivity)Activity).Fab;
+                fab.SetImageResource(Resource.Drawable.action_add);
                 fab.SetOnClickListener(new ActionOnClickListener(CreateContact));
                 fab.Visibility = ViewStates.Visible;
             }
@@ -36,10 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (ActionMode == null)
             {
-                var i = new Intent(Activity, typeof(ContactActivity));
-                i.PutExtra(ContactActivity.ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
-                i.PutExtra(ContactActivity.FolderIntentKey, Serializer.Serialize(Folder));
-                StartActivity(i);
+                StartActivity(ContactActivity.CreateIntent(Context, folder: Folder, contactPreview: contactPreview));
             }
             else
             {
@@ -71,16 +82,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var values = new List<ContactType> { ContactType.Company, ContactType.Department, ContactType.Person };
 
-            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(),
-                                                                   true);
+            var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
 
-            if (index >= 0)
-            {
-                var intent = new Intent(Context, typeof(AddEditContactActivity));
-                intent.PutExtra(AddEditContactActivity.ContactCreationModeFlag, (int)ContactCreationModeFlag.New);
-                intent.PutExtra(AddEditContactActivity.ContactTypeIntentKey, (int)values[index]);
-                StartActivity(intent);
-            }
+            if (index > 0)
+                StartActivity(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.New, contactType: (int)values[index]));
+
         }
     }
 }

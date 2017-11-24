@@ -11,7 +11,6 @@ namespace Mark5.Mobile.Common.Service
 {
     public class DocumentsDownloadService : AbstractService, IDocumentsDownloadService
     {
-
         readonly HashSet<int> documentIdSkipList = new HashSet<int>();
 
         public DocumentsDownloadService()

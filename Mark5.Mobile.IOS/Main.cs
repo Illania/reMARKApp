@@ -7,8 +7,7 @@ namespace Mark5.Mobile.IOS
     {
         static void Main(string[] args)
         {
-            int workerThreads, completionPortThreads;
-            ThreadPool.GetMinThreads(out workerThreads, out completionPortThreads);
+            ThreadPool.GetMinThreads(out int workerThreads, out int completionPortThreads);
             ThreadPool.SetMinThreads(workerThreads * 5, completionPortThreads * 5);
 
             UIApplication.Main(args, null, "AppDelegate");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Android.Content;
 using Android.Content.Res;
@@ -32,6 +32,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AbstractSearchView<SearchShortcodesCriteria>> subviews = new List<AbstractSearchView<SearchShortcodesCriteria>>();
 
+        public static (ShortcodesSearchCriteriaFragment Fragment, string tag) NewInstance()
+        {
+            var fragment = new ShortcodesSearchCriteriaFragment();
+            var tag = $"{nameof(ShortcodesSearchCriteriaFragment)}";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchCriteriaFragment)}...");
@@ -50,9 +58,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var paddingLinearLayout = Conversion.ConvertDpToPixels(12);
             var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
-            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
@@ -64,8 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
             fab.Visibility = ViewStates.Visible;
 
-            var p = (CoordinatorLayout.LayoutParams) fab.LayoutParameters;
-            p.Gravity = (int) (GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
+            p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
@@ -91,8 +99,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.shortcodes);
 
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchCriteriaFragment)}");
         }
@@ -137,32 +145,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void RefreshViews()
-        {
-            subviews.ForEach(c =>
-            {
-                c.Criteria = searchCriteria;
-                c.Refresh();
-            });
-        }
-
-        async void Reset()
-        {
-            searchCriteria = new SearchShortcodesCriteria();
-            containerLinearLayout.RequestFocus();
-            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
-            RefreshViews();
-
-            try
-            {
-                await Managers.SearchManager.SaveLastSearchShortcodesCrtieriaAsync(searchCriteria);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
-            }
-        }
-
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -188,27 +170,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
 
-        void HandleSearchButtonClicked()
-        {
-            GetCriteria();
-
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Shortcodes));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
-            StartActivity(i);
-        }
-
-        SearchShortcodesCriteria GetCriteria()
-        {
-            subviews.ForEach(v => v.UpdateCriteria());
-
-            searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
-
-            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
-
-            return searchCriteria;
-        }
-
         public void OnLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
         {
             var parent = containerLinearLayout?.Parent?.Parent?.Parent?.Parent?.Parent as CoordinatorLayout;
@@ -220,6 +181,50 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var bottomMargin = v.Context.Resources.GetDimension(Resource.Dimension.fab_margin);
 
             v.Visibility = distance > bottomMargin * 2 ? ViewStates.Invisible : ViewStates.Visible;
+        }
+
+        void RefreshViews()
+        {
+            subviews.ForEach(c =>
+            {
+                c.Criteria = searchCriteria;
+                c.Refresh();
+            });
+        }
+
+        async void Reset()
+        {
+            searchCriteria = new SearchShortcodesCriteria();
+            containerLinearLayout.RequestFocus();
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            RefreshViews();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchShortcodesCrtieriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
+        }
+
+        void HandleSearchButtonClicked()
+        {
+            GetCriteria();
+
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Shortcodes, shortcodeCriteria: GetCriteria()));
+        }
+
+        SearchShortcodesCriteria GetCriteria()
+        {
+            subviews.ForEach(v => v.UpdateCriteria());
+
+            searchCriteria.MaxToFetch = PlatformConfig.Preferences.MaxShortcodesToSearch;
+
+            CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
+
+            return searchCriteria;
         }
 
         #region Retained State
@@ -237,11 +242,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var df = restoredState as ShortcodeSearchCriteriaFragmentState;
             if (df != null)
                 searchCriteria = df.Criteria;
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ShortcodesSearchCriteriaFragment)}";
         }
 
         class ShortcodeSearchCriteriaFragmentState : IRetainableState

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\HubMessages\" />
+    <Folder Include="Utilities\Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Database\SharedContactsDatabaseProvider.cs" />

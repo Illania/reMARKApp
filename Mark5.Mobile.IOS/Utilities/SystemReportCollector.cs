@@ -5,6 +5,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Ui.Common;
 using MessageUI;
 using UIKit;
 
@@ -16,11 +17,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static UIActivityViewController CreateShareReportController(string report)
         {
-            var avc = new UIActivityViewController(new[]
-                {
-                    new NSString(report)
-                },
-                null)
+            return new UIActivityViewController(new[] { new NSString(report) }, null)
             {
                 ExcludedActivityTypes = new[]
                 {
@@ -35,21 +32,23 @@ namespace Mark5.Mobile.IOS.Utilities
                     UIActivityType.SaveToCameraRoll
                 }
             };
-            return avc;
         }
 
         public static MFMailComposeViewController CreateMailReportController(string report)
         {
-            var mc = new MFMailComposeViewController();
-            mc.SetToRecipients(new[]
-            {
-                "appfeedback@nordic-it.com"
-            });
-            mc.SetSubject("MARK5 for iOS Feedback");
-            mc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");
-            mc.Finished += (sender2, e) => e.Controller.DismissViewController(true, null);
-            mc.NavigationBar.TintColor = UIColor.White;
-            return mc;
+            var mcvc = new MFMailComposeViewController();
+            mcvc.SetToRecipients(new[] { "appfeedback@nordic-it.com" });
+            mcvc.SetSubject("MARK5 for iOS Feedback");
+            mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");
+            mcvc.Finished += Mcvc_Finished;
+            mcvc.NavigationBar.TintColor = Theme.White;
+            return mcvc;
+        }
+
+        static void Mcvc_Finished(object sender, MFComposeResultEventArgs e)
+        {
+            e.Controller.Finished -= Mcvc_Finished;
+            e.Controller.DismissViewController(true, null);
         }
 
         public static string CreateFullReport()
@@ -65,7 +64,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static Task<string> CreateFullReportAsync()
         {
-            return Task.Run(() => { return CreateFullReport(); });
+            return Task.Run(() => CreateFullReport());
         }
 
         public static string CreateSystemInfoReport()
@@ -125,7 +124,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var sb = new StringBuilder();
             sb.Append("===== log =====");
-            sb.AppendLine(((ConsoleAndFileLogger) CommonConfig.Logger).ReadLogFile());
+            sb.AppendLine(((ConsoleAndFileLogger)CommonConfig.Logger).ReadLogFile());
             return sb.ToString();
         }
     }

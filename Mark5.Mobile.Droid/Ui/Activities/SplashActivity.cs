@@ -147,7 +147,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         Services.DocumentsDownloadService?.Start();
 
                         if (t.Result)
-                            StartActivity(new Intent(this, typeof(MainActivity)));
+                    StartActivity(MainActivity.CreateIntent(this));
                         else
                             ShowLoginButton();
                     },
@@ -161,7 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             var progressBar = FindViewById<ProgressBar>(Resource.Id.progress_bar);
             var loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
 
-            loginButton.Click += (sender, e) => StartActivity(new Intent(this, typeof(LoginActivity)));
+            loginButton.Click += (sender, e) => StartActivity(LoginActivity.CreateIntent(this));
 
             progressBar.Visibility = ViewStates.Gone;
             loginButton.Visibility = ViewStates.Visible;

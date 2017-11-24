@@ -34,6 +34,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AbstractSearchView<SearchDocumentsCriteria>> subviews = new List<AbstractSearchView<SearchDocumentsCriteria>>();
 
+        public static (DocumentSearchCriteriaFragment Fragment, string tag) NewInstance()
+        {
+            var fragment = new DocumentSearchCriteriaFragment();
+            var tag = $"{nameof(DocumentSearchCriteriaFragment)}";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");
@@ -52,9 +60,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var paddingLinearLayout = Conversion.ConvertDpToPixels(12);
             var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
-            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
@@ -65,8 +73,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.BackgroundTintList = ColorStateList.ValueOf(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
             fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
 
-            var p = (CoordinatorLayout.LayoutParams) fab.LayoutParameters;
-            p.Gravity = (int) (GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
+            p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
@@ -82,14 +90,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var fromToCriteria = new DocumentFromToSearchView(Context);
             subviews.Add(fromToCriteria);
 
-            var extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
-            subviews.Add(extraFieldsCriteria);
+            DocumentExtraFieldsSearchView extraFieldsCriteria = null;
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+            {
+                extraFieldsCriteria = new DocumentExtraFieldsSearchView(Context);
+                subviews.Add(extraFieldsCriteria);
+            }
 
             var attUnreadCriteria = new DocumentAttachmentUnreadSearchView(Context);
             subviews.Add(attUnreadCriteria);
 
-            var handledCriteria = new DocumentHandledSearchView(Context);
-            subviews.Add(handledCriteria);
+            DocumentHandledSearchView handledCriteria = null;
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+            {
+                handledCriteria = new DocumentHandledSearchView(Context);
+                subviews.Add(handledCriteria);
+            }
 
             containerLinearLayout.AddView(directionCriteria);
             containerLinearLayout.AddView(subjectMessageCriteria);
@@ -97,15 +113,84 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(daterangeCriteria);
             PrepareEditableTextRow();
             PrepareDropdownTextRow();
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos.Any())
+            if (extraFieldsCriteria != null)
                 containerLinearLayout.AddView(extraFieldsCriteria);
             containerLinearLayout.AddView(attUnreadCriteria);
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
+            if (handledCriteria != null)
                 containerLinearLayout.AddView(handledCriteria);
 
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
+
+            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
+        }
+
+        public override async void OnResume()
+        {
+            base.OnResume();
+
+            fab.Visibility = ViewStates.Visible;
+
+            try
+            {
+                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchDocumentsCriteriaAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
+
+                searchCriteria = new SearchDocumentsCriteria();
+            }
+
+            RefreshViews();
+        }
+
+        public override void OnPause()
+        {
+            fab.Visibility = ViewStates.Gone;
+
+            base.OnPause();
+        }
+
+        public override async void OnStop()
+        {
+            base.OnStop();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
+            item.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                Reset();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
         }
 
         public void PrepareEditableTextRow()
@@ -165,55 +250,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(ll);
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        public void ReplaceFragment(Fragment f, string tag)
         {
-            base.OnViewCreated(view, savedInstanceState);
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.documents);
-
-            CommonConfig.Logger.Info($"Created {nameof(DocumentSearchCriteriaFragment)}");
-        }
-
-        public override async void OnResume()
-        {
-            base.OnResume();
-
-            fab.Visibility = ViewStates.Visible;
-
-            try
-            {
-                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchDocumentsCriteriaAsync();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
-
-                searchCriteria = new SearchDocumentsCriteria();
-            }
-
-            RefreshViews();
-        }
-
-        public override void OnPause()
-        {
-            fab.Visibility = ViewStates.Gone;
-
-            base.OnPause();
-        }
-
-        public override async void OnStop()
-        {
-            base.OnStop();
-
-            try
-            {
-                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(searchCriteria);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
-            }
+            fragmentManager.BeginTransaction()
+                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                           .Replace(Resource.Id.fragment_container, f, tag)
+                           .AddToBackStack(tag)
+                           .Commit();
         }
 
         void RefreshViews()
@@ -225,57 +270,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             });
         }
 
-        async void Reset()
-        {
-            searchCriteria = new SearchDocumentsCriteria();
-            containerLinearLayout.RequestFocus();
-            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
-            RefreshViews();
-
-            try
-            {
-                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(searchCriteria);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
-            }
-        }
-
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            menu.Clear();
-            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
-            item.SetShowAsAction(ShowAsAction.Always);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                Reset();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-
-        public void ReplaceFragment(Fragment f, string tag)
-        {
-            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
-
-            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
-        }
-
         void HandleSearchButtonClicked()
         {
             GetCriteria();
 
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Documents));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
-            StartActivity(i);
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Documents, documentCriteria: GetCriteria()));
         }
 
         SearchDocumentsCriteria GetCriteria()
@@ -290,6 +289,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return searchCriteria;
         }
 
+        async void Reset()
+        {
+            searchCriteria = new SearchDocumentsCriteria();
+            containerLinearLayout.RequestFocus();
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            RefreshViews();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchDocumentsCriteriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
+        }
+
         #region Retained State
 
         public override IRetainableState OnRetainInstanceState()
@@ -302,14 +318,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var df = restoredState as DocumentSearchCriteriaFragmentState;
-            if (df != null)
+            if (restoredState is DocumentSearchCriteriaFragmentState df)
                 searchCriteria = df.Criteria;
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentSearchCriteriaFragment)}";
         }
 
         class DocumentSearchCriteriaFragmentState : IRetainableState

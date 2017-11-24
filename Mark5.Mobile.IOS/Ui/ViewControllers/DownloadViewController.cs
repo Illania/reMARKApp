@@ -50,7 +50,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Folder Folder { get; set; }
 
-        public Task DidDisappear { get => tcs.Task; }
+        readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        public Task Result => tcs.Task;
 
         UIBarButtonItem doneItem;
 
@@ -70,7 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         Stopwatch sw;
         CancellationTokenSource cts;
 
-        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        NSObject didEnterBackgroundNotification;
 
         public override void LoadView()
         {
@@ -86,19 +87,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            UIApplication.Notifications.ObserveDidEnterBackground(DidEnterBackgroundNotification);
-
-            ExtendedLayoutIncludesOpaqueBars = false;
+            didEnterBackgroundNotification = UIApplication.Notifications.ObserveDidEnterBackground(DidEnterBackgroundNotification);
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = false;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            }
+
             InitializeNavigationBarTitle();
             InitializeHandlers();
-
-            ReachabilityBar.Attach(View, null, (float)NavigationController.BottomLayoutGuide.Length);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -111,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
                 lastDownloadedLabel.Text = null;
 
-            CommonConfig.Logger.Info($"{nameof(DownloadViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -132,10 +136,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(DownloadViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            doneItem = null;
+
+            startView = null;
+            progressView = null;
+            finishedView = null;
+
+            startButton = null;
+            lastDownloadedLabel = null;
+            progressPreparingIndicator = null;
+            progressIndicator = null;
+            progressLabel = null;
+            cancelButton = null;
+            downloadedLabel = null;
+            closeButton = null;
+
+            didEnterBackgroundNotification?.Dispose();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         void DidEnterBackgroundNotification(object sender, NSNotificationEventArgs e)
@@ -231,7 +265,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             lastDownloadedLabel = new UILabel
             {
                 TintColor = Theme.LightGray,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -304,7 +338,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var warningInfoLabel = new UILabel
             {
                 TextColor = Theme.LightGray,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 Text = Localization.GetString("dont_close_app"),
                 Lines = 6,
@@ -362,7 +396,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             progressLabel = new UILabel
             {
                 TintColor = Theme.DarkBlue,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
@@ -464,7 +498,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 TintColor = Theme.LightGray,
                 Lines = 2,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-4f),
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -514,13 +548,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 closeButton.TouchUpInside -= CloseButton_TouchUpInside;
         }
 
-        void DoneItem_Clicked(object sender, EventArgs e) => NavigationController.DismissViewController(true, null);
+        void DoneItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
-        void StartButton_TouchUpInside(object sender, EventArgs e)
+        async void StartButton_TouchUpInside(object sender, EventArgs e)
         {
             if (!CommonConfig.Reachability.IsReachable)
             {
-                Dialogs.ShowConfirmDialogAsync(this, Localization.GetString("youre_offline_title"), Localization.GetString("youre_offline_message"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("youre_offline_title"), Localization.GetString("youre_offline_message"));
                 return;
             }
 
@@ -646,7 +680,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var hapticGenerator = new UINotificationFeedbackGenerator();
                     hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error);
 
-                    Dialogs.ShowErrorDialog(this, ex);
+                    Dialogs.ShowErrorAlert(this, ex);
                 });
             }
 
@@ -676,14 +710,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
+            await Task.Run(async () => await Download(Folder, OnStart, OnProgress, OnFinished, OnException, OnCancelled, cts.Token));
         }
 
         async void CancelButton_TouchUpInside(object sender, EventArgs e)
         {
             ((UIButton)sender).Enabled = false;
 
-            var result = await Dialogs.ShowYesNoDialogAsync(this, Localization.GetString("warning"), Localization.GetString("download_interrupt_warning"));
+            var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("download_interrupt_warning"));
             if (result)
                 cts?.Cancel();
             else
@@ -703,7 +737,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 ActivityIndicator.Show();
-                
+
                 CommonConfig.Logger.Info($"Starting download of folder {folder.Name} [folder.id={folder.Id}, folder.module={folder.Module}]");
 
                 onStartedAction();
@@ -877,7 +911,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             finally
             {
-                ActivityIndicator.Hide();    
+                ActivityIndicator.Hide();
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Android.Animation;
 using Android.Content;
@@ -33,6 +33,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AbstractSearchView<SearchContactsCriteria>> subviews = new List<AbstractSearchView<SearchContactsCriteria>>();
 
+        public static (ContactsSearchCriteriaFragment fragment, string tag) NewInstance()
+        {
+            var fragment = new ContactsSearchCriteriaFragment();
+            var tag = $"{nameof(ContactsSearchCriteriaFragment)}";
+
+            return (fragment, tag);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchCriteriaFragment)}...");
@@ -51,9 +59,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var paddingLinearLayout = Conversion.ConvertDpToPixels(12);
             var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
-            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int) bottomPadding);
+            containerLinearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout, paddingLinearLayout, (int)bottomPadding);
 
-            fab = ((View) container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);
+            fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.AddOnLayoutChangeListener(new FloatingActionButtonLayoutChangeListener());
 
             var fabIcon = Resources.GetDrawable(Resource.Drawable.action_search_server, null).GetConstantState().NewDrawable().Mutate();
@@ -65,8 +73,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.RippleColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)).ToArgb();
             fab.Visibility = ViewStates.Visible;
 
-            var p = (CoordinatorLayout.LayoutParams) fab.LayoutParameters;
-            p.Gravity = (int) (GravityFlags.Bottom | GravityFlags.CenterHorizontal);
+            var p = (CoordinatorLayout.LayoutParams)fab.LayoutParameters;
+            p.Gravity = (int)(GravityFlags.Bottom | GravityFlags.CenterHorizontal);
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
@@ -88,6 +96,75 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
+
+            CommonConfig.Logger.Info($"Created {nameof(ContactsSearchCriteriaFragment)}");
+        }
+
+        public override async void OnResume()
+        {
+            base.OnResume();
+
+            fab.Visibility = ViewStates.Visible;
+
+            try
+            {
+                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchContactsCriteriaAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
+
+                searchCriteria = new SearchContactsCriteria();
+            }
+
+            RefreshViews();
+        }
+
+        public override void OnPause()
+        {
+            fab.Visibility = ViewStates.Gone;
+
+            base.OnPause();
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
+            item.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                Reset();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        public override async void OnStop()
+        {
+            base.OnStop();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchContactsCriteriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
         }
 
         public void PrepareEditableTextRow()
@@ -143,57 +220,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             containerLinearLayout.AddView(ll);
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
-
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.contacts);
-
-            CommonConfig.Logger.Info($"Created {nameof(ContactsSearchCriteriaFragment)}");
-        }
-
-        public override async void OnResume()
-        {
-            base.OnResume();
-
-            fab.Visibility = ViewStates.Visible;
-
-            try
-            {
-                searchCriteria = searchCriteria ?? await Managers.SearchManager.GetLastSearchContactsCriteriaAsync();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to restore last search criteria", ex);
-
-                searchCriteria = new SearchContactsCriteria();
-            }
-
-            RefreshViews();
-        }
-
-        public override void OnPause()
-        {
-            fab.Visibility = ViewStates.Gone;
-
-            base.OnPause();
-        }
-
-        public override async void OnStop()
-        {
-            base.OnStop();
-
-            try
-            {
-                await Managers.SearchManager.SaveLastSearchContactsCriteriaAsync(searchCriteria);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
-            }
-        }
-
         void RefreshViews()
         {
             subviews.ForEach(c =>
@@ -203,57 +229,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             });
         }
 
-        async void Reset()
-        {
-            searchCriteria = new SearchContactsCriteria();
-            containerLinearLayout.RequestFocus();
-            ((InputMethodManager) Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
-            RefreshViews();
-
-            try
-            {
-                await Managers.SearchManager.SaveLastSearchContactsCriteriaAsync(searchCriteria);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
-            }
-        }
-
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            menu.Clear();
-            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
-            item.SetShowAsAction(ShowAsAction.Always);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                Reset();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
-
-        public void ReplaceFragment(Fragment f, string tag)
-        {
-            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
-
-            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
-        }
-
         void HandleSearchButtonClicked()
         {
             GetCriteria();
 
-            var i = new Intent(Activity, typeof(SearchResultsActivity));
-            i.PutExtra(SearchResultsActivity.ModuleIntentKey, Serializer.Serialize(ModuleType.Contacts));
-            i.PutExtra(SearchResultsActivity.CriteriaIntentKey, Serializer.Serialize(GetCriteria()));
-            StartActivity(i);
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Contacts, GetCriteria()));
         }
 
         SearchContactsCriteria GetCriteria()
@@ -265,6 +245,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(searchCriteria)}]");
 
             return searchCriteria;
+        }
+
+        async void Reset()
+        {
+            searchCriteria = new SearchContactsCriteria();
+            containerLinearLayout.RequestFocus();
+            ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            RefreshViews();
+
+            try
+            {
+                await Managers.SearchManager.SaveLastSearchContactsCriteriaAsync(searchCriteria);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
+            }
+        }
+
+        public void ReplaceFragment(Fragment f, string tag)
+        {
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
+
+            fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
 
         #region Retained State
@@ -282,11 +286,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var df = restoredState as ContactSearchCriteriaFragmentState;
             if (df != null)
                 searchCriteria = df.Criteria;
-        }
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(ContactsSearchCriteriaFragment)}";
         }
 
         class ContactSearchCriteriaFragmentState : IRetainableState

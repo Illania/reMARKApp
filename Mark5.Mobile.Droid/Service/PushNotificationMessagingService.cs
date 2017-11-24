@@ -9,8 +9,8 @@ using Firebase.Messaging;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities.Service
@@ -43,10 +43,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                 {
                     await Managers.NotificationsManager.SaveNotification(n);
 
-                    var i = new Intent(this, typeof(DocumentActivity));
-                    i.PutExtra(DocumentActivity.FolderIdIntentKey, n.FolderId);
-                    i.PutExtra(DocumentActivity.DocumentIdIntentKey, n.ObjectId);
-                    i.PutExtra(DocumentActivity.NotificationGuidIntentKey, Serializer.Serialize(n.Guid));
+                    var i = DocumentActivity.CreateIntent(this, folderId: n.FolderId, documentId: n.ObjectId, notificationGuid: Serializer.Serialize(n.Guid));
                     var pi = PendingIntent.GetActivity(this, 0, i, PendingIntentFlags.OneShot);
 
                     var nb = new NotificationCompat.Builder(this).SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon).SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue)).SetContentTitle(n.Title).SetContentText(n.Message).SetContentIntent(pi).SetCategory(Android.Support.V4.App.NotificationCompat.CategoryMessage).SetAutoCancel(true).SetGroup(GroupName).SetPriority((int)NotificationPriority.High).SetStyle(new Android.Support.V4.App.NotificationCompat.BigTextStyle().BigText(n.Message));
@@ -65,7 +62,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                     var nm = Android.Support.V4.App.NotificationManagerCompat.From(this);
                     nm.Notify((int)(Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
 
-                    CommonConfig.MessengerHub.Publish(new NewNotificationsReceived(this));
+                    CommonConfig.MessengerHub.Publish(new NewNotificationsReceivedMessage(this));
                 }
 
                 StackIfNeeded();

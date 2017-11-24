@@ -1,5 +1,6 @@
 ﻿using System;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -23,6 +24,28 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context, string failedDocumentToUploadGuid = null, int? folderId = null, int? documentId = null, string documentPreview = null, string notificationGuid = null)
+        {
+            var intent = new Intent(context, typeof(DocumentActivity));
+
+            if (failedDocumentToUploadGuid != null)
+                intent.PutExtra(FailedDocumentToUploadGuidIntentKey, failedDocumentToUploadGuid);
+
+            if (folderId != null)
+                intent.PutExtra(FolderIdIntentKey, folderId.Value);
+
+            if (documentId != null)
+                intent.PutExtra(DocumentIdIntentKey, documentId.Value);
+
+            if (documentPreview != null)
+                intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+
+            if (notificationGuid != null)
+                intent.PutExtra(NotificationGuidIntentKey, notificationGuid);
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -40,30 +63,35 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var df = new DocumentFragment();
+                Guid? failedDocumentToUploadGuid = null;
+                int? folderId = null;
+                Folder folder = null;
+                int? documentId = null;
+                DocumentPreview documentPreview = null;
+                Guid? notificationGuid = null;
 
                 if (Intent.HasExtra(FailedDocumentToUploadGuidIntentKey))
-                    df.FailedDocumentToUploadGuid = Guid.Parse(Intent.Extras.GetString(FailedDocumentToUploadGuidIntentKey));
+                    failedDocumentToUploadGuid = Guid.Parse(Intent.Extras.GetString(FailedDocumentToUploadGuidIntentKey));
 
                 if (Intent.HasExtra(FolderIdIntentKey))
-                    df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+                    folderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    df.Folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(DocumentIdIntentKey))
-                    df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
+                    documentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    df.DocumentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    documentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
-                df.CloseRequest = OnBackPressed;
+                var (df, tag) = DocumentFragment.NewInstance(folder, folderId, documentPreview, documentId, notificationGuid, failedDocumentToUploadGuid);
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, df, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(DocumentActivity)}");

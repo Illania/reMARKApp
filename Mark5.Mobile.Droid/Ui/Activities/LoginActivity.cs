@@ -21,7 +21,7 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
-    public class LoginActivity : AppCompatActivity
+    public class LoginActivity : BaseAppCompatActivity
     {
         TextInputEditText usernameEditText;
         TextInputEditText passwordEditText;
@@ -31,6 +31,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         FloatingActionButton loginButton;
 
         IAuthenticator authenticator;
+
+        public static Intent CreateIntent(Context context)
+        {
+            return new Intent(context, typeof(LoginActivity));
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -99,11 +104,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             passwordEditText.Text = savedInstanceState.GetString("password");
             hostnameEditText.Text = savedInstanceState.GetString("hostname");
             portEditText.SetSelection(savedInstanceState.GetInt("ssl"));
-        }
-
-        static class MenuItemActions
-        {
-            public const int SystemReport = 10;
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -236,7 +236,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
-                StartActivity(new Intent(this, typeof(MainActivity)));
+                StartActivity(MainActivity.CreateIntent(this));
                 Finish();
             }
             catch (Exception ex)
@@ -250,6 +250,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }
+        }
+
+        static class MenuItemActions
+        {
+            public const int SystemReport = 10;
         }
     }
 }

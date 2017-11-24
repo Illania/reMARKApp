@@ -1,26 +1,30 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class CopyToWorktrayViewController : AbstractViewController
+    public class CopyToWorktrayViewController : AbstractTableViewController
     {
         public List<IBusinessEntity> BusinessEntities { get; set; }
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
-        UITableView tableView;
+        public CopyToWorktrayViewController()
+            : base(UITableViewStyle.Grouped)
+        {
+        }
 
         public override void LoadView()
         {
@@ -30,31 +34,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            ExtendedLayoutIncludesOpaqueBars = true;
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
-            InitializeHandlers();
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
-            ReachabilityBar.Attach(View, tableView, (float) NavigationController.BottomLayoutGuide.Length);
+            InitializeHandlers();
         }
 
         public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(CopyToWorktrayViewController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource) tableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
         }
 
@@ -67,48 +67,53 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(CopyToWorktrayViewController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            cancelItem = null;
+            doneItem = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         void InitializeNavigationBar()
         {
+            NavigationItem.Title = Localization.GetString("copy_to_worktray");
+
             cancelItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             NavigationItem.SetLeftBarButtonItem(cancelItem, false);
 
-            doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            doneItem.Enabled = false;
+            doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done)
+            {
+                Enabled = false
+            };
             NavigationItem.SetRightBarButtonItem(doneItem, false);
         }
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_system_users"));
-            tableView.AllowsSelection = true;
-            tableView.AllowsMultipleSelection = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            NavigationItem.Title = Localization.GetString("copy_to_worktray");
+            TableView.Source = new DataSource(this, TableView);
+            TableView.AllowsSelection = true;
+            TableView.AllowsMultipleSelection = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
         }
 
         void InitializeHandlers()
@@ -131,14 +136,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async void DoneItem_Clicked(object sender, EventArgs e)
         {
-            var ds = (DataSource) tableView.Source;
-
-            if (ds.IsOwnSelected)
+            if (((DataSource)TableView.Source).IsOwnSelected)
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_own_worktray___"));
 
@@ -152,11 +155,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Error("Could not copy to own worktray", ex);
 
                     dismissAction();
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
             }
 
-            var selectedUsers = ds.SelectedItems;
+            var selectedUsers = ((DataSource)TableView.Source).SelectedItems;
             if (selectedUsers.Count > 0)
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_worktray___"));
@@ -171,11 +174,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Error("Could not copy to users' worktrays", ex);
 
                     dismissAction();
-                    await Dialogs.ShowErrorDialogAsync(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
             }
 
-            NavigationController.DismissViewController(true, null);
+            DismissViewController(true, null);
         }
 
         async Task RefreshData()
@@ -185,94 +188,87 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                var ds = (DataSource) tableView.Source;
-                ds.SetItems(usersDepartments.Users);
+                ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
 
                 var firstItemIndexPath = NSIndexPath.FromRowSection(0, 0);
-                tableView.SelectRow(firstItemIndexPath, false, UITableViewScrollPosition.None);
-                ds.RowSelected(tableView, firstItemIndexPath);
+                TableView.SelectRow(firstItemIndexPath, false, UITableViewScrollPosition.None);
+                ((DataSource)TableView.Source).RowSelected(TableView, firstItemIndexPath);
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Could not refresh list of users", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
-        void EnableDoneButton()
-        {
-            doneItem.Enabled = true;
-        }
+        void EnableDoneButton() => doneItem.Enabled = true;
+        void DisableDoneButton() => doneItem.Enabled = false;
 
-        void DisableDoneButton()
+        class DataSource : UITableViewSource
         {
-            doneItem.Enabled = false;
-        }
-
-        class DataSource : UITableViewSource, IDisposable
-        {
-            public bool Empty => systemUsersInView.Count < 1;
-
-            public bool IsOwnSelected => tableView.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0));
+            public bool Empty => items.Count < 1;
+            public bool IsOwnSelected => tableViewWeakReference.Unwrap()?.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0)) ?? false;
 
             public List<SystemUser> SelectedItems
             {
                 get
                 {
+                    var tableView = tableViewWeakReference.Unwrap();
+
                     if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
                         return new List<SystemUser>();
 
                     var rows = tableView.IndexPathsForSelectedRows.Where(indexPath => indexPath.Section != 0).ToArray();
-                    return rows.Select(ip => systemUsersInView[ip.Row]).ToList();
+                    return rows.Select(ip => items[ip.Row]).ToList();
                 }
             }
 
-            CopyToWorktrayViewController viewController;
-            UITableView tableView;
-            string emptyText;
+            readonly WeakReference<CopyToWorktrayViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            List<SystemUser> systemUsersInView = new List<SystemUser>();
+            readonly List<SystemUser> items = new List<SystemUser>(50);
 
-            public DataSource(CopyToWorktrayViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(CopyToWorktrayViewController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (indexPath.Section == 0)
                 {
-                    var ownCell = tableView.DequeueReusableCell("default") ?? new UITableViewCell(UITableViewCellStyle.Default, "default");
+                    var ownCell = tableView.DequeueReusableCell("ownCell") ?? UITableViewCellUtilities.CreateDefault("ownCell", UITableViewCellSelectionStyle.None);
                     ownCell.TextLabel.Text = Localization.GetString("own_worktray");
-                    ownCell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
-                    ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+                    ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
+                        ? UITableViewCellAccessory.Checkmark
+                        : UITableViewCellAccessory.None;
 
                     return ownCell;
                 }
 
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (systemUsersInView.Count < 1)
+                if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_system_users"));
                     return emptyCell;
                 }
 
-                var su = systemUsersInView[indexPath.Row];
+                var su = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
                 cell.DetailTextLabel.Text = su.Username;
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
-                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
+                    ? UITableViewCellAccessory.Checkmark
+                    : UITableViewCellAccessory.None;
 
                 return cell;
             }
@@ -282,72 +278,60 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (section == 0)
                     return 1;
 
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (systemUsersInView.Count < 1)
-                    return 1;
-
-                return systemUsersInView.Count;
+                return items.Count;
             }
 
-            public override nint NumberOfSections(UITableView tableView)
-            {
-                return 2;
-            }
+            public override nint NumberOfSections(UITableView tableView) => 2;
 
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return 44f;
-            }
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return;
+
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
 
                 if (tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Length > 0)
-                    viewController.EnableDoneButton();
+                    viewControllerWeakReference.Unwrap()?.EnableDoneButton();
                 else
-                    viewController.DisableDoneButton();
+                    viewControllerWeakReference.Unwrap()?.DisableDoneButton();
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return;
+
                 cell.Accessory = UITableViewCellAccessory.None;
 
                 if (tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Length > 0)
-                    viewController.EnableDoneButton();
+                    viewControllerWeakReference.Unwrap()?.EnableDoneButton();
                 else
-                    viewController.DisableDoneButton();
+                    viewControllerWeakReference.Unwrap()?.DisableDoneButton();
             }
 
             public void SetItems(List<SystemUser> systemUsers)
             {
                 loading = false;
 
-                systemUsersInView.Clear();
-                systemUsersInView.AddRange(systemUsers);
+                items.Clear();
+                items.AddRange(systemUsers);
 
-                tableView.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
             {
                 loading = true;
 
-                systemUsersInView.Clear();
-                tableView.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                systemUsersInView = null;
+                items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
             }
         }
     }

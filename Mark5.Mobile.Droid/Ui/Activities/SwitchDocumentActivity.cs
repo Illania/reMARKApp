@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
@@ -34,6 +35,28 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
+        public static Intent CreateIntent(Context context, int? folderId = null, Folder folder = null, int? documentId = null, DocumentPreview documentPreview = null, Guid? guid = null)
+        {
+            var intent = new Intent(context, typeof(SwitchDocumentActivity));
+
+            if (folderId != null)
+                intent.PutExtra(FolderIdIntentKey, folderId.Value);
+            
+            if (folder != null)
+                intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
+            
+            if (documentId != null)
+                intent.PutExtra(DocumentIdIntentKey, documentId.Value);
+            
+            if (documentPreview != null)
+                intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+            
+            if (guid != null)
+                intent.PutExtra(NotificationGuidIntentKey, Serializer.Serialize(guid.Value));
+            
+            return intent;
+        }
+
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -51,35 +74,39 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (savedInstanceState == null)
             {
-                var df = new DocumentFragment();
+                int? folderId = null;
+                Folder folder = null;
+                int? documentId = null;
+                DocumentPreview documentPreview = null;
+                Guid? notificationGuid = null;
 
                 if (Intent.HasExtra(FolderIdIntentKey))
-                    df.FolderId = Intent.Extras.GetInt(FolderIdIntentKey);
+                    folderId = Intent.Extras.GetInt(FolderIdIntentKey);
 
                 if (Intent.HasExtra(FolderIntentKey))
-                    df.Folder = folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
+                    folder = Serializer.Deserialize<Folder>(Intent.Extras.GetString(FolderIntentKey));
 
                 if (Intent.HasExtra(DocumentIdIntentKey))
-                    df.DocumentId = Intent.Extras.GetInt(DocumentIdIntentKey);
+                    documentId = Intent.Extras.GetInt(DocumentIdIntentKey);
 
                 if (Intent.HasExtra(DocumentPreviewIntentKey))
-                    df.DocumentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
+                    documentPreview = Serializer.Deserialize<DocumentPreview>(Intent.Extras.GetString(DocumentPreviewIntentKey));
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
-                    df.NotificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+                    notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
-                df.CloseRequest = OnBackPressed;
+                var (df, tag) = DocumentFragment.NewInstance(folder, folderId, documentPreview, documentId, notificationGuid);
 
                 var ft = SupportFragmentManager.BeginTransaction();
-                ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
+                ft.Replace(Resource.Id.fragment_container, df, tag);
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(SwitchDocumentActivity)}");
 
-                if (folder != null && df.DocumentPreview != null)
+                if (folder != null && documentPreview != null)
                     try
                     {
-                        documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, df.DocumentPreview.Id, true, true, MaxNeighbours));
+                        documentIds.AddRange(await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(folder, documentPreview.Id, true, true, MaxNeighbours));
                     }
                     catch (Exception ex)
                     {
@@ -110,6 +137,53 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.Finish();
 
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
+        }
+
+        public void GoToPrevious(int documentId)
+        {
+            var previousId = GetPreviousId(documentId);
+            if (previousId == null)
+                return;
+
+            var (df,tag) = DocumentFragment.NewInstance(folder, docId: previousId);
+
+            var ft = SupportFragmentManager.BeginTransaction();
+
+            ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
+            ft.Replace(Resource.Id.fragment_container, df, tag);
+            ft.Commit();
+        }
+
+        public void GoToNext(int documentId)
+        {
+            var nextId = GetNextId(documentId);
+            if (nextId == null)
+                return;
+
+            var (df,tag) = DocumentFragment.NewInstance(folder, docId: nextId);
+
+            var ft = SupportFragmentManager.BeginTransaction();
+            ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
+            ft.Replace(Resource.Id.fragment_container, df, tag);
+            ft.Commit();
+        }
+
+        int? GetNextId(int documentId)
+        {
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex < documentIds.Count - 1)
+                return documentIds[documentIndex + 1];
+
+            return null;
+        }
+
+        int? GetPreviousId(int documentId)
+        {
+            var documentIndex = documentIds.FindIndex(d => d == documentId);
+            if (documentIndex > 0)
+                return documentIds[documentIndex - 1];
+
+            return null;
         }
 
         public async Task<bool> HasPrevious(int documentId)
@@ -166,62 +240,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
 
             return true;
-        }
-
-        public void GoToPrevious(int documentId)
-        {
-            var previousId = GetPreviousId(documentId);
-            if (previousId == null)
-                return;
-
-            var df = new DocumentFragment
-            {
-                Folder = folder,
-                DocumentId = previousId,
-                CloseRequest = OnBackPressed,
-            };
-
-            var ft = SupportFragmentManager.BeginTransaction();
-            ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
-            ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
-            ft.Commit();
-        }
-
-        public void GoToNext(int documentId)
-        {
-            var nextId = GetNextId(documentId);
-            if (nextId == null)
-                return;
-
-            var df = new DocumentFragment
-            {
-                Folder = folder,
-                DocumentId = nextId,
-                CloseRequest = OnBackPressed,
-            };
-
-            var ft = SupportFragmentManager.BeginTransaction();
-            ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
-            ft.Replace(Resource.Id.fragment_container, df, df.GenerateTag());
-            ft.Commit();
-        }
-
-        int? GetNextId(int documentId)
-        {
-            var documentIndex = documentIds.FindIndex(d => d == documentId);
-            if (documentIndex < documentIds.Count - 1)
-                return documentIds[documentIndex + 1];
-
-            return null;
-        }
-
-        int? GetPreviousId(int documentId)
-        {
-            var documentIndex = documentIds.FindIndex(d => d == documentId);
-            if (documentIndex > 0)
-                return documentIds[documentIndex - 1];
-
-            return null;
         }
     }
 }

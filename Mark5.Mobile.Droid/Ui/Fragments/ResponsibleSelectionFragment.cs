@@ -1,21 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Android.OS;
 using Android.Support.V7.App;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ResponsibleSelectionFragment : AbstractUserSelectionFragment
     {
-        public Action<Dictionary<int, string>> CloseRequest { get; set; }
+        public Task<Dictionary<int, string>> Task => tcs.Task;
 
-        public ResponsibleSelectionFragment()
-            : base(Resource.String.confirm, true, true)
-        {
-        }
+        TaskCompletionSource<Dictionary<int, string>> tcs = new TaskCompletionSource<Dictionary<int, string>>();
 
-        public override string GenerateTag()
+        public static (ResponsibleSelectionFragment fragment, string tag) NewInstance(List<int> preselectedUserIds)
         {
-            return $"{nameof(ResponsibleSelectionFragment)}";
+            var args = new Bundle();
+
+            if (preselectedUserIds != null)
+                args.PutString(PreselectedUserIdsBundleKey, Serializer.Serialize(preselectedUserIds));
+
+            args.PutInt(ActionButtonTextResIdBundleKey, Resource.String.confirm);
+            args.PutBoolean(IncludeCurrentUserBundleKey, true);
+            args.PutBoolean(AllowNoUserSelectedBundleKey, true);
+
+            ResponsibleSelectionFragment fragment = new ResponsibleSelectionFragment();
+            fragment.Arguments = args;
+
+            var tag = $"{nameof(ResponsibleSelectionFragment)}";
+
+            return (fragment, tag);
         }
 
         protected override void ActionButton_Click(object sender, EventArgs e)
@@ -25,13 +39,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 responsibleDict.Add(kvp.Key, kvp.Value.Username);
             }
-            CloseRequest?.Invoke(responsibleDict);
+            tcs.SetResult(responsibleDict);
             ((AppCompatActivity)Activity).OnBackPressed();
         }
 
         protected override string GetInfo()
         {
-            return $"[preselectedEntitites.Count ={PreselectedUserIds?.Count}]";
+            return $"[preselectedEntitites.Count ={preselectedUserIds?.Count}]";
         }
     }
 }

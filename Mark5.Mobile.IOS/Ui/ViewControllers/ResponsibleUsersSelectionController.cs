@@ -2,29 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ResponsibleUsersSelectionController : AbstractViewController
+    public class ResponsibleUsersSelectionController : AbstractTableViewController
     {
-        public List<int> PreselectedSystemUsersId { get; set; }
+        public List<int> PreselectedSystemUserIds { get; set; }
+
+        readonly public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
+        public Task<List<SystemUser>> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
-
-        UITableView tableView;
-
-        public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
-
-        public Task<List<SystemUser>> Task => tcs.Task;
 
         public override void LoadView()
         {
@@ -34,31 +32,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            ExtendedLayoutIncludesOpaqueBars = true;
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            InitializeNavigationBarTitle();
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
             InitializeHandlers();
         }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public override async void ViewDidAppear(bool animated)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             base.ViewDidAppear(animated);
 
-            CommonConfig.Logger.Info($"{nameof(ResponsibleUsersSelectionController)} appeared");
+            CommonConfig.Logger.Info("Appeared");
 
-            var ds = (DataSource)tableView.Source;
-            if (ds.Empty)
+            if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
         }
 
@@ -71,17 +65,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void DidReceiveMemoryWarning()
         {
-            CommonConfig.Logger.Warning($"{nameof(ResponsibleUsersSelectionController)} received memory warning!");
+            CommonConfig.Logger.Warning("Received memory warning!");
 
-            var ds = tableView?.Source as DataSource;
-            ds?.Reset();
+            ((DataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
 
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            cancelItem = null;
+            doneItem = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
         void InitializeNavigationBar()
         {
+            NavigationItem.Title = Localization.GetString("select_users");
+
             cancelItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             NavigationItem.SetLeftBarButtonItem(cancelItem, false);
 
@@ -91,27 +104,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeView()
         {
-            AutomaticallyAdjustsScrollViewInsets = true;
-
-            tableView = new UITableView(CGRect.Empty, UITableViewStyle.Grouped);
-            tableView.ClipsToBounds = false;
-            tableView.Source = new DataSource(this, tableView, Localization.GetString("no_system_users"));
-            tableView.AllowsSelection = true;
-            tableView.AllowsMultipleSelection = true;
-            tableView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(tableView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-        }
-
-        void InitializeNavigationBarTitle()
-        {
-            NavigationItem.Title = Localization.GetString("select_users");
+            TableView.Source = new DataSource(this, TableView);
+            TableView.AllowsMultipleSelection = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 20f;
         }
 
         void InitializeHandlers()
@@ -135,15 +131,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CancelItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
+            DismissViewController(true, null);
         }
 
         void DoneItem_Clicked(object sender, EventArgs e)
         {
-            var ds = (DataSource)tableView.Source;
-
-            var selectedUsers = ds.SelectedItems;
-
+            var selectedUsers = ((DataSource)TableView.Source).SelectedUsers;
             tcs.SetResult(selectedUsers);
+            DismissViewController(true, null);
         }
 
         async Task RefreshData()
@@ -154,130 +149,148 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
                 usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
-                var ds = (DataSource)tableView.Source;
-                ds.SetItems(usersDepartments.Users, PreselectedSystemUsersId);
+                ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
+
+                if (PreselectedSystemUserIds != null)
+                    ((DataSource)TableView.Source).SelectedUserIds = PreselectedSystemUserIds;
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Could not refresh list of users", ex);
 
-                await Dialogs.ShowErrorDialogAsync(this, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
 
-        class DataSource : UITableViewSource, IDisposable
+        class DataSource : UITableViewSource
         {
-            public bool Empty => systemUsersInView.Count < 1;
+            public bool Empty => items.Count < 1;
 
-            public List<SystemUser> SelectedItems { get; set; } = new List<SystemUser>();
+            public List<int> SelectedUserIds
+            {
+                get
+                {
+                    var tableView = tableViewWeakReference.Unwrap();
+                    if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
+                        return new List<int>();
+                    return tableView.IndexPathsForSelectedRows.Select(ip => items[ip.Row].Id).ToList();
+                }
+                set
+                {
+                    var selectedIds = value.ToHashSet();
+                    for (var i = 0; i < items.Count; i++)
+                        if (selectedIds.Contains(items[i].Id))
+                        {
+                            var ip = NSIndexPath.FromRowSection(i, 0);
+                            tableViewWeakReference.Unwrap()?.SelectRow(ip, false, UITableViewScrollPosition.None);
+                            RowSelected(tableViewWeakReference.Unwrap(), ip);
+                        }
+                }
+            }
 
-            ResponsibleUsersSelectionController viewController;
-            UITableView tableView;
-            string emptyText;
+            public List<SystemUser> SelectedUsers
+            {
+                get
+                {
+                    var tableView = tableViewWeakReference.Unwrap();
+                    if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
+                        return new List<SystemUser>();
+                    return tableView.IndexPathsForSelectedRows.Select(ip => items[ip.Row]).ToList();
+                }
+                set
+                {
+                    var selectedIds = value.Select(su => su.Id).ToHashSet();
+                    for (var i = 0; i < items.Count; i++)
+                        if (selectedIds.Contains(items[i].Id))
+                        {
+                            var ip = NSIndexPath.FromRowSection(i, 0);
+                            tableViewWeakReference.Unwrap()?.SelectRow(ip, false, UITableViewScrollPosition.None);
+                            RowSelected(tableViewWeakReference.Unwrap(), ip);
+                        }
+                }
+            }
+
+            readonly WeakReference<ResponsibleUsersSelectionController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            List<SystemUser> systemUsersInView = new List<SystemUser>();
+            readonly List<SystemUser> items = new List<SystemUser>();
 
-            public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView, string emptyText)
+            public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView)
             {
-                this.viewController = viewController;
-                this.tableView = tableView;
-                this.emptyText = emptyText;
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.Key) as WaitTableViewCell ?? WaitTableViewCell.Create();
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
 
-                if (systemUsersInView.Count < 1)
+                if (Empty)
                 {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.Key) as EmptyTableViewCell ?? EmptyTableViewCell.Create();
-                    emptyCell.Initialize(emptyText);
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_system_users"));
                     return emptyCell;
                 }
 
-                var su = systemUsersInView[indexPath.Row];
+                var su = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell("subtitle") ?? new UITableViewCell(UITableViewCellStyle.Subtitle, "subtitle");
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
                 cell.TextLabel.Text = $"{su.FirstName} {su.LastName}";
                 cell.DetailTextLabel.Text = su.Username;
-                cell.Accessory = SelectedItems.Contains(su) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+
+                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
+                    ? UITableViewCellAccessory.Checkmark
+                    : UITableViewCellAccessory.None;
 
                 return cell;
             }
 
-            public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
-            {
-                if (SelectedItems.Contains(systemUsersInView.ElementAtOrDefault(indexPath.Row)))
-                    tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
-                else
-                    tableView.DeselectRow(indexPath, false);
-            }
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading)
+                if (loading || Empty)
                     return 1;
 
-                if (systemUsersInView.Count < 1)
-                    return 1;
-
-                return systemUsersInView.Count;
-            }
-
-            public override nint NumberOfSections(UITableView tableView)
-            {
-                return 1;
-            }
-
-            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return 44f;
+                return items.Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return;
+
                 cell.Accessory = UITableViewCellAccessory.Checkmark;
-                SelectedItems.Add(systemUsersInView[indexPath.Row]);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return;
+
                 cell.Accessory = UITableViewCellAccessory.None;
-                SelectedItems.Remove(systemUsersInView[indexPath.Row]);
             }
 
-            public void SetItems(List<SystemUser> systemUsers, List<int> preselectedSystemUsersId)
+            public void SetItems(List<SystemUser> systemUsers)
             {
                 loading = false;
 
-                systemUsersInView.Clear();
-                systemUsersInView.AddRange(systemUsers.OrderBy(s => s.Username));
+                items.Clear();
+                items.AddRange(systemUsers.OrderBy(s => s.Username));
 
-                SelectedItems.AddRange(systemUsersInView.Where(s => preselectedSystemUsersId.Contains(s.Id)));
-
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
             {
                 loading = true;
 
-                systemUsersInView.Clear();
-                tableView.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                viewController = null;
-                tableView = null;
-                systemUsersInView = null;
+                items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,13 +23,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         bool refreshing;
 
-        public Action CloseRequest { get; set; }
-
         RecyclerView recyclerView;
         DocumentsToUploadListAdapter adapter;
         ActionMode actionMode;
 
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
+
+        public static (DocumentsToUploadListFragment fragment, string var) NewInstance()
+        {
+            var fragment = new DocumentsToUploadListFragment();
+            var tag = $"{nameof(DocumentsToUploadListFragment)}]";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -82,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!IsAdded || IsDetached || IsRemoving)
                 return;
 
-            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChanged>(m =>
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(m =>
             {
                 Activity.RunOnUiThread(async () =>
                 {
@@ -123,7 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
-                CloseRequest?.Invoke();
+                Activity?.OnBackPressed();
             }
             finally
             {
@@ -244,24 +250,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region RetainableStateFragment overrides
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(DocumentsToUploadListFragment)}]";
-        }
-
-        #endregion
-
         protected class DocumentsToUploadListAdapter : RecyclerView.Adapter
         {
+            public override int ItemCount => itemsInView.Count;
+            public int SelectedItemCount => selectedItemsInView.Count;
+
             public List<(Guid Guid, DocumentPreview DocumentPreview)> Items => itemsInView.ToList();
             public List<(Guid Guid, DocumentPreview DocumentPreview)> SelectedItems => selectedItemsInView.ToList();
             public HashSet<Guid> PendingGuids => pendingGuids.ToHashSet();
             public HashSet<Guid> FailedGuids => failedGuids.ToHashSet();
-
-            public override int ItemCount => itemsInView.Count;
-            public int SelectedItemCount => selectedItemsInView.Count;
 
             List<(Guid Guid, DocumentPreview DocumentPreview)> itemsInView = new List<(Guid, DocumentPreview)>(25);
             List<(Guid Guid, DocumentPreview DocumentPreview)> selectedItemsInView = new List<(Guid, DocumentPreview)>(25);

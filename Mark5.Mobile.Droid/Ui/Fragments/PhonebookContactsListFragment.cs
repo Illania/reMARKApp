@@ -1,4 +1,3 @@
-﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +23,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         RecyclerView recyclerView;
         PhonebookContactsListAdapter adapter;
+
+        public static (PhonebookContactsListFragment fragment, string tag) NewInstance()
+        {
+            var fragment = new PhonebookContactsListFragment();
+            var tag = $"{nameof(PhonebookContactsListFragment)}";
+
+            return (fragment, tag);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -116,19 +123,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.Finish();
         }
 
-        #region Retainable state
-
-        public override string GenerateTag()
-        {
-            return $"{nameof(PhonebookContactsListFragment)}";
-        }
-
-        #endregion
-
         class PhonebookContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            public List<Recipient> Items { get; } = new List<Recipient>();
             public override int ItemCount => Items.Count;
+            public List<Recipient> Items { get; } = new List<Recipient>();
 
             public event EventHandler<Recipient> ItemClicked = delegate { };
 

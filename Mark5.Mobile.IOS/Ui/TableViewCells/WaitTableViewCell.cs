@@ -1,22 +1,36 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class WaitTableViewCell : UITableViewCell
+    public class WaitTableViewCell : UITableViewCell
     {
-        public static readonly NSString Key = new NSString("WaitTableViewCell");
-        public static readonly UINib Nib = UINib.FromName("WaitTableViewCell", NSBundle.MainBundle);
+        public static readonly NSString DefaultId = new NSString(nameof(WaitTableViewCell));
 
-        public static WaitTableViewCell Create()
-        {
-            return (WaitTableViewCell) Nib.Instantiate(null, null)[0];
-        }
+        readonly UIActivityIndicatorView spinner;
 
-        protected WaitTableViewCell(IntPtr handle)
-            : base(handle)
+        public WaitTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
         {
+            UserInteractionEnabled = false;
+            SelectionStyle = UITableViewCellSelectionStyle.None;
+            Accessory = UITableViewCellAccessory.None;
+
+            spinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            spinner.StartAnimating();
+
+            ContentView.Add(spinner);
+            ContentView.AddConstraints(new[]
+            {
+                spinner.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
+                spinner.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                spinner.HeightAnchor.ConstraintEqualTo(20f),
+                spinner.WidthAnchor.ConstraintEqualTo(20f),
+                ContentView.HeightAnchor.ConstraintGreaterThanOrEqualTo(44f)
+            });
         }
     }
 }

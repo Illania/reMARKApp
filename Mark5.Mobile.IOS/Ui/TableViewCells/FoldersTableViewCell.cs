@@ -1,103 +1,135 @@
-using System;
 using System.IO;
+using System.Linq;
 using Foundation;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
-    public partial class FoldersTableViewCell : UITableViewCell
+    public class FoldersTableViewCell : UITableViewCell
     {
-        public const float Height = 48f;
+        public static readonly NSString DefaultId = new NSString(nameof(FoldersTableViewCell));
 
-        public static readonly UINib Nib = UINib.FromName("FoldersTableViewCell", NSBundle.MainBundle);
-        public static readonly NSString Key = new NSString("FoldersTableViewCell");
-
-        Folder folder;
-
-        public event EventHandler<Folder> ExpandCollapseClicked;
-
-        public static FoldersTableViewCell Create()
+        public UITapGestureRecognizer ExpandGestureRecognizer
         {
-            var cell = (FoldersTableViewCell) Nib.Instantiate(null, null)[0];
-            cell.FolderCheckedIndicatorImage.Image = UIImage.FromBundle(Path.Combine("icons", "checkmark.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            cell.FolderCheckedIndicatorImage.TintColor = Theme.Brown;
-            cell.OfflineIndicatorImage.Image = UIImage.FromBundle(Path.Combine("icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            cell.OfflineIndicatorImage.TintColor = Theme.DarkBlue;
-            cell.ExpandButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "expand.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            return cell;
+            get => expandButton.GestureRecognizers.OfType<UITapGestureRecognizer>().FirstOrDefault();
+            set
+            {
+                expandButton.GestureRecognizers?.ForEach(expandButton.RemoveGestureRecognizer);
+                expandButton.AddGestureRecognizer(value);
+            }
         }
 
-        public FoldersTableViewCell(IntPtr handle)
-            : base(handle)
-        {
-        }
+        readonly UIImageView folderIconImage;
+        readonly UIImageView favoriteIndicatorImage;
+        readonly UIImageView offlineIndicatorImage;
+        readonly UILabel nameLabel;
+        readonly UIButton expandButton;
 
-        public override void LayoutSubviews()
-        {
-            base.LayoutSubviews();
+        readonly NSLayoutConstraint offlineIndicatorWidthConstraint;
+        readonly NSLayoutConstraint offlineIndicatorLeadingConstraint;
 
-            Hacks.CorrectFontInActions(this, Theme.DefaultActionsFont);
+        public FoldersTableViewCell()
+            : base(UITableViewCellStyle.Default, DefaultId)
+        {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            Accessory = UITableViewCellAccessory.None;
+
+            folderIconImage = new UIImageView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            ContentView.Add(folderIconImage);
+
+            favoriteIndicatorImage = new UIImageView
+            {
+                Image = UIImage.FromBundle(Path.Combine("icons", "checkmark.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(favoriteIndicatorImage);
+
+            offlineIndicatorImage = new UIImageView
+            {
+                Image = UIImage.FromBundle(Path.Combine("icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(offlineIndicatorImage);
+
+            nameLabel = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                TextColor = Theme.Black,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            ContentView.Add(nameLabel);
+
+            expandButton = new UIButton
+            {
+                ImageEdgeInsets = new UIEdgeInsets(-10f, -10f, -10f, -10f),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            expandButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "expand.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            ContentView.Add(expandButton);
+
+            ContentView.AddConstraints(new[]
+            {
+                folderIconImage.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                folderIconImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                folderIconImage.HeightAnchor.ConstraintEqualTo(20f),
+                folderIconImage.WidthAnchor.ConstraintEqualTo(20f),
+
+                favoriteIndicatorImage.CenterXAnchor.ConstraintEqualTo(folderIconImage.TrailingAnchor, -5f),
+                favoriteIndicatorImage.CenterYAnchor.ConstraintEqualTo(folderIconImage.BottomAnchor, -5f),
+                favoriteIndicatorImage.HeightAnchor.ConstraintEqualTo(15f),
+                favoriteIndicatorImage.WidthAnchor.ConstraintEqualTo(15f),
+
+                offlineIndicatorLeadingConstraint = offlineIndicatorImage.LeadingAnchor.ConstraintEqualTo(folderIconImage.TrailingAnchor, 12f),
+                offlineIndicatorImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                offlineIndicatorImage.HeightAnchor.ConstraintEqualTo(15f),
+                offlineIndicatorWidthConstraint = offlineIndicatorImage.WidthAnchor.ConstraintEqualTo(15f),
+
+                nameLabel.LeadingAnchor.ConstraintEqualTo(offlineIndicatorImage.TrailingAnchor, 8f),
+                nameLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                nameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 4f),
+                nameLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -4f),
+
+                expandButton.LeadingAnchor.ConstraintEqualTo(nameLabel.TrailingAnchor, 8f),
+                expandButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                expandButton.HeightAnchor.ConstraintEqualTo(40f),
+                expandButton.WidthAnchor.ConstraintEqualTo(40f),
+                expandButton.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor)
+            });
         }
 
         public void Initialize(Folder folder, bool folderIsOffline)
         {
-            this.folder = folder;
+            UserInteractionEnabled = true;
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
 
-            FolderNameLabel.Text = folder.Name;
-            FolderIconImage.Image = GetIcon(folder);
+            nameLabel.TextColor = Theme.Black;
+            folderIconImage.TintColor = Theme.TintColor;
+            favoriteIndicatorImage.TintColor = Theme.TintColor;
 
-            if (folder.Subscribed)
-            {
-                FolderIconImage.TintColor = Theme.Brown;
-                FolderCheckedIndicatorImage.TintColor = Theme.Brown;
-                FolderCheckedIndicatorImage.Alpha = 1f;
-            }
-            else
-            {
-                FolderIconImage.TintColor = Theme.TintColor;
-                FolderCheckedIndicatorImage.TintColor = Theme.TintColor;
-                FolderCheckedIndicatorImage.Alpha = 0f;
-            }
-
-            if (folderIsOffline)
-            {
-                OfflineIndicatorLeadingConstraint.Constant = 10f;
-                OfflineIndicatorWidthConstraint.Constant = 15f;
-            }
-            else
-            {
-                OfflineIndicatorLeadingConstraint.Constant = 0f;
-                OfflineIndicatorWidthConstraint.Constant = 0f;
-            }
-
-            if (folder.HasSubFolders)
-            {
-                ExpandButton.Alpha = 1f;
-                ExpandButton.Hidden = false;
-            }
-            else
-            {
-                ExpandButton.Alpha = 0f;
-                ExpandButton.Hidden = true;
-            }
+            folderIconImage.Image = GetIcon(folder);
+            favoriteIndicatorImage.Hidden = !folder.Subscribed;
+            offlineIndicatorLeadingConstraint.Constant = folderIsOffline ? 10f : 0f;
+            offlineIndicatorWidthConstraint.Constant = folderIsOffline ? 15f : 0f;
+            nameLabel.Text = folder.Name;
+            expandButton.Hidden = !folder.HasSubFolders;
         }
 
         public void Disable()
         {
-            FolderNameLabel.TextColor = Theme.DarkGray;
-            FolderIconImage.TintColor = Theme.DarkGray;
-            FolderCheckedIndicatorImage.TintColor = Theme.DarkGray;
-
+            UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;
-        }
 
-        partial void ExpandButtonTouchUpInside(NSObject sender)
-        {
-            if (ExpandCollapseClicked != null && folder != null)
-                ExpandCollapseClicked(this, folder);
+            nameLabel.TextColor = Theme.DarkGray;
+            folderIconImage.TintColor = Theme.DarkGray;
+            favoriteIndicatorImage.TintColor = Theme.DarkGray;
         }
 
         static UIImage GetIcon(Folder folder)
