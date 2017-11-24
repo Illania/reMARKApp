@@ -43,8 +43,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var tc = navigationController.TopViewController.GetTransitionCoordinator();
 
-            CommonConfig.UsageAnalytics.SetScreen(viewController.GetType().Name); //TODO debug
-
             if (tc == null)
                 return;
 
