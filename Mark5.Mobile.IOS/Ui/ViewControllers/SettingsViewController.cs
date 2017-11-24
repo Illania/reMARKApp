@@ -62,7 +62,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TableView.InsetsContentViewsToSafeArea = true;
             }
 
-
             RefreshHiddenSettings();
         }
 
@@ -223,7 +222,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Dialogs.ShowErrorAlert(this, ex);
                 }
-
 
                 return;
             }

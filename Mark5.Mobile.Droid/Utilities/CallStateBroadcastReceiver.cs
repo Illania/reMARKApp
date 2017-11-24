@@ -68,7 +68,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     Height = 500,
                     Width = 500
                 };
-                if (state == TelephonyManager.ExtraStateRinging)
+                if (state == TelephonyManager.ExtraStateRinging) //Phone ringing
                 {
                     var incomingNumber = FormatNumber(intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber));
 
@@ -100,7 +100,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 {
                     if (incomingCallLayout != null && incomingCallLayout.IsShown)
                         wm.RemoveView(incomingCallLayout);
-                    onGoingCallLayout = LayoutNewContext( Color.Bisque);
+                    onGoingCallLayout = LayoutNewContext(Color.Bisque);
                     wm.AddView(onGoingCallLayout, overlayParams);
                 }
                 else if (state == TelephonyManager.ExtraStateIdle) //Call stopped
@@ -111,7 +111,6 @@ namespace Mark5.Mobile.Droid.Utilities
                     if (onGoingCallLayout != null && onGoingCallLayout.IsShown)
                         wm.RemoveView(onGoingCallLayout);
                 }
-                GoAsync();
             }
         }
 

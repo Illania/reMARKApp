@@ -51,7 +51,6 @@ namespace Mark5.Mobile.IOS.Utilities
                     }
                     else
                         return;
-                    
                 }
                 else
                 {
