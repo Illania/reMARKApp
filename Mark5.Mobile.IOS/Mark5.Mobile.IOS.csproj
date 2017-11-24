@@ -147,7 +147,6 @@
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentSubView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\RecipientsView.cs" />
@@ -251,6 +250,7 @@
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
 		<Compile Include="Ui\Common\AbstractWebViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController2.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -510,6 +510,8 @@
 		<BundleResource Include="Resources\html\fonts\trebuchetms.ttf" />
 		<BundleResource Include="Resources\html\fonts\couriernew.ttf" />
 		<BundleResource Include="Resources\html\fonts\opensans.ttf" />
+		<BundleResource Include="Resources\html\insertTemplate.js" />
+		<BundleResource Include="Resources\html\headerpadding.js" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">

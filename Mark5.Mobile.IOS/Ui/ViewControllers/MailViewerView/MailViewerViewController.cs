@@ -46,9 +46,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             this.url = url;
         }
 
-        public override void LoadView()
+        public override void ViewDidLoad()
         {
-            base.LoadView();
+            base.ViewDidLoad();
 
             Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";
 
@@ -271,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             if (mailMessage != null)
             {
                 if (!string.IsNullOrWhiteSpace(mailMessage.BodyHtmlText))
-                    await LoadHtmlString(mailMessage.BodyHtmlText, true, true, false, true);
+                    await LoadHtmlString(mailMessage.BodyHtmlText, HtmlProcessingConfiguration.DefaultForViewing);
                 else if (!string.IsNullOrWhiteSpace(mailMessage.BodyPlainText))
                     LoadPlainString(mailMessage.BodyPlainText);
                 else

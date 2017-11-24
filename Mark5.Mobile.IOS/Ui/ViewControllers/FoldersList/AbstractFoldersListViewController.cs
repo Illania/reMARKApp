@@ -330,7 +330,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
         {
-            var vc = new ComposeDocumentViewController
+            var vc = new ComposeDocumentViewController2
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New
             };

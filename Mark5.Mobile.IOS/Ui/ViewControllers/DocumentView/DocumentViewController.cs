@@ -88,23 +88,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region UIViewController overrides
 
-        public override void LoadView()
-        {
-            base.LoadView();
-
-            InitNavigationBar();
-            InitHeaderView();
-            InitToolbar();
-        }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
+            InitNavigationBar();
+            InitHeaderView();
+            InitToolbar();
+
             if (Integration.IsRunningAtLeast(11))
-            {
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
-            }
 
             RestorationIdentifier = nameof(DocumentViewController);
             RestorationClass = Class;
@@ -577,7 +570,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (document != null)
                 {
                     if (!string.IsNullOrWhiteSpace(document.HtmlBody))
-                        await LoadHtmlString(document.HtmlBody, true, true, false, true);
+                        await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForViewing);
                     else if (!string.IsNullOrWhiteSpace(document.PlainTextBody))
                         LoadPlainString(document.PlainTextBody);
                     else

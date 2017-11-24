@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
 using MailBee.Html;
+using Mark5.Mobile.Common;
 using UIKit;
 using WebKit;
-using Mark5.Mobile.Common;
-using System.Diagnostics;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -26,9 +27,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         TaskCompletionSource<bool> loadTcs;
 
-        public override void LoadView()
+        string headerPaddingJsTemplate = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/headerpadding", "js"));
+
+        public override void ViewDidLoad()
         {
-            base.LoadView();
+            base.ViewDidLoad();
 
             View.BackgroundColor = Theme.White;
 
@@ -68,6 +71,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 NavigationDelegate = this,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            webView.ScrollView.Bounces = true;
+            webView.ScrollView.BouncesZoom = false;
             webView.ScrollView.Delegate = this;
             webView.AddObserver(this, new NSString("estimatedProgress"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             webView.AddObserver(this, new NSString("loading"), NSKeyValueObservingOptions.New, IntPtr.Zero);
@@ -126,28 +131,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
-        public override void ViewDidLayoutSubviews()
+        public override void ViewWillLayoutSubviews()
         {
-            base.ViewDidLayoutSubviews();
+            base.ViewWillLayoutSubviews();
 
             var desireHeaderSize = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
             var desiredHeaderHeight = desireHeaderSize.Height;
-
             if (desiredHeaderHeight < 1)
                 return;
 
-            foreach (var constraint in webView.Constraints)
-            {
-                if (constraint.GetIdentifier() == "headerContainer.topAnchor")
-                    constraint.Constant = -desiredHeaderHeight;
+            var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
+            if (constraint == null)
+                return;
+            constraint.Constant = desiredHeaderHeight;
 
-                if (constraint.GetIdentifier() == "headerContainer.height")
-                    constraint.Constant = desiredHeaderHeight;
-            }
-
-            var contentInset = webView.ScrollView.ContentInset;
-            contentInset.Top = desiredHeaderHeight;
-            webView.ScrollView.ContentInset = contentInset;
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessJavaScriptTemplate(headerPaddingJs, desireHeaderSize.Height);
+            webView?.EvaluateJavaScript(headerPaddingJs, null);
         }
 
         protected override void Recycle()
@@ -236,23 +236,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
             loadIndicatorView.StopAnimating();
         }
 
-        protected async Task LoadHtmlString(string html, bool makeHtmlSafe, bool correctScale, bool inlineCss, bool injectFonts)
+        protected async Task LoadHtmlString(string html, HtmlProcessingConfiguration config)
         {
             if (CommonConfig.Logger.IsInfoEnabled())
                 CommonConfig.Logger.Info("Starting processing of the document...");
 
             var processingStopwatch = Stopwatch.StartNew();
 
-            if (makeHtmlSafe)
+            if (config.MakeHtmlSafe)
                 html = await MakeHtmlSafe(html);
 
-            if (inlineCss)
+            if (config.InlineCss)
                 html = await InlineCss(html);
 
-            if (correctScale)
+            if (config.CorrectScale)
                 html = await CorrectScale(html);
 
-            if (injectFonts)
+            if (config.InjectFonts)
                 html = await InjectFonts(html);
 
             processingStopwatch.Stop();
@@ -289,6 +289,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             webView?.StopLoading();
             webView?.LoadHtmlString("", null);
+        }
+
+        protected void LoadEditor()
+        {
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/editor", "html"));
+            webView?.StopLoading();
+            webView?.LoadHtmlString(html, null);
+        }
+
+        protected Task<(NSObject, NSError)> EvaluateJavaScriptAsync(string script)
+        {
+            var tcs = new TaskCompletionSource<(NSObject, NSError)>();
+            webView.EvaluateJavaScript(script, (result, error) => tcs.SetResult((result, error)));
+            return tcs.Task;
         }
 
         Task<string> MakeHtmlSafe(string html)
@@ -338,7 +352,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
                 var viewportElement = htmlDocument.CreateElement("meta");
                 viewportElement.SetAttributeValue("name", "viewport");
-                viewportElement.SetAttributeValue("content", "initial-scale=1");
+                viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
                 headNode.PrependChild(viewportElement);
 
                 var scaledHtml = htmlDocument.DocumentNode.OuterHtml;
@@ -358,6 +372,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     return html;
 
                 var cssLinkElement = htmlDocument.CreateElement("link");
+                cssLinkElement.SetAttributeValue("id", "fonts");
                 cssLinkElement.SetAttributeValue("rel", "stylesheet");
                 cssLinkElement.SetAttributeValue("type", "text/css");
                 cssLinkElement.SetAttributeValue("href", "html/fonts.css");
@@ -387,20 +402,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("scrollViewDidScroll:")]
         public void Scrolled(UIScrollView scrollView)
         {
-            NSLayoutConstraint leadingAnchorConstraint = null;
-            foreach (var constraint in webView.Constraints)
-            {
-                if (constraint.GetIdentifier() == "headerContainer.leadingAnchor")
-                {
-                    leadingAnchorConstraint = constraint;
-                    break;
-                }
-            }
-
-            if (leadingAnchorConstraint == null)
+            var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.leadingAnchor");
+            if (constraint == null)
                 return;
+            constraint.Constant = scrollView.ContentOffset.X;
+        }
 
-            leadingAnchorConstraint.Constant = scrollView.ContentOffset.X;
+        [Export("scrollViewDidZoom:")]
+        public void DidZoom(UIScrollView scrollView)
+        {
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessJavaScriptTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
+            webView?.EvaluateJavaScript(headerPaddingJs, null);
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
@@ -410,7 +423,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         [Export("webView:didFinishNavigation:")]
-        void DidFinishNavigation(WKWebView webView, WKNavigation navigation) => loadTcs.SetResult(true);
+        async void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+        {
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessJavaScriptTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
+            await webView?.EvaluateJavaScriptAsync(headerPaddingJs);
+
+            loadTcs.SetResult(true);
+        }
 
         [Export("webView:didFailNavigation:withError:")]
         void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error) => loadTcs.SetResult(false);
@@ -465,6 +485,30 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 default:
                     return true;
             }
+        }
+
+        protected class HtmlProcessingConfiguration
+        {
+            public static HtmlProcessingConfiguration DefaultForViewing { get; } = new HtmlProcessingConfiguration();
+            public static HtmlProcessingConfiguration DefaultForEditing { get; } = new HtmlProcessingConfiguration
+            {
+                InlineCss = true,
+                MakeEditable = true
+            };
+
+            public bool MakeHtmlSafe { get; set; } = true;
+            public bool CorrectScale { get; set; } = true;
+            public bool InjectFonts { get; set; } = true;
+            public bool InlineCss { get; set; } = false;
+            public bool MakeEditable { get; set; } = false;
+        }
+
+        protected static string ProcessJavaScriptTemplate(string javaScriptTemplate, params object[] args)
+        {
+            var output = javaScriptTemplate;
+            for (var i = 0; i < args.Length; i++)
+                output = output.Replace($"%%{i}%%", args[i].ToString());
+            return output;
         }
     }
 }

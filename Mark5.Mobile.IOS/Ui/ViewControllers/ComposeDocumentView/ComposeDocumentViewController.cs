@@ -22,7 +22,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
-    public class ComposeDocumentViewController : AbstractViewController
+    public class ComposeDocumentViewController : AbstractWebViewController
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
@@ -52,9 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         UIBarButtonItem sendButtonItem;
         UIBarButtonItem attachmentButtonItem;
 
-        UIScrollView scrollView;
-        UIStackView stackView;
-
+        UIStackView headerStackView;
         ToView toView;
         CcView ccView;
         BccView bccView;
@@ -62,17 +60,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         PriorityView priorityView;
         SubjectView subjectView;
         AttachmentsView attachmentsView;
-        ContentView contentView;
-
-        SuggestionsListView suggestionsListView;
 
         UIDocumentInteractionController attachmentInteractionController;
-
-        NSObject observeDidShowNotification;
-        NSObject observeWillChangeNotification;
-        NSObject observeWillHideNotification;
-        NSObject observeWillShowNotification;
-        float keyboardHeight = 216f;
 
         Worker autoSaveWorkingCopyWorker;
 
@@ -84,7 +73,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             InitNavigationBar();
             InitializeView();
-            InitializeSubViews();
         }
 
         public override void ViewDidLoad()
@@ -99,11 +87,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.ViewWillAppear(animated);
 
             InitializeHandlers();
-
-            observeWillShowNotification = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardWillShowNotification);
-            observeDidShowNotification = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardDidShowNotification);
-            observeWillChangeNotification = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardDidShowNotification);
-            observeWillHideNotification = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHideNotification);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -112,7 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             CommonConfig.Logger.Info("Appeared");
 
-            await LoadDocument();
+            await RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -120,11 +103,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.ViewWillDisappear(animated);
 
             DeInitializeHandlers();
-
-            observeDidShowNotification?.Dispose();
-            observeWillHideNotification?.Dispose();
-            observeWillChangeNotification?.Dispose();
-            observeWillShowNotification?.Dispose();
         }
 
         public override void DidReceiveMemoryWarning()
@@ -143,8 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             sendButtonItem = null;
             attachmentButtonItem = null;
 
-            scrollView?.RemoveFromSuperview();
-            stackView?.RemoveFromSuperview();
+            headerStackView?.RemoveFromSuperview();
 
             toView?.RemoveFromSuperview();
             ccView?.RemoveFromSuperview();
@@ -153,12 +130,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             priorityView?.RemoveFromSuperview();
             subjectView?.RemoveFromSuperview();
             attachmentsView?.RemoveFromSuperview();
-            contentView?.RemoveFromSuperview();
 
-            suggestionsListView?.RemoveFromSuperview();
-
-            scrollView = null;
-            stackView = null;
+            headerStackView = null;
             toView = null;
             ccView = null;
             bccView = null;
@@ -166,8 +139,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             priorityView = null;
             subjectView = null;
             attachmentsView = null;
-            contentView = null;
-            suggestionsListView = null;
             attachmentInteractionController = null;
         }
 
@@ -209,68 +180,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             View.BackgroundColor = Theme.White;
 
-            scrollView = new UIScrollView
-            {
-                BackgroundColor = Theme.White,
-                ShowsVerticalScrollIndicator = true,
-                ShowsHorizontalScrollIndicator = false,
-                ScrollEnabled = true,
-                ScrollsToTop = true,
-                UserInteractionEnabled = true,
-                ClipsToBounds = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            View.AddSubview(scrollView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                scrollView.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor),
-            });
-
-            stackView = new UIStackView
+            headerStackView = new UIStackView
             {
                 BackgroundColor = Theme.White,
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
                 Spacing = 0f,
-                TranslatesAutoresizingMaskIntoConstraints = false
             };
-            scrollView.AddSubview(stackView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
 
-            contentView = new ContentView(scrollView);
-            scrollView.AddSubview(contentView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, scrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
-        }
-
-        void InitializeSubViews()
-        {
-            stackView.AddArrangedSubview(toView = new ToView());
-            stackView.AddArrangedSubview(ccView = new CcView());
-            stackView.AddArrangedSubview(bccView = new BccView());
-            stackView.AddArrangedSubview(lineView = new LineView(this));
-
+            headerStackView.AddArrangedSubview(toView = new ToView());
+            headerStackView.AddArrangedSubview(ccView = new CcView());
+            headerStackView.AddArrangedSubview(bccView = new BccView());
+            headerStackView.AddArrangedSubview(lineView = new LineView(this));
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
-                stackView.AddArrangedSubview(priorityView = new PriorityView(this));
+                headerStackView.AddArrangedSubview(priorityView = new PriorityView(this));
+            headerStackView.AddArrangedSubview(subjectView = new SubjectView());
+            headerStackView.AddArrangedSubview(attachmentsView = new AttachmentsView());
 
-            stackView.AddArrangedSubview(subjectView = new SubjectView());
-            stackView.AddArrangedSubview(attachmentsView = new AttachmentsView());
+            SetHeaderView(headerStackView);
         }
 
         void InitializeHandlers()
@@ -280,15 +208,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentButtonItem.Clicked += AttachmentButtonItem_Clicked;
 
             toView.AddButtonTapped += RecipientView_AddButtonTapped;
-            toView.SearchRequested += RecipientView_SearchRequested;
             toView.Edited += Subview_Edited;
 
             ccView.AddButtonTapped += RecipientView_AddButtonTapped;
-            ccView.SearchRequested += RecipientView_SearchRequested;
             ccView.Edited += Subview_Edited;
 
             bccView.AddButtonTapped += RecipientView_AddButtonTapped;
-            bccView.SearchRequested += RecipientView_SearchRequested;
             bccView.Edited += Subview_Edited;
 
             lineView.Edited += Subview_Edited;
@@ -306,15 +231,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             attachmentButtonItem.Clicked -= AttachmentButtonItem_Clicked;
 
             toView.AddButtonTapped -= RecipientView_AddButtonTapped;
-            toView.SearchRequested -= RecipientView_SearchRequested;
             toView.Edited -= Subview_Edited;
 
             ccView.AddButtonTapped -= RecipientView_AddButtonTapped;
-            ccView.SearchRequested -= RecipientView_SearchRequested;
             ccView.Edited -= Subview_Edited;
 
             bccView.AddButtonTapped -= RecipientView_AddButtonTapped;
-            bccView.SearchRequested -= RecipientView_SearchRequested;
             bccView.Edited -= Subview_Edited;
 
             lineView.Edited -= Subview_Edited;
@@ -327,17 +249,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #endregion
 
-        async Task LoadDocument()
+        async Task RefreshData()
         {
             if (documentLoaded)
                 return;
 
             documentLoaded = true;
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_document___"));
-
             try
             {
+                await StartRefreshing();
+
                 if (RestoreWorkingCopy)
                 {
                     var wc = await Managers.DocumentsManager.GetDocumentWorkingCopyAsync();
@@ -374,8 +296,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     documentPreview.Id = PreviousDocumentId.Value;
                 }
 
-                await ShowDocument();
-                dismissAction();
+                var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
+                foreach (var subView in subViews)
+                {
+                    subView.RestoreWorkingCopy = RestoreWorkingCopy;
+                    subView.DocumentCreationModeFlag = DocumentCreationModeFlag;
+                    subView.CopyToNewOption = CopyToNewOption;
+                    subView.Document = document;
+                    subView.DocumentPreview = documentPreview;
+                    subView.PreviousDocumentDirection = PreviousDocumentDirection;
+                    subView.PreviousDocument = previousDocument;
+                    subView.PreviousDocumentPreview = previousDocumentPreview;
+                    subView.PreconfiguredEmailAddresses = PreconfiguredEmailAddresses;
+
+                    await subView.InitializeView();
+                }
+
+                var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
+                attachmentsView.InitializeFileDescriptions(files.Select(f => new FileDescription(f)).ToArray());
+
+                sendButtonItem.Enabled = IsFormValid();
+
+                LoadEditor();
+
+                if (!RestoreWorkingCopy)
+                    await AskIfShouldUseTemplates();
+
+                await EndRefreshing();
 
                 autoSaveWorkingCopyWorker?.Stop();
                 autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
@@ -383,39 +330,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                dismissAction();
+                CommonConfig.Logger.Error("Failed to load editor", ex);
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-        }
-
-        async Task ShowDocument()
-        {
-            var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
-            foreach (var subView in subViews)
-            {
-                subView.RestoreWorkingCopy = RestoreWorkingCopy;
-                subView.DocumentCreationModeFlag = DocumentCreationModeFlag;
-                subView.CopyToNewOption = CopyToNewOption;
-                subView.Document = document;
-                subView.DocumentPreview = documentPreview;
-                subView.PreviousDocumentDirection = PreviousDocumentDirection;
-                subView.PreviousDocument = previousDocument;
-                subView.PreviousDocumentPreview = previousDocumentPreview;
-                subView.PreconfiguredEmailAddresses = PreconfiguredEmailAddresses;
-
-                await subView.InitializeView();
-            }
-
-            var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
-            attachmentsView.InitializeFileDescriptions(files.Select(f => new FileDescription(f)).ToArray());
-
-            sendButtonItem.Enabled = IsFormValid();
-
-            if (RestoreWorkingCopy)
-                return;
-
-            await AskIfShouldUseTemplates();
         }
 
         bool IsFormValid()
@@ -426,32 +344,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             return recipientAdded && !lineView.LineSelectedIsAmbiguous;
         }
-
-        #region Keyboard Notifications
-
-        void OnKeyboardWillShowNotification(object sender, UIKeyboardEventArgs e)
-        {
-            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
-            contentView.OnKeyboardWillShow(keyboardHeight);
-        }
-
-        void OnKeyboardDidShowNotification(object sender, UIKeyboardEventArgs e)
-        {
-            keyboardHeight = UI.KeyboardHeightFromNotification(e.Notification);
-
-            var insets = scrollView.ContentInset;
-            insets.Bottom = keyboardHeight;
-            scrollView.ContentInset = insets;
-        }
-
-        void OnKeyboardWillHideNotification(object sender, UIKeyboardEventArgs e)
-        {
-            var insets = scrollView.ContentInset;
-            insets.Bottom = 0f;
-            scrollView.ContentInset = insets;
-        }
-
-        #endregion
 
         #region NavigationBar Event Handlers
 
@@ -632,7 +524,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await autoSaveWorkingCopyWorker.Finished();
                 }
 
-                var subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray();
+                var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
                 foreach (var subView in subViews)
                     await subView.UpdateDocument();
 
@@ -679,7 +571,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 ComposeDocumentSubView[] subViews = null;
 
-                InvokeOnMainThread(() => subViews = stackView.Subviews.Append(contentView).OfType<ComposeDocumentSubView>().ToArray());
+                InvokeOnMainThread(() => subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray());
 
                 foreach (var subView in subViews)
                     await subView.UpdateDocument();
@@ -755,40 +647,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             sendButtonItem.Enabled = IsFormValid();
-        }
-
-        void RecipientView_SearchRequested(object sender, string initialSearchString)
-        {
-            if (string.IsNullOrEmpty(initialSearchString))
-                return;
-
-            if (suggestionsListView == null)
-            {
-                suggestionsListView = new SuggestionsListView(this);
-
-                View.AddSubview(suggestionsListView);
-                View.AddConstraints(new[]
-                {
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-                });
-
-                View.SendSubviewToBack(suggestionsListView);
-            }
-
-            suggestionsListView.Initialize((RecipientsView)sender, initialSearchString);
-            suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
-            suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
-
-            View.BringSubviewToFront(suggestionsListView);
-        }
-
-        void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
-        {
-            View.SendSubviewToBack(suggestionsListView);
-            ((SuggestionsListView)sender).ShouldDisappear -= SuggestionsListView_ShouldDisappear;
         }
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
@@ -974,11 +832,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     Localization.GetString("template_selection_local"),
                     Localization.GetString("template_selection_another")
                 };
-                var result = await Dialogs.ShowListActionSheetAsync(this, templateListStrings, contentView);
+                //var result = await Dialogs.ShowListActionSheetAsync(this, templateListStrings, contentView);
+                var result = -1;
                 switch (result)
                 {
-                    case -1:
-                        break;
                     case 0:
                         await GetDefaultTemplate(true);
                         break;
@@ -1007,7 +864,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async Task GetLocalTemplate()
         {
             var localTemplate = PlatformConfig.Preferences.LocalTemplate;
-            await contentView.InsertLocalTemplate(localTemplate);
+            //await contentView.InsertLocalTemplate(localTemplate);
         }
 
         async Task GetDefaultTemplate(bool errorMessageIfNull = false)
@@ -1062,7 +919,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             ProcessTemplate(template);
 
-            await contentView.InsertTemplate(template);
+            //await contentView.InsertTemplate(template);
 
             if (!string.IsNullOrEmpty(template.Subject))
                 subjectView.Subject = template.Subject;
