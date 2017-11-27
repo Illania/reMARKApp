@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override void Adapter_ItemClicked(object sender, int position)
         {
-            var folder = CurrentAdapter.GetItemAtPosition(position);
+            var folder = CurrentAdapter.GetItemAtPosition(position).Folder;
             Activity.StartActivityForResult(ParentContactSelectorActivity.CreateIntent(Context, folder, childrenType), ParentContactSelectorFoldersListActivity.ContactRequestCode);
         }
 

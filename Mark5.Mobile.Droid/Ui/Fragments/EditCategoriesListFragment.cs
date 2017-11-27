@@ -23,16 +23,16 @@ namespace Mark5.Mobile.Droid
 {
     public class EditCategoriesListFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter)recyclerView.GetAdapter();
 
         readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
-        
+
         readonly Handler searchHandler = new Handler();
-        
+
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_730da2d5-20b7-487f-b118-0053ced930af";
 
         BusinessEntityPreview businessEntityPreview;
-        
+
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         SearchView searchView;
@@ -42,6 +42,8 @@ namespace Mark5.Mobile.Droid
 
         public static (EditCategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntityPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenEditCategoriesEvent(businessEntityPreview.ModuleType));
+
             var args = new Bundle();
 
             if (businessEntityPreview != null)

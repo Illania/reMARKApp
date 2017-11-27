@@ -354,6 +354,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(selectedDocuments.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(selectedDocuments, true);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }
@@ -374,6 +376,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
                 TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
             }

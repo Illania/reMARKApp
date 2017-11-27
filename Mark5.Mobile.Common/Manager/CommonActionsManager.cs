@@ -8,6 +8,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -77,6 +78,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new CopyToFolderEvent(folder.Module, businessEntities.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -102,6 +105,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new MoveToFolderEvent(fromFolder.Module, businessEntities.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -155,6 +160,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new CopyToWorktrayEvent(businessEntities.First().ModuleType, businessEntities.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -178,6 +185,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new CopyToUserWorktrayEvent(businessEntities.First().ModuleType, businessEntities.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -203,6 +212,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DeleteFromFolderEvent(folder.Module, businessEntities.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -255,6 +266,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DeleteEvent(businessEntities.First().ModuleType, businessEntities.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -240,6 +240,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetDocumentsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new SetPriorityEvent(documentPreviews.Count));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -423,6 +425,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Documents, 1));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -454,6 +458,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<Comment> AddComment(Document document, string content, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new AddCommentEvent(ModuleType.Documents));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -520,6 +526,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task DeleteComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DeleteCommentEvent(ModuleType.Documents));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -641,6 +649,8 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 

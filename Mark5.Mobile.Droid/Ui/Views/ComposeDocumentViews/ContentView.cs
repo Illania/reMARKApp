@@ -32,6 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly CustomWebView oldContentWebView;
         readonly Context context;
 
+        bool oldContentShown;
+
         public SemaphoreSlim NewSetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
         SemaphoreSlim newGetHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
 
@@ -113,6 +115,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void ShowOldContentButton_Click(object sender, EventArgs e)
         {
+            if (!oldContentShown)
+            {
+                oldContentShown = true;
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeShowPreviousEmailEvent());
+            }
+
             if (oldContentWebView.Visibility == ViewStates.Gone)
             {
                 showOldContentButton.SetText(Resource.String.hide_previous_message);

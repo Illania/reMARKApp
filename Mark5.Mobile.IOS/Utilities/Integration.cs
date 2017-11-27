@@ -226,8 +226,14 @@ namespace Mark5.Mobile.IOS.Utilities
                 var textUrl = new NSUrl("sms://" + processedNumber);
 
                 var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null);
+                }));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null);
+                }));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
@@ -256,8 +262,14 @@ namespace Mark5.Mobile.IOS.Utilities
                 var textUrl = new NSUrl("sms://" + processedNumber);
 
                 var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null);
+                }));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null);
+                }));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)

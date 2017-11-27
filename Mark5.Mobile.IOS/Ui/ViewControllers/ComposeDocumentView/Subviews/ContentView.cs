@@ -47,6 +47,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         bool oldContentResized;
         bool newContentResized;
 
+        bool buttonExpanded;
+        bool oldContentEdited;
+
         CGPoint tapLocationOldContent;
         CGPoint tapLocationNewContent;
 
@@ -105,6 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     oldContentWebView.RemoveFromSuperview();
                     oldContentWebView.NavigationDelegate = null;
                     oldContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("sizeNotification");
+                    oldContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("mutation");
                     oldContentWebView.Configuration.UserContentController?.RemoveScriptMessageHandler("keypress");
                     oldContentWebView = null;
                 }
@@ -243,14 +247,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var wkscript1 = new WKUserScript(script1, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript2 = new WKUserScript(script2, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript3 = new WKUserScript(script3, WKUserScriptInjectionTime.AtDocumentStart, true);
+            var wkscript4 = new WKUserScript(script4, WKUserScriptInjectionTime.AtDocumentEnd, true);
             var wkscript5 = new WKUserScript(script5, WKUserScriptInjectionTime.AtDocumentEnd, true);
 
             var userContentController = new WKUserContentController();
             userContentController.AddUserScript(wkscript1);
             userContentController.AddUserScript(wkscript2);
             userContentController.AddUserScript(wkscript3);
+            userContentController.AddUserScript(wkscript4);
             userContentController.AddUserScript(wkscript5);
             userContentController.AddScriptMessageHandler(this, "sizeNotification");
+            userContentController.AddScriptMessageHandler(this, "mutation");
             userContentController.AddScriptMessageHandler(this, "keypress");
 
             var configuration = new WKWebViewConfiguration
@@ -691,6 +698,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         async void ExpandButton_Tapped(object sender, EventArgs e)
         {
+            if (!buttonExpanded)
+            {
+                buttonExpanded = true;
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeShowPreviousEmailEvent());
+            }
+
             if (oldContentWebView.Hidden)
             {
                 expandButton.SetTitle(Localization.GetString("hide_original_message"), UIControlState.Normal);
@@ -782,7 +795,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             if (justLoaded || resized || mutated)
             {
-                if (userContentController == newContentWebView.Configuration.UserContentController)
+                if (mutated && !oldContentEdited && userContentController == oldContentWebView.Configuration.UserContentController)
+                {
+                    oldContentEdited = true;
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeEditedPreviousEmailEvent());
+                }
+                else if (userContentController == newContentWebView.Configuration.UserContentController)
                 {
                     if (resized && newContentResized)
                         return;

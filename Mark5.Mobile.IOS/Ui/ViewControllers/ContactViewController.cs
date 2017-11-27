@@ -448,6 +448,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Email));
+
             var primaryEmail = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
             if (primaryEmail == null)
                 return;
@@ -465,6 +467,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button2_TouchUpInside(object sender, EventArgs e)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Call));
+
             var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
                                           .Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
             if (formattedNumbers.Length == 0)
@@ -485,6 +489,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button3_TouchUpInside(object sender, EventArgs e)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Text));
+
             var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
             if (communicationAddresses == null)
                 return;
@@ -494,6 +500,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Button4_TouchUpInside(object sender, EventArgs e)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Map));
+
             var physicalAddress = contact.PhysicalAddresses.ToArray();
             if (physicalAddress.Length == 0)
                 return;
@@ -639,10 +647,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
-        void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
+        async void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
         {
             if (ca.Type == CommunicationAddressType.Email)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Email));
+
                 var vc = new ComposeDocumentViewController
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag.New,
@@ -655,26 +665,53 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (ca.Type == CommunicationAddressType.Phone)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
                 Integration.Call(this, tv, cell, ca.Address);
+            }
 
             if (ca.Type == CommunicationAddressType.Mobile)
-                Integration.CallOrText(this, tv, cell, ca.Address);
+            {
+                var choices = new string[] { Localization.GetString("call"), Localization.GetString("send_text") };
+                var result = await Dialogs.ShowListActionSheetAsync(this, choices, tv, cell);
+
+                if (result == 0)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
+                    Integration.Call(this, tv, cell, ca.Address);
+                }
+                if (result == 1)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Text));
+                    Integration.Text(this, tv, cell, ca.Address);
+                }
+            }
+
         }
 
         public void LinkedContactClicked(ContactPreview contactPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ContactNavigateSubContactEvent());
+
             var vc = new ContactViewController();
             vc.SetData(contactPreview);
             vc.SetRefreshDataOnAppear();
             PresentViewController(new NavigationController(vc), true, null);
         }
 
-        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa) => Integration.ShowOnMap(this, tv, cell, pa);
+        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Map));
+            Integration.ShowOnMap(this, tv, cell, pa);
+        }
+
         public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress) => Integration.OpenUrl(this, tableView, cell, webPageAddress);
         public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
 
         public void SetData(int folderId, int contactId)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
+
             folder = null;
             contactPreview = null;
             contact = null;
@@ -685,6 +722,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, ContactPreview contactPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
+
             folderId = null;
             contactId = null;
             contact = null;
@@ -695,6 +734,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(ContactPreview contactPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
+
             folderId = null;
             folder = null;
             contactId = null;
@@ -705,6 +746,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int contactId)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
+
             folderId = null;
             folder = null;
             contactPreview = null;

@@ -33,5 +33,24 @@ namespace Mark5.Mobile.Common.Extensions
                     return new ObjectType[0];
             }
         }
+
+        public static ModuleType Module(this ObjectType type)
+        {
+            switch (type)
+            {
+                case ObjectType.Document:
+                    return ModuleType.Documents;
+                case ObjectType.Contact:
+                    return ModuleType.Contacts;
+                case ObjectType.Shortcode:
+                    return ModuleType.Shortcodes;
+                case ObjectType.CalendarTask:
+                    return ModuleType.Calendar;
+                case ObjectType.CalendarAppointment:
+                    return ModuleType.Calendar;
+                default:
+                    return ModuleType.None;
+            }
+        }
     }
 }

@@ -347,7 +347,7 @@
 			<key>Title</key>
 			<string>clear_all_cache</string>
 			<key>Key</key>
-			<string>clearCacheRequested</string>
+			<string>ClearCache</string>
 			<key>DefaultValue</key>
 			<string>No</string>
 		</dict>

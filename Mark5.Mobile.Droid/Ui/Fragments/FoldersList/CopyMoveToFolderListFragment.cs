@@ -94,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override async void Adapter_ItemClicked(object sender, int position)
         {
-            var toFolder = CurrentAdapter.GetItemAtPosition(position);
+            var toFolder = CurrentAdapter.GetItemAtPosition(position).Folder;
             if (actionType == ActionType.Copy)
                 await CopyBusinessEntityToFolder(toFolder);
             else

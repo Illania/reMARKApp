@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -329,8 +330,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(forceClear: true);
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, ModuleType.Contacts));
 
+            RefreshData(forceClear: true);
+        }
         async void RefreshData(int startRowId = -1, bool forceClear = false)
         {
             if (refreshing)
@@ -600,6 +605,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {
             var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active)
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, ModuleType.Contacts));
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {

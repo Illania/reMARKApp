@@ -23,12 +23,12 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.Common.Service;
-using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -98,6 +98,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += async (sender, e) =>
             {
+                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, module: ModuleType.Documents));
+
                 actionMode?.Finish();
                 actionMode = null;
 
@@ -582,6 +584,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, true);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
                 searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
@@ -607,6 +611,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, false);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
                 searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
@@ -762,6 +768,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Documents));
+
                 menu?.FindItem(10)?.SetVisible(false);
 
                 refreshLayout.Enabled = false;
@@ -1120,7 +1128,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new GetMoreDocumentsEvent());
+
                     loadMoreAction(dp.Id);
+                }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)

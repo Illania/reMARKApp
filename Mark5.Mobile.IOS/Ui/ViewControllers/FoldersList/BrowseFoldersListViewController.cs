@@ -42,9 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             ReachabilityBar.Detach(this);
         }
 
-        protected override void FolderSelected(Folder folder)
+        protected override void FolderSelected(Folder folder, bool isFromFavorite)
         {
-            base.FolderSelected(folder);
+            base.FolderSelected(folder, isFromFavorite);
 
             if (folder.Module == ModuleType.Documents)
             {

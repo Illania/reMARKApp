@@ -36,6 +36,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (DocumentSearchCriteriaFragment Fragment, string tag) NewInstance()
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent());
+
             var fragment = new DocumentSearchCriteriaFragment();
             var tag = $"{nameof(DocumentSearchCriteriaFragment)}";
 

@@ -34,6 +34,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodesSearchCriteriaFragment Fragment, string tag) NewInstance()
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent());
+
             var fragment = new ShortcodesSearchCriteriaFragment();
             var tag = $"{nameof(ShortcodesSearchCriteriaFragment)}";
 
@@ -165,7 +167,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void ReplaceFragment(Fragment f, string tag)
         {
-            var fragmentManager = ((AppCompatActivity) Activity).SupportFragmentManager;
+            var fragmentManager = ((AppCompatActivity)Activity).SupportFragmentManager;
 
             fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
