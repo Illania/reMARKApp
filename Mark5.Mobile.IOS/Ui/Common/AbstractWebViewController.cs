@@ -243,24 +243,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (CommonConfig.Logger.IsInfoEnabled())
                 CommonConfig.Logger.Info("Starting processing of the document...");
 
-            var processingStopwatch = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 
-            if (config.MakeHtmlSafe)
-                html = await MakeHtmlSafe(html);
+            html = await ProcessHtml(html, config);
 
-            if (config.InlineCss)
-                html = await InlineCss(html);
-
-            if (config.CorrectScale)
-                html = await CorrectScale(html);
-
-            if (config.InjectFonts)
-                html = await InjectFonts(html);
-
-            processingStopwatch.Stop();
+            sw.Stop();
 
             if (CommonConfig.Logger.IsInfoEnabled())
-                CommonConfig.Logger.Info($"Processing document took: {processingStopwatch.ElapsedMilliseconds}ms.");
+                CommonConfig.Logger.Info($"Processing document took: {sw.ElapsedMilliseconds}ms.");
 
             webView?.StopLoading();
             webView?.LoadHtmlString(html, NSBundle.MainBundle.BundleUrl);
@@ -268,16 +258,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected void LoadPlainString(string plain)
         {
-            var escapedPlain = HttpUtility.HtmlEncode(plain);
-            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
-            var htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html);
-            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
-            preNode.InnerHtml = escapedPlain;
-            var plainHtml = htmlDocument.DocumentNode.OuterHtml;
+            if (CommonConfig.Logger.IsInfoEnabled())
+                CommonConfig.Logger.Info("Starting processing of the document...");
+
+            var sw = Stopwatch.StartNew();
+
+            plain = ProcessPlain(plain);
+
+            sw.Stop();
+
+            if (CommonConfig.Logger.IsInfoEnabled())
+                CommonConfig.Logger.Info($"Processing document took: {sw.ElapsedMilliseconds}ms.");
 
             webView?.StopLoading();
-            webView?.LoadHtmlString(plainHtml, null);
+            webView?.LoadHtmlString(plain, null);
         }
 
         protected void LoadNoContentString()
@@ -300,11 +294,47 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.LoadHtmlString(html, null);
         }
 
+        protected async Task<string> GetContent()
+        {
+            return await webView?.EvaluateJavaScriptAsync("document.documentElement.outerHTML") as NSString;
+        }
+
         protected Task<(NSObject, NSError)> EvaluateJavaScriptAsync(string script)
         {
             var tcs = new TaskCompletionSource<(NSObject, NSError)>();
             webView.EvaluateJavaScript(script, (result, error) => tcs.SetResult((result, error)));
             return tcs.Task;
+        }
+
+        protected async Task<string> ProcessHtml(string html, HtmlProcessingConfiguration config)
+        {
+            if (config.MakeHtmlSafe)
+                html = await MakeHtmlSafe(html);
+
+            if (config.InlineCss)
+                html = await InlineCss(html);
+
+            if (config.CorrectScale)
+                html = await CorrectScale(html);
+
+            if (config.InjectFonts)
+                html = await InjectFonts(html);
+
+            if (config.MakeEditable)
+                html = await MakeEditable(html);
+
+            return html;
+        }
+
+        protected string ProcessPlain(string plain)
+        {
+            var escapedPlain = HttpUtility.HtmlEncode(plain);
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
+            preNode.InnerHtml = escapedPlain;
+            return htmlDocument.DocumentNode.OuterHtml;
         }
 
         Task<string> MakeHtmlSafe(string html)
@@ -321,7 +351,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
-        Task<String> InlineCss(string html)
+        Task<string> InlineCss(string html)
         {
             return Task.Run(() =>
             {
@@ -333,7 +363,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
-        Task<String> CorrectScale(string html)
+        Task<string> CorrectScale(string html)
         {
             return Task.Run(() =>
             {
@@ -362,7 +392,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
-        Task<String> InjectFonts(string html)
+        Task<string> InjectFonts(string html)
         {
             return Task.Run(() =>
             {
@@ -383,6 +413,24 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 var htmlWithFonts = htmlDocument.DocumentNode.OuterHtml;
                 return htmlWithFonts;
             });
+        }
+
+        Task<string> MakeEditable(string html)
+        {
+            return Task.Run(() =>
+            {
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(html);
+
+                var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+                if (bodyNode == null)
+                    return html;
+
+                bodyNode.SetAttributeValue("contentEditable", "true");
+
+                var htmlEditable = htmlDocument.DocumentNode.OuterHtml;
+                return htmlEditable;
+            });   
         }
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
@@ -496,6 +544,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 InlineCss = true,
                 MakeEditable = true
+            };
+            public static HtmlProcessingConfiguration Disabled { get; } = new HtmlProcessingConfiguration
+            {
+                MakeHtmlSafe = false,
+                CorrectScale = false,
+                InjectFonts = false
             };
 
             public bool MakeHtmlSafe { get; set; } = true;

@@ -17,9 +17,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
-    public class ComposeDocumentViewController2 : AbstractWebViewController
+    public class ComposeDocumentViewController : AbstractWebViewController
     {
-
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
 
@@ -43,6 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         bool documentLoaded;
         bool templateLoaded;
+        string previousDocumentContent;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem sendButtonItem;
@@ -60,9 +60,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            
+
             InitNavigationBar();
             InitializeView();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            InitializeHandlers();
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            CommonConfig.Logger.Info("Appeared");
+
+            RefreshData();
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            DeinitializeHandlers();
         }
 
         void InitNavigationBar()
@@ -112,13 +135,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             SetHeaderView(headerStackView);
         }
 
-        public override void ViewDidAppear(bool animated)
+        void InitializeHandlers()
         {
-            base.ViewDidAppear(animated);
+            cancelButtonItem.Clicked += CancelButtonItem_Clicked;
+        }
 
-            CommonConfig.Logger.Info("Appeared");
+        void DeinitializeHandlers()
+        {
+            cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
+        }
 
-            RefreshData();
+        private void CancelButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
         }
 
         async void RefreshData()
@@ -195,6 +224,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
 
                 LoadEditor();
+
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                    DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
+                {
+                    if (!string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
+                        previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                    else if (!string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
+                        previousDocumentContent = ProcessPlain(previousDocument.PlainTextBody);
+                    else
+                        previousDocumentContent = null;
+                }
+
+                if (previousDocumentContent != null)
+                {
+                    ToolbarItems = new[]
+                    {
+                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                        new UIBarButtonItem(Localization.GetString("edit_original_message"), UIBarButtonItemStyle.Plain, async (sender, e) => {
+                            var vc = new EditOriginalDocumentViewController { Content = previousDocumentContent };
+                            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                            var editedContent = await vc.Result;
+                            if (editedContent != null)
+                                previousDocumentContent = editedContent;
+                        }),
+                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
+                    };
+                    NavigationController.SetToolbarHidden(false, false);
+                }
 
                 await EndRefreshing();
 

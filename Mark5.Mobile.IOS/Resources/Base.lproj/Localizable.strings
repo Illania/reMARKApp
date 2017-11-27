@@ -117,6 +117,7 @@
 "edit_shortcode_edit" = "Edit shortcode";
 "edit_message" = "Edit message";
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
+"edit_original_email" = "Edit original email";
 "editing_comment___" = "Editing comment...";
 "email" = "Email";
 "enable_notifications" = "Notify";
@@ -150,7 +151,6 @@
 "folders" = "Folders";
 "forward" = "Forward";
 "from" = "From";
-"hide_original_message" = "Hide original message";
 "hostname" = "Hostname";
 "im" = "IM";
 "incorrect_email_addresses" = "There are email addresses that seem to be incorrect. Do you want to send anyway?";
@@ -335,7 +335,6 @@
 "short_id" = "Short ID";
 "shortcodes" = "Shortcodes";
 "show_more___" = "Show more...";
-"show_original_message" = "Show original message";
 "skype" = "Skype";
 "subject" = "Subject";
 "system" = "System";
