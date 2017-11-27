@@ -1,4 +1,7 @@
 using System.IO;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -55,11 +58,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SelectedIndex = 0;
         }
 
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            ViewControllerSelected += ViewControllerSelected1;
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            ViewControllerSelected -= ViewControllerSelected1;
+        }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             RestorationIdentifier = nameof(SplitViewController);
+        }
+
+        void ViewControllerSelected1(object sender, UITabBarSelectionEventArgs e)
+        {
+            ModuleType module = ModuleType.None;
+            if (e.ViewController == documentSplitViewController)
+                module = ModuleType.Documents;
+            if (e.ViewController == contactSplitViewController)
+                module = ModuleType.Contacts;
+            if (e.ViewController == shortcodeSplitViewController)
+                module = ModuleType.Shortcodes;
+
+            if (module != ModuleType.None)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(module));
         }
     }
 }

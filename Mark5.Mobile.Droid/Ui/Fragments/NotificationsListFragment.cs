@@ -10,6 +10,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -141,6 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.MarkAllAsRead)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new NotificationMarkAllAsReadEvent(objectTypes.First().Module()));
                 MarkAllAsRead();
                 return true;
             }
@@ -170,8 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
         {
-            var dlfs = restoredState as NotificationsFragmentState;
-            if (dlfs != null)
+            if (restoredState is NotificationsFragmentState dlfs)
             {
                 CommonConfig.Logger.Info($"Restoring state [dlfs.items.count={dlfs.Notifications?.Count}]...");
 
@@ -218,6 +219,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void Adapter_ItemClicked(object sender, Notification notification)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new NotificationClickedEvent(notification.ObjectType.Module()));
+
             await Managers.NotificationsManager.MarkAsRead(notification);
 
             var position = adapter.GetPosition(notification);

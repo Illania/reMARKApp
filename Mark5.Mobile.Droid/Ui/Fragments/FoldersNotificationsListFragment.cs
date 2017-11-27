@@ -9,11 +9,10 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using System;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersNotificationsListFragment : RetainableStateFragment
+    public class FoldersNotificationsListFragment : RetainableStateFragment, ViewPager.IOnPageChangeListener
     {
         static readonly int[] tabTitles =
         {
@@ -62,6 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             pager = rootView.FindViewById<ViewPager>(Resource.Id.pager);
             pager.OffscreenPageLimit = 1;
             pager.AddOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+            pager.AddOnPageChangeListener(this);
             pager.Adapter = new PagerAdapter(ChildFragmentManager, remoteFolder);
 
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
@@ -118,6 +118,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 remoteFolder = srs.Folder;
                 pager.CurrentItem = srs.SelectedTab;
             }
+        }
+
+        void ViewPager.IOnPageChangeListener.OnPageScrollStateChanged(int state)
+        {
+            //Nothing to do...
+        }
+
+        void ViewPager.IOnPageChangeListener.OnPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+        {
+            //Nothing to do...
+        }
+
+        void ViewPager.IOnPageChangeListener.OnPageSelected(int position)
+        {
+            if (position == 1)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenNotificationsEvent(ModuleType.Documents));
         }
 
         class FoldersNotificationsRetainableState : IRetainableState

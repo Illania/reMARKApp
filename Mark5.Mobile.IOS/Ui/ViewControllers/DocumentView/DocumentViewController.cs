@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -402,6 +402,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             documentId = null;
             document = null;
@@ -416,6 +418,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
@@ -430,6 +434,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId, Guid notificationGuid)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
@@ -444,6 +450,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
@@ -458,6 +466,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
@@ -470,6 +480,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Guid failedDocumentToUploadGuid)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
+
             document = null;
             documentPreview = null;
             folder = null;
@@ -698,6 +710,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
+
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentOpenAttachmentEvent());
 
             try
             {
@@ -942,6 +956,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void NextDocumentButton_Clicked(object sender, EventArgs args)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+
             nextDocumentButtonItem.Enabled = false;
             previousDocumentButtonItem.Enabled = false;
 
@@ -958,6 +974,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PreviousDocumentButton_Clicked(object sender, EventArgs args)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+
             nextDocumentButtonItem.Enabled = false;
             previousDocumentButtonItem.Enabled = false;
 
@@ -1001,6 +1019,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(1));
+
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
 
                 dismissAction();

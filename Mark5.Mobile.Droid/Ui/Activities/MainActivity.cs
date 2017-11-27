@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Android;
 using Android.Content;
 using Android.Content.PM;
@@ -17,9 +16,10 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -37,6 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         RetainedFragment<MainActivityState> stateFragment;
 
+        bool firstSelection = true;
         bool permissionsAsked;
 
         public static Intent CreateIntent(Context context)
@@ -101,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ss = AsyncHelpers.RunSync(() => Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local));
                 navHeaderTitleTextView.Text = $"{ss?.UserInfo?.User?.FirstName} {ss?.UserInfo?.User?.LastName}";
- 
+
                 CommonConfig.Logger.Info($"Created {nameof(MainActivity)}");
             }
             else
@@ -212,7 +213,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             drawer?.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
         }
-        
+
         public void UnlockDrawer()
         {
             drawer?.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
@@ -229,7 +230,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                             stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
                         if (SupportFragmentManager.BackStackEntryCount > 0)
-                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int) Android.App.PopBackStackFlags.Inclusive);
+                            SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
+
+                        if (firstSelection)
+                            firstSelection = false;
+                        else
+                            CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(stateFragment.State.MenuItemContents[menuItem.ItemId].ModuleType));
 
                         stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
@@ -270,10 +276,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var shouldRecover = await Dialogs.ShowYesNoDialogAsync(this, Resource.String.autosave_recover_title, Resource.String.autosave_recover_content);
                 if (shouldRecover)
                 {
+                    CommonConfig.UsageAnalytics.LogEvent(new DocumentRecoveredEvent(true));
                     StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.None, CopyToNewOption.None, true));
                 }
                 else
                 {
+                    CommonConfig.UsageAnalytics.LogEvent(new DocumentRecoveredEvent(false));
                     await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
                 }
             }
@@ -307,7 +315,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
             protected readonly List<string> SavedTags = new List<string>();
 
-            protected ModuleType ModuleType { get; }
+            public ModuleType ModuleType { get; }
 
             public MenuItemContent(ModuleType moduleType)
             {
@@ -347,7 +355,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     (f, tag) = FoldersNotificationsListFragment.NewInstance(Folder.RootForModule(ModuleType));
                 else //(ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
                     (f, tag) = FoldersListFragment.NewInstance(Folder.RootForModule(ModuleType));
-                
+
                 var ft = fm.BeginTransaction();
                 ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
                 ft.Replace(Resource.Id.fragment_container, f, tag);

@@ -29,12 +29,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 
-            return (fragment,tag);
+            return (fragment, tag);
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
         {
-            var folder = CurrentAdapter.GetItemAtPosition(position);
+            var folder = CurrentAdapter.GetItemAtPosition(position).Folder;
             Activity.StartActivityForResult(PickerShortcodesListActivity.CreateIntent(Context, folder), PickerShortcodesFolderListActivity.ShortcodesRequestCode);
         }
 

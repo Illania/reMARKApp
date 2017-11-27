@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.props')" />
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 		<Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
@@ -248,9 +249,11 @@
 		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
+		<Compile Include="Utilities\UsageAnalytics.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
 		<Compile Include="Ui\Common\AbstractWebViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController2.cs" />
+		<Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -309,6 +312,15 @@
 		  <HintPath>..\packages\HtmlAgilityPack.1.6.5\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Web.Services" />
+		<Reference Include="Firebase.Core">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.4.0.8\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.InstanceID">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.2.0.4\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.Analytics">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.4.0.4\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
@@ -496,6 +508,7 @@
 		<BundleResource Include="Resources\icons\shortcodes%403x.png" />
 		<BundleResource Include="Resources\icons\warning%402x.png" />
 		<BundleResource Include="Resources\icons\warning%403x.png" />
+		<BundleResource Include="GoogleService-Info.plist" />
 		<BundleResource Include="Resources\icons\worktray%402x.png" />
 		<BundleResource Include="Resources\icons\worktray%403x.png" />
 		<BundleResource Include="Resources\html\editor.html" />
@@ -529,4 +542,8 @@
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
+	<Import Project="..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.6\build\Xamarin.Build.Download.targets')" />
+	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.8\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.8\build\Xamarin.Firebase.iOS.Core.targets')" />
+	<Import Project="..\packages\Xamarin.Firebase.iOS.InstanceID.2.0.4\build\Xamarin.Firebase.iOS.InstanceID.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.InstanceID.2.0.4\build\Xamarin.Firebase.iOS.InstanceID.targets')" />
+	<Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.4.0.4\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.4.0.4\build\Xamarin.Firebase.iOS.Analytics.targets')" />
 </Project>

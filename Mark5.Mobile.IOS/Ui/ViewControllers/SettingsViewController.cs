@@ -5,6 +5,7 @@ using InAppSettingsKit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
@@ -12,7 +13,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class SettingsViewController : AppSettingsViewController, ISettingsDelegate
+    public class SettingsViewController : AbstractAppSettingsViewController, ISettingsDelegate
     {
         const string UseServerTimezoneKey = "UseServerTimezone";
         const string CreateSystemReportKey = "createSystemReport";
@@ -50,6 +51,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSettingsEvent());
 
             if (Integration.IsRunningAtLeast(11))
             {
@@ -252,6 +255,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == UpdateConfigKey)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_config___"));
 
                 try
@@ -277,6 +282,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == LogoutKey)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SettingsLogOutEvent());
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 
                 try

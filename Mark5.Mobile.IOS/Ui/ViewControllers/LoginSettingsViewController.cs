@@ -12,7 +12,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class LoginSettingsViewController : AppSettingsViewController, ISettingsDelegate
+    public class LoginSettingsViewController : AbstractAppSettingsViewController, ISettingsDelegate
     {
         const string SslEnabledKey = "sslEnabled";
         const string AcceptSelfSignedKey = "acceptSelfSigned";

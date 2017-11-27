@@ -261,6 +261,8 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
+        public bool IsOutgoing => Id == DocumentsOutgoingFolder.Id;
+
         #endregion
 
         public override string ToString()

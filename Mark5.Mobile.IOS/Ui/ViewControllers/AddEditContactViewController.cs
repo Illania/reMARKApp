@@ -40,6 +40,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
+            if (ParentPreselected)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenAddSubContactEvent());
+            else if (CreationModeFlag == ContactCreationModeFlag.New)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenAddContactEvent());
+            else if (CreationModeFlag == ContactCreationModeFlag.Edit)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenEditContactEvent());
+
             InitializeNavigationBar();
             InitializeView();
         }

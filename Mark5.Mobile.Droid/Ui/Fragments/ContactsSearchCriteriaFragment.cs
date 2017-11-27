@@ -35,6 +35,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ContactsSearchCriteriaFragment fragment, string tag) NewInstance()
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent());
+
             var fragment = new ContactsSearchCriteriaFragment();
             var tag = $"{nameof(ContactsSearchCriteriaFragment)}";
 

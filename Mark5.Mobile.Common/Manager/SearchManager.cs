@@ -75,6 +75,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<DocumentPreview>> SearchDocumentsAsync(SearchDocumentsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DoSearchEvent(ModuleType.Documents));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -127,6 +129,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<ContactPreview>> SearchContactsAsync(SearchContactsCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DoSearchEvent(ModuleType.Contacts));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -168,6 +172,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<ShortcodePreview>> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DoSearchEvent(ModuleType.Shortcodes));
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 

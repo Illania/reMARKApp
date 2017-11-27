@@ -88,6 +88,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
 
+                if (documentPreview?.Direction == DocumentDirection.External)
+                    CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(true));
+                else
+                    CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
+
                 var (df, tag) = DocumentFragment.NewInstance(folder, folderId, documentPreview, documentId, notificationGuid, failedDocumentToUploadGuid);
 
                 var ft = SupportFragmentManager.BeginTransaction();

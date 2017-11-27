@@ -166,7 +166,7 @@ namespace FastScrollRecycler
         {
             if (IsVisible())
             {
-                var restoreCount = canvas.Save(SaveFlags.Matrix);
+                var restoreCount = canvas.Save();
                 canvas.Translate(backgroundBounds.Left, backgroundBounds.Top);
                 tmpRect.Set(backgroundBounds);
                 tmpRect.OffsetTo(0, 0);

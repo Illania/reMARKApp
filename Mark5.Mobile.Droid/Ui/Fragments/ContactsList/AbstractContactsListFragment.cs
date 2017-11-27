@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -25,7 +25,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public abstract class AbstractContactsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public abstract class AbstractContactsListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
 
@@ -69,6 +69,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += (sender, e) =>
             {
+                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, module: ModuleType.Contacts));
+
                 ActionMode?.Finish();
                 ActionMode = null;
 
@@ -164,8 +166,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
-            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            filterItem.SetOnActionExpandListener(this);
+            searchView = (SearchView)filterItem.ActionView;
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
 
@@ -536,10 +538,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Contacts));
+
                 menu?.FindItem(10)?.SetVisible(false);
 
                 refreshLayout.Enabled = false;
@@ -552,7 +556,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
