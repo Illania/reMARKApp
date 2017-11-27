@@ -32,7 +32,7 @@ using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
 
@@ -210,8 +210,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
-            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            filterItem.SetOnActionExpandListener(this);
+            searchView = (SearchView)filterItem.ActionView;
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
 
@@ -758,7 +758,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
@@ -774,7 +774,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {

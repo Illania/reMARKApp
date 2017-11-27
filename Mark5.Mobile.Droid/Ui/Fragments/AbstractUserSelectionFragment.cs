@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public abstract class AbstractUserSelectionFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public abstract class AbstractUserSelectionFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         UserSelectionAdapter CurrentAdapter => (UserSelectionAdapter)recyclerView.GetAdapter();
 
@@ -122,8 +122,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var searchItem = menu.FindItem(Resource.Id.action_filter);
-            MenuItemCompat.SetOnActionExpandListener(searchItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(searchItem);
+            searchItem.SetOnActionExpandListener(this);
+            searchView = (SearchView)searchItem.ActionView;
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -220,7 +220,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
@@ -232,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {

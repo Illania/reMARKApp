@@ -21,7 +21,7 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid
 {
-    public class CategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class CategoriesListFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public List<Category> Categories => adapter.Items;
 
@@ -131,8 +131,8 @@ namespace Mark5.Mobile.Droid
             item.SetShowAsAction(ShowAsAction.Always);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
-            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            filterItem.SetOnActionExpandListener(this);
+            searchView = (SearchView)filterItem.ActionView;
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -214,7 +214,7 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
