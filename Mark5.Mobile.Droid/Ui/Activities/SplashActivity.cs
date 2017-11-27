@@ -81,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ci = await authenticator.GetConnectionInfoAsync();
 
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username);
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username.ToLowerInvariant());
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
                     CommonConfig.Logger.Info($"Current connection info: {ci}");
