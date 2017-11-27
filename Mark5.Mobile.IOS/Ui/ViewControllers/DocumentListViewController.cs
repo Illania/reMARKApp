@@ -218,7 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             composeDocumentItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "compose.png"))
+                Image = UIImage.FromBundle(Path.Combine("icons", "create.png"))
             };
             NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
 

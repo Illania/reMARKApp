@@ -338,7 +338,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     i = UIImage.FromBundle(Path.Combine("icons", "outgoing.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case DocumentDirection.Draft:
-                    i = UIImage.FromBundle(Path.Combine("icons", "pencil.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    i = UIImage.FromBundle(Path.Combine("icons", "edit_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
             }
             directionIndicatorImageView.Image = i;
