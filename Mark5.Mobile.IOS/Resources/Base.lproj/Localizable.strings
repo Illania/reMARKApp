@@ -154,6 +154,7 @@
 "hostname" = "Hostname";
 "im" = "IM";
 "incorrect_email_addresses" = "There are email addresses that seem to be incorrect. Do you want to send anyway?";
+"insert_template" = "Insert template";
 "internal" = "Internal";
 "internet_access" = "Internet access: ";
 "last_name" = "Last name";

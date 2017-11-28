@@ -76,6 +76,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView.ScrollView.Bounces = true;
             webView.ScrollView.BouncesZoom = false;
             webView.ScrollView.Delegate = this;
+            webView.ScrollView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.Interactive;
             webView.AddObserver(this, new NSString("estimatedProgress"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             webView.AddObserver(this, new NSString("loading"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             View.AddSubview(webView);
