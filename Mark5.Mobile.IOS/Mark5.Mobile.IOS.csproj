@@ -524,7 +524,8 @@
 		<BundleResource Include="Resources\html\fonts\couriernew.ttf" />
 		<BundleResource Include="Resources\html\fonts\opensans.ttf" />
 		<BundleResource Include="Resources\html\insertTemplate.js" />
-		<BundleResource Include="Resources\html\headerpadding.js" />
+		<BundleResource Include="Resources\html\headerPadding.js" />
+		<BundleResource Include="Resources\html\replyHeader.html" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">

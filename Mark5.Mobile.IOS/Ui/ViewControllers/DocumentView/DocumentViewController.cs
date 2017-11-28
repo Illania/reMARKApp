@@ -584,7 +584,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (!string.IsNullOrWhiteSpace(document.HtmlBody))
                         await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForViewing);
                     else if (!string.IsNullOrWhiteSpace(document.PlainTextBody))
-                        LoadPlainString(document.PlainTextBody);
+                        await LoadPlainText(document.PlainTextBody, PlainTextProcessingConfiguration.DefaultForViewing);
                     else
                         LoadNoContentString();
                 }

@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewDidLoad();
 
-            headerPaddingJsTemplate = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/headerpadding", "js"));
+            headerPaddingJsTemplate = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/headerPadding", "js"));
 
             View.BackgroundColor = Theme.White;
 
@@ -148,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             constraint.Constant = desiredHeaderHeight;
 
             var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessJavaScriptTemplate(headerPaddingJs, desireHeaderSize.Height);
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, desireHeaderSize.Height);
             webView?.EvaluateJavaScript(headerPaddingJs, null);
         }
 
@@ -256,14 +256,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.LoadHtmlString(html, NSBundle.MainBundle.BundleUrl);
         }
 
-        protected void LoadPlainString(string plain)
+        protected async Task LoadPlainText(string text, PlainTextProcessingConfiguration config)
         {
             if (CommonConfig.Logger.IsInfoEnabled())
                 CommonConfig.Logger.Info("Starting processing of the document...");
 
             var sw = Stopwatch.StartNew();
 
-            plain = ProcessPlain(plain);
+            text = await ProcessPlainText(text, config);
 
             sw.Stop();
 
@@ -271,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 CommonConfig.Logger.Info($"Processing document took: {sw.ElapsedMilliseconds}ms.");
 
             webView?.StopLoading();
-            webView?.LoadHtmlString(plain, null);
+            webView?.LoadHtmlString(text, null);
         }
 
         protected void LoadNoContentString()
@@ -323,18 +323,31 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (config.MakeEditable)
                 html = await MakeEditable(html);
 
+            if (config.InjectReplyHeader)
+                html = await InjectReplyHeader(html, config.ReplyHeaderParameters);
+
             return html;
         }
 
-        protected string ProcessPlain(string plain)
+        protected async Task<string> ProcessPlainText(string text, PlainTextProcessingConfiguration config)
         {
-            var escapedPlain = HttpUtility.HtmlEncode(plain);
+            if (config.Encode)
+                text = HttpUtility.HtmlEncode(text);
+
             var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
             var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
-            preNode.InnerHtml = escapedPlain;
-            return htmlDocument.DocumentNode.OuterHtml;
+            preNode.InnerHtml = text;
+            text = htmlDocument.DocumentNode.OuterHtml;
+
+            if (config.MakeEditable)
+                text = await MakeEditable(text);
+
+            if (config.InjectReplyHeader)
+                text = await InjectReplyHeader(text, config.ReplyHeaderParameters);
+
+            return text;
         }
 
         Task<string> MakeHtmlSafe(string html)
@@ -430,7 +443,30 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
                 var htmlEditable = htmlDocument.DocumentNode.OuterHtml;
                 return htmlEditable;
-            });   
+            });
+        }
+
+        Task<string> InjectReplyHeader(string html, string[] parameters)
+        {
+            return Task.Run(() =>
+            {
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(html);
+
+                var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+                if (bodyNode == null)
+                    return html;
+
+                var replyHeader = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/replyHeader", "html"));
+                replyHeader = ProcessWebTemplate(replyHeader, parameters);
+                var headerDiv = htmlDocument.CreateElement("div");
+                headerDiv.SetAttributeValue("id", "replyHeader");
+                headerDiv.InnerHtml = replyHeader;
+                bodyNode.PrependChild(headerDiv);
+
+                var htmlWithReplyHeader = htmlDocument.DocumentNode.OuterHtml;
+                return htmlWithReplyHeader;
+            });
         }
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
@@ -462,7 +498,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public void DidZoom(UIScrollView scrollView)
         {
             var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessJavaScriptTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
             webView?.EvaluateJavaScript(headerPaddingJs, null);
         }
 
@@ -476,7 +512,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         async void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
         {
             var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessJavaScriptTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
             await webView?.EvaluateJavaScriptAsync(headerPaddingJs);
 
             loadTcs.SetResult(true);
@@ -539,29 +575,75 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected class HtmlProcessingConfiguration
         {
-            public static HtmlProcessingConfiguration DefaultForViewing { get; } = new HtmlProcessingConfiguration();
-            public static HtmlProcessingConfiguration DefaultForEditing { get; } = new HtmlProcessingConfiguration
+            public static HtmlProcessingConfiguration DefaultForViewing
             {
-                InlineCss = true,
-                MakeEditable = true
-            };
-            public static HtmlProcessingConfiguration Disabled { get; } = new HtmlProcessingConfiguration
+                get => new HtmlProcessingConfiguration();
+            }
+
+            public static HtmlProcessingConfiguration DefaultForEditing
             {
-                MakeHtmlSafe = false,
-                CorrectScale = false,
-                InjectFonts = false
-            };
+                get => new HtmlProcessingConfiguration
+                {
+                    InlineCss = true,
+                    MakeEditable = true,
+                    InjectReplyHeader = true,
+                };
+            }
+
+            public static HtmlProcessingConfiguration Disabled
+            {
+                get => new HtmlProcessingConfiguration
+                {
+                    MakeHtmlSafe = false,
+                    CorrectScale = false,
+                    InjectFonts = false
+                };
+            }
 
             public bool MakeHtmlSafe { get; set; } = true;
             public bool CorrectScale { get; set; } = true;
             public bool InjectFonts { get; set; } = true;
             public bool InlineCss { get; set; } = false;
             public bool MakeEditable { get; set; } = false;
+            public bool InjectReplyHeader { get; set; } = false;
+
+            public string[] ReplyHeaderParameters { get; set; }
         }
 
-        protected static string ProcessJavaScriptTemplate(string javaScriptTemplate, params object[] args)
+        protected class PlainTextProcessingConfiguration
         {
-            var output = javaScriptTemplate;
+            public static PlainTextProcessingConfiguration DefaultForViewing
+            {
+                get => new PlainTextProcessingConfiguration();
+            }
+
+            public static PlainTextProcessingConfiguration DefaultForEditing
+            {
+                get => new PlainTextProcessingConfiguration
+                {
+                    MakeEditable = true,
+                    InjectReplyHeader = true,
+                };
+            }
+
+            public static PlainTextProcessingConfiguration Disabled
+            {
+                get => new PlainTextProcessingConfiguration
+                {
+                    Encode = false,
+                };
+            }
+
+            public bool Encode { get; set; } = true;
+            public bool MakeEditable { get; set; } = false;
+            public bool InjectReplyHeader { get; set; } = false;
+
+            public string[] ReplyHeaderParameters { get; set; }
+        }
+
+        protected static string ProcessWebTemplate(string template, params object[] args)
+        {
+            var output = template;
             for (var i = 0; i < args.Length; i++)
                 output = output.Replace($"%%{i}%%", args[i].ToString());
             return output;

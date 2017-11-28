@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
@@ -9,6 +10,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
@@ -230,10 +232,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
                 {
-                    if (!string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
-                        previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
-                    else if (!string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
-                        previousDocumentContent = ProcessPlain(previousDocument.PlainTextBody);
+                    if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
+                    {
+                        var config = HtmlProcessingConfiguration.DefaultForEditing;
+                        config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
+                        previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, config);
+                    }
+                    else if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
+                    {
+                        var config = PlainTextProcessingConfiguration.DefaultForEditing;
+                        config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
+                        previousDocumentContent = await ProcessPlainText(previousDocument.PlainTextBody, config);
+                    }
                     else
                         previousDocumentContent = null;
                 }
@@ -243,7 +253,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     ToolbarItems = new[]
                     {
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        new UIBarButtonItem(Localization.GetString("edit_original_message"), UIBarButtonItemStyle.Plain, async (sender, e) => {
+                        new UIBarButtonItem(Localization.GetString("edit_original_email"), UIBarButtonItemStyle.Plain, async (sender, e) => {
                             var vc = new EditOriginalDocumentViewController { Content = previousDocumentContent };
                             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                             var editedContent = await vc.Result;
@@ -331,12 +341,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template.ContentType == ContentType.PlainText)
                 {
                     var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessJavaScriptTemplate(insertTemplateJs, "text", template.Id, templateText);
+                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
                 }
                 if (template.ContentType == ContentType.Html)
                 {
                     var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessJavaScriptTemplate(insertTemplateJs, "html", template.Id, templateText);
+                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
                 }
 
                 var result = await EvaluateJavaScriptAsync(insertTemplateJs);
@@ -358,7 +368,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/insertTemplate", "js"));
             var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-            insertTemplateJs = ProcessJavaScriptTemplate(insertTemplateJs, "text", "local", localTemplateText);
+            insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
 
             var result = await EvaluateJavaScriptAsync(insertTemplateJs);
         }
@@ -384,12 +394,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template.ContentType == ContentType.PlainText)
                 {
                     var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessJavaScriptTemplate(insertTemplateJs, "text", template.Id, templateText);
+                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
                 }
                 if (template.ContentType == ContentType.Html)
                 {
                     var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessJavaScriptTemplate(insertTemplateJs, "html", template.Id, templateText);
+                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
                 }
 
                 var result = await EvaluateJavaScriptAsync(insertTemplateJs);
@@ -405,6 +415,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 dismissAction();
             }
+        }
+
+        #endregion
+
+        #region Utilities
+
+        static string[] GetReplyHeaderParameters(DocumentPreview documentPreview)
+        {
+            var from = GetAddressTextFromPreviousDocument(documentPreview, DocumentAddressType.From);
+            var date = documentPreview.DateReceivedTimestamp
+                                      .ConvertTimestampMillisecondsToDateTime()
+                                      .ConvertUtcToUserTime()
+                                      .ConvertDateTimeToTimestampMilliseconds()
+                                      .FormatUserTimestampAsTimeAndDateString();
+            var to = GetAddressTextFromPreviousDocument(documentPreview, DocumentAddressType.To, DocumentAddressType.Cc);
+            var subject = documentPreview.Subject;
+
+            return new[] { from, date, to, subject };
+        }
+
+        static string GetAddressTextFromPreviousDocument(DocumentPreview documentPreview, params DocumentAddressType[] addressTypes)
+        {
+            var sb = new StringBuilder();
+            var addresses = documentPreview.Addresses.Where(da => addressTypes.Contains(da.AddressType)).ToArray();
+            for (var i = 0; i < addresses.Length; i++)
+            {
+                var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
+                if (hasName)
+                    sb.Append(addresses[i].Name).Append(" &lt;");
+                sb.Append(addresses[i].Address);
+                if (hasName)
+                    sb.Append("&gt;");
+                if (i < addresses.Length - 1)
+                    sb.Append(", ");
+            }
+
+            return sb.ToString();
         }
 
         #endregion

@@ -66,6 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void DoneItem_Clicked(object sender, EventArgs e)
         {
+            doneItem.Enabled = false;
             var content = await GetContent();
             tcs.SetResult(content);
             DismissViewController(true, null);
