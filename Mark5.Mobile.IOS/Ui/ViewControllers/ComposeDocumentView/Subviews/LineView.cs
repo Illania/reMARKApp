@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll ||
                 DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
             {
-                if (PlatformConfig.Preferences.AlwatsUseDefaultLine && defaultOutgoingLine != null)
+                if (PlatformConfig.Preferences.AlwaysUseDefaultLine && defaultOutgoingLine != null)
                 {
                     SetLine(defaultOutgoingLine);
                     return Task.CompletedTask;

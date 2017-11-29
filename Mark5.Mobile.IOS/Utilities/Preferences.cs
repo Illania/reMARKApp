@@ -158,7 +158,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool RemoveLine => ud.BoolForKey(Keys.RemoveLineKey);
 
-        public bool AlwatsUseDefaultLine => ud.BoolForKey(Keys.AlwaysUseDefaultLineKey);
+        public bool AlwaysUseDefaultLine => ud.BoolForKey(Keys.AlwaysUseDefaultLineKey);
 
         public TemplateUsageMode UseTemplate => (TemplateUsageMode)(int)ud.IntForKey(Keys.UseTemplateKey);
 
