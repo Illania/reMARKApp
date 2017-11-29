@@ -17,6 +17,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UILabel bottomLabel;
         readonly UIImageView iconImage;
 
+        public string Content => topLabel?.Text;
+
         public DocumentAddressTableViewCell(NSString reuseIdentifier)
             : base(UITableViewCellStyle.Default, reuseIdentifier)
         {
