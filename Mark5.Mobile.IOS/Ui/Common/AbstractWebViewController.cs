@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -228,6 +229,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 if (webView.IsLoading)
                     webView.StopLoading();
                 await loadTcs.Task;
+
+                CommonConfig.Logger.Warning("!!! Email load timeout !!!");
             }
 
             webView.Hidden = false;
@@ -321,6 +324,15 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 sw.Restart();
             }
 
+            if (config.MakeHtmlKindaSafe)
+            {
+                html = await MakeHtmlKindaSafe(html);
+
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"MakeHtmlKindaSafe {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
+
             if (config.InlineCss)
             {
                 html = await InlineCss(html);
@@ -409,6 +421,30 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 p.Dom.OuterHtml = html;
                 var safeHtml = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
                 return safeHtml;
+            });
+        }
+
+        Task<string> MakeHtmlKindaSafe(string html)
+        {
+            return Task.Run(() =>
+            {
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(html);
+                var dn = htmlDocument.DocumentNode;
+
+                var nodesToRemove = new List<HtmlNode>();
+
+                foreach (var xpath in new[] { "//script", "//bgsound", "//embed", "//iframe", "//frame", "//frameset", "//object", "//applet" })
+                {
+                    var nodes = dn.SelectNodes(xpath);
+                    if (nodes != null)
+                        nodesToRemove.AddRange(nodes);
+                }
+
+                foreach (var nodeToRemove in nodesToRemove)
+                    nodeToRemove.Remove();
+
+                return htmlDocument.DocumentNode.OuterHtml;
             });
         }
 
@@ -622,13 +658,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 get => new HtmlProcessingConfiguration
                 {
-                    MakeHtmlSafe = false,
+                    MakeHtmlKindaSafe = false,
                     CorrectScale = false,
                     InjectFonts = false
                 };
             }
 
-            public bool MakeHtmlSafe { get; set; } = true;
+            public bool MakeHtmlSafe { get; set; } = false;
+            public bool MakeHtmlKindaSafe { get; set; } = true;
             public bool CorrectScale { get; set; } = true;
             public bool InjectFonts { get; set; } = true;
             public bool InlineCss { get; set; } = false;
