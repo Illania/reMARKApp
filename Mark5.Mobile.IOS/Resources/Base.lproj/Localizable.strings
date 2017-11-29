@@ -153,7 +153,7 @@
 "from" = "From";
 "hostname" = "Hostname";
 "im" = "IM";
-"incorrect_email_addresses" = "There are email addresses that seem to be incorrect. Do you want to send anyway?";
+"incorrect_email_addresses_added" = "There are email addresses that seem to be incorrect. Do you want to send this email anyway?";
 "insert_template" = "Insert template";
 "internal" = "Internal";
 "internet_access" = "Internet access: ";
@@ -202,11 +202,13 @@
 "no_documents_failed" = "No documents failed to send";
 "no_documents_found" = "No emails were found";
 "no_documents_pending" = "No documents are pending send";
+"no_email_addresses_added" = "You need to add at least one email address to send this email.";
 "no_email_addresses_content" = "The contact does not have email addresses";
 "no_email_addresses_title" = "No email addresses";
 "no_folders_found" = "No folders found";
 "no_folders_in_favorites" = "No folders were added to favorites yet";
 "no_folders_in_section" = "There are no folders in this section";
+"no_line_selected" = "You need to select mailbox to send this email.";
 "no_matching_categories" = "There are no matching categories";
 "no_matching_contacts" = "There are no matching contacts";
 "no_matching_documents" = "There are no matching emails";
@@ -219,6 +221,7 @@
 "no_object_links" = "There are no links";
 "no_shortcodes_found" = "No shortcodes were found";
 "no_subject" = "No subject";
+"no_subject_added" = "This email has no subject. Do you want to send this email anyway?";
 "no_suggestions_available" = "No suggestions available";
 "no_templates" = "No templates";
 "no_templates_content" = "There are no templates defined for this creation mode.";

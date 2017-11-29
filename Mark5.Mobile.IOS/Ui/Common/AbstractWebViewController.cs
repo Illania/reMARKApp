@@ -649,8 +649,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 get => new HtmlProcessingConfiguration
                 {
                     InlineCss = true,
-                    MakeEditable = true,
-                    InjectReplyHeader = true,
+                    MakeEditable = true
                 };
             }
 
@@ -686,8 +685,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 get => new PlainTextProcessingConfiguration
                 {
-                    MakeEditable = true,
-                    InjectReplyHeader = true,
+                    MakeEditable = true
                 };
             }
 

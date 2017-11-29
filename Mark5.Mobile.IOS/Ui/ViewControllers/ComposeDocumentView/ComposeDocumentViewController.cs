@@ -320,33 +320,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     attachmentsView.InitializeFileDescriptions(files.Select(f => new FileDescription(f)).ToArray());
                 }
 
-                LoadEditor();
-
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
-                    DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
-                    DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
-                    DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
+                if (RestoreWorkingCopy)
+                    await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                else
                 {
-                    if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
-                    {
-                        var config = HtmlProcessingConfiguration.DefaultForEditing;
-                        config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
-                        previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, config);
-                    }
-                    else if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
-                    {
-                        var config = PlainTextProcessingConfiguration.DefaultForEditing;
-                        config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
-                        previousDocumentContent = await ProcessPlainText(previousDocument.PlainTextBody, config);
-                    }
-                    else
-                        previousDocumentContent = null;
-                }
+                    LoadEditor();
 
-                if (previousDocumentContent != null)
-                {
-                    ToolbarItems = new[]
+                    if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
+                        DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                        DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                        DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
                     {
+                        if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
+                        {
+                            var config = HtmlProcessingConfiguration.DefaultForEditing;
+                            config.InjectReplyHeader = true;
+                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
+                            previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, config);
+                        }
+                        else if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
+                        {
+                            var config = PlainTextProcessingConfiguration.DefaultForEditing;
+                            config.InjectReplyHeader = true;
+                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
+                            previousDocumentContent = await ProcessPlainText(previousDocument.PlainTextBody, config);
+                        }
+                        else
+                            previousDocumentContent = null;
+                    }
+
+                    if (previousDocumentContent != null)
+                    {
+                        ToolbarItems = new[]
+                        {
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                         new UIBarButtonItem(Localization.GetString("edit_original_email"), UIBarButtonItemStyle.Plain, async (sender, e) => {
                             var vc = new EditOriginalDocumentViewController { Content = previousDocumentContent };
@@ -357,7 +363,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         }),
                         new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
                     };
-                    NavigationController.SetToolbarHidden(false, false);
+                        NavigationController.SetToolbarHidden(false, false);
+                    }
                 }
 
                 await EndRefreshing();
@@ -486,8 +493,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void Subview_Edited(object sender, EventArgs e)
         {
-            Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
-
             if (sender is LineView
                 && PlatformConfig.Preferences.RemoveLine
                 && DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll
@@ -660,9 +665,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task<bool> SendDocument()
         {
+            if (!ContainsValidEmails(toView, ccView, bccView))
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_email_addresses_added"));
+                return false;
+            }
+
+            if (lineView.LineSelectedIsAmbiguous)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_line_selected"));
+                return false;
+            }
+
             if (ContainsInvalidEmails(toView, ccView, bccView))
             {
-                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses"));
+                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses_added"));
+                if (!result)
+                    return false;
+            }
+
+            if (subjectView.Empty)
+            {
+                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_subject_added"));
                 if (!result)
                     return false;
             }
