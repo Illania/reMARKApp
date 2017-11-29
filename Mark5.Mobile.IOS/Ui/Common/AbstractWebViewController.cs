@@ -64,7 +64,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 AllowsInlineMediaPlayback = false,
                 Preferences = preferences,
                 UserContentController = userContentController,
-                DataDetectorTypes = WKDataDetectorTypes.All
+                DataDetectorTypes = WKDataDetectorTypes.All,
+                WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore
             };
 
             webView = new WKWebView(CGRect.Empty, configuration)
@@ -295,7 +296,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.LoadHtmlString(html, null);
         }
 
-        protected async Task<string> GetContent()
+        protected virtual async Task<string> GetContent()
         {
             return await webView?.EvaluateJavaScriptAsync("document.documentElement.outerHTML") as NSString;
         }
@@ -397,6 +398,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                         existingViewportNode.Remove();
 
                 var viewportElement = htmlDocument.CreateElement("meta");
+                viewportElement.SetAttributeValue("id", "viewport");
                 viewportElement.SetAttributeValue("name", "viewport");
                 viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
                 headNode.PrependChild(viewportElement);
@@ -498,9 +500,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("scrollViewDidZoom:")]
         public void DidZoom(UIScrollView scrollView)
         {
-            var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-            webView?.EvaluateJavaScript(headerPaddingJs, null);
+            if (headerContainerView.Bounds.Height > 0)
+            {
+                var headerPaddingJs = headerPaddingJsTemplate;
+                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
+                webView?.EvaluateJavaScript(headerPaddingJs, null);
+            }
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
@@ -512,9 +517,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("webView:didFinishNavigation:")]
         async void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
         {
-            var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-            await webView?.EvaluateJavaScriptAsync(headerPaddingJs);
+            if (headerContainerView.Bounds.Height > 0)
+            {
+                var headerPaddingJs = headerPaddingJsTemplate;
+                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
+                await webView?.EvaluateJavaScriptAsync(headerPaddingJs);
+            }
 
             loadTcs.SetResult(true);
         }

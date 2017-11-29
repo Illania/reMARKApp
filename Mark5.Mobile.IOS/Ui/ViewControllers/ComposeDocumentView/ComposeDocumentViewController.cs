@@ -13,12 +13,16 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
 using Photos;
 using UIKit;
+using HtmlAgilityPack;
+using MailBee.Html;
+using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
@@ -148,6 +152,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
             insertButtonItem.Clicked += InsertButtonItem_Clicked;
             sendButtonItem.Clicked += SendButtonItem_Clicked;
+
+            attachmentsView.Tapped += AttachmentsView_Tapped;
+            attachmentsView.DeleteTapped += AttachmentsView_DeleteTapped;
         }
 
         void DeinitializeHandlers()
@@ -155,42 +162,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
             insertButtonItem.Clicked -= InsertButtonItem_Clicked;
             sendButtonItem.Clicked -= SendButtonItem_Clicked;
-        }
 
-        void CancelButtonItem_Clicked(object sender, EventArgs e)
-        {
-            DismissViewController(true, null);
-        }
-
-        async void InsertButtonItem_Clicked(object sender, EventArgs e)
-        {
-            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-            var source = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("insert_template"), Localization.GetString("take_photo"), Localization.GetString("existing_photo"), Localization.GetString("browse_files") }, d);
-            if (source < 0)
-                return;
-
-            if (source == 0)
-                await InsertTemplate();
-
-            if (source == 1)
-                InsertNewPhoto(d);
-
-            if (source == 2)
-                InsertExistingPhoto(d);
-
-            if (source == 3)
-                InsertFile(d);
-        }
-
-        void SendButtonItem_Clicked(object sender, EventArgs e)
-        {
-
+            attachmentsView.Tapped -= AttachmentsView_Tapped;
+            attachmentsView.DeleteTapped -= AttachmentsView_DeleteTapped;
         }
 
         async void RefreshData()
         {
             await LoadDocument();
             await LoadTemplate();
+
+            insertButtonItem.Enabled = true;
+            sendButtonItem.Enabled = true;
         }
 
         async Task LoadDocument()
@@ -332,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await InsertLocalTemplate();
                     break;
                 case Preferences.TemplateUsageMode.AlwaysAsk:
-                    var templateListStrings = new []
+                    var templateListStrings = new[]
                     {
                         Localization.GetString("template_selection_default"),
                         Localization.GetString("template_selection_local"),
@@ -358,6 +341,338 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             templateLoaded = true;
         }
 
+        #region Handlers
+
+        async void CancelButtonItem_Clicked(object sender, EventArgs e)
+        {
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("save_draft"), Localization.GetString("delete_draft") }, d);
+            if (source < 0)
+                return;
+
+            if (autoSaveWorkingCopyWorker != null)
+            {
+                autoSaveWorkingCopyWorker.Stop();
+                await autoSaveWorkingCopyWorker.Finished();
+            }
+
+            if (source == 0)
+            {
+                var saved = await SaveDraft();
+                if (!saved)
+                    return;
+
+                DismissViewController(true, null);
+            }
+
+            if (source == 1)
+            {
+                await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
+                DismissViewController(true, null);
+            }
+        }
+
+        async void InsertButtonItem_Clicked(object sender, EventArgs e)
+        {
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("insert_template"), Localization.GetString("take_photo"), Localization.GetString("existing_photo"), Localization.GetString("browse_files") }, d);
+            if (source < 0)
+                return;
+
+            if (source == 0)
+                await InsertTemplate();
+
+            if (source == 1)
+                InsertNewPhoto(d);
+
+            if (source == 2)
+                InsertExistingPhoto(d);
+
+            if (source == 3)
+                InsertFile(d);
+        }
+
+        async void SendButtonItem_Clicked(object sender, EventArgs e)
+        {
+            if (autoSaveWorkingCopyWorker != null)
+            {
+                autoSaveWorkingCopyWorker.Stop();
+                await autoSaveWorkingCopyWorker.Finished();
+            }
+
+            var sent = await SendDocument();
+            if (!sent)
+                return;
+
+            DismissViewController(true, null);
+        }
+
+        async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
+
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
+
+            try
+            {
+                string path = null;
+
+                if (e.AttachmentDescription != null)
+                {
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
+
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        if (PlatformConfig.Preferences.LargeAttachmentWarning &&
+                            e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
+                            !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
+                        {
+                            dismissAction();
+                            return;
+                        }
+
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
+                    }
+                }
+
+                if (e.FileDescription != null)
+                    path = e.FileDescription.Path;
+
+                if (string.IsNullOrWhiteSpace(path))
+                    throw new Exception("Unable to open attachment.");
+
+                var url = NSUrl.FromFilename(path);
+
+                if (MailViewerViewController.CanOpen(url))
+                {
+                    PresentViewController(new NavigationController(new MailViewerViewController(url), UIModalPresentationStyle.PageSheet), true, null);
+                    return;
+                }
+
+                var attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
+                attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
+
+                var success = attachmentInteractionController.PresentPreview(true);
+                if (!success)
+                {
+                    CommonConfig.Logger.Info($"Failed to present preview for attachment. Presenting open with instead [documentId={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
+
+                    success = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
+                    if (!success)
+                    {
+                        CommonConfig.Logger.Warning($"Failed to present open in view - there is no app that can open this type of attachment installed [documentId={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]");
+
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
+
+                dismissAction();
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+            finally
+            {
+                dismissAction();
+            }
+        }
+
+        async void AttachmentsView_DeleteTapped(object sender, AttachmentsView.DeleteTappedEventArgs e)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeRemoveAttachmentEvent());
+
+            try
+            {
+                if (e.AttachmentDescription != null)
+                    attachmentsView.RemoveAttachment(e.AttachmentDescription);
+
+                if (e.FileDescription != null)
+                {
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(e.FileDescription.Name);
+                    attachmentsView.RemoveFileDescription(e.FileDescription);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to remove attachment [document.Id={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        #endregion
+
+        #region Sending/saving/deleting
+
+        async Task<bool> SendDocument()
+        {
+            if (ContainsInvalidEmails(toView, ccView, bccView))
+            {
+                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses"));
+                if (!result)
+                    return false;
+            }
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_document___"));
+
+            try
+            {
+                var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
+
+                document.HtmlBody = await GetContent();
+
+                documentPreview.Direction = DocumentDirection.Outgoing;
+
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag,
+                    CopyToNewOption = CopyToNewOption,
+                    PreviousDocumentFolderId = PreviousDocumentFolderId,
+                    PreviousDocumentId = PreviousDocumentId,
+                    PreviousDocumentDirection = PreviousDocumentDirection,
+                    DocumentPreview = documentPreview,
+                    Document = document
+                });
+                await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+
+                dismissAction();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Failed to queue document for upload [previousDocumentId={PreviousDocumentId}, previousDocumentFolderId={PreviousDocumentFolderId}, creationModeFlag={DocumentCreationModeFlag}]", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+
+                return false;
+            }
+        }
+
+        async Task<bool> SaveDraft()
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("saving_draft___"));
+
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
+
+            try
+            {
+                var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
+                foreach (var subView in subViews)
+                    await subView.UpdateDocument();
+
+                document.HtmlBody = await GetContent();
+
+                documentPreview.Direction = DocumentDirection.Draft;
+
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag,
+                    CopyToNewOption = CopyToNewOption,
+                    PreviousDocumentFolderId = PreviousDocumentFolderId,
+                    PreviousDocumentId = PreviousDocumentId,
+                    PreviousDocumentDirection = PreviousDocumentDirection,
+                    DocumentPreview = documentPreview,
+                    Document = document
+                });
+                await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+
+                CommonConfig.MessengerHub.PublishAsync(new DraftSentMessage(this, previousDocumentPreview.Id));
+
+                dismissAction();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Failed to queue document draft for upload [previousDocumentId={PreviousDocumentId}, previousDocumentFolderId={PreviousDocumentFolderId}, creationModeFlag={DocumentCreationModeFlag}] ", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+
+                return false;
+            }
+        }
+
+        protected override async Task<string> GetContent()
+        {
+            var newContent = await base.GetContent();
+            newContent = await CleanContent(newContent);
+
+            var oldContent = previousDocumentContent;
+            if (!string.IsNullOrWhiteSpace(oldContent))
+            {
+                oldContent = await CleanContent(oldContent);
+                var mergedContent = await MergeContent(newContent, oldContent);
+                return mergedContent;
+            }
+
+            return newContent;
+        }
+
+        Task<string> CleanContent(string content)
+        {
+            return Task.Run(() =>
+            {
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(content);
+
+                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "link" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "fonts"))?.Remove();
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "meta" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "viewport"))?.Remove();
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "style" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "style1"))?.Remove();
+
+                var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+                bodyNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+                bodyNode?.ChildNodes.FirstOrDefault(n => n.Name == "div" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "headerpadding"))?.Remove();
+
+                var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
+                editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
+                var html = htmlDocument.DocumentNode.OuterHtml;
+
+                html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
+
+                var p = new Processor();
+                p.Dom.OuterHtml = html;
+                html = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
+
+                return html;
+            });
+        }
+
+        Task<string> MergeContent(string newContent, string oldContent)
+        {
+            return Task.Run(() =>
+            {
+                var newHtmlDocument = new HtmlDocument();
+                newHtmlDocument.LoadHtml(newContent);
+                var oldHtmlDocument = new HtmlDocument();
+                oldHtmlDocument.LoadHtml(oldContent);
+
+                var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/blank", "html"));
+                var mergedHtmlDocument = new HtmlDocument();
+                mergedHtmlDocument.LoadHtml(html);
+
+                var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
+                newNode.AppendChildren(newHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
+                newNode.Attributes.Remove("id");
+                var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
+                oldNode.AppendChildren(oldHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
+                oldNode.Attributes.Remove("id");
+
+                return mergedHtmlDocument.DocumentNode.OuterHtml;
+            });
+        }
+
+        #endregion
+
         #region Templates loading
 
         async Task InsertDefaultTemplate()
@@ -369,7 +684,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(DocumentCreationModeFlag);
                 if (template == null)
                     return;
-                
+
                 ProcessTemplate(template, previousDocumentPreview);
 
                 var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/insertTemplate", "js"));
@@ -499,11 +814,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             var picker = new UIDocumentPickerViewController(new[]
             {
-                    "public.content",
-                    "public.data",
-                    "public.msg",
-                    "public.eml"
-                }, UIDocumentPickerMode.Import)
+                "public.content",
+                "public.data",
+                "public.msg",
+                "public.eml"
+            }, UIDocumentPickerMode.Import)
             {
                 Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
             };
@@ -581,6 +896,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         #endregion
 
         #region Utilities
+
+        static bool ContainsValidEmails(params RecipientsView[] rvs)
+        {
+            var containsValidEmails = false;
+
+            foreach (var rv in rvs)
+                containsValidEmails |= !rv.Empty;
+
+            return containsValidEmails;
+        }
+
+        static bool ContainsInvalidEmails(params RecipientsView[] rvs)
+        {
+            foreach (var rv in rvs)
+                if (rv.ContainsInvalidEmail())
+                    return true;
+
+            return false;
+        }
 
         static void ProcessTemplate(Template template, DocumentPreview documentPreview)
         {

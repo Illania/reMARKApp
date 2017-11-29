@@ -526,6 +526,7 @@
 		<BundleResource Include="Resources\html\insertTemplate.js" />
 		<BundleResource Include="Resources\html\headerPadding.js" />
 		<BundleResource Include="Resources\html\replyHeader.html" />
+		<BundleResource Include="Resources\html\blank.html" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
