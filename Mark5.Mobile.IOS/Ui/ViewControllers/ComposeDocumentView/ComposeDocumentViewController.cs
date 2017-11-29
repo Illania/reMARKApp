@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 using Foundation;
+using HtmlAgilityPack;
+using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -16,13 +17,12 @@ using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
+using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
 using Photos;
 using UIKit;
-using HtmlAgilityPack;
-using MailBee.Html;
-using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
@@ -66,6 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         SubjectView subjectView;
         AttachmentsView attachmentsView;
 
+        SuggestionsListView suggestionsListView;
         Worker autoSaveWorkingCopyWorker;
 
         public override void ViewDidLoad()
@@ -97,6 +98,50 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.ViewWillDisappear(animated);
 
             DeinitializeHandlers();
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning("Received memory warning!");
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            cancelButtonItem = null;
+            sendButtonItem = null;
+            insertButtonItem = null;
+
+            toView?.RemoveFromSuperview();
+            ccView?.RemoveFromSuperview();
+            bccView?.RemoveFromSuperview();
+            lineView?.RemoveFromSuperview();
+            priorityView?.RemoveFromSuperview();
+            subjectView?.RemoveFromSuperview();
+            attachmentsView?.RemoveFromSuperview();
+
+            suggestionsListView?.RemoveFromSuperview();
+
+            toView = null;
+            ccView = null;
+            bccView = null;
+            lineView = null;
+            priorityView = null;
+            subjectView = null;
+            attachmentsView = null;
+            suggestionsListView = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
         }
 
         void InitNavigationBar()
@@ -153,6 +198,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             insertButtonItem.Clicked += InsertButtonItem_Clicked;
             sendButtonItem.Clicked += SendButtonItem_Clicked;
 
+            toView.AddButtonTapped += RecipientView_AddButtonTapped;
+            ccView.AddButtonTapped += RecipientView_AddButtonTapped;
+            bccView.AddButtonTapped += RecipientView_AddButtonTapped;
+
+            toView.SearchRequested += RecipientView_SearchRequested;
+            ccView.SearchRequested += RecipientView_SearchRequested;
+            bccView.SearchRequested += RecipientView_SearchRequested;
+
+            toView.Edited += Subview_Edited;
+            ccView.Edited += Subview_Edited;
+            bccView.Edited += Subview_Edited;
+            lineView.Edited += Subview_Edited;
+            subjectView.Edited += Subview_Edited;
+
             attachmentsView.Tapped += AttachmentsView_Tapped;
             attachmentsView.DeleteTapped += AttachmentsView_DeleteTapped;
         }
@@ -162,6 +221,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
             insertButtonItem.Clicked -= InsertButtonItem_Clicked;
             sendButtonItem.Clicked -= SendButtonItem_Clicked;
+
+            toView.AddButtonTapped -= RecipientView_AddButtonTapped;
+            ccView.AddButtonTapped -= RecipientView_AddButtonTapped;
+            bccView.AddButtonTapped -= RecipientView_AddButtonTapped;
+
+            toView.SearchRequested -= RecipientView_SearchRequested;
+            ccView.SearchRequested -= RecipientView_SearchRequested;
+            bccView.SearchRequested -= RecipientView_SearchRequested;
+
+            toView.Edited -= Subview_Edited;
+            ccView.Edited -= Subview_Edited;
+            bccView.Edited -= Subview_Edited;
+            lineView.Edited -= Subview_Edited;
+            subjectView.Edited -= Subview_Edited;
 
             attachmentsView.Tapped -= AttachmentsView_Tapped;
             attachmentsView.DeleteTapped -= AttachmentsView_DeleteTapped;
@@ -174,6 +247,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             insertButtonItem.Enabled = true;
             sendButtonItem.Enabled = true;
+
+            autoSaveWorkingCopyWorker?.Stop();
+            autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
+            autoSaveWorkingCopyWorker.Start();
         }
 
         async Task LoadDocument()
@@ -405,6 +482,82 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return;
 
             DismissViewController(true, null);
+        }
+
+        void Subview_Edited(object sender, EventArgs e)
+        {
+            Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+
+            if (sender is LineView
+                && PlatformConfig.Preferences.RemoveLine
+                && DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll
+                && previousDocumentPreview != null
+                && previousDocumentPreview.Direction == DocumentDirection.Incoming
+                && !lineView.LineSelectedIsAmbiguous
+                && !string.IsNullOrEmpty(lineView.GetLine().FromAddress))
+            {
+                toView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                ccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+                bccView.RemoveAddressFromLine(lineView.GetLine().FromAddress);
+            }
+        }
+
+        void RecipientView_SearchRequested(object sender, string initialSearchString)
+        {
+            if (string.IsNullOrEmpty(initialSearchString))
+                return;
+
+            if (suggestionsListView == null)
+            {
+                suggestionsListView = new SuggestionsListView(this);
+
+                View.AddSubview(suggestionsListView);
+                View.AddConstraints(new[]
+                {
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                });
+
+                View.SendSubviewToBack(suggestionsListView);
+            }
+
+            suggestionsListView.Initialize((RecipientsView)sender, initialSearchString);
+            suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
+            suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+
+            View.BringSubviewToFront(suggestionsListView);
+        }
+
+        async void RecipientView_AddButtonTapped(object sender, EventArgs e)
+        {
+            var strings = new[]
+            {
+                Localization.GetString("contact_picker_recent_addresses"),
+                Localization.GetString("contact_picker_contacts"),
+                Localization.GetString("contact_picker_shortcodes"),
+                Localization.GetString("contact_picker_phonebook")
+            };
+
+            var choice = await Dialogs.ShowListActionSheetAsync(this, strings, (UIView)sender);
+            switch (choice)
+            {
+                case 0:
+                    await DoOpenRecents(sender as RecipientsView);
+                    break;
+                case 1:
+                    await DoOpenContacts(sender as RecipientsView);
+                    break;
+                case 2:
+                    await DoOpenShortcodes();
+                    break;
+                case 3:
+                    await DoOpenPhonebook(sender as RecipientsView);
+                    break;
+                default:
+                    return;
+            }
         }
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
@@ -771,6 +924,73 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #endregion
 
+        #region Suggestions methods
+
+        void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
+        {
+            View.SendSubviewToBack(suggestionsListView);
+            ((SuggestionsListView)sender).ShouldDisappear -= SuggestionsListView_ShouldDisappear;
+        }
+
+        #endregion
+
+        #region Picker methods
+
+        async Task DoOpenPhonebook(RecipientsView recipientsView)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Phonebook));
+
+            var vc = new PhonebookContactsListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Result;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+        }
+
+        async Task DoOpenShortcodes()
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Shortcodes));
+
+            var vc = new PickerShortcodesFoldersListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var sc = await vc.Result;
+            if (sc != null && sc.Addresses != null && sc.Addresses.Any())
+            {
+                var addresses = sc.Addresses;
+                toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+                bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
+            }
+        }
+
+        async Task DoOpenContacts(RecipientsView recipientsView)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Contacts));
+
+            var vc = new PickerContactsFoldersListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Result;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+        }
+
+        async Task DoOpenRecents(RecipientsView recipientsView)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Recents));
+
+            var vc = new RecentAddressesListViewController();
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Result;
+            if (pa != null)
+                recipientsView.AddRecipent(pa.Name, pa.Address);
+        }
+
+        #endregion
+
         #region Attachments
 
         void InsertNewPhoto(PopoverPresentationControllerDelegate d)
@@ -890,6 +1110,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             finally
             {
                 stream?.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region Auto save
+
+        async Task SaveWorkingCopy()
+        {
+            try
+            {
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug("Saving working copy...");
+
+                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
+                {
+                    var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
+
+                    foreach (var subView in subViews)
+                        await subView.UpdateDocument();
+
+                    document.HtmlBody = await GetContent();
+                });
+
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag,
+                    CopyToNewOption = CopyToNewOption,
+                    PreviousDocumentFolderId = PreviousDocumentFolderId,
+                    PreviousDocumentId = PreviousDocumentId,
+                    PreviousDocumentDirection = PreviousDocumentDirection,
+                    DocumentPreview = documentPreview,
+                    Document = document
+                });
+
+                CommonConfig.Logger.Info("Saved working copy");
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to save working copy!", ex);
             }
         }
 
