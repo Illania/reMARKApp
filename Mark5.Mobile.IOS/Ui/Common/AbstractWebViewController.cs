@@ -310,25 +310,72 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected async Task<string> ProcessHtml(string html, HtmlProcessingConfiguration config)
         {
+            var sw = Stopwatch.StartNew();
+
             if (config.MakeHtmlSafe)
+            {
                 html = await MakeHtmlSafe(html);
 
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"MakeHtmlSafe {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
+
             if (config.InlineCss)
+            {
                 html = await InlineCss(html);
 
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
+
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug($"LoadHtml {sw.ElapsedMilliseconds}ms");
+            sw.Restart();
+
             if (config.CorrectScale)
-                html = await CorrectScale(html);
+            {
+                await CorrectScale(htmlDocument);
+
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"CorrectScale {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
 
             if (config.InjectFonts)
-                html = await InjectFonts(html);
+            {
+                await InjectFonts(htmlDocument);
+
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"InjectFonts {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
 
             if (config.MakeEditable)
-                html = await MakeEditable(html);
+            {
+                await MakeEditable(htmlDocument);
+
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"MakeEditable {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
 
             if (config.InjectReplyHeader)
-                html = await InjectReplyHeader(html, config.ReplyHeaderParameters);
+            {
+                await InjectReplyHeader(htmlDocument, config.ReplyHeaderParameters);
 
-            return html;
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"InjectReplyHeader {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
+
+            sw.Stop();
+
+            return htmlDocument.DocumentNode.OuterHtml;
         }
 
         protected async Task<string> ProcessPlainText(string text, PlainTextProcessingConfiguration config)
@@ -341,15 +388,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             htmlDocument.LoadHtml(html);
             var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
             preNode.InnerHtml = text;
-            text = htmlDocument.DocumentNode.OuterHtml;
 
             if (config.MakeEditable)
-                text = await MakeEditable(text);
+                await MakeEditable(htmlDocument);
 
             if (config.InjectReplyHeader)
-                text = await InjectReplyHeader(text, config.ReplyHeaderParameters);
+                await InjectReplyHeader(htmlDocument, config.ReplyHeaderParameters);
 
-            return text;
+            return htmlDocument.DocumentNode.OuterHtml;
         }
 
         Task<string> MakeHtmlSafe(string html)
@@ -378,19 +424,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
-        Task<string> CorrectScale(string html)
+        Task CorrectScale(HtmlDocument htmlDocument)
         {
             return Task.Run(() =>
             {
-                if (html == null)
-                    return null;
-
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(html);
-
                 var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
                 if (headNode == null)
-                    return html;
+                    return;
 
                 var existingViewportNodes = headNode.SelectNodes("/meta[@name='viewport']");
                 if (existingViewportNodes != null)
@@ -402,22 +442,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 viewportElement.SetAttributeValue("name", "viewport");
                 viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
                 headNode.PrependChild(viewportElement);
-
-                var scaledHtml = htmlDocument.DocumentNode.OuterHtml;
-                return scaledHtml;
             });
         }
 
-        Task<string> InjectFonts(string html)
+        Task InjectFonts(HtmlDocument htmlDocument)
         {
             return Task.Run(() =>
             {
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(html);
-
                 var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
                 if (headNode == null)
-                    return html;
+                    return;
 
                 var cssLinkElement = htmlDocument.CreateElement("link");
                 cssLinkElement.SetAttributeValue("id", "fonts");
@@ -425,40 +459,28 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 cssLinkElement.SetAttributeValue("type", "text/css");
                 cssLinkElement.SetAttributeValue("href", "html/fonts.css");
                 headNode.PrependChild(cssLinkElement);
-
-                var htmlWithFonts = htmlDocument.DocumentNode.OuterHtml;
-                return htmlWithFonts;
             });
         }
 
-        Task<string> MakeEditable(string html)
+        Task MakeEditable(HtmlDocument htmlDocument)
         {
             return Task.Run(() =>
             {
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(html);
-
                 var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
                 if (bodyNode == null)
-                    return html;
+                    return;
 
                 bodyNode.SetAttributeValue("contentEditable", "true");
-
-                var htmlEditable = htmlDocument.DocumentNode.OuterHtml;
-                return htmlEditable;
             });
         }
 
-        Task<string> InjectReplyHeader(string html, string[] parameters)
+        Task InjectReplyHeader(HtmlDocument htmlDocument, string[] parameters)
         {
             return Task.Run(() =>
             {
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(html);
-
                 var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
                 if (bodyNode == null)
-                    return html;
+                    return;
 
                 var replyHeader = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/replyHeader", "html"));
                 replyHeader = ProcessWebTemplate(replyHeader, parameters);
@@ -466,9 +488,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 headerDiv.SetAttributeValue("id", "replyHeader");
                 headerDiv.InnerHtml = replyHeader;
                 bodyNode.PrependChild(headerDiv);
-
-                var htmlWithReplyHeader = htmlDocument.DocumentNode.OuterHtml;
-                return htmlWithReplyHeader;
             });
         }
 
