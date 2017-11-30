@@ -18,6 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UILabel bottomLabel;
         readonly UIImageView iconImage;
 
+        public string Content => middleLabel?.Text;
+
         public CommunicationAddressTableViewCell(NSString reuseIdentifier)
             : base(UITableViewCellStyle.Default, reuseIdentifier)
         {

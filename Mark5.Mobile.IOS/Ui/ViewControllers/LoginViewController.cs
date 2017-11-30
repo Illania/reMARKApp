@@ -669,7 +669,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                     vc = new SimpleMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
 
-                PresentViewController(vc, true, null);
+                var window = ((AppDelegate)UIApplication.SharedApplication.Delegate).Window;
+                UIView.TransitionNotify(window, 0.25, UIViewAnimationOptions.TransitionCrossDissolve, () => window.RootViewController = vc, null);
+
             }
             catch (Exception ex)
             {

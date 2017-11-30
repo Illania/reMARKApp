@@ -323,7 +323,7 @@ namespace Mark5.Mobile.IOS
                     CommonConfig.Utf8Normalizer = filename => filename;
 
 #if !DEBUG
-                CommonConfig.Logger.Level = LogLevel.INFO;
+                CommonConfig.Logger.Level = Common.Utilities.LogLevel.INFO;
 #else
                 CommonConfig.Logger.Level = Common.Utilities.LogLevel.DEBUG;
 #endif
