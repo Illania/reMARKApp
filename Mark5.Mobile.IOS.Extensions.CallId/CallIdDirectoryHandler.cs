@@ -4,10 +4,10 @@ using CallKit;
 
 namespace CallOverlayExtension
 {
-    [Register("CallDirectoryHandler")]
-    public class CallDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
+    [Register("CallIdDirectoryHandler")]
+    public class CallIdDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
     {
-        protected CallDirectoryHandler(IntPtr handle) : base(handle)
+        protected CallIdDirectoryHandler(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
         }
