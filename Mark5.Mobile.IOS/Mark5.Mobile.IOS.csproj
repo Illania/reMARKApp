@@ -349,7 +349,7 @@
 		<ProjectReference Include="..\CallOverlayExtension\CallOverlayExtension.csproj">
 		  <IsAppExtension>true</IsAppExtension>
 		  <Project>{D8B702CE-A49B-4A21-88F3-9648E0051AB6}</Project>
-		  <Name>CallOverlayExtension</Name>
+		  <Name>Mark5.Mobile.IOS.Extensions.CallId</Name>
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>

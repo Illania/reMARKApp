@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mark5.Mobile.Droid", "Mark5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaterialDialogs", "MaterialDialogs\MaterialDialogs.csproj", "{03F5EB27-28E4-4309-962C-628C73475478}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CallOverlayExtension", "CallOverlayExtension\CallOverlayExtension.csproj", "{D8B702CE-A49B-4A21-88F3-9648E0051AB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mark5.Mobile.IOS.Extensions.CallId", "Mark5.Mobile.IOS.Extensions.CallId\Mark5.Mobile.IOS.Extensions.CallId.csproj", "{D8B702CE-A49B-4A21-88F3-9648E0051AB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
