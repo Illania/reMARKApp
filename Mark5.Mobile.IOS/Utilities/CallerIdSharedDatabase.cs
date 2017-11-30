@@ -1,21 +1,22 @@
 ﻿using System;
 using Foundation;
 using SQLite;
-using System.Text;
 using System.Threading.Tasks;
-using System.Linq;
 using PhoneNumbers;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
     public static class CallerIdSharedDatabase
     {
-        /*This class is used by the app for storing contact information to be shown to the user when receiving calls.
-        The information is stored in a shared container that the CallOverlayExtension can access. 
-        In the class called CallOverlayExtension.CallerIdSharedDatabase in the CallOverlayExtension solution, the contacts from the shared container are retrieved.
-
-        If only one number is associated with a name it is simply stored as the number casted to a string.
-        If there are more numbers asociated with a number they are all stored in the same string seperated by commas (',').*/
+        /// <summary>
+        /// This class is used by the app for storing contact information to be shown to the user when receiving calls.
+        /// 
+        /// The information is stored in a shared container that the CallOverlayExtension can access.
+        /// In the class called CallOverlayExtension.CallerIdSharedDatabase in the CallOverlayExtension solution, the contacts from the shared container are retrieved.
+        /// 
+        /// If only one number is associated with a name it is simply stored as the number casted to a string.
+        /// If there are more numbers asociated with a number they are all stored in the same string seperated by commas(',').
+        /// </summary>
 
         const string databaseFileName = "sharedcontacts.sqlite3";
         const string databaseLockName = "sharedcontacts.lock";

@@ -60,8 +60,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            RestorationIdentifier = nameof(SimpleMainViewController);
 
+            RestorationIdentifier = nameof(SimpleMainViewController);
         }
     }
 }

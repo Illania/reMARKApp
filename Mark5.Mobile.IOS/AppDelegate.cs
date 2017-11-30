@@ -26,7 +26,6 @@ using PCLStorage;
 using TinyMessenger;
 using UIKit;
 using UserNotifications;
-using CallKit;
 
 namespace Mark5.Mobile.IOS
 {
@@ -43,7 +42,6 @@ namespace Mark5.Mobile.IOS
                 startupTime.Start();
 
                 InitializeCommon();
-                CallIdUtilities.ReloadExtension();
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);

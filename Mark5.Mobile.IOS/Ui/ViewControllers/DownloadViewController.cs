@@ -897,6 +897,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItems.Count} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
                     CommonConfig.Logger.Warning($"Following items failed to download: {string.Join(", ", failedItems)}. [folder.id={folder.Id}]");
 
+                    CallIdUtilities.ReloadExtension();
+
                     if (totalItemsCount > 0)
                         await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
