@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NeverShowPrivacySettings = false;
             ShowCreditsFooter = false;
             Delegate = this;
-            OverlayExtensionUtilities.SetCallerIdPreference();
+            CallIdUtilities.GetCallerIdPreference();
         }
 
         public override void ViewDidLoad()

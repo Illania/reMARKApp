@@ -253,7 +253,7 @@
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
 		<Compile Include="Utilities\CallerIdSharedDatabase.cs" />
-		<Compile Include="Utilities\OverlayExtensionUtilities.cs" />
+		<Compile Include="Utilities\CallIdUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
