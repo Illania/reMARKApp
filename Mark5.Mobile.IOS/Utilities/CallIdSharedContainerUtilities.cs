@@ -3,7 +3,6 @@ using Foundation;
 using SQLite;
 using System.Threading.Tasks;
 using PhoneNumbers;
-using System.Collections;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -38,50 +37,6 @@ namespace Mark5.Mobile.IOS.Utilities
                         using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
                         {
                             connection.CreateTable<ExtensionContact>();
-                        }
-                    }
-                    finally
-                    {
-                        UnlockDatabase(containerUrl);
-                    }
-                }
-
-            });
-        }
-
-        public static async Task WipeContainer()
-        {
-            await Task.Run(() =>
-            {
-                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
-                {
-                    try
-                    {
-                        LockDatabase(containerUrl);
-
-                        NSError err = new NSError();
-                        var fm = NSFileManager.DefaultManager;
-                        var filesInDir = fm.GetDirectoryContent(containerUrl.Path, out err);
-
-                        if(err != null)
-                        {
-                            foreach (String s in filesInDir)
-                            {
-                                if(fm.FileExists(s))
-                                {
-                                    NSError error = new NSError();
-
-                                    fm.Remove(s, out error);
-                                    if (error != null)
-                                    {
-                                        throw new Exception("Error wiping shared container: " + error.LocalizedFailureReason);
-                                    }
-                                }
-                            }
-                        } 
-                        else
-                        {
-                            throw new NSErrorException(err);
                         }
                     }
                     finally
@@ -181,6 +136,49 @@ namespace Mark5.Mobile.IOS.Utilities
                 }
 
             });
+        }
+
+        public static void WipeContainer()
+        {
+            using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
+            {
+                try
+                {
+                    LockDatabase(containerUrl);
+
+                    NSError err = new NSError();
+                    var fm = NSFileManager.DefaultManager;
+                    var filesInDir = fm.GetDirectoryContent(containerUrl.Path, out err);
+
+                    if (err == null)
+                    {
+                        foreach (string s in filesInDir)
+                        {
+                            var pathToRemove = containerUrl.Path + Common.CommonConfig.PathSeparator + s;
+
+                            if (fm.FileExists(pathToRemove))
+                            {
+                                if (s.Contains("log") || s == databaseFileName) //Only wipe log files and database.
+                                {
+                                    fm.Remove(pathToRemove, out err);
+                                }
+                                if (err != null)
+                                {
+                                    throw new Exception("Error wiping shared container: " + err.LocalizedFailureReason);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new NSErrorException(err);
+                    }
+                }
+                finally
+                {
+                    UnlockDatabase(containerUrl);
+                }
+            }
         }
 
         static void LockDatabase(NSUrl containerUrl)
