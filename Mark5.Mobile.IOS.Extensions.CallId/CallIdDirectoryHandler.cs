@@ -7,9 +7,9 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
     [Register("CallIdDirectoryHandler")]
     public class CallIdDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
     {
-        protected CallIdDirectoryHandler(IntPtr handle) : base(handle)
+        protected CallIdDirectoryHandler(IntPtr handle)
+            : base(handle) 
         {
-            // Note: this .ctor should not contain any initialization logic.
         }
 
         public override void BeginRequestWithExtensionContext(NSExtensionContext context)
@@ -20,22 +20,21 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
             try
             {
                 CallerIdSharedDatabase.GetContactsFromSharedDatabase(cxContext);
+                var lel = new NSString("ele");
+                var er = new NSError(lel,0,null);
+                cxContext.CancelRequest(er);
             } 
             catch (Exception ex)
             {
                 new ErrorLogger().WriteToLog(ex);
+
+
             }
             cxContext.CompleteRequest(null);
         }
 
         public void RequestFailed(CXCallDirectoryExtensionContext extensionContext, NSError error)
         {
-            // An error occurred while adding blocking or identification entries, check the NSError for details.
-            // For Call Directory error codes, see the CXErrorCodeCallDirectoryManagerError enum.
-            //
-            // This may be used to store the error details in a location accessible by the extension's containing app, so that the
-            // app may be notified about errors which occured while loading data even if the request to load data was initiated by
-            // the user in Settings instead of via the app itself.
             new ErrorLogger().WriteToLog(new NSErrorException(error));
         }
     }

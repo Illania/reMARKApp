@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -118,6 +119,7 @@
     <Compile Include="CallerIdSharedDatabase.cs" />
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="ExtensionContact.cs" />
+    <Compile Include="Exceptions\DatabaseLockException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.AppExtension.CSharp.targets" />
 </Project>

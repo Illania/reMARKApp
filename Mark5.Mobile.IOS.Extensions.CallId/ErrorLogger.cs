@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
-using System.Threading;
 using Foundation;
 
 namespace Mark5.Mobile.IOS.Extensions.CallId
@@ -14,21 +13,14 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
 
         public ErrorLogger()
         {
-            try
-            {
-                var fm = NSFileManager.DefaultManager;
+            var fm = NSFileManager.DefaultManager;
 
-                logPath = NSFileManager.DefaultManager.GetContainerUrl(appGroupId).Path;
+            logPath = NSFileManager.DefaultManager.GetContainerUrl(appGroupId).Path;
 
-                logFilePath = $"{logPath}/Mark5.Mobile.IOS.Extensions.CallId_{DateTime.Now.ToString("yyyy_M_dd")}.log";
+            logFilePath = $"{logPath}/Mark5.Mobile.IOS.Extensions.CallId_{DateTime.Now.ToString("yyyy_M_dd")}.log";
 
-                if (!fm.FileExists(logFilePath))
-                    fm.CreateFile(logFilePath, new NSData(), new NSFileAttributes());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+            if (!fm.FileExists(logFilePath))
+                fm.CreateFile(logFilePath, new NSData(), new NSFileAttributes());
         }
 
         public void WriteToLog(Exception exception)

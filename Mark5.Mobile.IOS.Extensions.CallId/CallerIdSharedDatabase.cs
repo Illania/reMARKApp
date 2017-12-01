@@ -2,12 +2,17 @@
 using CallKit;
 using Foundation;
 using SQLite;
+using Mark5.Mobile.IOS.Extensions.CallId.Exceptions;
 
 namespace Mark5.Mobile.IOS.Extensions.CallId
 {
     public static class CallerIdSharedDatabase
     {
-        //Retrieves all contacts stored in the database in the shared container by a deferred query.
+        /// <summary>
+        /// This class is used to access the database in the shared container. 
+        /// The database contains the contacts that should be recognised when receing calls.
+        /// </summary>
+
         const string databaseFileName = "sharedcontacts.sqlite3";
         const string databaseLockName = "sharedcontacts.lock";
         const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
@@ -24,8 +29,12 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
                     {
                         LockDatabase();
 
+                        //throw new Exception("ding ding");
+
                         var commandString = $"select {nameof(ExtensionContact.Name)},{nameof(ExtensionContact.Number)} "
-                            + $"from {nameof(ExtensionContact)} group by {nameof(ExtensionContact.Number)} order by {nameof(ExtensionContact.Number)} asc";
+                            + $"from {nameof(ExtensionContact)} "
+                            + $"group by {nameof(ExtensionContact.Number)} " 
+                            + $"order by {nameof(ExtensionContact.Number)} asc";
                         
                         var row = connection.DeferredQuery<ExtensionContact>(commandString);
                         var enumerator = row.GetEnumerator();
@@ -48,7 +57,7 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
                 var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
                 if (fm.FileExists(lockPath))
-                    throw new Exception("The database is locked, unable to get lock.");
+                    throw new DatabaseLockException("The database is locked, unable to get lock.");
 
                 fm.CreateFile(lockPath, new NSData(), new NSFileAttributes());
             }
@@ -67,11 +76,11 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
                     fm.Remove(lockPath, out error);
                     if (error != null)
                     {
-                        throw new Exception("Error database lock file: " + error.LocalizedFailureReason);
+                        throw new NSErrorException(error);
                     }
                 }
                 else
-                    throw new Exception("The database is locked, unable to get lock.");
+                    throw new DatabaseLockException("The database is locked, unable to get lock.");
             }
         }
     }
