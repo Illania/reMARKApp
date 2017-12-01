@@ -44,7 +44,7 @@ namespace Mark5.Mobile.IOS.Utilities
                         {
                             if (error == null)
                             {
-                                CommonConfig.Logger.Info("CallOverlayExtension refreshed succesfully.");
+                                CommonConfig.Logger.Info("Mark5.Mobile.IOS.Extensions.CallId refreshed succesfully.");
                             }
                             else
                             {

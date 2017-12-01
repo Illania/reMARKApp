@@ -252,7 +252,7 @@
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
-		<Compile Include="Utilities\CallerIdSharedDatabase.cs" />
+		<Compile Include="Utilities\CallIdSharedContainerUtilities.cs" />
 		<Compile Include="Utilities\CallIdUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
@@ -346,7 +346,7 @@
 			<Project>{a54356bd-9cc4-4de0-a8dc-9b2d9d6ed288}</Project>
 			<Name>TinyMessenger</Name>
 		</ProjectReference>
-		<ProjectReference Include="..\CallOverlayExtension\CallOverlayExtension.csproj">
+		<ProjectReference Include="..\Mark5.Mobile.IOS.Extensions.CallId\Mark5.Mobile.IOS.Extensions.CallId.csproj">
 		  <IsAppExtension>true</IsAppExtension>
 		  <Project>{D8B702CE-A49B-4A21-88F3-9648E0051AB6}</Project>
 		  <Name>Mark5.Mobile.IOS.Extensions.CallId</Name>

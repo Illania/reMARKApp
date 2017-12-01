@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using Foundation;
 
-namespace CallOverlayExtension
+namespace Mark5.Mobile.IOS.Extensions.CallId
 {
     public class ErrorLogger
     {
@@ -16,12 +16,11 @@ namespace CallOverlayExtension
         {
             try
             {
-                NSError err;
                 var fm = NSFileManager.DefaultManager;
 
-                var logPath = NSFileManager.DefaultManager.GetContainerUrl(appGroupId).Path;
+                logPath = NSFileManager.DefaultManager.GetContainerUrl(appGroupId).Path;
 
-                logFilePath = $"{logPath}/calloverlayextension_{DateTime.Now.ToString("yyyy_M_dd")}.log";
+                logFilePath = $"{logPath}/Mark5.Mobile.IOS.Extensions.CallId_{DateTime.Now.ToString("yyyy_M_dd")}.log";
 
                 if (!fm.FileExists(logFilePath))
                     fm.CreateFile(logFilePath, new NSData(), new NSFileAttributes());

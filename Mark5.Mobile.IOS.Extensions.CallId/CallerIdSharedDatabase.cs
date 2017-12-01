@@ -4,7 +4,7 @@ using CallKit;
 using Foundation;
 using SQLite;
 
-namespace CallOverlayExtension
+namespace Mark5.Mobile.IOS.Extensions.CallId
 {
     public static class CallerIdSharedDatabase
     {

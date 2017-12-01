@@ -6,8 +6,8 @@
     <ProjectGuid>{D8B702CE-A49B-4A21-88F3-9648E0051AB6}</ProjectGuid>
     <ProjectTypeGuids>{EE2C853D-36AF-4FDB-B1AD-8E90477E2198};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>CallOverlayExtension</RootNamespace>
-    <AssemblyName>CallOverlayExtension</AssemblyName>
+    <RootNamespace>Mark5.Mobile.IOS.Extensions.CallId</RootNamespace>
+    <AssemblyName>Mark5.Mobile.IOS.Extensions.CallId</AssemblyName>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">

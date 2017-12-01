@@ -3,16 +3,17 @@ using Foundation;
 using SQLite;
 using System.Threading.Tasks;
 using PhoneNumbers;
+using System.Collections;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public static class CallerIdSharedDatabase
+    public static class CallIdSharedContainerUtilities
     {
         /// <summary>
         /// This class is used by the app for storing contact information to be shown to the user when receiving calls.
         /// 
-        /// The information is stored in a shared container that the CallOverlayExtension can access.
-        /// In the class called CallOverlayExtension.CallerIdSharedDatabase in the CallOverlayExtension solution, the contacts from the shared container are retrieved.
+        /// The information is stored in a shared container that the Mark5.Mobile.IOS.Extensions.CallId can access.
+        /// In the class called CallerIdSharedDatabase in the Mark5.Mobile.IOS.Extensions.CallId solution, the contacts from the shared container are retrieved.
         /// 
         /// If only one number is associated with a name it is simply stored as the number casted to a string.
         /// If there are more numbers asociated with a number they are all stored in the same string seperated by commas(',').
@@ -48,7 +49,7 @@ namespace Mark5.Mobile.IOS.Utilities
             });
         }
 
-        public static async Task DropExtensionContactsTable()
+        public static async Task WipeContainer()
         {
             await Task.Run(() =>
             {
@@ -58,11 +59,29 @@ namespace Mark5.Mobile.IOS.Utilities
                     {
                         LockDatabase(containerUrl);
 
-                        var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
+                        NSError err = new NSError();
+                        var fm = NSFileManager.DefaultManager;
+                        var filesInDir = fm.GetDirectoryContent(containerUrl.Path, out err);
 
-                        using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
+                        if(err != null)
                         {
-                            connection.DropTable<ExtensionContact>();
+                            foreach (String s in filesInDir)
+                            {
+                                if(fm.FileExists(s))
+                                {
+                                    NSError error = new NSError();
+
+                                    fm.Remove(s, out error);
+                                    if (error != null)
+                                    {
+                                        throw new Exception("Error wiping shared container: " + error.LocalizedFailureReason);
+                                    }
+                                }
+                            }
+                        } 
+                        else
+                        {
+                            throw new NSErrorException(err);
                         }
                     }
                     finally

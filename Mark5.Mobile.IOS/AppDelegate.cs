@@ -284,6 +284,8 @@ namespace Mark5.Mobile.IOS
                 if (preferences.ResetOnLaunch)
                     Integration.ClearData();
 
+                await CallIdSharedContainerUtilities.WipeContainer();
+
                 CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
                 CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);

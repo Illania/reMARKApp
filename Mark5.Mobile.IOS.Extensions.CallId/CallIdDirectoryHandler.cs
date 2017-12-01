@@ -2,7 +2,7 @@
 using Foundation;
 using CallKit;
 
-namespace CallOverlayExtension
+namespace Mark5.Mobile.IOS.Extensions.CallId
 {
     [Register("CallIdDirectoryHandler")]
     public class CallIdDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
