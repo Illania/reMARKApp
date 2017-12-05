@@ -75,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 NavigationDelegate = this,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            webView.ScrollView.Bounces = true;
+            webView.ScrollView.Bounces = false;
             webView.ScrollView.BouncesZoom = false;
             webView.ScrollView.Delegate = this;
             webView.ScrollView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.Interactive;

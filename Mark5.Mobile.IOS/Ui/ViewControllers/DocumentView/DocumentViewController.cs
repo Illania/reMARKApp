@@ -30,6 +30,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null;
 
+        public DocumentPreview DocumentPreview => documentPreview;
+
         Guid failedDocumentToUploadGuid;
         int? folderId;
         Folder folder;

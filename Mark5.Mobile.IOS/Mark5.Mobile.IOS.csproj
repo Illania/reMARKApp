@@ -254,6 +254,8 @@
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
 		<Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\EditOriginalDocumentViewController.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\DocumentPageViewController.cs" />
+		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

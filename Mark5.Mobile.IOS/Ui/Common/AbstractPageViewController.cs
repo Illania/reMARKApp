@@ -4,11 +4,16 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    public abstract class AbstractViewController : UIViewController, ITaggedViewController
+    public abstract class AbstractPageViewController : UIPageViewController, ITaggedViewController
     {
         public string Tag { get; set; }
 
         bool recycled;
+
+        protected AbstractPageViewController(UIPageViewControllerTransitionStyle style, UIPageViewControllerNavigationOrientation navigationOrientation, UIPageViewControllerSpineLocation spineLocation)
+            : base(style, navigationOrientation, spineLocation)
+        {
+        }
 
         public override void LoadView()
         {
@@ -20,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewDidAppear(animated);
 
-            if (SplitViewController == null && !(this is AbstractMultiViewController))
+            if (SplitViewController == null)
                 CommonConfig.UsageAnalytics.SetScreen(GetType().Name);
         }
 
@@ -38,14 +43,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 GC.Collect();
 #endif
             }
-        }
-
-        public override void DidMoveToParentViewController(UIViewController parent)
-        {
-            base.DidMoveToParentViewController(parent);
-
-            if (parent == null)
-                RecycleIfNeeded();
         }
 
         public void RecycleIfNeeded()
