@@ -15,7 +15,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickLinesListFragment : RetainableStateFragment
+    public class PickLinesListFragment : BaseFragment
     {
         public Task<List<Guid>> Task => tcs.Task;
 
@@ -45,7 +45,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(SelectedLinesGuidBundleKey))
+            if (savedInstanceState?.ContainsKey(SelectedLinesGuidBundleKey) == true)
+                selectedLinesGuid = Serializer.Deserialize<List<Guid>>(savedInstanceState.GetString(SelectedLinesGuidBundleKey));
+            else if (Arguments.ContainsKey(SelectedLinesGuidBundleKey))
                 selectedLinesGuid = Serializer.Deserialize<List<Guid>>(Arguments.GetString(SelectedLinesGuidBundleKey));
 
             CommonConfig.Logger.Info($"Creating {nameof(PickLinesListFragment)}]");
@@ -68,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_lines);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_lines);
 
             CommonConfig.Logger.Info($"Created {nameof(PickLinesListFragment)}");
         }
@@ -82,6 +84,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Refreshing {nameof(PickLinesListFragment)}");
                 RefreshData();
             }
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (selectedLinesGuid != null)
+                outState.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(selectedLinesGuid));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -112,32 +122,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void CloseFragment()
         {
             tcs.SetResult(adapter.SelectedLinesGuid);
-            ((AppCompatActivity) Activity).OnBackPressed();
+            ((AppCompatActivity)Activity).OnBackPressed();
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new PickLinesListFragmentState
-            {
-                SelectedLinesGuid = adapter.SelectedLinesGuid,
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var clfs = restoredState as PickLinesListFragmentState;
-            if (clfs != null)
-                selectedLinesGuid = clfs.SelectedLinesGuid;
-        }
-
-        class PickLinesListFragmentState : IRetainableState
-        {
-            public List<Guid> SelectedLinesGuid { get; set; }
-        }
-
-        #endregion
 
         class LinesListViewAdapter : RecyclerView.Adapter
         {

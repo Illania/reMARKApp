@@ -16,7 +16,7 @@ using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickDateRangeFragment : RetainableStateFragment
+    public class PickDateRangeFragment : BaseFragment
     {
         public Task<(long, long)> Task => tcs.Task;
 
@@ -244,37 +244,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             tcs.SetResult((fromTimestamp, toTimestamp));
             ((AppCompatActivity)Activity).OnBackPressed();
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new PickDateRangeFragmentState
-            {
-                FromTimestamp = fromTimestamp,
-                ToTimestamp = toTimestamp,
-                StartWithToDate = toCalendarView.Visibility == ViewStates.Visible,
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var fs = restoredState as PickDateRangeFragmentState;
-            if (fs != null)
-            {
-                fromTimestamp = fs.FromTimestamp;
-                toTimestamp = fs.ToTimestamp;
-                startWithToDate = fs.StartWithToDate;
-            }
-        }
-
-        class PickDateRangeFragmentState : IRetainableState
-        {
-            public long FromTimestamp { get; set; }
-            public long ToTimestamp { get; set; }
-            public bool StartWithToDate { get; set; }
-        }
-
-        #endregion
     }
 }

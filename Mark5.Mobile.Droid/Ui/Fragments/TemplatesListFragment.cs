@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -20,12 +19,16 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class TemplatesListFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class TemplatesListFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        const string TemplatePreviewsKey = "TemplatePreviews_c5f93ae9-c1b6-4b3b-b281-ceae33cbd6c0";
+
         readonly Handler searchHandler = new Handler();
 
         RecyclerView recyclerView;
         SearchView searchView;
+
+        List<TemplatePreview> templatePreviews;
 
         TemplatesListAdapter adapter;
         TemplatesListAdapter searchAdapter;
@@ -40,6 +43,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (savedInstanceState?.ContainsKey(TemplatePreviewsKey) == true)
+                templatePreviews = Serializer.Deserialize<List<TemplatePreview>>(savedInstanceState.GetString(TemplatePreviewsKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(TemplatesListFragment)}");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -95,6 +101,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (templatePreviews != null)
+                outState.PutString(TemplatePreviewsKey, Serializer.Serialize(templatePreviews));
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
@@ -114,9 +128,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                var previews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+                if (templatePreviews == null)
+                    templatePreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
 
-                adapter.RefreshData(previews);
+                adapter.RefreshData(templatePreviews);
             }
             catch (Exception ex)
             {
@@ -196,34 +211,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
         {
             return false;
-        }
-
-        #endregion
-
-        #region Retainable State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state for {nameof(TemplatesListFragment)}");
-            return new TemplateListFragmentState
-            {
-                TemplatePreviews = adapter.Items.ToList()
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            CommonConfig.Logger.Info($"Restoring state for {nameof(TemplatesListFragment)}");
-
-            if (restoredState is TemplateListFragmentState tlfs)
-            {
-                adapter.RefreshData(tlfs.TemplatePreviews);
-            }
-        }
-
-        class TemplateListFragmentState : IRetainableState
-        {
-            public List<TemplatePreview> TemplatePreviews { get; set; }
         }
 
         #endregion

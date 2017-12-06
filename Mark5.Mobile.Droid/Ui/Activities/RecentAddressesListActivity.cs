@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             else
             {
-                ralf = (RecentAddressesListFragment) SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                ralf = (RecentAddressesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(RecentAddressesListActivity)}");
             }
         }
