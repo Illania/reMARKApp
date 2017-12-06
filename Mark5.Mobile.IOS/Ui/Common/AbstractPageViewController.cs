@@ -10,8 +10,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         bool recycled;
 
-        protected AbstractPageViewController(UIPageViewControllerTransitionStyle style, UIPageViewControllerNavigationOrientation navigationOrientation, UIPageViewControllerSpineLocation spineLocation)
-            : base(style, navigationOrientation, spineLocation)
+        protected AbstractPageViewController()
+            : base(UIPageViewControllerTransitionStyle.Scroll, UIPageViewControllerNavigationOrientation.Horizontal, UIPageViewControllerSpineLocation.None)
         {
         }
 

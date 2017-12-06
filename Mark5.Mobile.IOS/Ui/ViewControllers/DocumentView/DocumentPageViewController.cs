@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
-using System.Linq;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 {
@@ -15,12 +13,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         public Folder Folder { get; set; }
         public DocumentPreview CurrentDocumentPreview { get; set; }
         public List<DocumentPreview> DocumentPreviews { get; set; }
-
-        public DocumentPageViewController()
-            : base(UIPageViewControllerTransitionStyle.Scroll, UIPageViewControllerNavigationOrientation.Horizontal, UIPageViewControllerSpineLocation.Mid)
-        {
-            DoubleSided = false;
-        }
 
         public override void ViewDidLoad()
         {
