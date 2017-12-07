@@ -25,7 +25,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
+    public class DocumentSearchCriteriaFragment : BaseFragment, ISearchCriteriaFragment
     {
         const string SearchCriteriaKey = "SearchCriteria_d48ddd3d-781c-45dd-bd25-8cb1ea7ab423";
 
@@ -319,29 +319,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
             }
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new DocumentSearchCriteriaFragmentState
-            {
-                Criteria = GetCriteria(),
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is DocumentSearchCriteriaFragmentState df)
-                searchCriteria = df.Criteria;
-        }
-
-        class DocumentSearchCriteriaFragmentState : IRetainableState
-        {
-            public SearchDocumentsCriteria Criteria { get; set; }
-        }
-
-        #endregion
     }
 
     public interface ISearchCriteriaFragment

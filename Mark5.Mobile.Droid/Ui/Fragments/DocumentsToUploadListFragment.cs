@@ -19,7 +19,7 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentsToUploadListFragment : RetainableStateFragment, ActionMode.ICallback
+    public class DocumentsToUploadListFragment : BaseFragment, ActionMode.ICallback
     {
         bool refreshing;
 

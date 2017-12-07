@@ -348,7 +348,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             void Create(FragmentManager fm)
             {
-                RetainableStateFragment f = null;
+                BaseFragment f = null;
                 string tag;
 
                 if (ModuleType == ModuleType.Documents)
@@ -377,7 +377,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var state = item.State;
                     var tag = item.Tag;
 
-                    RetainableStateFragment f = null;
+                    BaseFragment f = null;
 
                     if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
                         f = FoldersNotificationsListFragment.NewInstance();

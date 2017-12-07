@@ -24,12 +24,13 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class FoldersListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         protected const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
         protected const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
-        protected const string HideFabBundleKey = "35efe47d-6c24-4374-afe4-74713393d00a";
-        protected const string LoadRemoteFromCacheBundleKey = "ae16f485-9e09-4f74-9f47-ad4d357eee12";
+        protected const string HideFabBundleKey = "HideFab_35efe47d-6c24-4374-afe4-74713393d00a";
+        protected const string LoadRemoteFromCacheBundleKey = "LoadRemote_ae16f485-9e09-4f74-9f47-ad4d357eee12";
+        protected const string RecoveredPositionsKey = "RecoveredItemPositions_e71c23ca-686c-4c63-a4ee-022c3855fdeb";
 
         protected Folder RemoteFolder;
         protected bool HideSearch;
@@ -94,6 +95,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
                     LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
             }
+
+            if (savedInstanceState?.ContainsKey(RecoveredPositionsKey) == true)
+                recoveredSelectedItemsPosition = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(RecoveredPositionsKey));
 
             Container = container;
 
@@ -208,6 +212,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SetSections();
             RefreshData();
             RestoreSelection();
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (Adapter?.SelectedItemPositions != null)
+                outState.PutString(RecoveredPositionsKey, Serializer.Serialize(Adapter.SelectedItemPositions));
         }
 
         public override void OnUserVisibilityHintChanged()
@@ -339,7 +351,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.SetSections(AvailableSections);
         }
 
-        protected virtual (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
+        protected virtual (BaseFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
             return NewInstance(folder, HideSearch);
         }
@@ -873,42 +885,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 SearchRecursively(subFolder, searchText, resultList);
             }
-        }
-
-        #endregion
-
-        #region Retained Fragment methods
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count}]");
-
-            return new FolderListFragmentState
-            {
-                Folder = RemoteFolder,
-                HideSearch = HideSearch,
-                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions)
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var flfs = restoredState as FolderListFragmentState;
-            if (flfs != null)
-            {
-                RemoteFolder = flfs.Folder;
-                HideSearch = flfs.HideSearch;
-                recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
-
-                CommonConfig.Logger.Info($"Restored state state: [folderName={RemoteFolder.Name}, folderId={RemoteFolder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
-            }
-        }
-
-        protected class FolderListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-            public bool HideSearch { get; set; }
-            public List<int> SelectedItemPositions { get; set; }
         }
 
         #endregion
