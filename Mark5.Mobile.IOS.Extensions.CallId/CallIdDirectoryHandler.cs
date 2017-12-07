@@ -4,7 +4,7 @@ using CallKit;
 
 namespace Mark5.Mobile.IOS.Extensions.CallId
 {
-    [Register("CallIdDirectoryHandler")]
+    [Register("CallDirectoryHandler")]
     public class CallIdDirectoryHandler : CXCallDirectoryProvider, ICXCallDirectoryExtensionContextDelegate
     {
         protected CallIdDirectoryHandler(IntPtr handle)
@@ -20,15 +20,11 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
             try
             {
                 CallerIdSharedDatabase.GetContactsFromSharedDatabase(cxContext);
-                var lel = new NSString("ele");
-                var er = new NSError(lel,0,null);
-                cxContext.CancelRequest(er);
-            } 
+            }
             catch (Exception ex)
             {
                 new ErrorLogger().WriteToLog(ex);
-
-
+                throw; //This will prompt the user with an error dialog, instead of hiding the fact that an exception occured.
             }
             cxContext.CompleteRequest(null);
         }
