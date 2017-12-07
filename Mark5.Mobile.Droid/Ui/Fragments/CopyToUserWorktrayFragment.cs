@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -18,17 +17,19 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class CopyToUserWorktrayFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class CopyToUserWorktrayFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
-        
+
         readonly Handler searchHandler = new Handler();
 
         const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
+        const string SystemUsersKey = "SystemUsers_8b67db42-df77-4340-b840-1ebe2f4c937b";
+        const string SelectedSystemUsersKey = "SelectedSystemUsers_f2f7fa81-a3c0-4b3d-9b24-c2ecd360ae92";
 
         List<IBusinessEntity> businessEntities;
 
-        CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
+        CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter)recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -112,8 +113,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            if (savedInstanceState?.ContainsKey(SystemUsersKey) == true)
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+
+                var systemUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SystemUsersKey));
+
+                Dictionary<int, SystemUser> selectedUsers = null;
+                if (savedInstanceState.ContainsKey(SelectedSystemUsersKey))
+                    selectedUsers = Serializer.Deserialize<Dictionary<int, SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
+
+                adapter.SetItems(systemUsers); //TODO I think there is a problem serializing the system users
+
+                selectedSystemUsers.Clear();
+                foreach (var kv in selectedUsers)
+                    selectedSystemUsers.Add(kv.Key, kv.Value);
+
+                UpdateControls();
+            }
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={businessEntities?.Count}]");
         }
@@ -232,15 +252,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (selectedSystemUsers.Count < 1)
             {
-                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = false;
             }
             else
             {
-                ((AppCompatActivity) Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = true;
             }

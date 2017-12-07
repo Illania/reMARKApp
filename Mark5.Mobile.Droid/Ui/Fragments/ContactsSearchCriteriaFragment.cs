@@ -24,7 +24,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ContactsSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
+    public class ContactsSearchCriteriaFragment : BaseFragment, ISearchCriteriaFragment
     {
         const string SearchCriteriaKey = "SearchCriteria_8e4bff71-ffc2-42d6-9faf-c1d29717e7f2";
 
@@ -141,7 +141,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             base.OnPause();
         }
-
 
         public override void OnSaveInstanceState(Bundle outState)
         {
@@ -285,29 +284,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             fragmentManager.BeginTransaction().SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right).Replace(Resource.Id.fragment_container, f, tag).AddToBackStack(tag).Commit();
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ContactSearchCriteriaFragmentState
-            {
-                Criteria = GetCriteria(),
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var df = restoredState as ContactSearchCriteriaFragmentState;
-            if (df != null)
-                searchCriteria = df.Criteria;
-        }
-
-        class ContactSearchCriteriaFragmentState : IRetainableState
-        {
-            public SearchContactsCriteria Criteria { get; set; }
-        }
-
-        #endregion
     }
 }

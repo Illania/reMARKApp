@@ -41,6 +41,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
+        const string DocumentPreviewsKey = "DocumentPreviews_b4509169-c29a-4d43-abce-31585b29e639";
+        const string SelectedDocumentPreviewsKey = "SelectedDocumentPreviews_9d33e0b7-9791-4ee9-82bd-73af5c0b5716";
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
@@ -147,6 +149,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            if (savedInstanceState?.ContainsKey(DocumentPreviewsKey) == true)
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+
+                var dps = Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(DocumentPreviewsKey));
+
+                List<DocumentPreview> selectedDps = null;
+
+                if (savedInstanceState.ContainsKey(SelectedDocumentPreviewsKey))
+                    selectedDps = Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(SelectedDocumentPreviewsKey));
+
+                adapter.AppendItems(dps);
+
+                if (selectedDps?.Count > 0)
+                {
+                    actionMode?.Finish();
+                    actionMode = Activity.StartActionMode(this);
+
+                    adapter.SetSelected(selectedDps, true);
+                    actionMode.Title = adapter.SelectedItemCount.ToString();
+                    actionMode.Invalidate();
+                }
+            }
+
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
@@ -205,6 +231,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Stopped automatic refresh");
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.Items != null)
+                outState.PutString(DocumentPreviewsKey, Serializer.Serialize(adapter.Items));
+
+            if (adapter?.SelectedItems != null)
+                outState.PutString(SelectedDocumentPreviewsKey, Serializer.Serialize(adapter.SelectedItems));
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             this.menu = menu;
@@ -231,44 +268,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
-        }
-
-        #endregion
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, documentPreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}]...");
-
-            return new DocumentsListFragmentState
-            {
-                Folder = Folder,
-                DocumentPreviews = adapter.Items,
-                SelectedDocumentPreviews = adapter.SelectedItems
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as DocumentsListFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder?.Id}, dlfs.items.count={dlfs.DocumentPreviews?.Count}, dlfs.selectedItems.count={dlfs.SelectedDocumentPreviews?.Count}]...");
-
-                Folder = dlfs.Folder;
-                adapter.AppendItems(dlfs.DocumentPreviews);
-
-                if (dlfs.SelectedDocumentPreviews.Count > 0)
-                {
-                    actionMode?.Finish();
-                    actionMode = Activity.StartActionMode(this);
-
-                    adapter.SetSelected(dlfs.SelectedDocumentPreviews, true);
-                    actionMode.Title = adapter.SelectedItemCount.ToString();
-                    actionMode.Invalidate();
-                }
-            }
         }
 
         #endregion
@@ -847,19 +846,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
 
             return false;
-        }
-
-        #endregion
-
-        #region State
-
-        class DocumentsListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-
-            public List<DocumentPreview> DocumentPreviews { get; set; }
-
-            public List<DocumentPreview> SelectedDocumentPreviews { get; set; }
         }
 
         #endregion
