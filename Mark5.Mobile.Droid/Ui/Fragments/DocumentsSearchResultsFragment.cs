@@ -26,6 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class DocumentsSearchResultsFragment : RetainableStateFragment
     {
         const string SearchDocumentsCriteriaBundleKey = "SearchDocumentsCriteria_273f369b-8818-4944-9dfc-5193a7bd542a";
+        const string DocumentPreivewsKey = "DocumentPreviews_88491381-02c2-40ec-a560-d74c788fcf1e";
 
         SearchDocumentsCriteria criteria;
 
@@ -80,6 +81,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            if (savedInstanceState != null && savedInstanceState.ContainsKey(DocumentPreivewsKey))
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+                adapter.AppendItems(Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(DocumentPreivewsKey)));
+            }
+
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
@@ -111,6 +118,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Pausing {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.Items != null)
+                outState.PutString(DocumentPreivewsKey, Serializer.Serialize(adapter.Items));
         }
 
         #endregion

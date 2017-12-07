@@ -8,7 +8,6 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.V4.Content;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -25,7 +24,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public abstract class AbstractContactsListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public abstract class AbstractContactsListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
 
@@ -36,6 +35,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         protected const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
+        protected const string ContactPreivewsKey = "ContactPreviewsKey_f1a16a22-134d-4694-8ece-35e992536b89";
+        protected const string SelectedContactPreviewsKey = "SelectedContactPreviews_ce01f4c3-6106-440c-b606-3ed89f97d51b";
+        protected const string RefreshInProgressKey = "RefrehInProgressKey_48b4bc29-5b38-48c4-bb24-6494bbcd063c";
+
 
         bool refreshing;
 
@@ -113,6 +116,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
+
+            if (savedInstanceState != null)
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+
+                List<ContactPreview> contactPreviews = null;
+                List<ContactPreview> selectedContactPreviews = null;
+
+                if (savedInstanceState.ContainsKey(ContactPreivewsKey))
+                    contactPreviews = Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(ContactPreivewsKey));
+                if (savedInstanceState.ContainsKey(SelectedContactPreviewsKey))
+                    selectedContactPreviews = Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(SelectedContactPreviewsKey));
+
+                bool refreshInProgress = savedInstanceState.GetBoolean(RefreshInProgressKey);
+
+                if (contactPreviews == null)
+                    return;
+
+                adapter.AppendItems(contactPreviews);
+
+                if (refreshInProgress)
+                {
+                    CommonConfig.Logger.Info("Refresh was in progress before - will continue...");
+                    RefreshData(contactPreviews[contactPreviews.Count - 1].RowId);
+                }
+
+                if (selectedContactPreviews?.Count > 0)
+                {
+                    ActionMode?.Finish();
+                    ActionMode = Activity.StartActionMode(this);
+
+                    adapter.SetSelected(selectedContactPreviews, true);
+                    ActionMode.Title = adapter.SelectedItemCount.ToString();
+                    ActionMode.Invalidate();
+                }
+            }
         }
 
         public override void OnResume()
@@ -159,6 +198,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts?.Cancel();
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.Items != null)
+                outState.PutString(ContactPreivewsKey, Serializer.Serialize(adapter.Items));
+
+            if (adapter?.SelectedItems != null)
+                outState.PutString(SelectedContactPreviewsKey, Serializer.Serialize(adapter.SelectedItems));
+
+            outState.PutBoolean(RefreshInProgressKey, refreshing);
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             this.menu = menu;
@@ -185,52 +237,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
-        }
-
-        #endregion
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, contactPreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}, refreshing={refreshing}]...");
-
-            return new ContactsListFragmentState
-            {
-                Folder = Folder,
-                ContactPreviews = adapter.Items,
-                SelectedContactPreviews = adapter.SelectedItems,
-                RefreshInProgress = refreshing
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as ContactsListFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder?.Id}, dlfs.items.count={dlfs.ContactPreviews?.Count}, dlfs.selectedItems.count={dlfs.SelectedContactPreviews?.Count}]...");
-
-                Folder = dlfs.Folder;
-                adapter.AppendItems(dlfs.ContactPreviews);
-
-                if (dlfs.RefreshInProgress)
-                {
-                    CommonConfig.Logger.Info("Refresh was in progress before - will continue...");
-
-                    RefreshData(dlfs.ContactPreviews[dlfs.ContactPreviews.Count - 1].RowId);
-                }
-
-                if (dlfs.SelectedContactPreviews.Count > 0)
-                {
-                    ActionMode?.Finish();
-                    ActionMode = Activity.StartActionMode(this);
-
-                    adapter.SetSelected(dlfs.SelectedContactPreviews, true);
-                    ActionMode.Title = adapter.SelectedItemCount.ToString();
-                    ActionMode.Invalidate();
-                }
-            }
         }
 
         #endregion
@@ -906,21 +912,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
-        }
-
-        #endregion
-
-        #region State
-
-        class ContactsListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-
-            public List<ContactPreview> ContactPreviews { get; set; }
-
-            public List<ContactPreview> SelectedContactPreviews { get; set; }
-
-            public bool RefreshInProgress { get; set; }
         }
 
         #endregion

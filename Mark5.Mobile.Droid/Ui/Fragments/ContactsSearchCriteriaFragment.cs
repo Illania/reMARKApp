@@ -26,6 +26,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class ContactsSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
     {
+        const string SearchCriteriaKey = "SearchCriteria_8e4bff71-ffc2-42d6-9faf-c1d29717e7f2";
+
         SearchContactsCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
@@ -45,6 +47,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (savedInstanceState != null && savedInstanceState.ContainsKey(SearchCriteriaKey))
+                searchCriteria = Serializer.Deserialize<SearchContactsCriteria>(savedInstanceState.GetString(SearchCriteriaKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
@@ -135,6 +140,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.Visibility = ViewStates.Gone;
 
             base.OnPause();
+        }
+
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutString(SearchCriteriaKey, Serializer.Serialize(GetCriteria()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

@@ -27,6 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
     {
+        const string SearchCriteriaKey = "SearchCriteria_d48ddd3d-781c-45dd-bd25-8cb1ea7ab423";
+
         SearchDocumentsCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
@@ -46,6 +48,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (savedInstanceState != null && savedInstanceState.ContainsKey(SearchCriteriaKey))
+                searchCriteria = Serializer.Deserialize<SearchDocumentsCriteria>(savedInstanceState.GetString(SearchCriteriaKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
@@ -175,6 +180,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
             }
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutString(SearchCriteriaKey, Serializer.Serialize(GetCriteria()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

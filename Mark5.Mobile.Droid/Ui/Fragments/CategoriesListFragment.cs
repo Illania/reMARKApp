@@ -4,7 +4,6 @@ using System.Linq;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -21,7 +20,7 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid
 {
-    public class CategoriesListFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class CategoriesListFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public List<Category> Categories => adapter.Items;
 
@@ -258,29 +257,6 @@ namespace Mark5.Mobile.Droid
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
             return false;
-        }
-
-        #endregion
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new CategoriesListFragmentState
-            {
-                BusinessEntityPreview = businessEntityPreview
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is CategoriesListFragmentState clfs)
-                businessEntityPreview = clfs.BusinessEntityPreview;
-        }
-
-        class CategoriesListFragmentState : IRetainableState
-        {
-            public BusinessEntityPreview BusinessEntityPreview { get; set; }
         }
 
         #endregion

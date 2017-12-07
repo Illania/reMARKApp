@@ -23,8 +23,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ShortcodesSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment, View.IOnLayoutChangeListener
+    public class ShortcodesSearchCriteriaFragment : BaseFragment, ISearchCriteriaFragment, View.IOnLayoutChangeListener
     {
+        const string SearchCriteriaKey = "SearchCriteria_6c828c6e-4fd9-4439-8e4f-00787eff5931";
+
         SearchShortcodesCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
@@ -44,6 +46,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            if (savedInstanceState != null && savedInstanceState.ContainsKey(SearchCriteriaKey))
+                searchCriteria = Serializer.Deserialize<SearchShortcodesCriteria>(savedInstanceState.GetString(SearchCriteriaKey));
+
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
@@ -147,6 +152,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutString(SearchCriteriaKey, Serializer.Serialize(GetCriteria()));
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -228,29 +240,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return searchCriteria;
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ShortcodeSearchCriteriaFragmentState
-            {
-                Criteria = GetCriteria(),
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var df = restoredState as ShortcodeSearchCriteriaFragmentState;
-            if (df != null)
-                searchCriteria = df.Criteria;
-        }
-
-        class ShortcodeSearchCriteriaFragmentState : IRetainableState
-        {
-            public SearchShortcodesCriteria Criteria { get; set; }
-        }
-
-        #endregion
     }
 }
