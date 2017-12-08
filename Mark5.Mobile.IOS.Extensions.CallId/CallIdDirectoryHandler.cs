@@ -1,6 +1,7 @@
 ﻿using System;
 using Foundation;
 using CallKit;
+using Mark5.Mobile.IOS.Common.CallId;
 
 namespace Mark5.Mobile.IOS.Extensions.CallId
 {
@@ -19,7 +20,7 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
 
             try
             {
-                CallerIdSharedDatabase.GetContactsFromSharedDatabase(cxContext);
+                CallIdSharedDatabase.GetContactsFromSharedDatabase(cxContext);
             }
             catch (Exception ex)
             {

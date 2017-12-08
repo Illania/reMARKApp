@@ -3,20 +3,18 @@ using System.Diagnostics;
 using System.Text;
 using Foundation;
 
-namespace Mark5.Mobile.IOS.Extensions.CallId
+namespace Mark5.Mobile.IOS.Common.CallId
 {
     public class ErrorLogger
     {
         readonly string logPath;
         readonly string logFilePath;
-        const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
 
         public ErrorLogger()
         {
             var fm = NSFileManager.DefaultManager;
 
-            logPath = NSFileManager.DefaultManager.GetContainerUrl(appGroupId).Path;
-
+            logPath = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.appGroupId).Path;
             logFilePath = $"{logPath}/Mark5.Mobile.IOS.Extensions.CallId_{DateTime.Now.ToString("yyyy_M_dd")}.log";
 
             if (!fm.FileExists(logFilePath))

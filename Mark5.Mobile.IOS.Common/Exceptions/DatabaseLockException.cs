@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mark5.Mobile.IOS.Extensions.CallId.Exceptions
+namespace Mark5.Mobile.IOS.Common.Exceptions
 {
     public class DatabaseLockException : Exception
     {

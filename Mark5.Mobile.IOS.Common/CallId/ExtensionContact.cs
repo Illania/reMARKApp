@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace Mark5.Mobile.IOS.Extensions.CallId
+namespace Mark5.Mobile.IOS.Common
 {
     [Table("ExtensionContact")]
     public class ExtensionContact

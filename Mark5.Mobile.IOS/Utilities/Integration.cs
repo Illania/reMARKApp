@@ -6,6 +6,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Common.CallId;
 using PCLStorage;
 using UIKit;
 
@@ -22,6 +23,8 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
             UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+
+            CallIdContainerUtilities.WipeContainer();
         }
 
         #endregion
@@ -75,7 +78,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var localStorage = FileSystem.Current.LocalStorage;
             var dataFolder = PortablePath.Combine(localStorage.Path, "v2");
             var cacheFolder = PortablePath.Combine(localStorage.Path, "Caches", "v2");
-            CallIdSharedContainerUtilities.WipeContainer();
+            CallIdContainerUtilities.WipeContainer();
 
             NSFileManager.DefaultManager.Remove(dataFolder, out NSError _error);
             NSFileManager.DefaultManager.Remove(cacheFolder, out _error);

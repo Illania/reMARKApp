@@ -252,8 +252,6 @@
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
-		<Compile Include="Utilities\CallIdSharedContainerUtilities.cs" />
-		<Compile Include="Utilities\CallIdUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -311,9 +309,6 @@
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
 		</Reference>
-		<Reference Include="PhoneNumbers">
-		  <HintPath>..\packages\libphonenumber-csharp.8.8.5\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
-		</Reference>
 		<Reference Include="HockeySDK">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
 		</Reference>
@@ -323,8 +318,11 @@
 		<Reference Include="MailBee.NET">
 		  <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
 		</Reference>
+		<Reference Include="PhoneNumbers">
+		  <HintPath>..\packages\libphonenumber-csharp.8.8.7\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.6.5\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.6\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -350,6 +348,10 @@
 		  <IsAppExtension>true</IsAppExtension>
 		  <Project>{D8B702CE-A49B-4A21-88F3-9648E0051AB6}</Project>
 		  <Name>Mark5.Mobile.IOS.Extensions.CallId</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\Mark5.Mobile.IOS.Common\Mark5.Mobile.IOS.Common.csproj">
+		  <Project>{9735C6AC-AAEE-4768-B8DB-E29A2FAFF4F9}</Project>
+		  <Name>Mark5.Mobile.IOS.Common</Name>
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>

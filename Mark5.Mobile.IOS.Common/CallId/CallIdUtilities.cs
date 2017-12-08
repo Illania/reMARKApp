@@ -2,7 +2,7 @@
 using Foundation;
 using System.Threading.Tasks;
 
-namespace Mark5.Mobile.IOS.Extensions.CallId
+namespace Mark5.Mobile.IOS.Common.CallId
 {
     public static class CallIdUtilities
     {

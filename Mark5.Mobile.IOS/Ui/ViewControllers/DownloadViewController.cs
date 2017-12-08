@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
+using Mark5.Mobile.IOS.Common.CallId;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -805,8 +806,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 try
                 {
-                    await CallIdSharedContainerUtilities.CreateExtensionContactsTable();
-                    await CallIdSharedContainerUtilities.CleanExtensionContactsTable(folder.Id);
+                    await CallIdContainerUtilities.CreateExtensionContactsTable();
+                    await CallIdSharedDatabase.CleanExtensionContactsTable(folder.Id);
                 }
                 catch (Exception ex)
                 {
@@ -852,7 +853,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                     {
                                         foreach (CommunicationAddress ca in caList)
                                         {
-                                            await CallIdSharedContainerUtilities.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
+                                            await CallIdSharedDatabase.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
                                         }
                                     }
                                 }
