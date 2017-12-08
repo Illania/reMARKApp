@@ -11,28 +11,55 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public bool Toggled { get => settingsSwitch.On; set => settingsSwitch.On = value; }
 
-        public event EventHandler SwitchToggled
-        {
-            add => settingsSwitch.TouchDown += value;
-            remove => settingsSwitch.TouchDown -= value;
-        }
 
         readonly UISwitch settingsSwitch;
+        readonly UILabel label;
+        readonly UIView view;
 
-        public CallIdTableViewCell()
+        public CallIdTableViewCell(Action action)
             : base(UITableViewCellStyle.Default, Key)
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            settingsSwitch = new UISwitch
+            UserInteractionEnabled = true; // if not enabled by default
+
+            view = new UIView
             {
-                ClipsToBounds = false,
-                UserInteractionEnabled = true,
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Enabled = true
+                BackgroundColor = UIColor.Black
             };
 
-            AccessoryView = settingsSwitch;
+            settingsSwitch = new UISwitch
+            {
+                UserInteractionEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            label = new UILabel
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = UIColor.Red,
+                Lines = (Int16) 1,
+                Text = "Caller identification enabled"
+            };
+
+            UITapGestureRecognizer tapRecognizer = new UITapGestureRecognizer(action);
+            view.AddGestureRecognizer(tapRecognizer);
+
+            ContentView.AddSubviews(new UIView[] { label, settingsSwitch, view });
+
+            ContentView.AddConstraints(new[]
+            {
+                label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor),
+                label.TrailingAnchor.ConstraintEqualTo(settingsSwitch.LeadingAnchor, -8f),
+                settingsSwitch.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
+                settingsSwitch.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                view.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
+                view.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor)
+            });
+
         }
     }
 }

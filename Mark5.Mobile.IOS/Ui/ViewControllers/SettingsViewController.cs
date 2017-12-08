@@ -122,13 +122,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = (CallIdTableViewCell)tableView.DequeueReusableCell(CallIdTableViewCell.Key);
                 if (cell == null)
                 {
-                    cell = new CallIdTableViewCell();
-                    cell.TextLabel.Text = specifier.Title;
-                    cell.SwitchToggled += async (sender, e) =>
+                    cell = new CallIdTableViewCell(async () =>
                     {
                         if (cell.Toggled)
+                        {
                             await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("enable_callid_extension_title"), Localization.GetString("enable_callid_extension_message"));
-                    };
+                        }
+                    });
                 }
                 cell.Toggled = CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result;
 
@@ -201,10 +201,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 case LocalTemplateKey:
                     return 150f;
-                case CallerIdentificationEnabled:
                 case UsernameKey:
                 case ServerAddressKey:
                 case SslEnabledKey:
+                case CallerIdentificationEnabled:
+                    return 44f;
                 case VersionKey:
                     return 44f;
                 default:
