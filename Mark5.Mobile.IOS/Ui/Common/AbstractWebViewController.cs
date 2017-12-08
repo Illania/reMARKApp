@@ -10,6 +10,7 @@ using Foundation;
 using HtmlAgilityPack;
 using MailBee.Html;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
 
@@ -82,13 +83,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView.AddObserver(this, new NSString("estimatedProgress"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             webView.AddObserver(this, new NSString("loading"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             View.AddSubview(webView);
-            View.AddConstraints(new[]
+
+            if (Integration.IsRunningAtLeast(11))
             {
-                webView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-                webView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-                webView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                webView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
-            });
+                View.AddConstraints(new[]
+                {
+                    webView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                    webView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
+                    webView.LeadingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeadingAnchor),
+                    webView.TrailingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TrailingAnchor)
+                });
+            }
+            else
+            {
+                View.AddConstraints(new[]
+                {
+                    webView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                    webView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                    webView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                    webView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+                });
+            }
 
             headerContainerView = new UIView
             {
