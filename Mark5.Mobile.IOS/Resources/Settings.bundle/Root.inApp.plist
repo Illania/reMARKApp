@@ -172,13 +172,11 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>caller_identification_enabled</string>
+			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
 			<string>CallerIdentificationEnabled</string>
-			<key>DefaultValue</key>
-			<false/>
+			<key>Title</key>
+			<string>caller_identification_enabled</string>
 		</dict>
 		<dict>
 			<key>Type</key>

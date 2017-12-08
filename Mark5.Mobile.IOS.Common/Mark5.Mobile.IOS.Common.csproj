@@ -76,8 +76,8 @@
     <Compile Include="CallId\CallIdDatabaseLock.cs" />
     <Compile Include="Exceptions\DatabaseLockException.cs" />
     <Compile Include="CallId\ExtensionContact.cs" />
-    <Compile Include="CallId\CallIdSharedDatabase.cs" />
-    <Compile Include="CallId\CallIdUtilities.cs" />
+    <Compile Include="CallId\CallIdDataAccess.cs" />
+    <Compile Include="CallId\CallIdExtensionUtilities.cs" />
     <Compile Include="CallId\ErrorLogger.cs" />
   </ItemGroup>
   <ItemGroup>

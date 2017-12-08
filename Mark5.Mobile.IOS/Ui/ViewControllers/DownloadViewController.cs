@@ -807,7 +807,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 try
                 {
                     await CallIdContainerUtilities.CreateExtensionContactsTable();
-                    await CallIdSharedDatabase.CleanExtensionContactsTable(folder.Id);
+                    await CallIdDataAccess.CleanExtensionContactsTable(folder.Id);
                 }
                 catch (Exception ex)
                 {
@@ -828,9 +828,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             contactName = qName;
                         } 
                         else //if (folder.Module == ModuleType.Shortcodes)
-                        {
                             item = shortcodeQueue.Dequeue();   
-                        }
+                        
                         leftItemsCount--;
                     }
                     catch (InvalidOperationException)
@@ -853,7 +852,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                     {
                                         foreach (CommunicationAddress ca in caList)
                                         {
-                                            await CallIdSharedDatabase.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
+                                            await CallIdDataAccess.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
                                         }
                                     }
                                 }
@@ -861,6 +860,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             catch (Exception ex)
                             {
                                 onException(ex);
+                                break;
                             }
 
                             async Task DeepDownload(Contact c)
@@ -898,7 +898,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItems.Count} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
                     CommonConfig.Logger.Warning($"Following items failed to download: {string.Join(", ", failedItems)}. [folder.id={folder.Id}]");
 
-                    CallIdUtilities.ReloadExtension();
+                    CallIdExtensionUtilities.ReloadExtension();
 
                     if (totalItemsCount > 0)
                         await Managers.FoldersManager.AddSavedFolderInfo(folder);

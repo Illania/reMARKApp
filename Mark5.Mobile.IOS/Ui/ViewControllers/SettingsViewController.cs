@@ -5,6 +5,7 @@ using InAppSettingsKit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.IOS.Common.CallId;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
@@ -39,7 +40,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NeverShowPrivacySettings = false;
             ShowCreditsFooter = false;
             Delegate = this;
-            //CallIdUtilities.GetCallerIdPreference();
         }
 
         public override void ViewDidLoad()
@@ -117,6 +117,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         [Export("tableView:cellForSpecifier:")]
         public virtual UITableViewCell GetCellForSpecifier(UITableView tableView, SettingsSpecifier specifier)
         {
+            if (specifier.Key == CallerIdentificationEnabled)
+            {
+                var cell = (CallIdTableViewCell)tableView.DequeueReusableCell(CallIdTableViewCell.Key);
+                if (cell == null)
+                {
+                    cell = new CallIdTableViewCell();
+                    cell.TextLabel.Text = specifier.Title;
+                    cell.SwitchToggled += async (sender, e) =>
+                    {
+                        if (cell.Toggled)
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("enable_callid_extension_title"), Localization.GetString("enable_callid_extension_message"));
+                    };
+                }
+                cell.Toggled = CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result;
+
+                return cell;
+            }
+
             if (specifier.Key == LocalTemplateKey)
             {
                 var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
@@ -183,10 +201,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 case LocalTemplateKey:
                     return 150f;
+                case CallerIdentificationEnabled:
                 case UsernameKey:
                 case ServerAddressKey:
                 case SslEnabledKey:
-                case CallerIdentificationEnabled:
                 case VersionKey:
                     return 44f;
                 default:
@@ -331,16 +349,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (key == UseTemplateKey)
                 RefreshHiddenSettings();
-
-            if (key == CallerIdentificationEnabled)
-            {
-                if (((NSNumber)n.UserInfo.ValueForKey(new NSString(CallerIdentificationEnabled))).Int32Value == 1)
-                {   
-                    await Dialogs.ShowConfirmAlertAsync(this, "Extension Enabling", "To enable the caller indentification you must save the folders of the contacts you want to be indentified locally. Then enable the extension manually in settings.");
-                }
-                else
-                    return;
-            }
         }
 
         void RefreshHiddenSettings()

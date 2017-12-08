@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
 
             try
             {
-                CallIdSharedDatabase.GetContactsFromSharedDatabase(cxContext);
+                CallIdDataAccess.GetContactsFromSharedDatabase(cxContext);
             }
             catch (Exception ex)
             {

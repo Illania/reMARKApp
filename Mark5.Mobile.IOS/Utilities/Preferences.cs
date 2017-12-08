@@ -1,7 +1,6 @@
 ﻿using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
-using System;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -44,8 +43,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string PushNotificationTokenKey = "PushNotificationToken";
 
             public const string ResetOnLaunchKey = "ResetOnLaunch";
-            public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled"; //TODO sdsada
-
+            public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled"; 
         }
 
         readonly NSUserDefaults ud;

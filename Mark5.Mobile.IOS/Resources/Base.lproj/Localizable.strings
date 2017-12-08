@@ -119,6 +119,8 @@
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "editing_comment___" = "Editing comment...";
 "email" = "Email";
+"enable_callid_extension_title" = "Enable extension";
+"enable_callid_extension_message" = "To enable caller indentification you must save the folders \"All companies\" and/or \"All persons\". Afterwards go to Settings => Phone => Call Blocking &... and enable MARK5.";
 "enable_notifications" = "Notify";
 "enable_sync" = "Enable\nsync";
 "enabled" = "Enabled";

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Mark5.Mobile.IOS.Common.CallId
 {
-    public static class CallIdUtilities
+    public static class CallIdExtensionUtilities
     {
         static readonly string extensionId = "com.nordic-it.mark5.mobile.ios.extensions.callid";
 

@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Common.CallId
     /// If there are more numbers asociated with a number they are all stored in the same string seperated by commas (',').
     /// </summary>
     /// 
-    public static class CallIdSharedDatabase
+    public static class CallIdDataAccess
     {
         public static void GetContactsFromSharedDatabase(CXCallDirectoryExtensionContext cxContext)
         {

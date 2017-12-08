@@ -252,6 +252,7 @@
 		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
+		<Compile Include="Ui\TableViewCells\CallIdTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
