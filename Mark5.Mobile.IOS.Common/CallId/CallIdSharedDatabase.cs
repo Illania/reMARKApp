@@ -1,0 +1,118 @@
+﻿using CallKit;
+using Foundation;
+using SQLite;
+using Mark5.Mobile.IOS.Extensions.CallId.Exceptions;
+using System.Threading.Tasks;
+using PhoneNumbers;
+using System;
+using static Mark5.Mobile.IOS.Extensions.CallId.CallIdDatabaseLock;
+
+namespace Mark5.Mobile.IOS.Extensions.CallId
+{
+    /// <summary>
+    /// This class is used to insert and retrieve contacts from the database in the shared container. 
+    /// Contacts are inserted when downloaded in the 
+    /// The database contains the contacts that should be recognised when receivng calls.
+    /// 
+    /// If only one number is associated with a name it is simply stored as the number casted to a string.
+    /// If there are more numbers asociated with a number they are all stored in the same string seperated by commas (',').
+    /// </summary>
+    /// 
+    public static class CallIdSharedDatabase
+    {
+        const string databaseFileName = "sharedcontacts.sqlite3";
+        const string databaseLockName = "sharedcontacts.lock";
+        const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
+
+        public static void GetContactsFromSharedDatabase(CXCallDirectoryExtensionContext cxContext)
+        {
+            using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
+            {
+                var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
+               
+                using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
+                {
+                    try
+                    {
+                        LockDatabase();
+
+                        var commandString = $"select {nameof(ExtensionContact.Name)},{nameof(ExtensionContact.Number)} "
+                            + $"from {nameof(ExtensionContact)} "
+                            + $"group by {nameof(ExtensionContact.Number)} " 
+                            + $"order by {nameof(ExtensionContact.Number)} asc";
+                        
+                        var row = connection.DeferredQuery<ExtensionContact>(commandString);
+                        var enumerator = row.GetEnumerator();
+
+                        while (enumerator.MoveNext())
+                        {
+                            cxContext.AddIdentificationEntry(enumerator.Current.Number,enumerator.Current.Name);
+                        }
+                    }
+                    finally { UnlockDatabase(); }
+                }
+            }
+        }
+
+        public static async Task AddContactToExtensionContactsTable(int folderId, string name, string number)
+        {
+            await Task.Run(() =>
+            {
+                var splitNumber = number.Split('|');
+
+                var countryNumber = splitNumber[0];
+
+                if (countryNumber == "") //No country code is defined, so the number will not be handled.
+                    return;
+
+                var regCode = splitNumber[1];
+                var baseNumber = splitNumber[2];
+
+                if (regCode != String.Empty) //If there actually is a regional code, then this will be appended with the base number.
+                    baseNumber = regCode + baseNumber;
+
+                var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+
+                //Get region code for parsing the number. Parsing will remove any char's like '(' or '-'.
+                var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(countryNumber));
+                try
+                {
+                    PhoneNumber phoneNumber = phoneNumberUtil.Parse(baseNumber, countryString);
+                    number = phoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.E164);
+                }
+                catch (NumberParseException ex)
+                {
+                    return; //Number has been stored incorrectly, e.g. it contains letters, so it is ignored.
+                }
+
+                //'+' will be in the number, since it's part of the E164 format.
+                number = number.Replace("+", String.Empty);
+
+                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
+                {
+                    var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
+
+                    using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
+                    {
+                        try
+                        {
+                            LockDatabase();
+
+                            var contactName = new ExtensionContact();
+                            contactName.FolderId = folderId;
+                            contactName.Name = name;
+                            contactName.Number = Convert.ToInt64(number);
+
+                            connection.Insert(contactName);
+                        }
+                        finally
+                        {
+                            UnlockDatabase();
+                        }
+                    }
+                }
+
+            });
+        }
+    }
+}

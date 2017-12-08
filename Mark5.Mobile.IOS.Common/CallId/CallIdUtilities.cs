@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using CallKit;
+﻿using CallKit;
 using Foundation;
-using Mark5.Mobile.Common;
+using System.Threading.Tasks;
 
-namespace Mark5.Mobile.IOS.Utilities
+namespace Mark5.Mobile.IOS.Extensions.CallId
 {
     public static class CallIdUtilities
     {
@@ -26,7 +25,6 @@ namespace Mark5.Mobile.IOS.Utilities
                     tcs.SetException(new NSErrorException(statuserror));
                 }
             });
-
             return tcs.Task;
         }
 
@@ -42,16 +40,16 @@ namespace Mark5.Mobile.IOS.Utilities
                         CXCallDirectoryManager.SharedInstance.ReloadExtension(extensionId,
                                                                               error =>
                         {
-                            if (error == null)
+                            if (error == null) 
                             {
-                                CommonConfig.Logger.Info("Mark5.Mobile.IOS.Extensions.CallId refreshed succesfully.");
+                                   
                             }
                             else
                             {
-                                    // Extension failed, see error.Code 
-                                    // and error.Description for more 
-                                    // information 
-                                    throw new NSErrorException(error);
+                                // Extension failed, see error.Code 
+                                // and error.Description for more 
+                                // information 
+                                throw new NSErrorException(error);
                             }
                         });
                     }
