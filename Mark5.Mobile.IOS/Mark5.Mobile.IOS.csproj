@@ -90,7 +90,6 @@
 		<Compile Include="Service\Reachability.cs" />
 		<Compile Include="Ui\Common\AbstractSplitViewController.cs" />
 		<Compile Include="Ui\Common\AbstractViewController.cs" />
-		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\Common\Dialogs.cs" />
 		<Compile Include="Ui\Common\IPrimaryViewController.cs" />
 		<Compile Include="Ui\Common\ISecondaryViewController.cs" />

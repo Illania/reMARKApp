@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -14,6 +15,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         public DocumentPreview CurrentDocumentPreview { get; set; }
         public List<DocumentPreview> DocumentPreviews { get; set; }
 
+        public DocumentPageViewController()
+        {
+            HidesBottomBarWhenPushed = true;
+        }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -23,7 +29,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
             WeakDataSource = this;
 
-            SetViewControllers(new [] { GetDocumentViewController(Folder, CurrentDocumentPreview) }, UIPageViewControllerNavigationDirection.Forward, false, null);
+            WillTransition += DocumentPageViewController_WillTransition;
+            DidFinishAnimating += DocumentPageViewController_DidFinishAnimating;
+
+            var vc = GetDocumentViewController(Folder, CurrentDocumentPreview);
+            SetViewControllers(new[] { vc }, UIPageViewControllerNavigationDirection.Forward, false, null);
+            ToolbarItems = vc.ToolbarItems;
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            if (NavigationController != null)
+                NavigationController.ToolbarHidden = false;
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            if (NavigationController != null)
+                NavigationController.ToolbarHidden = true;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -37,6 +64,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         protected override void Recycle()
         {
             base.Recycle();
+
+            WillTransition -= DocumentPageViewController_WillTransition;
+            DidFinishAnimating -= DocumentPageViewController_DidFinishAnimating;
 
             WeakDataSource = null;
         }
@@ -71,6 +101,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
             var nextDocumentPreview = DocumentPreviews[index - 1];
             return GetDocumentViewController(Folder, nextDocumentPreview);
+        }
+
+        void DocumentPageViewController_WillTransition(object sender, UIPageViewControllerTransitionEventArgs e)
+        {
+            SetToolbarItems(null, true);
+        }
+
+        void DocumentPageViewController_DidFinishAnimating(object sender, UIPageViewFinishedAnimationEventArgs e)
+        {
+            var vc = ViewControllers.FirstOrDefault()?.ToolbarItems;
+            SetToolbarItems(vc, true);
         }
 
         static DocumentViewController GetDocumentViewController(Folder folder, DocumentPreview documentPreview)

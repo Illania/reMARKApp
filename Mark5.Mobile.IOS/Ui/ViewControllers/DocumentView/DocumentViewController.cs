@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -14,6 +13,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
@@ -63,8 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem flagButton;
         UIBarButtonItem fileToButton;
-        UIButton commentsButton;
-        BadgeBarButtonItem commentsBadgeButton;
+        UIBarButtonItem commentsButton;
         UIBarButtonItem replyActionsButton;
         UIBarButtonItem userActionsButton;
 
@@ -80,7 +79,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
-        TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
 
         public DocumentViewController()
@@ -112,7 +110,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeHandlers();
             SubscribeToMessages();
 
-            if (NavigationController != null)
+            if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
         }
 
@@ -142,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DeinitializeHandlers();
             UnsubscribeFromMessages();
 
-            if (NavigationController != null)
+            if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = true;
         }
 
@@ -278,13 +276,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitToolbar()
         {
-            commentsButton = new UIButton
-            {
-                Frame = new CGRect(0f, 0f, 25f, 25f),
-                Enabled = false
-            };
-            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-
             ToolbarItems = new[]
             {
                 flagButton = new UIBarButtonItem
@@ -305,8 +296,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
+                commentsButton = new UIBarButtonItem
                 {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "comments.png")),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
@@ -338,7 +330,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (replyActionsButton != null)
                 replyActionsButton.Clicked += ReplyActionsButton_Clicked;
             if (commentsButton != null)
-                commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+                commentsButton.Clicked += CommentsButton_Clicked;
             if (userActionsButton != null)
                 userActionsButton.Clicked += UserActionsButton_Clicked;
 
@@ -373,7 +365,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (replyActionsButton != null)
                 replyActionsButton.Clicked -= ReplyActionsButton_Clicked;
             if (commentsButton != null)
-                commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
+                commentsButton.Clicked -= CommentsButton_Clicked;
             if (userActionsButton != null)
                 userActionsButton.Clicked -= UserActionsButton_Clicked;
 
@@ -391,14 +383,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler, m => m.DocumentPreviewId == document?.Id);
-            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document && m.EntityId == document?.Id);
             draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(DraftSentHandler, m => m.DocumentId == document?.Id);
         }
 
         void UnsubscribeFromMessages()
         {
             readStatusChangedToken?.Dispose();
-            commentsCountChangedToken?.Dispose();
             draftSentToken?.Dispose();
         }
 
@@ -519,8 +509,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             flagButton.Enabled = false;
             fileToButton.Enabled = false;
             replyActionsButton.Enabled = false;
-            commentsBadgeButton.SetBadgeValue("0", false);
-            commentsBadgeButton.Enabled = false;
             commentsButton.Enabled = false;
             userActionsButton.Enabled = false;
 
@@ -697,8 +685,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 flagButton.Enabled = document != null;
                 fileToButton.Enabled = document != null;
                 replyActionsButton.Enabled = document != null;
-                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
-                commentsBadgeButton.Enabled = document != null;
                 commentsButton.Enabled = document != null;
                 userActionsButton.Enabled = document != null;
             }
@@ -877,11 +863,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 CommonConfig.Logger.Info($"Attempting to setting priority for document [documentId={document.Id}]");
-                await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview>
-                    {
-                        documentPreview
-                    },
-                    priority);
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview> { documentPreview }, priority);
 
                 UpdatePriority();
 
@@ -1073,7 +1055,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CommentsButton_TouchUpInside(object sender, EventArgs e)
+        void CommentsButton_Clicked(object sender, EventArgs e)
         {
             var vc = new CommentsListViewController
             {
@@ -1254,11 +1236,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 readByView.RefreshView();
                 readByView.UpdateVisibility();
             });
-        }
-
-        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
-        {
-            BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
         }
 
         void DraftSentHandler(DraftSentMessage message)
