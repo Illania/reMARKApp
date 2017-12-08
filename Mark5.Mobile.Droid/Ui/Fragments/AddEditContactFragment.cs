@@ -499,10 +499,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool ParentPreselected { get; set; }
         }
 
-
-
-
-
         #endregion
         static class RequestCodes
         {

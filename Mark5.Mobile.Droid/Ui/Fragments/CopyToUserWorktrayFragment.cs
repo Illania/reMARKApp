@@ -109,7 +109,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Bundle savedInstanceState) //TODO need
         {
             base.OnViewCreated(view, savedInstanceState);
 
@@ -119,15 +119,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var systemUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SystemUsersKey));
 
-                Dictionary<int, SystemUser> selectedUsers = null;
                 if (savedInstanceState.ContainsKey(SelectedSystemUsersKey))
-                    selectedUsers = Serializer.Deserialize<Dictionary<int, SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
+                {
+                    var selectedUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
 
-                adapter.SetItems(systemUsers); //TODO I think there is a problem serializing the system users
+                    selectedSystemUsers.Clear();
+                    foreach (var s in selectedUsers)
+                        selectedSystemUsers.Add(s.Id, s);
+                }
 
-                selectedSystemUsers.Clear();
-                foreach (var kv in selectedUsers)
-                    selectedSystemUsers.Add(kv.Key, kv.Value);
+                adapter.SetItems(systemUsers);
 
                 UpdateControls();
             }
@@ -152,6 +153,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.Items != null)
+                outState.PutString(SystemUsersKey, Serializer.Serialize(adapter.Items));
+
+            if (selectedSystemUsers != null)
+                outState.PutString(SystemUsersKey, Serializer.Serialize(selectedSystemUsers.Values));
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
@@ -167,40 +179,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             ToggleSelected(e);
             UpdateControls();
-        }
-
-        #endregion
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={businessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Count={selectedSystemUsers.Count}]...");
-
-            return new CopyToUserWorktrayFragmentState
-            {
-                BusinessEntities = businessEntities,
-                SystemUsers = adapter.Items,
-                SelectedSystemUsers = selectedSystemUsers
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as CopyToUserWorktrayFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.businessEntities.Count={dlfs.BusinessEntities?.Count}, dlfs.systemUsers.Count={dlfs.SystemUsers?.Count}, dlfs.selectedSystemUsers.Cound={dlfs.SelectedSystemUsers?.Count}]...");
-
-                businessEntities = dlfs.BusinessEntities;
-                adapter.SetItems(dlfs.SystemUsers);
-
-                selectedSystemUsers.Clear();
-                foreach (var kv in dlfs.SelectedSystemUsers)
-                    selectedSystemUsers.Add(kv.Key, kv.Value);
-
-                UpdateControls();
-            }
         }
 
         #endregion
@@ -326,19 +304,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
             return false;
-        }
-
-        #endregion
-
-        #region State
-
-        class CopyToUserWorktrayFragmentState : IRetainableState
-        {
-            public List<IBusinessEntity> BusinessEntities { get; set; }
-
-            public List<SystemUser> SystemUsers { get; set; }
-
-            public Dictionary<int, SystemUser> SelectedSystemUsers { get; set; }
         }
 
         #endregion
