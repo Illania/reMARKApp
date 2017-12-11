@@ -23,9 +23,11 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Android.App.Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+    [Android.App.Activity()]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
+        const string StateKey = "State_d7a09340-3478-43d7-93c3-8974b687a5ec";
+
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -35,10 +37,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         IMenuItem lastSelectedItem;
         CoordinatorLayout coordinatorLayout;
 
-        RetainedFragment<MainActivityState> stateFragment;
-
         bool firstSelection = true;
         bool permissionsAsked;
+
+        MainActivityState state;
 
         public static Intent CreateIntent(Context context)
         {
@@ -82,11 +84,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             navHeaderTitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
 
-            stateFragment = RetainedFragment<MainActivityState>.FindOrCreate(SupportFragmentManager, nameof(MainActivity));
-
             if (savedInstanceState == null)
             {
-                stateFragment.State = new MainActivityState
+                state = new MainActivityState
                 {
                     MenuItemContents = new Dictionary<int, MenuItemContent>
                     {
@@ -172,22 +172,28 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnSaveInstanceState(outState);
 
-            stateFragment.State.NavHeaderTitle = navHeaderTitleTextView.Text;
+            state.NavHeaderTitle = navHeaderTitleTextView.Text;
 
-            stateFragment.State.LastSelectedItemId = lastSelectedItem.ItemId;
-            stateFragment.State.PermissionsAsked = permissionsAsked;
+            state.LastSelectedItemId = lastSelectedItem.ItemId;
+            state.PermissionsAsked = permissionsAsked;
+
+            outState.PutString(StateKey, Serializer.Serialize(state));
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
         {
             base.OnRestoreInstanceState(savedInstanceState);
 
-            navHeaderTitleTextView.Text = stateFragment.State.NavHeaderTitle;
-            permissionsAsked = stateFragment.State.PermissionsAsked;
+            if (savedInstanceState?.ContainsKey(StateKey) == true)
+            {
+                state = Serializer.Deserialize<MainActivityState>(savedInstanceState.GetString(StateKey));
+                navHeaderTitleTextView.Text = state.NavHeaderTitle;
+                permissionsAsked = state.PermissionsAsked;
 
-            var menuItemId = stateFragment.State.LastSelectedItemId;
-            var menuItem = navigationView.Menu.FindItem(menuItemId);
-            lastSelectedItem = menuItem;
+                var menuItemId = state.LastSelectedItemId;
+                var menuItem = navigationView.Menu.FindItem(menuItemId);
+                lastSelectedItem = menuItem;
+            }
         }
 
         public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
@@ -227,7 +233,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     if (lastSelectedItem != menuItem)
                     {
                         if (lastSelectedItem != null)
-                            stateFragment.State.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
+                            state.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
                         if (SupportFragmentManager.BackStackEntryCount > 0)
                             SupportFragmentManager.PopBackStackImmediate(SupportFragmentManager.GetBackStackEntryAt(0).Id, (int)Android.App.PopBackStackFlags.Inclusive);
@@ -235,9 +241,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         if (firstSelection)
                             firstSelection = false;
                         else
-                            CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(stateFragment.State.MenuItemContents[menuItem.ItemId].ModuleType));
+                            CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(state.MenuItemContents[menuItem.ItemId].ModuleType));
 
-                        stateFragment.State.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
+                        state.MenuItemContents[menuItem.ItemId].CreateOrRestore(SupportFragmentManager);
 
                         lastSelectedItem = menuItem;
                     }
