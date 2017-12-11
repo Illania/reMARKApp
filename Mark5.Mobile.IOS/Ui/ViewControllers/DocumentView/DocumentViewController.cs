@@ -1233,8 +1233,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                readByView.RefreshView();
-                readByView.UpdateVisibility();
+                readByView?.RefreshView();
+                readByView?.UpdateVisibility();
             });
         }
 

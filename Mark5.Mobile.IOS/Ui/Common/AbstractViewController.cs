@@ -40,14 +40,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
         }
 
-        public override void DidMoveToParentViewController(UIViewController parent)
-        {
-            base.DidMoveToParentViewController(parent);
-
-            if (parent == null)
-                RecycleIfNeeded();
-        }
-
         public void RecycleIfNeeded()
         {
             if (!recycled)

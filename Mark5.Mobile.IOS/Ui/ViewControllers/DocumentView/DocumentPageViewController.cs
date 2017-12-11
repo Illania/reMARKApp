@@ -11,9 +11,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 {
     public class DocumentPageViewController : AbstractPageViewController, IUIPageViewControllerDataSource
     {
+        const int CacheCapacity = 5; // Going below 5 might cause issues with internal caching of
+                                     // UIPageViewController
+
         public Folder Folder { get; set; }
-        public DocumentPreview CurrentDocumentPreview { get; set; }
+        public DocumentPreview InitialDocumentPreview { get; set; }
         public List<DocumentPreview> DocumentPreviews { get; set; }
+
+        readonly List<DocumentViewController> viewControllerCache = new List<DocumentViewController>(CacheCapacity + 1);
 
         public DocumentPageViewController()
         {
@@ -32,7 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             WillTransition += DocumentPageViewController_WillTransition;
             DidFinishAnimating += DocumentPageViewController_DidFinishAnimating;
 
-            var vc = GetDocumentViewController(Folder, CurrentDocumentPreview);
+            var vc = GetDocumentViewController(Folder, InitialDocumentPreview);
             SetViewControllers(new[] { vc }, UIPageViewControllerNavigationDirection.Forward, false, null);
             ToolbarItems = vc.ToolbarItems;
         }
@@ -68,6 +73,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             WillTransition -= DocumentPageViewController_WillTransition;
             DidFinishAnimating -= DocumentPageViewController_DidFinishAnimating;
 
+            foreach (var cachedViewController in viewControllerCache)
+                cachedViewController.RecycleIfNeeded();
+            viewControllerCache.Clear();
+
             WeakDataSource = null;
         }
 
@@ -83,6 +92,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             var referenceDocumentViewController = (DocumentViewController)referenceViewController;
             var referenceDocumentPreview = referenceDocumentViewController.DocumentPreview;
+
             var index = DocumentPreviews.FindIndex(dp => dp.Id == referenceDocumentPreview.Id);
             if (index < 0 || index >= DocumentPreviews.Count)
                 return null;
@@ -95,12 +105,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             var referenceDocumentViewController = (DocumentViewController)referenceViewController;
             var referenceDocumentPreview = referenceDocumentViewController.DocumentPreview;
+
             var index = DocumentPreviews.FindIndex(dp => dp.Id == referenceDocumentPreview.Id);
             if (index < 1)
                 return null;
 
-            var nextDocumentPreview = DocumentPreviews[index - 1];
-            return GetDocumentViewController(Folder, nextDocumentPreview);
+            var previousDocumentPreview = DocumentPreviews[index - 1];
+            return GetDocumentViewController(Folder, previousDocumentPreview);
         }
 
         void DocumentPageViewController_WillTransition(object sender, UIPageViewControllerTransitionEventArgs e)
@@ -114,11 +125,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             SetToolbarItems(vc, true);
         }
 
-        static DocumentViewController GetDocumentViewController(Folder folder, DocumentPreview documentPreview)
+        DocumentViewController GetDocumentViewController(Folder folder, DocumentPreview documentPreview)
         {
+            var cachedViewController = viewControllerCache.FirstOrDefault(dvc => dvc.DocumentPreview.Id == documentPreview.Id);
+            if (cachedViewController != null)
+                return cachedViewController;
+
             var vc = new DocumentViewController();
             vc.SetData(folder, documentPreview);
             vc.SetRefreshDataOnAppear();
+            viewControllerCache.Add(vc);
+
+            if (viewControllerCache.Count > CacheCapacity)
+            {
+                viewControllerCache[0].RecycleIfNeeded();
+                viewControllerCache.RemoveAt(0);
+            }
+
             return vc;
         }
     }

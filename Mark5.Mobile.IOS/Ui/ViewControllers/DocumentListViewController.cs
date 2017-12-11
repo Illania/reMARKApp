@@ -545,7 +545,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     var vc = new DocumentPageViewController
                     {
                         Folder = Folder,
-                        CurrentDocumentPreview = documentPreview,
+                        InitialDocumentPreview = documentPreview,
                         DocumentPreviews = ((DataSource)TableView.Source).Items
                     };
                     newDocumentsAvailableAction = null;

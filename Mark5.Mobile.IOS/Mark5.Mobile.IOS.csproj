@@ -116,7 +116,6 @@
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
@@ -255,6 +254,7 @@
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\EditOriginalDocumentViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\DocumentPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
+		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -266,9 +266,6 @@
 		<Reference Include="System.Net.Http" />
 		<Reference Include="PCLStorage.Abstractions">
 			<HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.Abstractions.dll</HintPath>
-		</Reference>
-		<Reference Include="PCLStorage">
-			<HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
 		</Reference>
 		<Reference Include="ModernHttpClient">
 			<HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
@@ -309,9 +306,6 @@
 		<Reference Include="SQLitePCLRaw.batteries_v2">
 		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
-		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.6.5\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-		</Reference>
 		<Reference Include="System.Web.Services" />
 		<Reference Include="Firebase.Core">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.4.0.8\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
@@ -321,6 +315,12 @@
 		</Reference>
 		<Reference Include="Firebase.Analytics">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.4.0.4\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
+		</Reference>
+		<Reference Include="PCLStorage">
+		  <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
+		</Reference>
+		<Reference Include="HtmlAgilityPack">
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

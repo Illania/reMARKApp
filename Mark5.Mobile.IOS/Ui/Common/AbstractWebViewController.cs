@@ -155,6 +155,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewWillLayoutSubviews();
 
+            if (webView == null)
+                return;
+
             var desireHeaderSize = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
             var desiredHeaderHeight = desireHeaderSize.Height;
             if (desiredHeaderHeight < 1)
