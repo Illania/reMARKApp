@@ -56,17 +56,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (savedInstanceState != null)
+            {
+                if (savedInstanceState.ContainsKey(FromTimestampBundleKey))
+                    fromTimestamp = savedInstanceState.GetLong(FromTimestampBundleKey);
+
+                if (savedInstanceState.ContainsKey(ToTimestampBundleKey))
+                    toTimestamp = savedInstanceState.GetLong(ToTimestampBundleKey);
+
+                if (savedInstanceState.ContainsKey(StartWithToDateBundleKey))
+                    startWithToDate = savedInstanceState.GetBoolean(StartWithToDateBundleKey);
+            }
+            else
+            {
+                if (Arguments.ContainsKey(FromTimestampBundleKey))
+                    fromTimestamp = Arguments.GetLong(FromTimestampBundleKey);
+
+                if (Arguments.ContainsKey(ToTimestampBundleKey))
+                    toTimestamp = Arguments.GetLong(ToTimestampBundleKey);
+
+                if (Arguments.ContainsKey(StartWithToDateBundleKey))
+                    startWithToDate = Arguments.GetBoolean(StartWithToDateBundleKey);
+            }
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(FromTimestampBundleKey))
-                fromTimestamp = Arguments.GetLong(FromTimestampBundleKey);
-
-            if (Arguments.ContainsKey(ToTimestampBundleKey))
-                toTimestamp = Arguments.GetLong(ToTimestampBundleKey);
-
-            if (Arguments.ContainsKey(StartWithToDateBundleKey))
-                startWithToDate = Arguments.GetBoolean(StartWithToDateBundleKey);
-
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
             var scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
@@ -161,6 +180,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SelectTo();
             else
                 SelectFrom();
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutLong(FromTimestampBundleKey, fromTimestamp);
+            outState.PutLong(ToTimestampBundleKey, toTimestamp);
+            outState.PutBoolean(StartWithToDateBundleKey, toCalendarView.Visibility == ViewStates.Visible);
         }
 
         void DateView_FromClicked(object sender, EventArgs e)

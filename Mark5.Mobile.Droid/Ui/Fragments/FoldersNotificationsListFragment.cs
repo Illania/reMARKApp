@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if ((Arguments != null) && Arguments.ContainsKey(RemoteFolderBundleKey))
+            if (Arguments?.ContainsKey(RemoteFolderBundleKey) == true)
                 remoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
 
             CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsListFragment)}...");

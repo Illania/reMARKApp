@@ -319,6 +319,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         class MenuItemContent
         {
             protected readonly List<Fragment.SavedState> BackstackStates = new List<Fragment.SavedState>();
+            protected readonly List<Bundle> Arguments = new List<Bundle>();
             protected readonly List<string> SavedTags = new List<string>();
 
             public ModuleType ModuleType { get; }
@@ -330,6 +331,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             public void Save(FragmentManager fm)
             {
+                Arguments.Clear();
                 BackstackStates.Clear();
                 SavedTags.Clear();
 
@@ -340,6 +342,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var state = fm.SaveFragmentInstanceState(fragment);
                     SavedTags.Add(tag);
                     BackstackStates.Add(state);
+                    Arguments.Add(fragment.Arguments);
                 }
             }
 
@@ -371,17 +374,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             void Restore(FragmentManager fm)
             {
-                var backStackStatesAndTags = BackstackStates.Zip(SavedTags,
-                    (state, tag) => new
-                    {
-                        State = state,
-                        Tag = tag
-                    });
-
-                foreach (var item in backStackStatesAndTags)
+                for (int i = 0; i < BackstackStates.Count; i++)
                 {
-                    var state = item.State;
-                    var tag = item.Tag;
+                    var state = BackstackStates[i];
+                    var tag = SavedTags[i];
+                    var arguments = Arguments[i];
 
                     BaseFragment f = null;
 
@@ -390,6 +387,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
                         f = FoldersListFragment.NewInstance();
 
+                    f.Arguments = arguments;
                     f.SetInitialSavedState(state);
 
                     var ft = fm.BeginTransaction();
@@ -401,6 +399,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 BackstackStates.Clear();
                 SavedTags.Clear();
+                Arguments.Clear();
             }
         }
 

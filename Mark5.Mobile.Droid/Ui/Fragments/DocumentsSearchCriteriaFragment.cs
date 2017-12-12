@@ -46,11 +46,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (savedInstanceState != null && savedInstanceState.ContainsKey(SearchCriteriaKey))
                 searchCriteria = Serializer.Deserialize<SearchDocumentsCriteria>(savedInstanceState.GetString(SearchCriteriaKey));
+        }
 
+        //TODO
+        // There is a problem when opening another fragment (like the line) and rotating twice.
+        // That happens because onCreateView is not created on the first rotation (as the fragment is not visible), but only onCreate
+        // If onCreateView isn't called then we'll get a crash when trying to retrieve the fragment criteria because of null variables
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);

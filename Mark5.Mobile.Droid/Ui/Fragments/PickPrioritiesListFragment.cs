@@ -90,8 +90,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (selectedPriorities != null)
-                outState.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(selectedPriorities));
+            if (adapter?.SelectedPriorities != null)
+                outState.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(adapter.SelectedPriorities));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

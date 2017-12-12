@@ -90,8 +90,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (selectedLinesGuid != null)
-                outState.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(selectedLinesGuid));
+            if (adapter?.SelectedLinesGuid != null)
+                outState.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(adapter.SelectedLinesGuid));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
