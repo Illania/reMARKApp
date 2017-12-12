@@ -216,29 +216,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
-
-            if (savedInstanceState?.ContainsKey(StateKey) == true)
-            {
-                CommonConfig.Logger.Info("Restoring....");
-
-                var cfs = Serializer.Deserialize<ComposeDocumentState>(savedInstanceState.GetString(StateKey));
-
-                documentLoaded = cfs.DocumentLoaded;
-                templateLoaded = cfs.TemplateLoaded;
-                toView.State = cfs.ToState;
-                ccView.State = cfs.CcState;
-                bccView.State = cfs.BccState;
-                priorityView.State = cfs.PriorityState;
-                lineView.State = cfs.LineState;
-                subjectView.State = cfs.SubjectState;
-                attachmentsView.State = cfs.AttachmentsState;
-                contentView.State = cfs.ContentState;
-            }
-        }
-
         public override async void OnResume()
         {
             base.OnResume();
@@ -255,34 +232,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Paused {nameof(ComposeDocumentFragment)}");
-        }
-
-        public override void OnSaveInstanceState(Bundle outState)
-        {
-            base.OnSaveInstanceState(outState);
-
-            try
-            {
-                var cfs = new ComposeDocumentState
-                {
-                    DocumentLoaded = documentLoaded,
-                    TemplateLoaded = templateLoaded,
-                    ToState = toView.GetState(),
-                    CcState = ccView.GetState(),
-                    BccState = bccView.GetState(),
-                    PriorityState = priorityView.GetState(),
-                    LineState = lineView.GetState(),
-                    SubjectState = subjectView.GetState(),
-                    AttachmentsState = attachmentsView.GetState(),
-                    ContentState = contentView.GetState()
-                };
-
-                outState.PutString(StateKey, Serializer.Serialize(cfs));
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Error while saving state", ex);
-            }
         }
 
         public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -1007,24 +956,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.SetSubject(template.Subject);
 
             lineView.SetLine(template.LineGuid);
-        }
-
-        #endregion
-
-        #region Retained State methods
-
-        class ComposeDocumentState
-        {
-            public bool DocumentLoaded { get; set; }
-            public bool TemplateLoaded { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState ToState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState CcState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState BccState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState PriorityState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState LineState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState SubjectState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState AttachmentsState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState ContentState { get; set; }
         }
 
         #endregion

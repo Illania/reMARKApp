@@ -135,6 +135,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (Adapter?.Items != null)
+                outState.PutString(SystemUsersKey, Serializer.Serialize(Adapter.Items));
+
+            if (SelectedSystemUsers != null)
+                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(SelectedSystemUsers.Values.ToList()));
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
