@@ -44,11 +44,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (savedInstanceState != null && savedInstanceState.ContainsKey(SearchCriteriaKey))
                 searchCriteria = Serializer.Deserialize<SearchShortcodesCriteria>(savedInstanceState.GetString(SearchCriteriaKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchCriteriaFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
