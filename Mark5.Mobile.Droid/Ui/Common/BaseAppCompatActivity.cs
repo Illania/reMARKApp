@@ -34,16 +34,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             if (!((Mark5Application)ApplicationContext).StartedFromRoot)
             {
-                CommonConfig.Logger.Error("RESTARTING!"); //TODO for debug
                 var intent = new Intent(this, typeof(SplashActivity));
                 intent.SetFlags(ActivityFlags.ClearTask | ActivityFlags.NewTask);
                 StartActivity(intent);
                 Finish();
                 return;
-            }
-            else
-            {
-                CommonConfig.Logger.Error("NOT RESTARTING!"); //TODO for debug
             }
         }
 
