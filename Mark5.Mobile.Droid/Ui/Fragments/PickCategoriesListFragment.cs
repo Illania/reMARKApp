@@ -118,8 +118,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (availableCategories != null)
                 outState.PutString(AvailableCategoriesKey, Serializer.Serialize(availableCategories));
 
-            if (selectedCategoryIds != null)
-                outState.PutString(SelectedCategoryIdsBundleKey, Serializer.Serialize(selectedCategoryIds));
+            if (selectedCategories != null)
+                outState.PutIntArray(SelectedCategoryIdsBundleKey, selectedCategories.Keys.ToArray());
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
