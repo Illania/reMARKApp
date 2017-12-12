@@ -103,6 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         //TODO Remove this?
         string SafeGenerateTag()
         {
+            CommonConfig.Logger.Error("SHOULD NOT COME HERE");
             try
             {
                 return "NotAnEmptyTag";

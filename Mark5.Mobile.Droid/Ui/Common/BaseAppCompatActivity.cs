@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Text;
+using Android.Content;
+using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -22,6 +25,25 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 }
 
                 return fab;
+            }
+        }
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (!((Mark5Application)ApplicationContext).StartedFromRoot)
+            {
+                CommonConfig.Logger.Error("RESTARTING!"); //TODO for debug
+                var intent = new Intent(this, typeof(SplashActivity));
+                intent.SetFlags(ActivityFlags.ClearTask | ActivityFlags.NewTask);
+                StartActivity(intent);
+                Finish();
+                return;
+            }
+            else
+            {
+                CommonConfig.Logger.Error("NOT RESTARTING!"); //TODO for debug
             }
         }
 
