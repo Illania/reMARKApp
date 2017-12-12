@@ -19,7 +19,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DownloadFragment : RetainableStateFragment
+    public class DownloadFragment : BaseFragment
     {
         const string FolderBundleKey = "Folder_3a0c4202-ba8e-457d-9db7-025692ad0b35";
 
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (Arguments.ContainsKey(FolderBundleKey))
                 folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
-            
+
             CommonConfig.Logger.Info($"Creating {nameof(DownloadFragment)} [folder.Id={folder?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.download, container, false);
@@ -213,7 +213,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     downloaded.Text = fi.DownloadedItemsCount > 0
                         ? GetString(Resource.String.download_finished)
                         : GetString(Resource.String.download_finished_empty);
-                    
+
                     finishedLayout.Visibility = ViewStates.Visible;
                     startLayout.Visibility = ViewStates.Gone;
                     progressLayout.Visibility = ViewStates.Gone;

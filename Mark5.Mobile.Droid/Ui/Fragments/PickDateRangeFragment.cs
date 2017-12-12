@@ -16,7 +16,7 @@ using Mark5.Mobile.Droid.Ui.Views.SearchViews;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickDateRangeFragment : RetainableStateFragment
+    public class PickDateRangeFragment : BaseFragment
     {
         public Task<(long, long)> Task => tcs.Task;
 
@@ -56,17 +56,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (savedInstanceState != null)
+            {
+                if (savedInstanceState.ContainsKey(FromTimestampBundleKey))
+                    fromTimestamp = savedInstanceState.GetLong(FromTimestampBundleKey);
+
+                if (savedInstanceState.ContainsKey(ToTimestampBundleKey))
+                    toTimestamp = savedInstanceState.GetLong(ToTimestampBundleKey);
+
+                if (savedInstanceState.ContainsKey(StartWithToDateBundleKey))
+                    startWithToDate = savedInstanceState.GetBoolean(StartWithToDateBundleKey);
+            }
+            else
+            {
+                if (Arguments.ContainsKey(FromTimestampBundleKey))
+                    fromTimestamp = Arguments.GetLong(FromTimestampBundleKey);
+
+                if (Arguments.ContainsKey(ToTimestampBundleKey))
+                    toTimestamp = Arguments.GetLong(ToTimestampBundleKey);
+
+                if (Arguments.ContainsKey(StartWithToDateBundleKey))
+                    startWithToDate = Arguments.GetBoolean(StartWithToDateBundleKey);
+            }
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(FromTimestampBundleKey))
-                fromTimestamp = Arguments.GetLong(FromTimestampBundleKey);
-
-            if (Arguments.ContainsKey(ToTimestampBundleKey))
-                toTimestamp = Arguments.GetLong(ToTimestampBundleKey);
-
-            if (Arguments.ContainsKey(StartWithToDateBundleKey))
-                startWithToDate = Arguments.GetBoolean(StartWithToDateBundleKey);
-
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
             var scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
@@ -163,6 +182,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SelectFrom();
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutLong(FromTimestampBundleKey, fromTimestamp);
+            outState.PutLong(ToTimestampBundleKey, toTimestamp);
+            outState.PutBoolean(StartWithToDateBundleKey, toCalendarView.Visibility == ViewStates.Visible);
+        }
+
         void DateView_FromClicked(object sender, EventArgs e)
         {
             if (fromCalendarView.Visibility == ViewStates.Visible)
@@ -244,37 +272,5 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             tcs.SetResult((fromTimestamp, toTimestamp));
             ((AppCompatActivity)Activity).OnBackPressed();
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new PickDateRangeFragmentState
-            {
-                FromTimestamp = fromTimestamp,
-                ToTimestamp = toTimestamp,
-                StartWithToDate = toCalendarView.Visibility == ViewStates.Visible,
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var fs = restoredState as PickDateRangeFragmentState;
-            if (fs != null)
-            {
-                fromTimestamp = fs.FromTimestamp;
-                toTimestamp = fs.ToTimestamp;
-                startWithToDate = fs.StartWithToDate;
-            }
-        }
-
-        class PickDateRangeFragmentState : IRetainableState
-        {
-            public long FromTimestamp { get; set; }
-            public long ToTimestamp { get; set; }
-            public bool StartWithToDate { get; set; }
-        }
-
-        #endregion
     }
 }

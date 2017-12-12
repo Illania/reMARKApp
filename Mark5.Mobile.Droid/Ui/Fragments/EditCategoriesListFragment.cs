@@ -21,7 +21,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
-    public class EditCategoriesListFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class EditCategoriesListFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter)recyclerView.GetAdapter();
 
@@ -30,6 +30,8 @@ namespace Mark5.Mobile.Droid
         readonly Handler searchHandler = new Handler();
 
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_730da2d5-20b7-487f-b118-0053ced930af";
+        const string AvailableCategoriesKey = "AvailableCategoires_79b2e3d3-887e-4d9b-8b1f-77e2b235cb82";
+        const string SelectedCategoriesKey = "SelectedCategories_4d6b9cb9-d133-4d8b-8695-14c9d4d4af72";
 
         BusinessEntityPreview businessEntityPreview;
 
@@ -94,6 +96,20 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            if (savedInstanceState?.ContainsKey(AvailableCategoriesKey) == true)
+            {
+                adapter.SetItems(Serializer.Deserialize<List<Category>>(savedInstanceState.GetString(AvailableCategoriesKey)));
+
+                selectedCategories.Clear();
+
+                if (savedInstanceState.ContainsKey(SelectedCategoriesKey))
+                {
+                    var selected = Serializer.Deserialize<List<Category>>(savedInstanceState.GetString(SelectedCategoriesKey));
+                    foreach (var s in selected)
+                        selectedCategories.Add(s.Id, s);
+                }
+            }
+
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
@@ -111,6 +127,17 @@ namespace Mark5.Mobile.Droid
             }
 
             UpdateControls();
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.Items != null)
+                outState.PutString(AvailableCategoriesKey, Serializer.Serialize(adapter.Items));
+
+            if (selectedCategories != null)
+                outState.PutString(SelectedCategoriesKey, Serializer.Serialize(selectedCategories.Values.ToList()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -312,43 +339,6 @@ namespace Mark5.Mobile.Droid
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
             return false;
-        }
-
-        #endregion
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new AvailableCategoriesListFragmentState
-            {
-                BusinessEntityPreview = businessEntityPreview,
-                SelectedCategories = selectedCategories,
-                AvailableCategories = adapter.Items
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var clfs = restoredState as AvailableCategoriesListFragmentState;
-            if (clfs != null)
-            {
-                businessEntityPreview = clfs.BusinessEntityPreview;
-                selectedCategories.Clear();
-                foreach (var kv in clfs.SelectedCategories)
-                    selectedCategories.Add(kv.Key, kv.Value);
-
-                adapter.SetItems(clfs.AvailableCategories);
-            }
-        }
-
-        class AvailableCategoriesListFragmentState : IRetainableState
-        {
-            public BusinessEntityPreview BusinessEntityPreview { get; set; }
-
-            public Dictionary<int, Category> SelectedCategories { get; set; }
-
-            public List<Category> AvailableCategories { get; set; }
         }
 
         #endregion

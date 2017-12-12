@@ -1410,7 +1410,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
-                    viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
+                    if (cell is CommunicationAddressTableViewCell caCell)
+                        viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, caCell.Content);
                 }
             }
 
@@ -1441,7 +1442,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
-                    viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
+                    if (cell is PhysicalAddressTableViewCell paCell)
+                        viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, paCell.Content);
                 }
             }
 

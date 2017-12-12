@@ -25,8 +25,10 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentSearchCriteriaFragment : RetainableStateFragment, ISearchCriteriaFragment
+    public class DocumentSearchCriteriaFragment : BaseFragment, ISearchCriteriaFragment
     {
+        const string SearchCriteriaKey = "SearchCriteria_d48ddd3d-781c-45dd-bd25-8cb1ea7ab423";
+
         SearchDocumentsCriteria searchCriteria;
 
         LinearLayoutCompat containerLinearLayout;
@@ -43,6 +45,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return (fragment, tag);
         }
+
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (savedInstanceState != null && savedInstanceState.ContainsKey(SearchCriteriaKey))
+                searchCriteria = Serializer.Deserialize<SearchDocumentsCriteria>(savedInstanceState.GetString(SearchCriteriaKey));
+        }
+
+        //TODO
+        // There is a problem when opening another fragment (like the line) and rotating twice.
+        // That happens because onCreateView is not created on the first rotation (as the fragment is not visible), but only onCreate
+        // If onCreateView isn't called then we'll get a crash when trying to retrieve the fragment criteria because of null variables
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -177,6 +192,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutString(SearchCriteriaKey, Serializer.Serialize(GetCriteria()));
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -307,29 +329,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error("Failed to clear last search criteria", ex);
             }
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new DocumentSearchCriteriaFragmentState
-            {
-                Criteria = GetCriteria(),
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is DocumentSearchCriteriaFragmentState df)
-                searchCriteria = df.Criteria;
-        }
-
-        class DocumentSearchCriteriaFragmentState : IRetainableState
-        {
-            public SearchDocumentsCriteria Criteria { get; set; }
-        }
-
-        #endregion
     }
 
     public interface ISearchCriteriaFragment

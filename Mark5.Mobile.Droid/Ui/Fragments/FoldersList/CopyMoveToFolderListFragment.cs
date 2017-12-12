@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class CopyMoveToFolderListFragment : FoldersListFragment
+    public class CopyMoveToFolderListFragment : FoldersListFragment //TODO need to test this one
     {
         const string BusinessEntitiesBundleKey = "BusinessEntities_cac3f9a0-dba6-486f-ab6f-2b691ae9f243";
         const string FromFolderBundleKey = "FromFolder_8dc816f4-08b8-428d-9cce-1c481c460df5";
@@ -86,10 +86,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.SetSections(AvailableSections);
         }
 
-        protected override (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
+        protected override (BaseFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
             return NewInstance(folder, businessEntities, fromFolder, actionType);
-
         }
 
         protected override async void Adapter_ItemClicked(object sender, int position)
@@ -198,46 +197,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Activity?.Finish();
             }
         }
-
-        #region Retained Fragment methods
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            var baseState = base.OnRetainInstanceState() as FolderListFragmentState;
-
-            CommonConfig.Logger.Info($"Retaining state: [businessEntities.Count={businessEntities?.Count}, businessEntity.Type={businessEntities.First().ObjectType}, fromFolder.Id={fromFolder?.Id}]");
-
-            return new MoveToFolderListFragmentState
-            {
-                Folder = baseState.Folder,
-                SelectedItemPositions = baseState.SelectedItemPositions,
-                BusinessEntities = businessEntities,
-                FromFolder = fromFolder,
-                Type = actionType
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            base.OnRetainedInstanceStateRestored(restoredState as FolderListFragmentState);
-
-            if (restoredState is MoveToFolderListFragmentState flfs)
-            {
-                businessEntities = flfs.BusinessEntities;
-                fromFolder = flfs.FromFolder;
-                actionType = flfs.Type;
-                CommonConfig.Logger.Info($"Restored state state: [businessEntities.Count={businessEntities?.Count}, businessEntity.Type={businessEntities?.First().ObjectType}, fromFolder.Id={fromFolder?.Id}]");
-            }
-        }
-
-        protected class MoveToFolderListFragmentState : FolderListFragmentState
-        {
-            public List<IBusinessEntity> BusinessEntities { get; set; }
-            public Folder FromFolder { get; set; }
-            public ActionType Type { get; set; }
-        }
-
-        #endregion
 
         public enum ActionType
         {

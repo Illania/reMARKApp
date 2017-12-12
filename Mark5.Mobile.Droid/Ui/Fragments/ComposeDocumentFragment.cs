@@ -27,7 +27,7 @@ using PCLStorage;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ComposeDocumentFragment : RetainableStateFragment
+    public class ComposeDocumentFragment : BaseFragment
     {
         readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>(10);
 
@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string PreviousDocumentFolderIdBundleKey = "PreviousDocumentFolderId_def12a0b-0156-4189-9c67-e41ed7c944a5";
         const string PreviousDocumentIdBundleKey = "PreviousDocumentId_b8e521b8-8a8a-42ce-9d67-99b61abdafd2";
         const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
+
+        const string StateKey = "State_4601ad7b-fff8-4155-bbcd-c8737554a830";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 2.5 seconds
@@ -954,88 +956,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.SetSubject(template.Subject);
 
             lineView.SetLine(template.LineGuid);
-        }
-
-        #endregion
-
-        #region Retained State methods
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ComposeDocumentFragmentState
-            {
-                DocumentCreationModeFlag = documentCreationModeFlag,
-                CopyToNewOptions = copyToNewOption,
-                DocumentPreview = documentPreview,
-                Document = document,
-                PreviousDocumentDirection = previousDocumentDirection,
-                PreviousDocumentFolderId = previousDocumentFolderId,
-                PreviousDocumentId = previousDocumentId,
-                PreviousDocumentPreview = previousDocumentPreview,
-                PreviousDocument = previousDocument,
-                PreconfiguredEmailAddresses = preconfiguredEmailAddresses,
-                DocumentLoaded = documentLoaded,
-                TemplateLoaded = templateLoaded,
-                ToState = toView.GetState(),
-                CcState = ccView.GetState(),
-                BccState = bccView.GetState(),
-                PriorityState = priorityView.GetState(),
-                LineState = lineView.GetState(),
-                SubjectState = subjectView.GetState(),
-                AttachmentsState = attachmentsView.GetState(),
-                ContentState = contentView.GetState()
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is ComposeDocumentFragmentState cfs)
-            {
-                documentCreationModeFlag = cfs.DocumentCreationModeFlag;
-                copyToNewOption = cfs.CopyToNewOptions;
-                documentPreview = cfs.DocumentPreview;
-                document = cfs.Document;
-                previousDocumentDirection = cfs.PreviousDocumentDirection;
-                previousDocumentFolderId = cfs.PreviousDocumentFolderId;
-                previousDocumentId = cfs.PreviousDocumentId;
-                previousDocumentPreview = cfs.PreviousDocumentPreview;
-                previousDocument = cfs.PreviousDocument;
-                preconfiguredEmailAddresses = cfs.PreconfiguredEmailAddresses;
-                documentLoaded = cfs.DocumentLoaded;
-                templateLoaded = cfs.TemplateLoaded;
-                toView.State = cfs.ToState;
-                ccView.State = cfs.CcState;
-                bccView.State = cfs.BccState;
-                priorityView.State = cfs.PriorityState;
-                lineView.State = cfs.LineState;
-                subjectView.State = cfs.SubjectState;
-                attachmentsView.State = cfs.AttachmentsState;
-                contentView.State = cfs.ContentState;
-            }
-        }
-
-        class ComposeDocumentFragmentState : IRetainableState
-        {
-            public DocumentCreationModeFlag DocumentCreationModeFlag { get; set; }
-            public CopyToNewOption CopyToNewOptions { get; set; }
-            public DocumentPreview DocumentPreview { get; set; }
-            public Document Document { get; set; }
-            public DocumentDirection PreviousDocumentDirection { get; set; }
-            public int? PreviousDocumentFolderId { get; set; }
-            public int? PreviousDocumentId { get; set; }
-            public DocumentPreview PreviousDocumentPreview { get; set; }
-            public Document PreviousDocument { get; set; }
-            public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
-            public bool DocumentLoaded { get; set; }
-            public bool TemplateLoaded { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState ToState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState CcState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState BccState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState PriorityState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState LineState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState SubjectState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState AttachmentsState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState ContentState { get; set; }
         }
 
         #endregion

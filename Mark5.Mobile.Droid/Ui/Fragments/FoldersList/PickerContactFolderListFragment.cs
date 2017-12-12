@@ -13,7 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var args = new Bundle();
 
-            if(remoteFolder != null)
+            if (remoteFolder != null)
                 args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
 
             if (hideSearch != null)
@@ -30,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var tag = $"{nameof(FoldersListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
 
-            return (fragment,tag);
+            return (fragment, tag);
         }
 
         protected override void Adapter_ItemClicked(object sender, int position)
@@ -43,9 +43,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             //Nothing to do here
         }
 
-        protected override (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
+        protected override (BaseFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
-            return NewInstance(folder);  
+            return NewInstance(folder);
         }
     }
 }

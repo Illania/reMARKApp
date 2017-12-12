@@ -7,7 +7,6 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -24,7 +23,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public abstract class AbstractShortcodesListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public abstract class AbstractShortcodesListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         static class RequestCodes
         {
@@ -38,6 +37,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         protected const string FolderBundleKey = "BundleKey_002d532f-2acf-4ee2-9bb1-e9601e5bf83e";
+
+        protected const string ShortcodePreviewsKey = "ShortcodePreviews_3eca9281-9489-4c2e-82a7-918367c06e8f";
+        protected const string SelectedShortcodePreviewsKey = "SelectedPreviews_7b36f3cd-ded2-4e09-a138-76019d2bb358";
+        protected const string RefreshInProgressKey = "RefreshInProgress_ba32b92c-1d9e-44d1-b25a-7695864ee1de";
 
         protected ActionMode ActionMode;
 
@@ -113,6 +116,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            if (savedInstanceState?.ContainsKey(ShortcodePreviewsKey) == true)
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+
+                var shortcodePreviews = Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(ShortcodePreviewsKey));
+
+                adapter.AppendItems(shortcodePreviews);
+
+                var refreshInProgress = savedInstanceState.ContainsKey(RefreshInProgressKey) && savedInstanceState.GetBoolean(RefreshInProgressKey);
+                var selectedShortcodePreviews = savedInstanceState.ContainsKey(SelectedShortcodePreviewsKey) ?
+                                                                  Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(SelectedShortcodePreviewsKey)) : null;
+                if (refreshInProgress)
+                {
+                    CommonConfig.Logger.Info($"Refresh was in progress before - will continue...");
+
+                    RefreshData(shortcodePreviews[shortcodePreviews.Count - 1].RowId);
+                }
+
+                if (selectedShortcodePreviews?.Count > 0)
+                {
+                    ActionMode?.Finish();
+                    ActionMode = Activity.StartActionMode(this);
+
+                    adapter.SetSelected(selectedShortcodePreviews, true);
+                    ActionMode.Title = adapter.SelectedItemCount.ToString();
+                    ActionMode.Invalidate();
+                }
+            }
+
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.shortcodes);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
@@ -159,6 +191,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts?.Cancel();
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.Items != null)
+                outState.PutString(ShortcodePreviewsKey, Serializer.Serialize(adapter.Items));
+
+            if (adapter?.SelectedItems != null)
+                outState.PutString(SelectedShortcodePreviewsKey, Serializer.Serialize(adapter.SelectedItems));
+
+            outState.PutBoolean(RefreshInProgressKey, refreshing);
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             this.menu = menu;
@@ -185,52 +230,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             return base.OnOptionsItemSelected(item);
-        }
-
-        #endregion
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, shortcodePreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}, refreshing={refreshing}]...");
-
-            return new ShortcodesListFragmentState
-            {
-                Folder = Folder,
-                ShortcodePreviews = adapter.Items,
-                SelectedShortcodePreviews = adapter.SelectedItems,
-                RefreshInProgress = refreshing
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as ShortcodesListFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder.Id}, dlfs.items.count={dlfs.ShortcodePreviews.Count}, dlfs.selectedItems.count={dlfs.SelectedShortcodePreviews.Count}]...");
-
-                Folder = dlfs.Folder;
-                adapter.AppendItems(dlfs.ShortcodePreviews);
-
-                if (dlfs.RefreshInProgress)
-                {
-                    CommonConfig.Logger.Info($"Refresh was in progress before - will continue...");
-
-                    RefreshData(dlfs.ShortcodePreviews[dlfs.ShortcodePreviews.Count - 1].RowId);
-                }
-
-                if (dlfs.SelectedShortcodePreviews.Count > 0)
-                {
-                    ActionMode?.Finish();
-                    ActionMode = Activity.StartActionMode(this);
-
-                    adapter.SetSelected(dlfs.SelectedShortcodePreviews, true);
-                    ActionMode.Title = adapter.SelectedItemCount.ToString();
-                    ActionMode.Invalidate();
-                }
-            }
         }
 
         #endregion
@@ -554,21 +553,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
 
             return false;
-        }
-
-        #endregion
-
-        #region State
-
-        class ShortcodesListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-
-            public List<ShortcodePreview> ShortcodePreviews { get; set; }
-
-            public List<ShortcodePreview> SelectedShortcodePreviews { get; set; }
-
-            public bool RefreshInProgress { get; set; }
         }
 
         #endregion

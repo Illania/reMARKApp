@@ -12,10 +12,10 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickCountryFragment : RetainableStateFragment
+    public class PickCountryFragment : BaseFragment
     {
         public Task<int> Task => tcs.Task;
-       
+
         RecyclerView recyclerView;
         CountriesListViewAdapter adapter;
 
@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_country);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_country);
 
             CommonConfig.Logger.Info($"Created {nameof(PickCountryFragment)}");
         }
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void CountrySelected(CountryInfo c)
         {
             tcs.SetResult(c.FaxPrefix);
-            ((AppCompatActivity) Activity).OnBackPressed();
+            ((AppCompatActivity)Activity).OnBackPressed();
         }
 
         class CountriesListViewAdapter : RecyclerView.Adapter

@@ -21,9 +21,10 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ContactsSearchResultsFragment : RetainableStateFragment
+    public class ContactsSearchResultsFragment : BaseFragment
     {
         const string CriteriaBundleKey = "Criteria_cc2b48a4-affd-48a8-bb0c-4a6cec17975a";
+        const string ContactPreviewsKey = "ContactPreviews_dbe9d50f-3e9e-4e20-a0d8-981cc0511e39";
 
         SearchContactsCriteria criteria;
 
@@ -36,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
 
             if (criteria != null)
-                args.PutString(CriteriaBundleKey,Serializer.Serialize(criteria));
+                args.PutString(CriteriaBundleKey, Serializer.Serialize(criteria));
 
             var fragment = new ContactsSearchResultsFragment();
             fragment.Arguments = args;
@@ -76,8 +77,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts_result);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            if (savedInstanceState != null && savedInstanceState.ContainsKey(ContactPreviewsKey))
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+                adapter.AppendItems(Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(ContactPreviewsKey)));
+            }
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts_result);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]");
         }
@@ -103,31 +110,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]...");
         }
 
-        #endregion
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
+        public override void OnSaveInstanceState(Bundle outState)
         {
-            CommonConfig.Logger.Info($"Retaining state [criteria={criteria}, contactPreviews.Count={adapter?.ItemCount}]...");
+            base.OnSaveInstanceState(outState);
 
-            return new ContactSearchResultsFragmentState
-            {
-                Criteria = criteria,
-                ContactPreviews = adapter.Items
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as ContactSearchResultsFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.ContactPreviews?.Count}]...");
-
-                criteria = dlfs.Criteria;
-                adapter.AppendItems(dlfs.ContactPreviews);
-            }
+            if (adapter?.Items != null)
+                outState.PutString(ContactPreviewsKey, Serializer.Serialize(adapter.Items));
         }
 
         #endregion
@@ -181,17 +169,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var i = new Intent(Activity, typeof(ContactActivity));
             i.PutExtra(ContactActivity.ContactPreviewIntentKey, Serializer.Serialize(contactPreview));
             StartActivity(i);
-        }
-
-        #endregion
-
-        #region State
-
-        class ContactSearchResultsFragmentState : IRetainableState
-        {
-            public SearchContactsCriteria Criteria { get; set; }
-
-            public List<ContactPreview> ContactPreviews { get; set; }
         }
 
         #endregion
