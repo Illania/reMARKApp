@@ -438,7 +438,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading || Empty)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {

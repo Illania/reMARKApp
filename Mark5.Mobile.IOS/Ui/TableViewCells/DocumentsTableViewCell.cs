@@ -46,6 +46,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 Accessory = UITableViewCellAccessory.None;
             }
 
+            var leadingMarginGuide = new UILayoutGuide();
+            ContentView.AddLayoutGuide(leadingMarginGuide);
+
+            leadingMarginGuide.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor).Active = true;
+            var leadingMarginWidthAnchor = leadingMarginGuide.WidthAnchor.ConstraintEqualTo(0f);
+            leadingMarginWidthAnchor.SetIdentifier("leadingMarginWidth");
+            leadingMarginWidthAnchor.Active = true;
+
             if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == ExternalId)
             {
                 categoriesStackView = new UIStackView
@@ -59,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 ContentView.AddSubview(categoriesStackView);
                 ContentView.AddConstraints(new[]
                 {
-                    categoriesStackView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor, -8f),
+                    categoriesStackView.TrailingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor, -8f),
                     categoriesStackView.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
                     categoriesStackView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -4f),
                     categoriesStackView.WidthAnchor.ConstraintEqualTo(4f),
@@ -77,7 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             ContentView.AddConstraints(new[]
             {
                 topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
-                topLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor, 15f + 8f),
+                topLabel.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor, 15f + 8f),
                 topLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
             });
 
@@ -169,7 +177,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 ContentView.AddSubview(directionIndicatorImageView);
                 ContentView.AddConstraints(new[]
                 {
-                    directionIndicatorImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    directionIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
                     directionIndicatorImageView.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor),
                     directionIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
                     directionIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
@@ -188,7 +196,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 ContentView.AddSubview(unreadIndicatorImageView);
                 ContentView.AddConstraints(new[]
                 {
-                    unreadIndicatorImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    unreadIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
                     unreadIndicatorImageView.TopAnchor.ConstraintEqualTo(directionIndicatorImageView.BottomAnchor, 4f),
                     unreadIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
                     unreadIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
@@ -207,7 +215,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 ContentView.AddSubview(attachmentsIndicatorImageView);
                 ContentView.AddConstraints(new[]
                 {
-                    attachmentsIndicatorImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    attachmentsIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
                     attachmentsIndicatorImageView.TopAnchor.ConstraintEqualTo(unreadIndicatorImageView.BottomAnchor, 4f),
                     attachmentsIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
                     attachmentsIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
@@ -223,7 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 ContentView.AddSubview(commentsIndicatorImageView);
                 ContentView.AddConstraints(new[]
                 {
-                    commentsIndicatorImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    commentsIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
                     commentsIndicatorImageView.TopAnchor.ConstraintEqualTo(attachmentsIndicatorImageView.BottomAnchor, 4f),
                     commentsIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
                     commentsIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f)
@@ -371,26 +379,60 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public override void SetSelected(bool selected, bool animated)
         {
-            base.SetSelected(selected, animated);
+            UIColor[] colors = null;
 
             if (categoriesStackView != null)
-                categoriesStackView.Subviews.ForEach(v =>
-                {
-                    if (v.BackgroundColor.CGColor.Alpha < 1f)
-                        v.BackgroundColor = v.BackgroundColor.ColorWithAlpha(1f);
-                });
+            {
+                colors = new UIColor[categoriesStackView.Subviews.Length];
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    colors[i] = categoriesStackView.Subviews[i].BackgroundColor;
+            }
+
+            base.SetSelected(selected, animated);
+
+            if (colors != null)
+            {
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    categoriesStackView.Subviews[i].BackgroundColor = colors[i];
+
+                colors = null;
+            }
         }
 
         public override void SetHighlighted(bool highlighted, bool animated)
         {
-            base.SetHighlighted(highlighted, animated);
+            UIColor[] colors = null;
 
             if (categoriesStackView != null)
-                categoriesStackView.Subviews.ForEach(v =>
-                {
-                    if (v.BackgroundColor.CGColor.Alpha < 1f)
-                        v.BackgroundColor = v.BackgroundColor.ColorWithAlpha(1f);
-                });
+            {
+                colors = new UIColor[categoriesStackView.Subviews.Length];
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    colors[i] = categoriesStackView.Subviews[i].BackgroundColor;
+            }
+
+            base.SetHighlighted(highlighted, animated);
+
+            if (colors != null)
+            {
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    categoriesStackView.Subviews[i].BackgroundColor = colors[i];
+
+                colors = null;
+            }
+        }
+
+        public override void SetEditing(bool editing, bool animated)
+        {
+            base.SetEditing(editing, animated);
+
+            var c = ContentView?.Constraints?.FirstOrDefault(nslc => nslc.GetIdentifier() == "leadingMarginWidth");
+            if (c != null)
+                c.Constant = editing ? 16f : 0f;
+
+            if (animated)
+                AnimateNotify(.25d, ContentView.LayoutIfNeeded, null);
+            else
+                LayoutIfNeeded();
         }
     }
 }
