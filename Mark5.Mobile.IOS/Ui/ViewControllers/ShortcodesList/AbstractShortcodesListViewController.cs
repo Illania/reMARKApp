@@ -682,7 +682,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(null, true);
+            NavigationItem.SetRightBarButtonItem(RightButton, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
 
             searchController.SearchBar.UserInteractionEnabled = true;
