@@ -9,6 +9,7 @@ using Firebase;
 using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Utilities
@@ -19,11 +20,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
-            sendIntent.PutExtra(Intent.ExtraEmail,
-                new[]
-                {
-                    "appfeedback@nordic-it.com"
-                });
+            sendIntent.PutExtra(Intent.ExtraEmail, new[] { "appfeedback@nordic-it.com" });
             sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android System report");
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
@@ -143,7 +140,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sb = new StringBuilder();
             sb.AppendLine("===== Server information =====");
-            sb.AppendLine(Serializer.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine(Serializer.SerializeSelectively(ServerConfig.SystemSettings, new[] { (typeof(ContactsModuleInfo), nameof(ContactsModuleInfo.Countries)) }));
             return sb.ToString();
         }
 
