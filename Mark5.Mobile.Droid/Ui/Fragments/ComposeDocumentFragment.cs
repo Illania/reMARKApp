@@ -825,8 +825,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void GetAllTemplates()
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
-
             StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
         }
 
@@ -856,14 +854,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (useTemplate == Preferences.TemplateUsageMode.Local)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
+
                 await GetLocalTemplate();
             }
             else if (useTemplate == Preferences.TemplateUsageMode.Default)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
+
                 await GetDefaultTemplate();
             }
             else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
+
                 var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true);
                 switch (result)
                 {
@@ -887,8 +891,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetLocalTemplate()
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
-
             var localTemplate = PlatformConfig.Preferences.LocalTemplate;
             localTemplate = "\n\n\n" + localTemplate;
             await contentView.InsertLocalTemplate(localTemplate);
@@ -896,8 +898,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetDefaultTemplate(bool errorMessageIfNull = false)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
-
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
             try

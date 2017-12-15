@@ -73,6 +73,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             base.ViewDidLoad();
 
+            if (CopyToNewOption != CopyToNewOption.None)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeEditDraftEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyAllEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeForwardEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeNewDocumentEvent());
+
             InitNavigationBar();
             InitializeView();
         }
@@ -393,12 +406,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             switch (PlatformConfig.Preferences.UseTemplate)
             {
                 case Preferences.TemplateUsageMode.Default:
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
+
                     await InsertDefaultTemplate();
                     break;
                 case Preferences.TemplateUsageMode.Local:
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
+
                     await InsertLocalTemplate();
                     break;
                 case Preferences.TemplateUsageMode.AlwaysAsk:
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
+
                     var templateListStrings = new[]
                     {
                         Localization.GetString("template_selection_default"),
@@ -464,16 +483,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return;
 
             if (source == 0)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
                 await InsertTemplate();
+            }
 
             if (source == 1)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
                 InsertNewPhoto(d);
+            }
 
             if (source == 2)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.PickPhoto));
                 InsertExistingPhoto(d);
+            }
 
             if (source == 3)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 InsertFile(d);
+            }
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
@@ -1019,8 +1050,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InsertNewPhoto(PopoverPresentationControllerDelegate d)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
-
             var picker = new UIImagePickerController
             {
                 AllowsEditing = false,
@@ -1037,8 +1066,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InsertExistingPhoto(PopoverPresentationControllerDelegate d)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.PickPhoto));
-
             var picker = new UIImagePickerController
             {
                 AllowsEditing = false,
@@ -1054,8 +1081,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InsertFile(PopoverPresentationControllerDelegate d)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
-
             var picker = new UIDocumentPickerViewController(new[]
             {
                 "public.content",
