@@ -6,10 +6,11 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
-using Mark5.Mobile.Common.Storage;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -89,9 +90,9 @@ namespace Mark5.Mobile.Common.Manager
                     Token = Token,
                     SavedSearchFilterHash = criteria.SavedSearchFilterHash,
                     MaxToFetch = criteria.MaxToFetch,
-                    SubjectMessageField = criteria.SubjectMessageField,
+                    SubjectMessageField = criteria.SubjectMessageField.SanitizeForSearch(),
                     SubjectMessageClause = criteria.SubjectMessageClause.ConvertEnum<DataContract.SubjectMessageClause>(),
-                    FromToField = criteria.FromToField,
+                    FromToField = criteria.FromToField.SanitizeForSearch(),
                     FromToClause = criteria.FromToClause.ConvertEnum<DataContract.FromToClause>(),
                     SearchInAttachments = criteria.SearchInAttachments,
                     Unread = criteria.UnreadOnly,
