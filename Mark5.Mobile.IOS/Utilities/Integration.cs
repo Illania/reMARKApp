@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using ObjCRuntime;
 using PCLStorage;
 using UIKit;
 
@@ -30,6 +32,46 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static bool IsIPhone() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
         public static bool IsIPad() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
+
+        #endregion
+
+        #region Model recognition
+
+        const string HardwareProperty = "hw.machine";
+
+        [DllImport(Constants.SystemLibrary)]
+        static extern int sysctlbyname([MarshalAs(UnmanagedType.LPStr)] string property, IntPtr output, IntPtr oldLen, IntPtr newp, uint newlen);
+
+        public static string GetModelNumber()
+        {
+            try
+            {
+                var pLen = Marshal.AllocHGlobal(sizeof(int));
+                sysctlbyname(HardwareProperty, IntPtr.Zero, pLen, IntPtr.Zero, 0);
+
+                var length = Marshal.ReadInt32(pLen);
+
+                if (length == 0)
+                {
+                    Marshal.FreeHGlobal(pLen);
+                    return "Unknown";
+                }
+
+                var pStr = Marshal.AllocHGlobal(length);
+                sysctlbyname(HardwareProperty, pStr, pLen, IntPtr.Zero, 0);
+
+                var hardwareStr = Marshal.PtrToStringAnsi(pStr);
+
+                Marshal.FreeHGlobal(pLen);
+                Marshal.FreeHGlobal(pStr);
+
+                return hardwareStr;
+            }
+            catch
+            {
+                return "Unknown";
+            }
+        }
 
         #endregion
 
