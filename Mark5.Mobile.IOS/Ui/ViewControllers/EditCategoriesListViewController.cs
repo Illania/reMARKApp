@@ -105,7 +105,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cancelItem = null;
             doneItem = null;
 
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
             ((DataSource)TableView.Source)?.Reset();
+
+            searchController.SearchResultsUpdater = null;
+            searchController = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -144,7 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_contacts"));
+            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_categories"));
             searchResultsController.TableView.Source = searchResultsDataSource;
             searchResultsController.TableView.EstimatedRowHeight = 40f;
             searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -256,16 +264,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var searchText = searchController.SearchBar.Text;
 
-            if (!searchController.Active)
-                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, ModuleType.Contacts));
-
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 
                 var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
-                ((DataSource)dataSource)?.Reset();
+                ((SearchDataSource)dataSource)?.Reset();
             }
             else
             {
@@ -286,7 +291,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async void DoSearchCategories(string searchText, CancellationToken ct)
         {
             var tableViewController = searchController?.SearchResultsController as UITableViewController;
-            var dataSource = tableViewController?.TableView?.Source as DataSource;
+            var dataSource = tableViewController?.TableView?.Source as SearchDataSource;
             dataSource?.Reset();
 
             await Task.Delay(500);
@@ -459,7 +464,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = base.GetCell(tableView, indexPath);
-                cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+
+                if (cell is CategoriesTableViewCell)
+                    cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+
                 return cell;
             }
 
