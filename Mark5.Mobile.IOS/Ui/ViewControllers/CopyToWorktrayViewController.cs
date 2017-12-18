@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -285,6 +286,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             public override nint NumberOfSections(UITableView tableView) => 2;
+
+            public override string[] SectionIndexTitles(UITableView tableView)
+            {
+                var sectionIndexTitles = items.Select(cp => cp.Username.SafeSubstring(0, 1).ToUpper()).Distinct();
+                if (sectionIndexTitles.Any())
+                    sectionIndexTitles = sectionIndexTitles.Prepend("#");
+                return sectionIndexTitles.ToArray();
+            }
+
+            public override nint SectionFor(UITableView tableView, string title, nint atIndex)
+            {
+                if (title == "#")
+                {
+                    tableView.ScrollToRow(NSIndexPath.FromRowSection(0, 0), UITableViewScrollPosition.Top, true);
+                    return -1;
+                }
+
+                var row = items.FindIndex(cp => cp.Username.SafeSubstring(0, 1).ToUpper() == title);
+                if (row >= 0)
+                    tableView.ScrollToRow(NSIndexPath.FromRowSection(row, 1), UITableViewScrollPosition.Top, true);
+
+                return -1;
+            }
 
             public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
 
