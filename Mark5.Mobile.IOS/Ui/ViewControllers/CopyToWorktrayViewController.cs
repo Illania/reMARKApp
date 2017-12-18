@@ -283,11 +283,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
 
-                DoSearchCategories(searchText, searchCancellationTokenSource.Token);
+                DoSearchSystemUsers(searchText, searchCancellationTokenSource.Token);
             }
         }
 
-        async void DoSearchCategories(string searchText, CancellationToken ct)
+        async void DoSearchSystemUsers(string searchText, CancellationToken ct)
         {
             var tableViewController = searchController?.SearchResultsController as UITableViewController;
             var dataSource = tableViewController?.TableView?.Source as SearchDataSource;
