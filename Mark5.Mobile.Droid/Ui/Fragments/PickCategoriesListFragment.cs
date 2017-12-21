@@ -57,8 +57,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(ObjectTypeBundleKey))
                 objectType = (ObjectType)Arguments.GetInt(ObjectTypeBundleKey);
 
@@ -69,7 +71,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (savedInstanceState?.ContainsKey(AvailableCategoriesKey) == true)
                 availableCategories = Serializer.Deserialize<List<Category>>(savedInstanceState.GetString(AvailableCategoriesKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -118,8 +123,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (availableCategories != null)
                 outState.PutString(AvailableCategoriesKey, Serializer.Serialize(availableCategories));
 
-            if (selectedCategories != null)
-                outState.PutIntArray(SelectedCategoryIdsBundleKey, selectedCategories.Keys.ToArray());
+            if (selectedCategories != null || selectedCategoryIds != null)
+                outState.PutIntArray(SelectedCategoryIdsBundleKey, selectedCategories?.Keys?.ToArray() ?? selectedCategoryIds);
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

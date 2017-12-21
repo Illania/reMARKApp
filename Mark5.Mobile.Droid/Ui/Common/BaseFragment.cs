@@ -8,6 +8,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
     {
         bool publishVisibilityNotifications;
 
+        protected bool Restored
+        {
+            get; private set;
+        }
+
         public override bool UserVisibleHint
         {
             get => base.UserVisibleHint;
@@ -37,6 +42,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             UserVisibleHint = false;
         }
 
+        public override void OnCreate(Android.OS.Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            Restored = savedInstanceState != null;
+        }
         public override void OnResume()
         {
             base.OnResume();

@@ -77,8 +77,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(FolderIdBundleKey))
                 folderId = Arguments.GetInt(FolderIdBundleKey);
 
@@ -93,7 +95,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(NotificationGuidBundleKey))
                 NotificationGuid = Serializer.Deserialize<Guid>(Arguments.GetString(NotificationGuidBundleKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodeFragment)} [folder.name={folder?.Name}, folder.id={folderId ?? folder?.Id}, shortcodeId={shortcodeId ?? shortcodePreview?.Id}...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -387,13 +392,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (force || (shortcodeId.HasValue && shortcodePreview == null && shortcode == null))
                 {
-                    var container = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId ?? folder?.Id, shortcodeId ?? shortcodePreview.Id);
+                    var sourceType = (Restored && !force) ? SourceType.Local : SourceType.Auto;
+
+                    var container = await Managers.ShortcodesManager.GetShortcodeWithPreviewAsync(folderId ?? folder?.Id, shortcodeId ?? shortcodePreview.Id, sourceType);
                     shortcodePreview = container.ShortcodePreview;
                     shortcode = container.Shortcode;
                 }
 
                 if (shortcodePreview != null && shortcode == null)
-                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folderId ?? folder?.Id, shortcodePreview.Id);
+                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folderId ?? folder?.Id, shortcodePreview.Id, Restored ? SourceType.Local : SourceType.Auto);
 
                 RefreshView();
             }

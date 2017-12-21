@@ -24,7 +24,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
-        const string SystemUsersKey = "SystemUsers_8b67db42-df77-4340-b840-1ebe2f4c937b";
         const string SelectedSystemUsersKey = "SelectedSystemUsers_f2f7fa81-a3c0-4b3d-9b24-c2ecd360ae92";
 
         List<IBusinessEntity> businessEntities;
@@ -55,11 +54,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(BusinessEntitiesBundleKey))
                 businessEntities = Serializer.Deserialize<List<IBusinessEntity>>(Arguments.GetString(BusinessEntitiesBundleKey));
 
+            if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
+            {
+                var selectedUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
+
+                selectedSystemUsers.Clear();
+                foreach (var s in selectedUsers)
+                    selectedSystemUsers.Add(s.Id, s);
+            }
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
@@ -113,26 +126,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState?.ContainsKey(SystemUsersKey) == true)
-            {
-                CommonConfig.Logger.Info($"Restoring state...");
-
-                var systemUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SystemUsersKey));
-
-                if (savedInstanceState.ContainsKey(SelectedSystemUsersKey))
-                {
-                    var selectedUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
-
-                    selectedSystemUsers.Clear();
-                    foreach (var s in selectedUsers)
-                        selectedSystemUsers.Add(s.Id, s);
-                }
-
-                adapter.SetItems(systemUsers);
-
-                UpdateControls();
-            }
-
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
@@ -157,11 +150,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.Items != null)
-                outState.PutString(SystemUsersKey, Serializer.Serialize(adapter.Items));
-
             if (selectedSystemUsers != null)
-                outState.PutString(SystemUsersKey, Serializer.Serialize(selectedSystemUsers.Values));
+                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(selectedSystemUsers.Values));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -191,10 +181,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Refreshing = true;
+                if (!Restored)
+                    refreshLayout.Refreshing = true;
 
-                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(Restored ? SourceType.Local : SourceType.Auto);
                 adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
+                UpdateControls();
             }
             catch (Exception ex)
             {

@@ -25,7 +25,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class NotificationsListFragment : BaseFragment
     {
         const string ObjectTypesBundleKey = "ObjectTypes_0df8f79a-884b-4d2b-93ce-8141f1111cc5";
-        const string NotificationsKey = "Notifications_cfc1530b-e526-4495-ada1-16ae9718458c";
 
         ObjectType[] objectTypes;
         List<Notification> notifications;
@@ -53,16 +52,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (Arguments.ContainsKey(ObjectTypesBundleKey))
+                objectTypes = Serializer.Deserialize<ObjectType[]>(Arguments.GetString(ObjectTypesBundleKey));
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(ObjectTypesBundleKey))
-                objectTypes = Serializer.Deserialize<ObjectType[]>(Arguments.GetString(ObjectTypesBundleKey));
-
-            if (savedInstanceState?.ContainsKey(NotificationsKey) == true)
-                notifications = Serializer.Deserialize<List<Notification>>(savedInstanceState.GetString(NotificationsKey));
-
             CommonConfig.Logger.Info($"Creating {nameof(NotificationsListFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -129,14 +130,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.MessengerHub.Unsubscribe<NewNotificationsReceivedMessage>(newNotificationsToken);
         }
 
-        public override void OnSaveInstanceState(Bundle outState)
-        {
-            base.OnSaveInstanceState(outState);
-
-            if (notifications != null)
-                outState.PutString(NotificationsKey, Serializer.Serialize(notifications));
-        }
-
         #endregion
 
         #region Options menu
@@ -178,9 +171,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Refreshing = true;
+                if (!Restored)
+                    refreshLayout.Refreshing = true;
 
-                notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken,
+                                                                                          Restored ? SourceType.Local : SourceType.Auto);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
 
                 adapter.Clear();

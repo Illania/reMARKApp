@@ -29,7 +29,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected const string ActionButtonTextResIdBundleKey = "ActionButtonTextResId_0482d7d6-a109-4a78-8075-f69455052af2";
         protected const string IncludeCurrentUserBundleKey = "IncludeCurrentUser_470297d6-812a-4ae8-8528-e85355aa7da7";
         protected const string AllowNoUserSelectedBundleKey = "AllowNoUserSelected_fca35857-47a0-45c7-b8e1-d5bd4ff8bf39";
-        protected const string SystemUsersKey = "SystemUsers_cf15bc94-215a-48dc-bce5-26c3b4ec5903";
         protected const string SelectedSystemUsersKey = "SelectedSystemUsers_124e4282-1191-4d17-9615-c7a6c3d8d0a4";
 
         protected UserSelectionAdapter Adapter;
@@ -45,10 +44,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected bool includeCurrentUser;
         protected bool allowNoUserSelected;
 
+        List<SystemUser> systemUsers;
+
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(PreselectedUserIdsBundleKey))
                 preselectedUserIds = Serializer.Deserialize<List<int>>(Arguments.GetString(PreselectedUserIdsBundleKey));
 
@@ -61,6 +64,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Arguments.ContainsKey(AllowNoUserSelectedBundleKey))
                 allowNoUserSelected = Arguments.GetBoolean(AllowNoUserSelectedBundleKey);
 
+            if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
+                preselectedUserIds = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(SelectedSystemUsersKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(AbstractUserSelectionFragment)} {GetInfo()}");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
@@ -98,23 +107,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState?.ContainsKey(SystemUsersKey) == true)
-            {
-                CommonConfig.Logger.Info($"Restoring state...");
-
-                Adapter.SetItems(Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SystemUsersKey)));
-
-                if (savedInstanceState.ContainsKey(SelectedSystemUsersKey))
-                {
-                    var selected = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
-                    SelectedSystemUsers.Clear();
-                    foreach (var kv in selected)
-                        SelectedSystemUsers.Add(kv.Id, kv);
-                }
-
-                UpdateControls();
-            }
-
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
@@ -139,11 +131,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (Adapter?.Items != null)
-                outState.PutString(SystemUsersKey, Serializer.Serialize(Adapter.Items));
-
             if (SelectedSystemUsers != null)
-                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(SelectedSystemUsers.Values.ToList()));
+                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(SelectedSystemUsers.Values.Select(u => u.Id).ToList()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -173,9 +162,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Refreshing = true;
+                if (!Restored)
+                    refreshLayout.Refreshing = true;
 
-                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(Restored ? SourceType.Local : SourceType.Auto);
                 if (includeCurrentUser)
                     Adapter.SetItems(userDepartments.Users.OrderBy(su => su.Username).ToList());
                 else

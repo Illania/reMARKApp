@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         TabLayout tabLayout;
         ViewPager pager;
 
+        int savedCurrentPageIndex = -1;
+
         public static FoldersNotificationsListFragment NewInstance()
         {
             return new FoldersNotificationsListFragment();
@@ -48,11 +50,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments?.ContainsKey(RemoteFolderBundleKey) == true)
                 remoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
 
+            if (savedInstanceState?.ContainsKey(SelectedTabKey) == true)
+                savedCurrentPageIndex = savedInstanceState.GetInt(SelectedTabKey);
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsListFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.pager, container, false);
@@ -79,8 +89,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState?.ContainsKey(SelectedTabKey) == true)
-                pager.CurrentItem = savedInstanceState.GetInt(SelectedTabKey);
+            if (savedCurrentPageIndex >= 0)
+                pager.CurrentItem = savedCurrentPageIndex;
 
             if (remoteFolder.Root)
                 remoteFolder = Folder.RootForModule(remoteFolder.Module);
@@ -110,8 +120,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (pager != null)
-                outState.PutInt(SelectedTabKey, pager.CurrentItem);
+            if (pager != null || savedCurrentPageIndex >= 0)
+                outState.PutInt(SelectedTabKey, pager?.CurrentItem ?? savedCurrentPageIndex);
         }
 
         void ViewPager.IOnPageChangeListener.OnPageScrollStateChanged(int state)

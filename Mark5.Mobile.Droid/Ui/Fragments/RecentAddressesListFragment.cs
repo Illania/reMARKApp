@@ -36,11 +36,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (savedInstanceState?.ContainsKey(RecentAddressesKey) == true)
                 recentAddresses = Serializer.Deserialize<List<RecentAddress>>(savedInstanceState.GetString(RecentAddressesKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(RecentAddressesListFragment)}");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);

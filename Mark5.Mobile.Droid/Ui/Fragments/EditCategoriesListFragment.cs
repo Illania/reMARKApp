@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -30,7 +29,6 @@ namespace Mark5.Mobile.Droid
         readonly Handler searchHandler = new Handler();
 
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_730da2d5-20b7-487f-b118-0053ced930af";
-        const string AvailableCategoriesKey = "AvailableCategoires_79b2e3d3-887e-4d9b-8b1f-77e2b235cb82";
         const string SelectedCategoriesKey = "SelectedCategories_4d6b9cb9-d133-4d8b-8695-14c9d4d4af72";
 
         BusinessEntityPreview businessEntityPreview;
@@ -59,11 +57,23 @@ namespace Mark5.Mobile.Droid
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(BusinessEntityPreviewBundleKey))
                 businessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
 
+            if (savedInstanceState?.ContainsKey(SelectedCategoriesKey) == true)
+            {
+                var selected = Serializer.Deserialize<List<Category>>(savedInstanceState.GetString(SelectedCategoriesKey));
+                foreach (var s in selected)
+                    selectedCategories.Add(s.Id, s);
+            }
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(EditCategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
@@ -96,20 +106,6 @@ namespace Mark5.Mobile.Droid
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState?.ContainsKey(AvailableCategoriesKey) == true)
-            {
-                adapter.SetItems(Serializer.Deserialize<List<Category>>(savedInstanceState.GetString(AvailableCategoriesKey)));
-
-                selectedCategories.Clear();
-
-                if (savedInstanceState.ContainsKey(SelectedCategoriesKey))
-                {
-                    var selected = Serializer.Deserialize<List<Category>>(savedInstanceState.GetString(SelectedCategoriesKey));
-                    foreach (var s in selected)
-                        selectedCategories.Add(s.Id, s);
-                }
-            }
-
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
@@ -132,9 +128,6 @@ namespace Mark5.Mobile.Droid
         public override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
-
-            if (adapter?.Items != null)
-                outState.PutString(AvailableCategoriesKey, Serializer.Serialize(adapter.Items));
 
             if (selectedCategories != null)
                 outState.PutString(SelectedCategoriesKey, Serializer.Serialize(selectedCategories.Values.ToList()));
@@ -198,16 +191,17 @@ namespace Mark5.Mobile.Droid
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Refreshing = true;
+                if (!Restored)
+                    refreshLayout.Refreshing = true;
 
                 List<Category> availableCategories;
                 switch (businessEntityPreview.ObjectType)
                 {
                     case ObjectType.Document:
-                        availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
+                        availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
                         break;
                     case ObjectType.Contact:
-                        availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
+                        availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
                         break;
                     default:
                         throw new ArgumentException("The business entity provided does not have categories in the model");

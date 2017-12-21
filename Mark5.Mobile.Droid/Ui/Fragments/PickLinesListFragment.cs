@@ -43,13 +43,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (savedInstanceState?.ContainsKey(SelectedLinesGuidBundleKey) == true)
                 selectedLinesGuid = Serializer.Deserialize<List<Guid>>(savedInstanceState.GetString(SelectedLinesGuidBundleKey));
             else if (Arguments.ContainsKey(SelectedLinesGuidBundleKey))
                 selectedLinesGuid = Serializer.Deserialize<List<Guid>>(Arguments.GetString(SelectedLinesGuidBundleKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(PickLinesListFragment)}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -90,8 +95,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.SelectedLinesGuid != null)
-                outState.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(adapter.SelectedLinesGuid));
+            if (adapter?.SelectedLinesGuid != null || selectedLinesGuid != null)
+                outState.PutString(SelectedLinesGuidBundleKey, Serializer.Serialize(adapter?.SelectedLinesGuid ?? selectedLinesGuid));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

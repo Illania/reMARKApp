@@ -41,8 +41,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
-        const string DocumentPreviewsKey = "DocumentPreviews_b4509169-c29a-4d43-abce-31585b29e639";
         const string SelectedDocumentPreviewsKey = "SelectedDocumentPreviews_9d33e0b7-9791-4ee9-82bd-73af5c0b5716";
+        const string FirstRowIdKey = "FirstRowId_ab73aa33-930f-4139-94b1-b7828d5f4de7";
+        const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c";
+
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
@@ -63,6 +65,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
 
+        int savedFirstRowId = -1;
+        int savedLastRowId = -1;
+        List<DocumentPreview> savedSelectedDocumentPreviews;
+
         AutoRefreshWorker autoRefreshWorker;
 
         public static (DocumentsListFragment fragment, string tag) NewInstance(Folder folder)
@@ -80,13 +86,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (Arguments.ContainsKey(FolderBundleKey))
+                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
+
+            if (savedInstanceState?.ContainsKey(SelectedDocumentPreviewsKey) == true)
+                savedSelectedDocumentPreviews = Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(SelectedDocumentPreviewsKey));
+
+            if (savedInstanceState?.ContainsKey(FirstRowIdKey) == true)
+                savedFirstRowId = savedInstanceState.GetInt(FirstRowIdKey);
+
+            if (savedInstanceState?.ContainsKey(LastRowIdKey) == true)
+                savedLastRowId = savedInstanceState.GetInt(LastRowIdKey);
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(FolderBundleKey))
-                Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
-
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -148,30 +168,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-
-            if (savedInstanceState?.ContainsKey(DocumentPreviewsKey) == true)
-            {
-                CommonConfig.Logger.Info($"Restoring state...");
-
-                var dps = Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(DocumentPreviewsKey));
-
-                List<DocumentPreview> selectedDps = null;
-
-                if (savedInstanceState.ContainsKey(SelectedDocumentPreviewsKey))
-                    selectedDps = Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(SelectedDocumentPreviewsKey));
-
-                adapter.AppendItems(dps);
-
-                if (selectedDps?.Count > 0)
-                {
-                    actionMode?.Finish();
-                    actionMode = Activity.StartActionMode(this);
-
-                    adapter.SetSelected(selectedDps, true);
-                    actionMode.Title = adapter.SelectedItemCount.ToString();
-                    actionMode.Invalidate();
-                }
-            }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
@@ -235,11 +231,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.Items != null)
-                outState.PutString(DocumentPreviewsKey, Serializer.Serialize(adapter.Items));
+            if (adapter?.SelectedItems != null || savedSelectedDocumentPreviews != null)
+                outState.PutString(SelectedDocumentPreviewsKey, Serializer.Serialize(adapter?.SelectedItems ?? savedSelectedDocumentPreviews));
 
-            if (adapter?.SelectedItems != null)
-                outState.PutString(SelectedDocumentPreviewsKey, Serializer.Serialize(adapter.SelectedItems));
+            if (adapter?.Items?.Any() == true)
+            {
+                outState.PutInt(FirstRowIdKey, adapter.Items.First().Id);
+                outState.PutInt(LastRowIdKey, adapter.Items.Last().Id);
+            }
+            else
+            {
+                outState.PutInt(FirstRowIdKey, savedFirstRowId);
+                outState.PutInt(LastRowIdKey, savedLastRowId);
+            }
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -345,7 +349,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+                List<DocumentPreview> documentPreviews;
+
+                if (Restored && savedLastRowId != -1 && savedFirstRowId != -1)
+                {
+                    documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, savedFirstRowId, savedLastRowId, SourceType.Local);
+                    savedLastRowId = savedFirstRowId = -1;
+                }
+                else
+                {
+                    documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+                }
                 adapter.EnableLoadMore = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {adapter.EnableLoadMore}");
 
@@ -353,6 +367,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     adapter.Clear();
 
                 adapter.AppendItems(documentPreviews);
+
+                if (savedSelectedDocumentPreviews?.Count > 0)
+                {
+                    actionMode?.Finish();
+                    actionMode = Activity.StartActionMode(this);
+
+                    adapter.SetSelected(savedSelectedDocumentPreviews, true);
+                    actionMode.Title = adapter.SelectedItemCount.ToString();
+                    actionMode.Invalidate();
+
+                    savedSelectedDocumentPreviews = null;
+                }
 
                 Services.DocumentsDownloadService.Notify();
             }

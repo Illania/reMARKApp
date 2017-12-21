@@ -43,13 +43,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (savedInstanceState?.ContainsKey(SelectedPrioritiesBundleKey) == true)
                 selectedPriorities = Serializer.Deserialize<List<Priority>>(savedInstanceState.GetString(SelectedPrioritiesBundleKey));
             else if (Arguments.ContainsKey(SelectedPrioritiesBundleKey))
                 selectedPriorities = Serializer.Deserialize<List<Priority>>(Arguments.GetString(SelectedPrioritiesBundleKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(PickPrioritiesListFragment)}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -90,8 +95,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.SelectedPriorities != null)
-                outState.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(adapter.SelectedPriorities));
+            if (adapter?.SelectedPriorities != null || selectedPriorities != null)
+                outState.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(adapter?.SelectedPriorities ?? selectedPriorities));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
