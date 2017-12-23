@@ -83,6 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CancellationTokenSource loadCts;
 
         bool refreshDataOnAppear;
+        bool disableDoneButton;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
@@ -280,7 +281,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 rightButtons[1] = previousDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
             }
-            else
+            else if (!disableDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -578,7 +579,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.notificationGuid = notificationGuid;
         }
 
-        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview,
+                           bool disableDoneButton)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
 
@@ -588,6 +590,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folderId = null;
             folder = null;
             notificationGuid = default(Guid);
+            this.disableDoneButton = disableDoneButton;
 
             this.documentPreview = documentPreview;
             GetNextDocumentPreview = getNextDocumentPreview;
@@ -820,7 +823,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void RefreshNavigationBar()
         {
-            if (PresentingViewController == null)
+            if (PresentingViewController == null && nextDocumentButtonItem != null && previousDocumentButtonItem != null)
             {
                 bool _na;
                 bool _pa;
