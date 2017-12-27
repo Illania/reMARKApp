@@ -35,6 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         Shortcode shortcode;
 
         bool refreshDataOnAppear;
+        bool hideDoneButton;
 
         UIView headerView;
         UILabel nameLabel;
@@ -230,7 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
             }
-            else
+            else if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -422,7 +423,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodePreview = shortcodePreview;
         }
 
-        public void SetData(ShortcodePreview shortcodePreview)
+        public void SetData(ShortcodePreview shortcodePreview, bool hideDoneButton)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
 
@@ -431,6 +432,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             shortcodeId = null;
             shortcode = null;
 
+            this.hideDoneButton = hideDoneButton;
             this.shortcodePreview = shortcodePreview;
         }
 

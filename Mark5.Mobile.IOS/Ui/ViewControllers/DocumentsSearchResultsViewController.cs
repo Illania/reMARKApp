@@ -266,7 +266,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void DocumentSelected(DocumentPreview documentPreview)
         {
             var vc = new DocumentViewController();
-            vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
+            vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview, true);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
         }

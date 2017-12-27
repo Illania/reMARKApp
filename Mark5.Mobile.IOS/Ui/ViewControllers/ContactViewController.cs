@@ -35,6 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         Contact contact;
 
         bool refreshDataOnAppear;
+        bool hideDoneButton;
 
         UIView headerView;
         UILabel nameLabel;
@@ -330,7 +331,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
             }
-            else
+            else if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -694,7 +695,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.UsageAnalytics.LogEvent(new ContactNavigateSubContactEvent());
 
             var vc = new ContactViewController();
-            vc.SetData(contactPreview);
+            vc.SetData(contactPreview, false);
             vc.SetRefreshDataOnAppear();
             PresentViewController(new NavigationController(vc), true, null);
         }
@@ -732,7 +733,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.contactPreview = contactPreview;
         }
 
-        public void SetData(ContactPreview contactPreview)
+        public void SetData(ContactPreview contactPreview, bool hideDoneButton)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
@@ -741,6 +742,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             contactId = null;
             contact = null;
 
+            this.hideDoneButton = hideDoneButton;
             this.contactPreview = contactPreview;
         }
 

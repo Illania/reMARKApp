@@ -224,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void ContactSelected(UITableView tableView, ContactPreview contactPreview)
         {
             var vc = new ContactViewController();
-            vc.SetData(contactPreview);
+            vc.SetData(contactPreview, true);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
         }
