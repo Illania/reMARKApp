@@ -1,7 +1,6 @@
 ﻿using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
-using System;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -31,6 +30,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string RemoveLineKey = "RemoveLine";
             public const string UseTemplateKey = "UseTemplate";
             public const string LocalTemplateKey = "LocalTemplate";
+            public const string AlwaysUseDefaultLineKey = "AlwaysUseDefaultLine";
 
             public const string DocumentsToSearchKey = "DocumentsToSearch";
             public const string ContactsToSearchKey = "ContactsToSearch";
@@ -95,6 +95,9 @@ namespace Mark5.Mobile.IOS.Utilities
                     new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1)
                 },
                 {
+                    new NSString(Keys.AlwaysUseDefaultLineKey), NSNumber.FromBoolean(false)
+                },
+                {
                     new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250)
                 },
                 {
@@ -154,6 +157,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public bool ComposePriorityEnabled => ud.BoolForKey(Keys.ComposePriorityEnabledKey);
 
         public bool RemoveLine => ud.BoolForKey(Keys.RemoveLineKey);
+
+        public bool AlwaysUseDefaultLine => ud.BoolForKey(Keys.AlwaysUseDefaultLineKey);
 
         public TemplateUsageMode UseTemplate => (TemplateUsageMode)(int)ud.IntForKey(Keys.UseTemplateKey);
 

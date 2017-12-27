@@ -433,8 +433,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList(), Folder);
-                adapter.RemoveItems(CurrentAdapter.SelectedItems);
-                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
 
                 dismissAction();
                 ActionMode?.Finish();
@@ -462,8 +460,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.Delete(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
-                adapter.RemoveItems(CurrentAdapter.SelectedItems);
-                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
 
                 dismissAction();
                 ActionMode?.Finish();
@@ -620,14 +616,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     shouldNotifyAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    adapter.RemoveItemAtPosition(position);
                 }
 
                 position = searchAdapter.GetPosition(entityId);
                 if (position >= 0)
                 {
                     shouldNotifySearchAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    searchAdapter.RemoveItemAtPosition(position);
                 }
             }
         }
@@ -640,14 +636,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     shouldNotifyAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    adapter.RemoveItemAtPosition(position);
                 }
 
                 position = searchAdapter.GetPosition(entityId);
                 if (position >= 0)
                 {
                     shouldNotifySearchAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    searchAdapter.RemoveItemAtPosition(position);
                 }
             }
         }
@@ -736,6 +732,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         NotifyItemRemoved(position);
                     }
                 }
+            }
+
+            public void RemoveItemAtPosition(int position)
+            {
+                Items.RemoveAt(position);
+                NotifyItemRemoved(position);
             }
 
             public bool IsSelected(ShortcodePreview shortcodePreview)

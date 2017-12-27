@@ -7,6 +7,7 @@
 "advanced" = "Advanced";
 "always_ask" = "Always ask";
 "always_ask_short" = "Ask";
+"always_use_default_line" = "Always use default mailbox";
 "anyone" = "Anyone";
 "cache" = "Cache";
 "clean_cache_interval_days" = "Compact cache every";
@@ -40,7 +41,7 @@
 "open_settings_app" = "Open Settings app";
 "partial_word_search" = "Partial word search";
 "plain" = "Plain Text";
-"remove_line" = "Remove line address";
+"remove_line" = "Remove mailbox address";
 "search" = "Search";
 "security" = "Security";
 "security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server can be intercepted.";
