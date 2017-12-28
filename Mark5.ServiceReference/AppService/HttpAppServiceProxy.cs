@@ -72,16 +72,17 @@ namespace Mark5.ServiceReference.AppService
 
             var dcs = new DataContractSerializer(typeof(P));
             var sw = new StringWriterWithEncoding(Encoding.UTF8);
-            using (var w = XmlWriter.Create(sw, new XmlWriterSettings
-            {
-                OmitXmlDeclaration = false,
-                Encoding = Encoding.UTF8,
-                ConformanceLevel = ConformanceLevel.Document,
-                NewLineHandling = NewLineHandling.None,
-                NamespaceHandling = NamespaceHandling.OmitDuplicates,
-                CheckCharacters = true,
-                Indent = false
-            }))
+            using (var w = XmlWriter.Create(sw,
+                new XmlWriterSettings
+                {
+                    OmitXmlDeclaration = false,
+                    Encoding = Encoding.UTF8,
+                    ConformanceLevel = ConformanceLevel.Document,
+                    NewLineHandling = NewLineHandling.None,
+                    NamespaceHandling = NamespaceHandling.OmitDuplicates,
+                    CheckCharacters = true,
+                    Indent = false
+                }))
             {
                 w.WriteStartDocument();
                 w.WriteStartElement("s", "Envelope", "http://schemas.xmlsoap.org/soap/envelope/");
@@ -106,83 +107,79 @@ namespace Mark5.ServiceReference.AppService
 
         async Task<R> ProcessResponse<R>(string soapAction, HttpResponseMessage res) where R : class
         {
-            var responseContent = await res.Content.ReadAsStringAsync();
-
-            var doc = new XmlDocument();
-            doc.LoadXml(responseContent);
-
-            var envelope = doc.DocumentElement;
-            if (envelope.LocalName != "Envelope")
-                throw new SOAPException("Envelope not found.");
-
-            var body = envelope.FirstChild;
-            if (body.LocalName != "Body")
-                throw new SOAPException("Body not found.");
-
-            var response = body.FirstChild;
-
             if (res.StatusCode == HttpStatusCode.OK)
             {
-                if (response.LocalName == typeof(R).Name.Replace("Result", "Response"))
-                    return ParseResponse<R>(body);
+                var responseContent = await res.Content.ReadAsStringAsync();
 
-                if (response.LocalName == "Fault")
-                    throw ParseFault(body, res.StatusCode);
+                var doc = new XmlDocument();
+                doc.LoadXml(responseContent);
 
-                throw new SOAPException($"Invalid response. {soapAction}Response or Fault not found.");
+                var envelope = doc.DocumentElement;
+                if (envelope.LocalName != "Envelope")
+                    throw new SOAPException("Envelope not found.");
+
+                var body = envelope.FirstChild;
+                if (body.LocalName != "Body")
+                    throw new SOAPException("Body not found.");
+
+                var response = body.FirstChild;
+                if (response.LocalName != typeof(R).Name.Replace("Result", "Response"))
+                    throw new SOAPException($"{soapAction}Response not found.");
+
+                var resultContent = response.InnerXml;
+
+                var dcs = new DataContractSerializer(typeof(R));
+                var sb = new StringReader(resultContent);
+                using (var r = XmlReader.Create(sb,
+                    new XmlReaderSettings
+                    {
+                        CheckCharacters = false,
+                        ConformanceLevel = ConformanceLevel.Fragment
+                    }))
+                {
+                    var result = dcs.ReadObject(r);
+                    return (R)result;
+                }
             }
 
             if (res.StatusCode == HttpStatusCode.InternalServerError)
             {
-                if (response.LocalName == "Fault")
-                    throw ParseFault(body, res.StatusCode);
+                var responseContent = await res.Content.ReadAsStringAsync();
 
-                throw new SOAPException($"Invalid response. Fault not found.");
+                var doc = new XmlDocument();
+                doc.LoadXml(responseContent);
+
+                var envelope = doc.DocumentElement;
+                if (envelope.LocalName != "Envelope")
+                    throw new SOAPException("Envelope not found.");
+
+                var body = envelope.FirstChild;
+                if (body.LocalName != "Body")
+                    throw new SOAPException("Body not found.");
+
+                var fault = body.FirstChild;
+
+                var faultString = fault.ChildNodes[1].InnerText;
+                var faultDetailContent = fault.ChildNodes[2].InnerXml;
+                AppServiceFaultDetail faultDetail = null;
+
+                var dcs = new DataContractSerializer(typeof(AppServiceFaultDetail));
+                var sb = new StringReader(faultDetailContent);
+                using (var r = XmlReader.Create(sb,
+                    new XmlReaderSettings
+                    {
+                        CheckCharacters = false,
+                        ConformanceLevel = ConformanceLevel.Fragment
+                    }))
+                {
+                    var result = dcs.ReadObject(r);
+                    faultDetail = (AppServiceFaultDetail)result;
+                }
+
+                throw new HttpAppServiceException(res.StatusCode, faultString, faultDetail);
             }
 
             throw new HttpAppServiceException(res.StatusCode, "Invalid status code received.");
-        }
-
-        static R ParseResponse<R>(XmlNode body) where R : class
-        {
-            var response = body.FirstChild;
-
-            var resultContent = response.InnerXml;
-
-            var dcs = new DataContractSerializer(typeof(R));
-            var sb = new StringReader(resultContent);
-            using (var r = XmlReader.Create(sb, new XmlReaderSettings
-            {
-                CheckCharacters = false,
-                ConformanceLevel = ConformanceLevel.Fragment
-            }))
-            {
-                var result = dcs.ReadObject(r);
-                return (R)result;
-            }
-        }
-
-        static HttpAppServiceException ParseFault(XmlNode body, HttpStatusCode statusCode)
-        {
-            var fault = body.FirstChild;
-
-            var faultString = fault.ChildNodes[1].InnerText;
-            var faultDetailContent = fault.ChildNodes[2].InnerXml;
-            AppServiceFaultDetail faultDetail = null;
-
-            var dcs = new DataContractSerializer(typeof(AppServiceFaultDetail));
-            var sb = new StringReader(faultDetailContent);
-            using (var r = XmlReader.Create(sb, new XmlReaderSettings
-            {
-                CheckCharacters = false,
-                ConformanceLevel = ConformanceLevel.Fragment
-            }))
-            {
-                var result = dcs.ReadObject(r);
-                faultDetail = (AppServiceFaultDetail)result;
-            }
-
-            return new HttpAppServiceException(statusCode, faultString, faultDetail);
         }
 
         public async Task<AuthenticateResult> AuthenticateAsync(AuthenticateParameters parameters, CancellationToken ct = default(CancellationToken))

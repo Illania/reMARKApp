@@ -7,7 +7,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
@@ -103,12 +102,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll ||
                 DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
             {
-                if (PlatformConfig.Preferences.AlwaysUseDefaultLine && defaultOutgoingLine != null)
-                {
-                    SetLine(defaultOutgoingLine);
-                    return Task.CompletedTask;
-                }
-
                 if (availableOutgoingLines.Count == 1)
                 {
                     SetLine(availableOutgoingLines.FirstOrDefault());

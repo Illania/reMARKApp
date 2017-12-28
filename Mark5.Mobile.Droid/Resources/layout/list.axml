@@ -14,7 +14,6 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
             app:fastScrollPopupBackgroundColor="@color/darkblue"
             app:fastScrollPopupBackgroundSize="60dp"
             app:fastScrollPopupTextColor="@color/lightgray"

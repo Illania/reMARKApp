@@ -87,12 +87,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll ||
                 DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
             {
-                if (PlatformConfig.Preferences.AlwaysUseDefaultLine && defaultOutgoingLine != null)
-                {
-                    SetLine(defaultOutgoingLine);
-                    return Task.CompletedTask;
-                }
-
                 if (availableOutgoingLines.Count == 1)
                 {
                     SetLine(availableOutgoingLines.FirstOrDefault());
