@@ -393,6 +393,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 autoSaveWorkingCopyWorker?.Stop();
                 autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
                 autoSaveWorkingCopyWorker.Start();
+
+                UpdateTitle();
             }
             catch (Exception ex)
             {
@@ -729,9 +731,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Subviews Event Handlers
 
-        void Subview_Edited(object sender, EventArgs e)
+        void UpdateTitle()
         {
             Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+        }
+
+        void Subview_Edited(object sender, EventArgs e)
+        {
+            UpdateTitle();
             sendButtonItem.Enabled = IsFormValid();
 
             if (sender is LineView

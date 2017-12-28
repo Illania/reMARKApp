@@ -741,16 +741,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EndRefreshing(bool withError = false)
         {
-            spinner.StopAnimating();
+            spinner?.StopAnimating();
 
             if (withError)
                 return;
 
-            View.SendSubviewToBack(backgroundView);
+            View?.SendSubviewToBack(backgroundView);
             UIView.Animate(0.25, () =>
             {
-                backgroundView.Alpha = 0f;
-                mainScrollView.Alpha = 1f;
+                if (backgroundView != null)
+                    backgroundView.Alpha = 0f;
+
+                if (mainScrollView != null)
+                    mainScrollView.Alpha = 1f;
             });
         }
 
