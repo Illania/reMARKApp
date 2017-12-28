@@ -359,6 +359,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { contactPreview }, folder);
 
                 dismissAction();
+                Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -624,7 +625,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void RefreshTitle()
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = contactPreview?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = contactPreview?.CompanyName;
+
+            if (contactPreview.Type == ContactType.Person)
+            {
+                if (!string.IsNullOrEmpty(contactPreview?.CompanyName) && !string.IsNullOrEmpty(contact?.Position))
+                {
+                    ((AppCompatActivity)Activity).SupportActionBar.Subtitle = $"{contact.Position} @ {this.contactPreview.CompanyName}";
+                }
+                else
+                {
+                    string subtitle = string.Empty;
+                    subtitle += contact.Position;
+                    subtitle += contactPreview.CompanyName;
+
+                    ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
+                }
+            }
+            else
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = contactPreview?.CompanyName;
 
             descriptionCardTitle.Text = $"About {contactPreview?.Name}";
         }
