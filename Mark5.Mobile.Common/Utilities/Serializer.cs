@@ -1,18 +1,20 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace Mark5.Mobile.Common.Utilities
 {
     public static class Serializer
     {
-        static readonly JsonSerializer jsonSerializer;
+        static readonly JsonSerializer jsonSerializer = JsonSerializer.Create(CreateDefaultSettings());
 
-        static Serializer()
+        static JsonSerializerSettings CreateDefaultSettings()
         {
-            var jsSettings = new JsonSerializerSettings
+            return new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All,
                 DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
@@ -23,10 +25,28 @@ namespace Mark5.Mobile.Common.Utilities
                     new VersionConverter()
                 }
             };
-            jsonSerializer = JsonSerializer.Create(jsSettings);
         }
 
         #region string
+
+        public static string SerializeSelectively<T>(T obj, (Type Type, string FieldName)[] fieldsToExclude)
+        {
+            var settings = CreateDefaultSettings();
+            settings.ContractResolver = new ShouldSerializeContractResolver(fieldsToExclude);
+
+            var js = JsonSerializer.Create(settings);
+
+            using (var w = new StringWriter())
+            {
+                js.Serialize(w, obj, typeof(T));
+                return w.ToString();
+            }
+        }
+
+        public static Task<string> SerializeSelectivelyAsync<T>(T obj, (Type Type, string FieldName)[] fieldsToExclude)
+        {
+            return Task.Run(() => { return SerializeSelectively(obj, fieldsToExclude); });
+        }
 
         public static string Serialize<T>(T obj)
         {
@@ -123,5 +143,28 @@ namespace Mark5.Mobile.Common.Utilities
         }
 
         #endregion
+
+        class ShouldSerializeContractResolver : DefaultContractResolver
+        {
+            readonly (Type Type, string FieldName)[] fieldsToExclude;
+
+            public ShouldSerializeContractResolver((Type Type, string FieldName)[] fieldsToExclude)
+            {
+                this.fieldsToExclude = fieldsToExclude;
+            }
+
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            {
+                var p = base.CreateProperty(member, memberSerialization);
+
+                foreach (var fieldToExclude in fieldsToExclude)
+                {
+                    if (p.DeclaringType == fieldToExclude.Type && p.PropertyName == fieldToExclude.FieldName)
+                        p.ShouldSerialize = i => false;
+                }
+
+                return p;
+            }
+        }
     }
 }

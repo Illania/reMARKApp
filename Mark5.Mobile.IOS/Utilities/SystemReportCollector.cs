@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using MessageUI;
@@ -81,6 +82,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("Name: " + UIDevice.CurrentDevice.Name);
             sb.AppendLine("UserInterfaceIdiom: " + UIDevice.CurrentDevice.UserInterfaceIdiom.ToString());
             sb.AppendLine("Model: " + UIDevice.CurrentDevice.Model);
+            sb.AppendLine("Model number: " + Integration.GetModelNumber());
             sb.AppendLine("LocalizedModel: " + UIDevice.CurrentDevice.LocalizedModel);
             sb.AppendLine("SystemName: " + UIDevice.CurrentDevice.SystemName);
             sb.AppendLine("SystemVersion: " + UIDevice.CurrentDevice.SystemVersion);
@@ -101,7 +103,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");
-            sb.AppendLine(Serializer.Serialize(ServerConfig.SystemSettings));
+            sb.AppendLine(Serializer.SerializeSelectively(ServerConfig.SystemSettings, new[] { (typeof(ContactsModuleInfo), nameof(ContactsModuleInfo.Countries)) }));
             sb.AppendLine();
 
             sb.AppendLine("===== Memory information =====");

@@ -83,6 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CancellationTokenSource loadCts;
 
         bool refreshDataOnAppear;
+        bool hideDoneButton;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
@@ -280,7 +281,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 rightButtons[1] = previousDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
             }
-            else
+            else if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -530,7 +531,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             draftSentToken?.Dispose();
         }
 
-        public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview,
+                            GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
 
@@ -578,7 +580,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.notificationGuid = notificationGuid;
         }
 
-        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview,
+                            GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview, bool hideDoneButton)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
 
@@ -589,6 +592,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folder = null;
             notificationGuid = default(Guid);
 
+            this.hideDoneButton = hideDoneButton;
             this.documentPreview = documentPreview;
             GetNextDocumentPreview = getNextDocumentPreview;
             GetPreviousDocumentPreview = getPreviousDocumentPreview;
@@ -737,16 +741,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EndRefreshing(bool withError = false)
         {
-            spinner.StopAnimating();
+            spinner?.StopAnimating();
 
             if (withError)
                 return;
 
-            View.SendSubviewToBack(backgroundView);
+            View?.SendSubviewToBack(backgroundView);
             UIView.Animate(0.25, () =>
             {
-                backgroundView.Alpha = 0f;
-                mainScrollView.Alpha = 1f;
+                if (backgroundView != null)
+                    backgroundView.Alpha = 0f;
+
+                if (mainScrollView != null)
+                    mainScrollView.Alpha = 1f;
             });
         }
 
@@ -820,7 +827,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void RefreshNavigationBar()
         {
-            if (PresentingViewController == null)
+            if (PresentingViewController == null && previousDocumentButtonItem != null && nextDocumentButtonItem != null)
             {
                 bool _na;
                 bool _pa;

@@ -266,7 +266,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void DocumentSelected(DocumentPreview documentPreview)
         {
             var vc = new DocumentViewController();
-            vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
+            vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview, true);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
         }
@@ -676,7 +676,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Items.Count;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading || Empty)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {

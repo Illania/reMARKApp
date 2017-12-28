@@ -1221,7 +1221,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Items.Count;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading || Empty)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -1387,14 +1393,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             if (cts.IsCancellationRequested)
                                 break;
 
-                            var first = firstOrDefaultItem();
-                            if (first != null)
+                            await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
                             {
-                                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
+                                var first = firstOrDefaultItem?.Invoke();
+                                if (first != null)
                                 {
-                                    await work(first.Id);
-                                });
-                            }
+                                    if (work != null)
+                                        await work(first.Id);
+                                }
+                            });
                         }
                     });
                 }
