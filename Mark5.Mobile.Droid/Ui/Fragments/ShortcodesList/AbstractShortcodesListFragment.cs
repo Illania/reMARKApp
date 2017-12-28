@@ -46,6 +46,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool refreshing;
 
+        List<ShortcodePreview> savedSelectedShortcodes;
+        bool savedRefreshInProgress;
+
         IMenu menu;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -60,11 +63,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(FolderBundleKey))
                 Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
 
+            savedRefreshInProgress = savedInstanceState?.ContainsKey(RefreshInProgressKey) == true && savedInstanceState.GetBoolean(RefreshInProgressKey);
+
+            if (savedInstanceState?.ContainsKey(SelectedShortcodePreviewsKey) == true)
+                savedSelectedShortcodes = savedInstanceState.ContainsKey(SelectedShortcodePreviewsKey) ?
+                                                              Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(SelectedShortcodePreviewsKey)) : null;
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(AbstractShortcodesListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -115,35 +129,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-
-            if (savedInstanceState?.ContainsKey(ShortcodePreviewsKey) == true)
-            {
-                CommonConfig.Logger.Info($"Restoring state...");
-
-                var shortcodePreviews = Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(ShortcodePreviewsKey));
-
-                adapter.AppendItems(shortcodePreviews);
-
-                var refreshInProgress = savedInstanceState.ContainsKey(RefreshInProgressKey) && savedInstanceState.GetBoolean(RefreshInProgressKey);
-                var selectedShortcodePreviews = savedInstanceState.ContainsKey(SelectedShortcodePreviewsKey) ?
-                                                                  Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(SelectedShortcodePreviewsKey)) : null;
-                if (refreshInProgress)
-                {
-                    CommonConfig.Logger.Info($"Refresh was in progress before - will continue...");
-
-                    RefreshData(shortcodePreviews[shortcodePreviews.Count - 1].RowId);
-                }
-
-                if (selectedShortcodePreviews?.Count > 0)
-                {
-                    ActionMode?.Finish();
-                    ActionMode = Activity.StartActionMode(this);
-
-                    adapter.SetSelected(selectedShortcodePreviews, true);
-                    ActionMode.Title = adapter.SelectedItemCount.ToString();
-                    ActionMode.Invalidate();
-                }
-            }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.shortcodes);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
@@ -243,10 +228,59 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (refreshing)
                 return;
 
+            var isSavedOffline = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder);
+
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            if (!isSavedOffline && Restored && !force && adapter?.ItemCount == 0) //TODO to test heavily
+            {
+                Managers.ShortcodesManager.GetAllShortcodePreviews(Folder,
+                    cps =>
+                    {
+                        Activity.RunOnUiThread(() => adapter.AppendItems(cps));
+                    },
+                    () =>
+                    {
+                        if (savedRefreshInProgress && adapter.Items?.Any() == true)
+                        {
+                            RefreshData(adapter.Items.Last().Id);
+                            savedRefreshInProgress = false;
+                        }
+                        else
+                        {
+                            if (savedSelectedShortcodes?.Count > 0)
+                            {
+                                ActionMode?.Finish();
+                                ActionMode = Activity.StartActionMode(this);
+
+                                adapter.SetSelected(savedSelectedShortcodes, true);
+                                ActionMode.Title = adapter.SelectedItemCount.ToString();
+                                ActionMode.Invalidate();
+                                savedSelectedShortcodes = null;
+                            }
+                        }
+                    },
+                    ex =>
+                    {
+                        CommonConfig.Logger.Error($"Downloading shortcodes failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
+
+                        Dialogs.ShowErrorDialog(Activity, ex);
+
+                        if (adapter.ItemCount < 1)
+                            Activity?.OnBackPressed();
+                    },
+                    -1,
+                    cts.Token,
+                    SourceType.Local);
+
+                return;
+            }
+
             refreshing = true;
             refreshLayout.Refreshing = true;
 
-            if (force && !skipOfflineCheck && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            if (force && !skipOfflineCheck && isSavedOffline)
             {
                 var result = await Dialogs.ShowYesNoCancelDialogAsync(Activity,
                                                                       Resource.String.folder_offline_title,
@@ -276,11 +310,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Refresh running...");
 
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
             if (force)
                 adapter.Clear();
+
+            var sourceType = isSavedOffline ? SourceType.Local : SourceType.Auto;
+
 
             Managers.ShortcodesManager.GetAllShortcodePreviews(Folder,
                 cps =>
@@ -305,8 +339,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (adapter.ItemCount < 1)
                         Activity?.OnBackPressed();
                 },
-                startRowId,
-                cts.Token);
+                startRowId, cts.Token, sourceType);
         }
 
         #endregion

@@ -35,10 +35,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         protected const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
-        protected const string ContactPreivewsKey = "ContactPreviewsKey_f1a16a22-134d-4694-8ece-35e992536b89";
         protected const string SelectedContactPreviewsKey = "SelectedContactPreviews_ce01f4c3-6106-440c-b606-3ed89f97d51b";
         protected const string RefreshInProgressKey = "RefrehInProgressKey_48b4bc29-5b38-48c4-bb24-6494bbcd063c";
 
+        List<ContactPreview> savedSelectedContactPreviews;
+        bool savedRefreshInProgress;
 
         bool refreshing;
 
@@ -56,11 +57,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(FolderBundleKey))
                 Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
 
+            if (savedInstanceState?.ContainsKey(SelectedContactPreviewsKey) == true)
+                savedSelectedContactPreviews = Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(SelectedContactPreviewsKey));
+
+            savedRefreshInProgress = savedInstanceState?.GetBoolean(RefreshInProgressKey) ?? false;
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -116,42 +127,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
-
-            if (savedInstanceState != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state...");
-
-                List<ContactPreview> contactPreviews = null;
-                List<ContactPreview> selectedContactPreviews = null;
-
-                if (savedInstanceState.ContainsKey(ContactPreivewsKey))
-                    contactPreviews = Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(ContactPreivewsKey));
-                if (savedInstanceState.ContainsKey(SelectedContactPreviewsKey))
-                    selectedContactPreviews = Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(SelectedContactPreviewsKey));
-
-                bool refreshInProgress = savedInstanceState.GetBoolean(RefreshInProgressKey);
-
-                if (contactPreviews == null)
-                    return;
-
-                adapter.AppendItems(contactPreviews);
-
-                if (refreshInProgress)
-                {
-                    CommonConfig.Logger.Info("Refresh was in progress before - will continue...");
-                    RefreshData(contactPreviews[contactPreviews.Count - 1].RowId);
-                }
-
-                if (selectedContactPreviews?.Count > 0)
-                {
-                    ActionMode?.Finish();
-                    ActionMode = Activity.StartActionMode(this);
-
-                    adapter.SetSelected(selectedContactPreviews, true);
-                    ActionMode.Title = adapter.SelectedItemCount.ToString();
-                    ActionMode.Invalidate();
-                }
-            }
         }
 
         public override void OnResume()
@@ -202,9 +177,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.Items != null)
-                outState.PutString(ContactPreivewsKey, Serializer.Serialize(adapter.Items));
-
             if (adapter?.SelectedItems != null)
                 outState.PutString(SelectedContactPreviewsKey, Serializer.Serialize(adapter.SelectedItems));
 
@@ -250,10 +222,59 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (refreshing)
                 return;
 
+            var isSavedOffline = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder);
+
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            if (!isSavedOffline && Restored && !force && adapter?.ItemCount == 0) //TODO to test heavily
+            {
+                Managers.ContactsManager.GetAllContactPreviews(Folder,
+                    cps =>
+                    {
+                        Activity.RunOnUiThread(() => adapter.AppendItems(cps));
+                    },
+                    () =>
+                    {
+                        if (savedRefreshInProgress && adapter.Items?.Any() == true)
+                        {
+                            RefreshData(adapter.Items.Last().Id);
+                            savedRefreshInProgress = false;
+                        }
+                        else
+                        {
+                            if (savedSelectedContactPreviews?.Count > 0)
+                            {
+                                ActionMode?.Finish();
+                                ActionMode = Activity.StartActionMode(this);
+
+                                adapter.SetSelected(savedSelectedContactPreviews, true);
+                                ActionMode.Title = adapter.SelectedItemCount.ToString();
+                                ActionMode.Invalidate();
+                                savedSelectedContactPreviews = null;
+                            }
+                        }
+                    },
+                    ex =>
+                    {
+                        CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
+
+                        Dialogs.ShowErrorDialog(Activity, ex);
+
+                        if (adapter.ItemCount < 1)
+                            Activity?.OnBackPressed();
+                    },
+                    -1,
+                    cts.Token,
+                    SourceType.Local);
+
+                return;
+            }
+
             refreshing = true;
             refreshLayout.Refreshing = true;
 
-            if (force && !skipOfflineCheck && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            if (force && !skipOfflineCheck && isSavedOffline)
             {
                 var result = await Dialogs.ShowYesNoCancelDialogAsync(Activity,
                                                                       Resource.String.folder_offline_title,
@@ -283,13 +304,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Refresh running...");
 
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
             if (force)
                 adapter.Clear();
 
-            var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
+            var sourceType = isSavedOffline ? SourceType.Local : SourceType.Auto;
 
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
@@ -302,6 +320,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     refreshing = false;
 
                     CommonConfig.Logger.Info($"Refresh finished");
+
+                    if (savedSelectedContactPreviews?.Count > 0)
+                    {
+                        ActionMode?.Finish();
+                        ActionMode = Activity.StartActionMode(this);
+
+                        adapter.SetSelected(savedSelectedContactPreviews, true);
+                        ActionMode.Title = adapter.SelectedItemCount.ToString();
+                        ActionMode.Invalidate();
+                        savedSelectedContactPreviews = null;
+                    }
                 },
                 ex =>
                 {

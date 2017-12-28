@@ -89,8 +89,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(FolderIdBundleKey))
                 folderId = Arguments.GetInt(FolderIdBundleKey);
 
@@ -105,6 +107,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(NotificationGuidBundleKey))
                 notificationGuid = Serializer.Deserialize<Guid>(Arguments.GetString(NotificationGuidBundleKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
 
             CommonConfig.Logger.Info($"Creating {nameof(ContactFragment)} [folder.id={folderId ?? folder?.Id}, contact.id={contactId ?? contactPreview?.Id}...");
 
@@ -574,23 +580,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             try
             {
+                var source = (Restored && !force) ? SourceType.Local : SourceType.Auto;
+
                 if (notificationGuid != default(Guid))
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
 
                 if (force)
                 {
-                    var contactContainer = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId ?? folder?.Id, contactId ?? contactPreview.Id);
+                    var contactContainer = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId ?? folder?.Id, contactId ?? contactPreview.Id, source);
                     contactPreview = contactContainer.ContactPreview;
                     contact = contactContainer.Contact;
                 }
                 else if (contactId.HasValue && contactPreview == null && contact == null)
                 {
-                    var contactContainer = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId ?? folder?.Id, contactId.Value);
+                    var contactContainer = await Managers.ContactsManager.GetContactWithPreviewAsync(folderId ?? folder?.Id, contactId.Value, source);
                     contactPreview = contactContainer.ContactPreview;
                     contact = contactContainer.Contact;
                 }
                 else if (contactPreview != null && contact == null)
-                    contact = await Managers.ContactsManager.GetContactAsync(folderId ?? folder?.Id, contactPreview.Id);
+                    contact = await Managers.ContactsManager.GetContactAsync(folderId ?? folder?.Id, contactPreview.Id, source);
 
                 RefreshView();
             }

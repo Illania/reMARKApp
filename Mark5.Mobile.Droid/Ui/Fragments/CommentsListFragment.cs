@@ -21,7 +21,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public List<Comment> Comments => adapter.Items;
 
         const string BusinessEntityBundleKey = "BusinessEntity_d475f087-b641-494d-b56b-152e945b0823";
-        const string CommentsKey = "Comments_d84c0988-62f6-4a77-8cd2-b5b9821b3e6c";
         const string CommentTextKey = "CommentText_d70c2cb7-bb9c-495f-9bc9-c3616f18d7be";
 
         const int SecondsToEdit = 60;
@@ -33,6 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AppCompatEditText addCommentEditText;
         AppCompatImageButton addCommentButton;
+
+        string savedCommentText;
 
         public static (CommentsListFragment fragment, string tag) NewInstance(BusinessEntity be)
         {
@@ -51,11 +52,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(BusinessEntityBundleKey))
                 entity = Serializer.Deserialize<BusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
 
+            if (savedInstanceState?.ContainsKey(CommentTextKey) == true)
+                savedCommentText = savedInstanceState.GetString(CommentTextKey);
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_comments, container, false);
@@ -99,14 +108,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState?.ContainsKey(CommentTextKey) == true)
-                addCommentEditText.Text = savedInstanceState.GetString(CommentTextKey);
-
-            if (savedInstanceState?.ContainsKey(CommentsKey) == true)
-                adapter.AppendItems(Serializer.Deserialize<List<Comment>>(savedInstanceState.GetString(CommentsKey)));
-
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.comments);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
+
+            if (!string.IsNullOrEmpty(savedCommentText))
+            {
+                addCommentEditText.Text = savedCommentText;
+                savedCommentText = null;
+            }
 
             CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]");
         }
@@ -131,9 +140,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!string.IsNullOrEmpty(addCommentEditText?.Text))
                 outState.PutString(CommentTextKey, addCommentEditText.Text);
-
-            if (adapter?.Items != null)
-                outState.PutString(CommentsKey, Serializer.Serialize(adapter.Items));
         }
 
         public void RefreshView()
