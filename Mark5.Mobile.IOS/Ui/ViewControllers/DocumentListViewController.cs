@@ -1404,14 +1404,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             if (cts.IsCancellationRequested)
                                 break;
 
-                            var first = firstOrDefaultItem();
-                            if (first != null)
+                            await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
                             {
-                                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
+                                var first = firstOrDefaultItem?.Invoke();
+                                if (first != null)
                                 {
-                                    await work(first.Id);
-                                });
-                            }
+                                    if (work != null)
+                                        await work(first.Id);
+                                }
+                            });
                         }
                     });
                 }
