@@ -101,8 +101,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
 
             if (Arguments.ContainsKey(ContactIdBundleKey))
                 contactId = Arguments.GetInt(ContactIdBundleKey);
@@ -131,6 +132,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else if (Arguments.ContainsKey(ParentContactPreviewBundleKey))
                 parentContactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ParentContactPreviewBundleKey));
 
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={contactId ?? contactPreview?.Id}, " +
                                      $"type={contactType}, mode={creationModeFlag}]...");
 

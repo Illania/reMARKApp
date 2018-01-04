@@ -76,9 +76,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(ShortcodeCreationModeFlagBundleKey))
                 creationModeFlag = (ShortcodeCreationModeFlag)Arguments.GetInt(ShortcodeCreationModeFlagBundleKey);
 
@@ -91,7 +92,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 shortcodePreview = Serializer.Deserialize<ShortcodePreview>(savedInstanceState.GetString(ShortcodePreviewBundleKey));
             else if (Arguments.ContainsKey(ShortcodePreviewBundleKey))
                 shortcodePreview = Serializer.Deserialize<ShortcodePreview>(Arguments.GetString(ShortcodePreviewBundleKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(AddEditShortcodeFragment)} [shortcode.id={shortcodePreview?.Id}, " +
                                      $" mode={creationModeFlag}]...");
 
