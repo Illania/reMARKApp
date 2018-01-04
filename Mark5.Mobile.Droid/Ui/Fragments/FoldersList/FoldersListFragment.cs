@@ -214,7 +214,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             SetSections();
             RefreshData();
-            RestoreSelection();
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -247,8 +246,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
-
-            actionMode?.Finish();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -323,12 +320,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info("Restoring selected items");
 
-            if (recoveredSelectedItemsPosition != null && recoveredSelectedItemsPosition.Any())
+            if (recoveredSelectedItemsPosition?.Any() == true)
             {
                 actionMode = Activity.StartActionMode(this);
                 Adapter.SetSelection(recoveredSelectedItemsPosition);
                 actionMode.Title = Adapter.SelectedItemsCount.ToString();
                 actionMode.Invalidate();
+                recoveredSelectedItemsPosition = null;
             }
         }
 
@@ -403,6 +401,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshLocal();
 
             RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
+
+            RestoreSelection();
         }
 
         async Task RefreshRemote(bool forceRefresh = false)

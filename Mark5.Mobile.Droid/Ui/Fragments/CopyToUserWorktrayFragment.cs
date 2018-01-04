@@ -151,7 +151,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnSaveInstanceState(outState);
 
             if (selectedSystemUsers != null)
-                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(selectedSystemUsers.Values));
+                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(selectedSystemUsers.Values.ToList()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

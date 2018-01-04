@@ -236,8 +236,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (adapter?.Items?.Any() == true)
             {
-                outState.PutInt(FirstRowIdKey, adapter.Items.First().Id);
-                outState.PutInt(LastRowIdKey, adapter.Items.Last().Id);
+                outState.PutInt(FirstRowIdKey, adapter.Items.First().Id + 1); //To comply with the DB query we use
+                outState.PutInt(LastRowIdKey, adapter.Items.Last().Id - 1);
             }
             else
             {

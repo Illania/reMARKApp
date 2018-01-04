@@ -14,6 +14,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -227,50 +228,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts?.Cancel();
             cts = new CancellationTokenSource();
 
-            if (!isSavedOffline && Restored && !force && adapter?.ItemCount == 0) //TODO to test heavily
-            {
-                Managers.ContactsManager.GetAllContactPreviews(Folder,
-                    cps =>
-                    {
-                        Activity.RunOnUiThread(() => adapter.AppendItems(cps));
-                    },
-                    () =>
-                    {
-                        if (savedRefreshInProgress && adapter.Items?.Any() == true)
-                        {
-                            RefreshData(adapter.Items.Last().Id);
-                            savedRefreshInProgress = false;
-                        }
-                        else
-                        {
-                            if (savedSelectedContactPreviews?.Count > 0)
-                            {
-                                ActionMode?.Finish();
-                                ActionMode = Activity.StartActionMode(this);
-
-                                adapter.SetSelected(savedSelectedContactPreviews, true);
-                                ActionMode.Title = adapter.SelectedItemCount.ToString();
-                                ActionMode.Invalidate();
-                                savedSelectedContactPreviews = null;
-                            }
-                        }
-                    },
-                    ex =>
-                    {
-                        CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
-
-                        Dialogs.ShowErrorDialog(Activity, ex);
-
-                        if (adapter.ItemCount < 1)
-                            Activity?.OnBackPressed();
-                    },
-                    -1,
-                    cts.Token,
-                    SourceType.Local);
-
-                return;
-            }
-
             refreshing = true;
             refreshLayout.Refreshing = true;
 
@@ -307,7 +264,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (force)
                 adapter.Clear();
 
-            var sourceType = isSavedOffline ? SourceType.Local : SourceType.Auto;
+            var sourceType = (isSavedOffline || Restored) ? SourceType.Local : SourceType.Auto;
 
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
@@ -336,7 +293,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
-                    Dialogs.ShowErrorDialog(Activity, ex);
+                    if (!(ex is DataNotFoundException && Restored))
+                        Dialogs.ShowErrorDialog(Activity, ex);
 
                     if (adapter.ItemCount < 1)
                         Activity?.OnBackPressed();

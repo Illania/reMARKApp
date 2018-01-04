@@ -44,8 +44,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected bool includeCurrentUser;
         protected bool allowNoUserSelected;
 
-        List<SystemUser> systemUsers;
-
         #region Fragment overrides
 
         public override void OnCreate(Bundle savedInstanceState)
