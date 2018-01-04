@@ -10,6 +10,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(CategoriesTableViewCell));
 
+        public int CategoryId { get; private set; }
+
         readonly UIView colorView;
         readonly UILabel label;
 
@@ -54,6 +56,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(Category category)
         {
+            CategoryId = category.Id;
             colorView.BackgroundColor = UI.UIColorFromHexString(category.HexColor);
             label.Text = category.Name;
         }
