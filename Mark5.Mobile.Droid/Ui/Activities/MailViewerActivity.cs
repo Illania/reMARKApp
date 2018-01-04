@@ -251,20 +251,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         {
                             mailMessage = t.Result;
 
-                            RefreshView();
+                            await RefreshView();
                         }
                     },
                     TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void RefreshView()
+        async Task RefreshView()
         {
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
                 if (linearLayout.GetChildAt(i) is MailViewerView dv)
                 {
                     dv.MailMessage = mailMessage;
-                    dv.RefreshView();
+                    await dv.RefreshView();
 
                     if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {

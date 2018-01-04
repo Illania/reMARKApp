@@ -436,7 +436,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        void RefreshView()
+        async Task RefreshView()
         {
             var activateButtons = FailedDocumentToUploadGuid == Guid.Empty;
             if (activateButtons)
@@ -467,7 +467,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dv.DocumentPreview = DocumentPreview;
                     dv.Document = Document;
-                    dv.RefreshView();
+                    await dv.RefreshView();
 
                     if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {
@@ -483,7 +483,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.InvalidateOptionsMenu();
         }
 
-        void RefreshView<T>() where T : DocumentView
+        async Task RefreshView<T>() where T : DocumentView
         {
             progress.Visibility = ViewStates.Gone;
             relativeLayout.Visibility = ViewStates.Visible;
@@ -494,7 +494,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dv.DocumentPreview = DocumentPreview;
                     dv.Document = Document;
-                    dv.RefreshView();
+                    await dv.RefreshView();
 
                     if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {
@@ -547,7 +547,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (dp == null)
                     return;
 
-                RefreshView<RecipentsView>();
+                await RefreshView<RecipentsView>();
             }
             catch (Exception ex)
             {
@@ -585,7 +585,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, true, ServerConfig.SystemSettings.UserInfo.User);
 
-                RefreshView<RecipentsView>();
+                await RefreshView<RecipentsView>();
 
                 dismissAction();
             }
@@ -611,7 +611,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(DocumentPreview, Document, false, ServerConfig.SystemSettings.UserInfo.User);
 
-                RefreshView<RecipentsView>();
+                await RefreshView<RecipentsView>();
 
                 dismissAction();
             }
@@ -684,7 +684,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     },
                     priority);
 
-                RefreshView<PriorityView>();
+                await RefreshView<PriorityView>();
 
                 dismissAction();
             }
@@ -907,7 +907,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (DocumentPreview != null && Document == null)
                     Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
 
-                RefreshView();
+                await RefreshView();
             }
             catch (Exception ex)
             {
