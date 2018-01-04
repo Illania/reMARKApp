@@ -27,6 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string ContactPreviewsKey = "ContactPreviews_dbe9d50f-3e9e-4e20-a0d8-981cc0511e39";
 
         SearchContactsCriteria criteria;
+        List<ContactPreview> savedResults;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -49,11 +50,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(CriteriaBundleKey))
                 criteria = Serializer.Deserialize<SearchContactsCriteria>(Arguments.GetString(CriteriaBundleKey));
 
+            if (savedInstanceState?.ContainsKey(ContactPreviewsKey) == true)
+                savedResults = Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(ContactPreviewsKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ContactsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -77,10 +86,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState != null && savedInstanceState.ContainsKey(ContactPreviewsKey))
+            if (savedResults != null)
             {
                 CommonConfig.Logger.Info($"Restoring state...");
-                adapter.AppendItems(Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(ContactPreviewsKey)));
+                adapter.AppendItems(savedResults);
             }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_contacts_result);
@@ -114,8 +123,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.Items != null)
-                outState.PutString(ContactPreviewsKey, Serializer.Serialize(adapter.Items));
+            if (adapter?.Items != null || savedResults != null)
+                outState.PutString(ContactPreviewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
         }
 
         #endregion

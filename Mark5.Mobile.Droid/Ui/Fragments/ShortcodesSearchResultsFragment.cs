@@ -24,6 +24,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         SearchShortcodesCriteria criteria;
 
+        List<ShortcodePreview> savedResults;
+
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         ShortcodeSearchResultsAdapter adapter;
@@ -45,11 +47,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(SearchShortcodesCriteriaBundleKey))
                 criteria = Serializer.Deserialize<SearchShortcodesCriteria>(Arguments.GetString(SearchShortcodesCriteriaBundleKey));
 
+            if (savedInstanceState?.ContainsKey(ShortcodePreviewsKey) == true)
+                savedResults = Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(ShortcodePreviewsKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -73,10 +83,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState != null && savedInstanceState.ContainsKey(ShortcodePreviewsKey))
+            if (savedResults != null)
             {
                 CommonConfig.Logger.Info($"Restoring state...");
-                adapter.AppendItems(Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(ShortcodePreviewsKey)));
+                adapter.AppendItems(savedResults);
             }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes_result);
@@ -110,8 +120,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.Items != null)
-                outState.PutString(ShortcodePreviewsKey, Serializer.Serialize(adapter.Items));
+            if (adapter?.Items != null || savedResults != null)
+                outState.PutString(ShortcodePreviewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
         }
 
         #endregion

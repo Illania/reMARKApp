@@ -29,6 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string DocumentPreivewsKey = "DocumentPreviews_88491381-02c2-40ec-a560-d74c788fcf1e";
 
         SearchDocumentsCriteria criteria;
+        List<DocumentPreview> savedResults;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -53,11 +54,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(SearchDocumentsCriteriaBundleKey))
                 criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Arguments.GetString(SearchDocumentsCriteriaBundleKey));
 
+            if (savedInstanceState?.ContainsKey(DocumentPreivewsKey) == true)
+                savedResults = Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(DocumentPreivewsKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -81,10 +90,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            if (savedInstanceState != null && savedInstanceState.ContainsKey(DocumentPreivewsKey))
+            if (savedResults != null)
             {
                 CommonConfig.Logger.Info($"Restoring state...");
-                adapter.AppendItems(Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(DocumentPreivewsKey)));
+                adapter.AppendItems(savedResults);
             }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
@@ -124,8 +133,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (adapter?.Items != null)
-                outState.PutString(DocumentPreivewsKey, Serializer.Serialize(adapter.Items));
+            if (adapter?.Items != null || savedResults != null)
+                outState.PutString(DocumentPreivewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
         }
 
         #endregion
