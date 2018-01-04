@@ -38,7 +38,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected bool HideFab;
         protected bool LoadRemoteFromCache;
 
-        protected View Container;
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
         protected SearchView SearchView;
@@ -80,31 +79,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
-            if (Arguments != null)
-            {
-                if (Arguments.ContainsKey(RemoteFolderBundleKey))
-                    RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
+            base.OnCreate(savedInstanceState);
 
-                if (Arguments.ContainsKey(HideSearchBundleKey))
-                    HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
+            if (Arguments.ContainsKey(RemoteFolderBundleKey))
+                RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
 
-                if (Arguments.ContainsKey(HideFabBundleKey))
-                    HideFab = Arguments.GetBoolean(HideFabBundleKey);
+            if (Arguments.ContainsKey(HideSearchBundleKey))
+                HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
 
-                if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
-                    LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
-            }
+            if (Arguments.ContainsKey(HideFabBundleKey))
+                HideFab = Arguments.GetBoolean(HideFabBundleKey);
+
+            if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
+                LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
 
             if (savedInstanceState?.ContainsKey(RecoveredPositionsKey) == true)
                 recoveredSelectedItemsPosition = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(RecoveredPositionsKey));
 
             if (savedInstanceState?.ContainsKey(SubFoldersKey) == true)
                 RemoteFolder.SubFolders = Serializer.Deserialize<List<Folder>>(savedInstanceState.GetString(SubFoldersKey));
+        }
 
-            Container = container;
-
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             var rootView = InflateView(inflater, container);

@@ -131,7 +131,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 parentContactPreview = Serializer.Deserialize<ContactPreview>(savedInstanceState.GetString(ParentContactPreviewBundleKey));
             else if (Arguments.ContainsKey(ParentContactPreviewBundleKey))
                 parentContactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ParentContactPreviewBundleKey));
-
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
