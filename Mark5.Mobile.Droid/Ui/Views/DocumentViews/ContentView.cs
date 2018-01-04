@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V4.View;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Droid.Model;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -32,18 +35,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(webView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (DocumentPreview != null && Document != null)
             {
                 Visibility = ViewStates.Visible;
 
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                    webView.LoadDataWithBaseURL(null, Document.PlainTextBody ?? "Content could not be loaded.", "text/plain", "UTF-8", null);
+                    await webView.LoadPlainText(Context, Document.PlainTextBody, PlainTextProcessingConfiguration.DefaultForViewing);
                 else if (!string.IsNullOrWhiteSpace(Document.HtmlBody))
-                    webView.LoadDataWithBaseURL(null, Document.HtmlBody ?? "Content could not be loaded.", "text/html", "UTF-8", null);
+                    await webView.LoadHtml(Context, Document.HtmlBody, HtmlProcessingConfiguration.DefaultForViewing);
+                else if (!string.IsNullOrWhiteSpace(Document.PlainTextBody))
+                    await webView.LoadPlainText(Context, Document.PlainTextBody, PlainTextProcessingConfiguration.DefaultForViewing);
                 else
-                    webView.LoadDataWithBaseURL(null, Document.PlainTextBody ?? "Content could not be loaded.", "text/plain", "UTF-8", null);
+                    webView.LoadNoContentString(Context);
             }
             else
             {

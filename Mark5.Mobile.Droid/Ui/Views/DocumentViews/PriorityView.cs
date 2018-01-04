@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -32,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(message);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (DocumentPreview != null)
             {
@@ -69,6 +70,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 message.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
                 message.Text = string.Empty;
             }
+
+            return Task.CompletedTask;
         }
     }
 }
