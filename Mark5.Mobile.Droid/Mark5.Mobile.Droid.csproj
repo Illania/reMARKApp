@@ -171,9 +171,6 @@
     <Reference Include="Xamarin.Android.Support.v14.Preference">
       <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v14.Preference.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.6.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-    </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Basement">
       <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Basement.dll</HintPath>
     </Reference>
@@ -195,15 +192,17 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.6.6\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-    </Reference>
     <Reference Include="HockeySDK.AndroidBindings">
       <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
     </Reference>
     <Reference Include="HockeySDK">
       <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\MonoAndroid403\HockeySDK.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.6.10\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
@@ -437,6 +436,10 @@
     <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
     <Compile Include="Utilities\UsageAnalytics.cs" />
+    <Compile Include="Model\HtmlProcessingConfiguration.cs" />
+    <Compile Include="Model\PlainTextProcessingConfiguration.cs" />
+    <Compile Include="Utilities\HtmlUtilities.cs" />
+    <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -776,6 +779,21 @@
       <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
       <Name>MaterialDialogs</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\blank.html" />
+    <AndroidAsset Include="Assets\editor.html" />
+    <AndroidAsset Include="Assets\empty.html" />
+    <AndroidAsset Include="Assets\fonts.css" />
+    <AndroidAsset Include="Assets\insertTemplate.js" />
+    <AndroidAsset Include="Assets\plain.html" />
+    <AndroidAsset Include="Assets\replyHeader.html" />
+    <AndroidAsset Include="Assets\calibri.ttf" />
+    <AndroidAsset Include="Assets\cambria.ttf" />
+    <AndroidAsset Include="Assets\couriernew.ttf" />
+    <AndroidAsset Include="Assets\opensans.ttf" />
+    <AndroidAsset Include="Assets\tahoma.ttf" />
+    <AndroidAsset Include="Assets\trebuchetms.ttf" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets')" />
