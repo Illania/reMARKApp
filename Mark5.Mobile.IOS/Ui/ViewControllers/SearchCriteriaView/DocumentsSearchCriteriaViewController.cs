@@ -23,6 +23,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
         {
             base.LoadView();
 
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent());
+
             StackView.AddArrangedSubview(new DocumentDirectionSearchView());
             StackView.AddArrangedSubview(new MessageSubjectView());
             StackView.AddArrangedSubview(new FromToView());

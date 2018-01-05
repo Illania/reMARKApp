@@ -83,6 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CancellationTokenSource loadCts;
 
         bool refreshDataOnAppear;
+        bool hideDoneButton;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
@@ -280,7 +281,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 rightButtons[1] = previousDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
             }
-            else
+            else if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -530,8 +531,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             draftSentToken?.Dispose();
         }
 
-        public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview,
+                            GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             documentId = null;
             document = null;
@@ -546,6 +550,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
@@ -560,6 +566,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int documentId, Guid notificationGuid)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             folder = null;
@@ -572,8 +580,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.notificationGuid = notificationGuid;
         }
 
-        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview,
+                            GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview, bool hideDoneButton)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
@@ -581,6 +592,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folder = null;
             notificationGuid = default(Guid);
 
+            this.hideDoneButton = hideDoneButton;
             this.documentPreview = documentPreview;
             GetNextDocumentPreview = getNextDocumentPreview;
             GetPreviousDocumentPreview = getPreviousDocumentPreview;
@@ -588,6 +600,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, DocumentPreview documentPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
@@ -600,6 +614,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Guid failedDocumentToUploadGuid)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
+
             document = null;
             documentPreview = null;
             folder = null;
@@ -725,16 +741,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void EndRefreshing(bool withError = false)
         {
-            spinner.StopAnimating();
+            spinner?.StopAnimating();
 
             if (withError)
                 return;
 
-            View.SendSubviewToBack(backgroundView);
+            View?.SendSubviewToBack(backgroundView);
             UIView.Animate(0.25, () =>
             {
-                backgroundView.Alpha = 0f;
-                mainScrollView.Alpha = 1f;
+                if (backgroundView != null)
+                    backgroundView.Alpha = 0f;
+
+                if (mainScrollView != null)
+                    mainScrollView.Alpha = 1f;
             });
         }
 
@@ -808,7 +827,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void RefreshNavigationBar()
         {
-            if (PresentingViewController == null)
+            if (PresentingViewController == null && previousDocumentButtonItem != null && nextDocumentButtonItem != null)
             {
                 bool _na;
                 bool _pa;
@@ -849,6 +868,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
+
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentOpenAttachmentEvent());
 
             try
             {
@@ -1093,6 +1114,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void NextDocumentButton_Clicked(object sender, EventArgs args)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+
             document = null;
             documentId = null;
 
@@ -1110,6 +1133,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void PreviousDocumentButton_Clicked(object sender, EventArgs args)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+
             document = null;
             documentId = null;
 
@@ -1154,6 +1179,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(1));
+
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
 
                 dismissAction();

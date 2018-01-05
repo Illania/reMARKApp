@@ -39,6 +39,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
+
+            if (CreationModeFlag == ShortcodeCreationModeFlag.New)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenAddShortcodeEvent());
+            if (CreationModeFlag == ShortcodeCreationModeFlag.Edit)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenEditShortcodeEvent());
         }
 
         public override void ViewWillAppear(bool animated)
@@ -54,7 +59,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
         }
-
 
         public override void ViewDidAppear(bool animated)
         {
@@ -403,10 +407,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return 60.0f;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => true;
 
             public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
             {

@@ -23,16 +23,16 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.Mobile.Common.Service;
-using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class DocumentsListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
 
@@ -98,6 +98,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             refreshLayout.SetColorSchemeResources(Resource.Color.blue, Resource.Color.darkerblue);
             refreshLayout.Refresh += async (sender, e) =>
             {
+                CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(false, module: ModuleType.Documents));
+
                 actionMode?.Finish();
                 actionMode = null;
 
@@ -210,8 +212,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
-            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            filterItem.SetOnActionExpandListener(this);
+            searchView = (SearchView)filterItem.ActionView;
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
 
@@ -582,6 +584,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, true);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
                 searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
@@ -607,6 +611,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, false);
                 adapter.RefreshItems(CurrentAdapter.SelectedItems);
                 searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
@@ -696,8 +702,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.RemoveFromFolder(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList(), Folder);
-                adapter.RemoveItems(CurrentAdapter.SelectedItems);
-                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
 
                 dismissAction();
                 actionMode?.Finish();
@@ -725,8 +729,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.CommonActionsManager.Delete(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
-                adapter.RemoveItems(CurrentAdapter.SelectedItems);
-                searchAdapter.RemoveItems(CurrentAdapter.SelectedItems);
 
                 dismissAction();
                 actionMode?.Finish();
@@ -758,10 +760,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Documents));
+
                 menu?.FindItem(10)?.SetVisible(false);
 
                 refreshLayout.Enabled = false;
@@ -774,7 +778,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
@@ -946,14 +950,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     shouldNotifyAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    adapter.RemoveItemAtPosition(position);
                 }
 
                 position = searchAdapter.GetPosition(entityId);
                 if (position >= 0)
                 {
                     shouldNotifySearchAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    searchAdapter.RemoveItemAtPosition(position);
                 }
             }
         }
@@ -966,14 +970,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     shouldNotifyAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    adapter.RemoveItemAtPosition(position);
                 }
 
                 position = searchAdapter.GetPosition(entityId);
                 if (position >= 0)
                 {
                     shouldNotifySearchAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    searchAdapter.RemoveItemAtPosition(position);
                 }
             }
         }
@@ -986,14 +990,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     shouldNotifyAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    adapter.RemoveItemAtPosition(position);
                 }
 
                 position = searchAdapter.GetPosition(entityId);
                 if (position >= 0)
                 {
                     shouldNotifySearchAdapter = true;
-                    adapter.Items.RemoveAt(position);
+                    searchAdapter.RemoveItemAtPosition(position);
                 }
             }
         }
@@ -1120,7 +1124,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new GetMoreDocumentsEvent());
+
                     loadMoreAction(dp.Id);
+                }
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -1181,6 +1189,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         NotifyItemRemoved(position);
                     }
                 }
+            }
+
+            public void RemoveItemAtPosition(int position)
+            {
+                Items.RemoveAt(position);
+                NotifyItemRemoved(position);
             }
 
             public bool IsSelected(DocumentPreview documentPreview)

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using CoreGraphics;
 using Foundation;
@@ -7,6 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Common.CallId;
+using ObjCRuntime;
 using PCLStorage;
 using UIKit;
 
@@ -33,6 +35,46 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static bool IsIPhone() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
         public static bool IsIPad() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
+
+        #endregion
+
+        #region Model recognition
+
+        const string HardwareProperty = "hw.machine";
+
+        [DllImport(Constants.SystemLibrary)]
+        static extern int sysctlbyname([MarshalAs(UnmanagedType.LPStr)] string property, IntPtr output, IntPtr oldLen, IntPtr newp, uint newlen);
+
+        public static string GetModelNumber()
+        {
+            try
+            {
+                var pLen = Marshal.AllocHGlobal(sizeof(int));
+                sysctlbyname(HardwareProperty, IntPtr.Zero, pLen, IntPtr.Zero, 0);
+
+                var length = Marshal.ReadInt32(pLen);
+
+                if (length == 0)
+                {
+                    Marshal.FreeHGlobal(pLen);
+                    return "Unknown";
+                }
+
+                var pStr = Marshal.AllocHGlobal(length);
+                sysctlbyname(HardwareProperty, pStr, pLen, IntPtr.Zero, 0);
+
+                var hardwareStr = Marshal.PtrToStringAnsi(pStr);
+
+                Marshal.FreeHGlobal(pLen);
+                Marshal.FreeHGlobal(pStr);
+
+                return hardwareStr;
+            }
+            catch
+            {
+                return "Unknown";
+            }
+        }
 
         #endregion
 
@@ -230,8 +272,14 @@ namespace Mark5.Mobile.IOS.Utilities
                 var textUrl = new NSUrl("sms://" + processedNumber);
 
                 var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null);
+                }));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null);
+                }));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
@@ -260,8 +308,14 @@ namespace Mark5.Mobile.IOS.Utilities
                 var textUrl = new NSUrl("sms://" + processedNumber);
 
                 var callChooser = UIAlertController.Create(null, processedNumber, UIAlertControllerStyle.ActionSheet);
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null)));
-                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null)));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("call"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(callUrl, new NSDictionary(), null);
+                }));
+                callChooser.AddAction(UIAlertAction.Create(Localization.GetString("send_text"), UIAlertActionStyle.Default, a =>
+                {
+                    UIApplication.SharedApplication.OpenUrl(textUrl, new NSDictionary(), null);
+                }));
                 callChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
                 if (callChooser.PopoverPresentationController != null)
@@ -407,6 +461,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void CopyToClipboard(UIViewController viewController, UITableView tableView, UITableViewCell cell, string text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
             var browserChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_clipboard"), UIAlertActionStyle.Default, a => { 
                 UIPasteboard.General.String = text;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Firebase.Core;
 using Foundation;
 using HockeyApp.iOS;
 using Mark5.Mobile.Common;
@@ -43,6 +44,8 @@ namespace Mark5.Mobile.IOS
 
                 InitializeCommon();
 
+                App.Configure(); //Firebase Analytics
+
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("MARK5 initialized");
@@ -50,10 +53,12 @@ namespace Mark5.Mobile.IOS
                 BITHockeyManager.SharedHockeyManager.Configure(Config.HockeyId);
 #if DEBUG
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
+                AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(false);
 #else
                 BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = PlatformConfig.Preferences.EnableReporting
                     ? BITCrashManagerStatus.AutoSend
                     : BITCrashManagerStatus.Disabled;
+                AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
 #endif
                 BITHockeyManager.SharedHockeyManager.StartManager();
                 BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
@@ -298,6 +303,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.MessengerHub = new TinyMessengerHub();
                 CommonConfig.Phonebook = new Phonebook();
                 CommonConfig.Reachability = new Reachability();
+                CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
@@ -317,9 +323,9 @@ namespace Mark5.Mobile.IOS
                     CommonConfig.Utf8Normalizer = filename => filename;
 
 #if !DEBUG
-                CommonConfig.Logger.Level = LogLevel.INFO;
+                CommonConfig.Logger.Level = Common.Utilities.LogLevel.INFO;
 #else
-                CommonConfig.Logger.Level = LogLevel.DEBUG;
+                CommonConfig.Logger.Level = Common.Utilities.LogLevel.DEBUG;
 #endif
 
                 Dialogs.Initialize();
@@ -358,6 +364,10 @@ namespace Mark5.Mobile.IOS
                 var ci = await authenticator.GetConnectionInfoAsync();
                 CommonConfig.Logger.Info($"Current connection info: {ci}");
 
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username.ToLowerInvariant());
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
+
                 switch (ci.SslMode)
                 {
                     case SslMode.AllowSelfSigned:
@@ -377,6 +387,8 @@ namespace Mark5.Mobile.IOS
 
                 if (PlatformConfig.Preferences.ClearCache)
                 {
+                    CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
+
                     CommonConfig.Logger.Info("Clearing cache...");
                     await DatabaseUtils.ResetDatabases();
                     PlatformConfig.Preferences.ClearCache = false;

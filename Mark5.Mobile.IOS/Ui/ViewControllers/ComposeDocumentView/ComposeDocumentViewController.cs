@@ -82,6 +82,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             base.LoadView();
 
+            if (CopyToNewOption != CopyToNewOption.None)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeEditDraftEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeReplyAllEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeForwardEvent());
+            else if (DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeNewDocumentEvent());
+
             InitNavigationBar();
             InitializeView();
             InitializeSubViews();
@@ -380,6 +393,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 autoSaveWorkingCopyWorker?.Stop();
                 autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
                 autoSaveWorkingCopyWorker.Start();
+
+                UpdateTitle();
             }
             catch (Exception ex)
             {
@@ -464,6 +479,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 0)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
+
                 var picker = new UIImagePickerController
                 {
                     AllowsEditing = false,
@@ -480,6 +497,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 1)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.PickPhoto));
+
                 var picker = new UIImagePickerController
                 {
                     AllowsEditing = false,
@@ -495,6 +514,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (source == 2)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
+
                 var picker = new UIDocumentPickerViewController(new[]
                         {
                             "public.content",
@@ -624,6 +645,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(saveDraft ? Localization.GetString("saving_draft___") : Localization.GetString("sending_document___"));
 
+            if (saveDraft)
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
+
             try
             {
                 if (autoSaveWorkingCopyWorker != null)
@@ -707,9 +731,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Subviews Event Handlers
 
-        void Subview_Edited(object sender, EventArgs e)
+        void UpdateTitle()
         {
             Title = !subjectView.Empty ? subjectView.Subject : DefaultTitle;
+        }
+
+        void Subview_Edited(object sender, EventArgs e)
+        {
+            UpdateTitle();
             sendButtonItem.Enabled = IsFormValid();
 
             if (sender is LineView
@@ -795,6 +824,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
+
             try
             {
                 string path = null;
@@ -865,6 +896,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void AttachmentsView_DeleteTapped(object sender, AttachmentsView.DeleteTappedEventArgs e)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeRemoveAttachmentEvent());
+
             try
             {
                 if (e.AttachmentDescription != null)
@@ -889,6 +922,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenPhonebook(RecipientsView recipientsView)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Phonebook));
+
             var vc = new PhonebookContactsListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -899,6 +934,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenShortcodes()
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Shortcodes));
+
             var vc = new PickerShortcodesFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -914,6 +951,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenContacts(RecipientsView recipientsView)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Contacts));
+
             var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -924,6 +963,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task DoOpenRecents(RecipientsView recipientsView)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Recents));
+
             var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
 
@@ -956,7 +997,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var useTemplate = PlatformConfig.Preferences.UseTemplate;
 
             if (useTemplate == Preferences.TemplateUsageMode.DontUse)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
                 return;
+            }
 
             if (useTemplate == Preferences.TemplateUsageMode.Local)
             {
@@ -978,6 +1022,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 switch (result)
                 {
                     case -1:
+                        CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
                         break;
                     case 0:
                         await GetDefaultTemplate(true);
@@ -996,6 +1041,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task GetAllTemplates()
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
+
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
 
@@ -1006,6 +1053,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task GetLocalTemplate()
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
+
             var localTemplate = PlatformConfig.Preferences.LocalTemplate;
             await contentView.InsertLocalTemplate(localTemplate);
         }
@@ -1013,6 +1062,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async Task GetDefaultTemplate(bool errorMessageIfNull = false)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_template___"));
+
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
 
             try
             {

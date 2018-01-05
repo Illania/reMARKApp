@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Context context, string failedDocumentToUploadGuid = null, int? folderId = null, int? documentId = null, string documentPreview = null, string notificationGuid = null)
+        public static Intent CreateIntent(Context context, string failedDocumentToUploadGuid = null, int? folderId = null, int? documentId = null, DocumentPreview documentPreview = null, string notificationGuid = null)
         {
             var intent = new Intent(context, typeof(DocumentActivity));
 
@@ -87,6 +87,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(NotificationGuidIntentKey))
                     notificationGuid = Serializer.Deserialize<Guid>(Intent.Extras.GetString(NotificationGuidIntentKey));
+
+                if (documentPreview?.Direction == DocumentDirection.External)
+                    CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(true));
+                else
+                    CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
                 var (df, tag) = DocumentFragment.NewInstance(folder, folderId, documentPreview, documentId, notificationGuid, failedDocumentToUploadGuid);
 

@@ -30,6 +30,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string RemoveLineKey = "RemoveLine";
             public const string UseTemplateKey = "UseTemplate";
             public const string LocalTemplateKey = "LocalTemplate";
+            public const string AlwaysUseDefaultLineKey = "AlwaysUseDefaultLine";
 
             public const string DocumentsToSearchKey = "DocumentsToSearch";
             public const string ContactsToSearchKey = "ContactsToSearch";
@@ -95,6 +96,9 @@ namespace Mark5.Mobile.IOS.Utilities
                     new NSString(Keys.UseTemplateKey), NSNumber.FromInt16(1)
                 },
                 {
+                    new NSString(Keys.AlwaysUseDefaultLineKey), NSNumber.FromBoolean(false)
+                },
+                {
                     new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250)
                 },
                 {
@@ -140,9 +144,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool UseServerTimezone => ud.BoolForKey(Keys.UseServerTimezoneKey);
 
-        public int DocumentsToDownload => (int) ud.IntForKey(Keys.DocumentsToDownloadKey);
+        public int DocumentsToDownload => (int)ud.IntForKey(Keys.DocumentsToDownloadKey);
 
-        public int MarkAsReadDelaySeconds => (int) ud.IntForKey(Keys.MarkAsReadDelaySecondsKey);
+        public int MarkAsReadDelaySeconds => (int)ud.IntForKey(Keys.MarkAsReadDelaySecondsKey);
 
         public bool UnreadIndicatorMe => ud.BoolForKey(Keys.UnreadIndicatorMeKey);
 
@@ -158,7 +162,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool RemoveLine => ud.BoolForKey(Keys.RemoveLineKey);
 
-        public TemplateUsageMode UseTemplate => (TemplateUsageMode) (int) ud.IntForKey(Keys.UseTemplateKey);
+        public bool AlwaysUseDefaultLine => ud.BoolForKey(Keys.AlwaysUseDefaultLineKey);
+
+        public TemplateUsageMode UseTemplate => (TemplateUsageMode)(int)ud.IntForKey(Keys.UseTemplateKey);
 
         public string LocalTemplate
         {
@@ -170,15 +176,15 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public int DocumentsToSearch => (int) ud.IntForKey(Keys.DocumentsToSearchKey);
+        public int DocumentsToSearch => (int)ud.IntForKey(Keys.DocumentsToSearchKey);
 
-        public int ContactsToSearch => (int) ud.IntForKey(Keys.ContactsToSearchKey);
+        public int ContactsToSearch => (int)ud.IntForKey(Keys.ContactsToSearchKey);
 
-        public int ShortcodesToSearch => (int) ud.IntForKey(Keys.ShortcodesToSearchKey);
+        public int ShortcodesToSearch => (int)ud.IntForKey(Keys.ShortcodesToSearchKey);
 
         public bool PartialWordSearch => ud.BoolForKey(Keys.PartialWordSearchKey);
 
-        public int CleanCacheIntervalDays => (int) ud.IntForKey(Keys.CleanCacheIntervalDaysKey);
+        public int CleanCacheIntervalDays => (int)ud.IntForKey(Keys.CleanCacheIntervalDaysKey);
 
         public bool ClearCache
         {

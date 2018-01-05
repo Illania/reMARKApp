@@ -79,9 +79,11 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool RemoveLine => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_compose_remove_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_compose_remove_line_default));
 
-        public TemplateUsageMode UseTemplate => (TemplateUsageMode) int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_mode), Application.Context.GetString(Resource.String.pref_compose_template_mode_default)));
+        public TemplateUsageMode UseTemplate => (TemplateUsageMode)int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_mode), Application.Context.GetString(Resource.String.pref_compose_template_mode_default)));
 
         public string LocalTemplate => sp.GetString(Application.Context.GetString(Resource.String.pref_key_compose_template_local), Application.Context.GetString(Resource.String.pref_compose_template_local_default));
+
+        public bool AlwaysUseDefaultLine => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_always_use_default_line), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_always_use_default_line_default));
 
         #endregion
 
@@ -90,7 +92,6 @@ namespace Mark5.Mobile.Droid.Utilities
         public int MaxDocumentsToSearch => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_documents_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_documents_to_get_default)));
 
         public int MaxContactsToSearch => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_contacts_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_contacts_to_get_default)));
-
 
         public int MaxShortcodesToSearch => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_shortcodes_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_shortcodes_to_get_default)));
 

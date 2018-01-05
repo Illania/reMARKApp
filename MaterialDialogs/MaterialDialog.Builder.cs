@@ -299,7 +299,9 @@ namespace MaterialDialogs
                     if (Android.OS.Build.VERSION.SdkInt >= BuildVersionCodes.N)
                         text = Html.FromHtml(text.Replace("\n", "<br/>"), FromHtmlOptions.ModeLegacy).ToString();
                     else
-                        Html.FromHtml(text.Replace("\n", "<br/>")).ToString();
+#pragma warning disable CS0618 // Type or member is obsolete
+                        text = Html.FromHtml(text.Replace("\n", "<br/>")).ToString();
+#pragma warning restore CS0618 // Type or member is obsolete
                 }
 
                 return Content(text);
@@ -320,7 +322,9 @@ namespace MaterialDialogs
                 if (Android.OS.Build.VERSION.SdkInt >= BuildVersionCodes.N)
                     return Content(Html.FromHtml(str, FromHtmlOptions.ModeLegacy).ToString());
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 return Content(Html.FromHtml(str).ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             public Builder ContentColor([ColorInt] int color)

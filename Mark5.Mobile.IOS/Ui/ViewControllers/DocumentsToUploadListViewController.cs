@@ -237,7 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var dp = items[indexPath.Section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.UploadId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.UploadId);
-                cell.Initialize(dp.DocumentPreview);// TODO , indexPath.Section);
+                cell.Initialize(dp.DocumentPreview);
 
                 cell.SelectionStyle = indexPath.Section == Section.Failed
                     ? UITableViewCellSelectionStyle.Default
@@ -283,12 +283,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                var cell = tableView.CellAt(indexPath);
-                if (cell == null)
-                    return false;
-                if (!cell.UserInteractionEnabled)
-                    return false;
-                if (cell.SelectionStyle == UITableViewCellSelectionStyle.None)
+                if (loading || items[indexPath.Section].Count < 1)
                     return false;
 
                 return true;

@@ -50,6 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ShortcodeFragment fragment, string tag) NewInstance(int? folderId, Folder folder, int? shortcodeId, ShortcodePreview shortcodePreview, Guid? notificationGuid)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
+
             var args = new Bundle();
 
             if (folderId != null)
@@ -185,6 +187,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.CreateNewDocument)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ShortcodeComposeDocumentEvent());
+
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
@@ -358,6 +362,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (e.Type == CommunicationAddressType.Email)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new ShortcodeClickEmailEvent());
+
                 if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
                 {
                     Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);

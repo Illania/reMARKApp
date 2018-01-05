@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
@@ -424,7 +425,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #region Refreshing
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e) => RefreshData(true);
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new PullToRefreshEvent(true, ParentFolder.Module));
+            RefreshData(true);
+        }
 
         async void RefreshData(bool forceRefresh = false)
         {
@@ -575,8 +580,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #region List handlers
 
-        protected virtual void FolderSelected(Folder folder)
+        protected virtual void FolderSelected(Folder folder, bool isFromFavorite)
         {
+            if (folder == null)
+                return;
+
+            if (folder.IsOutgoing)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenOutgoingFolderEvent());
+            else
+                CommonConfig.UsageAnalytics.LogEvent(new OpenFolderEvent(folder.Module, isFromFavorite));
         }
 
         protected virtual void FolderDeselected(Folder folder)
@@ -585,6 +597,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void FolderExpand(Folder folder)
         {
+            if (folder == null)
+                return;
+
+            CommonConfig.UsageAnalytics.LogEvent(new ExpandFolderEvent(folder.Module));
         }
 
         protected virtual bool ShouldDisableFolder(Folder folder)
@@ -600,6 +616,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
+
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
                 if (TableView.Source is GrouppedDataSource gds)
@@ -636,6 +654,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
+
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 
                 if (TableView.Source is GrouppedDataSource gds)
@@ -672,6 +692,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
+
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.IOS,
                     PlatformConfig.Preferences.PushNotificationToken,
                     folder.Module,
@@ -709,6 +731,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
+
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.IOS,
                     PlatformConfig.Preferences.PushNotificationToken,
                     folder.Module,
@@ -743,6 +767,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderSyncEvent(folder.Module, 1));
+
                 await Managers.FoldersManager.AddSavedFolderInfo(folder);
 
                 if (TableView.Source is GrouppedDataSource gds)
@@ -773,6 +799,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SetFolderSyncEvent(folder.Module, 1));
+
                 await Managers.FoldersManager.RemoveSavedFolderInfo(folder);
 
                 if (TableView.Source is GrouppedDataSource gds)
@@ -811,6 +839,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {
             var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active)
+                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(true, ParentFolder.Module));
 
             if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
             {
@@ -995,7 +1026,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     return;
 
-                viewControllerWeakReference.Unwrap()?.FolderSelected(f);
+                viewControllerWeakReference.Unwrap()?.FolderSelected(f, indexPath.LongSection == 0);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
@@ -1325,7 +1356,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     return;
 
-                viewControllerWeakReference.Unwrap()?.FolderSelected(f);
+                viewControllerWeakReference.Unwrap()?.FolderSelected(f, indexPath.LongSection == 0);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
@@ -1360,7 +1391,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderExpand(f);
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (disableRowActions || loading || Empty)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -1569,7 +1606,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     return;
 
-                viewControllerWeakReference.Unwrap()?.FolderSelected(f);
+                viewControllerWeakReference.Unwrap()?.FolderSelected(f, indexPath.LongSection == 0);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)

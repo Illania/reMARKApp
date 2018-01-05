@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,18 +21,18 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid
 {
-    public class EditCategoriesListFragment : RetainableStateFragment, MenuItemCompat.IOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class EditCategoriesListFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter) recyclerView.GetAdapter();
+        CategoriesListAdapter CurrentAdapter => (CategoriesListAdapter)recyclerView.GetAdapter();
 
         readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
-        
+
         readonly Handler searchHandler = new Handler();
-        
+
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_730da2d5-20b7-487f-b118-0053ced930af";
 
         BusinessEntityPreview businessEntityPreview;
-        
+
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         SearchView searchView;
@@ -42,6 +42,8 @@ namespace Mark5.Mobile.Droid
 
         public static (EditCategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntityPreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenEditCategoriesEvent(businessEntityPreview.ModuleType));
+
             var args = new Bundle();
 
             if (businessEntityPreview != null)
@@ -116,8 +118,8 @@ namespace Mark5.Mobile.Droid
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
-            MenuItemCompat.SetOnActionExpandListener(filterItem, this);
-            searchView = (SearchView)MenuItemCompat.GetActionView(filterItem);
+            filterItem.SetOnActionExpandListener(this);
+            searchView = (SearchView)filterItem.ActionView;
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
         }
@@ -268,7 +270,7 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
@@ -280,7 +282,7 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
-        bool MenuItemCompat.IOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {

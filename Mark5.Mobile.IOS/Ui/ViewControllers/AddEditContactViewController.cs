@@ -40,6 +40,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
+            if (ParentPreselected)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenAddSubContactEvent());
+            else if (CreationModeFlag == ContactCreationModeFlag.New)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenAddContactEvent());
+            else if (CreationModeFlag == ContactCreationModeFlag.Edit)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenEditContactEvent());
+
             InitializeNavigationBar();
             InitializeView();
         }
@@ -432,10 +439,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return 60.0f;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => true;
 
             public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
             {

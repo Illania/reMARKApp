@@ -35,6 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         Shortcode shortcode;
 
         bool refreshDataOnAppear;
+        bool hideDoneButton;
 
         UIView headerView;
         UILabel nameLabel;
@@ -230,7 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
             }
-            else
+            else if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -311,6 +312,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void Button1_TouchUpInside(object sender, EventArgs e)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ShortcodeComposeDocumentEvent());
+
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
@@ -381,6 +384,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentAddressClicked(DocumentAddress documentAddress)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new ShortcodeClickEmailEvent());
+
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
@@ -396,6 +401,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(int folderId, int shortcodeId)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
+
             folder = null;
             shortcodePreview = null;
             shortcode = null;
@@ -406,6 +413,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SetData(Folder folder, ShortcodePreview shortcodePreview)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
+
             folderId = null;
             shortcodeId = null;
             shortcode = null;
@@ -414,18 +423,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodePreview = shortcodePreview;
         }
 
-        public void SetData(ShortcodePreview shortcodePreview)
+        public void SetData(ShortcodePreview shortcodePreview, bool hideDoneButton)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
+
             folderId = null;
             folder = null;
             shortcodeId = null;
             shortcode = null;
 
+            this.hideDoneButton = hideDoneButton;
             this.shortcodePreview = shortcodePreview;
         }
 
         public void SetData(int shortcodeId)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
+
             folderId = null;
             folder = null;
             shortcode = null;
@@ -921,7 +935,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 public override void OnLongClicked(WeakReference<ShortcodeViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
-                    viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, cell.TextLabel.Text);
+                    if (cell is DocumentAddressTableViewCell daCell)
+                        viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, daCell.Content);
                 }
             }
         }

@@ -19,12 +19,15 @@
 	<string name="pref_account_ssl_title">SSL</string>
 	<string name="pref_account_username_title">Username</string>
 	<string name="pref_advanced_create_system_report_summary">Create report containing current device and user information as well as MARK5 logs that you can share with Nordic IT in case of problems</string>
-	<string name="pref_advanced_create_system_report_title">Create system report</string>
+    <string name="pref_advanced_create_system_report_title">Create system report</string>
 	<string name="pref_advanced_enable_reporting_summary_off">Don\'t share anonymous usage statistics and diagnostic information with Nordic IT</string>
 	<string name="pref_advanced_enable_reporting_summary_on">Share anonymous usage statistics and diagnostic information with Nordic IT, to help improve MARK5</string>
 	<string name="pref_advanced_enable_reporting_title">Share diagnostics and usage statistics</string>
 	<string name="pref_advanced_update_config_summary">Download new configuration settings from MARK5 server</string>
 	<string name="pref_advanced_update_config_title">Update configuration</string>
+	<string name="pref_always_use_default_line_title">Always use default mailbox</string>
+	<string name="pref_always_use_default_line_summary_off">The predefined mailbox will be selected according to the original email</string>
+    <string name="pref_always_use_default_line_summary_on">The default mailbox will be used on every email</string>
 	<string name="pref_cache_auto_clean_dialog_title">Clean up cache every</string>
 	<string name="pref_cache_auto_clean_summary">Cache will be cleaned up every %s</string>
 	<string name="pref_cache_auto_clean_title">Cache clean up</string>
@@ -119,6 +122,7 @@
 	<string name="pref_key_compose_template_local">pref_key_compose_template_local</string>
 	<string name="pref_key_compose_template_mode">pref_key_compose_template_mode</string>
 	<string name="pref_key_compose_view_options">pref_key_compose_view_options</string>
+    <string name="pref_key_always_use_default_line">pref_key_always_use_default_line</string>
 	<string name="pref_key_contacts_sub_account">pref_key_contacts_sub_account</string>
 	<string name="pref_key_contacts_sub_address">pref_key_contacts_sub_address</string>
 	<string name="pref_key_contacts_sub_birthdate">pref_key_contacts_sub_birthdate</string>

@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
@@ -51,6 +50,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 #if !DEBUG
             CrashManager.Register(this, Config.HockeyId, new CustomCrashManagerListener());
             CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
+
+            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
+#else
+            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
             Task.Run(async () =>
@@ -77,6 +80,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     var ci = await authenticator.GetConnectionInfoAsync();
 
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username.ToLowerInvariant());
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
+
                     CommonConfig.Logger.Info($"Current connection info: {ci}");
                     CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
 
@@ -100,6 +107,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     if (PlatformConfig.Preferences.ClearCache)
                     {
+                        CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
+
                         CommonConfig.Logger.Info("Clearing cache...");
 
                         await DatabaseUtils.ResetDatabases();
@@ -147,7 +156,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         Services.DocumentsDownloadService?.Start();
 
                         if (t.Result)
-                    StartActivity(MainActivity.CreateIntent(this));
+                            StartActivity(MainActivity.CreateIntent(this));
                         else
                             ShowLoginButton();
                     },

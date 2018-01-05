@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.Mobile.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
@@ -13,6 +14,15 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.LoadView();
             View.BackgroundColor = Theme.White;
+        }
+
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            if (SplitViewController == null && !(this is AbstractMultiViewController))
+                CommonConfig.UsageAnalytics.SetScreen(GetType().Name);
         }
 
         public override void ViewDidDisappear(bool animated)

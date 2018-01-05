@@ -18,6 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UITextView bottomTextView;
         readonly UIImageView iconImage;
 
+        public string Content => bottomTextView?.Text;
+
         public PhysicalAddressTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {

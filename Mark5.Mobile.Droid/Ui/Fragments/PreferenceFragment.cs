@@ -16,6 +16,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -27,6 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (PreferenceFragment fragment, string tag) NewInstance()
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenSettingsEvent());
+
             var fragment = new PreferenceFragment();
             var tag = $"{nameof(PreferenceFragment)}";
 
@@ -55,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Android.App.Result.Ok) 
+            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
             {
                 if (requestCode == RequestCodes.NotificationRingtoneRequest)
                 {
@@ -167,6 +170,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_update_config))
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
                 {
@@ -212,8 +217,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
                         if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                                await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
-               
+                            await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+
                         Integration.ClearDataAndStop();
                     });
                 return true;
@@ -282,7 +287,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 Arguments = args
             });
-            
+
             ft.AddToBackStack(pref.Key);
             ft.Commit();
             return true;

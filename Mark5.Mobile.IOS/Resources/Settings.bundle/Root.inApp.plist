@@ -243,6 +243,16 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>always_use_default_line</string>
+			<key>Key</key>
+			<string>AlwaysUseDefaultLine</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>search</string>
@@ -363,7 +373,7 @@
 			<key>Title</key>
 			<string>clear_all_cache</string>
 			<key>Key</key>
-			<string>clearCacheRequested</string>
+			<string>ClearCache</string>
 			<key>DefaultValue</key>
 			<string>No</string>
 		</dict>

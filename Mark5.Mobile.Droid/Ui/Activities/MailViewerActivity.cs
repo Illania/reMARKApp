@@ -18,6 +18,7 @@ using MailBee.Outlook;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -57,6 +58,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenMailViewerEvent());
+
             base.OnCreate(savedInstanceState);
 
             Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";

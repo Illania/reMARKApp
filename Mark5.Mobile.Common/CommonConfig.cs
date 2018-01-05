@@ -22,6 +22,7 @@ namespace Mark5.Mobile.Common
         public static ITinyMessengerHub MessengerHub { get; set; }
         public static IPhonebook Phonebook { get; set; }
         public static IReachability Reachability { get; set; }
+        public static IUsageAnalytics UsageAnalytics { get; set; }
         public static Type ConcurrentQueueType { get; set; }
         public static Func<string, string> Utf8Normalizer { get; set; }
     }

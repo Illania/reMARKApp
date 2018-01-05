@@ -659,13 +659,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => { });
 
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, username.ToLowerInvariant());
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
+
                 UIViewController vc;
                 if (Integration.IsIPad())
                     vc = new SplitMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
                 else
                     vc = new SimpleMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
 
-                PresentViewController(vc, true, null);
+                var window = ((AppDelegate)UIApplication.SharedApplication.Delegate).Window;
+                UIView.TransitionNotify(window, 0.25, UIViewAnimationOptions.TransitionCrossDissolve, () => window.RootViewController = vc, null);
+
             }
             catch (Exception ex)
             {

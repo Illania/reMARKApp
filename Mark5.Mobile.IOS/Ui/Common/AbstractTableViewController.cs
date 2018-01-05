@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.Mobile.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
@@ -16,6 +17,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public AbstractTableViewController(UITableViewStyle withStyle)
             : base(withStyle)
         {
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            if (SplitViewController == null)
+                CommonConfig.UsageAnalytics.SetScreen(GetType().Name);
         }
 
         public override void ViewDidDisappear(bool animated)
