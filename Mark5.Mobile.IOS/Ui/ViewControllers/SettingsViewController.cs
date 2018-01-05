@@ -132,20 +132,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     
                 cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
-                /*var cell = (CallIdTableViewCell)tableView.DequeueReusableCell(CallIdTableViewCell.Key);
-                if (cell == null)
-                {
-                    cell = new CallIdTableViewCell(async () =>
-                    {
-                        if (cell.Toggled)
-                        {
-                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("enable_callid_extension_title"), Localization.GetString("enable_callid_extension_message"));
-                        }
-                    });
-                }
-                cell.Toggled = CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result;
-
-                return cell;*/
             }
 
             if (specifier.Key == LocalTemplateKey)
