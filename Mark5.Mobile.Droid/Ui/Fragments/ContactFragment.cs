@@ -125,7 +125,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var paddingLinearLayout = Conversion.ConvertDpToPixels(10);
 
             if (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department)
-                linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout*9);
+                linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout * 9);
             else
                 linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout);
             linearLayout.SetClipToPadding(false);
