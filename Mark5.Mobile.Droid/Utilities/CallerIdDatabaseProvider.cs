@@ -144,7 +144,7 @@ namespace Mark5.Mobile.Droid.Utilities
             });
         }
 
-        public async Task<ContactIdentification> GetContactsFromSharedDatabase(string number)
+        public async Task<ContactIdentification> GetContactsFromCallerIdDatabase(string number)
         {
             return await Task.Run(() =>
             {

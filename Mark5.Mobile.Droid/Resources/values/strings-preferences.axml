@@ -55,8 +55,8 @@
 	<string name="pref_compose_template_mode_title">Template behavior</string>
 	<string name="pref_compose_view_options_summary">Turn on or off visibility of compose view fields</string>
 	<string name="pref_compose_view_options_title">Compose view options</string>
-	<string name="pref_callidentification_summary_off">Enable caller identification of MARK5 contacts</string>
-	<string name="pref_callidentification_summary_on">Disable caller identification</string>
+	<string name="pref_callidentification_summary_off">Caller identification of MARK5 contacts is disabled</string>
+	<string name="pref_callidentification_summary_on">Caller identification of MARK5 contacts is enabled</string>
 	<string name="pref_callidentification_title">Caller Identification</string>
 	<string name="pref_contacts_sub_account_title">Account</string>
 	<string name="pref_contacts_sub_address_title">Addresses</string>

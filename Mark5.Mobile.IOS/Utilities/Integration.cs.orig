@@ -7,8 +7,11 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+<<<<<<< HEAD
 using Mark5.Mobile.IOS.Common.CallId;
+=======
 using ObjCRuntime;
+>>>>>>> master
 using PCLStorage;
 using UIKit;
 
@@ -465,7 +468,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 return;
 
             var browserChooser = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_clipboard"), UIAlertActionStyle.Default, a => UIPasteboard.General.String = text));
+            browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_clipboard"), UIAlertActionStyle.Default, a => { 
+                UIPasteboard.General.String = text;
+            }));
             browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (browserChooser.PopoverPresentationController != null)

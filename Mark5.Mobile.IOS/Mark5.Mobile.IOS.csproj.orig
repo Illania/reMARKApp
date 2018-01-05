@@ -254,8 +254,11 @@
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Utilities\UsageAnalytics.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
-		<Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
+<<<<<<< HEAD
 		<Compile Include="Ui\TableViewCells\CallIdTableViewCell.cs" />
+=======
+		<Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
+>>>>>>> master
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -276,6 +279,9 @@
 		</Reference>
 		<Reference Include="InAppSettingsKit">
 			<HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
+		</Reference>
+		<Reference Include="AngleSharp">
+			<HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="PreMailer.Net">
 			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
@@ -301,6 +307,25 @@
 		<Reference Include="SQLitePCLRaw.batteries_v2">
 		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
+<<<<<<< HEAD
+		<Reference Include="Newtonsoft.Json">
+		  <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="HockeySDK">
+		  <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+		</Reference>
+		<Reference Include="HockeySDK.iOSBindings">
+		  <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
+		</Reference>
+		<Reference Include="MailBee.NET">
+		  <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
+		</Reference>
+		<Reference Include="PhoneNumbers">
+		  <HintPath>..\packages\libphonenumber-csharp.8.8.7\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+		</Reference>
+		<Reference Include="HtmlAgilityPack">
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.6\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+=======
 		<Reference Include="Firebase.Core">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.4.0.8\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
 		</Reference>
@@ -310,23 +335,15 @@
 		<Reference Include="Firebase.Analytics">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.4.0.4\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
 		</Reference>
-		<Reference Include="AngleSharp">
-		  <HintPath>..\packages\AngleSharp.0.9.9.1\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
-		</Reference>
 		<Reference Include="HockeySDK">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
-		  <Private>False</Private>
 		</Reference>
 		<Reference Include="HockeySDK.iOSBindings">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
-		  <Private>False</Private>
-		</Reference>
-		<Reference Include="PhoneNumbers">
-		  <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
 		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.6.11\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-		  <Private>False</Private>
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+>>>>>>> master
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

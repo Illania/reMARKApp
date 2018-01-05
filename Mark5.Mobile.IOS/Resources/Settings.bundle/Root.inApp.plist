@@ -173,10 +173,18 @@
 		<dict>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
-			<key>Key</key>
-			<string>CallerIdentificationEnabled</string>
 			<key>Title</key>
 			<string>caller_identification_enabled</string>
+			<key>Key</key>
+			<string>CallerIdentificationEnabled</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>caller_identification_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>

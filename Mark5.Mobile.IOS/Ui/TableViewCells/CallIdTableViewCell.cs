@@ -21,12 +21,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            UserInteractionEnabled = true; // if not enabled by default
+            UserInteractionEnabled = true; 
 
             view = new UIView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = UIColor.Black
+                BackgroundColor = UIColor.Green
             };
 
             settingsSwitch = new UISwitch
@@ -50,14 +50,21 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             ContentView.AddConstraints(new[]
             {
+                label.WidthAnchor.ConstraintGreaterThanOrEqualTo(10.0f),
                 label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
-                label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor),
+                label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
                 label.TrailingAnchor.ConstraintEqualTo(settingsSwitch.LeadingAnchor, -8f),
+
                 settingsSwitch.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
                 settingsSwitch.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                settingsSwitch.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                settingsSwitch.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+
                 view.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
-                view.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor)
+                view.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                view.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                view.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor)
             });
 
         }

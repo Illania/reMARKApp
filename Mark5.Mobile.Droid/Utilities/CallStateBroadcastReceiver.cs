@@ -55,8 +55,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 if (state == oldState) 
                     return;
 
-                //On LollipopMR1, the onReceive gets invoked twice instead of once for every change of the call state. In other viersion this doesn't happen.
-                //Que pasa?
+                //On LollipopMR1, the onReceive gets invoked twice instead of once for every change of the call state. In other versions this doesn't happen.
                 oldState = state;
 
                 var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
@@ -74,12 +73,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     Task.Run(async () =>
                     {
-                        return await CallerIdDatabaseProvider.CallerIdDatabase.GetContactsFromSharedDatabase(incomingNumber);
+                        return await CallerIdDatabaseProvider.CallerIdDatabase.GetContactsFromCallerIdDatabase(incomingNumber);
                     }).ContinueWith((t) =>
                     {
                         var contact = t.Result;
 
-                        if (contact != null && PhoneNumberUtils.Compare(incomingNumber, contact.Number)) //If contact from database is calling, show overlay.
+                        if (contact != null) //If contact from database is calling, show overlay.
                         {
                             var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
                             if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked

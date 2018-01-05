@@ -105,7 +105,7 @@
       <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
     <Reference Include="PhoneNumbers">
-      <HintPath>..\packages\libphonenumber-csharp.8.8.7\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+      <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

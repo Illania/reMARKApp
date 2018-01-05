@@ -279,7 +279,7 @@
     <string name="read_by_prefix">read by</string>
     <string name="recent_addresses">Recent addresses</string>
 	<string name="redirect_to_draw_settings_title">You must allow MARK5 to draw on top of other apps</string>
-	<string name="redirect_to_draw_settings_content">By clicking yes, you will be redirected to the settings where you must enable MARK5 to draw on top of other applications. Additionally, All Contacts and All Companies must be saved offline.</string>
+	<string name="redirect_to_draw_settings_content">By clicking yes, you will be redirected to the settings where you must enable MARK5 to draw on top of other applications. Additionally, all contacts and all companies must be saved offline.</string>
 	<string name="reference">Ref.</string>
 	<string name="reset">Reset</string>
 	<string name="related_contacts">Related</string>

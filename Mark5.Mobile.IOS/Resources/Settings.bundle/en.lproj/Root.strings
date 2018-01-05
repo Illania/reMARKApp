@@ -12,6 +12,7 @@
 "cache" = "Cache";
 "caller_identification" = "Caller identification";
 "caller_identification_enabled" = "Caller identification enabled";
+"caller_identification_desc" = "To enable caller identification all contacts and companies must be saved offline. Furthermore MARK5 must be allowed to do so in Settings => Call Blocking & Identification.";
 "clean_cache_interval_days" = "Compact cache every";
 "clear_all_cache" = "Clear all cache";
 "compact_documents_list" = "Compact emails list";
@@ -42,7 +43,7 @@
 "me" = "Me";
 "open_settings_app" = "Open Settings app";
 "partial_word_search" = "Partial word search";
-"plain" = "Plain Text";
+"plain" = "Plain Text"; 
 "remove_line" = "Remove mailbox address";
 "search" = "Search";
 "security" = "Security";

@@ -5,8 +5,11 @@ using InAppSettingsKit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
+<<<<<<< HEAD
 using Mark5.Mobile.IOS.Common.CallId;
+=======
+using Mark5.Mobile.Common.Utilities;
+>>>>>>> master
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
@@ -122,17 +125,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (specifier.Key == CallerIdentificationEnabled)
             {
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-
-                if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
-                    cell.DetailTextLabel.Text = "Yes";
-                else
-                    cell.DetailTextLabel.Text = "No";
-                    
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-                /*var cell = (CallIdTableViewCell)tableView.DequeueReusableCell(CallIdTableViewCell.Key);
+                var cell = (CallIdTableViewCell)tableView.DequeueReusableCell(CallIdTableViewCell.Key);
                 if (cell == null)
                 {
                     cell = new CallIdTableViewCell(async () =>
@@ -145,7 +138,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 cell.Toggled = CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result;
 
-                return cell;*/
+                return cell;
             }
 
             if (specifier.Key == LocalTemplateKey)
