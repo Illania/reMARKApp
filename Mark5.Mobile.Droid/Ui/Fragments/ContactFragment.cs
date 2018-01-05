@@ -123,7 +123,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             var paddingLinearLayout = Conversion.ConvertDpToPixels(10);
-            linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout);
+
+            if (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department)
+                linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout*9);
+            else
+                linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout);
             linearLayout.SetClipToPadding(false);
 
             button1Layout.Click += Button1Layout_Click;
