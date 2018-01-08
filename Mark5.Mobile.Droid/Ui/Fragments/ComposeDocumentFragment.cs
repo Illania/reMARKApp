@@ -566,21 +566,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
         }
 
-        public void DeleteAutoSavedDocumentAndClose()
+        public async void DeleteAutoSavedDocumentAndClose()
         {
-            AsyncHelpers.RunSync(async () =>
+            try
             {
-                try
-                {
-                    autoSaveWorkingCopyWorker.Stop();
-                    await autoSaveWorkingCopyWorker.Finished();
-                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Error while deleting autosaved document", ex);
-                }
-            });
+                autoSaveWorkingCopyWorker.Stop();
+                await autoSaveWorkingCopyWorker.Finished();
+                await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while deleting autosaved document", ex);
+            }
 
             Activity?.Finish();
         }

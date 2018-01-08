@@ -69,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task UpdateDocument()
         {
-            await AsyncHelpers.RunOnUiThreadSync((Activity)Context, () => DocumentPreview.Subject = subjectTextView.Text);
+            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => DocumentPreview.Subject = subjectTextView.Text);
             return;
         }
 

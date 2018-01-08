@@ -188,7 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
 
-            await AsyncHelpers.RunOnUiThreadSync((Activity)Context, () =>
+            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () =>
             {
                 foreach (var email in GetEmails())
                 {

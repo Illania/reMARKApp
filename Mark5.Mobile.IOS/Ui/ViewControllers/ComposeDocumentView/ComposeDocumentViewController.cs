@@ -366,16 +366,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     {
                         ToolbarItems = new[]
                         {
-                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                        new UIBarButtonItem(Localization.GetString("edit_original_email"), UIBarButtonItemStyle.Plain, async (sender, e) => {
-                            var vc = new EditOriginalDocumentViewController { Content = previousDocumentContent };
-                            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                            var editedContent = await vc.Result;
-                            if (editedContent != null)
-                                previousDocumentContent = editedContent;
-                        }),
-                        new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
-                    };
+                            new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                            new UIBarButtonItem(Localization.GetString("edit_original_email"), UIBarButtonItemStyle.Plain, async (sender, e) =>
+                            {
+                                var vc = new EditOriginalDocumentViewController { Content = previousDocumentContent };
+                                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                                var editedContent = await vc.Result;
+                                if (editedContent != null)
+                                    previousDocumentContent = editedContent;
+                            }),
+                            new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
+                        };
                         NavigationController.SetToolbarHidden(false, false);
                     }
                 }
