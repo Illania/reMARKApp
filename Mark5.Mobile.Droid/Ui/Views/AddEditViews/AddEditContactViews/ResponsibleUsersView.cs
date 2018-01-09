@@ -26,11 +26,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
             }
         }
 
-        protected override void ContentClicked(object sender, EventArgs e)
+        protected override async void ContentClicked(object sender, EventArgs e)
         {
             var (pllf, tag) = ResponsibleSelectionFragment.NewInstance(Contact.ResponsibleUsers.Keys.ToList());
 
             parentFragment.ReplaceFragment(pllf, tag);
+
+            HandleResponsibleUsersSelection(await pllf.Task);
         }
 
         void HandleResponsibleUsersSelection(Dictionary<int, string> selectedUsers)

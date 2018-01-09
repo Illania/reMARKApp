@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ContactViews
             if (Contact?.ResponsibleUsers?.Count > 0)
             {
                 Visibility = ViewStates.Visible;
-                Content = string.Join(", ", Contact?.ResponsibleUsers.Values);
+                Content = string.Join(", ", Contact?.ResponsibleUsers.Values.OrderBy(s => s));
             }
             else
             {

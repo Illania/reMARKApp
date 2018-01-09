@@ -215,7 +215,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(itemsId);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
+            {
                 builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -229,7 +232,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(itemsId);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
+            {
                 builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -243,7 +249,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Items(items);
             builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
             if (includeCancel)
+            {
                 builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            }
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
