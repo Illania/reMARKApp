@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Android.Content;
@@ -6,9 +7,7 @@ using Android.Webkit;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Utilities;
-using Android.App;
 using Newtonsoft.Json;
-using System;
 
 namespace Mark5.Mobile.IOS.Utilities.Extensions
 {

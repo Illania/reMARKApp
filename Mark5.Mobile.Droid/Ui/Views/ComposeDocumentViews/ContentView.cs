@@ -165,7 +165,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task UpdateDocument()
         {
-            Document.HtmlBody = await GetContent();
+            Document.HtmlBody = await GetContentAsync();
         }
 
         public async Task InsertTemplate(Template template)
@@ -188,29 +188,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
             showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
             showOldContentButton.Text = contentViewState.ShowOldContentButtonText;
-
-            await newContentSemaphore.WaitAsync();
-            await newContentWebView.LoadHtml(context, contentViewState.NewContent, HtmlProcessingConfiguration.Disabled);
-
-            await oldContentSemaphore.WaitAsync();
-            await oldContentWebView.LoadHtml(context, contentViewState.OldContent, HtmlProcessingConfiguration.Disabled);
         }
 
         public override IComposeDocumentViewState GetState()
         {
-            //var newContentString = AsyncHelpers.RunSync(() =>
-            //{
-            //    return GetNewContent();
-            //});
-            var oldContentString = AsyncHelpers.RunSync(() =>
-            {
-                return GetOldContent();
-            });
-
             return new ContentViewState
             {
-                //NewContent = newContentString,
-                //OldContent = oldContentString,
                 OldContentWebViewVisibility = oldContentWebView.Visibility,
                 ShowOldContentButtonVisibility = showOldContentButton.Visibility,
                 ShowOldContentButtonText = showOldContentButton.Text,
@@ -219,8 +202,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         class ContentViewState : IComposeDocumentViewState
         {
-            public string NewContent { get; set; }
-            public string OldContent { get; set; }
             public ViewStates OldContentWebViewVisibility { get; set; }
             public ViewStates ShowOldContentButtonVisibility { get; set; }
             public string ShowOldContentButtonText { get; set; }
@@ -228,28 +209,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #endregion
 
-        async Task<string> GetContent()
+        async Task<string> GetContentAsync()
         {
-            var newContent = await GetNewContent();
-            newContent = await CleanContent(newContent);
+            var newContent = await GetNewContentAsync();
+            newContent = await CleanContentAsync(newContent);
 
-            var oldContent = await GetOldContent();
+            var oldContent = await GetOldContentAsync();
             if (!string.IsNullOrWhiteSpace(oldContent))
             {
-                oldContent = await CleanContent(oldContent);
-                var mergedContent = await MergeContent(newContent, oldContent);
+                oldContent = await CleanContentAsync(oldContent);
+                var mergedContent = await MergeContentAsync(newContent, oldContent);
                 return mergedContent;
             }
 
             return newContent;
         }
 
-        async Task<string> GetNewContent()
+        async Task<string> GetNewContentAsync()
         {
             try
             {
                 await newContentSemaphore.WaitAsync();
-                return await newContentWebView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+                var result = await newContentWebView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+                return result;
             }
             finally
             {
@@ -257,12 +239,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        async Task<string> GetOldContent()
+        async Task<string> GetOldContentAsync()
         {
             try
             {
                 await oldContentSemaphore.WaitAsync();
-                return await oldContentWebView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+                var result = await oldContentWebView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+                return result;
             }
             finally
             {
@@ -270,7 +253,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        Task<string> CleanContent(string content)
+        Task<string> CleanContentAsync(string content)
         {
             return Task.Run(() =>
             {
@@ -301,7 +284,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             });
         }
 
-        Task<string> MergeContent(string newContent, string oldContent)
+        Task<string> MergeContentAsync(string newContent, string oldContent)
         {
             return Task.Run(() =>
             {
