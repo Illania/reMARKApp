@@ -130,8 +130,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(DocumentCreationModeFlagBundleKey))
                 documentCreationModeFlag = (DocumentCreationModeFlag)Arguments.GetInt(DocumentCreationModeFlagBundleKey);
 
@@ -153,6 +155,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Arguments.ContainsKey(PreconfiguredEmailAddressesBundleKey))
                 preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Arguments.GetString(PreconfiguredEmailAddressesBundleKey));
 
+            restoreWorkingCopy = restoreWorkingCopy || Restored;
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -292,17 +299,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                if (restoreWorkingCopy)
+                if (restoreWorkingCopy || Restored)
                 {
                     var wc = await Managers.DocumentsManager.GetDocumentWorkingCopyAsync();
 
-                    documentCreationModeFlag = wc.DocumentCreationModeFlag;
-                    copyToNewOption = wc.CopyToNewOption;
-                    previousDocumentFolderId = wc.PreviousDocumentFolderId;
-                    previousDocumentId = wc.PreviousDocumentId;
-                    previousDocumentDirection = wc.PreviousDocumentDirection;
-                    documentPreview = wc.DocumentPreview;
-                    document = wc.Document;
+                    if (wc != null)
+                    {
+                        documentCreationModeFlag = wc.DocumentCreationModeFlag;
+                        copyToNewOption = wc.CopyToNewOption;
+                        previousDocumentFolderId = wc.PreviousDocumentFolderId;
+                        previousDocumentId = wc.PreviousDocumentId;
+                        previousDocumentDirection = wc.PreviousDocumentDirection;
+                        documentPreview = wc.DocumentPreview;
+                        document = wc.Document;
+                    }
                 }
 
                 if (documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
