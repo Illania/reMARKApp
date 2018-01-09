@@ -821,7 +821,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     switch (result)
                     {
                         case 0:
-                            await GetDefaultTemplate(true);
+                            await GetDefaultTemplate();
                             break;
                         case 1:
                             await GetLocalTemplate();
@@ -839,7 +839,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             templateLoaded = true;
         }
 
-        async Task GetDefaultTemplate(bool errorMessageIfNull = false)
+        async Task GetDefaultTemplate()
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
@@ -848,8 +848,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(documentCreationModeFlag);
                 if (template != null)
                     await ApplyTemplate(template);
-                else if (errorMessageIfNull)
-                    throw new Exception(Resources.GetString(Resource.String.template_null));
             }
             catch (Exception ex)
             {
