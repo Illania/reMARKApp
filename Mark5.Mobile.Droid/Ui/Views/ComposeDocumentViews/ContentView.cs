@@ -20,6 +20,7 @@ using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using Android.App;
+using System.Text.RegularExpressions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -170,24 +171,47 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public async Task InsertTemplate(Template template)
         {
-            //
+            string insertTemplateJs;
+            using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
+                insertTemplateJs = sr.ReadToEnd();
+
+            if (template.ContentType == ContentType.PlainText)
+            {
+                var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+                insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
+            }
+            if (template.ContentType == ContentType.Html)
+            {
+                var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
+                insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
+            }
+
+            var result = await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
         }
 
         public async Task InsertLocalTemplate(string localTemplate)
         {
-            //
+            string insertTemplateJs;
+            using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
+                insertTemplateJs = sr.ReadToEnd();
+
+            var localTemplateText = Regex.Replace(localTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+
+            insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
+            await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
         }
 
         #endregion
 
         #region State related
 
-        async Task RestoreState()
+        Task RestoreState()
         {
             var contentViewState = (ContentViewState)State;
             oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
             showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
             showOldContentButton.Text = contentViewState.ShowOldContentButtonText;
+            return Task.CompletedTask;
         }
 
         public override IComposeDocumentViewState GetState()

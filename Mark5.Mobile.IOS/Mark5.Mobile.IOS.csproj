@@ -273,9 +273,6 @@
 		<Reference Include="InAppSettingsKit">
 			<HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
 		</Reference>
-		<Reference Include="AngleSharp">
-			<HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
-		</Reference>
 		<Reference Include="PreMailer.Net">
 			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
 		</Reference>
@@ -319,8 +316,11 @@
 		<Reference Include="HockeySDK.iOSBindings">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
 		</Reference>
+		<Reference Include="AngleSharp">
+		  <HintPath>..\packages\AngleSharp.0.9.9.1\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.6.10\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.11\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
