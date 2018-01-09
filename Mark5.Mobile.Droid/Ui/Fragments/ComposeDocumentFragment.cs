@@ -719,6 +719,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             menu.Clear();
 
+            var insertTemplateItem = menu.Add(Menu.None, MenuItemActions.InsertTemplate, MenuItemActions.InsertTemplate, Resource.String.insert_template);
+            insertTemplateItem.SetIcon(Resource.Drawable.action_add);
+            insertTemplateItem.SetShowAsAction(ShowAsAction.Always);
+
             var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
             attachmentItem.SetIcon(Resource.Drawable.action_attachment);
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
@@ -729,15 +733,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == Android.Resource.Id.Home)
                 AskIfShouldSave();
 
+            if (item.ItemId == MenuItemActions.InsertTemplate)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
+                GetAllTemplates();
+            }
+
             if (item.ItemId == MenuItemActions.AddAttachment)
+            {
+                
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 AddAttachment();
+            }
 
             return true;
         }
 
         void AddAttachment()
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
             var intent = new Intent(Intent.ActionGetContent);
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
@@ -770,7 +783,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
-            public const int AddAttachment = 10;
+            public const int InsertTemplate = 10;
+            public const int AddAttachment = 20;
         }
 
         #endregion
