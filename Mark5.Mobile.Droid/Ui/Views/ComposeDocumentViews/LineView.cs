@@ -174,6 +174,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 this.hiddenItemPosition = hiddenItemPosition;
             }
 
+            //TODO there is a problem here, and we have "select mailbox" among the choices
+
             public override View GetView(int position, View convertView, ViewGroup parent)
             {
                 var v = base.GetView(position, convertView, parent);
