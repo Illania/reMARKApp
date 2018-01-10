@@ -218,6 +218,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return Localization.GetString("error_dataaccessexception_title");
             if (ex is InvalidSourceTypeException)
                 return Localization.GetString("error_invalidsourcetypeexception_title");
+            if (ex is EmptyTokenException)
+                return Localization.GetString("error_emptytokenexception_title");
 
             return Localization.GetString("error_generalexception_title");
         }
@@ -236,6 +238,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return ex.Message;
             if (ex is InvalidSourceTypeException)
                 return Localization.GetString("error_invalidsourcetypeexception_message");
+            if (ex is EmptyTokenException)
+                return Localization.GetString("error_emptytokenexception_message");
 
             return ex.Message;
         }

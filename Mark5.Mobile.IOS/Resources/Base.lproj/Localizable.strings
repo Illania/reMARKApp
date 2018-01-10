@@ -134,6 +134,8 @@
 "error_removing_local_attachment" = "Error while removing local attachment";
 "error_saving_local_attachment" = "Error while saving local attachment";
 "error_while_sending_document" = "Error while sending email";
+"error_emptytokenexception_title" = "Empty APNS Token";
+"error_emptytokenexception_message" = "Your device did not receive an Apple Push Notification Token. Please restart the app";
 "existing_photo" = "Add existing photo";
 "failed" = "Failed";
 "failed_send_document_notification_content" = "One or more emails could not be sent. Please check Outgoing folder for details.";
