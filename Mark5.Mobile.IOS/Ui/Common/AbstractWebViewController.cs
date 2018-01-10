@@ -501,19 +501,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         Task InjectFonts(HtmlDocument htmlDocument)
         {
-            return Task.Run(() =>
-            {
-                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
-                if (headNode == null)
-                    return;
+            return Task.CompletedTask;
 
-                var cssLinkElement = htmlDocument.CreateElement("link");
-                cssLinkElement.SetAttributeValue("id", "fonts");
-                cssLinkElement.SetAttributeValue("rel", "stylesheet");
-                cssLinkElement.SetAttributeValue("type", "text/css");
-                cssLinkElement.SetAttributeValue("href", "html/fonts.css");
-                headNode.PrependChild(cssLinkElement);
-            });
+            //
+
+            //Remember to change Build action in properties on all ttf files (list in fonts.css)
+            //to BundleResource after uncommenting this code.
+
+            //
+            //return Task.Run(() =>
+            //{
+            //    var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
+            //    if (headNode == null)
+            //        return;
+
+            //    var cssLinkElement = htmlDocument.CreateElement("link");
+            //    cssLinkElement.SetAttributeValue("id", "fonts");
+            //    cssLinkElement.SetAttributeValue("rel", "stylesheet");
+            //    cssLinkElement.SetAttributeValue("type", "text/css");
+            //    cssLinkElement.SetAttributeValue("href", "html/fonts.css");
+            //    headNode.PrependChild(cssLinkElement);
+            //});
         }
 
         Task MakeEditable(HtmlDocument htmlDocument)

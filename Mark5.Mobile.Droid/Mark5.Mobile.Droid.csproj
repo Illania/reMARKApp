@@ -446,6 +446,12 @@
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="packages.config" />
+    <None Include="Assets\calibri.ttf" />
+    <None Include="Assets\cambria.ttf" />
+    <None Include="Assets\couriernew.ttf" />
+    <None Include="Assets\opensans.ttf" />
+    <None Include="Assets\tahoma.ttf" />
+    <None Include="Assets\trebuchetms.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
@@ -788,12 +794,6 @@
     <AndroidAsset Include="Assets\insertTemplate.js" />
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
-    <AndroidAsset Include="Assets\calibri.ttf" />
-    <AndroidAsset Include="Assets\cambria.ttf" />
-    <AndroidAsset Include="Assets\couriernew.ttf" />
-    <AndroidAsset Include="Assets\opensans.ttf" />
-    <AndroidAsset Include="Assets\tahoma.ttf" />
-    <AndroidAsset Include="Assets\trebuchetms.ttf" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets')" />

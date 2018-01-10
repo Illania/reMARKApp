@@ -347,6 +347,12 @@
 		<None Include="Info.plist" />
 		<None Include="Entitlements.plist" />
 		<None Include="packages.config" />
+		<None Include="Resources\html\fonts\calibri.ttf" />
+		<None Include="Resources\html\fonts\cambria.ttf" />
+		<None Include="Resources\html\fonts\couriernew.ttf" />
+		<None Include="Resources\html\fonts\opensans.ttf" />
+		<None Include="Resources\html\fonts\tahoma.ttf" />
+		<None Include="Resources\html\fonts\trebuchetms.ttf" />
 	</ItemGroup>
 	<ItemGroup>
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -519,12 +525,6 @@
 		<BundleResource Include="Resources\html\scriptsAtEnd.js" />
 		<BundleResource Include="Resources\html\scriptsAtStart.js" />
 		<BundleResource Include="Resources\html\fonts.css" />
-		<BundleResource Include="Resources\html\fonts\calibri.ttf" />
-		<BundleResource Include="Resources\html\fonts\tahoma.ttf" />
-		<BundleResource Include="Resources\html\fonts\cambria.ttf" />
-		<BundleResource Include="Resources\html\fonts\trebuchetms.ttf" />
-		<BundleResource Include="Resources\html\fonts\couriernew.ttf" />
-		<BundleResource Include="Resources\html\fonts\opensans.ttf" />
 		<BundleResource Include="Resources\html\insertTemplate.js" />
 		<BundleResource Include="Resources\html\headerPadding.js" />
 		<BundleResource Include="Resources\html\replyHeader.html" />

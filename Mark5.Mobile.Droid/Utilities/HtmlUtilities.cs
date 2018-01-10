@@ -167,23 +167,31 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static Task CorrectScale(HtmlDocument htmlDocument)
         {
-            return Task.Run(() =>
-            {
-                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
-                if (headNode == null)
-                    return;
+            return Task.CompletedTask;
 
-                var existingViewportNodes = headNode.SelectNodes("/meta[@name='viewport']");
-                if (existingViewportNodes != null)
-                    foreach (var existingViewportNode in existingViewportNodes)
-                        existingViewportNode.Remove();
+            //
 
-                var viewportElement = htmlDocument.CreateElement("meta");
-                viewportElement.SetAttributeValue("id", "viewport");
-                viewportElement.SetAttributeValue("name", "viewport");
-                viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
-                headNode.PrependChild(viewportElement);
-            });
+            //Remember to change Build action in properties on all ttf files (list in fonts.css)
+            //to AndroidAsset after uncommenting this code.
+
+            //
+            //return Task.Run(() =>
+            //{
+            //    var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
+            //    if (headNode == null)
+            //        return;
+
+            //    var existingViewportNodes = headNode.SelectNodes("/meta[@name='viewport']");
+            //    if (existingViewportNodes != null)
+            //        foreach (var existingViewportNode in existingViewportNodes)
+            //            existingViewportNode.Remove();
+
+            //    var viewportElement = htmlDocument.CreateElement("meta");
+            //    viewportElement.SetAttributeValue("id", "viewport");
+            //    viewportElement.SetAttributeValue("name", "viewport");
+            //    viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
+            //    headNode.PrependChild(viewportElement);
+            //});
         }
 
         public static Task InjectFonts(HtmlDocument htmlDocument)
