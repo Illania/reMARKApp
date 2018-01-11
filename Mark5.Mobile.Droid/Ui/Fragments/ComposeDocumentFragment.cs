@@ -17,6 +17,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -304,9 +305,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     document = wc.Document;
                 }
 
-                if (documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
-                    documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
-                    documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption == CopyToNewOption.KeepOnlyAttachments ||
+                if (documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption != CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Reply && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Forward && copyToNewOption == CopyToNewOption.None)
@@ -799,7 +798,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (documentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 return;
 
-            if (copyToNewOption == CopyToNewOption.KeepTextAndAttachments)
+            if (copyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
                 return;
 
             switch (PlatformConfig.Preferences.UseTemplate)

@@ -288,9 +288,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     document = wc.Document;
                 }
 
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
-                    DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
-                    DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAttachments ||
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption != CopyToNewOption.None ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
@@ -339,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     LoadEditor();
 
-                    if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
+                    if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments) ||
                         DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
                         DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
                         DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
@@ -401,7 +399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 return;
 
-            if (CopyToNewOption == CopyToNewOption.KeepTextAndAttachments)
+            if (CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
                 return;
 
             switch (PlatformConfig.Preferences.UseTemplate)

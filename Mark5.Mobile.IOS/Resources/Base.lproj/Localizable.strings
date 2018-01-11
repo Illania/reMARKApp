@@ -67,10 +67,9 @@
 "copy_to_folder" = "Copy to folder";
 "copy_to_worktray" = "Copy to worktray";
 "copy_to_new" = "Copy to new";
-"copy_to_new_addresses" = "Copy addresses";
-"copy_to_new_text" = "Copy text";
-"copy_to_new_text_and_attachments" = "Copy text and attachments";
-"copy_to_new_attachments" = "Copy attachments";
+"copy_to_new_addresses" = "Addresses";
+"copy_to_new_content" = "Content";
+"copy_to_new_attachments" = "Attachments";
 "copy_to_worktray_ml" = "Copy to\nworktray";
 "copying___" = "Copying...";
 "copying_to_own_worktray___" = "Copying to own worktray...";

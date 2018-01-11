@@ -121,9 +121,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<T[]> ShowMultiSelectViewControllerAsync<T>(UIViewController vc, string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
+        public static Task<T[]> ShowMultiSelectViewControllerAsync<T>(UIViewController vc, string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer, bool requireSelection)
         {
-            var msvc = new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer);
+            var msvc = new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer, requireSelection);
             vc.PresentViewController(new NavigationController(msvc, UIModalPresentationStyle.FormSheet), true, null);
             return msvc.Result;
         }

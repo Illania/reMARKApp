@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -14,13 +15,12 @@ using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
-using Android.App;
-using System.Text.RegularExpressions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -131,7 +131,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 await newContentSemaphore.WaitAsync();
                 newContentWebView.LoadEditor(context);
 
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments) ||
                         DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
                         DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
                         DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)

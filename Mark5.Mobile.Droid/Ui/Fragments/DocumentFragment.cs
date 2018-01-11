@@ -763,31 +763,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Document == null || DocumentPreview == null)
                 return;
 
-            var hasAttachments = Document.Attachments.Any();
+            List<CopyToNewOption> data = new List<CopyToNewOption> { CopyToNewOption.Addresses, CopyToNewOption.Content };
 
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_new_mode_title,
-                                                      hasAttachments ? Resource.Array.copy_to_new_modes : Resource.Array.copy_to_new_modes_no_attachments, true);
+            if (Document.Attachments.Any())
+                data.Add(CopyToNewOption.Attachments);
 
-            if (choice < 0)
+            string DisplayText(CopyToNewOption ctno)
+            {
+                switch(ctno)
+                {
+                    case CopyToNewOption.Addresses:
+                        return GetString(Resource.String.copy_to_new_addresses);
+                    case CopyToNewOption.Content:
+                        return GetString(Resource.String.copy_to_new_content);
+                    case CopyToNewOption.Attachments:
+                        return GetString(Resource.String.copy_to_new_attachments);
+                    default:
+                        return string.Empty;
+                }
+            }
+
+            var selections = await Dialogs.ShowMultiSelectDialogAsync(Context, Resource.String.copy_to_new, data, data, displayText: DisplayText);
+            if (selections == null || selections.Count < 1)
                 return;
 
-            CopyToNewOption option = CopyToNewOption.None;
-            switch (choice)
-            {
-                case 0:
-                    option = CopyToNewOption.KeepOnlyAddresses;
-                    break;
-                case 1:
-                    option = CopyToNewOption.KeepTextAndAttachments;
-                    break;
-                case 2:
-                    option = CopyToNewOption.KeepOnlyAttachments;
-                    break;
-            }
+            CopyToNewOption copyToNewOption = CopyToNewOption.None;
+            for (int i = 0; i < selections.Count; i++)
+                copyToNewOption |= selections[i];
+
 
             StartActivity(ComposeDocumentActivity.CreateIntent(Context,
                                                                DocumentCreationModeFlag.New,
-                                                               option,
+                                                               copyToNewOption,
                                                                previousDocumentDirection: DocumentPreview.Direction,
                                                                previousDocumentFolderId: Folder?.Id ?? FolderId,
                                                                previousDocumentId: DocumentPreview.Id));

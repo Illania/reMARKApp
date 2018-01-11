@@ -23,15 +23,6 @@
 		<item>SSL Enabled (allow self-signed)</item>
 		<item>SSL Disabled</item>
 	</string-array>
-	<string-array name="copy_to_new_modes">
-		<item>Addresses</item>
-		<item>Text and attachments</item>
-		<item>Attachments</item>
-	</string-array>
-	<string-array name="copy_to_new_modes_no_attachments">
-		<item>Addresses</item>
-		<item>Text</item>
-	</string-array>
 	<string-array name="picker_choice">
 		<item>Recent addresses</item>
 		<item>Contacts</item>

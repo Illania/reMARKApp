@@ -21,12 +21,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
         T[] preselected;
         readonly Func<T, string> description;
         readonly IEqualityComparer<T> equalityComparer;
+        readonly bool requireSelection;
 
         readonly HashSet<T> selectedItems;
 
-        public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer)
+        public MultiSelectViewController(string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer, bool requireSelection)
             : base(UITableViewStyle.Grouped)
         {
+            this.requireSelection = requireSelection;
             this.title = title;
             this.data = data;
             this.preselected = preselected;
@@ -71,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             for (var i = 0; i < data.Length; i++)
             {
                 var d = data[i];
-                if (preselected.Contains(d, equalityComparer))
+                if (preselected != null && preselected.Contains(d, equalityComparer))
                 {
                     selectedItems.Add(d);
                     TableView.SelectRow(NSIndexPath.FromRowSection(i, 0), false, UITableViewScrollPosition.None);
@@ -79,6 +81,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
 
             preselected = null;
+
+            if (requireSelection)
+                doneItem.Enabled = selectedItems.Any();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -110,14 +115,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(null);
-            DismissViewController(true, null);
+            DismissViewController(true, () =>
+            {
+                tcs.SetResult(null);
+            });
         }
 
         void DoneItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(selectedItems.ToArray());
-            DismissViewController(true, null);
+            DismissViewController(true, () =>
+            {
+                tcs.SetResult(selectedItems.ToArray());
+            });
         }
 
         public override nint RowsInSection(UITableView tableView, nint section) => data.Length;
@@ -141,6 +150,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
             selectedItems.Add(data[indexPath.Row]);
+
+            if (requireSelection)
+                doneItem.Enabled = selectedItems.Any();
         }
 
         public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
@@ -151,6 +163,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
             selectedItems.Remove(data[indexPath.Row]);
+
+            if (requireSelection)
+                doneItem.Enabled = selectedItems.Any();
         }
     }
 }

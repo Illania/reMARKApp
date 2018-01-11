@@ -1097,36 +1097,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (document == null || documentPreview == null)
                 return;
 
+            CopyToNewOption[] data;
+
             var hasAttachments = document.Attachments.Any();
-
-            string[] modes;
             if (hasAttachments)
-                modes = new[] { Localization.GetString("copy_to_new_addresses"), Localization.GetString("copy_to_new_text_and_attachments"), Localization.GetString("copy_to_new_attachments") };
+                data = new[] { CopyToNewOption.Addresses, CopyToNewOption.Content, CopyToNewOption.Attachments };
             else
-                modes = new[] { Localization.GetString("copy_to_new_addresses"), Localization.GetString("copy_to_new_text") };
+                data = new[] { CopyToNewOption.Addresses, CopyToNewOption.Content };
 
-            var result = await Dialogs.ShowListActionSheetAsync(this, modes, replyActionsButton);
-            if (result < 0)
+            var selections = await Dialogs.ShowMultiSelectViewControllerAsync(this, Localization.GetString("copy_to_new"), data, data, UI.PrettyCopyToNewString, LambdaEqualityComparer<CopyToNewOption>.Create(ctno => ctno), true);
+            if (selections == null || selections.Length < 1)
                 return;
 
-            CopyToNewOption option = CopyToNewOption.None;
-            switch (result)
-            {
-                case 0:
-                    option = CopyToNewOption.KeepOnlyAddresses;
-                    break;
-                case 1:
-                    option = CopyToNewOption.KeepTextAndAttachments;
-                    break;
-                case 2:
-                    option = CopyToNewOption.KeepOnlyAttachments;
-                    break;
-            }
+            CopyToNewOption copyToNewOption = CopyToNewOption.None;
+            for (int i = 0; i < selections.Length; i++)
+                copyToNewOption |= selections[i];
 
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                CopyToNewOption = option,
+                CopyToNewOption = copyToNewOption,
                 PreviousDocumentDirection = documentPreview.Direction,
                 PreviousDocumentFolderId = folderId ?? folder?.Id,
                 PreviousDocumentId = documentPreview.Id

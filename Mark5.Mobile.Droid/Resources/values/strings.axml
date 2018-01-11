@@ -51,6 +51,9 @@
 	<string name="copying_to_worktray">Copying to worktray</string>
 	<string name="copy_to_new_mode_title">Copy to new</string>
 	<string name="copy_to_new">Copy to new</string>
+    <string name="copy_to_new_addresses">Addresses</string>
+    <string name="copy_to_new_content">Content</string>
+    <string name="copy_to_new_attachments">Attachments</string>
 	<string name="create_new_document">Create new email</string>
 	<string name="create_system_report">Create system report</string>
 	<string name="creator">Creator:</string>
