@@ -77,6 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CancellationTokenSource loadCts;
 
         bool refreshDataOnAppear;
+        bool hideDoneButton;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
@@ -215,9 +216,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (PresentingViewController == null)
             {
-                nextDocumentButtonItem = null;
-                previousDocumentButtonItem = null;
-
                 nextDocumentButtonItem = new UIBarButtonItem
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "arrow-down.png")),
@@ -240,7 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 rightButtons[1] = previousDocumentButtonItem;
                 NavigationItem.SetRightBarButtonItems(rightButtons, false);
             }
-            else
+            else if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -392,6 +390,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             draftSentToken?.Dispose();
         }
 
+        public void SetData(Folder folder, DocumentPreview documentPreview)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
+            failedDocumentToUploadGuid = Guid.Empty;
+            document = null;
+            documentId = null;
+            folderId = null;
+            notificationGuid = default(Guid);
+
+            this.documentPreview = documentPreview;
+            this.folder = folder;
+        }
+
         public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
@@ -404,6 +416,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             this.documentPreview = documentPreview;
             this.folder = folder;
+            GetNextDocumentPreview = getNextDocumentPreview;
+            GetPreviousDocumentPreview = getPreviousDocumentPreview;
+        }
+
+        public void SetData(DocumentPreview documentPreview, bool hideDoneButton)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
+            failedDocumentToUploadGuid = Guid.Empty;
+            folder = null;
+            document = null;
+            documentId = null;
+            folderId = null;
+            notificationGuid = default(Guid);
+            GetNextDocumentPreview = null;
+            GetPreviousDocumentPreview = null;
+
+            this.documentPreview = documentPreview;
+            this.hideDoneButton = hideDoneButton;
+        }
+
+        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+
+            failedDocumentToUploadGuid = Guid.Empty;
+            document = null;
+            documentId = null;
+            folderId = null;
+            folder = null;
+            notificationGuid = default(Guid);
+
+            this.documentPreview = documentPreview;
             GetNextDocumentPreview = getNextDocumentPreview;
             GetPreviousDocumentPreview = getPreviousDocumentPreview;
         }
@@ -438,36 +483,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             this.documentId = documentId;
             this.notificationGuid = notificationGuid;
-        }
-
-        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
-
-            failedDocumentToUploadGuid = Guid.Empty;
-            document = null;
-            documentId = null;
-            folderId = null;
-            folder = null;
-            notificationGuid = default(Guid);
-
-            this.documentPreview = documentPreview;
-            GetNextDocumentPreview = getNextDocumentPreview;
-            GetPreviousDocumentPreview = getPreviousDocumentPreview;
-        }
-
-        public void SetData(Folder folder, DocumentPreview documentPreview)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
-
-            failedDocumentToUploadGuid = Guid.Empty;
-            document = null;
-            documentId = null;
-            folderId = null;
-            notificationGuid = default(Guid);
-
-            this.documentPreview = documentPreview;
-            this.folder = folder;
         }
 
         public void SetData(Guid failedDocumentToUploadGuid)
