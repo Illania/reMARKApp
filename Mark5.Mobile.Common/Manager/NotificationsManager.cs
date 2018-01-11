@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
-                return;
+                throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task UnSubscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
-                return;
+                throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -159,7 +159,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, ModuleType moduleType, List<Folder> folders, bool enabled, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
-                throw new EmptyTokenException();
+                throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -235,7 +235,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetCalendarNotificationsEnabledAsync(DeviceType deviceType, string pushToken, bool enabled, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
-                throw new EmptyTokenException();
+                throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -298,7 +298,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetNotificationsSoundAsync(DeviceType deviceType, string pushToken, string soundName, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
-                throw new EmptyTokenException();
+                throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -329,7 +329,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
-                throw new EmptyTokenException();
+                throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
