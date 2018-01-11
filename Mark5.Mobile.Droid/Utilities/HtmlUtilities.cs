@@ -167,6 +167,27 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static Task CorrectScale(HtmlDocument htmlDocument)
         {
+            return Task.Run(() =>
+            {
+                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
+                if (headNode == null)
+                    return;
+
+                var existingViewportNodes = headNode.SelectNodes("/meta[@name='viewport']");
+                if (existingViewportNodes != null)
+                    foreach (var existingViewportNode in existingViewportNodes)
+                        existingViewportNode.Remove();
+
+                var viewportElement = htmlDocument.CreateElement("meta");
+                viewportElement.SetAttributeValue("id", "viewport");
+                viewportElement.SetAttributeValue("name", "viewport");
+                viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
+                headNode.PrependChild(viewportElement);
+            });
+        }
+
+        public static Task InjectFonts(HtmlDocument htmlDocument)
+        {
             return Task.CompletedTask;
 
             //
@@ -181,34 +202,13 @@ namespace Mark5.Mobile.Droid.Utilities
             //    if (headNode == null)
             //        return;
 
-            //    var existingViewportNodes = headNode.SelectNodes("/meta[@name='viewport']");
-            //    if (existingViewportNodes != null)
-            //        foreach (var existingViewportNode in existingViewportNodes)
-            //            existingViewportNode.Remove();
-
-            //    var viewportElement = htmlDocument.CreateElement("meta");
-            //    viewportElement.SetAttributeValue("id", "viewport");
-            //    viewportElement.SetAttributeValue("name", "viewport");
-            //    viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
-            //    headNode.PrependChild(viewportElement);
+            //    var cssLinkElement = htmlDocument.CreateElement("link");
+            //    cssLinkElement.SetAttributeValue("id", "fonts");
+            //    cssLinkElement.SetAttributeValue("rel", "stylesheet");
+            //    cssLinkElement.SetAttributeValue("type", "text/css");
+            //    cssLinkElement.SetAttributeValue("href", "file:///android_asset/fonts.css");
+            //    headNode.PrependChild(cssLinkElement);
             //});
-        }
-
-        public static Task InjectFonts(HtmlDocument htmlDocument)
-        {
-            return Task.Run(() =>
-            {
-                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
-                if (headNode == null)
-                    return;
-
-                var cssLinkElement = htmlDocument.CreateElement("link");
-                cssLinkElement.SetAttributeValue("id", "fonts");
-                cssLinkElement.SetAttributeValue("rel", "stylesheet");
-                cssLinkElement.SetAttributeValue("type", "text/css");
-                cssLinkElement.SetAttributeValue("href", "file:///android_asset/fonts.css");
-                headNode.PrependChild(cssLinkElement);
-            });
         }
 
         public static Task MakeEditable(HtmlDocument htmlDocument)
