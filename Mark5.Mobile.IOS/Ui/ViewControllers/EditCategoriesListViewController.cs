@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -16,7 +17,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class EditCategoriesListViewController : AbstractTableViewController
+    public class EditCategoriesListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
         public BusinessEntityPreview BusinessEntityPreview { get; set; }
 
@@ -25,6 +26,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
+
+        UISearchController searchController;
+        CancellationTokenSource searchCancellationTokenSource;
+        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
         public override void LoadView()
         {
@@ -35,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
+            InitializeSearchBar();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -59,6 +65,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
+
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
+
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -85,7 +105,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cancelItem = null;
             doneItem = null;
 
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
             ((DataSource)TableView.Source)?.Reset();
+
+            searchController.SearchResultsUpdater = null;
+            searchController = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -112,11 +140,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeView()
         {
-            TableView.Source = new DataSource(TableView);
+            TableView.Source = new DataSource(TableView, Localization.GetString("no_categories"));
             TableView.AllowsSelection = true;
             TableView.AllowsMultipleSelection = true;
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 40f;
+        }
+
+        void InitializeSearchBar()
+        {
+            DefinesPresentationContext = true;
+
+            var searchResultsController = new UITableViewController();
+            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_categories"));
+            searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 40f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
+
+            searchController = new UISearchController(searchResultsController)
+            {
+                HidesNavigationBarDuringPresentation = true,
+                DimsBackgroundDuringPresentation = true,
+                ObscuresBackgroundDuringPresentation = true,
+                SearchResultsUpdater = this
+            };
+            searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         void InitializeHandlers()
@@ -207,9 +260,80 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
+        {
+            var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
+                ((SearchDataSource)dataSource)?.Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
+                {
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
+
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                DoSearchCategories(searchText, searchCancellationTokenSource.Token);
+            }
+        }
+
+        async void DoSearchCategories(string searchText, CancellationToken ct)
+        {
+            var tableViewController = searchController?.SearchResultsController as UITableViewController;
+            var dataSource = tableViewController?.TableView?.Source as SearchDataSource;
+            dataSource?.Reset();
+
+            await Task.Delay(500);
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            var ds = (DataSource)TableView.Source;
+            var filteredCategories = ds.Items.Where(c => MatchesQuery(c, searchText)).ToList();
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            dataSource?.SetItems(filteredCategories);
+        }
+
+        static bool MatchesQuery(Category c, string query)
+        {
+            if (c.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
+        }
+
+        void ShowCategoryFromSearch(int categoryId)
+        {
+            searchController.Active = false;
+
+            var ds = (DataSource)TableView.Source;
+            var index = ds.Items.FindIndex(c => c.Id == categoryId);
+            if (index < 0)
+                return;
+
+            var indexPath = NSIndexPath.FromRowSection(index, 0);
+
+            TableView.ScrollToRow(indexPath, UITableViewScrollPosition.Middle, true);
+        }
+
         class DataSource : UITableViewSource
         {
             public bool Empty => !items.Any();
+            public List<Category> Items => items;
 
             public List<Category> SelectedItems
             {
@@ -236,13 +360,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             readonly WeakReference<UITableView> tableViewWeakReference;
+            readonly string emptyText;
 
             bool loading = true;
             readonly List<Category> items = new List<Category>();
 
-            public DataSource(UITableView tableView)
+            public DataSource(UITableView tableView, string emptyText)
             {
                 tableViewWeakReference = tableView.Wrap();
+                this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -253,7 +379,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
-                    emptyCell.Initialize(Localization.GetString("no_categories"));
+                    emptyCell.Initialize(emptyText);
                     return emptyCell;
                 }
 
@@ -322,6 +448,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+        }
+
+        class SearchDataSource : DataSource
+        {
+            public WeakReference<EditCategoriesListViewController> viewControllerWeakReference;
+
+            public SearchDataSource(EditCategoriesListViewController viewController, UITableView tableView, string emptyText)
+                : base(tableView, emptyText)
+            {
+                viewControllerWeakReference = viewController.Wrap();
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = base.GetCell(tableView, indexPath);
+
+                if (cell is CategoriesTableViewCell)
+                    cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+
+                return cell;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath) as CategoriesTableViewCell;
+                if (cell == null)
+                    return;
+
+                viewControllerWeakReference.Unwrap()?.ShowCategoryFromSearch(cell.CategoryId);
+            }
+
+            public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+            {
             }
         }
     }
