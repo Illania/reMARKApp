@@ -218,6 +218,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return Localization.GetString("error_dataaccessexception_title");
             if (ex is InvalidSourceTypeException)
                 return Localization.GetString("error_invalidsourcetypeexception_title");
+            if (ex is ArgumentException)
+                return Localization.GetString("error_argumentexception_title");
 
             return Localization.GetString("error_generalexception_title");
         }
@@ -236,6 +238,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return ex.Message;
             if (ex is InvalidSourceTypeException)
                 return Localization.GetString("error_invalidsourcetypeexception_message");
+            if (ex is ArgumentException)
+                return ex.Message;
 
             return ex.Message;
         }
@@ -253,6 +257,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (ex is DataAccessException)
                 return true;
             if (ex is InvalidSourceTypeException)
+                return false;
+            if (ex is ArgumentException)
                 return false;
 
             return true;

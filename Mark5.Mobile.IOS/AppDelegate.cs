@@ -203,8 +203,15 @@ namespace Mark5.Mobile.IOS
                 Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
             }
 
-            CommonConfig.Logger.Info("Sending new APNS token...");
-            Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
+            if (!string.IsNullOrWhiteSpace(newToken))
+            {
+                CommonConfig.Logger.Info("Sending new APNS token...");
+                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
+            }
+            else
+            {
+                CommonConfig.Logger.Info("Received empty or null APNS token...");
+            }
         }
 
         public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
