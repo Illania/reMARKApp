@@ -241,6 +241,24 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
+			<string>contacts</string>
+			<key>FooterText</key>
+			<string>caller_identification_desc</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Title</key>
+			<string>caller_identification</string>
+			<key>Key</key>
+			<string>CallerIdentificationEnabled</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
 			<string>search</string>
 		</dict>
 		<dict>
@@ -362,28 +380,6 @@
 			<string>ClearCache</string>
 			<key>DefaultValue</key>
 			<string>No</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>Title</key>
-			<string>caller_identification</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>FooterText</key>
-			<string>caller_identification_desc</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>Title</key>
-			<string>caller_identification_enabled</string>
-			<key>Key</key>
-			<string>CallerIdentificationEnabled</string>
-			<key>DefaultValue</key>
-			<string></string>
 		</dict>
 		<dict>
 			<key>Type</key>

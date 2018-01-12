@@ -10,6 +10,7 @@ using Mark5.Mobile.IOS.Common.CallId;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -70,6 +71,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
 
+        public override void WillDisplayFooterView(UITableView tableView, UIView footerView, nint section)
+        {
+            if (footerView is UITableViewHeaderFooterView footer)
+            {
+                var text = footer.TextLabel.Text ?? string.Empty;
+                footer.TextLabel.Text = null;
+                footer.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = Theme.DefaultFont.WithRelativeSize(-2f) });
+            }
+        }
+
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)
         {
             var footerText = SettingsReader.GetFooterText(section);
@@ -80,7 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
             var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue),
                                                                 NSStringDrawingOptions.UsesLineFragmentOrigin,
-                                                                new UIStringAttributes { Font = Theme.DefaultFont },
+                                                                new UIStringAttributes { Font = Theme.DefaultFont.WithRelativeSize(-2f) },
                                                                 null);
 
             return size.Height + 10f;
@@ -126,9 +137,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
 
                 if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
-                    cell.DetailTextLabel.Text = "Yes";
+                    cell.DetailTextLabel.Text = "Enabled";
                 else
-                    cell.DetailTextLabel.Text = "No";
+                    cell.DetailTextLabel.Text = "Disabled";
                     
                 cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;

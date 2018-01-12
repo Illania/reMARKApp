@@ -11,13 +11,13 @@
 "anyone" = "Anyone";
 "cache" = "Cache";
 "caller_identification" = "Caller identification";
-"caller_identification_enabled" = "Caller identification enabled";
-"caller_identification_desc" = "To enable caller identification all contacts and companies must be saved offline. Furthermore MARK5 must be allowed to identify calls in Settings => Call Blocking & Identification.";
+"caller_identification_desc" = "To enable caller identification contacts must be saved offline and MARK5 must be allowed to identify calls in Settings, Call Blocking & Identification.";
 "clean_cache_interval_days" = "Compact cache every";
 "clear_all_cache" = "Clear all cache";
 "compact_documents_list" = "Compact emails list";
 "compose_options" = "Compose email options";
 "compose_priority_enabled" = "Show priority field";
+"contacts" = "Contacts";
 "contact_section_visibility" = "Sections";
 "contacts_to_search" = "Contacts search results";
 "create_report" = "Create system report";
