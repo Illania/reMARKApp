@@ -181,7 +181,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcodes, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
@@ -227,7 +227,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
             var vc = new ShortcodeViewController();
-            vc.SetData(shortcodePreview);
+            vc.SetData(shortcodePreview, true);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
         }
@@ -300,7 +300,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedShortcode, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
@@ -456,7 +456,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return -1;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading || Empty)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {

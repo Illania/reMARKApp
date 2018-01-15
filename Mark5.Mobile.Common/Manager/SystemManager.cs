@@ -63,8 +63,8 @@ namespace Mark5.Mobile.Common.Manager
                 });
 
                 var result = new SystemUsersDepartments();
-                result.Users.AddRange(systemSettingsResult.Users.WhereNotNull().Select(u => u.Convert()));
-                result.Departments.AddRange(systemSettingsResult.Departments.WhereNotNull().Select(d => d.Convert()));
+                result.Users.AddRange(systemSettingsResult.Users.WhereNotNull().OrderBy(su => su.Username).Select(u => u.Convert()));
+                result.Departments.AddRange(systemSettingsResult.Departments.WhereNotNull().OrderBy(sd => sd.Name).Select(d => d.Convert()));
 
                 await FileSystemStorage.SaveSystemUsersDepartmentsAsync(result);
 

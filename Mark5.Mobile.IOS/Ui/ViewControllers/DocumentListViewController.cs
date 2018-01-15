@@ -390,7 +390,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments, d)));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocuments, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
@@ -576,28 +576,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    Respond(selectedDocument, DocumentCreationModeFlag.Reply);
-                    EndEditing();
-                }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    Respond(selectedDocument, DocumentCreationModeFlag.ReplyAll);
-                    EndEditing();
-                }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    Respond(selectedDocument, DocumentCreationModeFlag.Forward);
-                    EndEditing();
-                }));
-
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
@@ -620,7 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
@@ -751,19 +729,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Error($"Error while deleting documents", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-        }
-
-        void Respond(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
-        {
-            var vc = new ComposeDocumentViewController
-            {
-                DocumentCreationModeFlag = creationModeFlag,
-                PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocumentFolderId = Folder.Id,
-                PreviousDocumentId = documentPreview.Id
-            };
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void ShowCategories(DocumentPreview selectedDocument)
@@ -1221,7 +1186,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Items.Count;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false;
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading || Empty)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
@@ -1387,14 +1358,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             if (cts.IsCancellationRequested)
                                 break;
 
-                            var first = firstOrDefaultItem();
-                            if (first != null)
+                            await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
                             {
-                                await AsyncHelpers.InvokeOnMainThreadAsync(this, async () =>
+                                var first = firstOrDefaultItem?.Invoke();
+                                if (first != null)
                                 {
-                                    await work(first.Id);
-                                });
-                            }
+                                    if (work != null)
+                                        await work(first.Id);
+                                }
+                            });
                         }
                     });
                 }

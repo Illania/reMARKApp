@@ -119,6 +119,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RecyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             RecyclerView.SetItemAnimator(new DefaultItemAnimator());
             RecyclerView.HasFixedSize = true;
+            RecyclerView.SetBackgroundColor(Color.Transparent);
+            var bottomPadding = Conversion.ConvertDpToPixels(56) + (Resources.GetDimension(Resource.Dimension.fab_margin) + 2) * 2;
+            RecyclerView.SetPadding(0, 0, 0, (int)bottomPadding);
 
             Adapter = new FolderListAdapter(Context, RecyclerView);
             Adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>

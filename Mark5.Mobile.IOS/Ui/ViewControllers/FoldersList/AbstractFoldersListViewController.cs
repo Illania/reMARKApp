@@ -690,6 +690,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public async void EnableNotifications(Folder folder)
         {
+            if (string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+            {
+                CommonConfig.Logger.Info("Empty APNS token");
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("empty_token_enable_title"), Localization.GetString("empty_token_enable_content"));
+                return;
+            }
+
             try
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
@@ -697,10 +704,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.IOS,
                     PlatformConfig.Preferences.PushNotificationToken,
                     folder.Module,
-                    new List<Folder>
-                    {
-                        folder
-                    },
+                    new List<Folder> { folder },
                     true);
 
                 if (TableView.Source is GrouppedDataSource gds)
@@ -729,6 +733,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public async void DisableNotifications(Folder folder)
         {
+            if (string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+            {
+                CommonConfig.Logger.Info("Empty APNS token");
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("empty_token_disable_title"), Localization.GetString("empty_token_disable_content"));
+                return;
+            }
+
             try
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderNotifyEvent(folder.Module, 1));
@@ -1391,7 +1402,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderExpand(f);
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => !disableRowActions && (tableView.CellAt(indexPath)?.UserInteractionEnabled ?? false);
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (disableRowActions || loading || Empty)
+                    return false;
+
+                return true;
+            }
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {

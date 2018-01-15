@@ -129,6 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             var paddingLinearLayout = Conversion.ConvertDpToPixels(10);
+
             linearLayout.SetPadding(paddingLinearLayout, paddingLinearLayout * 3, paddingLinearLayout, paddingLinearLayout);
             linearLayout.SetClipToPadding(false);
 
@@ -169,6 +170,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department)
                 {
+                    int paddingFab = Conversion.ConvertDpToPixels(16);
+                    int fabHeight = Conversion.ConvertDpToPixels(56);
+
+                    linearLayout.SetPadding(linearLayout.PaddingLeft, linearLayout.Top, linearLayout.PaddingRight, linearLayout.PaddingBottom + paddingFab + fabHeight); 
                     fab.SetImageResource(Resource.Drawable.action_add);
                     fab.SetOnClickListener(new ActionOnClickListener(AddChildrenContact));
                     fab.Visibility = ViewStates.Visible;
@@ -222,7 +227,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
@@ -365,6 +370,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { contactPreview }, folder);
 
                 dismissAction();
+                Activity?.OnBackPressed();
             }
             catch (Exception ex)
             {
@@ -632,7 +638,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void RefreshTitle()
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = contactPreview?.Name;
-            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = contactPreview?.CompanyName;
+
+            if (contactPreview.Type == ContactType.Person)
+            {
+                if (!string.IsNullOrEmpty(contactPreview?.CompanyName) && !string.IsNullOrEmpty(contact?.Position))
+                {
+                    ((AppCompatActivity)Activity).SupportActionBar.Subtitle = $"{contact.Position} @ {this.contactPreview.CompanyName}";
+                }
+                else
+                {
+                    string subtitle = string.Empty;
+                    subtitle += contact.Position;
+                    subtitle += contactPreview.CompanyName;
+
+                    ((AppCompatActivity)Activity).SupportActionBar.Subtitle = subtitle;
+                }
+            }
+            else
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = contactPreview?.CompanyName;
 
             descriptionCardTitle.Text = $"About {contactPreview?.Name}";
         }

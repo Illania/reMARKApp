@@ -407,10 +407,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return 60.0f;
             }
 
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                return true;
-            }
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath) => true;
 
             public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
             {

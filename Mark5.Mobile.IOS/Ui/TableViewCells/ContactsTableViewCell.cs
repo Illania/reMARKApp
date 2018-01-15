@@ -1,3 +1,4 @@
+using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -20,6 +21,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.DisclosureIndicator;
 
+            var leadingMarginGuide = new UILayoutGuide();
+            ContentView.AddLayoutGuide(leadingMarginGuide);
+
+            leadingMarginGuide.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor).Active = true;
+            var leadingMarginWidthAnchor = leadingMarginGuide.WidthAnchor.ConstraintEqualTo(0f);
+            leadingMarginWidthAnchor.SetIdentifier("leadingMarginWidth");
+            leadingMarginWidthAnchor.Active = true;
+
             categoriesStackView = new UIStackView
             {
                 Axis = UILayoutConstraintAxis.Vertical,
@@ -40,12 +49,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             ContentView.AddConstraints(new[]
             {
-                categoriesStackView.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor, -8f),
+                categoriesStackView.TrailingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor, -8f),
                 categoriesStackView.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
                 categoriesStackView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -4f),
                 categoriesStackView.WidthAnchor.ConstraintEqualTo(4f),
 
-                label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                label.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
                 label.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
                 label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 8f),
                 label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -8f),
@@ -71,24 +80,60 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public override void SetSelected(bool selected, bool animated)
         {
+            UIColor[] colors = null;
+
+            if (categoriesStackView != null)
+            {
+                colors = new UIColor[categoriesStackView.Subviews.Length];
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    colors[i] = categoriesStackView.Subviews[i].BackgroundColor;
+            }
+
             base.SetSelected(selected, animated);
 
-            categoriesStackView.Subviews.ForEach(v =>
+            if (colors != null)
             {
-                if (v.BackgroundColor.CGColor.Alpha < 1f)
-                    v.BackgroundColor = v.BackgroundColor.ColorWithAlpha(1f);
-            });
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    categoriesStackView.Subviews[i].BackgroundColor = colors[i];
+
+                colors = null;
+            }
         }
 
         public override void SetHighlighted(bool highlighted, bool animated)
         {
+            UIColor[] colors = null;
+
+            if (categoriesStackView != null)
+            {
+                colors = new UIColor[categoriesStackView.Subviews.Length];
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    colors[i] = categoriesStackView.Subviews[i].BackgroundColor;
+            }
+
             base.SetHighlighted(highlighted, animated);
 
-            categoriesStackView.Subviews.ForEach(v =>
+            if (colors != null)
             {
-                if (v.BackgroundColor.CGColor.Alpha < 1f)
-                    v.BackgroundColor = v.BackgroundColor.ColorWithAlpha(1f);
-            });
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    categoriesStackView.Subviews[i].BackgroundColor = colors[i];
+
+                colors = null;
+            }
+        }
+
+        public override void SetEditing(bool editing, bool animated)
+        {
+            base.SetEditing(editing, animated);
+
+            var c = ContentView?.Constraints?.FirstOrDefault(nslc => nslc.GetIdentifier() == "leadingMarginWidth");
+            if (c != null)
+                c.Constant = editing ? 16f : 0f;
+
+            if (animated)
+                AnimateNotify(.25d, ContentView.LayoutIfNeeded, null);
+            else
+                LayoutIfNeeded();
         }
     }
 }
