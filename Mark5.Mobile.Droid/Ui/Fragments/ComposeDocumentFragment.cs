@@ -39,8 +39,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string PreviousDocumentIdBundleKey = "PreviousDocumentId_b8e521b8-8a8a-42ce-9d67-99b61abdafd2";
         const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
 
-        const string StateKey = "State_4601ad7b-fff8-4155-bbcd-c8737554a830";
-
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 2.5 seconds
 

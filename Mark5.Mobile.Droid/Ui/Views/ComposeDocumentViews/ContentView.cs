@@ -138,13 +138,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task RefreshView()
         {
-            if (State != null)
-            {
-                await RestoreState();
-                State = null;
-                return;
-            }
-
             await SetNewHtmlContentAsync(DefaultEditContent);
             if (RestoreWorkingCopy)
             {
@@ -471,50 +464,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         string GetLinesTextFromPreviousDocument()
         {
             return string.Join(", ", PreviousDocument.Lines.Select(l => l.FromAddress));
-        }
-
-        #endregion
-
-        #region State related
-
-        async Task RestoreState()
-        {
-            var contentViewState = (ContentViewState)State;
-            oldContentLoaded = contentViewState.OldContentLoaded;
-            oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
-            showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
-            showOldContentButton.Text = contentViewState.ShowOldContentButtonText;
-
-            await SetNewHtmlContentAsync(contentViewState.NewContent);
-
-            if (oldContentLoaded)
-                await SetOldHtmlContentAsync(contentViewState.OldContent);
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            var newContentString = AsyncHelpers.RunSync(() => { return GetNewHtmlContentAsync(); });
-            var oldContentString = AsyncHelpers.RunSync(() => { return GetOldHtmlContentAsync(); });
-
-            return new ContentViewState
-            {
-                NewContent = newContentString,
-                OldContent = oldContentString,
-                OldContentLoaded = oldContentLoaded,
-                OldContentWebViewVisibility = oldContentWebView.Visibility,
-                ShowOldContentButtonVisibility = showOldContentButton.Visibility,
-                ShowOldContentButtonText = showOldContentButton.Text,
-            };
-        }
-
-        class ContentViewState : IComposeDocumentViewState
-        {
-            public string NewContent { get; set; }
-            public string OldContent { get; set; }
-            public bool OldContentLoaded { get; set; }
-            public ViewStates OldContentWebViewVisibility { get; set; }
-            public ViewStates ShowOldContentButtonVisibility { get; set; }
-            public string ShowOldContentButtonText { get; set; }
         }
 
         #endregion

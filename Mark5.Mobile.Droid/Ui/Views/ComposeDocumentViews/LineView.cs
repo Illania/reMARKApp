@@ -65,12 +65,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
-            if (State != null)
-            {
-                RestoreState();
-                State = null;
-                return Task.CompletedTask;
-            }
             if (RestoreWorkingCopy)
             {
                 SetLine(Document.Lines.FirstOrDefault());
@@ -137,26 +131,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         }
 
         public Line GetLine() => availableOutgoingLines[lineSpinner.SelectedItemPosition];
-
-        #endregion
-
-        #region State related
-
-        void RestoreState()
-        {
-            var lineViewState = (LineViewState)State;
-            SetLine(lineViewState.SelectedLine);
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            return new LineViewState { SelectedLine = GetLine() };
-        }
-
-        class LineViewState : IComposeDocumentViewState
-        {
-            public Line SelectedLine { get; set; }
-        }
 
         #endregion
 
