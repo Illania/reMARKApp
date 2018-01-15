@@ -470,7 +470,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
                 menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
 
             return true;
