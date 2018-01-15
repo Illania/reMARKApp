@@ -38,6 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+        string lastSearchQuery;
 
         AutoRefreshWorker autoRefreshWorker;
         Action newDocumentsAvailableAction;
@@ -93,6 +94,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
 
+            if (searchController.SearchResultsController is UITableViewController searchTableViewController)
+            {
+                if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
+                    searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+
+                if (searchTableViewController?.TableView?.IndexPathsForSelectedRows?.Length > 0)
+                    foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
+                        searchTableViewController.TableView.DeselectRow(selectedIndexPath, true);
+            }
+
+
             ReachabilityBar.Attach(this);
         }
 
@@ -135,9 +147,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             autoRefreshWorker?.Stop();
             autoRefreshWorker?.Dispose();
             autoRefreshWorker = null;
-
-            if (searchController != null && searchController.Active)
-                searchController.Active = false;
         }
 
         public override void ViewDidDisappear(bool animated)
@@ -848,6 +857,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                if (searchText == lastSearchQuery)
+                    return;
+
+                lastSearchQuery = searchText;
 
                 DoSearchDocuments(searchText, searchCancellationTokenSource.Token);
             }
