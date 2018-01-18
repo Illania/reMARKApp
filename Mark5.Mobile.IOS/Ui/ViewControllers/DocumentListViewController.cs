@@ -39,6 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+        string lastSearchQuery;
 
         AutoRefreshWorker autoRefreshWorker;
         Action newDocumentsAvailableAction;
@@ -94,6 +95,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
 
+            if (searchController.SearchResultsController is UITableViewController searchTableViewController)
+            {
+                if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
+                    searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+
+                if (searchTableViewController?.TableView?.IndexPathsForSelectedRows?.Length > 0)
+                    foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
+                        searchTableViewController.TableView.DeselectRow(selectedIndexPath, true);
+            }
+
+
             ReachabilityBar.Attach(this);
         }
 
@@ -136,9 +148,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             autoRefreshWorker?.Stop();
             autoRefreshWorker?.Dispose();
             autoRefreshWorker = null;
-
-            if (searchController != null && searchController.Active)
-                searchController.Active = false;
         }
 
         public override void ViewDidDisappear(bool animated)
@@ -391,7 +400,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments, d)));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocuments, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
@@ -587,28 +596,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    Respond(selectedDocument, DocumentCreationModeFlag.Reply);
-                    EndEditing();
-                }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("reply_all"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    Respond(selectedDocument, DocumentCreationModeFlag.ReplyAll);
-                    EndEditing();
-                }));
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("forward"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    Respond(selectedDocument, DocumentCreationModeFlag.Forward);
-                    EndEditing();
-                }));
-
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
@@ -631,7 +618,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
@@ -764,19 +751,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void Respond(DocumentPreview documentPreview, DocumentCreationModeFlag creationModeFlag)
-        {
-            var vc = new ComposeDocumentViewController
-            {
-                DocumentCreationModeFlag = creationModeFlag,
-                PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocumentFolderId = Folder.Id,
-                PreviousDocumentId = documentPreview.Id
-            };
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
         void ShowCategories(DocumentPreview selectedDocument)
         {
             var vc = new CategoriesListViewController
@@ -894,6 +868,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                if (searchText == lastSearchQuery)
+                    return;
+
+                lastSearchQuery = searchText;
 
                 DoSearchDocuments(searchText, searchCancellationTokenSource.Token);
             }

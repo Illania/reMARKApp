@@ -36,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+        string lastSearchQuery;
 
         CancellationTokenSource cts;
 
@@ -81,6 +82,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (TableView?.IndexPathsForSelectedRows?.Length > 0)
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
+
+            if (searchController.SearchResultsController is UITableViewController searchTableViewController)
+            {
+                if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
+                    searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+
+                if (searchTableViewController?.TableView?.IndexPathsForSelectedRows?.Length > 0)
+                    foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
+                        searchTableViewController.TableView.DeselectRow(selectedIndexPath, true);
+            }
         }
 
         public override void ViewDidAppear(bool animated)
@@ -116,9 +127,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             DeinitializeHandlers();
 
             cts?.Cancel();
-
-            if (searchController != null && searchController.Active)
-                searchController.Active = false;
         }
 
         public override void WillMoveToParentViewController(UIViewController parent)
@@ -314,7 +322,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedContacts, d)));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContacts, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => ExitEditItem.Enabled = true));
@@ -478,7 +486,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedContact, d)));
 
-            if (ServerConfig.SystemSettings.UserInfo.IsSystemAdministrator || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedContact, d)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => EndEditing()));
@@ -628,6 +636,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                if (searchText == lastSearchQuery)
+                    return;
+
+                lastSearchQuery = searchText;
 
                 DoSearchContacts(searchText, searchCancellationTokenSource.Token);
             }

@@ -118,6 +118,10 @@
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "edit_original_email" = "Edit original email";
 "editing_comment___" = "Editing comment...";
+"empty_token_enable_title" = "Problem while enabling notifications";
+"empty_token_enable_content" = "It is not possible to enable notifications at the moment. Please try again later or restart the app.";
+"empty_token_disable_title" = "Problem while disabling notifications";
+"empty_token_disable_content" = "It is not possible to disable notifications at the moment. Please try again later or restart the app.";
 "email" = "Email";
 "enable_notifications" = "Notify";
 "enable_sync" = "Enable\nsync";
@@ -134,6 +138,7 @@
 "error_removing_local_attachment" = "Error while removing local attachment";
 "error_saving_local_attachment" = "Error while saving local attachment";
 "error_while_sending_document" = "Error while sending email";
+"error_argumentexception_title" = "Argument exception";
 "existing_photo" = "Add existing photo";
 "failed" = "Failed";
 "failed_send_document_notification_content" = "One or more emails could not be sent. Please check Outgoing folder for details.";
