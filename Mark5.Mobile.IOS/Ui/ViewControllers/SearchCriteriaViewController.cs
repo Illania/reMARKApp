@@ -69,19 +69,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void EncodeRestorableState(NSCoder coder)
         {
             base.EncodeRestorableState(coder);
-            coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
-            coder.Encode(ViewControllers[0], "vc_0");
-            coder.Encode(ViewControllers[1], "vc_1");
-            coder.Encode(ViewControllers[2], "vc_2");
+
+            if (SegmentedControl != null)
+                coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
+
+            if (ViewControllers != null && ViewControllers.Length == 3)
+            {
+                coder.Encode(ViewControllers[0], "vc_0");
+                coder.Encode(ViewControllers[1], "vc_1");
+                coder.Encode(ViewControllers[2], "vc_2");
+            }
         }
 
         public override void DecodeRestorableState(NSCoder coder)
         {
             base.DecodeRestorableState(coder);
-            SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
-            documentsSearchCriteriaViewController = (DocumentsSearchCriteriaViewController)coder.DecodeObject("vc_0");
-            contactsSearchViewController = (ContactsSearchCriteriaViewController)coder.DecodeObject("vc_1");
-            shortcodesSearchCriteriaViewController = (ShortcodesSearchCriteriaViewController)coder.DecodeObject("vc_2");
+
+            if (coder.ContainsKey("selectedSegment"))
+                SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+
+            if (coder.ContainsKey("vc_0"))
+                documentsSearchCriteriaViewController = (DocumentsSearchCriteriaViewController)coder.DecodeObject("vc_0");
+
+            if (coder.ContainsKey("vc_1"))
+                contactsSearchViewController = (ContactsSearchCriteriaViewController)coder.DecodeObject("vc_1");
+
+            if (coder.ContainsKey("vc_2"))
+                shortcodesSearchCriteriaViewController = (ShortcodesSearchCriteriaViewController)coder.DecodeObject("vc_2");
         }
 
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
