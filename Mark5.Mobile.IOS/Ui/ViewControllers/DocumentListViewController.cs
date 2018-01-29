@@ -1285,9 +1285,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                Items.InsertRange(0, documentPreviews);
-                var indexes = Enumerable.Range(0, documentPreviews.Count()).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
-                tableViewWeakReference.Unwrap()?.InsertRows(indexes, UITableViewRowAnimation.Fade);
+                if (Empty)
+                {
+                    Items.InsertRange(0, documentPreviews);
+
+                    tableViewWeakReference.Unwrap()?.BeginUpdates();
+
+                    tableViewWeakReference.Unwrap()?.ReloadRows(new[] { NSIndexPath.FromRowSection(0, 0) }, UITableViewRowAnimation.Automatic);
+
+                    if (documentPreviews.Count() > 1)
+                    {
+                        var indexes = Enumerable.Range(1, documentPreviews.Count() - 1).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                        tableViewWeakReference.Unwrap()?.InsertRows(indexes, UITableViewRowAnimation.Fade);
+                    }
+
+                    tableViewWeakReference.Unwrap()?.EndUpdates();
+                }
+                else
+                {
+                    Items.InsertRange(0, documentPreviews);
+                    var indexes = Enumerable.Range(0, documentPreviews.Count()).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    tableViewWeakReference.Unwrap()?.InsertRows(indexes, UITableViewRowAnimation.Fade);
+                }
+
             }
 
             public void AppendItems(IEnumerable<DocumentPreview> documentPreviews)
