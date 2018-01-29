@@ -1,0 +1,24 @@
+﻿@font-face {
+    font-family: 'Calibri';
+    src: url('fonts/calibri.ttf');
+}
+@font-face {
+    font-family: 'Cambria';
+    src: url('fonts/cambria.ttf');
+}
+@font-face {
+    font-family: 'Courier New';
+    src: url('fonts/couriernew.ttf');
+}
+@font-face {
+    font-family: 'Open Sans';
+    src: url('fonts/opensans.ttf');
+}
+@font-face {
+    font-family: 'Tahoma';
+    src: url('fonts/tahoma.ttf');
+}
+@font-face {
+    font-family: 'Trebuchet MS';
+    src: url('fonts/trebuchetms.ttf');
+}

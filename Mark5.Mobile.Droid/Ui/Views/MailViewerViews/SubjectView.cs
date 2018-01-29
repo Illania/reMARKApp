@@ -1,4 +1,5 @@
-﻿using Android.Content;
+﻿using System.Threading.Tasks;
+using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -28,7 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
             AddView(subjectTextView);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (MailMessage != null)
             {
@@ -40,6 +41,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 Visibility = ViewStates.Gone;
                 subjectTextView.Text = string.Empty;
             }
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -266,7 +266,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void DocumentSelected(DocumentPreview documentPreview)
         {
             var vc = new DocumentViewController();
-            vc.SetData(documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview, true);
+            vc.SetData(documentPreview, true);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
         }
@@ -571,44 +571,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.SetEditing(false, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
-        }
-
-        public DocumentPreview GetNextDocumentPreview(DocumentPreview documentPreview, out bool previousDocumentAvailable, out bool nextDocumentAvailable, bool scrollToDocument = false)
-        {
-            var ds = ((DataSource)TableView.Source);
-
-            var currentDocumentRow = ds.Items.IndexOf(d => d.Id == documentPreview.Id);
-            if (currentDocumentRow < 0)
-            {
-                previousDocumentAvailable = false;
-                nextDocumentAvailable = false;
-                return null;
-            }
-
-            var nextDocumentRow = currentDocumentRow + 1;
-            previousDocumentAvailable = true;
-            nextDocumentAvailable = nextDocumentRow < ds.Items.Count - 1;
-
-            return ds.Items.ElementAtOrDefault(nextDocumentRow);
-        }
-
-        public DocumentPreview GetPreviousDocumentPreview(DocumentPreview documentPreview, out bool previousDocumentAvailable, out bool nextDocumentAvailable, bool scrollToDocument = false)
-        {
-            var ds = ((DataSource)TableView.Source);
-
-            var currentDocumentRow = ds.Items.IndexOf(d => d.Id == documentPreview.Id);
-            if (currentDocumentRow < 0)
-            {
-                previousDocumentAvailable = false;
-                nextDocumentAvailable = false;
-                return null;
-            }
-
-            var previousDocumentRow = currentDocumentRow - 1;
-            previousDocumentAvailable = previousDocumentRow > 0;
-            nextDocumentAvailable = previousDocumentRow < ds.Items.Count - 1;
-
-            return ds.Items.ElementAtOrDefault(previousDocumentRow);
         }
 
         #endregion

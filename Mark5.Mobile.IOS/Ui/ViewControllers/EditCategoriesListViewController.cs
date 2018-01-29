@@ -231,7 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void DoneItem_Clicked(object sender, EventArgs e)
         {
-            CommonConfig.Logger.Info($"Updateing categories... [entity={BusinessEntityPreview}]");
+            CommonConfig.Logger.Info($"Updating categories... [entity={BusinessEntityPreview}]");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_categories___"));
 

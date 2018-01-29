@@ -48,6 +48,21 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
+        public static string PrettyCopyToNewString(CopyToNewOption copyToNew)
+        {
+            switch (copyToNew)
+            {
+                case CopyToNewOption.Addresses:
+                    return Localization.GetString("copy_to_new_addresses");
+                case CopyToNewOption.Content:
+                    return Localization.GetString("copy_to_new_content");
+                case CopyToNewOption.Attachments:
+                    return Localization.GetString("copy_to_new_attachments");
+                default:
+                    return string.Empty;
+            }
+        }
+
         #endregion
 
         #region Color

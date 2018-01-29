@@ -1,10 +1,13 @@
-﻿namespace Mark5.Mobile.Common.Model
+﻿using System;
+
+namespace Mark5.Mobile.Common.Model
 {
+    [Flags]
     public enum CopyToNewOption
     {
-        None,
-        KeepOnlyAddresses,
-        KeepTextAndAttachments,
-        KeepOnlyAttachments
+        None = 0,
+        Addresses = 1,
+        Content = 2,
+        Attachments = 4
     }
 }

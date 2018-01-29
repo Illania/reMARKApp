@@ -16,7 +16,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             View.BackgroundColor = Theme.White;
         }
 
-
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);

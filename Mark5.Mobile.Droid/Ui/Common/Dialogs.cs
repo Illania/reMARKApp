@@ -190,7 +190,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
-            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(selected)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(null)));
             var md = builder.Build();
             if (selected != null)
             {

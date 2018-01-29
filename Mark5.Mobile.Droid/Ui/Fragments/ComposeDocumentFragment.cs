@@ -17,6 +17,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -236,6 +237,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
                 HandleAddAttachment(data);
+            
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
@@ -303,9 +305,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     document = wc.Document;
                 }
 
-                if (documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption == CopyToNewOption.KeepOnlyAddresses ||
-                    documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption == CopyToNewOption.KeepTextAndAttachments ||
-                    documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption == CopyToNewOption.KeepOnlyAttachments ||
+                if (documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption != CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Reply && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Forward && copyToNewOption == CopyToNewOption.None)
@@ -566,21 +566,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
         }
 
-        public void DeleteAutoSavedDocumentAndClose()
+        public async void DeleteAutoSavedDocumentAndClose()
         {
-            AsyncHelpers.RunSync(async () =>
+            try
             {
-                try
-                {
-                    autoSaveWorkingCopyWorker.Stop();
-                    await autoSaveWorkingCopyWorker.Finished();
-                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Error while deleting autosaved document", ex);
-                }
-            });
+                autoSaveWorkingCopyWorker.Stop();
+                await autoSaveWorkingCopyWorker.Finished();
+                await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while deleting autosaved document", ex);
+            }
 
             Activity?.Finish();
         }
@@ -721,6 +718,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             menu.Clear();
 
+            var insertTemplateItem = menu.Add(Menu.None, MenuItemActions.InsertTemplate, MenuItemActions.InsertTemplate, Resource.String.insert_template);
+            insertTemplateItem.SetIcon(Resource.Drawable.action_add);
+            insertTemplateItem.SetShowAsAction(ShowAsAction.Always);
+
             var attachmentItem = menu.Add(Menu.None, MenuItemActions.AddAttachment, MenuItemActions.AddAttachment, Resource.String.add_attachment);
             attachmentItem.SetIcon(Resource.Drawable.action_attachment);
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
@@ -731,15 +732,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == Android.Resource.Id.Home)
                 AskIfShouldSave();
 
+            if (item.ItemId == MenuItemActions.InsertTemplate)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
+                GetAllTemplates();
+            }
+
             if (item.ItemId == MenuItemActions.AddAttachment)
+            {
+                
+                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 AddAttachment();
+            }
 
             return true;
         }
 
         void AddAttachment()
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
             var intent = new Intent(Intent.ActionGetContent);
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
@@ -772,63 +782,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
-            public const int AddAttachment = 10;
+            public const int InsertTemplate = 10;
+            public const int AddAttachment = 20;
         }
 
         #endregion
 
         #region Template methods
-
-        void ProcessTemplate(Template template)
-        {
-            var templateContent = template.Content;
-
-            var currentTime = DateTime.Now;
-            var dateString = currentTime.ToString("dd-MM-yyyy");
-            var timeString = currentTime.ToString("HH:mm");
-
-            var fromNameString = string.Empty;
-
-            if (previousDocumentPreview != null && previousDocumentPreview.Addresses != null)
-                fromNameString = previousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
-
-            if (template.ContentType == ContentType.Html)
-            {
-                templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
-                templateContent = templateContent.Replace("&lt;DATE&gt;", dateString);
-                templateContent = templateContent.Replace("&lt;TIME&gt;", timeString);
-            }
-            else
-            {
-                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
-                templateContent = templateContent.Replace("<DATE>", dateString);
-                templateContent = templateContent.Replace("<TIME>", timeString);
-            }
-
-            if (template.ContentType == ContentType.Html)
-            {
-                templateContent = templateContent.Replace("&lt;CUR&gt;", string.Empty);
-                templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
-                templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
-                templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
-            }
-            else
-            {
-                templateContent = templateContent.Replace("<CUR>", string.Empty);
-                templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
-                templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
-                templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
-            }
-
-            template.Content = templateContent;
-        }
-
-        void GetAllTemplates()
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
-
-            StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
-        }
 
         async Task AskIfShouldUseTemplates()
         {
@@ -836,68 +796,50 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
 
             if (documentCreationModeFlag == DocumentCreationModeFlag.Edit)
-            {
-                CommonConfig.Logger.Info("Document opened in edit mode, no need to add template");
                 return;
-            }
 
-            if (copyToNewOption == CopyToNewOption.KeepTextAndAttachments)
-            {
-                CommonConfig.Logger.Info("Document copied as new with text and attachments, no need to add template");
+            if (copyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
                 return;
-            }
 
-            var useTemplate = PlatformConfig.Preferences.UseTemplate;
-            if (useTemplate == Preferences.TemplateUsageMode.DontUse)
+            switch (PlatformConfig.Preferences.UseTemplate)
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
-                return;
-            }
+                case Preferences.TemplateUsageMode.Default:
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
 
-            if (useTemplate == Preferences.TemplateUsageMode.Local)
-            {
-                await GetLocalTemplate();
-            }
-            else if (useTemplate == Preferences.TemplateUsageMode.Default)
-            {
-                await GetDefaultTemplate();
-            }
-            else if (useTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
-            {
-                var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true);
-                switch (result)
-                {
-                    case 0:
-                        await GetDefaultTemplate(true);
-                        break;
-                    case 1:
-                        await GetLocalTemplate();
-                        break;
-                    case 2:
-                        GetAllTemplates();
-                        break;
-                    default:
-                        CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
-                        break;
-                }
+                    await GetDefaultTemplate();
+                    break;
+                case Preferences.TemplateUsageMode.Local:
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
+
+                    await GetLocalTemplate();
+                    break;
+                case Preferences.TemplateUsageMode.AlwaysAsk:
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Another));
+
+                    var result = await Dialogs.ShowListDialog(Context, Resource.String.template_question, Resource.Array.template_question_options, true);
+                    switch (result)
+                    {
+                        case 0:
+                            await GetDefaultTemplate();
+                            break;
+                        case 1:
+                            await GetLocalTemplate();
+                            break;
+                        case 2:
+                            GetAllTemplates();
+                            break;
+                        default:
+                            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
+                            break;
+                    }
+                    break;
             }
 
             templateLoaded = true;
         }
 
-        async Task GetLocalTemplate()
+        async Task GetDefaultTemplate()
         {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
-
-            var localTemplate = PlatformConfig.Preferences.LocalTemplate;
-            localTemplate = "\n\n\n" + localTemplate;
-            await contentView.InsertLocalTemplate(localTemplate);
-        }
-
-        async Task GetDefaultTemplate(bool errorMessageIfNull = false)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
-
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
             try
@@ -905,8 +847,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(documentCreationModeFlag);
                 if (template != null)
                     await ApplyTemplate(template);
-                else if (errorMessageIfNull)
-                    throw new Exception(Resources.GetString(Resource.String.template_null));
             }
             catch (Exception ex)
             {
@@ -919,6 +859,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
             }
+        }
+
+        void GetAllTemplates()
+        {
+            StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
         }
 
         async Task GetTemplate(TemplatePreview templatePreview)
@@ -944,9 +889,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        async Task GetLocalTemplate()
+        {
+            var localTemplate = PlatformConfig.Preferences.LocalTemplate;
+            await contentView.InsertLocalTemplate(localTemplate);
+        }
+
         async Task ApplyTemplate(Template template)
         {
-            ProcessTemplate(template);
+            ProcessTemplate(template, documentPreview);
 
             await contentView.InsertTemplate(template);
 
@@ -954,6 +905,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.SetSubject(template.Subject);
 
             lineView.SetLine(template.LineGuid);
+        }
+
+        static void ProcessTemplate(Template template, DocumentPreview documentPreview)
+        {
+            var templateContent = template.Content;
+
+            var currentTime = DateTime.Now;
+            var dateString = currentTime.ToString("dd-MM-yyyy");
+            var timeString = currentTime.ToString("HH:mm");
+
+            var fromNameString = string.Empty;
+            if (documentPreview?.Addresses != null)
+                fromNameString = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
+
+            if (template.ContentType == ContentType.Html)
+            {
+                templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
+                templateContent = templateContent.Replace("&lt;DATE&gt;", dateString);
+                templateContent = templateContent.Replace("&lt;TIME&gt;", timeString);
+
+                templateContent = templateContent.Replace("&lt;CUR&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
+                templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
+            }
+            else
+            {
+                templateContent = templateContent.Replace("<FROMNAME>", fromNameString);
+                templateContent = templateContent.Replace("<DATE>", dateString);
+                templateContent = templateContent.Replace("<TIME>", timeString);
+
+                templateContent = templateContent.Replace("<CUR>", string.Empty);
+                templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
+                templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
+                templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
+            }
+
+            template.Content = templateContent;
         }
 
         #endregion

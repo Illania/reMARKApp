@@ -90,7 +90,6 @@
 		<Compile Include="Service\Reachability.cs" />
 		<Compile Include="Ui\Common\AbstractSplitViewController.cs" />
 		<Compile Include="Ui\Common\AbstractViewController.cs" />
-		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\Common\Dialogs.cs" />
 		<Compile Include="Ui\Common\IPrimaryViewController.cs" />
 		<Compile Include="Ui\Common\ISecondaryViewController.cs" />
@@ -117,7 +116,6 @@
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\AbstractMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
@@ -142,13 +140,11 @@
 		<Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentSubView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ContentView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\RecipientsView.cs" />
@@ -158,7 +154,6 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\AttachmentsView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\BccView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\CcView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ContentView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\CreatorView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\DateReceivedView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\DocumentSubView.cs" />
@@ -177,7 +172,6 @@
 		<Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\ContentView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateReceivedView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
@@ -254,7 +248,13 @@
 		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
 		<Compile Include="Utilities\UsageAnalytics.cs" />
 		<Compile Include="Ui\Common\ReachabilityBar.cs" />
+		<Compile Include="Ui\Common\AbstractWebViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
 		<Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\ComposeDocumentView\EditOriginalDocumentViewController.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\DocumentPageViewController.cs" />
+		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
+		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -267,17 +267,11 @@
 		<Reference Include="PCLStorage.Abstractions">
 			<HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.Abstractions.dll</HintPath>
 		</Reference>
-		<Reference Include="PCLStorage">
-			<HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
-		</Reference>
 		<Reference Include="ModernHttpClient">
 			<HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
 		</Reference>
 		<Reference Include="InAppSettingsKit">
 			<HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
-		</Reference>
-		<Reference Include="AngleSharp">
-			<HintPath>..\packages\AngleSharp.0.9.9\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="PreMailer.Net">
 			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
@@ -303,6 +297,7 @@
 		<Reference Include="SQLitePCLRaw.batteries_v2">
 		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
+		<Reference Include="System.Web.Services" />
 		<Reference Include="Firebase.Core">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.4.0.8\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
 		</Reference>
@@ -312,14 +307,20 @@
 		<Reference Include="Firebase.Analytics">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.4.0.4\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
 		</Reference>
+		<Reference Include="PCLStorage">
+		  <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
+		</Reference>
 		<Reference Include="HockeySDK">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
 		</Reference>
 		<Reference Include="HockeySDK.iOSBindings">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
 		</Reference>
+		<Reference Include="AngleSharp">
+		  <HintPath>..\packages\AngleSharp.0.9.9.1\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.6.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		  <HintPath>..\packages\HtmlAgilityPack.1.6.11\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -346,6 +347,12 @@
 		<None Include="Info.plist" />
 		<None Include="Entitlements.plist" />
 		<None Include="packages.config" />
+		<None Include="Resources\html\fonts\calibri.ttf" />
+		<None Include="Resources\html\fonts\cambria.ttf" />
+		<None Include="Resources\html\fonts\couriernew.ttf" />
+		<None Include="Resources\html\fonts\opensans.ttf" />
+		<None Include="Resources\html\fonts\tahoma.ttf" />
+		<None Include="Resources\html\fonts\trebuchetms.ttf" />
 	</ItemGroup>
 	<ItemGroup>
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -512,6 +519,16 @@
 		<BundleResource Include="GoogleService-Info.plist" />
 		<BundleResource Include="Resources\icons\worktray%402x.png" />
 		<BundleResource Include="Resources\icons\worktray%403x.png" />
+		<BundleResource Include="Resources\html\editor.html" />
+		<BundleResource Include="Resources\html\empty.html" />
+		<BundleResource Include="Resources\html\plain.html" />
+		<BundleResource Include="Resources\html\scriptsAtEnd.js" />
+		<BundleResource Include="Resources\html\scriptsAtStart.js" />
+		<BundleResource Include="Resources\html\fonts.css" />
+		<BundleResource Include="Resources\html\insertTemplate.js" />
+		<BundleResource Include="Resources\html\headerPadding.js" />
+		<BundleResource Include="Resources\html\replyHeader.html" />
+		<BundleResource Include="Resources\html\blank.html" />
 	</ItemGroup>
 	<ItemGroup>
 		<XamarinComponentReference Include="InAppSettingsKit">
@@ -525,6 +542,7 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
+	  <Folder Include="Resources\html\fonts\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

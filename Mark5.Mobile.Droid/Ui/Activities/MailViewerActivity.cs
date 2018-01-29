@@ -28,20 +28,9 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(Label = "MARK5 Mail Viewer", ScreenOrientation = ScreenOrientation.Portrait, Exported = true)]
-    [IntentFilter(new[]
-        {
-            Intent.ActionView,
-            Intent.ActionSend
-        },
-        Categories = new[]
-        {
-            Intent.CategoryDefault
-        },
-        DataMimeTypes = new[]
-        {
-            "application/octet-stream",
-            "message/rfc822"
-        })]
+    [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend },
+                  Categories = new[] { Intent.CategoryDefault },
+                  DataMimeTypes = new[] { "application/octet-stream", "message/rfc822" })]
     public class MailViewerActivity : BaseAppCompatActivity
     {
         const long MaxSize = 5 * 1024 * 1024; // 5MB
@@ -142,13 +131,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
         }
 
-        static void MakeHtmlSafe(MailMessage mm)
-        {
-            var p = new Processor();
-            p.Dom.OuterHtml = mm.BodyHtmlText;
-            mm.BodyHtmlText = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
-        }
-
         void LoadMailFromUri()
         {
             var uri = Intent.Data;
@@ -204,7 +186,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                             };
                             mm.LoadMessage(bytes);
                             bytes = null;
-                            MakeHtmlSafe(mm);
                             InlineImages(mm);
                             return mm;
                         }
@@ -238,7 +219,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                         };
                                         mm.LoadMessage(emlStream.ToArray());
                                         emlStream.Dispose();
-                                        MakeHtmlSafe(mm);
                                         InlineImages(mm);
                                         return mm;
                                     }
@@ -271,20 +251,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         {
                             mailMessage = t.Result;
 
-                            RefreshView();
+                            await RefreshView();
                         }
                     },
                     TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void RefreshView()
+        async Task RefreshView()
         {
             for (var i = 0; i < linearLayout.ChildCount; i++)
             {
                 if (linearLayout.GetChildAt(i) is MailViewerView dv)
                 {
                     dv.MailMessage = mailMessage;
-                    dv.RefreshView();
+                    await dv.RefreshView();
 
                     if (linearLayout.GetChildAt(i + 1) is Divider d)
                     {

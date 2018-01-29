@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
@@ -527,8 +528,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!searchController.Active)
                 {
-                    vc.SetData(Folder, documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
-                    newDocumentsAvailableAction = vc.RefreshNavigationBar;
+                    vc.SetData(Folder, documentPreview);
+                    newDocumentsAvailableAction = null;
                 }
                 else
                 {
@@ -540,15 +541,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                var vc = new DocumentViewController();
                 if (searchController.Active)
+                {
+                    var vc = new DocumentViewController();
                     vc.SetData(Folder, documentPreview);
+                    vc.SetRefreshDataOnAppear();
+                    newDocumentsAvailableAction = null;
+                    NavigationController.PushViewController(vc, true);
+                }
                 else
-                    vc.SetData(Folder, documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
-                vc.SetRefreshDataOnAppear();
-
-                newDocumentsAvailableAction = vc.RefreshNavigationBar;
-                NavigationController.PushViewController(vc, true);
+                {
+                    var vc = new DocumentPageViewController
+                    {
+                        Folder = Folder,
+                        InitialDocumentPreview = documentPreview,
+                        DocumentPreviews = ((DataSource)TableView.Source).Items
+                    };
+                    newDocumentsAvailableAction = null;
+                    NavigationController.PushViewController(vc, true);
+                }
             }
         }
 
