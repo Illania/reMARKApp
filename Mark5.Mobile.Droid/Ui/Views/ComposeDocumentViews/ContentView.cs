@@ -124,12 +124,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 await newContentSemaphore.WaitAsync();
                 newContentWebView.LoadEditor(context);
 
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments) ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
+
+                if (PreviousDocument != null && DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content))
                 {
-                    if (PreviousDocumentPreview != null && !string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
+                    if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
+                    {
+                        var config = HtmlProcessingConfiguration.DefaultForEditing;
+
+                        await newContentSemaphore.WaitAsync();
+                        await newContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, config);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
+                    {
+                        var config = PlainTextProcessingConfiguration.DefaultForEditing;
+
+                        await newContentSemaphore.WaitAsync();
+                        await newContentWebView.LoadPlainText(context, PreviousDocument.HtmlBody, config);
+                    }
+                }
+                else if (PreviousDocumentPreview != null && (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                                                             DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                                                             DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None))
+                {
+                    if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
                     {
                         var config = HtmlProcessingConfiguration.DefaultForEditing;
                         config.InjectReplyHeader = true;
@@ -140,7 +157,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                         previousDocumentLoaded = true;
                     }
-                    else if (PreviousDocumentPreview != null && !string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
+                    else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
                     {
                         var config = PlainTextProcessingConfiguration.DefaultForEditing;
                         config.InjectReplyHeader = true;
