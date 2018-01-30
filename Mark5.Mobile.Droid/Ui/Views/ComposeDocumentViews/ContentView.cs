@@ -112,13 +112,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task RefreshView()
         {
-            if (State != null)
-            {
-                await RestoreState();
-                State = null;
-                return;
-            }
-
             if (RestoreWorkingCopy)
             {
                 await newContentSemaphore.WaitAsync();
@@ -199,36 +192,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
             await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
-        }
-
-        #endregion
-
-        #region State related
-
-        Task RestoreState()
-        {
-            var contentViewState = (ContentViewState)State;
-            oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
-            showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
-            showOldContentButton.Text = contentViewState.ShowOldContentButtonText;
-            return Task.CompletedTask;
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            return new ContentViewState
-            {
-                OldContentWebViewVisibility = oldContentWebView.Visibility,
-                ShowOldContentButtonVisibility = showOldContentButton.Visibility,
-                ShowOldContentButtonText = showOldContentButton.Text,
-            };
-        }
-
-        class ContentViewState : IComposeDocumentViewState
-        {
-            public ViewStates OldContentWebViewVisibility { get; set; }
-            public ViewStates ShowOldContentButtonVisibility { get; set; }
-            public string ShowOldContentButtonText { get; set; }
         }
 
         #endregion
