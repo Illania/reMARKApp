@@ -23,6 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly AppCompatSpinner lineSpinner;
         readonly Line defaultOutgoingLine;
         readonly List<Line> availableOutgoingLines;
+        readonly Line fakeLine;
 
         public bool LineSelectedIsAmbiguous => GetLine().Guid == Guid.Empty;
 
@@ -42,11 +43,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             titleTextView.SetText(Resource.String.line);
             AddView(titleTextView);
 
-            availableOutgoingLines.Add(new Line
+            fakeLine = new Line
             {
                 Name = Resources.GetString(Resource.String.select_a_line),
                 Guid = Guid.Empty,
-            });
+            };
+
+            availableOutgoingLines.Add(fakeLine);
 
             lineSpinner = new AppCompatSpinner(context);
             var spinnerLayoutParams = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent) { Weight = 1 };
@@ -87,9 +90,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     return Task.CompletedTask;
                 }
 
-                if (availableOutgoingLines.Count == 1)
+                if (availableOutgoingLines.Count(l => l != null && l.Guid != Guid.Empty) == 1)
                 {
-                    SetLine(availableOutgoingLines.FirstOrDefault());
+                    SetLine(availableOutgoingLines.FirstOrDefault(l => l != null && l.Guid != Guid.Empty));
                     return Task.CompletedTask;
                 }
 
