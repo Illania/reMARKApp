@@ -84,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning("Received memory warning!");
 
-            ((DataSource)tableView.Source)?.Reset();
+            ((DataSource)tableView?.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();

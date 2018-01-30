@@ -325,6 +325,14 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
+    public class ComposeInsertTemplateEvent : AnalyticsEvent
+    {
+        public ComposeInsertTemplateEvent()
+            : base(ModuleType.Documents, "compose_insert_template")
+        {
+        }
+    }
+
     public class ComposeAddTemplateEvent : AnalyticsEvent
     {
         public ComposeAddTemplateEvent(TemplateType? type)

@@ -1,0 +1,24 @@
+﻿@font-face {
+    font-family: 'Calibri';
+    src: url('file:///android_asset/calibri.ttf')
+}
+@font-face {
+    font-family: 'Cambria';
+    src: url('file:///android_asset/cambria.ttf')
+}
+@font-face {
+    font-family: 'Courier New';
+    src: url('file:///android_asset/couriernew.ttf')
+}
+@font-face {
+    font-family: 'Open Sans';
+    src: url('file:///android_asset/opensans.ttf')
+}
+@font-face {
+    font-family: 'Tahoma';
+    src: url('file:///android_asset/tahoma.ttf')
+}
+@font-face {
+    font-family: 'Trebuchet MS';
+    src: url('file:///android_asset/trebuchetms.ttf')
+}

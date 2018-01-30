@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Views;
 using Android.Webkit;
+using Mark5.Mobile.Droid.Model;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
 {
@@ -30,22 +33,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
             AddView(webView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (MailMessage != null && MailMessage != null)
             {
                 Visibility = ViewStates.Visible;
 
                 if (!string.IsNullOrWhiteSpace(MailMessage.BodyHtmlText))
-                    webView.LoadDataWithBaseURL(null, MailMessage.BodyHtmlText ?? "Content could not be loaded.", "text/html", "UTF-8", null);
+                    await webView.LoadHtml(Context, MailMessage.BodyHtmlText, HtmlProcessingConfiguration.DefaultForViewing);
+                else if (!string.IsNullOrWhiteSpace(MailMessage.BodyPlainText))
+                    await webView.LoadPlainText(Context, MailMessage.BodyPlainText, PlainTextProcessingConfiguration.DefaultForViewing);
                 else
-                    webView.LoadDataWithBaseURL(null, MailMessage.BodyPlainText ?? "Content could not be loaded.", "text/plain", "UTF-8", null);
+                    webView.LoadNoContentString(Context);
             }
             else
             {
                 Visibility = ViewStates.Gone;
 
-                webView.LoadData(string.Empty, "text/plain", "UTF-8");
+                webView.LoadEmpty();
             }
         }
 

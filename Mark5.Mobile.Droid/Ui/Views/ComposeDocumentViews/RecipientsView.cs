@@ -123,7 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepOnlyAddresses)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Addresses))
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
@@ -181,7 +181,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
 
-            await AsyncHelpers.RunOnUiThreadSync((Activity)Context, () =>
+            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () =>
             {
                 foreach (var email in GetEmails())
                 {

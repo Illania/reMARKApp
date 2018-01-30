@@ -79,7 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return Task.CompletedTask;
             }
 
-            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content))
                 textView.Text = PreviousDocumentPreview.Subject;
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 textView.Text = PreviousDocumentPreview.Subject;

@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Android.Animation;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -8,8 +11,6 @@ using Android.Views;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using System.Linq;
-using Android.Animation;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -52,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(container);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (DocumentPreview != null && Document != null && Document.Attachments.Count > 0)
             {
@@ -97,6 +98,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Visibility = ViewStates.Gone;
                 container.RemoveViews(0, container.ChildCount);
             }
+
+            return Task.CompletedTask;
         }
 
         void ShowHideButton_Click(object sender, EventArgs e)

@@ -2,26 +2,25 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Webkit;
-using AngleSharp.Dom.Html;
-using AngleSharp.Html;
-using AngleSharp.Parser.Html;
-using Java.Interop;
+using HtmlAgilityPack;
+using MailBee.Html;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -32,32 +31,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly CustomWebView oldContentWebView;
         readonly Context context;
 
+        readonly SemaphoreSlim newContentSemaphore = new SemaphoreSlim(1, 1);
+        readonly SemaphoreSlim oldContentSemaphore = new SemaphoreSlim(1, 1);
+
         bool oldContentShown;
-
-        public SemaphoreSlim NewSetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
-        SemaphoreSlim newGetHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
-
-        public SemaphoreSlim OldSetGetContentAsyncSemaphore = new SemaphoreSlim(1, 1);
-        SemaphoreSlim oldGetHtmlContentInterfaceSemaphore = new SemaphoreSlim(0, 1);
-
-        string newContent;
-        string oldContent;
-
-        const string NewEditableContentClass = "new_content_c176f8ef-2579-4f1f-86c1-f289beaba2ae";
-        const string OldEditableContentClass = "old_content_cc4ee2cb-e18c-423a-adb2-d106a29dcbc3";
-
-        const string DefaultEditContent = @"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">
-                                            <html>
-                                                <head>
-                                                </head>
-                                                <body style=""min-height: 500px;"">
-                                                    <div class=""" +
-                                          NewEditableContentClass +
-                                          @""" contenteditable=""true"" style=""font-family: sans-serif; width: 100%; outline: 0px solid transparent""><br><br></div>
-                                                </body>
-                                            </html>";
-
-        bool oldContentLoaded;
 
         public ContentView(Context context)
             : base(context)
@@ -75,9 +52,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
             newContentWebView.SetBackgroundColor(Color.Transparent);
-            newContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             var customWebViewClient = new CustomWebViewClient();
-            customWebViewClient.PageFinishedLoading += (sender, e) => { NewSetGetContentAsyncSemaphore.Release(); };
+            customWebViewClient.PageFinishedLoading += (sender, e) => { newContentSemaphore.Release(); };
             newContentWebView.SetWebViewClient(customWebViewClient);
             newContentWebView.Settings.JavaScriptEnabled = true;
             newContentWebView.Settings.DomStorageEnabled = true;
@@ -105,9 +81,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
             var oldContentWebViewClient = new CustomWebViewClient();
-            oldContentWebViewClient.PageFinishedLoading += (sender, e) => { OldSetGetContentAsyncSemaphore.Release(); };
+            oldContentWebViewClient.PageFinishedLoading += (sender, e) => { oldContentSemaphore.Release(); };
             oldContentWebView.SetWebViewClient(oldContentWebViewClient);
-            oldContentWebView.AddJavascriptInterface(new GetHtmlContentInterface(this), "GetHtmlContentInterface");
             oldContentWebView.Settings.JavaScriptEnabled = true;
             oldContentWebView.Visibility = ViewStates.Gone;
             AddView(oldContentWebView);
@@ -124,7 +99,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (oldContentWebView.Visibility == ViewStates.Gone)
             {
                 showOldContentButton.SetText(Resource.String.hide_previous_message);
-                showOldContentButton.Enabled = true;
                 oldContentWebView.Visibility = ViewStates.Visible;
             }
             else
@@ -138,315 +112,248 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task RefreshView()
         {
-            await SetNewHtmlContentAsync(DefaultEditContent);
-            if (RestoreWorkingCopy)
+            if (State != null)
             {
-                await SetWebContentPart(NewEditableContentClass, ContentType.Html, Document.HtmlBody);
+                await RestoreState();
+                State = null;
                 return;
             }
 
-            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
-                (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments))
+            if (RestoreWorkingCopy)
             {
-                if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                    await SetWebContentPart(NewEditableContentClass, ContentType.Html, PreviousDocument.HtmlBody);
-                else
-                    await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, PreviousDocument.PlainTextBody);
+                await newContentSemaphore.WaitAsync();
+                await newContentWebView.LoadHtml(context, Document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
             }
             else
             {
-                showOldContentButton.Visibility = DocumentCreationModeFlag == DocumentCreationModeFlag.New ||
-                    DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
-                    PreviousDocument == null ? ViewStates.Gone : ViewStates.Visible;
+                var previousDocumentLoaded = false;
 
-                await LoadOldContent();
+                await newContentSemaphore.WaitAsync();
+                newContentWebView.LoadEditor(context);
+
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments) ||
+                        DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                        DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                        DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
+                {
+                    if (PreviousDocumentPreview != null && !string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
+                    {
+                        var config = HtmlProcessingConfiguration.DefaultForEditing;
+                        config.InjectReplyHeader = true;
+                        config.ReplyHeaderParameters = GetReplyHeaderParameters(PreviousDocumentPreview);
+
+                        await oldContentSemaphore.WaitAsync();
+                        await oldContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, config);
+
+                        previousDocumentLoaded = true;
+                    }
+                    else if (PreviousDocumentPreview != null && !string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
+                    {
+                        var config = PlainTextProcessingConfiguration.DefaultForEditing;
+                        config.InjectReplyHeader = true;
+                        config.ReplyHeaderParameters = GetReplyHeaderParameters(PreviousDocumentPreview);
+
+                        await oldContentSemaphore.WaitAsync();
+                        await oldContentWebView.LoadPlainText(context, PreviousDocument.PlainTextBody, config);
+
+                        previousDocumentLoaded = true;
+                    }
+
+                    showOldContentButton.Visibility = previousDocumentLoaded ? ViewStates.Visible : ViewStates.Gone;
+                }
             }
         }
 
         public override async Task UpdateDocument()
         {
-            (Document.HtmlBody, DocumentPreview.Preview) = await RetrieveCombinedText();
+            Document.HtmlBody = await GetContentAsync();
         }
 
         public async Task InsertTemplate(Template template)
         {
-            await SetWebContentPart(NewEditableContentClass, template.ContentType, "<br>" + template.Content);
+            string insertTemplateJs;
+            using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
+                insertTemplateJs = sr.ReadToEnd();
+
+            if (template.ContentType == ContentType.PlainText)
+            {
+                var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+                insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
+            }
+            if (template.ContentType == ContentType.Html)
+            {
+                var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
+                insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
+            }
+
+            var result = await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
         }
 
         public async Task InsertLocalTemplate(string localTemplate)
         {
-            await SetWebContentPart(NewEditableContentClass, ContentType.PlainText, "\n" + localTemplate);
+            string insertTemplateJs;
+            using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
+                insertTemplateJs = sr.ReadToEnd();
+
+            var localTemplateText = Regex.Replace(localTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+
+            insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
+            await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
         }
 
         #endregion
 
-        #region Utility methods
+        #region State related
 
-        async Task LoadOldContent()
+        Task RestoreState()
         {
-            if (!oldContentLoaded && DocumentCreationModeFlag != DocumentCreationModeFlag.Edit && DocumentCreationModeFlag != DocumentCreationModeFlag.New && PreviousDocument != null)
+            var contentViewState = (ContentViewState)State;
+            oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
+            showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
+            showOldContentButton.Text = contentViewState.ShowOldContentButtonText;
+            return Task.CompletedTask;
+        }
+
+        public override IComposeDocumentViewState GetState()
+        {
+            return new ContentViewState
             {
-                string oldContentString = null;
-
-                if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                    oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-                else if (!string.IsNullOrWhiteSpace(PreviousDocument.HtmlBody))
-                    oldContentString = await GetBodyWithHeader(PreviousDocument.HtmlBody, ContentType.Html);
-                else
-                    oldContentString = await GetBodyWithHeader(PreviousDocument.PlainTextBody, ContentType.PlainText);
-
-                await SetOldHtmlContentAsync(oldContentString);
-                oldContentLoaded = true;
-            }
+                OldContentWebViewVisibility = oldContentWebView.Visibility,
+                ShowOldContentButtonVisibility = showOldContentButton.Visibility,
+                ShowOldContentButtonText = showOldContentButton.Text,
+            };
         }
 
-        async Task<string> GetBodyWithHeader(string content, ContentType contentType)
+        class ContentViewState : IComposeDocumentViewState
         {
-            return await Task.Run(async () =>
-           {
-               if (contentType == ContentType.Html)
-               {
-                   var htmlHeader = GetHtmlHeader();
-
-                   var htmlParser = new HtmlParser();
-                   var htmlDocument = await htmlParser.ParseAsync(content);
-                   var body = htmlDocument.Body;
-                   var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
-                   body.InsertBefore(parsedHeader.Body, body.FirstChild);
-
-                   var ce = htmlDocument.CreateElement("div");
-                   ce.ClassName = OldEditableContentClass;
-                   ce.Id = "editable-one";
-                   ce.SetAttribute("contentEditable", "true");
-                   ce.SetAttribute("style", "outline: 0px solid transparent");
-
-                   ce.InnerHtml = body.InnerHtml;
-                   body.InnerHtml = ce.OuterHtml;
-
-                   var textWriter = new StringWriter();
-                   htmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-
-                   return textWriter.ToString();
-               }
-
-               if (contentType == ContentType.PlainText)
-               {
-                   var htmlHeader = GetHtmlHeader();
-
-                   var htmlParser = new HtmlParser();
-                   var parsedHeader = await htmlParser.ParseAsync(htmlHeader);
-
-                   var contentHtml = parsedHeader.CreateElement("pre");
-                   contentHtml.TextContent = content;
-
-                   parsedHeader.Body.Append(contentHtml);
-
-                   var ce = parsedHeader.CreateElement("div");
-                   ce.ClassName = OldEditableContentClass;
-                   ce.Id = "editable-one";
-                   ce.SetAttribute("contentEditable", "true");
-                   ce.SetAttribute("style", "outline: 0px solid transparent");
-
-                   ce.InnerHtml = parsedHeader.Body.InnerHtml;
-                   parsedHeader.Body.InnerHtml = ce.OuterHtml;
-
-                   var textWriter = new StringWriter();
-                   parsedHeader.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-
-                   return textWriter.ToString();
-               }
-
-               return "";
-           });
+            public ViewStates OldContentWebViewVisibility { get; set; }
+            public ViewStates ShowOldContentButtonVisibility { get; set; }
+            public string ShowOldContentButtonText { get; set; }
         }
 
-        string GetHtmlHeader()
+        #endregion
+
+        async Task<string> GetContentAsync()
         {
-            var processedDateReceivedTimestamp = PreviousDocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
-            var date = processedDateReceivedTimestamp.FormatUserTimestampAsTimeAndDateString(Context);
+            var newContent = await GetNewContentAsync();
+            newContent = await CleanContentAsync(newContent);
 
-            var header = new StringBuilder();
-            header.Append("<br/><hr/>");
-            var fromText = PreviousDocumentPreview.Direction == DocumentDirection.Incoming ? GetAddressTextFromPreviousDocument(DocumentAddressType.From) : GetLinesTextFromPreviousDocument();
-            if (!string.IsNullOrWhiteSpace(fromText))
-                header.Append($"<b>From</b>: {fromText}").Append("</br>");
-            header.Append($"<b>Date</b>: {date}").Append("</br>");
-            header.Append($"<b>To</b>: {GetAddressTextFromPreviousDocument(DocumentAddressType.To)}").Append("</br>");
-            var ccText = GetAddressTextFromPreviousDocument(DocumentAddressType.Cc);
-            if (!string.IsNullOrWhiteSpace(ccText))
-                header.Append($"<b>Cc</b>: {ccText}").Append("</br>");
-            header.Append($"<b>Subject</b>: {PreviousDocumentPreview.Subject}").Append("</br>");
-            header.Append("<br/><br/>");
-
-            return header.ToString();
-        }
-
-        async Task<(string content, string preview)> RetrieveCombinedText()
-        {
-            var htmlParser = new HtmlParser();
-
-            var newContentString = await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => GetNewHtmlContentAsync());
-            var newContentParsed = await htmlParser.ParseAsync(newContentString);
-            var newContentProcessedString = await ProcessRetrievedContent(newContentParsed, NewEditableContentClass);
-
-            if (oldContentLoaded)
+            var oldContent = await GetOldContentAsync();
+            if (!string.IsNullOrWhiteSpace(oldContent))
             {
-                var oldContentString = await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => GetOldHtmlContentAsync());
-                var oldContentParsed = await htmlParser.ParseAsync(oldContentString);
-                var oldContentProcessed = await ProcessRetrievedContent(oldContentParsed, OldEditableContentClass);
-                var oldContentProcessedParsed = await htmlParser.ParseAsync(oldContentProcessed);
-
-                var newContentProcessedParsed = await htmlParser.ParseAsync(newContentProcessedString);
-
-                var oldContentInDiv = newContentProcessedParsed.CreateElement("div");
-                oldContentInDiv.InnerHtml = oldContentProcessedParsed.Body.InnerHtml;
-                newContentProcessedParsed.Body.Append(oldContentInDiv);
-                var textWriter = new StringWriter();
-                newContentProcessedParsed.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-                var content = textWriter.ToString();
-                var preview = GetPreview(newContentProcessedParsed);
-                return (content, preview);
-            }
-
-            return (newContentProcessedString, GetPreview(newContentParsed));
-        }
-
-        #region Get/Set contents
-
-        async Task SetNewHtmlContentAsync(string htmlString)
-        {
-            await NewSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity)context).RunOnUiThread(() => newContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
-        }
-
-        async Task<string> GetNewHtmlContentAsync()
-        {
-            try
-            {
-                await NewSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity)context).RunOnUiThread(() => newContentWebView.LoadUrl(GetHtmlContentInterface.NewContentJavascript));
-
-                await newGetHtmlContentInterfaceSemaphore.WaitAsync();
-            }
-            finally
-            {
-                NewSetGetContentAsyncSemaphore.Release();
+                oldContent = await CleanContentAsync(oldContent);
+                var mergedContent = await MergeContentAsync(newContent, oldContent);
+                return mergedContent;
             }
 
             return newContent;
         }
 
-        async Task SetOldHtmlContentAsync(string htmlString)
-        {
-            await OldSetGetContentAsyncSemaphore.WaitAsync();
-            ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null));
-        }
-
-        async Task<string> GetOldHtmlContentAsync()
+        async Task<string> GetNewContentAsync()
         {
             try
             {
-                await OldSetGetContentAsyncSemaphore.WaitAsync();
-                ((Activity)context).RunOnUiThread(() => oldContentWebView.LoadUrl(GetHtmlContentInterface.OldContentJavascript));
-
-                await oldGetHtmlContentInterfaceSemaphore.WaitAsync();
+                await newContentSemaphore.WaitAsync();
+                var result = await newContentWebView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+                return result;
             }
             finally
             {
-                OldSetGetContentAsyncSemaphore.Release();
+                newContentSemaphore.Release();
             }
-
-            return oldContent;
         }
 
-        #endregion
-
-        async Task SetWebContentPart(string parentElementClass, ContentType contentType, string content)
+        async Task<string> GetOldContentAsync()
         {
-            var currentContent = await GetNewHtmlContentAsync();
-
-            var htmlParser = new HtmlParser();
-            var currentHtmlDocument = await htmlParser.ParseAsync(currentContent);
-
-            var parentElements = currentHtmlDocument.QuerySelectorAll("div." + parentElementClass);
-
-            if (parentElements.Length < 1)
+            try
             {
-                CommonConfig.Logger.Error("Could not find div element with class: " + parentElementClass);
-                return;
+                await oldContentSemaphore.WaitAsync();
+                var result = await oldContentWebView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+                return result;
             }
-
-            if (parentElements.Length > 1)
-                CommonConfig.Logger.Warning("Found more than one div element with class: " + parentElementClass);
-
-            var parentElement = parentElements[0];
-            parentElement.Children.ForEach(c => c.Remove());
-            parentElement.TextContent = string.Empty;
-
-            var precessedContent = await ProcessInsertedContent(htmlParser, contentType, content);
-
-            parentElement.InnerHtml = precessedContent;
-
-            var textWriter = new StringWriter();
-            currentHtmlDocument.ToHtml(textWriter, HtmlMarkupFormatter.Instance);
-
-            await SetNewHtmlContentAsync(textWriter.ToString());
-        }
-
-        static async Task<string> ProcessInsertedContent(HtmlParser htmlParser, ContentType contentToInsertType, string contentToInsert)
-        {
-            if (contentToInsertType == ContentType.Html)
+            finally
             {
-                var inlinedContentToInsert = await InlineStyles(contentToInsert);
-
-                var htmlDocument = await htmlParser.ParseAsync(inlinedContentToInsert);
-
-                return htmlDocument.Body.InnerHtml;
+                oldContentSemaphore.Release();
             }
+        }
 
-            if (contentToInsertType == ContentType.PlainText)
+        Task<string> CleanContentAsync(string content)
+        {
+            return Task.Run(() =>
             {
-                var htmlDocument = await htmlParser.ParseAsync("<div><pre>" + contentToInsert + "</pre></div>");
-                return htmlDocument.Body.InnerHtml;
-            }
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(content);
 
-            throw new ArgumentException(string.Format("Unsupported contentType. [contentType={0}]", contentToInsertType));
+                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "link" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "fonts"))?.Remove();
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "meta" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "viewport"))?.Remove();
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "style" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "style1"))?.Remove();
+
+                var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+                bodyNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+                bodyNode?.ChildNodes.FirstOrDefault(n => n.Name == "div" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "headerpadding"))?.Remove();
+
+                var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
+                editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
+                var html = htmlDocument.DocumentNode.OuterHtml;
+
+                html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
+
+                var p = new Processor();
+                p.Dom.OuterHtml = html;
+                html = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
+
+                return html;
+            });
         }
 
-        static async Task<string> ProcessRetrievedContent(IHtmlDocument currentHtmlDocument, string elementClass)
+        Task<string> MergeContentAsync(string newContent, string oldContent)
         {
-            var matchingElements = currentHtmlDocument.QuerySelectorAll("div." + elementClass);
-            foreach (var matchingElement in matchingElements)
-                matchingElement.Attributes.RemoveNamedItem("contenteditable");
+            return Task.Run(() =>
+            {
+                var newHtmlDocument = new HtmlDocument();
+                newHtmlDocument.LoadHtml(newContent);
+                var oldHtmlDocument = new HtmlDocument();
+                oldHtmlDocument.LoadHtml(oldContent);
 
-            var processedWebContent = currentHtmlDocument.DocumentElement.OuterHtml;
+                string html;
+                using (var sr = new StreamReader(context.Assets.Open("blank.html")))
+                    html = sr.ReadToEnd();
 
-            return await InlineStyles(processedWebContent);
+                var mergedHtmlDocument = new HtmlDocument();
+                mergedHtmlDocument.LoadHtml(html);
+
+                var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
+                newNode.AppendChildren(newHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
+                newNode.Attributes.Remove("id");
+                var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
+                oldNode.AppendChildren(oldHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
+                oldNode.Attributes.Remove("id");
+
+                return mergedHtmlDocument.DocumentNode.OuterHtml;
+            });
         }
 
-        static Task<string> InlineStyles(string content)
+        string[] GetReplyHeaderParameters(DocumentPreview documentPreview)
         {
-            var tcs = new TaskCompletionSource<string>();
+            var from = GetAddressTextFromPreviousDocument(documentPreview, DocumentAddressType.From);
+            var date = documentPreview.DateReceivedTimestamp
+                                      .ConvertTimestampMillisecondsToDateTime()
+                                      .ConvertUtcToUserTime()
+                                      .ConvertDateTimeToTimestampMilliseconds()
+                                      .FormatUserTimestampAsTimeAndDateString(context);
+            var to = GetAddressTextFromPreviousDocument(documentPreview, DocumentAddressType.To, DocumentAddressType.Cc);
+            var subject = documentPreview.Subject;
 
-            var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(content, true, null, null, true, true);
-            if (inlineResult.Warnings != null && inlineResult.Warnings.Count > 0)
-                CommonConfig.Logger.Warning("There were warnings when inlining CSS:\n" + string.Join("\n", inlineResult.Warnings));
-
-            tcs.SetResult(inlineResult.Html);
-            return tcs.Task;
+            return new[] { from, date, to, subject };
         }
 
-        static string GetPreview(IHtmlDocument contentParsed)
-        {
-            var textContent = contentParsed.Body.TextContent;
-            return textContent.SafeSubstring(0, 300).TrimStart();
-        }
-
-        string GetAddressTextFromPreviousDocument(DocumentAddressType addressType)
+        static string GetAddressTextFromPreviousDocument(DocumentPreview documentPreview, params DocumentAddressType[] addressTypes)
         {
             var sb = new StringBuilder();
-            var addresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == addressType).ToList();
-            for (var i = 0; i < addresses.Count; i++)
+            var addresses = documentPreview.Addresses.Where(da => addressTypes.Contains(da.AddressType)).ToArray();
+            for (var i = 0; i < addresses.Length; i++)
             {
                 var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
                 if (hasName)
@@ -454,71 +361,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 sb.Append(addresses[i].Address);
                 if (hasName)
                     sb.Append("&gt;");
-                if (i < addresses.Count - 1)
+                if (i < addresses.Length - 1)
                     sb.Append(", ");
             }
 
             return sb.ToString();
         }
-
-        string GetLinesTextFromPreviousDocument()
-        {
-            return string.Join(", ", PreviousDocument.Lines.Select(l => l.FromAddress));
-        }
-
-        #endregion
-
-        #region Java script interfaces callbacks
-
-        public void FinalizeGetNewHtmlContent(Java.Lang.String content)
-        {
-            newContent = (string)content;
-            newGetHtmlContentInterfaceSemaphore.Release();
-        }
-
-        public void FinalizeGetOldHtmlContent(Java.Lang.String content)
-        {
-            oldContent = (string)content;
-            oldGetHtmlContentInterfaceSemaphore.Release();
-        }
-
-        #endregion
-
-        #region Javascript interfaces
-
-        class GetHtmlContentInterface : Java.Lang.Object
-        {
-            public const string NewContentJavascript = "javascript:window.GetHtmlContentInterface.getNewHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
-
-            public const string OldContentJavascript = "javascript:window.GetHtmlContentInterface.getOldHtmlContent('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');";
-
-            readonly ContentView view;
-
-            public GetHtmlContentInterface(ContentView customWebViewRenderer)
-            {
-                view = customWebViewRenderer;
-            }
-
-            public GetHtmlContentInterface(IntPtr handle, Android.Runtime.JniHandleOwnership transfer)
-                : base(handle, transfer)
-            {
-            }
-
-            [Export("getNewHtmlContent")]
-            [JavascriptInterface]
-            public void GetNewHtmlContent(Java.Lang.String htmlContent)
-            {
-                view.FinalizeGetNewHtmlContent(htmlContent);
-            }
-
-            [Export("getOldHtmlContent")]
-            [JavascriptInterface]
-            public void GetOldHtmlContent(Java.Lang.String htmlContent)
-            {
-                view.FinalizeGetOldHtmlContent(htmlContent);
-            }
-        }
-
-        #endregion
     }
 }

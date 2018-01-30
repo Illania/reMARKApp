@@ -1,10 +1,10 @@
-﻿using Android.Content;
+﻿using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using MailBee.Mime;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
             AddView(message);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (MailMessage != null)
             {
@@ -72,6 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 message.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
                 message.Text = string.Empty;
             }
+
+            return Task.CompletedTask;
         }
     }
 }

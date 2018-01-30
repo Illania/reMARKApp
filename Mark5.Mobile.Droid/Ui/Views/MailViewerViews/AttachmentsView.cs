@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -51,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
             AddView(container);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (MailMessage != null && MailMessage.Attachments.Count > 0)
             {
@@ -72,6 +73,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 Visibility = ViewStates.Gone;
                 container.RemoveViews(0, container.ChildCount);
             }
+
+            return Task.CompletedTask;
         }
 
         class AttachmentView : LinearLayoutCompat

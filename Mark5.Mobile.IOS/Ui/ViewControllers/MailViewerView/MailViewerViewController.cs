@@ -24,7 +24,7 @@ using Attachment = MailBee.Mime.Attachment;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
-    public class MailViewerViewController : AbstractViewController
+    public class MailViewerViewController : AbstractWebViewController
     {
         const long MaxSize = 5 * 1024 * 1024; // 5MB
 
@@ -33,10 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         UIBarButtonItem closeItem;
         UIBarButtonItem shareItem;
 
-        UIScrollView mainScrollView;
-        UIStackView stackViewBeforeContent;
-        ContentView contentView;
-        UIStackView stackViewAfterContent;
+        UIStackView headerStackView;
 
         MailMessage mailMessage;
 
@@ -50,9 +47,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             this.url = url;
         }
 
-        public override void LoadView()
+        public override void ViewDidLoad()
         {
-            base.LoadView();
+            base.ViewDidLoad();
 
             CommonConfig.UsageAnalytics.LogEvent(new OpenMailViewerEvent());
 
@@ -67,79 +64,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             shareItem = new UIBarButtonItem(UIBarButtonSystemItem.Action);
             NavigationItem.SetRightBarButtonItem(shareItem, false);
 
-            mainScrollView = new UIScrollView
-            {
-                ShowsVerticalScrollIndicator = true,
-                ShowsHorizontalScrollIndicator = false,
-                ScrollEnabled = true,
-                ScrollsToTop = true,
-                UserInteractionEnabled = true,
-                ClipsToBounds = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            View.AddSubview(mainScrollView);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(mainScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-
-            stackViewBeforeContent = new UIStackView
+            headerStackView = new UIStackView
             {
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0f,
-                TranslatesAutoresizingMaskIntoConstraints = false
+                Spacing = 0f
             };
-            mainScrollView.AddSubview(stackViewBeforeContent);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewBeforeContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
 
-            contentView = new ContentView(this);
-            mainScrollView.AddSubview(contentView);
-            mainScrollView.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, stackViewBeforeContent, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, mainScrollView, NSLayoutAttribute.Width, 1f, 0f)
-            });
+            headerStackView.AddArrangedSubview(new SubjectView());
+            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.From));
+            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.To));
+            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Cc));
+            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Bcc));
+            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.ReplyTo));
+            headerStackView.AddArrangedSubview(new DateReceivedView());
+            headerStackView.AddArrangedSubview(new PriorityView());
+            headerStackView.AddArrangedSubview(new AttachmentsView(this));
 
-            stackViewAfterContent = new UIStackView
-            {
-                Axis = UILayoutConstraintAxis.Vertical,
-                Alignment = UIStackViewAlignment.Fill,
-                Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0f,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            mainScrollView.AddSubview(stackViewAfterContent);
-            View.AddConstraints(new[]
-            {
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Top, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(stackViewAfterContent, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainScrollView, NSLayoutAttribute.Bottom, 1f, 0f)
-            });
-
-            stackViewBeforeContent.AddArrangedSubview(new SubjectView());
-            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.From));
-            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.To));
-            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Cc));
-            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Bcc));
-            stackViewBeforeContent.AddArrangedSubview(new RecipientsView(RecipientsView.Type.ReplyTo));
-            stackViewBeforeContent.AddArrangedSubview(new DateReceivedView());
-            stackViewBeforeContent.AddArrangedSubview(new PriorityView());
-            stackViewBeforeContent.AddArrangedSubview(new AttachmentsView(this));
-
-            RefreshView();
+            SetHeaderView(headerStackView);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -188,17 +131,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             closeItem = null;
             shareItem = null;
 
-            mainScrollView.RemoveFromSuperview();
-            stackViewBeforeContent.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
-            stackViewBeforeContent.RemoveFromSuperview();
-            contentView.RemoveFromSuperview();
-            stackViewAfterContent.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
-            stackViewAfterContent.RemoveFromSuperview();
-
-            mainScrollView = null;
-            stackViewBeforeContent = null;
-            contentView = null;
-            stackViewAfterContent = null;
+            headerStackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
+            headerStackView.RemoveFromSuperview();
+            headerStackView = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -209,8 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 CommonConfig.Logger.Debug("Disposed");
         }
 
-        void CloseItem_Clicked(object sender, EventArgs e) =>
-            DismissViewController(true, null);
+        void CloseItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         void ShareItem_Clicked(object sender, EventArgs e)
         {
@@ -222,8 +156,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
         void LoadFromUrl()
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
-
             Task.Run(async () =>
             {
                 var auth = AuthenticatorFactory.Create();
@@ -263,7 +195,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                         };
                         mm.LoadMessage(bytes);
                         bytes = null;
-                        MakeHtmlSafe(mm);
                         InlineImages(mm);
                         return mm;
                     }
@@ -297,7 +228,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                                     };
                                     mm.LoadMessage(emlStream.ToArray());
                                     emlStream.Dispose();
-                                    MakeHtmlSafe(mm);
                                     InlineImages(mm);
                                     return mm;
                                 }
@@ -310,10 +240,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                     }
 
                 throw new MailViewerException("Unsupported file.");
-            }).ContinueWith(t =>
+            }).ContinueWith(async t =>
             {
-                dismissAction();
-
                 if (t.IsFaulted)
                 {
                     var ex = t.Exception.InnerException;
@@ -327,30 +255,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 {
                     mailMessage = t.Result;
 
-                    RefreshView();
+                    await RefreshView();
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        void RefreshView()
+        async Task RefreshView()
         {
-            foreach (var sv in stackViewBeforeContent.Subviews.OfType<MailViewerSubview>())
+            await StartRefreshing();
+
+            foreach (var sv in headerStackView.Subviews.OfType<MailViewerSubview>())
             {
                 sv.MailMessage = mailMessage;
                 sv.RefreshView();
                 sv.UpdateVisibility();
             }
 
-            contentView.MailMessage = mailMessage;
-            contentView.RefreshView();
-            contentView.UpdateVisibility();
-
-            foreach (var sv in stackViewAfterContent.Subviews.OfType<MailViewerSubview>())
+            if (mailMessage != null)
             {
-                sv.MailMessage = mailMessage;
-                sv.RefreshView();
-                sv.UpdateVisibility();
+                if (!string.IsNullOrWhiteSpace(mailMessage.BodyHtmlText))
+                    await LoadHtmlString(mailMessage.BodyHtmlText, HtmlProcessingConfiguration.DefaultForViewing);
+                else if (!string.IsNullOrWhiteSpace(mailMessage.BodyPlainText))
+                    await LoadPlainText(mailMessage.BodyPlainText, PlainTextProcessingConfiguration.DefaultForViewing);
+                else
+                    LoadNoContentString();
             }
+            else
+                LoadEmpty();
+
+            await EndRefreshing();
         }
 
         public void OpenComposeDocumentView(string[] preconfiguredEmailAddresses)
@@ -454,14 +387,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             mm.BodyHtmlText = htmlDoc.DocumentNode.OuterHtml;
         }
-
-        static void MakeHtmlSafe(MailMessage mm)
-        {
-            var p = new Processor();
-            p.Dom.OuterHtml = mm.BodyHtmlText;
-            mm.BodyHtmlText = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
-        }
-
         static byte[] ReadToEnd(Stream input)
         {
             var buffer = new byte[16 * 1024];

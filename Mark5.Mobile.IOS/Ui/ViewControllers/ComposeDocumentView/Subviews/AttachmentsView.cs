@@ -83,7 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward ||
                 DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
-                DocumentCreationModeFlag == DocumentCreationModeFlag.New && (CopyToNewOption == CopyToNewOption.KeepOnlyAttachments || CopyToNewOption == CopyToNewOption.KeepTextAndAttachments))
+                DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Attachments))
             {
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);

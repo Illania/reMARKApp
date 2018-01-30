@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -148,7 +149,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
             compactLayout.SetColumnShrinkable(1, true);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (MailMessage != null)
                 Visibility = ViewStates.Visible;
@@ -156,6 +157,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 Visibility = ViewStates.Gone;
 
             RefreshViewContent();
+
+            return Task.CompletedTask;
         }
 
         void RefreshViewContent()

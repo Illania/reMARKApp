@@ -67,10 +67,9 @@
 "copy_to_folder" = "Copy to folder";
 "copy_to_worktray" = "Copy to worktray";
 "copy_to_new" = "Copy to new";
-"copy_to_new_addresses" = "Copy addresses";
-"copy_to_new_text" = "Copy text";
-"copy_to_new_text_and_attachments" = "Copy text and attachments";
-"copy_to_new_attachments" = "Copy attachments";
+"copy_to_new_addresses" = "Addresses";
+"copy_to_new_content" = "Content";
+"copy_to_new_attachments" = "Attachments";
 "copy_to_worktray_ml" = "Copy to\nworktray";
 "copying___" = "Copying...";
 "copying_to_own_worktray___" = "Copying to own worktray...";
@@ -117,6 +116,7 @@
 "edit_shortcode_edit" = "Edit shortcode";
 "edit_message" = "Edit message";
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
+"edit_original_email" = "Edit original email";
 "editing_comment___" = "Editing comment...";
 "empty_token_enable_title" = "Problem while enabling notifications";
 "empty_token_enable_content" = "It is not possible to enable notifications at the moment. Please try again later or restart the app.";
@@ -155,10 +155,10 @@
 "folders" = "Folders";
 "forward" = "Forward";
 "from" = "From";
-"hide_original_message" = "Hide original message";
 "hostname" = "Hostname";
 "im" = "IM";
-"incorrect_email_addresses" = "There are email addresses that seem to be incorrect. Do you want to send anyway?";
+"incorrect_email_addresses_added" = "There are email addresses that seem to be incorrect. Do you want to send this email anyway?";
+"insert_template" = "Insert template";
 "internal" = "Internal";
 "internet_access" = "Internet access: ";
 "last_name" = "Last name";
@@ -206,11 +206,13 @@
 "no_documents_failed" = "No documents failed to send";
 "no_documents_found" = "No emails were found";
 "no_documents_pending" = "No documents are pending send";
+"no_email_addresses_added" = "You need to add at least one email address to send this email.";
 "no_email_addresses_content" = "The contact does not have email addresses";
 "no_email_addresses_title" = "No email addresses";
 "no_folders_found" = "No folders found";
 "no_folders_in_favorites" = "No folders were added to favorites yet";
 "no_folders_in_section" = "There are no folders in this section";
+"no_line_selected" = "You need to select mailbox to send this email.";
 "no_matching_categories" = "There are no matching categories";
 "no_matching_contacts" = "There are no matching contacts";
 "no_matching_documents" = "There are no matching emails";
@@ -223,6 +225,7 @@
 "no_object_links" = "There are no links";
 "no_shortcodes_found" = "No shortcodes were found";
 "no_subject" = "No subject";
+"no_subject_added" = "This email has no subject. Do you want to send this email anyway?";
 "no_suggestions_available" = "No suggestions available";
 "no_templates" = "No templates";
 "no_templates_content" = "There are no templates defined for this creation mode.";
@@ -340,7 +343,6 @@
 "short_id" = "Short ID";
 "shortcodes" = "Shortcodes";
 "show_more___" = "Show more...";
-"show_original_message" = "Show original message";
 "skype" = "Skype";
 "subject" = "Subject";
 "system" = "System";

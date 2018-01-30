@@ -1126,11 +1126,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     var preselected = data.Where(l => Criteria.LineGuids.Contains(l.Guid)).ToArray();
 
                     var result = await Dialogs.ShowMultiSelectViewControllerAsync(parentViewControllerWeakReference.Unwrap(),
-                                                                          Localization.GetString("search_lines"),
-                                                                          data,
-                                                                          preselected,
-                                                                          l => l.Name,
-                                                                          LambdaEqualityComparer<Line>.Create(l => l.Guid));
+                                                                                  Localization.GetString("search_lines"),
+                                                                                  data,
+                                                                                  preselected,
+                                                                                  l => l.Name,
+                                                                                  LambdaEqualityComparer<Line>.Create(l => l.Guid),
+                                                                                  false);
                     if (result == null)
                         return;
 
@@ -1179,11 +1180,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     };
 
                     var result = await Dialogs.ShowMultiSelectViewControllerAsync(parentViewControllerWeakReference.Unwrap(),
-                                                                          Localization.GetString("priority"),
-                                                                          data,
-                                                                          preselected,
-                                                                          description,
-                                                                          LambdaEqualityComparer<Priority>.Create(p => p));
+                                                                                  Localization.GetString("priority"),
+                                                                                  data,
+                                                                                  preselected,
+                                                                                  description,
+                                                                                  LambdaEqualityComparer<Priority>.Create(p => p),
+                                                                                  false);
                     if (result == null)
                         return;
 

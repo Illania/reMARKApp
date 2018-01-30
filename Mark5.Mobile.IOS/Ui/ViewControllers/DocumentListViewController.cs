@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
@@ -38,6 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+        string lastSearchQuery;
 
         AutoRefreshWorker autoRefreshWorker;
         Action newDocumentsAvailableAction;
@@ -93,6 +95,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
 
+            if (searchController.SearchResultsController is UITableViewController searchTableViewController)
+            {
+                if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
+                    searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+
+                if (searchTableViewController?.TableView?.IndexPathsForSelectedRows?.Length > 0)
+                    foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
+                        searchTableViewController.TableView.DeselectRow(selectedIndexPath, true);
+            }
+
+
             ReachabilityBar.Attach(this);
         }
 
@@ -135,9 +148,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             autoRefreshWorker?.Stop();
             autoRefreshWorker?.Dispose();
             autoRefreshWorker = null;
-
-            if (searchController != null && searchController.Active)
-                searchController.Active = false;
         }
 
         public override void ViewDidDisappear(bool animated)
@@ -518,8 +528,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (!searchController.Active)
                 {
-                    vc.SetData(Folder, documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
-                    newDocumentsAvailableAction = vc.RefreshNavigationBar;
+                    vc.SetData(Folder, documentPreview);
+                    newDocumentsAvailableAction = null;
                 }
                 else
                 {
@@ -531,15 +541,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
             {
-                var vc = new DocumentViewController();
                 if (searchController.Active)
+                {
+                    var vc = new DocumentViewController();
                     vc.SetData(Folder, documentPreview);
+                    vc.SetRefreshDataOnAppear();
+                    newDocumentsAvailableAction = null;
+                    NavigationController.PushViewController(vc, true);
+                }
                 else
-                    vc.SetData(Folder, documentPreview, GetNextDocumentPreview, GetPreviousDocumentPreview);
-                vc.SetRefreshDataOnAppear();
-
-                newDocumentsAvailableAction = vc.RefreshNavigationBar;
-                NavigationController.PushViewController(vc, true);
+                {
+                    var vc = new DocumentPageViewController
+                    {
+                        Folder = Folder,
+                        InitialDocumentPreview = documentPreview,
+                        DocumentPreviews = ((DataSource)TableView.Source).Items
+                    };
+                    newDocumentsAvailableAction = null;
+                    NavigationController.PushViewController(vc, true);
+                }
             }
         }
 
@@ -848,6 +868,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                if (searchText == lastSearchQuery)
+                    return;
+
+                lastSearchQuery = searchText;
 
                 DoSearchDocuments(searchText, searchCancellationTokenSource.Token);
             }
@@ -1260,9 +1285,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = false;
 
-                Items.InsertRange(0, documentPreviews);
-                var indexes = Enumerable.Range(0, documentPreviews.Count()).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
-                tableViewWeakReference.Unwrap()?.InsertRows(indexes, UITableViewRowAnimation.Fade);
+                if (Empty)
+                {
+                    Items.InsertRange(0, documentPreviews);
+
+                    tableViewWeakReference.Unwrap()?.BeginUpdates();
+
+                    tableViewWeakReference.Unwrap()?.ReloadRows(new[] { NSIndexPath.FromRowSection(0, 0) }, UITableViewRowAnimation.Automatic);
+
+                    if (documentPreviews.Count() > 1)
+                    {
+                        var indexes = Enumerable.Range(1, documentPreviews.Count() - 1).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                        tableViewWeakReference.Unwrap()?.InsertRows(indexes, UITableViewRowAnimation.Fade);
+                    }
+
+                    tableViewWeakReference.Unwrap()?.EndUpdates();
+                }
+                else
+                {
+                    Items.InsertRange(0, documentPreviews);
+                    var indexes = Enumerable.Range(0, documentPreviews.Count()).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    tableViewWeakReference.Unwrap()?.InsertRows(indexes, UITableViewRowAnimation.Fade);
+                }
+
             }
 
             public void AppendItems(IEnumerable<DocumentPreview> documentPreviews)
