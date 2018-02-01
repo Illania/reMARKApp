@@ -244,7 +244,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
                 HandleAddAttachment(data);
-            
+
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
@@ -320,7 +320,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Forward && copyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value);
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value); //TODO need to put local here
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
                 }
@@ -750,7 +750,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
-                
+
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 AddAttachment();
             }
