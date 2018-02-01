@@ -129,17 +129,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
                     {
-                        var config = HtmlProcessingConfiguration.DefaultForEditing;
-
                         await newContentSemaphore.WaitAsync();
-                        await newContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, config);
+                        await newContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
                     }
                     else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
                     {
-                        var config = PlainTextProcessingConfiguration.DefaultForEditing;
-
                         await newContentSemaphore.WaitAsync();
-                        await newContentWebView.LoadPlainText(context, PreviousDocument.HtmlBody, config);
+                        await newContentWebView.LoadPlainText(context, PreviousDocument.HtmlBody, PlainTextProcessingConfiguration.DefaultForEditing);
                     }
                 }
                 else if (PreviousDocumentPreview != null && (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
