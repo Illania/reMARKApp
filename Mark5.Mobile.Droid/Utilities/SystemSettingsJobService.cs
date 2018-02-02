@@ -12,15 +12,17 @@ namespace Mark5.Mobile.Droid.Utilities
     [Service(Exported = false, Permission = "android.permission.BIND_JOB_SERVICE")]
     class SystemSettingsJobService : JobService
     {
+        static readonly long OneDayInterval = 1000 * 60 * 60 * 24;
+
         static int jobId;
         static ComponentName serviceComponent = new ComponentName(Application.Context, Java.Lang.Class.FromType(typeof(SystemSettingsJobService)));
 
         public static void ScheduleJob()
         {
-            //RUns at some point in the interval if the requirements are met otherwise at the end of the interval.
+            //Runs at some point in the interval if there is a network connection, otherwise at the end of the interval. 
             var builder = new JobInfo.Builder(jobId++, serviceComponent);
             builder.SetRequiredNetworkType(NetworkType.Any);
-            builder.SetPeriodic(1000 * 10);//1000 * 60 * 60 * 24); //One day interval
+            builder.SetPeriodic(OneDayInterval);
             var jobInfo = builder.Build();
 
             var jobScheduler = (JobScheduler) Application.Context.GetSystemService(JobSchedulerService);
