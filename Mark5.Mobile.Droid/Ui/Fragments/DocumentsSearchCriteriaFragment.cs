@@ -54,16 +54,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 searchCriteria = Serializer.Deserialize<SearchDocumentsCriteria>(savedInstanceState.GetString(SearchCriteriaKey));
         }
 
-        //TODO
-        // There is a problem when opening another fragment (like the line) and rotating twice.
-        // That happens because onCreateView is not callae on the first rotation (as the fragment is not visible), but only onCreate
-        // If onCreateView isn't called then we'll get a crash when trying to retrieve the fragment criteria because of null variables
-
-        //So we need to
-        //- Move all the arguments and state retrieval to onCreate
-        //- Change the behaviour, such that we retireve from cache as much as we can
-        //.
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentSearchCriteriaFragment)}...");

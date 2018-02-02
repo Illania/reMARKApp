@@ -122,7 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState) //TODO need
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
 

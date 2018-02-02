@@ -320,7 +320,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Forward && copyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value); //TODO need to put local here
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value, SourceType.Local);
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
                 }
