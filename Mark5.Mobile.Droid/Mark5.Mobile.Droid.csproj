@@ -440,7 +440,7 @@
     <Compile Include="Model\PlainTextProcessingConfiguration.cs" />
     <Compile Include="Utilities\HtmlUtilities.cs" />
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
-    <Compile Include="Utilities\SystemConfigJobService.cs" />
+    <Compile Include="Utilities\SystemSettingsJobService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -135,6 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Info("Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                    SystemConfigJobService.ScheduleJob();
 
                     LocalNotificationsListener.Initialize();
 
