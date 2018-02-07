@@ -9,7 +9,7 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    [Service(Exported = false, Permission = "android.permission.BIND_JOB_SERVICE")]
+    [Service(Permission = "android.permission.BIND_JOB_SERVICE")]
     class SystemSettingsJobService : JobService
     {
         static readonly long OneDayInterval = 1000 * 60 * 60 * 24;

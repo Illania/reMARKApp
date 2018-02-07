@@ -90,8 +90,8 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(1000);
-            UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(UIApplication.BackgroundFetchIntervalMinimum);
+            var OneDayInterval = 60 * 24;
+            UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
 
             Window.MakeKeyAndVisible();
 
@@ -294,7 +294,7 @@ namespace Mark5.Mobile.IOS
             {
                 try
                 {
-                    CommonConfig.Logger.Info("SystemConfigJobService: Retrieving system settings...");
+                    CommonConfig.Logger.Info("Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
                     completionHandler(UIBackgroundFetchResult.NewData);
