@@ -279,7 +279,7 @@
     <string name="read_by_prefix">read by</string>
     <string name="recent_addresses">Recent addresses</string>
 	<string name="redirect_to_draw_settings_title">You must allow MARK5 to draw over other apps</string>
-	<string name="redirect_to_draw_settings_content">By clicking yes, you will be redirected to the settings where you must enable MARK5 to draw over other apps. Additionally, all contacts that you wish to be indentified should be saved offline.</string>
+	<string name="redirect_to_draw_settings_content">You will be redirected to the settings where you must enable MARK5 to draw over other apps. Only contacts that are saved offline will be identified by MARK5.</string>
 	<string name="reference">Ref.</string>
 	<string name="reset">Reset</string>
 	<string name="related_contacts">Related</string>
