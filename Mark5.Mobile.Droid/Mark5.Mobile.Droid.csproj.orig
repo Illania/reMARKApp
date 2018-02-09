@@ -1,0 +1,842 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{18408F16-3AEB-4095-949F-3299BACA8B58}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Mark5.Mobile.Droid</RootNamespace>
+    <AssemblyName>Mark5.Mobile.Droid</AssemblyName>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <AndroidApplication>True</AndroidApplication>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a;armeabi</AndroidSupportedAbis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <MandroidI18n>cjk;mideast;west</MandroidI18n>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <AndroidTlsProvider>btls</AndroidTlsProvider>
+    <AndroidKeyStore>True</AndroidKeyStore>
+    <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <NoWarn>
+    </NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidManagedSymbols>true</AndroidManagedSymbols>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
+    <MandroidI18n>cjk;mideast;west</MandroidI18n>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <AndroidTlsProvider>btls</AndroidTlsProvider>
+    <AndroidSupportedAbis>armeabi;armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
+    <AndroidKeyStore>True</AndroidKeyStore>
+    <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>default -tsa http://timestamp.comodoca.com/</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PreMailer.Net">
+      <HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="PCLStorage.Abstractions">
+      <HintPath>..\packages\PCLStorage.1.0.2\lib\monoandroid\PCLStorage.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="PCLStorage">
+      <HintPath>..\packages\PCLStorage.1.0.2\lib\monoandroid\PCLStorage.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Android.Export" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite-net">
+      <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="MailBee.NET">
+      <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.9\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.lib.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.lib.e_sqlite3.android.1.1.9\lib\MonoAndroid\SQLitePCLRaw.lib.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.e_sqlite3.android.1.1.9\lib\MonoAndroid\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\MonoAndroid\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Annotations">
+      <HintPath>..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Arch.Core.Common">
+      <HintPath>..\packages\Xamarin.Android.Arch.Core.Common.1.0.0\lib\MonoAndroid80\Xamarin.Android.Arch.Core.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Arch.Lifecycle.Common">
+      <HintPath>..\packages\Xamarin.Android.Arch.Lifecycle.Common.1.0.1\lib\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Arch.Lifecycle.Runtime">
+      <HintPath>..\packages\Xamarin.Android.Arch.Lifecycle.Runtime.1.0.0\lib\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Compat">
+      <HintPath>..\packages\Xamarin.Android.Support.Compat.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Compat.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Core.UI">
+      <HintPath>..\packages\Xamarin.Android.Support.Core.UI.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Core.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Core.Utils">
+      <HintPath>..\packages\Xamarin.Android.Support.Core.Utils.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Core.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Fragment">
+      <HintPath>..\packages\Xamarin.Android.Support.Fragment.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Fragment.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Media.Compat">
+      <HintPath>..\packages\Xamarin.Android.Support.Media.Compat.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Media.Compat.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Transition">
+      <HintPath>..\packages\Xamarin.Android.Support.Transition.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Transition.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v13">
+      <HintPath>..\packages\Xamarin.Android.Support.v13.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v13.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v4">
+      <HintPath>..\packages\Xamarin.Android.Support.v4.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v4.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.CardView">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.CardView.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.CardView.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.RecyclerView">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.RecyclerView.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Vector.Drawable">
+      <HintPath>..\packages\Xamarin.Android.Support.Vector.Drawable.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable">
+      <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.AppCompat">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Design">
+      <HintPath>..\packages\Xamarin.Android.Support.Design.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v7.Preference">
+      <HintPath>..\packages\Xamarin.Android.Support.v7.Preference.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.Preference.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.v14.Preference">
+      <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v14.Preference.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.GooglePlayServices.Basement">
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Basement.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.GooglePlayServices.Tasks">
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Tasks.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Common">
+      <HintPath>..\packages\Xamarin.Firebase.Common.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Iid">
+      <HintPath>..\packages\Xamarin.Firebase.Iid.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Iid.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Analytics.Impl">
+      <HintPath>..\packages\Xamarin.Firebase.Analytics.Impl.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Analytics.Impl.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Analytics">
+      <HintPath>..\packages\Xamarin.Firebase.Analytics.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Messaging">
+      <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
+    </Reference>
+<<<<<<< HEAD
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.9.1\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+    </Reference>
+=======
+>>>>>>> master
+    <Reference Include="HockeySDK.AndroidBindings">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\MonoAndroid403\HockeySDK.dll</HintPath>
+    </Reference>
+<<<<<<< HEAD
+    <Reference Include="PhoneNumbers">
+      <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+=======
+    <Reference Include="System.Web.Services" />
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.9.1\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+>>>>>>> master
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.6.11\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Mark5Application.cs" />
+    <Compile Include="PlatformConfig.cs" />
+    <Compile Include="Model\PushNotification.cs" />
+    <Compile Include="Model\Exceptions\MailViewerException.cs" />
+    <Compile Include="Service\PushNotificationInstanceIdService.cs" />
+    <Compile Include="Service\PushNotificationMessagingService.cs" />
+    <Compile Include="Service\ReachabilityBroadcastReceiver.cs" />
+    <Compile Include="Service\Reachability.cs" />
+    <Compile Include="Utilities\Conversion.cs" />
+    <Compile Include="Utilities\DateTimeFormatter.cs" />
+    <Compile Include="Utilities\DeviceInfoProvider.cs" />
+    <Compile Include="Utilities\InsecureAndroidClientHandler.cs" />
+    <Compile Include="Utilities\Integration.cs" />
+    <Compile Include="Utilities\LocalNotificationsListener.cs" />
+    <Compile Include="Utilities\MimeTypeMap.cs" />
+    <Compile Include="Utilities\Phonebook.cs" />
+    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
+    <Compile Include="Utilities\Preferences.cs" />
+    <Compile Include="Utilities\PushNotificationsConverter.cs" />
+    <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
+    <Compile Include="Utilities\SimpleLogger.cs" />
+    <Compile Include="Utilities\SystemReportCollector.cs" />
+    <Compile Include="Utilities\UI.cs" />
+    <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
+    <Compile Include="Ui\Activities\CategoriesListActivity.cs" />
+    <Compile Include="Ui\Activities\CommentsListActivity.cs" />
+    <Compile Include="Ui\Activities\ComposeDocumentActivity.cs" />
+    <Compile Include="Ui\Activities\ContactActivity.cs" />
+    <Compile Include="Ui\Activities\ContactsListActivity.cs" />
+    <Compile Include="Ui\Activities\CopyMoveToFolderListActivity.cs" />
+    <Compile Include="Ui\Activities\CopyToUserWorktrayActivity.cs" />
+    <Compile Include="Ui\Activities\DocumentActivity.cs" />
+    <Compile Include="Ui\Activities\DocumentsListActivity.cs" />
+    <Compile Include="Ui\Activities\LoginActivity.cs" />
+    <Compile Include="Ui\Activities\MailViewerActivity.cs" />
+    <Compile Include="Ui\Activities\MainActivity.cs" />
+    <Compile Include="Ui\Activities\ObjectActionsActivity.cs" />
+    <Compile Include="Ui\Activities\ObjectLinksActivity.cs" />
+    <Compile Include="Ui\Activities\PhonebookContactsListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerContactFolderListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerContactsListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerShortcodesFolderListActivity.cs" />
+    <Compile Include="Ui\Activities\PickerShortcodesListActivity.cs" />
+    <Compile Include="Ui\Activities\PreferenceActivity.cs" />
+    <Compile Include="Ui\Activities\RecentAddressesListActivity.cs" />
+    <Compile Include="Ui\Activities\SearchActivity.cs" />
+    <Compile Include="Ui\Activities\SearchResultsActivity.cs" />
+    <Compile Include="Ui\Activities\ShortcodeActivity.cs" />
+    <Compile Include="Ui\Activities\ShortcodesListActivity.cs" />
+    <Compile Include="Ui\Activities\SplashActivity.cs" />
+    <Compile Include="Ui\Activities\SwipeDocumentActivity.cs" />
+    <Compile Include="Ui\Activities\SwitchDocumentActivity.cs" />
+    <Compile Include="Ui\Common\ActionOnClickListener.cs" />
+    <Compile Include="Ui\Common\ActionOnCreateContextMenuListener.cs" />
+    <Compile Include="Ui\Common\ActionOnLongClickListener.cs" />
+    <Compile Include="Ui\Common\BaseAppCompatActivity.cs" />
+    <Compile Include="Ui\Common\BaseFragment.cs" />
+    <Compile Include="Ui\Common\CustomArrayAdapter.cs" />
+    <Compile Include="Ui\Common\Dialogs.cs" />
+    <Compile Include="Ui\Common\Divider.cs" />
+    <Compile Include="Ui\Common\DividerItemDecorator.cs" />
+    <Compile Include="Ui\Common\FloatingActionButtonBehavior.cs" />
+    <Compile Include="Ui\Common\FloatingActionButtonLayoutChangeListener.cs" />
+    <Compile Include="Ui\Common\Formatters.cs" />
+    <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
+    <Compile Include="Ui\Common\RetainableStateFragment.cs" />
+    <Compile Include="Ui\Common\RetainedFragment.cs" />
+    <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
+    <Compile Include="Ui\Common\ViewUtilities.cs" />
+    <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
+    <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ComposeDocumentFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsSearchResultsFragment.cs" />
+    <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsListFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsSearchResultsFragment.cs" />
+    <Compile Include="Ui\Fragments\EditCategoriesListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
+    <Compile Include="Ui\Fragments\NotificationsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
+    <Compile Include="Ui\Fragments\ObjectLinksFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentsToUploadListFragment.cs" />
+    <Compile Include="Ui\Fragments\PhonebookContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\PickCategoriesListFragment.cs" />
+    <Compile Include="Ui\Fragments\PickCountryFragment.cs" />
+    <Compile Include="Ui\Fragments\PickDateRangeFragment.cs" />
+    <Compile Include="Ui\Fragments\PickLinesListFragment.cs" />
+    <Compile Include="Ui\Fragments\PickPrioritiesListFragment.cs" />
+    <Compile Include="Ui\Fragments\PreferenceFragment.cs" />
+    <Compile Include="Ui\Fragments\RecentAddressesListFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodeFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesSearchCriteriaFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesSearchResultsFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\AbstractContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\ContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\PickerContactsListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\CopyMoveToFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\FoldersListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\PickerContactFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\PickerShortcodesFolderListFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesList\AbstractShortcodesListFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesList\PickerShortcodesListFragment.cs" />
+    <Compile Include="Ui\Fragments\ShortcodesList\ShortcodesListFragment.cs" />
+    <Compile Include="Ui\Views\ObjectActionsView.cs" />
+    <Compile Include="Ui\Views\ObjectLinksView.cs" />
+    <Compile Include="Ui\Views\Common\CustomWebView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\AttachmentsView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\BccView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\CcView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\ComposeDocumentView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\ContentView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\LineView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\PriorityView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\RecipientsView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\SubjectView.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\ToView.cs" />
+    <Compile Include="Ui\Views\ContactViews\AccountSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\BirthdateSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\CommunicationAddressesSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\DescriptionSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\LedgerSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\LinkedContactSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\PhysicalAddressesSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\ResponsibleSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\ShortIdSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\VatSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\WebPageSubview.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\ContactView.cs" />
+    <Compile Include="Ui\Views\ContactViews\BaseSubviews\DescriptionCardSubview.cs" />
+    <Compile Include="Ui\Views\DocumentViews\AttachmentsView.cs" />
+    <Compile Include="Ui\Views\DocumentViews\ContentView.cs" />
+    <Compile Include="Ui\Views\DocumentViews\DocumentView.cs" />
+    <Compile Include="Ui\Views\DocumentViews\PriorityView.cs" />
+    <Compile Include="Ui\Views\DocumentViews\RecipentsView.cs" />
+    <Compile Include="Ui\Views\DocumentViews\SubjectView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\AttachmentsView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\ContentView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\MailViewerView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\PriorityView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\RecipentsView.cs" />
+    <Compile Include="Ui\Views\MailViewerViews\SubjectView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactCountrySearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactDescriptionSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactEmailSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactNameSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactPostAddressSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactShortIdSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ContactTypeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentAttachmentSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentAttachmentUnreadSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentCommentsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentDateRangeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentDirectionsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentExtraFieldsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentFromToSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentHandledSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentLinesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentPrioritySearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentReferenceNumberSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\DocumentSubjectMessageSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ShortcodeAddressSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ShortcodeDescriptionSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\ShortcodeNameSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractButtonsSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractCategoriesSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractDropdownSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractEditableLargeSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractEditableTextSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractMultiSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\AbstractViews\AbstractSearchView.cs" />
+    <Compile Include="Ui\Views\SearchViews\RelatedViews\DocumentPickDateHeaderView.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\AddressesView.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\ShortcodeViews\ShortcodeView.cs" />
+    <Compile Include="Ui\Activities\DownloadActivity.cs" />
+    <Compile Include="Ui\Fragments\DownloadFragment.cs" />
+    <Compile Include="Ui\Activities\TemplatesListActivity.cs" />
+    <Compile Include="Ui\Fragments\TemplatesListFragment.cs" />
+    <Compile Include="Model\FileDescription.cs" />
+    <Compile Include="Utilities\Extensions\ViewGroupExtensions.cs" />
+    <Compile Include="Ui\Fragments\AddEditContactFragment.cs" />
+    <Compile Include="Ui\Activities\AddEditContactActivity.cs" />
+    <Compile Include="Ui\Activities\ParentContactSelectorActivity.cs" />
+    <Compile Include="Ui\Activities\ParentContactSelectorFoldersListActivity.cs" />
+    <Compile Include="Ui\Fragments\AbstractUserSelectionFragment.cs" />
+    <Compile Include="Ui\Fragments\ResponsibleSelectionFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactsList\ParentContactSelectorFragment.cs" />
+    <Compile Include="Ui\Fragments\FoldersList\ParentContactSelectorFoldersListFragment.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Ui\Activities\AddEditShortcodeActivity.cs" />
+    <Compile Include="Ui\Fragments\AddEditShortcodeFragment.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AccountView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AddEditContactView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\BirthdateView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\EmailsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\FaxView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\LedgerView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\MobileView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ParentContactView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PersonNameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PhoneView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PhysicalAddressesView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\PositionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ResponsibleUsersView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\ShortIdView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\TelexView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\VatView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\WebpageView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractPhoneNumberView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AddEditShortcodeView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditContactViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractSimpleFieldView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\AbstractMultipleRowsView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\NameView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\DescriptionView.cs" />
+    <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
+    <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
+    <Compile Include="Utilities\AsyncHelpers.cs" />
+    <Compile Include="Utilities\CallerIdDatabaseProvider.cs" />
+    <Compile Include="Utilities\CallStateBroadcastReceiver.cs" />
+    <Compile Include="Utilities\UsageAnalytics.cs" />
+    <Compile Include="Model\HtmlProcessingConfiguration.cs" />
+    <Compile Include="Model\PlainTextProcessingConfiguration.cs" />
+    <Compile Include="Utilities\HtmlUtilities.cs" />
+    <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AboutResources.txt" />
+    <None Include="Assets\AboutAssets.txt" />
+    <None Include="Properties\AndroidManifest.xml" />
+    <None Include="packages.config" />
+    <None Include="Assets\calibri.ttf" />
+    <None Include="Assets\cambria.ttf" />
+    <None Include="Assets\couriernew.ttf" />
+    <None Include="Assets\opensans.ttf" />
+    <None Include="Assets\tahoma.ttf" />
+    <None Include="Assets\trebuchetms.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\mipmap-mdpi\" />
+    <Folder Include="Model\HubMessages\" />
+    <Folder Include="Utilities\Extensions\" />
+    <Folder Include="Ui\Views\AddEditViews\" />
+    <Folder Include="Ui\Views\AddEditViews\AddEditContactViews\" />
+    <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\anim\enter_from_left.xml" />
+    <AndroidResource Include="Resources\anim\enter_from_left_half.xml" />
+    <AndroidResource Include="Resources\anim\enter_from_right.xml" />
+    <AndroidResource Include="Resources\anim\exit_to_left.xml" />
+    <AndroidResource Include="Resources\anim\exit_to_left_half.xml" />
+    <AndroidResource Include="Resources\anim\exit_to_right.xml" />
+    <AndroidResource Include="Resources\anim\fade_in.xml" />
+    <AndroidResource Include="Resources\anim\fade_out.xml" />
+    <AndroidResource Include="Resources\anim\no_change.xml" />
+    <AndroidResource Include="Resources\anim\slide_down.xml" />
+    <AndroidResource Include="Resources\anim\slide_up.xml" />
+    <AndroidResource Include="Resources\color\drawer_item.xml" />
+    <AndroidResource Include="Resources\color\drawer_item_background.xml" />
+    <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
+    <AndroidResource Include="Resources\drawable\circle.axml" />
+    <AndroidResource Include="Resources\drawable\circle_dark.xml" />
+    <AndroidResource Include="Resources\drawable\line_divider.axml" />
+    <AndroidResource Include="Resources\drawable\rounded_background.xml" />
+    <AndroidResource Include="Resources\drawable\search_button_background.axml" />
+    <AndroidResource Include="Resources\drawable\search_divider_horizontal.axml" />
+    <AndroidResource Include="Resources\drawable\search_divider_vertical.axml" />
+    <AndroidResource Include="Resources\drawable\search_edit_text_selector.axml" />
+    <AndroidResource Include="Resources\drawable\tab_background.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_search_server.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_company.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_department.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_email.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_fax.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_im.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_internal.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_mobile.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_person.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_phone.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_skype.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\cross.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-nodpi\background.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_search_server.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_company.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_department.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_email.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_fax.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_im.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_internal.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_mobile.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_person.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_phone.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_skype.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\cross.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_search_server.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_company.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_department.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_email.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_fax.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_im.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_internal.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_mobile.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_person.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_phone.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_skype.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\cross.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\unread.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_filter.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_new.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_search_server.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_send.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\arrow_right.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\attachment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\comment.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_company.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_department.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_email.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_fax.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_im.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_internal.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_mobile.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_person.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_phone.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_skype.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\contacts_telex.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\cross.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\failed.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_draft.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\folder_worktray.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\forward.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\incoming.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_call.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_company.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_department.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_map.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_new.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_person.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\large_text.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\map.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_contacts.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_documents.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_settings.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\nav_shortcodes.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\outgoing.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\pending.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\reply.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\replyall.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\sending.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\unread.png" />
+    <AndroidResource Include="Resources\layout\activity_login.axml" />
+    <AndroidResource Include="Resources\layout\activity_splash.axml" />
+    <AndroidResource Include="Resources\layout\appbar.axml" />
+    <AndroidResource Include="Resources\layout\base_layout.axml" />
+    <AndroidResource Include="Resources\layout\base_layout_nav.axml" />
+    <AndroidResource Include="Resources\layout\base_layout_pager.axml" />
+    <AndroidResource Include="Resources\layout\drawer_header.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_base.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_contact.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_button.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_buttons_and_progress.axml" />
+    <AndroidResource Include="Resources\layout\linear_layout_with_progress.axml" />
+    <AndroidResource Include="Resources\layout\list.axml" />
+    <AndroidResource Include="Resources\layout\list_comments.axml" />
+    <AndroidResource Include="Resources\layout\list_item_categories.axml" />
+    <AndroidResource Include="Resources\layout\list_item_comments.axml" />
+    <AndroidResource Include="Resources\layout\list_item_contacts.axml" />
+    <AndroidResource Include="Resources\layout\list_item_documents.axml" />
+    <AndroidResource Include="Resources\layout\list_item_documents_external.axml" />
+    <AndroidResource Include="Resources\layout\list_item_documents_to_upload.axml" />
+    <AndroidResource Include="Resources\layout\list_item_folders.axml" />
+    <AndroidResource Include="Resources\layout\list_item_notifications.axml" />
+    <AndroidResource Include="Resources\layout\list_item_section.axml" />
+    <AndroidResource Include="Resources\layout\list_item_shortcodes.axml" />
+    <AndroidResource Include="Resources\layout\list_item_system_user.axml" />
+    <AndroidResource Include="Resources\layout\list_with_button.axml" />
+    <AndroidResource Include="Resources\layout\mailviewer_layout.axml" />
+    <AndroidResource Include="Resources\layout\pager.axml" />
+    <AndroidResource Include="Resources\layout\search_edit_text_layout.axml" />
+    <AndroidResource Include="Resources\layout\search_list_item_categories.axml" />
+    <AndroidResource Include="Resources\layout\search_list_item_country.axml" />
+    <AndroidResource Include="Resources\layout\search_list_item_lines.axml" />
+    <AndroidResource Include="Resources\layout\search_list_item_priority.axml" />
+    <AndroidResource Include="Resources\layout\search_spinner_item_multi.axml" />
+    <AndroidResource Include="Resources\layout\selected_overlay.axml" />
+    <AndroidResource Include="Resources\layout\suggestion_dropdown.axml" />
+    <AndroidResource Include="Resources\menu\menu_drawer.axml" />
+    <AndroidResource Include="Resources\menu\menu_main.axml" />
+    <AndroidResource Include="Resources\mipmap-hdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\values\color.axml" />
+    <AndroidResource Include="Resources\values\dimens.axml" />
+    <AndroidResource Include="Resources\values\plurals.xml" />
+    <AndroidResource Include="Resources\values\strings-arrays.axml" />
+    <AndroidResource Include="Resources\values\strings-errordialogs.axml" />
+    <AndroidResource Include="Resources\values\strings-preferences.axml" />
+    <AndroidResource Include="Resources\values\strings.axml" />
+    <AndroidResource Include="Resources\values\style.axml" />
+    <AndroidResource Include="Resources\values\values-googleservices.axml" />
+    <AndroidResource Include="Resources\values\values-preferences.axml" />
+    <AndroidResource Include="Resources\xml\filepaths.xml" />
+    <AndroidResource Include="Resources\xml\network_security_config.xml" />
+    <AndroidResource Include="Resources\xml\preferences.axml" />
+    <AndroidResource Include="Resources\layout\list_item_templates.axml" />
+    <AndroidResource Include="Resources\layout\list_item_recipients.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\add.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\add.png" />
+    <AndroidResource Include="Resources\layout\download.axml" />
+    <AndroidResource Include="Resources\layout\list_no_refresh.axml" />
+    <AndroidResource Include="Resources\drawable\login_page_divider.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\login.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\login.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\login.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\login.png" />
+    <AndroidResource Include="Resources\layout\login_spinner.axml" />
+    <AndroidResource Include="Resources\drawable\icon_download_done.xml" />
+    <AndroidResource Include="Resources\drawable\icon_download_download.xml" />
+    <AndroidResource Include="Resources\drawable\icon_download_warning.xml" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_save.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\remove.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_save.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\remove.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_save.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\remove.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_add.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_save.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\expand_down.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\remove.png" />
+    <AndroidResource Include="Resources\layout\countries_dropdown.axml" />
+    <AndroidResource Include="Resources\layout\temp_incoming_caller.axml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
+      <Project>{F36FC024-B7D6-4512-BF4C-AEC8B0C93CE2}</Project>
+      <Name>FastScrollRecycler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
+      <Project>{A7F40F0E-DEF1-4CA5-BEE9-E611DF20FC3D}</Project>
+      <Name>Mark5.Mobile.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
+      <Project>{06432085-F969-4FB0-860B-6AC0F7B0F69D}</Project>
+      <Name>Mark5.ServiceReference.Exceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
+      <Project>{A54356BD-9CC4-4DE0-A8DC-9B2D9D6ED288}</Project>
+      <Name>TinyMessenger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MaterialDialogs\MaterialDialogs.csproj">
+      <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
+      <Name>MaterialDialogs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\blank.html" />
+    <AndroidAsset Include="Assets\editor.html" />
+    <AndroidAsset Include="Assets\empty.html" />
+    <AndroidAsset Include="Assets\fonts.css" />
+    <AndroidAsset Include="Assets\insertTemplate.js" />
+    <AndroidAsset Include="Assets\plain.html" />
+    <AndroidAsset Include="Assets\replyHeader.html" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Annotations.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Arch.Core.Common.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Core.Common.targets" Condition="Exists('..\packages\Xamarin.Android.Arch.Core.Common.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Core.Common.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Arch.Lifecycle.Common.1.0.1\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Common.targets" Condition="Exists('..\packages\Xamarin.Android.Arch.Lifecycle.Common.1.0.1\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Common.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Arch.Lifecycle.Runtime.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Runtime.targets" Condition="Exists('..\packages\Xamarin.Android.Arch.Lifecycle.Runtime.1.0.0\build\MonoAndroid80\Xamarin.Android.Arch.Lifecycle.Runtime.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.UI.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.UI.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.UI.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.UI.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Core.Utils.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.Utils.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.Utils.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Core.Utils.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Fragment.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Fragment.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Fragment.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Fragment.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Media.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Media.Compat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Media.Compat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Media.Compat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Transition.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Transition.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Transition.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Transition.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v13.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v13.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v13.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v13.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v4.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v4.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v4.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v4.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.CardView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.CardView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.CardView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.CardView.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.RecyclerView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.RecyclerView.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.RecyclerView.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.RecyclerView.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Animated.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Animated.Vector.Drawable.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.Design.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Design.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v7.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.Preference.targets')" />
+  <Import Project="..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v14.Preference.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v14.Preference.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v14.Preference.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Basement.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Tasks.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Tasks.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Tasks.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Tasks.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Common.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Common.targets" Condition="Exists('..\packages\Xamarin.Firebase.Common.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Common.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Iid.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Iid.targets" Condition="Exists('..\packages\Xamarin.Firebase.Iid.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Iid.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Analytics.Impl.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Analytics.Impl.targets" Condition="Exists('..\packages\Xamarin.Firebase.Analytics.Impl.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Analytics.Impl.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Analytics.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.Analytics.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Analytics.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Messaging.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Messaging.targets" Condition="Exists('..\packages\Xamarin.Firebase.Messaging.60.1142.0\build\MonoAndroid80\Xamarin.Firebase.Messaging.targets')" />
+</Project>
