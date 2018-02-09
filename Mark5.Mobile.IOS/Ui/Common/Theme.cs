@@ -122,6 +122,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 TextColor = White
             }, UIControlState.Selected);
 
+            UIProgressView.Appearance.TintColor = DarkerBlue;
+            UIProgressView.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = Blue;
+
             UISwitch.Appearance.OnTintColor = DarkBlue;
 
             UIRefreshControl.Appearance.TintColor = LightGray;

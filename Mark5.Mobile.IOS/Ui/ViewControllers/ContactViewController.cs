@@ -47,8 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
-        UIButton commentsButton;
-        BadgeBarButtonItem commentsBadgeButton;
+        UIBarButtonItem commentsButton;
         UIBarButtonItem actionsLinksButton;
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem editButtonItem;
@@ -283,13 +282,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TableView.TableHeaderView = headerView;
 
-            commentsButton = new UIButton
-            {
-                Frame = new CGRect(0f, 0f, 25f, 25f),
-                Enabled = false
-            };
-            commentsButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "comments.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-
             ToolbarItems = new[]
             {
                 assignCategoryButton = new UIBarButtonItem
@@ -304,8 +296,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
+                commentsButton = new UIBarButtonItem
                 {
+                    Image = UIImage.FromBundle(Path.Combine("icons", "comments.png")),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
@@ -359,7 +352,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 fileToButton.Clicked += FileToButton_Clicked;
 
             if (commentsButton != null)
-                commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+                commentsButton.Clicked += CommentsButton_Clicked;
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked += ActionsLinksButton_Clicked;
@@ -392,7 +385,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 fileToButton.Clicked -= FileToButton_Clicked;
 
             if (commentsButton != null)
-                commentsButton.TouchUpInside -= CommentsButton_TouchUpInside;
+                commentsButton.Clicked -= CommentsButton_Clicked;
 
             if (actionsLinksButton != null)
                 actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
@@ -614,7 +607,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-        void CommentsButton_TouchUpInside(object sender, EventArgs e)
+        void CommentsButton_Clicked(object sender, EventArgs e)
         {
             var vc = new CommentsListViewController { Entity = contact };
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -849,12 +842,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (fileToButton != null)
                     fileToButton.Enabled = true;
 
-                if (commentsBadgeButton != null)
-                {
-                    commentsBadgeButton.BadgeValue = contact?.Comments?.Count.ToString();
-                    commentsBadgeButton.Enabled = contact != null;
-                }
-
                 if (commentsButton != null)
                     commentsButton.Enabled = contact != null;
 
@@ -922,12 +909,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (fileToButton != null)
                 fileToButton.Enabled = false;
-
-            if (commentsBadgeButton != null)
-            {
-                commentsBadgeButton.SetBadgeValue("0", false);
-                commentsBadgeButton.Enabled = false;
-            }
 
             if (commentsButton != null)
                 commentsButton.Enabled = false;

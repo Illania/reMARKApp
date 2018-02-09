@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption == CopyToNewOption.KeepTextAndAttachments)
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content))
                 subjectTextView.Text = PreviousDocumentPreview.Subject;
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 subjectTextView.Text = PreviousDocumentPreview.Subject;
@@ -69,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task UpdateDocument()
         {
-            await AsyncHelpers.RunOnUiThreadSync((Activity)Context, () => DocumentPreview.Subject = subjectTextView.Text);
+            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => DocumentPreview.Subject = subjectTextView.Text);
             return;
         }
 

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -279,7 +279,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             extendedLayout.SetColumnShrinkable(1, true);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (DocumentPreview != null && Document != null)
                 Visibility = ViewStates.Visible;
@@ -290,6 +290,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             extendedLayout.Visibility = extendedLayout.Visibility = ViewStates.Gone;
 
             RefreshViewContent();
+
+            return Task.CompletedTask;
         }
 
         void RefreshViewContent()

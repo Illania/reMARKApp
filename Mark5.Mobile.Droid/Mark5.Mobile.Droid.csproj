@@ -189,21 +189,22 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
-    <Reference Include="AngleSharp">
-      <HintPath>..\packages\AngleSharp.0.9.9.1\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
-    </Reference>
     <Reference Include="HockeySDK.AndroidBindings">
       <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
     </Reference>
     <Reference Include="HockeySDK">
       <HintPath>..\packages\HockeySDK.Xamarin.5.1.1\lib\MonoAndroid403\HockeySDK.dll</HintPath>
     </Reference>
-    <Reference Include="PhoneNumbers">
-      <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.9.1\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.6.11\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="PhoneNumbers">
+        <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -440,12 +441,22 @@
     <Compile Include="Utilities\CallerIdDatabaseProvider.cs" />
     <Compile Include="Utilities\CallStateBroadcastReceiver.cs" />
     <Compile Include="Utilities\UsageAnalytics.cs" />
+    <Compile Include="Model\HtmlProcessingConfiguration.cs" />
+    <Compile Include="Model\PlainTextProcessingConfiguration.cs" />
+    <Compile Include="Utilities\HtmlUtilities.cs" />
+    <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="packages.config" />
+    <None Include="Assets\calibri.ttf" />
+    <None Include="Assets\cambria.ttf" />
+    <None Include="Assets\couriernew.ttf" />
+    <None Include="Assets\opensans.ttf" />
+    <None Include="Assets\tahoma.ttf" />
+    <None Include="Assets\trebuchetms.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
@@ -780,6 +791,15 @@
       <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
       <Name>MaterialDialogs</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\blank.html" />
+    <AndroidAsset Include="Assets\editor.html" />
+    <AndroidAsset Include="Assets\empty.html" />
+    <AndroidAsset Include="Assets\fonts.css" />
+    <AndroidAsset Include="Assets\insertTemplate.js" />
+    <AndroidAsset Include="Assets\plain.html" />
+    <AndroidAsset Include="Assets\replyHeader.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets')" />

@@ -1,4 +1,5 @@
-﻿using Android.Content;
+﻿using System.Threading.Tasks;
+using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Model;
@@ -29,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(subjectTextView);
         }
 
-        public override void RefreshView()
+        public override Task RefreshView()
         {
             if (DocumentPreview != null)
             {
@@ -43,6 +44,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 subjectTextView.Text = string.Empty;
             }
+
+            return Task.CompletedTask;
         }
     }
 }
