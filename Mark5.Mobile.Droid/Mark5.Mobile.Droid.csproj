@@ -440,6 +440,8 @@
     <Compile Include="Model\PlainTextProcessingConfiguration.cs" />
     <Compile Include="Utilities\HtmlUtilities.cs" />
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
+    <Compile Include="Ui\Activities\FingerprintActivity.cs" />
+    <Compile Include="Ui\Fragments\FingerprintFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -763,6 +765,12 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\remove.png" />
     <AndroidResource Include="Resources\layout\countries_dropdown.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_fingerprint_black_24dp.png" />
+    <AndroidResource Include="Resources\mipmap-mdpi\ic_fingerprint_black_24dp.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\ic_fingerprint_black_24dp.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_fingerprint_black_24dp.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_fingerprint_black_24dp.png" />
+    <AndroidResource Include="Resources\layout\fingerprint.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

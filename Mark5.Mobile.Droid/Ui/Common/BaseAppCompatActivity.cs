@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Text;
+using Android.Support.V4.Hardware.Fingerprint;
 using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
+using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
     public abstract class BaseAppCompatActivity : AppCompatActivity
     {
+        FingerprintManagerCompat fingerprintManager;
         FloatingActionButton fab;
 
         public FloatingActionButton Fab
@@ -28,6 +31,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
         protected override void OnResume()
         {
             base.OnResume();
+
+            fingerprintManager = FingerprintManagerCompat.From(ApplicationContext);
+
+            if(fingerprintManager.IsHardwareDetected)
+            {
+                FingerprintActivity.CreateIntent(ApplicationContext);
+            }
+
 
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             if (connectionBar != null)
