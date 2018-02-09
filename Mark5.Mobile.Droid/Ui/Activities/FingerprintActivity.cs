@@ -1,5 +1,6 @@
-﻿using System;
+﻿using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -7,6 +8,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid
 {
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class FingerprintActivity : BaseAppCompatActivity
     {
         FingerprintFragment fpf;

@@ -442,7 +442,7 @@
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
     <Compile Include="Ui\Activities\FingerprintActivity.cs" />
     <Compile Include="Ui\Fragments\FingerprintFragment.cs" />
-    <Compile Include="Utilities\Fingerprint\FingerprintHandler.cs" />
+    <Compile Include="Utilities\Fingerprint\FingerprintCallback.cs" />
     <Compile Include="Utilities\Fingerprint\CryptoObjectGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
