@@ -34,12 +34,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             fingerprintManager = FingerprintManagerCompat.From(ApplicationContext);
 
-            if(fingerprintManager.IsHardwareDetected)
-            {
-                FingerprintActivity.CreateIntent(ApplicationContext);
-            }
-
-
+            if(fingerprintManager.IsHardwareDetected) //And app has been reopened
+                StartActivity(FingerprintActivity.CreateIntent(ApplicationContext));
+            
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             if (connectionBar != null)
             {

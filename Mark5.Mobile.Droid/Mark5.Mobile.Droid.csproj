@@ -442,6 +442,8 @@
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
     <Compile Include="Ui\Activities\FingerprintActivity.cs" />
     <Compile Include="Ui\Fragments\FingerprintFragment.cs" />
+    <Compile Include="Utilities\Fingerprint\FingerprintHandler.cs" />
+    <Compile Include="Utilities\Fingerprint\CryptoObjectGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -462,6 +464,7 @@
     <Folder Include="Ui\Views\AddEditViews\" />
     <Folder Include="Ui\Views\AddEditViews\AddEditContactViews\" />
     <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
+    <Folder Include="Utilities\Fingerprint\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
