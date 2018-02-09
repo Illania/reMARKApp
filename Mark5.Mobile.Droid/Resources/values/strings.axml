@@ -173,6 +173,8 @@
 	<string name="error_while_sending_document">There was an error while sending the email</string>
 	<string name="failed_send_document_notification_content">One or more emails could not be sent. Please check Outgoing folder for details.</string>
 	<string name="failed_send_document_notification_title">Failed to send emails</string>
+    <string name="fingerprint_success">Fingerprint recognised.</string>
+    <string name="fingerprint_try_again">Fingerprint not recognised. Try again.</string>
 	<string name="filter">Filter...</string>
 	<string name="folder_favorites">Favorites</string>
 	<string name="folder_local">Local folders</string>

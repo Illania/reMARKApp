@@ -1,6 +1,6 @@
 ﻿using Android.App;
 using Android.Support.V4.Hardware.Fingerprint;
-
+using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 {
@@ -17,12 +17,15 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         {
             base.OnAuthenticationSucceeded(result);
 
-            activityContext.Finish();
+            Toast.MakeText(activityContext, Resource.String.fingerprint_success, ToastLength.Long).Show();
+            //activityContext.Finish();
         }
 
         public override void OnAuthenticationFailed()
         {
             base.OnAuthenticationFailed();
+
+            Toast.MakeText(activityContext, Resource.String.fingerprint_try_again, ToastLength.Long).Show();
         }
 
         public override void OnAuthenticationError(int errMsgId, Java.Lang.ICharSequence errString)
