@@ -22,11 +22,12 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class NotificationsListFragment : RetainableStateFragment
+    public class NotificationsListFragment : BaseFragment
     {
         const string ObjectTypesBundleKey = "ObjectTypes_0df8f79a-884b-4d2b-93ce-8141f1111cc5";
 
         ObjectType[] objectTypes;
+        List<Notification> notifications;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -51,13 +52,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (Arguments.ContainsKey(ObjectTypesBundleKey))
+                objectTypes = Serializer.Deserialize<ObjectType[]>(Arguments.GetString(ObjectTypesBundleKey));
+        }
+
         #region Fragment overrides
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(ObjectTypesBundleKey))
-                objectTypes = Serializer.Deserialize<ObjectType[]>(Arguments.GetString(ObjectTypesBundleKey));
-
             CommonConfig.Logger.Info($"Creating {nameof(NotificationsListFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -157,32 +163,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [notifications.Count={adapter?.ItemCount}]...");
-
-            return new NotificationsFragmentState
-            {
-                ObjectTypes = objectTypes,
-                Notifications = adapter.Items
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is NotificationsFragmentState dlfs)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.items.count={dlfs.Notifications?.Count}]...");
-
-                objectTypes = dlfs.ObjectTypes;
-                adapter.AppendItems(dlfs.Notifications);
-            }
-        }
-
-        #endregion
-
         #region Refreshing
 
         async Task RefreshData()
@@ -191,9 +171,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Refreshing = true;
+                if (!Restored)
+                    refreshLayout.Refreshing = true;
 
-                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken,
+                                                                                          Restored ? SourceType.Local : SourceType.Auto);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
 
                 adapter.Clear();
@@ -258,17 +240,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
-        }
-
-        #endregion
-
-        #region State
-
-        class NotificationsFragmentState : IRetainableState
-        {
-            public ObjectType[] ObjectTypes { get; set; }
-
-            public List<Notification> Notifications { get; set; }
         }
 
         #endregion

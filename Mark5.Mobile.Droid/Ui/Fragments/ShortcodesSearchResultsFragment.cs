@@ -17,11 +17,14 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ShortcodesSearchResultsFragment : RetainableStateFragment
+    public class ShortcodesSearchResultsFragment : BaseFragment
     {
         const string SearchShortcodesCriteriaBundleKey = "SearchShortcodesCriteria_ffe59102-9ddc-49d4-9172-bb119548ea77";
+        const string ShortcodePreviewsKey = "ShortcodePreviews_6716ab9c-97fc-4b61-91b0-1ed74dc0e9d4";
 
         SearchShortcodesCriteria criteria;
+
+        List<ShortcodePreview> savedResults;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -44,11 +47,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(SearchShortcodesCriteriaBundleKey))
                 criteria = Serializer.Deserialize<SearchShortcodesCriteria>(Arguments.GetString(SearchShortcodesCriteriaBundleKey));
 
+            if (savedInstanceState?.ContainsKey(ShortcodePreviewsKey) == true)
+                savedResults = Serializer.Deserialize<List<ShortcodePreview>>(savedInstanceState.GetString(ShortcodePreviewsKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -72,8 +83,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes_result);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            if (savedResults != null)
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+                adapter.AppendItems(savedResults);
+            }
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_shortcodes_result);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]");
         }
@@ -99,32 +116,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(ShortcodesSearchResultsFragment)} [criteria={criteria}]...");
         }
 
-        #endregion
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
+        public override void OnSaveInstanceState(Bundle outState)
         {
-            CommonConfig.Logger.Info($"Retaining state [criteria={criteria}, shortcodePreviews.Count={adapter?.ItemCount}]...");
+            base.OnSaveInstanceState(outState);
 
-            return new ShortcodeSearchResultsFragmentState
-            {
-                Criteria = criteria,
-                ShortcodePreviews = adapter.Items
-            };
+            if (adapter?.Items != null || savedResults != null)
+                outState.PutString(ShortcodePreviewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
         }
 
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as ShortcodeSearchResultsFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.ShortcodePreviews?.Count}]...");
-
-                criteria = dlfs.Criteria;
-                adapter.AppendItems(dlfs.ShortcodePreviews);
-            }
-        }
         #endregion
 
         #region Refreshing
@@ -174,17 +173,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
             StartActivity(ShortcodeActivity.CreateIntent(Context, shortcodePreview: shortcodePreview));
-        }
-
-        #endregion
-
-        #region State
-
-        class ShortcodeSearchResultsFragmentState : IRetainableState
-        {
-            public SearchShortcodesCriteria Criteria { get; set; }
-
-            public List<ShortcodePreview> ShortcodePreviews { get; set; }
         }
 
         #endregion

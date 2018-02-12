@@ -40,13 +40,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
-            if (State != null)
-            {
-                RestoreState();
-                State = null;
-                return Task.CompletedTask;
-            }
-
             if (RestoreWorkingCopy)
             {
                 subjectTextView.Text = DocumentPreview.Subject;
@@ -77,25 +70,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             subjectTextView.Text = subject;
         }
-
-        #region State related
-
-        void RestoreState()
-        {
-            var subjectViewState = (SubjectViewState)State;
-            subjectTextView.Text = subjectViewState.Content;
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            return new SubjectViewState { Content = subjectTextView.Text };
-        }
-
-        class SubjectViewState : IComposeDocumentViewState
-        {
-            public string Content { get; set; }
-        }
-
-        #endregion
     }
 }

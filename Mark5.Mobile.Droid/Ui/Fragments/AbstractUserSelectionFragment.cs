@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -18,7 +17,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public abstract class AbstractUserSelectionFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public abstract class AbstractUserSelectionFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         UserSelectionAdapter CurrentAdapter => (UserSelectionAdapter)recyclerView.GetAdapter();
 
@@ -30,7 +29,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected const string ActionButtonTextResIdBundleKey = "ActionButtonTextResId_0482d7d6-a109-4a78-8075-f69455052af2";
         protected const string IncludeCurrentUserBundleKey = "IncludeCurrentUser_470297d6-812a-4ae8-8528-e85355aa7da7";
         protected const string AllowNoUserSelectedBundleKey = "AllowNoUserSelected_fca35857-47a0-45c7-b8e1-d5bd4ff8bf39";
-        
+        protected const string SelectedSystemUsersKey = "SelectedSystemUsers_124e4282-1191-4d17-9615-c7a6c3d8d0a4";
+
         protected UserSelectionAdapter Adapter;
         protected UserSelectionAdapter SearchAdapter;
 
@@ -46,8 +46,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(PreselectedUserIdsBundleKey))
                 preselectedUserIds = Serializer.Deserialize<List<int>>(Arguments.GetString(PreselectedUserIdsBundleKey));
 
@@ -60,6 +62,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Arguments.ContainsKey(AllowNoUserSelectedBundleKey))
                 allowNoUserSelected = Arguments.GetBoolean(AllowNoUserSelectedBundleKey);
 
+            if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
+                preselectedUserIds = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(SelectedSystemUsersKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(AbstractUserSelectionFragment)} {GetInfo()}");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
@@ -117,6 +125,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (SelectedSystemUsers != null)
+                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(SelectedSystemUsers.Values.Select(u => u.Id).ToList()));
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             inflater.Inflate(Resource.Menu.menu_main, menu);
@@ -144,9 +160,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Refreshing = true;
+                if (!Restored)
+                    refreshLayout.Refreshing = true;
 
-                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(Restored ? SourceType.Local : SourceType.Auto);
                 if (includeCurrentUser)
                     Adapter.SetItems(userDepartments.Users.OrderBy(su => su.Username).ToList());
                 else
@@ -279,56 +296,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state {GetInfo()}[systemUsers.Count={Adapter?.ItemCount}, selectedSystemUsers.Count={SelectedSystemUsers.Count}]...");
-
-            return new AbstractUserSelectionFragmentState
-            {
-                SystemUsers = Adapter.Items,
-                SelectedSystemUsers = SelectedSystemUsers,
-                AllowNoUserSelected = allowNoUserSelected,
-                IncludeCurrentUser = includeCurrentUser,
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is AbstractUserSelectionFragmentState dlfs)
-            {
-                CommonConfig.Logger.Info($"Restoring state {GetInfo()}[dlfs.systemUsers.Count={dlfs.SystemUsers?.Count}, dlfs.selectedSystemUsers.Cound={dlfs.SelectedSystemUsers?.Count}]...");
-
-                allowNoUserSelected = dlfs.AllowNoUserSelected;
-                includeCurrentUser = dlfs.IncludeCurrentUser;
-
-                Adapter.SetItems(dlfs.SystemUsers);
-
-                SelectedSystemUsers.Clear();
-                foreach (var kv in dlfs.SelectedSystemUsers)
-                    SelectedSystemUsers.Add(kv.Key, kv.Value);
-
-                UpdateControls();
-            }
-        }
-
-        #endregion
-
-        #region State
-
-        protected class AbstractUserSelectionFragmentState : IRetainableState
-        {
-            public List<SystemUser> SystemUsers { get; set; }
-            public Dictionary<int, SystemUser> SelectedSystemUsers { get; set; }
-            public bool IncludeCurrentUser { get; set; }
-            public bool AllowNoUserSelected { get; set; }
-        }
-
-        #endregion
-
 
         #region RecyclerView Adapter/ViewHolder
 

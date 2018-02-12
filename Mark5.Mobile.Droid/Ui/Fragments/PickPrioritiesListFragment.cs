@@ -15,7 +15,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickPrioritiesListFragment : RetainableStateFragment
+    public class PickPrioritiesListFragment : BaseFragment
     {
         public Task<List<Priority>> Task => tcs.Task;
 
@@ -43,11 +43,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (savedInstanceState?.ContainsKey(SelectedPrioritiesBundleKey) == true)
+                selectedPriorities = Serializer.Deserialize<List<Priority>>(savedInstanceState.GetString(SelectedPrioritiesBundleKey));
+            else if (Arguments.ContainsKey(SelectedPrioritiesBundleKey))
+                selectedPriorities = Serializer.Deserialize<List<Priority>>(Arguments.GetString(SelectedPrioritiesBundleKey));
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(SelectedPrioritiesBundleKey))
-                selectedPriorities = Serializer.Deserialize<List<Priority>>(Arguments.GetString(SelectedPrioritiesBundleKey));
-
             CommonConfig.Logger.Info($"Creating {nameof(PickPrioritiesListFragment)}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -68,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_priorities);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.search_priorities);
 
             CommonConfig.Logger.Info($"Created {nameof(PickPrioritiesListFragment)}");
         }
@@ -82,6 +89,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Info($"Refreshing {nameof(PickPrioritiesListFragment)}");
                 RefreshData();
             }
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.SelectedPriorities != null || selectedPriorities != null)
+                outState.PutString(SelectedPrioritiesBundleKey, Serializer.Serialize(adapter?.SelectedPriorities ?? selectedPriorities));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -117,32 +132,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void CloseFragment()
         {
             tcs.SetResult(adapter.SelectedPriorities);
-            ((AppCompatActivity) Activity).OnBackPressed();
+            ((AppCompatActivity)Activity).OnBackPressed();
         }
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new PickLinesListFragmentState
-            {
-                SelectedPriorities = adapter.SelectedPriorities,
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var clfs = restoredState as PickLinesListFragmentState;
-            if (clfs != null)
-                selectedPriorities = clfs.SelectedPriorities;
-        }
-
-        class PickLinesListFragmentState : IRetainableState
-        {
-            public List<Priority> SelectedPriorities { get; set; }
-        }
-
-        #endregion
 
         class PrioritiesListViewAdapter : RecyclerView.Adapter
         {

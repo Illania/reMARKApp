@@ -112,13 +112,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task RefreshView()
         {
-            if (State != null)
-            {
-                await RestoreState();
-                State = null;
-                return;
-            }
-
             if (RestoreWorkingCopy)
             {
                 await newContentSemaphore.WaitAsync();
@@ -131,12 +124,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 await newContentSemaphore.WaitAsync();
                 newContentWebView.LoadEditor(context);
 
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments) ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
+
+                if (PreviousDocument != null && DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content))
                 {
-                    if (PreviousDocumentPreview != null && !string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
+                    if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
+                    {
+                        await newContentSemaphore.WaitAsync();
+                        await newContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
+                    {
+                        await newContentSemaphore.WaitAsync();
+                        await newContentWebView.LoadPlainText(context, PreviousDocument.HtmlBody, PlainTextProcessingConfiguration.DefaultForEditing);
+                    }
+                }
+                else if (PreviousDocumentPreview != null && (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                                                             DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                                                             DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None))
+                {
+                    if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
                     {
                         var config = HtmlProcessingConfiguration.DefaultForEditing;
                         config.InjectReplyHeader = true;
@@ -147,7 +153,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                         previousDocumentLoaded = true;
                     }
-                    else if (PreviousDocumentPreview != null && !string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
+                    else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
                     {
                         var config = PlainTextProcessingConfiguration.DefaultForEditing;
                         config.InjectReplyHeader = true;
@@ -199,36 +205,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             insertTemplateJs = HtmlUtilities.ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
             await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
-        }
-
-        #endregion
-
-        #region State related
-
-        Task RestoreState()
-        {
-            var contentViewState = (ContentViewState)State;
-            oldContentWebView.Visibility = contentViewState.OldContentWebViewVisibility;
-            showOldContentButton.Visibility = contentViewState.ShowOldContentButtonVisibility;
-            showOldContentButton.Text = contentViewState.ShowOldContentButtonText;
-            return Task.CompletedTask;
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            return new ContentViewState
-            {
-                OldContentWebViewVisibility = oldContentWebView.Visibility,
-                ShowOldContentButtonVisibility = showOldContentButton.Visibility,
-                ShowOldContentButtonText = showOldContentButton.Text,
-            };
-        }
-
-        class ContentViewState : IComposeDocumentViewState
-        {
-            public ViewStates OldContentWebViewVisibility { get; set; }
-            public ViewStates ShowOldContentButtonVisibility { get; set; }
-            public string ShowOldContentButtonText { get; set; }
         }
 
         #endregion

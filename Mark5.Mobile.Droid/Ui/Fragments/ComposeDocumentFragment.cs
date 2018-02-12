@@ -28,7 +28,7 @@ using PCLStorage;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ComposeDocumentFragment : RetainableStateFragment
+    public class ComposeDocumentFragment : BaseFragment
     {
         readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>(10);
 
@@ -129,8 +129,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(DocumentCreationModeFlagBundleKey))
                 documentCreationModeFlag = (DocumentCreationModeFlag)Arguments.GetInt(DocumentCreationModeFlagBundleKey);
 
@@ -152,6 +154,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Arguments.ContainsKey(PreconfiguredEmailAddressesBundleKey))
                 preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Arguments.GetString(PreconfiguredEmailAddressesBundleKey));
 
+            restoreWorkingCopy = restoreWorkingCopy || Restored;
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -237,7 +244,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
                 HandleAddAttachment(data);
-            
+
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
@@ -292,17 +299,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                if (restoreWorkingCopy)
+                if (restoreWorkingCopy || Restored)
                 {
                     var wc = await Managers.DocumentsManager.GetDocumentWorkingCopyAsync();
 
-                    documentCreationModeFlag = wc.DocumentCreationModeFlag;
-                    copyToNewOption = wc.CopyToNewOption;
-                    previousDocumentFolderId = wc.PreviousDocumentFolderId;
-                    previousDocumentId = wc.PreviousDocumentId;
-                    previousDocumentDirection = wc.PreviousDocumentDirection;
-                    documentPreview = wc.DocumentPreview;
-                    document = wc.Document;
+                    if (wc != null)
+                    {
+                        documentCreationModeFlag = wc.DocumentCreationModeFlag;
+                        copyToNewOption = wc.CopyToNewOption;
+                        previousDocumentFolderId = wc.PreviousDocumentFolderId;
+                        previousDocumentId = wc.PreviousDocumentId;
+                        previousDocumentDirection = wc.PreviousDocumentDirection;
+                        documentPreview = wc.DocumentPreview;
+                        document = wc.Document;
+                    }
                 }
 
                 if (documentCreationModeFlag == DocumentCreationModeFlag.New && copyToNewOption != CopyToNewOption.None ||
@@ -310,7 +320,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     documentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && copyToNewOption == CopyToNewOption.None ||
                     documentCreationModeFlag == DocumentCreationModeFlag.Forward && copyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value);
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentFolderId ?? -1, previousDocumentId.Value, SourceType.Local);
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
                 }
@@ -740,7 +750,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
-                
+
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 AddAttachment();
             }
@@ -943,88 +953,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             template.Content = templateContent;
-        }
-
-        #endregion
-
-        #region Retained State methods
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new ComposeDocumentFragmentState
-            {
-                DocumentCreationModeFlag = documentCreationModeFlag,
-                CopyToNewOptions = copyToNewOption,
-                DocumentPreview = documentPreview,
-                Document = document,
-                PreviousDocumentDirection = previousDocumentDirection,
-                PreviousDocumentFolderId = previousDocumentFolderId,
-                PreviousDocumentId = previousDocumentId,
-                PreviousDocumentPreview = previousDocumentPreview,
-                PreviousDocument = previousDocument,
-                PreconfiguredEmailAddresses = preconfiguredEmailAddresses,
-                DocumentLoaded = documentLoaded,
-                TemplateLoaded = templateLoaded,
-                ToState = toView.GetState(),
-                CcState = ccView.GetState(),
-                BccState = bccView.GetState(),
-                PriorityState = priorityView.GetState(),
-                LineState = lineView.GetState(),
-                SubjectState = subjectView.GetState(),
-                AttachmentsState = attachmentsView.GetState(),
-                ContentState = contentView.GetState()
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is ComposeDocumentFragmentState cfs)
-            {
-                documentCreationModeFlag = cfs.DocumentCreationModeFlag;
-                copyToNewOption = cfs.CopyToNewOptions;
-                documentPreview = cfs.DocumentPreview;
-                document = cfs.Document;
-                previousDocumentDirection = cfs.PreviousDocumentDirection;
-                previousDocumentFolderId = cfs.PreviousDocumentFolderId;
-                previousDocumentId = cfs.PreviousDocumentId;
-                previousDocumentPreview = cfs.PreviousDocumentPreview;
-                previousDocument = cfs.PreviousDocument;
-                preconfiguredEmailAddresses = cfs.PreconfiguredEmailAddresses;
-                documentLoaded = cfs.DocumentLoaded;
-                templateLoaded = cfs.TemplateLoaded;
-                toView.State = cfs.ToState;
-                ccView.State = cfs.CcState;
-                bccView.State = cfs.BccState;
-                priorityView.State = cfs.PriorityState;
-                lineView.State = cfs.LineState;
-                subjectView.State = cfs.SubjectState;
-                attachmentsView.State = cfs.AttachmentsState;
-                contentView.State = cfs.ContentState;
-            }
-        }
-
-        class ComposeDocumentFragmentState : IRetainableState
-        {
-            public DocumentCreationModeFlag DocumentCreationModeFlag { get; set; }
-            public CopyToNewOption CopyToNewOptions { get; set; }
-            public DocumentPreview DocumentPreview { get; set; }
-            public Document Document { get; set; }
-            public DocumentDirection PreviousDocumentDirection { get; set; }
-            public int? PreviousDocumentFolderId { get; set; }
-            public int? PreviousDocumentId { get; set; }
-            public DocumentPreview PreviousDocumentPreview { get; set; }
-            public Document PreviousDocument { get; set; }
-            public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
-            public bool DocumentLoaded { get; set; }
-            public bool TemplateLoaded { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState ToState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState CcState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState BccState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState PriorityState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState LineState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState SubjectState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState AttachmentsState { get; set; }
-            public ComposeDocumentView.IComposeDocumentViewState ContentState { get; set; }
         }
 
         #endregion

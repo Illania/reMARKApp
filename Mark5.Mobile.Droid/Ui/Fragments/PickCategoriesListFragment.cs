@@ -19,7 +19,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PickCategoriesListFragment : RetainableStateFragment
+    public class PickCategoriesListFragment : BaseFragment
     {
         public Task<List<Category>> Task => tcs.Task;
 
@@ -30,10 +30,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Dictionary<int, Category> selectedCategories = new Dictionary<int, Category>();
 
         const string ObjectTypeBundleKey = "ObjectType_cae47797-624e-48a2-a472-1758023b0e40";
-        const string PreselectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
+        const string SelectedCategoryIdsBundleKey = "PreselectedCategoryIds_b1c58f1d-0b7a-4ab1-bc33-f5c886828b47";
+        const string AvailableCategoriesKey = "AvailableCategories_b78120ea-4fb2-41ff-b431-d0fb62e6523f";
 
         ObjectType objectType;
-        int[] preselectedCategoryIds;
+        int[] selectedCategoryIds;
+        List<Category> availableCategories;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -45,7 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             args.PutInt(ObjectTypeBundleKey, (int)objectType);
 
             if (preselectedCategoryIds != null)
-                args.PutIntArray(PreselectedCategoryIdsBundleKey, preselectedCategoryIds);
+                args.PutIntArray(SelectedCategoryIdsBundleKey, preselectedCategoryIds);
 
             var fragment = new PickCategoriesListFragment();
             fragment.Arguments = args;
@@ -55,14 +57,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(ObjectTypeBundleKey))
                 objectType = (ObjectType)Arguments.GetInt(ObjectTypeBundleKey);
 
-            if (Arguments.ContainsKey(PreselectedCategoryIdsBundleKey))
-                preselectedCategoryIds = Arguments.GetIntArray(PreselectedCategoryIdsBundleKey);
+            if (savedInstanceState?.ContainsKey(SelectedCategoryIdsBundleKey) == true)
+                selectedCategoryIds = savedInstanceState.GetIntArray(SelectedCategoryIdsBundleKey);
+            else if (Arguments.ContainsKey(SelectedCategoryIdsBundleKey))
+                selectedCategoryIds = Arguments.GetIntArray(SelectedCategoryIdsBundleKey);
 
+            if (savedInstanceState?.ContainsKey(AvailableCategoriesKey) == true)
+                availableCategories = Serializer.Deserialize<List<Category>>(savedInstanceState.GetString(AvailableCategoriesKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(PickCategoriesListFragment)} [objectType={objectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -104,6 +116,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (availableCategories != null)
+                outState.PutString(AvailableCategoriesKey, Serializer.Serialize(availableCategories));
+
+            if (selectedCategories != null || selectedCategoryIds != null)
+                outState.PutIntArray(SelectedCategoryIdsBundleKey, selectedCategories?.Keys?.ToArray() ?? selectedCategoryIds);
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -143,21 +166,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 refreshLayout.Refreshing = true;
 
-                List<Category> availableCategories;
-                switch (objectType)
+                if (availableCategories == null)
                 {
-                    case ObjectType.Document:
-                        availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                        break;
-                    case ObjectType.Contact:
-                        availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
-                        break;
-                    default:
-                        throw new ArgumentException("The business entity provided does not have categories in the model");
+                    switch (objectType)
+                    {
+                        case ObjectType.Document:
+                            availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
+                            break;
+                        case ObjectType.Contact:
+                            availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
+                            break;
+                        default:
+                            throw new ArgumentException("The business entity provided does not have categories in the model");
+                    }
                 }
 
                 foreach (var category in availableCategories)
-                    if (preselectedCategoryIds.Contains(category.Id))
+                    if (selectedCategoryIds.Contains(category.Id))
                         ToggleSelected(category);
 
                 adapter.SetItems(availableCategories);
@@ -191,39 +216,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var position = CurrentAdapter.GetPosition(category);
             if (position >= 0)
                 CurrentAdapter.NotifyItemChanged(position);
-        }
-
-        #endregion
-
-        #region Retained State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new AvailableCategoriesListFragmentState
-            {
-                SelectedCategories = selectedCategories,
-                AvailableCategories = adapter.Items
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var clfs = restoredState as AvailableCategoriesListFragmentState;
-            if (clfs != null)
-            {
-                selectedCategories.Clear();
-                foreach (var kv in clfs.SelectedCategories)
-                    selectedCategories.Add(kv.Key, kv.Value);
-
-                adapter.SetItems(clfs.AvailableCategories);
-            }
-        }
-
-        class AvailableCategoriesListFragmentState : IRetainableState
-        {
-            public Dictionary<int, Category> SelectedCategories { get; set; }
-
-            public List<Category> AvailableCategories { get; set; }
         }
 
         #endregion

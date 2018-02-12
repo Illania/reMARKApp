@@ -19,7 +19,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public Document PreviousDocument { get; set; }
         public DocumentPreview PreviousDocumentPreview { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
-        public IComposeDocumentViewState State { get; set; }
 
         protected int DistanceVeryLarge;
         protected int DistanceLarge;
@@ -40,11 +39,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public abstract Task RefreshView();
 
         public abstract Task UpdateDocument();
-
-        public abstract IComposeDocumentViewState GetState();
-
-        public interface IComposeDocumentViewState
-        {
-        }
     }
 }

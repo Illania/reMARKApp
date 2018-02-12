@@ -23,11 +23,13 @@ using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentsSearchResultsFragment : RetainableStateFragment
+    public class DocumentsSearchResultsFragment : BaseFragment
     {
         const string SearchDocumentsCriteriaBundleKey = "SearchDocumentsCriteria_273f369b-8818-4944-9dfc-5193a7bd542a";
+        const string DocumentPreivewsKey = "DocumentPreviews_88491381-02c2-40ec-a560-d74c788fcf1e";
 
         SearchDocumentsCriteria criteria;
+        List<DocumentPreview> savedResults;
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -52,11 +54,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(SearchDocumentsCriteriaBundleKey))
                 criteria = Serializer.Deserialize<SearchDocumentsCriteria>(Arguments.GetString(SearchDocumentsCriteriaBundleKey));
 
+            if (savedInstanceState?.ContainsKey(DocumentPreivewsKey) == true)
+                savedResults = Serializer.Deserialize<List<DocumentPreview>>(savedInstanceState.GetString(DocumentPreivewsKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -79,6 +89,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
+
+            if (savedResults != null)
+            {
+                CommonConfig.Logger.Info($"Restoring state...");
+                adapter.AppendItems(savedResults);
+            }
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.search_documents_result);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
@@ -113,31 +129,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(DocumentsSearchResultsFragment)} [criteria={criteria}]...");
         }
 
-        #endregion
-
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
+        public override void OnSaveInstanceState(Bundle outState)
         {
-            CommonConfig.Logger.Info($"Retaining state [criteria={criteria}, documentPreviews.Count={adapter?.ItemCount}]...");
+            base.OnSaveInstanceState(outState);
 
-            return new DocumentSearchResultsFragmentState
-            {
-                Criteria = criteria,
-                DocumentPreviews = adapter.Items
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as DocumentSearchResultsFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.criteria={dlfs.Criteria}, dlfs.items.count={dlfs.DocumentPreviews?.Count}]...");
-
-                criteria = dlfs.Criteria;
-                adapter.AppendItems(dlfs.DocumentPreviews);
-            }
+            if (adapter?.Items != null || savedResults != null)
+                outState.PutString(DocumentPreivewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
         }
 
         #endregion
@@ -205,17 +202,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
             StartActivity(DocumentActivity.CreateIntent(Context, documentPreview: documentPreview));
-        }
-
-        #endregion
-
-        #region State
-
-        class DocumentSearchResultsFragmentState : IRetainableState
-        {
-            public SearchDocumentsCriteria Criteria { get; set; }
-
-            public List<DocumentPreview> DocumentPreviews { get; set; }
         }
 
         #endregion

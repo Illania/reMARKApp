@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersNotificationsListFragment : RetainableStateFragment, ViewPager.IOnPageChangeListener
+    public class FoldersNotificationsListFragment : BaseFragment, ViewPager.IOnPageChangeListener
     {
         static readonly int[] tabTitles =
         {
@@ -21,11 +21,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         };
 
         const string RemoteFolderBundleKey = "RemoteFolder_403cbd64-83e9-4e13-8809-0868debb55b9";
+        const string SelectedTabKey = "SelectedTab_8224d3cf-48b2-48d4-92e9-c36ecc84760a";
 
         Folder remoteFolder;
 
         TabLayout tabLayout;
         ViewPager pager;
+
+        int savedCurrentPageIndex = -1;
 
         public static FoldersNotificationsListFragment NewInstance()
         {
@@ -47,12 +50,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
-            if ((Arguments != null) && Arguments.ContainsKey(RemoteFolderBundleKey))
+            base.OnCreate(savedInstanceState);
+
+            if (Arguments?.ContainsKey(RemoteFolderBundleKey) == true)
                 remoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
 
-            CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsRetainableState)}...");
+            if (savedInstanceState?.ContainsKey(SelectedTabKey) == true)
+                savedCurrentPageIndex = savedInstanceState.GetInt(SelectedTabKey);
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
+            CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsListFragment)}...");
 
             var rootView = inflater.Inflate(Resource.Layout.pager, container, false);
 
@@ -78,6 +89,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            if (savedCurrentPageIndex >= 0)
+                pager.CurrentItem = savedCurrentPageIndex;
+
             if (remoteFolder.Root)
                 remoteFolder = Folder.RootForModule(remoteFolder.Module);
 
@@ -99,25 +113,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = title;
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = remoteFolder.Root ? null : remoteFolder.Name;
 
-            CommonConfig.Logger.Info($"Created {nameof(FoldersNotificationsRetainableState)}");
+            CommonConfig.Logger.Info($"Created {nameof(FoldersNotificationsListFragment)}");
         }
 
-        public override IRetainableState OnRetainInstanceState()
+        public override void OnSaveInstanceState(Bundle outState)
         {
-            return new FoldersNotificationsRetainableState
-            {
-                Folder = remoteFolder,
-                SelectedTab = pager.CurrentItem
-            };
-        }
+            base.OnSaveInstanceState(outState);
 
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is FoldersNotificationsRetainableState srs)
-            {
-                remoteFolder = srs.Folder;
-                pager.CurrentItem = srs.SelectedTab;
-            }
+            if (pager != null || savedCurrentPageIndex >= 0)
+                outState.PutInt(SelectedTabKey, pager?.CurrentItem ?? savedCurrentPageIndex);
         }
 
         void ViewPager.IOnPageChangeListener.OnPageScrollStateChanged(int state)
@@ -134,13 +138,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (position == 1)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenNotificationsEvent(ModuleType.Documents));
-        }
-
-        class FoldersNotificationsRetainableState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-
-            public int SelectedTab { get; set; }
         }
 
         class PagerAdapter : FragmentPagerAdapter

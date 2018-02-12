@@ -19,7 +19,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PhonebookContactsListFragment : RetainableStateFragment
+    public class PhonebookContactsListFragment : BaseFragment
     {
         RecyclerView recyclerView;
         PhonebookContactsListAdapter adapter;

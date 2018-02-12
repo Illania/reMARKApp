@@ -84,8 +84,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(FolderBundleKey))
                 Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
 
@@ -103,7 +105,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(FailedDocumentToUploadGuidBundleKey))
                 FailedDocumentToUploadGuid = Serializer.Deserialize<Guid>(Arguments.GetString(FailedDocumentToUploadGuidBundleKey));
+        }
 
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_buttons_and_progress, container, false);
@@ -906,13 +911,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (DocumentId.HasValue && DocumentPreview == null && Document == null)
                 {
-                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value);
+                    var container = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(FolderId ?? Folder?.Id, DocumentId.Value, Restored ? SourceType.Local : SourceType.Auto);
                     DocumentPreview = container.DocumentPreview;
                     Document = container.Document;
                 }
 
                 if (DocumentPreview != null && Document == null)
-                    Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id);
+                    Document = await Managers.DocumentsManager.GetDocumentAsync(FolderId ?? Folder?.Id, DocumentPreview.Id, Restored ? SourceType.Local : SourceType.Auto);
 
                 await RefreshView();
             }

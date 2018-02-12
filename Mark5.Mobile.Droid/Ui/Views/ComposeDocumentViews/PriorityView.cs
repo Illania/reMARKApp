@@ -42,12 +42,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
-            if (State != null)
-            {
-                RestoreState();
-                State = null;
-                return Task.CompletedTask;
-            }
             if (RestoreWorkingCopy)
             {
                 SetPriority(DocumentPreview.Priority);
@@ -85,26 +79,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         Priority GetPriority()
         {
             return priorities[prioritySpinner.SelectedItemPosition];
-        }
-
-        #endregion
-
-        #region State related
-
-        void RestoreState()
-        {
-            var priorityViewState = (PriorityViewState)State;
-            SetPriority(priorityViewState.SelectedPriority);
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            return new PriorityViewState { SelectedPriority = GetPriority() };
-        }
-
-        class PriorityViewState : IComposeDocumentViewState
-        {
-            public Priority SelectedPriority { get; set; }
         }
 
         #endregion

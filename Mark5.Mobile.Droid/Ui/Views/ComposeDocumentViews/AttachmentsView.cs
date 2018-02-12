@@ -56,13 +56,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
-            if (State != null)
-            {
-                RestoreState();
-                State = null;
-                return Task.CompletedTask;
-            }
-
             if (RestoreWorkingCopy)
             {
                 foreach (var attachmentDescription in Document.Attachments)
@@ -154,26 +147,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         }
 
         void UpdateVisibility() => Visibility = attachmentDescriptions.Any() || fileDescriptions.Any() ? ViewStates.Visible : ViewStates.Gone;
-
-        #region State related
-
-        void RestoreState()
-        {
-            var attachmentsViewState = (AttachmentsViewState)State;
-            attachmentsViewState.AttachmentDescriptions.ForEach(AddAttachment);
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            return new AttachmentsViewState { AttachmentDescriptions = attachmentDescriptions };
-        }
-
-        class AttachmentsViewState : IComposeDocumentViewState
-        {
-            public List<AttachmentDescription> AttachmentDescriptions { get; set; }
-        }
-
-        #endregion
 
         #region Subview
 
