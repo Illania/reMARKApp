@@ -125,7 +125,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 newContentWebView.LoadEditor(context);
 
 
-                if (PreviousDocument != null && DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content))
+                if (PreviousDocument != null && PreviousDocumentDirection == DocumentDirection.Draft ||
+                    (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {
                     if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
                     {

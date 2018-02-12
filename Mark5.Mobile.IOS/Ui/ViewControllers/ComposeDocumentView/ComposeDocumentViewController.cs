@@ -333,7 +333,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (RestoreWorkingCopy)
                     await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
-                else if (previousDocumentPreview != null && DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content))
+                else if (previousDocumentPreview != null && PreviousDocumentDirection == DocumentDirection.Draft ||
+                         (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {
                     previousDocumentContent = null;
 
