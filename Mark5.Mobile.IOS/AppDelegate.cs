@@ -294,13 +294,14 @@ namespace Mark5.Mobile.IOS
             {
                 try
                 {
-                    CommonConfig.Logger.Info("Retrieving system settings...");
+                    CommonConfig.Logger.Info("Background Fetch: Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
                     completionHandler(UIBackgroundFetchResult.NewData);
                 }
                 catch (Exception ex)
                 {
+                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.",ex);
                     completionHandler(UIBackgroundFetchResult.Failed);
                 }
             });

@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 try
                 {
-                    CommonConfig.Logger.Info("SystemConfigJobService: Retrieving system settings...");
+                    CommonConfig.Logger.Info("SystemSettingsJobService: Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
                 }
