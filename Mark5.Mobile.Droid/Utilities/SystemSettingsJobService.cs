@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.App.Job;
@@ -13,20 +14,25 @@ namespace Mark5.Mobile.Droid.Utilities
     class SystemSettingsJobService : JobService
     {
         static readonly long OneDayInterval = 1000 * 60 * 60 * 24;
+        static readonly int JobId = 1; //Must be unique for all jobservices scheduled by MARK5.
 
-        static int jobId;
         static ComponentName serviceComponent = new ComponentName(Application.Context, Java.Lang.Class.FromType(typeof(SystemSettingsJobService)));
 
         public static void ScheduleJob()
         {
+            var jobScheduler = (JobScheduler) Application.Context.GetSystemService(JobSchedulerService);
+
+            if (jobScheduler.AllPendingJobs.Any(j => (j.Id == JobId))) //Job already scheduled.
+                return; 
+
             //Runs at some point in the interval if there is a network connection, otherwise at the end of the interval. 
-            var builder = new JobInfo.Builder(jobId++, serviceComponent);
+            var builder = new JobInfo.Builder(JobId, serviceComponent);
             builder.SetRequiredNetworkType(NetworkType.Any);
             builder.SetPeriodic(OneDayInterval);
             var jobInfo = builder.Build();
-
-            var jobScheduler = (JobScheduler) Application.Context.GetSystemService(JobSchedulerService);
+            
             jobScheduler.Schedule(jobInfo);
+
         }
 
         public override bool OnStartJob(JobParameters parameters)
