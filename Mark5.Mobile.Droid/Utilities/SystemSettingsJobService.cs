@@ -32,7 +32,6 @@ namespace Mark5.Mobile.Droid.Utilities
             var jobInfo = builder.Build();
             
             jobScheduler.Schedule(jobInfo);
-
         }
 
         public override bool OnStartJob(JobParameters parameters)
@@ -47,7 +46,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 }
                 catch(Exception ex)
                 {
-                    CommonConfig.Logger.Info(ex.Message);
+                    CommonConfig.Logger.Error("SystemSettingsJobService: Error while retrieving system settings.",ex);
                 }
                 finally
                 {
