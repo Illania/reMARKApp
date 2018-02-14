@@ -20,16 +20,22 @@ namespace Mark5.Mobile.Droid
     [Application(Theme = "@style/mark5")]
     public class Mark5Application : Application
     {
+        public ApplicationLifecycleHandler LifecycleHandler;
+
         public Mark5Application(IntPtr javaReference, JniHandleOwnership transfer)
             : base(javaReference, transfer)
         {
             ThreadPool.SetMinThreads(50, 50);
             ThreadPool.SetMaxThreads(100, 100);
+
+            LifecycleHandler = new ApplicationLifecycleHandler();
         }
 
         public override void OnCreate()
         {
             base.OnCreate();
+
+            RegisterActivityLifecycleCallbacks(LifecycleHandler);
 
             AppCompatDelegate.CompatVectorFromResourcesEnabled = true;
 

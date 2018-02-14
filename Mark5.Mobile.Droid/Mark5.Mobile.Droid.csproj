@@ -444,6 +444,7 @@
     <Compile Include="Ui\Fragments\FingerprintFragment.cs" />
     <Compile Include="Utilities\Fingerprint\FingerprintCallback.cs" />
     <Compile Include="Utilities\Fingerprint\CryptoObjectGenerator.cs" />
+    <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

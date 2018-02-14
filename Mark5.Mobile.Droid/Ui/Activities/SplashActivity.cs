@@ -151,8 +151,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         Services.DocumentsDownloadService?.Start();
 
                         if (t.Result)
-                            //StartActivity(MainActivity.CreateIntent(this));
-                            StartActivity(FingerprintActivity.CreateIntent(ApplicationContext));
+                            StartActivity(MainActivity.CreateIntent(this));
+                            //StartActivity(FingerprintActivity.CreateIntent(ApplicationContext));
                         else
                             ShowLoginButton();
                     },
