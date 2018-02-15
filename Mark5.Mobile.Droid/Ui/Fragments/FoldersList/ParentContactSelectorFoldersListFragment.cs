@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             //Nothing to do here
         }
 
-        protected override (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
+        protected override (BaseFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
             return NewInstance(childrenType, folder, true, true, true);
         }

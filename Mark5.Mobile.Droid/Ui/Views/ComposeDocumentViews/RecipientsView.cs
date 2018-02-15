@@ -117,13 +117,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override Task RefreshView()
         {
-            if (State != null)
-            {
-                SetState();
-                State = null;
-                return Task.CompletedTask;
-            }
-
             if (RestoreWorkingCopy)
             {
                 SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
@@ -453,38 +446,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void SetCursorAtEnd()
         {
             emailEditor.SetSelection(emailEditor.Text.Count());
-        }
-
-        #endregion
-
-        #region State related
-
-        void SetState()
-        {
-            var recipientsViewState = (RecipientsViewState)State;
-            emailEditor.Text = recipientsViewState.Content;
-            savedRecipient = recipientsViewState.SavedRecipient;
-            if (recipientsViewState.HasFocus)
-            {
-                emailEditor.RequestFocus();
-            }
-        }
-
-        public override IComposeDocumentViewState GetState()
-        {
-            return new RecipientsViewState
-            {
-                Content = emailEditor.Text,
-                SavedRecipient = savedRecipient,
-                HasFocus = emailEditor.IsFocused,
-            };
-        }
-
-        class RecipientsViewState : IComposeDocumentViewState
-        {
-            public string Content { get; set; }
-            public string SavedRecipient { get; set; }
-            public bool HasFocus { get; set; }
         }
 
         #endregion

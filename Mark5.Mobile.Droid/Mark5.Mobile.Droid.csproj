@@ -275,8 +275,6 @@
     <Compile Include="Ui\Common\FloatingActionButtonLayoutChangeListener.cs" />
     <Compile Include="Ui\Common\Formatters.cs" />
     <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
-    <Compile Include="Ui\Common\RetainableStateFragment.cs" />
-    <Compile Include="Ui\Common\RetainedFragment.cs" />
     <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />

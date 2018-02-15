@@ -18,11 +18,15 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class RecentAddressesListFragment : RetainableStateFragment
+    public class RecentAddressesListFragment : BaseFragment
     {
+        const string RecentAddressesKey = "RecentAddresses_a0d328b3-7c18-4a18-b62e-f713cc528cc1";
+
         RecyclerView recyclerView;
 
         RecentAddressesListAdapter adapter;
+
+        List<RecentAddress> recentAddresses;
 
         public static (RecentAddressesListFragment fragment, string tag) NewInstance()
         {
@@ -30,6 +34,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var tag = $"{nameof(RecentAddressesListFragment)}";
 
             return (fragment, tag);
+        }
+
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (savedInstanceState?.ContainsKey(RecentAddressesKey) == true)
+                recentAddresses = Serializer.Deserialize<List<RecentAddress>>(savedInstanceState.GetString(RecentAddressesKey));
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -86,12 +98,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (recentAddresses != null)
+                outState.PutString(RecentAddressesKey, Serializer.Serialize(recentAddresses));
+        }
+
         async Task RefreshView()
         {
             try
             {
-                var addresses = await Managers.DocumentsManager.GetRecentAddressesAsync();
-                adapter.SetItems(addresses);
+                if (recentAddresses == null)
+                    recentAddresses = await Managers.DocumentsManager.GetRecentAddressesAsync();
+
+                adapter.SetItems(recentAddresses);
             }
             catch (Exception ex)
             {
@@ -107,32 +129,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity.SetResult(Result.Ok, intent);
             Activity?.Finish();
         }
-
-        #region Retainable State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info("Retaining state");
-            return new RecentAddressesListFragmentState
-            {
-                RecentAddresses = adapter.Items
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is RecentAddressesListFragmentState ralfs)
-            {
-                adapter.SetItems(ralfs.RecentAddresses);
-            }
-        }
-
-        class RecentAddressesListFragmentState : IRetainableState
-        {
-            public List<RecentAddress> RecentAddresses { get; set; }
-        }
-
-        #endregion
 
         class RecentAddressesListAdapter : RecyclerView.Adapter
         {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -18,17 +17,18 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class CopyToUserWorktrayFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class CopyToUserWorktrayFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
-        
+
         readonly Handler searchHandler = new Handler();
 
         const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
+        const string SelectedSystemUsersKey = "SelectedSystemUsers_f2f7fa81-a3c0-4b3d-9b24-c2ecd360ae92";
 
         List<IBusinessEntity> businessEntities;
 
-        CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter) recyclerView.GetAdapter();
+        CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter)recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
@@ -54,11 +54,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(BusinessEntitiesBundleKey))
                 businessEntities = Serializer.Deserialize<List<IBusinessEntity>>(Arguments.GetString(BusinessEntitiesBundleKey));
 
+            if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
+            {
+                var selectedUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
+
+                selectedSystemUsers.Clear();
+                foreach (var s in selectedUsers)
+                    selectedSystemUsers.Add(s.Id, s);
+            }
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
@@ -112,8 +126,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-            ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+            ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={businessEntities?.Count}]");
         }
@@ -130,6 +144,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await RefreshData();
             }
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (selectedSystemUsers != null)
+                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(selectedSystemUsers.Values.ToList()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -151,40 +173,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [businessEntities.Count={businessEntities?.Count}, systemUsers.Count={adapter?.ItemCount}, selectedSystemUsers.Count={selectedSystemUsers.Count}]...");
-
-            return new CopyToUserWorktrayFragmentState
-            {
-                BusinessEntities = businessEntities,
-                SystemUsers = adapter.Items,
-                SelectedSystemUsers = selectedSystemUsers
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as CopyToUserWorktrayFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.businessEntities.Count={dlfs.BusinessEntities?.Count}, dlfs.systemUsers.Count={dlfs.SystemUsers?.Count}, dlfs.selectedSystemUsers.Cound={dlfs.SelectedSystemUsers?.Count}]...");
-
-                businessEntities = dlfs.BusinessEntities;
-                adapter.SetItems(dlfs.SystemUsers);
-
-                selectedSystemUsers.Clear();
-                foreach (var kv in dlfs.SelectedSystemUsers)
-                    selectedSystemUsers.Add(kv.Key, kv.Value);
-
-                UpdateControls();
-            }
-        }
-
-        #endregion
-
         #region Local methods
 
         async Task RefreshData()
@@ -193,10 +181,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                refreshLayout.Refreshing = true;
+                if (!Restored)
+                    refreshLayout.Refreshing = true;
 
-                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(Restored ? SourceType.Local : SourceType.Auto);
                 adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
+                UpdateControls();
             }
             catch (Exception ex)
             {
@@ -232,15 +222,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (selectedSystemUsers.Count < 1)
             {
-                ((AppCompatActivity) Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = false;
             }
             else
             {
-                ((AppCompatActivity) Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
-                ((AppCompatActivity) Activity).SupportActionBar.Subtitle = null;
+                ((AppCompatActivity)Activity).SupportActionBar.Title = Resources.GetQuantityString(Resource.Plurals.users_selected, selectedSystemUsers.Count, selectedSystemUsers.Count);
+                ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
                 copyButton.Enabled = true;
             }
@@ -306,19 +296,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string newText)
         {
             return false;
-        }
-
-        #endregion
-
-        #region State
-
-        class CopyToUserWorktrayFragmentState : IRetainableState
-        {
-            public List<IBusinessEntity> BusinessEntities { get; set; }
-
-            public List<SystemUser> SystemUsers { get; set; }
-
-            public Dictionary<int, SystemUser> SelectedSystemUsers { get; set; }
         }
 
         #endregion

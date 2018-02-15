@@ -1,5 +1,4 @@
 ﻿using System;
-using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.App;
 
@@ -8,6 +7,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
     public abstract class BaseFragment : Fragment
     {
         bool publishVisibilityNotifications;
+
+        protected bool Restored
+        {
+            get; private set;
+        }
 
         public override bool UserVisibleHint
         {
@@ -38,6 +42,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             UserVisibleHint = false;
         }
 
+        public override void OnCreate(Android.OS.Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            Restored = savedInstanceState != null;
+        }
         public override void OnResume()
         {
             base.OnResume();

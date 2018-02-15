@@ -24,19 +24,20 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class FoldersListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         protected const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
         protected const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
-        protected const string HideFabBundleKey = "35efe47d-6c24-4374-afe4-74713393d00a";
-        protected const string LoadRemoteFromCacheBundleKey = "ae16f485-9e09-4f74-9f47-ad4d357eee12";
+        protected const string HideFabBundleKey = "HideFab_35efe47d-6c24-4374-afe4-74713393d00a";
+        protected const string LoadRemoteFromCacheBundleKey = "LoadRemote_ae16f485-9e09-4f74-9f47-ad4d357eee12";
+        protected const string RecoveredPositionsKey = "RecoveredItemPositions_e71c23ca-686c-4c63-a4ee-022c3855fdeb";
+        protected const string SubFoldersKey = "Subfolders_35f51cb3-b96c-4f26-be2d-af6760109bbc";
 
         protected Folder RemoteFolder;
         protected bool HideSearch;
         protected bool HideFab;
         protected bool LoadRemoteFromCache;
 
-        protected View Container;
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
         protected SearchView SearchView;
@@ -78,25 +79,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Overrides
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            if (Arguments.ContainsKey(RemoteFolderBundleKey))
+                RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
+
+            if (Arguments.ContainsKey(HideSearchBundleKey))
+                HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
+
+            if (Arguments.ContainsKey(HideFabBundleKey))
+                HideFab = Arguments.GetBoolean(HideFabBundleKey);
+
+            if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
+                LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
+
+            if (savedInstanceState?.ContainsKey(RecoveredPositionsKey) == true)
+                recoveredSelectedItemsPosition = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(RecoveredPositionsKey));
+
+            if (savedInstanceState?.ContainsKey(SubFoldersKey) == true)
+                RemoteFolder.SubFolders = Serializer.Deserialize<List<Folder>>(savedInstanceState.GetString(SubFoldersKey));
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            if (Arguments != null)
-            {
-                if (Arguments.ContainsKey(RemoteFolderBundleKey))
-                    RemoteFolder = Serializer.Deserialize<Folder>(Arguments.GetString(RemoteFolderBundleKey));
-
-                if (Arguments.ContainsKey(HideSearchBundleKey))
-                    HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
-
-                if (Arguments.ContainsKey(HideFabBundleKey))
-                    HideFab = Arguments.GetBoolean(HideFabBundleKey);
-
-                if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
-                    LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
-            }
-
-            Container = container;
-
             CommonConfig.Logger.Info($"Creating {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             var rootView = InflateView(inflater, container);
@@ -210,7 +217,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             SetSections();
             RefreshData();
-            RestoreSelection();
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (Adapter?.SelectedItemPositions != null)
+                outState.PutString(RecoveredPositionsKey, Serializer.Serialize(Adapter.SelectedItemPositions));
+
+            if (RemoteFolder.SubFolders != null)
+                outState.PutString(SubFoldersKey, Serializer.Serialize(RemoteFolder.SubFolders));
         }
 
         public override void OnUserVisibilityHintChanged()
@@ -232,8 +249,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
-
-            actionMode?.Finish();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -308,12 +323,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info("Restoring selected items");
 
-            if (recoveredSelectedItemsPosition != null && recoveredSelectedItemsPosition.Any())
+            if (recoveredSelectedItemsPosition?.Any() == true)
             {
                 actionMode = Activity.StartActionMode(this);
                 Adapter.SetSelection(recoveredSelectedItemsPosition);
                 actionMode.Title = Adapter.SelectedItemsCount.ToString();
                 actionMode.Invalidate();
+                recoveredSelectedItemsPosition = null;
             }
         }
 
@@ -342,7 +358,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.SetSections(AvailableSections);
         }
 
-        protected virtual (RetainableStateFragment fragment, string tag) GetFolderFragment(Folder folder)
+        protected virtual (BaseFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
             return NewInstance(folder, HideSearch);
         }
@@ -388,6 +404,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshLocal();
 
             RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
+
+            RestoreSelection();
         }
 
         async Task RefreshRemote(bool forceRefresh = false)
@@ -876,42 +894,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 SearchRecursively(subFolder, searchText, resultList);
             }
-        }
-
-        #endregion
-
-        #region Retained Fragment methods
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state: [folderName={RemoteFolder?.Name}, folderId={RemoteFolder?.Id}, selectedItemsCount={Adapter.SelectedItemPositions.Count}]");
-
-            return new FolderListFragmentState
-            {
-                Folder = RemoteFolder,
-                HideSearch = HideSearch,
-                SelectedItemPositions = new List<int>(Adapter.SelectedItemPositions)
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var flfs = restoredState as FolderListFragmentState;
-            if (flfs != null)
-            {
-                RemoteFolder = flfs.Folder;
-                HideSearch = flfs.HideSearch;
-                recoveredSelectedItemsPosition = flfs.SelectedItemPositions;
-
-                CommonConfig.Logger.Info($"Restored state state: [folderName={RemoteFolder.Name}, folderId={RemoteFolder.Id}, selectedItemsCount={recoveredSelectedItemsPosition.Count}]");
-            }
-        }
-
-        protected class FolderListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-            public bool HideSearch { get; set; }
-            public List<int> SelectedItemPositions { get; set; }
         }
 
         #endregion

@@ -39,6 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (CommonConfig.Logger.IsInfoEnabled())
                 CommonConfig.Logger.Info($"Created {nameof(SplashActivity)}");
+
+            ((Mark5Application)ApplicationContext).StartedFromRoot = true;
         }
 
         protected override void OnStart()

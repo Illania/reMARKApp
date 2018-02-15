@@ -20,9 +20,10 @@ using Mark5.Mobile.Droid.Ui.Views;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ObjectLinksFragment : RetainableStateFragment
+    public class ObjectLinksFragment : BaseFragment
     {
         const string BusinessEntityBundleKey = "BusinessEntity_0dd3cb9b-f178-4b02-b7d3-e1bb3428c913";
+        const string ObjectLinksKey = "ObjectLinks_0baf33c2-242b-44e6-ba0f-5f82fb1dc0e1";
 
         IBusinessEntity businessEntity;
 
@@ -49,11 +50,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(BusinessEntityBundleKey))
                 businessEntity = Serializer.Deserialize<IBusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
 
+            if (savedInstanceState?.ContainsKey(ObjectLinksKey) == true)
+                objectLinks = Serializer.Deserialize<List<ObjectLink>>(savedInstanceState.GetString(ObjectLinksKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
@@ -85,23 +94,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
-        public override IRetainableState OnRetainInstanceState()
+        public override void OnSaveInstanceState(Bundle outState)
         {
-            return new ObjectLinksFragmentState
-            {
-                BusinessEntity = businessEntity,
-                ObjectLinks = objectLinks
-            };
-        }
+            base.OnSaveInstanceState(outState);
 
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var oafs = restoredState as ObjectLinksFragmentState;
-            if (oafs != null)
-            {
-                businessEntity = oafs.BusinessEntity;
-                objectLinks = oafs.ObjectLinks;
-            }
+            if (objectLinks != null)
+                outState.PutString(ObjectLinksKey, Serializer.Serialize(objectLinks));
         }
 
         async Task RefreshData()
@@ -199,13 +197,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         break;
                 }
             }
-        }
-
-        class ObjectLinksFragmentState : IRetainableState
-        {
-            public IBusinessEntity BusinessEntity { get; set; }
-
-            public List<ObjectLink> ObjectLinks { get; set; }
         }
     }
 }

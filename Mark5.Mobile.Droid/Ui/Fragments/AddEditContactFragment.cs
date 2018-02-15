@@ -22,7 +22,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class AddEditContactFragment : RetainableStateFragment
+    public class AddEditContactFragment : BaseFragment
     {
         const string ContactBundleKey = "Contact_e06436ef-89bb-44b0-9419-3131796d126b";
         const string ContactPreviewBundleKey = "ContactPreview_d09e0cb6-e224-4327-8d09-43ce921f53c6";
@@ -88,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 args.PutInt(CreationModeFlagBundleKey, (int)creationModeFlag);
 
             if (parentContactPreview != null)
-                args.PutString(ContactPreviewBundleKey, Serializer.Serialize(parentContactPreview));
+                args.PutString(ParentContactPreviewBundleKey, Serializer.Serialize(parentContactPreview));
 
             if (parentPreselected != null)
                 args.PutBoolean(ParentPreselectedBundleKey, parentPreselected.Value);
@@ -101,13 +101,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(ContactBundleKey))
-                contact = Serializer.Deserialize<Contact>(Arguments.GetString(ContactBundleKey));
-
-            if (Arguments.ContainsKey(ContactPreviewBundleKey))
-                contactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ContactPreviewBundleKey));
+            base.OnCreate(savedInstanceState);
 
             if (Arguments.ContainsKey(ContactIdBundleKey))
                 contactId = Arguments.GetInt(ContactIdBundleKey);
@@ -118,12 +114,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Arguments.ContainsKey(CreationModeFlagBundleKey))
                 creationModeFlag = (ContactCreationModeFlag)Arguments.GetInt(CreationModeFlagBundleKey);
 
-            if (Arguments.ContainsKey(ParentContactPreviewBundleKey))
-                parentContactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ParentContactPreviewBundleKey));
-
             if (Arguments.ContainsKey(ParentPreselectedBundleKey))
                 parentPreselected = Arguments.GetBoolean(ParentPreselectedBundleKey);
 
+            if (savedInstanceState?.ContainsKey(ContactBundleKey) == true)
+                contact = Serializer.Deserialize<Contact>(savedInstanceState.GetString(ContactBundleKey));
+            else if (Arguments.ContainsKey(ContactBundleKey))
+                contact = Serializer.Deserialize<Contact>(Arguments.GetString(ContactBundleKey));
+
+            if (savedInstanceState?.ContainsKey(ContactPreviewBundleKey) == true)
+                contactPreview = Serializer.Deserialize<ContactPreview>(savedInstanceState.GetString(ContactPreviewBundleKey));
+            else if (Arguments.ContainsKey(ContactPreviewBundleKey))
+                contactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ContactPreviewBundleKey));
+
+            if (savedInstanceState?.ContainsKey(ParentContactPreviewBundleKey) == true)
+                parentContactPreview = Serializer.Deserialize<ContactPreview>(savedInstanceState.GetString(ParentContactPreviewBundleKey));
+            else if (Arguments.ContainsKey(ParentContactPreviewBundleKey))
+                parentContactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ParentContactPreviewBundleKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(AddEditContactFragment)} [contact.id={contactId ?? contactPreview?.Id}, " +
                                      $"type={contactType}, mode={creationModeFlag}]...");
 
@@ -244,6 +255,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnStop();
             fab.Visibility = ViewStates.Gone;
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (contact != null)
+                outState.PutString(ContactBundleKey, Serializer.Serialize(contact));
+
+            if (contactPreview != null)
+                outState.PutString(ContactPreviewBundleKey, Serializer.Serialize(contactPreview));
+
+            if (parentContactPreview != null)
+                outState.PutString(ParentContactPreviewBundleKey, Serializer.Serialize(parentContactPreview));
         }
 
         protected void PrepareViewsForPerson()
@@ -453,57 +478,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-
-
         #endregion
-        #region RetainableState 
 
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new AddEditContactFragmentState
-            {
-                ContactPreview = contactPreview,
-                Contact = contact,
-                ParentContactPreview = parentContactPreview,
-                CreationModeFlag = creationModeFlag,
-                ContactType = contactType,
-                SecondaryLayoutShown = secondaryLayoutShown,
-                ParentPreselected = parentPreselected,
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is AddEditContactFragmentState state)
-            {
-                contact = state.Contact;
-                contactPreview = state.ContactPreview;
-                parentContactPreview = state.ParentContactPreview;
-                creationModeFlag = state.CreationModeFlag;
-                contactId = state.ContactId;
-                contactType = state.ContactType;
-                secondaryLayoutShown = state.SecondaryLayoutShown;
-                parentPreselected = state.ParentPreselected;
-            }
-        }
-
-        class AddEditContactFragmentState : IRetainableState
-        {
-            public Contact Contact { get; set; }
-            public ContactPreview ContactPreview { get; set; }
-            public ContactPreview ParentContactPreview { get; set; }
-            public ContactCreationModeFlag CreationModeFlag { get; set; }
-            public int? ContactId { get; set; }
-            public ContactType ContactType { get; set; }
-            public bool SecondaryLayoutShown { get; set; }
-            public bool ParentPreselected { get; set; }
-        }
-
-
-
-
-
-        #endregion
         static class RequestCodes
         {
             public const int ParentContactRequestCode = 111;

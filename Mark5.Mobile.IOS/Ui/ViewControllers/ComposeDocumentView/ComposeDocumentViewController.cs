@@ -293,7 +293,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
                     DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
                 {
-                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value);
+                    var result = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(PreviousDocumentFolderId ?? -1, PreviousDocumentId.Value, SourceType.Local);
                     previousDocumentPreview = result.DocumentPreview;
                     previousDocument = result.Document;
                 }
@@ -333,23 +333,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (RestoreWorkingCopy)
                     await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                else if (previousDocumentPreview != null && PreviousDocumentDirection == DocumentDirection.Draft ||
+                         (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
+                {
+                    previousDocumentContent = null;
+
+                    if (!string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
+                        await LoadHtmlString(previousDocument.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                    else if (!string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
+                        await LoadPlainText(previousDocument.PlainTextBody, PlainTextProcessingConfiguration.DefaultForEditing);
+                }
                 else
                 {
                     LoadEditor();
 
-                    if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments) ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
-                        DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None)
+                    if (previousDocumentPreview != null &&
+                           (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                            DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                            DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None))
                     {
-                        if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
+                        if (!string.IsNullOrWhiteSpace(previousDocument?.HtmlBody))
                         {
                             var config = HtmlProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
                             config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
                             previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, config);
                         }
-                        else if (previousDocumentPreview != null && !string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
+                        else if (!string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
                         {
                             var config = PlainTextProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
@@ -969,6 +979,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task InsertLocalTemplate()
         {
+            if (string.IsNullOrEmpty(PlatformConfig.Preferences.LocalTemplate))
+                return;
+
             var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/insertTemplate", "js"));
             var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
             insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
