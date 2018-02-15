@@ -52,13 +52,14 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 var state = intent.GetStringExtra(TelephonyManager.ExtraState);
 
-                if (state == oldState) 
+                if (state == oldState)
                     return;
 
                 //On LollipopMR1, the onReceive gets invoked twice instead of once for every change of the call state. In other versions this doesn't happen.
                 oldState = state;
 
                 var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
+
                 //TODO: REPLACE WITH PROPER OVERLAY
                 var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, WindowManagerTypes.SystemOverlay,
                                                                   WindowManagerFlags.NotTouchModal | WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent)
@@ -73,7 +74,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     Task.Run(async () =>
                     {
-                        return await CallerIdDatabaseProvider.CallerIdDatabase.GetContactsFromCallerIdDatabase(incomingNumber);
+                        return await CallerIdDatabaseProvider.CallerIdDatabase.GetMatchingContactsFromCallerIdDatabase(incomingNumber);
                     }).ContinueWith((t) =>
                     {
                         var contact = t.Result;
@@ -81,7 +82,7 @@ namespace Mark5.Mobile.Droid.Utilities
                         if (contact != null) //If contact from database is calling, show overlay.
                         {
                             var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
-                            if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked
+                            if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked //TODO need to check if we want a difference
                             {
                                 incomingCallLayout = LayoutNewContext(Color.Peru);
                                 wm.AddView(incomingCallLayout, overlayParams);
@@ -131,5 +132,5 @@ namespace Mark5.Mobile.Droid.Utilities
 
             return layout;
         }
-    }   
+    }
 }

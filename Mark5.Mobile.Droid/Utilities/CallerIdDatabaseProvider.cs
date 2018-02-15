@@ -97,6 +97,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public async Task AddContact(int folderId, string name, string number)
         {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(number))
+                return;
+
             var splitNumber = number.Split('|');
 
             var countryNumber = splitNumber[0];
@@ -144,7 +147,7 @@ namespace Mark5.Mobile.Droid.Utilities
             });
         }
 
-        public async Task<ContactIdentification> GetContactsFromCallerIdDatabase(string number)
+        public async Task<ContactIdentification> GetMatchingContactsFromCallerIdDatabase(string number)
         {
             return await Task.Run(() =>
             {
@@ -152,7 +155,8 @@ namespace Mark5.Mobile.Droid.Utilities
                 try
                 {
                     connectionSemaphore.Wait();
-                    connection.RunInTransaction(() => {
+                    connection.RunInTransaction(() =>
+                    {
                         var commandString = $"select distinct {nameof(ContactIdentification.Name)},{nameof(ContactIdentification.Number)} "
                             + $"from {nameof(ContactIdentification)} where {nameof(ContactIdentification.Number)} = ?";
 

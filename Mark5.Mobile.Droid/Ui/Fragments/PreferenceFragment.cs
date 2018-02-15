@@ -58,16 +58,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
+            if (resultCode == (int)Android.App.Result.Ok)
             {
                 if (requestCode == RequestCodes.NotificationRingtoneRequest)
                 {
                     var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
                     PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
-                } 
+                }
             }
             //The only way the user can return from the settings screen is by pressing back, hence requestCode = canceled.
-            if (resultCode == (int)Android.App.Result.Canceled)
+            else if (resultCode == (int)Android.App.Result.Canceled)
             {
                 if (Build.VERSION.SdkInt >= BuildVersionCodes.M && requestCode == RequestCodes.DrawOnTopRequest) //Only relevant if version is M or above.
                 {
@@ -252,25 +252,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (key == GetString(Resource.String.pref_key_callidentification_identification_enabled))
             {
                 var valueChangedTo = PlatformConfig.Preferences.CallerIdentificationEnabled;
-                if(valueChangedTo)
-                {             
+                if (valueChangedTo)
+                {
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.M) //If version is api 22 or above
                     {
                         Dialogs.ShowConfirmDialog(Context, Resource.String.redirect_to_draw_settings_title, Resource.String.redirect_to_draw_settings_content,
                                                 () =>
                         {
-                            
-                            var intent = new Intent(Settings.ActionManageOverlayPermission, Android.Net.Uri.Parse("package:"+Context.PackageName));
+
+                            var intent = new Intent(Settings.ActionManageOverlayPermission, Android.Net.Uri.Parse("package:" + Context.PackageName));
                             StartActivityForResult(intent, RequestCodes.DrawOnTopRequest);
                         });
                     }
-                    else 
+                    else
                     {
-                        Dialogs.ShowConfirmDialog(Context,Resource.String.must_save_persons_companies_offline_title,Resource.String.must_save_persons_companies_offline_content,null);
+                        Dialogs.ShowConfirmDialog(Context, Resource.String.must_save_persons_companies_offline_title, Resource.String.must_save_persons_companies_offline_content, null);
                         PlatformConfig.CallStateBroadcastReceiver.Register();
                     }
                 }
-                else 
+                else
                 {
                     PlatformConfig.CallStateBroadcastReceiver.Unregister();
                 }

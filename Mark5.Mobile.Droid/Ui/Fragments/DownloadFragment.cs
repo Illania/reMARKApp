@@ -316,7 +316,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         var result = await Managers.ContactsManager.GetContactPreviewsAsync(folder, startRowId, SourceType.Remote);
 
-                        result.ForEach(cp => contactsQueue.Enqueue((cp.Id,cp.Name)));
+                        result.ForEach(cp => contactsQueue.Enqueue((cp.Id, cp.Name)));
                         startRowId = result.LastOrDefault()?.RowId ?? -1;
                         lastBatchCount = result.Count;
 
@@ -364,12 +364,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await CallerIdDatabaseProvider.CallerIdDatabase.CreateTable();
                     await CallerIdDatabaseProvider.CallerIdDatabase.CleanTable(folder.Id);
-                } 
+                }
                 catch (Exception ex)
                 {
                     onException(ex);
                 }
-
                 do
                 {
                     int item;
