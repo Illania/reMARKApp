@@ -149,6 +149,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public async Task<ContactIdentification> GetMatchingContactsFromCallerIdDatabase(string number)
         {
+            if (string.IsNullOrWhiteSpace(number))
+                return null;
+
             return await Task.Run(() =>
             {
                 ContactIdentification c = null;

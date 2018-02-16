@@ -1,24 +1,26 @@
-﻿using Android.App;
-using Android.Graphics;
+﻿using System;
+using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
+using Android.Graphics;
+using Android.OS;
 using Android.Provider;
+using Android.Runtime;
+using Android.Support.V4.Graphics.Drawable;
+using Android.Support.V7.Widget;
 using Android.Telephony;
 using Android.Views;
-using Android.Widget;
-using Android.Runtime;
-using Android.OS;
+using Mark5.Mobile.Droid.Ui.Common;
 using PhoneNumbers;
-using System.Threading.Tasks;
-using System;
+using static Android.Views.View;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
     public class CallStateBroadcastReceiver : BroadcastReceiver
     {
-        static LinearLayout incomingCallLayout;
-        static LinearLayout onGoingCallLayout;
-        Context context;
         bool registered;
+
+        LinearLayoutCompat callLayout;
 
         public void Register()
         {
@@ -46,8 +48,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public override void OnReceive(Context context, Intent intent)
         {
-            this.context = context;
-
             if (Build.VERSION.SdkInt == BuildVersionCodes.LollipopMr1 || (Build.VERSION.SdkInt >= BuildVersionCodes.M && Settings.CanDrawOverlays(context)))
             {
                 var state = intent.GetStringExtra(TelephonyManager.ExtraState);
@@ -60,14 +60,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
 
-                //TODO: REPLACE WITH PROPER OVERLAY
-                var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent, WindowManagerTypes.SystemOverlay,
-                                                                  WindowManagerFlags.NotTouchModal | WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent)
-                {
-                    Gravity = GravityFlags.CenterVertical,
-                    Height = 500,
-                    Width = 500
-                };
+                var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, WindowManagerTypes.Phone,
+                                                                   WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent);
+
                 if (state == TelephonyManager.ExtraStateRinging) //Phone ringing
                 {
                     var incomingNumber = FormatNumber(intent.GetStringExtra(TelephonyManager.ExtraIncomingNumber));
@@ -81,56 +76,127 @@ namespace Mark5.Mobile.Droid.Utilities
 
                         if (contact != null) //If contact from database is calling, show overlay.
                         {
-                            var keyguardManager = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
-                            if (!keyguardManager.InKeyguardRestrictedInputMode()) //Screen is not locked //TODO need to check if we want a difference
-                            {
-                                incomingCallLayout = LayoutNewContext(Color.Peru);
-                                wm.AddView(incomingCallLayout, overlayParams);
-                            }
-                            else //Screen is locked
-                            {
-                                incomingCallLayout = LayoutNewContext(Color.HotPink);
-                                wm.AddView(incomingCallLayout, overlayParams);
-                            }
+                            callLayout = GetCallLayout(context, contact.Name);
+                            wm.AddView(callLayout, overlayParams);
                         }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 }
-                else if (state == TelephonyManager.ExtraStateOffhook) //Call started
+                else if (state == TelephonyManager.ExtraStateOffhook || state == TelephonyManager.ExtraStateIdle) //Call started
                 {
-                    if (incomingCallLayout != null && incomingCallLayout.IsShown)
-                        wm.RemoveView(incomingCallLayout);
-                    onGoingCallLayout = LayoutNewContext(Color.Bisque);
-                    wm.AddView(onGoingCallLayout, overlayParams);
-                }
-                else if (state == TelephonyManager.ExtraStateIdle) //Call stopped
-                {
-                    if (incomingCallLayout != null && incomingCallLayout.IsShown)
-                        wm.RemoveView(incomingCallLayout);
-
-                    if (onGoingCallLayout != null && onGoingCallLayout.IsShown)
-                        wm.RemoveView(onGoingCallLayout);
+                    if (callLayout?.IsShown == true)
+                        wm.RemoveView(callLayout);
                 }
             }
         }
 
         String FormatNumber(string number)
         {
-            var phoneNumberUtil = PhoneNumberUtil.GetInstance();
-
-            //Number must start with '+' for this to work.
-            PhoneNumber phoneNumber = phoneNumberUtil.Parse(number, "");
-
-            return phoneNumberUtil.Format(phoneNumber, PhoneNumbers.PhoneNumberFormat.E164);
+            try
+            {
+                var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+                PhoneNumber phoneNumber = phoneNumberUtil.Parse(number, System.Globalization.RegionInfo.CurrentRegion.TwoLetterISORegionName);
+                return phoneNumberUtil.Format(phoneNumber, PhoneNumbers.PhoneNumberFormat.E164);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        LinearLayout LayoutNewContext(Color color)
+        LinearLayoutCompat GetCallLayout(Context context, string name)
         {
-            var layout = new LinearLayout(context);
-            layout.SetBackgroundColor(color);
-            layout.Orientation = Orientation.Vertical;
+            var paddingHorizontal = Conversion.ConvertDpToPixels(15);
+            var paddingVertical = Conversion.ConvertDpToPixels(15);
+            var marginValue = Conversion.ConvertDpToPixels(20);
+
+            var layout = new LinearLayoutCompat(context)
+            {
+                Orientation = LinearLayoutCompat.Horizontal,
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    RightMargin = marginValue,
+                    LeftMargin = marginValue,
+                    Gravity = (int)GravityFlags.Center,
+                },
+            };
+            layout.SetPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+
+            var imageView = new AppCompatImageView(context)
+            {
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    RightMargin = Conversion.ConvertDpToPixels(40),
+                }
+            };
+
+            var rbd = RoundedBitmapDrawableFactory.Create(context.Resources, BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.caller));
+            rbd.CornerRadius = Conversion.ConvertDpToPixels(8);
+            imageView.SetImageDrawable(rbd);
+
+            var textView = new AppCompatTextView(context)
+            {
+                Text = name,
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
+                {
+                    Gravity = (int)GravityFlags.CenterVertical,
+                }
+            };
+            textView.SetTextAppearanceCompat(context, Resource.Style.fontCallerId);
+
+            layout.AddView(imageView);
+            layout.AddView(textView);
+
+            layout.SetBackgroundResource(Resource.Drawable.caller_id_background);
+            layout.SetOnTouchListener(new TouchListener());
 
             return layout;
         }
+
+        class TouchListener : Java.Lang.Object, IOnTouchListener
+        {
+            int lpLastX;
+            int lpLastY;
+            int lpInitialX;
+            int lpInitialY;
+
+            public bool OnTouch(View view, MotionEvent e)
+            {
+                var lp = (WindowManagerLayoutParams)view.LayoutParameters;
+                var wm = view.Context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
+
+                int totalDeltaX = lpLastX - lpInitialX;
+                int totalDeltaY = lpLastY - lpInitialY;
+
+                if (e.Action == MotionEventActions.Down)
+                {
+                    lpLastX = lpInitialX = (int)e.RawX;
+                    lpLastY = lpInitialY = (int)e.RawY;
+
+                    return true;
+                }
+                if (e.Action == MotionEventActions.Move)
+                {
+                    int deltaX = (int)e.RawX - lpLastX;
+                    int deltaY = (int)e.RawY - lpLastY;
+                    lpLastX = (int)e.RawX;
+                    lpLastY = (int)e.RawY;
+                    if (Math.Abs(totalDeltaX) >= 1 || Math.Abs(totalDeltaY) >= 1)
+                    {
+                        if (e.PointerCount == 1)
+                        {
+                            lp.X += deltaX;
+                            lp.Y += deltaY;
+                            wm.UpdateViewLayout(view, lp);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                return false;
+            }
+        }
+
     }
 }
