@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Utilities
     public class CallStateBroadcastReceiver : BroadcastReceiver
     {
         bool registered;
-
+        string oldState;
         LinearLayoutCompat callLayout;
 
         public void Register()
@@ -44,8 +44,6 @@ namespace Mark5.Mobile.Droid.Utilities
             Application.Context.UnregisterReceiver(this);
         }
 
-        string oldState;
-
         public override void OnReceive(Context context, Intent intent)
         {
             if (Build.VERSION.SdkInt == BuildVersionCodes.LollipopMr1 || (Build.VERSION.SdkInt >= BuildVersionCodes.M && Settings.CanDrawOverlays(context)))
@@ -60,7 +58,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
 
-                var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, WindowManagerTypes.Phone,
+                var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, WindowManagerTypes.Phone,
                                                                    WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent);
 
                 if (state == TelephonyManager.ExtraStateRinging) //Phone ringing
@@ -74,7 +72,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     {
                         var contact = t.Result;
 
-                        if (contact != null) //If contact from database is calling, show overlay.
+                        if (contact != null)
                         {
                             callLayout = GetCallLayout(context, contact.Name);
                             wm.AddView(callLayout, overlayParams);
@@ -82,10 +80,13 @@ namespace Mark5.Mobile.Droid.Utilities
                     }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 }
-                else if (state == TelephonyManager.ExtraStateOffhook || state == TelephonyManager.ExtraStateIdle) //Call started
+                else if (state == TelephonyManager.ExtraStateOffhook || state == TelephonyManager.ExtraStateIdle) //Call started or ended
                 {
                     if (callLayout?.IsShown == true)
+                    {
                         wm.RemoveView(callLayout);
+                        callLayout = null;
+                    }
                 }
             }
         }
@@ -106,9 +107,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
         LinearLayoutCompat GetCallLayout(Context context, string name)
         {
-            var paddingHorizontal = Conversion.ConvertDpToPixels(15);
-            var paddingVertical = Conversion.ConvertDpToPixels(15);
-            var marginValue = Conversion.ConvertDpToPixels(20);
+            var paddingHorizontal = Conversion.ConvertDpToPixels(12);
+            var paddingVertical = Conversion.ConvertDpToPixels(12);
+            var marginValue = Conversion.ConvertDpToPixels(15);
 
             var layout = new LinearLayoutCompat(context)
             {
@@ -148,9 +149,12 @@ namespace Mark5.Mobile.Droid.Utilities
             layout.AddView(textView);
 
             layout.SetBackgroundResource(Resource.Drawable.caller_id_background);
-            layout.SetOnTouchListener(new TouchListener());
 
-            return layout;
+            var externaLayout = new LinearLayoutCompat(context);
+            externaLayout.SetOnTouchListener(new TouchListener());
+            externaLayout.AddView(layout);
+
+            return externaLayout;
         }
 
         class TouchListener : Java.Lang.Object, IOnTouchListener

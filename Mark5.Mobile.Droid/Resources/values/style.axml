@@ -239,6 +239,6 @@
 	</style>
 	<style name="fontCallerId" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textColor">@color/black</item>
-		<item name="android:textSize">20sp</item>
+		<item name="android:textSize">17sp</item>
 	</style>
 </resources>
