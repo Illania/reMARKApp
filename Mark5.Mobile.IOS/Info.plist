@@ -61,6 +61,6 @@
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to be able to attach pictures to email.</string>
 	<key>CFBundleVersion</key>
-	<string>218</string>
+	<string>219</string>
 </dict>
 </plist>
