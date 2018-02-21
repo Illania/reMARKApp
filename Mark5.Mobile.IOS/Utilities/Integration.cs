@@ -25,8 +25,6 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             UIApplication.SharedApplication.ApplicationIconBadgeNumber = 1;
             UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
-
-            CallIdContainerUtilities.WipeContainer();
         }
 
         #endregion
