@@ -13,8 +13,8 @@ namespace Mark5.Mobile.IOS.Common.CallId
     /// </summary>
     public static class CallIdContainerUtilities
     {
-        public const string databaseFileName = "sharedcontacts.sqlite3";
-        public const string appGroupId = "group.com.nordic-it.mark5.mobile.ios";
+        public const string DatabaseName = "sharedcontacts.sqlite3";
+        public const string AppGroupId = "group.com.nordic-it.mark5.mobile.ios";
 
         public static async Task CreateExtensionContactsTable()
         {
@@ -24,9 +24,9 @@ namespace Mark5.Mobile.IOS.Common.CallId
                 {
                     LockDatabase();
 
-                    using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(appGroupId))
+                    using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(AppGroupId))
                     {
-                        var fullDatabaseUrl = containerUrl.Append(databaseFileName, false);
+                        var fullDatabaseUrl = containerUrl.Append(DatabaseName, false);
 
                         using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
                         {
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.Common.CallId
             var fm = NSFileManager.DefaultManager;
             try
             {
-                using (var containerUrl = fm.GetContainerUrl(appGroupId))
+                using (var containerUrl = fm.GetContainerUrl(AppGroupId))
                 {
                     LockDatabase();
 
@@ -60,7 +60,7 @@ namespace Mark5.Mobile.IOS.Common.CallId
 
                         if (fm.FileExists(pathToRemove))
                         {
-                            if (s.Contains("log") || s == databaseFileName) //Only wipe log files and database.
+                            if (s.Contains("log") || s == DatabaseName) //Only wipe log files and database.
                             {
                                 fm.Remove(pathToRemove, out err);
                             }

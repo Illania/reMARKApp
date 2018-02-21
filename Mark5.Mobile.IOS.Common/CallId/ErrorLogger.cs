@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Common.CallId
         {
             var fm = NSFileManager.DefaultManager;
 
-            logPath = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.appGroupId).Path;
+            logPath = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId).Path;
             logFilePath = $"{logPath}/Mark5.Mobile.IOS.Extensions.CallId_{DateTime.Now.ToString("yyyy_M_dd")}.log";
 
             if (!fm.FileExists(logFilePath))
@@ -23,7 +23,6 @@ namespace Mark5.Mobile.IOS.Common.CallId
 
         public void WriteToLog(Exception exception)
         {
-            // Build message
             var logMessageBuilder = new StringBuilder();
             logMessageBuilder.Append("[").Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")).Append("] ");
 

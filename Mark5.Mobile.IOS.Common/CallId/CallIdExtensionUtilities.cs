@@ -40,15 +40,8 @@ namespace Mark5.Mobile.IOS.Common.CallId
                         CXCallDirectoryManager.SharedInstance.ReloadExtension(extensionId,
                                                                               error =>
                         {
-                            if (error == null) 
+                            if (error != null)
                             {
-                                   
-                            }
-                            else
-                            {
-                                // Extension failed, see error.Code 
-                                // and error.Description for more 
-                                // information 
                                 throw new NSErrorException(error);
                             }
                         });

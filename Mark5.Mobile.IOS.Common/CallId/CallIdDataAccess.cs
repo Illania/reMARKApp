@@ -1,16 +1,15 @@
-﻿using CallKit;
-using Foundation;
-using SQLite;
+﻿using System;
 using System.Threading.Tasks;
+using CallKit;
+using Foundation;
 using PhoneNumbers;
-using System;
+using SQLite;
 using static Mark5.Mobile.IOS.Common.CallId.CallIdDatabaseLock;
 
 namespace Mark5.Mobile.IOS.Common.CallId
 {
     /// <summary>
     /// This class is used to insert and retrieve contacts from the database in the shared container. 
-    /// Contacts are inserted when downloaded in the 
     /// The database contains the contacts that should be recognised when receivng calls.
     /// 
     /// If only one number is associated with a name it is simply stored as the number casted to a string.
@@ -24,13 +23,12 @@ namespace Mark5.Mobile.IOS.Common.CallId
             try
             {
                 LockDatabase();
-                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.appGroupId))
+                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
                 {
-                    var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.databaseFileName, false);
+                    var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.DatabaseName, false);
 
                     using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
                     {
-
                         var commandString = $"select {nameof(ExtensionContact.Name)},{nameof(ExtensionContact.Number)} "
                             + $"from {nameof(ExtensionContact)} "
                             + $"group by {nameof(ExtensionContact.Number)} "
@@ -86,9 +84,9 @@ namespace Mark5.Mobile.IOS.Common.CallId
                 //'+' will be in the number, since it's part of the E164 format.
                 number = number.Replace("+", String.Empty);
 
-                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.appGroupId))
+                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
                 {
-                    var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.databaseFileName, false);
+                    var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.DatabaseName, false);
 
                     using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
                     {
@@ -96,11 +94,12 @@ namespace Mark5.Mobile.IOS.Common.CallId
                         {
                             LockDatabase();
 
-                            var contactName = new ExtensionContact();
-                            contactName.FolderId = folderId;
-                            contactName.Name = name;
-                            contactName.Number = Convert.ToInt64(number);
-
+                            var contactName = new ExtensionContact
+                            {
+                                FolderId = folderId,
+                                Name = name,
+                                Number = Convert.ToInt64(number)
+                            };
                             connection.Insert(contactName);
                         }
                         finally
@@ -117,9 +116,9 @@ namespace Mark5.Mobile.IOS.Common.CallId
         {
             await Task.Run(() =>
             {
-                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.appGroupId))
+                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
                 {
-                    var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.databaseFileName, false);
+                    var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.DatabaseName, false);
 
                     using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
                     {

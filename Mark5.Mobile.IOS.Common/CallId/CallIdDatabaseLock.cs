@@ -11,7 +11,7 @@ namespace Mark5.Mobile.IOS.Common.CallId
         public static void LockDatabase()
         {
             var fm = NSFileManager.DefaultManager;
-            using (var containerUrl = fm.GetContainerUrl(CallIdContainerUtilities.appGroupId))
+            using (var containerUrl = fm.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
             {
                 var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Common.CallId
         public static void UnlockDatabase()
         {
             var fm = NSFileManager.DefaultManager;
-            using (var containerUrl = fm.GetContainerUrl(CallIdContainerUtilities.appGroupId))
+            using (var containerUrl = fm.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
             {
                 var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
@@ -38,8 +38,6 @@ namespace Mark5.Mobile.IOS.Common.CallId
                         throw new NSErrorException(error);
                     }
                 }
-                else
-                    throw new DatabaseLockException("The database is locked, unable to get lock.");
             }
         }
     }
