@@ -40,5 +40,12 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.Logger.Info($"Restored {nameof(FingerprintActivity)}");
             }
         }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            ((Mark5Application)Application).LifecycleHandler.ShouldBeShown = false;
+        }
     }
 }

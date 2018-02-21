@@ -9,20 +9,20 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
     public class CryptoObjectHelper
     {
         //Unique key name.
-        static readonly string KEY_NAME = "Mark5KeyName";
-        static readonly string KEYSTORE_NAME = "AndroidKeyStore";
+        static readonly string KeyName = "Mark5KeyName";
+        static readonly string KeystoreName = "AndroidKeyStore";
 
-        static readonly string KEY_ALGORITHM = KeyProperties.KeyAlgorithmAes;
+        static readonly string KeyAlgorithm = KeyProperties.KeyAlgorithmAes;
         static readonly string BLOCK_MODE = KeyProperties.BlockModeCbc;
         static readonly string ENCRYPTION_PADDING = KeyProperties.EncryptionPaddingPkcs7;
-        static readonly string TRANSFORMATION = KEY_ALGORITHM + "/" +
+        static readonly string TRANSFORMATION = KeyAlgorithm + "/" +
                                                 BLOCK_MODE + "/" +
                                                 ENCRYPTION_PADDING;
         readonly KeyStore keyStore;
 
         public CryptoObjectHelper()
         {
-            keyStore = KeyStore.GetInstance(KEYSTORE_NAME);
+            keyStore = KeyStore.GetInstance(KeystoreName);
             keyStore.Load(null);
         }
 
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             }
             catch (KeyPermanentlyInvalidatedException e)
             {
-                keyStore.DeleteEntry(KEY_NAME);
+                keyStore.DeleteEntry(KeyName);
                 if (retry)
                 {
                     CreateCipher(false);
@@ -58,20 +58,20 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         IKey GetKey()
         {
             IKey secretKey;
-            if (!keyStore.IsKeyEntry(KEY_NAME))
+            if (!keyStore.IsKeyEntry(KeyName))
             {
                 CreateKey();
             }
 
-            secretKey = keyStore.GetKey(KEY_NAME, null);
+            secretKey = keyStore.GetKey(KeyName, null);
             return secretKey;
         }
 
         void CreateKey()
         {
-            KeyGenerator keyGen = KeyGenerator.GetInstance(KeyProperties.KeyAlgorithmAes, KEYSTORE_NAME);
+            KeyGenerator keyGen = KeyGenerator.GetInstance(KeyProperties.KeyAlgorithmAes, KeystoreName);
             KeyGenParameterSpec keyGenSpec =
-                new KeyGenParameterSpec.Builder(KEY_NAME, KeyStorePurpose.Encrypt | KeyStorePurpose.Decrypt)
+                new KeyGenParameterSpec.Builder(KeyName, KeyStorePurpose.Encrypt | KeyStorePurpose.Decrypt)
                     .SetBlockModes(BLOCK_MODE)
                     .SetEncryptionPaddings(ENCRYPTION_PADDING)
                     .SetUserAuthenticationRequired(true)

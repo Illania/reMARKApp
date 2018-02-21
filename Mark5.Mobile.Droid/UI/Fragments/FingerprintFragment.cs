@@ -1,6 +1,8 @@
 ﻿using Android.App;
+using Android.Hardware.Fingerprints;
 using Android.OS;
 using Android.Support.V4.Hardware.Fingerprint;
+using Android.Support.V4.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -36,19 +38,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-            instructions.Text = "Scan that finger";
+            instructions.Text = "Scan fingerprint.";
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            fingerprintManager = FingerprintManagerCompat.From(Context);
+            fingerprintManager = FingerprintManagerCompat.From(Activity);
 
-            if(!fingerprintManager.HasEnrolledFingerprints)
+            if(!fingerprintManager.IsHardwareDetected || !fingerprintManager.HasEnrolledFingerprints)
             {
-                //Tell the user to get some enrolled fingerprints
-            } else 
+                Activity.Finish();
+            } 
+            else 
             {
                 cryptoHelper = new CryptoObjectHelper();
                 cancellationSignal = new Android.Support.V4.OS.CancellationSignal();

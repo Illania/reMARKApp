@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             base.OnAuthenticationSucceeded(result);
 
             Toast.MakeText(activityContext, Resource.String.fingerprint_success, ToastLength.Long).Show();
-            //activityContext.Finish();
+            activityContext.Finish();
         }
 
         public override void OnAuthenticationFailed()

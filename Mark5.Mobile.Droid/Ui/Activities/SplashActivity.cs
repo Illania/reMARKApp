@@ -152,7 +152,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                         if (t.Result)
                             StartActivity(MainActivity.CreateIntent(this));
-                            //StartActivity(FingerprintActivity.CreateIntent(ApplicationContext));
                         else
                             ShowLoginButton();
                     },

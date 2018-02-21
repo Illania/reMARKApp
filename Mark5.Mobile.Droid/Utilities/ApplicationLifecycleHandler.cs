@@ -7,7 +7,7 @@ namespace Mark5.Mobile.Droid.Utilities
 {
     public class ApplicationLifecycleHandler : Java.Lang.Object, Application.IActivityLifecycleCallbacks
     {
-        public static bool IsApplicationVisible
+        public bool IsApplicationVisible
         {
             get 
             { 
@@ -15,7 +15,8 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        static int acitivitiesStarted;
+        public bool ShouldBeShown;
+        int acitivitiesStarted;
 
         public void OnActivityCreated(Activity activity, Bundle savedInstanceState)
         {
@@ -45,9 +46,10 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if(!IsApplicationVisible) 
+            if(!IsApplicationVisible && ShouldBeShown) 
             {
                 Toast.MakeText(activity,Resource.String.fingerprint_success,ToastLength.Long).Show();
+                activity.StartActivity(FingerprintActivity.CreateIntent(activity));
             }
             acitivitiesStarted++;
         }
@@ -58,6 +60,7 @@ namespace Mark5.Mobile.Droid.Utilities
             if(!IsApplicationVisible)
             {
                 Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Long).Show();
+                ShouldBeShown = true;
             }
         }
     }

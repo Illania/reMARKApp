@@ -240,7 +240,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
 
                 StartActivity(MainActivity.CreateIntent(this));
-                //StartActivity(FingerprintActivity.CreateIntent(this));
                 Finish();
             }
             catch (Exception ex)
