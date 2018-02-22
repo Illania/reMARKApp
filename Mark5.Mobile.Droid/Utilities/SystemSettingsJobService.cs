@@ -20,18 +20,26 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static void ScheduleJob()
         {
-            var jobScheduler = (JobScheduler) Application.Context.GetSystemService(JobSchedulerService);
+            try
+            {
+                var jobScheduler = (JobScheduler)Application.Context.GetSystemService(JobSchedulerService);
 
-            if (jobScheduler.AllPendingJobs.Any(j => (j.Id == JobId))) //Job already scheduled.
-                return; 
+                if (jobScheduler.AllPendingJobs.Any(j => (j.Id == JobId))) //Job already scheduled.
+                    return;
 
-            //Runs at some point in the interval if there is a network connection, otherwise at the end of the interval. 
-            var builder = new JobInfo.Builder(JobId, serviceComponent);
-            builder.SetRequiredNetworkType(NetworkType.Any);
-            builder.SetPeriodic(OneDayInterval);
-            var jobInfo = builder.Build();
-            
-            jobScheduler.Schedule(jobInfo);
+                //Runs at some point in the interval if there is a network connection, otherwise at the end of the interval. 
+                var builder = new JobInfo.Builder(JobId, serviceComponent);
+                builder.SetRequiredNetworkType(NetworkType.Any);
+                builder.SetPeriodic(OneDayInterval);
+                var jobInfo = builder.Build();
+
+                jobScheduler.Schedule(jobInfo);
+
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while scheduling system settings job", ex);
+            }
         }
 
         public override bool OnStartJob(JobParameters parameters)
@@ -44,9 +52,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("SystemSettingsJobService: Error while retrieving system settings.",ex);
+                    CommonConfig.Logger.Error("SystemSettingsJobService: Error while retrieving system settings.", ex);
                 }
                 finally
                 {
