@@ -8,13 +8,13 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.V4.Content;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -25,7 +25,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public abstract class AbstractContactsListFragment : RetainableStateFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public abstract class AbstractContactsListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         public Folder Folder { get; set; }
 
@@ -36,6 +36,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         readonly Handler searchHandler = new Handler();
 
         protected const string FolderBundleKey = "Folder_d3ded4d4-be9a-49e6-8626-84cb175c12b4";
+        protected const string SelectedContactPreviewsKey = "SelectedContactPreviews_ce01f4c3-6106-440c-b606-3ed89f97d51b";
+        protected const string RefreshInProgressKey = "RefrehInProgressKey_48b4bc29-5b38-48c4-bb24-6494bbcd063c";
+
+        List<ContactPreview> savedSelectedContactPreviews;
+        bool savedRefreshInProgress;
 
         bool refreshing;
 
@@ -53,11 +58,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(FolderBundleKey))
                 Folder = Serializer.Deserialize<Folder>(Arguments.GetString(FolderBundleKey));
 
+            if (savedInstanceState?.ContainsKey(SelectedContactPreviewsKey) == true)
+                savedSelectedContactPreviews = Serializer.Deserialize<List<ContactPreview>>(savedInstanceState.GetString(SelectedContactPreviewsKey));
+
+            savedRefreshInProgress = savedInstanceState?.GetBoolean(RefreshInProgressKey) ?? false;
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(ContactsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
@@ -159,6 +174,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             cts?.Cancel();
         }
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (adapter?.SelectedItems != null)
+                outState.PutString(SelectedContactPreviewsKey, Serializer.Serialize(adapter.SelectedItems));
+
+            outState.PutBoolean(RefreshInProgressKey, refreshing);
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             this.menu = menu;
@@ -189,52 +214,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        #region RetainableStateFragment overrides
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [folder.id={Folder?.Id}, folder.name={Folder?.Name}, contactPreviews.Count={adapter?.ItemCount}/{adapter?.SelectedItemCount}, refreshing={refreshing}]...");
-
-            return new ContactsListFragmentState
-            {
-                Folder = Folder,
-                ContactPreviews = adapter.Items,
-                SelectedContactPreviews = adapter.SelectedItems,
-                RefreshInProgress = refreshing
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            var dlfs = restoredState as ContactsListFragmentState;
-            if (dlfs != null)
-            {
-                CommonConfig.Logger.Info($"Restoring state [dlfs.folder.id={dlfs.Folder?.Id}, dlfs.items.count={dlfs.ContactPreviews?.Count}, dlfs.selectedItems.count={dlfs.SelectedContactPreviews?.Count}]...");
-
-                Folder = dlfs.Folder;
-                adapter.AppendItems(dlfs.ContactPreviews);
-
-                if (dlfs.RefreshInProgress)
-                {
-                    CommonConfig.Logger.Info("Refresh was in progress before - will continue...");
-
-                    RefreshData(dlfs.ContactPreviews[dlfs.ContactPreviews.Count - 1].RowId);
-                }
-
-                if (dlfs.SelectedContactPreviews.Count > 0)
-                {
-                    ActionMode?.Finish();
-                    ActionMode = Activity.StartActionMode(this);
-
-                    adapter.SetSelected(dlfs.SelectedContactPreviews, true);
-                    ActionMode.Title = adapter.SelectedItemCount.ToString();
-                    ActionMode.Invalidate();
-                }
-            }
-        }
-
-        #endregion
-
         #region Refreshing
 
         async void RefreshData(int startRowId = -1, bool force = false, bool skipOfflineCheck = false)
@@ -244,10 +223,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (refreshing)
                 return;
 
+            var isSavedOffline = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder);
+
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
             refreshing = true;
             refreshLayout.Refreshing = true;
 
-            if (force && !skipOfflineCheck && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            if (force && !skipOfflineCheck && isSavedOffline)
             {
                 var result = await Dialogs.ShowYesNoCancelDialogAsync(Activity,
                                                                       Resource.String.folder_offline_title,
@@ -277,13 +261,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Refresh running...");
 
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
             if (force)
                 adapter.Clear();
 
-            var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
+            var sourceType = (isSavedOffline || Restored) ? SourceType.Local : SourceType.Auto;
 
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
@@ -296,12 +277,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     refreshing = false;
 
                     CommonConfig.Logger.Info($"Refresh finished");
+
+                    if (savedSelectedContactPreviews?.Count > 0)
+                    {
+                        ActionMode?.Finish();
+                        ActionMode = Activity.StartActionMode(this);
+
+                        adapter.SetSelected(savedSelectedContactPreviews, true);
+                        ActionMode.Title = adapter.SelectedItemCount.ToString();
+                        ActionMode.Invalidate();
+                        savedSelectedContactPreviews = null;
+                    }
                 },
                 ex =>
                 {
                     CommonConfig.Logger.Error($"Downloading contacts failed [folder.name={Folder?.Name}, folder.id={Folder?.Id}, startRowId={startRowId}, force={force}]", ex);
 
-                    Dialogs.ShowErrorDialog(Activity, ex);
+                    if (!(ex is DataNotFoundException && Restored))
+                        Dialogs.ShowErrorDialog(Activity, ex);
 
                     if (adapter.ItemCount < 1)
                         Activity?.OnBackPressed();
@@ -908,21 +901,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_contact_categories);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
             }
-        }
-
-        #endregion
-
-        #region State
-
-        class ContactsListFragmentState : IRetainableState
-        {
-            public Folder Folder { get; set; }
-
-            public List<ContactPreview> ContactPreviews { get; set; }
-
-            public List<ContactPreview> SelectedContactPreviews { get; set; }
-
-            public bool RefreshInProgress { get; set; }
         }
 
         #endregion

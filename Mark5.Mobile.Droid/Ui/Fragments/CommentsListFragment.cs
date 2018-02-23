@@ -16,11 +16,12 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class CommentsListFragment : RetainableStateFragment
+    public class CommentsListFragment : BaseFragment
     {
         public List<Comment> Comments => adapter.Items;
 
         const string BusinessEntityBundleKey = "BusinessEntity_d475f087-b641-494d-b56b-152e945b0823";
+        const string CommentTextKey = "CommentText_d70c2cb7-bb9c-495f-9bc9-c3616f18d7be";
 
         const int SecondsToEdit = 60;
 
@@ -31,6 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         AppCompatEditText addCommentEditText;
         AppCompatImageButton addCommentButton;
+
+        string savedCommentText;
 
         public static (CommentsListFragment fragment, string tag) NewInstance(BusinessEntity be)
         {
@@ -49,11 +52,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
+
             if (Arguments.ContainsKey(BusinessEntityBundleKey))
                 entity = Serializer.Deserialize<BusinessEntity>(Arguments.GetString(BusinessEntityBundleKey));
 
+            if (savedInstanceState?.ContainsKey(CommentTextKey) == true)
+                savedCommentText = savedInstanceState.GetString(CommentTextKey);
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_comments, container, false);
@@ -100,6 +111,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.comments);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
+            if (!string.IsNullOrEmpty(savedCommentText))
+            {
+                addCommentEditText.Text = savedCommentText;
+                savedCommentText = null;
+            }
+
             CommonConfig.Logger.Info($"Created {nameof(CommentsListFragment)} [entity.Id={entity?.Id}]");
         }
 
@@ -115,6 +132,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 RefreshView();
             }
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (!string.IsNullOrEmpty(addCommentEditText?.Text))
+                outState.PutString(CommentTextKey, addCommentEditText.Text);
         }
 
         public void RefreshView()
@@ -295,38 +320,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
             }
-        }
-
-        #endregion
-
-        #region Retained State methods
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state [entity.Id={entity?.Id}, addCommentText={addCommentEditText?.Text}");
-
-            return new CommentsFragmentState
-            {
-                Entity = entity,
-                AddCommentText = addCommentEditText.Text
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is CommentsFragmentState cfs)
-            {
-                entity = cfs.Entity;
-                addCommentEditText.Text = cfs.AddCommentText;
-
-                RefreshView();
-            }
-        }
-
-        class CommentsFragmentState : IRetainableState
-        {
-            public BusinessEntity Entity { get; set; }
-            public string AddCommentText { get; set; }
         }
 
         #endregion

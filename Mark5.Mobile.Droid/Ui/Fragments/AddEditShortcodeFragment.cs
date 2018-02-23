@@ -20,7 +20,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class AddEditShortcodeFragment : RetainableStateFragment
+    public class AddEditShortcodeFragment : BaseFragment
     {
         const string ShortcodeBundleKey = "Shortcode_abf63445-9b80-4ddf-8af6-f1d0d8ea2044";
         const string ShortcodePreviewBundleKey = "ShortcodePreview_880203fa-26a5-4111-a85a-d907fa3fdbd1";
@@ -76,18 +76,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
-
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)
         {
-            if (Arguments.ContainsKey(ShortcodeBundleKey))
-                shortcode = Serializer.Deserialize<Shortcode>(Arguments.GetString(ShortcodeBundleKey));
-
-            if (Arguments.ContainsKey(ShortcodePreviewBundleKey))
-                shortcodePreview = Serializer.Deserialize<ShortcodePreview>(Arguments.GetString(ShortcodePreviewBundleKey));
+            base.OnCreate(savedInstanceState);
 
             if (Arguments.ContainsKey(ShortcodeCreationModeFlagBundleKey))
                 creationModeFlag = (ShortcodeCreationModeFlag)Arguments.GetInt(ShortcodeCreationModeFlagBundleKey);
 
+            if (savedInstanceState?.ContainsKey(ShortcodeBundleKey) == true)
+                shortcode = Serializer.Deserialize<Shortcode>(savedInstanceState.GetString(ShortcodeBundleKey));
+            else if (Arguments.ContainsKey(ShortcodeBundleKey))
+                shortcode = Serializer.Deserialize<Shortcode>(Arguments.GetString(ShortcodeBundleKey));
+
+            if (savedInstanceState?.ContainsKey(ShortcodePreviewBundleKey) == true)
+                shortcodePreview = Serializer.Deserialize<ShortcodePreview>(savedInstanceState.GetString(ShortcodePreviewBundleKey));
+            else if (Arguments.ContainsKey(ShortcodePreviewBundleKey))
+                shortcodePreview = Serializer.Deserialize<ShortcodePreview>(Arguments.GetString(ShortcodePreviewBundleKey));
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             CommonConfig.Logger.Info($"Creating {nameof(AddEditShortcodeFragment)} [shortcode.id={shortcodePreview?.Id}, " +
                                      $" mode={creationModeFlag}]...");
 
@@ -118,6 +126,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SetTitle();
 
             return rootView;
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            if (shortcode != null)
+                outState.PutString(ShortcodeBundleKey, Serializer.Serialize(shortcode));
+
+            if (shortcodePreview != null)
+                outState.PutString(ShortcodePreviewBundleKey, Serializer.Serialize(shortcodePreview));
         }
 
         void SetTitle()
@@ -270,40 +289,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 default:
                     throw new ArgumentException("Invalid type");
             }
-        }
-
-        #endregion
-
-        #region Retainable State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            return new AddEditShortcodeFragmentState
-            {
-                Shortcode = shortcode,
-                ShortcodePreview = shortcodePreview,
-                CreationModeFlag = creationModeFlag,
-                RequestAddressType = requestAddressType,
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            if (restoredState is AddEditShortcodeFragmentState state)
-            {
-                shortcode = state.Shortcode;
-                shortcodePreview = state.ShortcodePreview;
-                creationModeFlag = state.CreationModeFlag;
-                requestAddressType = state.RequestAddressType;
-            }
-        }
-
-        class AddEditShortcodeFragmentState : IRetainableState
-        {
-            public Shortcode Shortcode { get; set; }
-            public ShortcodePreview ShortcodePreview { get; set; }
-            public DocumentAddressType RequestAddressType { get; set; }
-            public ShortcodeCreationModeFlag CreationModeFlag { get; set; }
         }
 
         #endregion

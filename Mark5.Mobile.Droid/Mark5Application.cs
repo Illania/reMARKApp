@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +20,8 @@ namespace Mark5.Mobile.Droid
     [Application(Theme = "@style/mark5")]
     public class Mark5Application : Application
     {
+        public bool StartedFromRoot { get; set; }
+
         public ApplicationLifecycleHandler LifecycleHandler;
 
         public Mark5Application(IntPtr javaReference, JniHandleOwnership transfer)

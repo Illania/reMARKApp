@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -17,6 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         public Folder Folder { get; set; }
         public DocumentPreview InitialDocumentPreview { get; set; }
         public List<DocumentPreview> DocumentPreviews { get; set; }
+
+        int currentDocumentId;
 
         readonly List<DocumentViewController> viewControllerCache = new List<DocumentViewController>(CacheCapacity + 1);
 
@@ -38,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             DidFinishAnimating += DocumentPageViewController_DidFinishAnimating;
 
             var vc = GetDocumentViewController(Folder, InitialDocumentPreview);
+            currentDocumentId = InitialDocumentPreview.Id;
             SetViewControllers(new[] { vc }, UIPageViewControllerNavigationDirection.Forward, false, null);
             ToolbarItems = vc.ToolbarItems;
         }
@@ -98,7 +102,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 return null;
 
             var nextDocumentPreview = DocumentPreviews[index + 1];
-            return GetDocumentViewController(Folder, nextDocumentPreview);
+            var vc = GetDocumentViewController(Folder, nextDocumentPreview);
+            return vc;
         }
 
         UIViewController IUIPageViewControllerDataSource.GetPreviousViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
@@ -111,18 +116,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 return null;
 
             var previousDocumentPreview = DocumentPreviews[index - 1];
-            return GetDocumentViewController(Folder, previousDocumentPreview);
+            var vc = GetDocumentViewController(Folder, previousDocumentPreview);
+            return vc;
+        }
+
+        void ReferenceDocumentViewController_Refreshed(object sender, EventArgs e)
+        {
+            var vc = (DocumentViewController)sender;
+
+            if (currentDocumentId == vc?.DocumentPreview?.Id)
+                RefreshNavigationItem(vc);
+        }
+
+        void RefreshNavigationItem(UIViewController vc)
+        {
+            NavigationItem.SetRightBarButtonItems(vc?.NavigationItem?.RightBarButtonItems ?? new UIBarButtonItem[0], true);
         }
 
         void DocumentPageViewController_WillTransition(object sender, UIPageViewControllerTransitionEventArgs e)
         {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
             SetToolbarItems(null, true);
         }
 
         void DocumentPageViewController_DidFinishAnimating(object sender, UIPageViewFinishedAnimationEventArgs e)
         {
-            var vc = ViewControllers.FirstOrDefault()?.ToolbarItems;
-            SetToolbarItems(vc, true);
+            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            var ti = vc?.ToolbarItems;
+            currentDocumentId = vc.DocumentPreview.Id;
+            SetToolbarItems(ti, true);
+            RefreshNavigationItem(vc);
         }
 
         DocumentViewController GetDocumentViewController(Folder folder, DocumentPreview documentPreview)
@@ -132,6 +155,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 return cachedViewController;
 
             var vc = new DocumentViewController();
+            vc.Refreshed += ReferenceDocumentViewController_Refreshed;
             vc.SetData(folder, documentPreview);
             vc.SetRefreshDataOnAppear();
             viewControllerCache.Add(vc);

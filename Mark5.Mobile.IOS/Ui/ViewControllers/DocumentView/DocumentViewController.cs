@@ -32,6 +32,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public DocumentPreview DocumentPreview => documentPreview;
 
+        public event EventHandler Refreshed = delegate { };
+
         Guid failedDocumentToUploadGuid;
         int? folderId;
         Folder folder;
@@ -41,8 +43,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         Guid notificationGuid;
 
         UIBarButtonItem doneButtonItem;
-        UIBarButtonItem previousDocumentButtonItem;
-        UIBarButtonItem nextDocumentButtonItem;
         UIBarButtonItem editDocumentButtonItem;
 
         UIStackView headerStackView;
@@ -160,8 +160,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.Recycle();
 
             doneButtonItem = null;
-            previousDocumentButtonItem = null;
-            nextDocumentButtonItem = null;
             editDocumentButtonItem = null;
 
             GetPreviousDocumentPreview = null;
@@ -216,27 +214,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (PresentingViewController == null)
             {
-                nextDocumentButtonItem = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "arrow-down.png")),
-                    Enabled = false
-                };
-
-                previousDocumentButtonItem = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "arrow-up.png")),
-                    Enabled = false
-                };
-
                 editDocumentButtonItem = new UIBarButtonItem
                 {
                     Image = UIImage.FromBundle(Path.Combine("icons", "edit.png"))
                 };
-
-                var rightButtons = new UIBarButtonItem[2];
-                rightButtons[0] = nextDocumentButtonItem;
-                rightButtons[1] = previousDocumentButtonItem;
-                NavigationItem.SetRightBarButtonItems(rightButtons, false);
             }
             else if (!hideDoneButton)
             {
@@ -335,10 +316,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
 
-            if (nextDocumentButtonItem != null)
-                nextDocumentButtonItem.Clicked += NextDocumentButton_Clicked;
-            if (previousDocumentButtonItem != null)
-                previousDocumentButtonItem.Clicked += PreviousDocumentButton_Clicked;
             if (editDocumentButtonItem != null)
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
         }
@@ -370,10 +347,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
 
-            if (nextDocumentButtonItem != null)
-                nextDocumentButtonItem.Clicked -= NextDocumentButton_Clicked;
-            if (previousDocumentButtonItem != null)
-                previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
             if (editDocumentButtonItem != null)
                 editDocumentButtonItem.Clicked -= EditDocumentButtonItem_Clicked;
         }
@@ -513,14 +486,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             GetNextDocumentPreview = null;
             notificationGuid = default(Guid);
 
-            nextDocumentButtonItem.Enabled = false;
-            previousDocumentButtonItem.Enabled = false;
-
-            var rightButtons = new UIBarButtonItem[2];
-            rightButtons[0] = nextDocumentButtonItem;
-            rightButtons[1] = previousDocumentButtonItem;
-            NavigationItem.SetRightBarButtonItems(rightButtons, true);
-
             flagButton.Enabled = false;
             fileToButton.Enabled = false;
             replyActionsButton.Enabled = false;
@@ -602,6 +567,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RefreshToolbar();
 
                 MarkAsReadIfNecessary();
+
+                Refreshed(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -661,32 +628,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (PresentingViewController == null)
             {
-                bool _na;
-                bool _pa;
-
-                if (GetNextDocumentPreview != null)
-                    nextDocumentButtonItem.Enabled = GetNextDocumentPreview(documentPreview, out _na, out _pa) != null;
-                else
-                    nextDocumentButtonItem.Enabled = false;
-
-                if (GetPreviousDocumentPreview != null)
-                    previousDocumentButtonItem.Enabled = GetPreviousDocumentPreview(documentPreview, out _na, out _pa) != null;
-                else
-                    previousDocumentButtonItem.Enabled = false;
-
                 if (document == null || documentPreview.Direction != DocumentDirection.Draft)
                 {
-                    var rightButtons = new UIBarButtonItem[2];
-                    rightButtons[0] = nextDocumentButtonItem;
-                    rightButtons[1] = previousDocumentButtonItem;
+                    var rightButtons = new UIBarButtonItem[0];
                     NavigationItem.SetRightBarButtonItems(rightButtons, true);
                 }
                 else
                 {
-                    var rightButtons = new UIBarButtonItem[3];
-                    rightButtons[0] = nextDocumentButtonItem;
-                    rightButtons[1] = previousDocumentButtonItem;
-                    rightButtons[2] = editDocumentButtonItem;
+                    var rightButtons = new UIBarButtonItem[1];
+                    rightButtons[0] = editDocumentButtonItem;
                     NavigationItem.SetRightBarButtonItems(rightButtons, true);
                 }
             }
@@ -952,42 +902,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region NavigationBar event handlers
-
-        void NextDocumentButton_Clicked(object sender, EventArgs args)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
-
-            nextDocumentButtonItem.Enabled = false;
-            previousDocumentButtonItem.Enabled = false;
-
-            document = null;
-            documentId = null;
-
-            documentPreview = GetNextDocumentPreview(documentPreview, out bool previousAvailable, out bool nextAvailable, true);
-
-            if (documentPreview == null)
-                return;
-
-            RefreshData();
-        }
-
-        void PreviousDocumentButton_Clicked(object sender, EventArgs args)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
-
-            nextDocumentButtonItem.Enabled = false;
-            previousDocumentButtonItem.Enabled = false;
-
-            document = null;
-            documentId = null;
-
-            documentPreview = GetPreviousDocumentPreview(documentPreview, out bool previousAvailable, out bool nextAvailable, true);
-
-            if (documentPreview == null)
-                return;
-
-            RefreshData();
-        }
 
         void EditDocumentButtonItem_Clicked(object sender, EventArgs e)
         {

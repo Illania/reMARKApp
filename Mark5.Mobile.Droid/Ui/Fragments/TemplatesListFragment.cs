@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -20,12 +19,14 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class TemplatesListFragment : RetainableStateFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class TemplatesListFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         readonly Handler searchHandler = new Handler();
 
         RecyclerView recyclerView;
         SearchView searchView;
+
+        List<TemplatePreview> templatePreviews;
 
         TemplatesListAdapter adapter;
         TemplatesListAdapter searchAdapter;
@@ -114,9 +115,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Refresh running...");
 
-                var previews = await Managers.DocumentsManager.GetTemplatePreviewsAsync();
+                if (templatePreviews == null)
+                    templatePreviews = await Managers.DocumentsManager.GetTemplatePreviewsAsync(Restored ? SourceType.Local : SourceType.Auto);
 
-                adapter.RefreshData(previews);
+                adapter.RefreshData(templatePreviews);
             }
             catch (Exception ex)
             {
@@ -196,34 +198,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
         {
             return false;
-        }
-
-        #endregion
-
-        #region Retainable State
-
-        public override IRetainableState OnRetainInstanceState()
-        {
-            CommonConfig.Logger.Info($"Retaining state for {nameof(TemplatesListFragment)}");
-            return new TemplateListFragmentState
-            {
-                TemplatePreviews = adapter.Items.ToList()
-            };
-        }
-
-        public override void OnRetainedInstanceStateRestored(IRetainableState restoredState)
-        {
-            CommonConfig.Logger.Info($"Restoring state for {nameof(TemplatesListFragment)}");
-
-            if (restoredState is TemplateListFragmentState tlfs)
-            {
-                adapter.RefreshData(tlfs.TemplatePreviews);
-            }
-        }
-
-        class TemplateListFragmentState : IRetainableState
-        {
-            public List<TemplatePreview> TemplatePreviews { get; set; }
         }
 
         #endregion
