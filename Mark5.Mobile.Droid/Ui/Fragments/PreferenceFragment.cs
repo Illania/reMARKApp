@@ -232,13 +232,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
-            else if (key == GetString(Resource.String.pref_key_fingerprint_auth))
-            {
-                if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
-                    ((Mark5Application)Activity.ApplicationContext).RegisterLifeCycleCallBacksForFingerprintAuth();
-                else
-                    ((Mark5Application)Activity.ApplicationContext).UnregisterLifeCycleCallBacksForFingerprintAuth();
-            }
         }
 
         public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)

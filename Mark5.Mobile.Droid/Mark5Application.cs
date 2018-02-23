@@ -37,6 +37,9 @@ namespace Mark5.Mobile.Droid
 
             AppCompatDelegate.CompatVectorFromResourcesEnabled = true;
 
+            LifecycleHandler = new ApplicationLifecycleHandler();
+            RegisterActivityLifecycleCallbacks(LifecycleHandler);
+
             Task.Run(async () =>
                 {
                     var mainFolder = FileSystem.Current.LocalStorage;
@@ -79,18 +82,6 @@ namespace Mark5.Mobile.Droid
             base.OnTerminate();
 
             CommonConfig.Logger.Info($"Terminated {nameof(Mark5Application)}");
-        }
-
-        public void RegisterLifeCycleCallBacksForFingerprintAuth()
-        {
-            LifecycleHandler = new ApplicationLifecycleHandler();
-            RegisterActivityLifecycleCallbacks(LifecycleHandler);
-        }
-
-        public void UnregisterLifeCycleCallBacksForFingerprintAuth()
-        {   
-            if(LifecycleHandler != null)
-                UnregisterActivityLifecycleCallbacks(LifecycleHandler);
         }
     }
 }

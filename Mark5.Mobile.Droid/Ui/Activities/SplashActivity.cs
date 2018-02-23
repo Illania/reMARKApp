@@ -138,10 +138,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                    CommonConfig.Logger.Info($"Registering {nameof(ApplicationLifecycleHandler)}...");
-                        if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
-                            ((Mark5Application)ApplicationContext).RegisterLifeCycleCallBacksForFingerprintAuth();
-
                     LocalNotificationsListener.Initialize();
 
                     DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;

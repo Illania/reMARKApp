@@ -1,6 +1,4 @@
-﻿using Android.App;
-using Android.Hardware.Fingerprints;
-using Android.OS;
+﻿using Android.OS;
 using Android.Support.V4.Hardware.Fingerprint;
 using Android.Support.V7.Widget;
 using Android.Views;
