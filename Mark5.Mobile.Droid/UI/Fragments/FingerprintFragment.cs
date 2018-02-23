@@ -36,7 +36,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-            instructions.Text = "Scan fingerprint.";
         }
 
         public override void OnResume()
@@ -45,12 +44,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             fingerprintManager = FingerprintManagerCompat.From(Activity);
 
-            if(!fingerprintManager.HasEnrolledFingerprints)
+            if (!fingerprintManager.HasEnrolledFingerprints)
+                instructions.Text = "No enrolled fingerprints.";
+            else
+                instructions.Text = "Scan fingerprint.";
+                                 
+            cryptoHelper = new CryptoObjectUtility();
+            cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
+            fingerprintCallback = new FingerprintCallback(Activity);
 
-                
-            
-                cryptoHelper = new CryptoObjectUtility();
-                cancellationSignal = new Android.Support.V4.OS.CancellationSignal();fingerprintCallback = new FingerprintCallback(Activity);
             fingerprintManager.Authenticate(cryptoHelper.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
         }
     }

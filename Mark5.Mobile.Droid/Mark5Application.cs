@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,15 +29,11 @@ namespace Mark5.Mobile.Droid
         {
             ThreadPool.SetMinThreads(50, 50);
             ThreadPool.SetMaxThreads(100, 100);
-
-            LifecycleHandler = new ApplicationLifecycleHandler();
         }
 
         public override void OnCreate()
         {
             base.OnCreate();
-
-            RegisterActivityLifecycleCallbacks(LifecycleHandler);
 
             AppCompatDelegate.CompatVectorFromResourcesEnabled = true;
 
@@ -83,6 +79,18 @@ namespace Mark5.Mobile.Droid
             base.OnTerminate();
 
             CommonConfig.Logger.Info($"Terminated {nameof(Mark5Application)}");
+        }
+
+        public void RegisterLifeCycleCallBacksForFingerprintAuth()
+        {
+            LifecycleHandler = new ApplicationLifecycleHandler();
+            RegisterActivityLifecycleCallbacks(LifecycleHandler);
+        }
+
+        public void UnregisterLifeCycleCallBacksForFingerprintAuth()
+        {   
+            if(LifecycleHandler != null)
+                UnregisterActivityLifecycleCallbacks(LifecycleHandler);
         }
     }
 }

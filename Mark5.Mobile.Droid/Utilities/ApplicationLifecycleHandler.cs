@@ -8,7 +8,7 @@ namespace Mark5.Mobile.Droid.Utilities
 {
     public class ApplicationLifecycleHandler : Java.Lang.Object, Application.IActivityLifecycleCallbacks
     {
-        public bool IsApplicationVisible
+        public bool ApplicationVisible
         {
             get 
             { 
@@ -16,14 +16,13 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        Stopwatch stopWatch;
+        int acitivitiesStarted;
+        
         public ApplicationLifecycleHandler()
         {
             stopWatch = new Stopwatch();
         }
-
-        public bool ShouldBeShown;
-        Stopwatch stopWatch;
-        int acitivitiesStarted;
 
         public void OnActivityCreated(Activity activity, Bundle savedInstanceState)
         {
@@ -53,17 +52,15 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if(!IsApplicationVisible)
+            if(!ApplicationVisible)
             {
                 stopWatch.Stop();
 
-                if(stopWatch.Elapsed.Seconds > 10 && ShouldBeShown) //settings
+                if(!activity.GetType().IsAssignableFrom(typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
                 {
-                    Toast.MakeText(activity, Resource.String.fingerprint_success, ToastLength.Long).Show();
                     activity.StartActivity(FingerprintActivity.CreateIntent(activity));
                 }
                 stopWatch.Reset();
-
             }
             acitivitiesStarted++;
         }
@@ -71,11 +68,9 @@ namespace Mark5.Mobile.Droid.Utilities
         public void OnActivityStopped(Activity activity)
         {
             acitivitiesStarted--;
-            if(!IsApplicationVisible)
+            if(!ApplicationVisible)
             {
-                Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Long).Show();
                 stopWatch.Start();
-                ShouldBeShown = true;
             }
         }
     }
