@@ -6,7 +6,7 @@ using Javax.Crypto;
 
 namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 {
-    public class CryptoObjectHelper
+    public class CryptoObjectUtility
     {
         static readonly string KeyName = "Mark5KeyName";
         static readonly string KeystoreName = "AndroidKeyStore";
@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
                                                 Encryptionpadding;
         readonly KeyStore keyStore;
 
-        public CryptoObjectHelper()
+        public CryptoObjectUtility()
         {
             keyStore = KeyStore.GetInstance(KeystoreName);
             keyStore.Load(null);
@@ -42,14 +42,11 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             catch (KeyPermanentlyInvalidatedException e)
             {
                 keyStore.DeleteEntry(KeyName);
+
                 if (retry)
-                {
                     CreateCipher(false);
-                }
                 else
-                {
                     throw new Exception("Could not create the cipher for fingerprint authentication.", e);
-                }
             }
             return cipher;
         }
@@ -58,10 +55,8 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         {
             IKey secretKey;
             if (!keyStore.IsKeyEntry(KeyName))
-            {
                 CreateKey();
-            }
-
+            
             secretKey = keyStore.GetKey(KeyName, null);
             return secretKey;
         }

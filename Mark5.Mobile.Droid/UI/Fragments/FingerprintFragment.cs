@@ -2,7 +2,6 @@
 using Android.Hardware.Fingerprints;
 using Android.OS;
 using Android.Support.V4.Hardware.Fingerprint;
-using Android.Support.V4.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -10,14 +9,13 @@ using Mark5.Mobile.Droid.Utilities.Fingerprint;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FingerprintFragment : RetainableStateFragment
+    public class FingerprintFragment : BaseFragment
     {
         AppCompatTextView instructions;
 
         FingerprintCallback fingerprintCallback;
         FingerprintManagerCompat fingerprintManager;
-        KeyguardManager keyguardManager;
-        CryptoObjectHelper cryptoHelper;
+        CryptoObjectUtility cryptoHelper;
         Android.Support.V4.OS.CancellationSignal cancellationSignal;
 
         public static (FingerprintFragment fragment, string tag) NewInstance()
@@ -47,18 +45,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             fingerprintManager = FingerprintManagerCompat.From(Activity);
 
-            if(!fingerprintManager.IsHardwareDetected || !fingerprintManager.HasEnrolledFingerprints)
-            {
-                Activity.Finish();
-            } 
-            else 
-            {
-                cryptoHelper = new CryptoObjectHelper();
-                cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
-                fingerprintCallback = new FingerprintCallback(Activity);
+            if(!fingerprintManager.HasEnrolledFingerprints)
+
                 
-                fingerprintManager.Authenticate(cryptoHelper.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
-            }
+            
+                cryptoHelper = new CryptoObjectUtility();
+                cancellationSignal = new Android.Support.V4.OS.CancellationSignal();fingerprintCallback = new FingerprintCallback(Activity);
+            fingerprintManager.Authenticate(cryptoHelper.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
         }
     }
 }

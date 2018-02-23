@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.OS;
 using Android.Widget;
+using System.Diagnostics;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -15,7 +16,13 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public ApplicationLifecycleHandler()
+        {
+            stopWatch = new Stopwatch();
+        }
+
         public bool ShouldBeShown;
+        Stopwatch stopWatch;
         int acitivitiesStarted;
 
         public void OnActivityCreated(Activity activity, Bundle savedInstanceState)
@@ -46,10 +53,17 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if(!IsApplicationVisible && ShouldBeShown) 
+            if(!IsApplicationVisible)
             {
-                Toast.MakeText(activity,Resource.String.fingerprint_success,ToastLength.Long).Show();
-                activity.StartActivity(FingerprintActivity.CreateIntent(activity));
+                stopWatch.Stop();
+
+                if(stopWatch.Elapsed.Seconds > 10 && ShouldBeShown) //settings
+                {
+                    Toast.MakeText(activity, Resource.String.fingerprint_success, ToastLength.Long).Show();
+                    activity.StartActivity(FingerprintActivity.CreateIntent(activity));
+                }
+                stopWatch.Reset();
+
             }
             acitivitiesStarted++;
         }
@@ -60,6 +74,7 @@ namespace Mark5.Mobile.Droid.Utilities
             if(!IsApplicationVisible)
             {
                 Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Long).Show();
+                stopWatch.Start();
                 ShouldBeShown = true;
             }
         }
