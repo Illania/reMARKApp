@@ -24,30 +24,35 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if (!ApplicationVisible)
+            if(stopWatch.ElapsedMilliseconds < 500)
+                activitiesStarted++;
+            else
             {
-                if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+                if (!ApplicationVisible)
                 {
-                    stopWatch.Stop();
-
-                    if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
+                    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
                     {
-                        activity.StartActivity(FingerprintActivity.CreateIntent(activity));
+                        stopWatch.Stop();
+                        
+                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
+                        {
+                            activity.StartActivity(FingerprintActivity.CreateIntent(activity));
+                        }
+                        stopWatch.Reset();
                     }
-                    stopWatch.Reset();
                 }
+                activitiesStarted++;
             }
-            activitiesStarted++;
         }
 
         public void OnActivityStopped(Activity activity)
         {
-            activitiesStarted--;
-            if (!ApplicationVisible)
-            {
-                if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
-                    stopWatch.Start();
-            }
+                activitiesStarted--;
+                if (!ApplicationVisible)
+                {
+                    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+                        stopWatch.Start();
+                }
         }
 
         #region Unused callbacks

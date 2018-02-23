@@ -9,7 +9,6 @@ using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Android.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
