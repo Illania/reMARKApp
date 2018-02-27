@@ -32,8 +32,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public DocumentPreview DocumentPreview => documentPreview;
 
-        public event EventHandler Refreshed = delegate { };
-
         Guid failedDocumentToUploadGuid;
         int? folderId;
         Folder folder;
@@ -66,12 +64,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem commentsButton;
         UIBarButtonItem replyActionsButton;
         UIBarButtonItem userActionsButton;
-
-        public delegate DocumentPreview GetPreviousDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
-        public delegate DocumentPreview GetNextDocumentPreviewDelegate(DocumentPreview documentPreview, out bool nextDocumentAvailable, out bool previousDocumentAvailable, bool scrollAndSelect = false);
-
-        GetPreviousDocumentPreviewDelegate GetPreviousDocumentPreview { get; set; }
-        GetNextDocumentPreviewDelegate GetNextDocumentPreview { get; set; }
 
         CancellationTokenSource readStatusCts;
         CancellationTokenSource loadCts;
@@ -161,9 +153,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             doneButtonItem = null;
             editDocumentButtonItem = null;
-
-            GetPreviousDocumentPreview = null;
-            GetNextDocumentPreview = null;
 
             headerStackView.RemoveFromSuperview();
 
@@ -377,22 +366,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.folder = folder;
         }
 
-        public void SetData(Folder folder, DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
-
-            failedDocumentToUploadGuid = Guid.Empty;
-            documentId = null;
-            document = null;
-            folderId = null;
-            notificationGuid = default(Guid);
-
-            this.documentPreview = documentPreview;
-            this.folder = folder;
-            GetNextDocumentPreview = getNextDocumentPreview;
-            GetPreviousDocumentPreview = getPreviousDocumentPreview;
-        }
-
         public void SetData(DocumentPreview documentPreview, bool hideDoneButton)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
@@ -403,14 +376,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentId = null;
             folderId = null;
             notificationGuid = default(Guid);
-            GetNextDocumentPreview = null;
-            GetPreviousDocumentPreview = null;
 
             this.documentPreview = documentPreview;
             this.hideDoneButton = hideDoneButton;
         }
 
-        public void SetData(DocumentPreview documentPreview, GetNextDocumentPreviewDelegate getNextDocumentPreview, GetPreviousDocumentPreviewDelegate getPreviousDocumentPreview)
+        public void SetData(DocumentPreview documentPreview)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
 
@@ -422,8 +393,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             notificationGuid = default(Guid);
 
             this.documentPreview = documentPreview;
-            GetNextDocumentPreview = getNextDocumentPreview;
-            GetPreviousDocumentPreview = getPreviousDocumentPreview;
         }
 
         public void SetData(int documentId)
@@ -435,8 +404,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folder = null;
             folderId = null;
             documentPreview = null;
-            GetNextDocumentPreview = null;
-            GetPreviousDocumentPreview = null;
             notificationGuid = default(Guid);
 
             this.documentId = documentId;
@@ -451,9 +418,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folder = null;
             folderId = null;
             documentPreview = null;
-            GetNextDocumentPreview = null;
-            GetPreviousDocumentPreview = null;
-
             this.documentId = documentId;
             this.notificationGuid = notificationGuid;
         }
@@ -466,8 +430,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentPreview = null;
             folder = null;
             documentId = null;
-            GetPreviousDocumentPreview = null;
-            GetNextDocumentPreview = null;
             notificationGuid = default(Guid);
 
             this.failedDocumentToUploadGuid = failedDocumentToUploadGuid;
@@ -482,8 +444,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentPreview = null;
             folder = null;
             documentId = null;
-            GetPreviousDocumentPreview = null;
-            GetNextDocumentPreview = null;
             notificationGuid = default(Guid);
 
             flagButton.Enabled = false;
@@ -567,8 +527,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RefreshToolbar();
 
                 MarkAsReadIfNecessary();
-
-                Refreshed(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -626,19 +584,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void RefreshNavigationBar()
         {
-            if (PresentingViewController == null)
+            if (PresentingViewController == null && document != null && documentPreview.Direction == DocumentDirection.Draft)
             {
-                if (document == null || documentPreview.Direction != DocumentDirection.Draft)
-                {
-                    var rightButtons = new UIBarButtonItem[0];
-                    NavigationItem.SetRightBarButtonItems(rightButtons, true);
-                }
-                else
-                {
-                    var rightButtons = new UIBarButtonItem[1];
-                    rightButtons[0] = editDocumentButtonItem;
-                    NavigationItem.SetRightBarButtonItems(rightButtons, true);
-                }
+                var rightButtons = new UIBarButtonItem[1];
+                rightButtons[0] = editDocumentButtonItem;
+                NavigationItem.SetRightBarButtonItems(rightButtons, true);
             }
         }
 
@@ -903,7 +853,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region NavigationBar event handlers
 
-        void EditDocumentButtonItem_Clicked(object sender, EventArgs e)
+        void EditDocumentButtonItem_Clicked(object sender, EventArgs e) => PresentEditing();
+
+        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+
+        #endregion
+
+        #region Actions
+
+        public void PresentEditing()
         {
             var vc = new ComposeDocumentViewController
             {
@@ -915,12 +873,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
-
-        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
-
-        #endregion
-
-        #region Actions
 
         async Task DoChangeReadStatus()
         {
