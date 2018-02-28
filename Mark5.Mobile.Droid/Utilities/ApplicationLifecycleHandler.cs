@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if(stopWatch.ElapsedMilliseconds < 500)
+            if(stopWatch.ElapsedMilliseconds < 500) //no gucci
                 activitiesStarted++;
             else
             {

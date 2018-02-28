@@ -255,6 +255,7 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\DocumentPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
+		<Compile Include="Utilities\Fingerprint\FingerprintAuthUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -543,6 +544,7 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
 	  <Folder Include="Resources\html\fonts\" />
+	  <Folder Include="Utilities\Fingerprint\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

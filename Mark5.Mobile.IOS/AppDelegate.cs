@@ -22,6 +22,7 @@ using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Fingerprint;
 using ModernHttpClient;
 using PCLStorage;
 using TinyMessenger;
@@ -173,6 +174,7 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
+            FingerprintAuthUtilities.Authenticate(application);
         }
 
         public override void DidEnterBackground(UIApplication application)
