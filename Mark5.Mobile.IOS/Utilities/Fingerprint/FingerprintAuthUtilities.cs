@@ -43,11 +43,6 @@ namespace Mark5.Mobile.IOS.Utilities.Fingerprint
                             CommonConfig.Logger.Info("Local Authentication succeeded.");
                             Stopwatch.Reset();
                         }
-                        else
-                        {
-                            Console.Write("FAIL!");
-                            //Reuqest pin code
-                        }
                     });
                 });
                 
