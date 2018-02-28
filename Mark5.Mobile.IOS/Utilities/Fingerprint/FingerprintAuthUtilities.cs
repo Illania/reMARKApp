@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Utilities.Fingerprint
         {
             get 
             {
-                return Stopwatch.Elapsed.Seconds > 3;
+                return PlatformConfig.Preferences.FingerprintInterval != -1 && Stopwatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerprintInterval;
             }
         }
 
