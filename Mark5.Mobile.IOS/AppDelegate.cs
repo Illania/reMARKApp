@@ -171,10 +171,10 @@ namespace Mark5.Mobile.IOS
 
         public override void OnActivated(UIApplication application)
         {
+            FingerprintAuthUtilities.Authenticate(application);
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
-            FingerprintAuthUtilities.Authenticate(application);
         }
 
         public override void DidEnterBackground(UIApplication application)
@@ -182,6 +182,7 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsUploadService?.Stop();
             Services.DocumentPreviewsDownloadService?.Stop();
             Services.DocumentsDownloadService?.Stop();
+            FingerprintAuthUtilities.Stopwatch.Start();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)

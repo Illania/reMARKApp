@@ -1,33 +1,58 @@
 ﻿using System;
+using System.Diagnostics;
 using Foundation;
 using LocalAuthentication;
+using Mark5.Mobile.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities.Fingerprint
 {
     public class FingerprintAuthUtilities
     {
+        public static Stopwatch Stopwatch;
+
+        public static bool AuthenticationRequired
+        {
+            get 
+            {
+                return Stopwatch.Elapsed.Seconds > 3;
+            }
+        }
+
+        static FingerprintAuthUtilities()
+        {
+            Stopwatch = new Stopwatch();
+        }
+
         public static void Authenticate(UIApplication application)
         {
-            var laContext = new LAContext();
-            NSError authError;
-            var authReason = new NSString("To continue using the app");
-
-            var replyHandler = new LAContextReplyHandler((bool success, NSError error) =>
+            if(AuthenticationRequired)
             {
-                application.InvokeOnMainThread(() =>
+                if(Stopwatch.IsRunning)
+                    Stopwatch.Stop();
+              
+                var laContext = new LAContext();
+                var authReason = new NSString("To continue using the app");
+
+                var replyHandler = new LAContextReplyHandler((bool success, NSError error) =>
                 {
-                    if (success)
+                    application.InvokeOnMainThread(() =>
                     {
-                        Console.Write("Succeed");
-                    }
-                    else
-                    {
-                        Console.Write("FAIL!");
-                        //Reuqest pin code
-                    }
+                        if (success)
+                        {
+                            CommonConfig.Logger.Info("Local Authentication succeeded.");
+                            Stopwatch.Reset();
+                        }
+                        else
+                        {
+                            Console.Write("FAIL!");
+                            //Reuqest pin code
+                        }
+                    });
                 });
-            });
+                
+                laContext.EvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, authReason, replyHandler);
+            }
         }
     }
 }
