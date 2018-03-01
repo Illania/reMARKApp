@@ -541,6 +541,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                         DismissViewController(true, null);
                 }
+                else
+                {
+                    ClearData();
+                }
             }
         }
 

@@ -58,8 +58,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             recyclingOnDisappearEnabled = false;
         }
 
+        public bool IsRecycled() => recycled;
+
         protected virtual void Recycle()
         {
         }
+
     }
 }

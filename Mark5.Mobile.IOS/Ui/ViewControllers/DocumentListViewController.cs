@@ -166,8 +166,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (DocumentViewController)nc.ViewControllers[0];
-                vc.ClearData();
+                var vc = (DocumentPageViewController)nc.ViewControllers[0];
+                vc.ClearPage();
             }
         }
 
@@ -517,27 +517,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
-                var vc = (DocumentViewController)nc.ViewControllers[0];
+                var vc = (DocumentPageViewController)nc.ViewControllers[0];
 
                 if (vc.IsShowingDocumentWithId(documentPreview.Id))
                     return;
 
                 vc.HidesBottomBarWhenPushed = false;
-
-                vc.ClearData();
-
-                if (!searchController.Active)
-                {
-                    vc.SetData(Folder, documentPreview);
-                    newDocumentsAvailableAction = null;
-                }
-                else
-                {
-                    vc.SetData(Folder, documentPreview);
-                    newDocumentsAvailableAction = null;
-                }
-
-                vc.RefreshData();
+                vc.SetPage(Folder, documentPreview);
             }
             else
             {
@@ -1015,8 +1001,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                var vc = (DocumentViewController)nc.ViewControllers[0];
-                vc.ClearData();
+                var vc = (DocumentPageViewController)nc.ViewControllers[0];
+                vc.ClearPage();
             }
 
             TableView.SetEditing(true, true);
@@ -1038,7 +1024,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                 {
                     var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                    var vc = (DocumentViewController)nc.ViewControllers[0];
+                    var vc = (DocumentPageViewController)nc.ViewControllers[0];
                     if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
                         vc.UpdatePriority();
                 }
@@ -1061,9 +1047,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (SplitViewController != null && !SplitViewController.Collapsed)
                 {
                     var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                    var vc = (DocumentViewController)nc.ViewControllers[0];
+                    var vc = (DocumentPageViewController)nc.ViewControllers[0];
                     if (ids.Select(id => vc.IsShowingDocumentWithId(id)).Any(v => v))
-                        vc.ClearData();
+                        vc.ClearPage();
                 }
             });
         }

@@ -1,5 +1,6 @@
 ﻿using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -15,9 +16,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         protected override NavigationController CreateSecondaryNavigationController()
         {
-            return new NavigationController(new DocumentViewController())
+            return new NavigationController(new DocumentPageViewController())
             {
-                RestorationIdentifier = "Secondary_NavigationController_" + nameof(DocumentViewController)
+                RestorationIdentifier = "Secondary_NavigationController_" + nameof(DocumentPageViewController)
             };
         }
     }
