@@ -255,7 +255,7 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\DocumentPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
-		<Compile Include="Utilities\Fingerprint\FingerprintAuthUtilities.cs" />
+		<Compile Include="Utilities\Fingerprint\FingerprintAuthentication.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
