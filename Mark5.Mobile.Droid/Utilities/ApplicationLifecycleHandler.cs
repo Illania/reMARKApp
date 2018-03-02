@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.OS;
 using System.Diagnostics;
+using Android.Content.Res;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -16,16 +17,21 @@ namespace Mark5.Mobile.Droid.Utilities
 
         Stopwatch stopWatch;
         int activitiesStarted;
+        Orientation currentOrientation;
 
-        public ApplicationLifecycleHandler()
+        public ApplicationLifecycleHandler(Orientation initialOrientation)
         {
             stopWatch = new Stopwatch();
+            currentOrientation = initialOrientation;
         }
 
         public void OnActivityStarted(Activity activity)
         {
-            if(stopWatch.ElapsedMilliseconds < 500) //no gucci
+            if (activity.Resources.Configuration.Orientation != currentOrientation && activitiesStarted > 0)
+            {
+                currentOrientation = activity.Resources.Configuration.Orientation;
                 activitiesStarted++;
+            }
             else
             {
                 if (!ApplicationVisible)

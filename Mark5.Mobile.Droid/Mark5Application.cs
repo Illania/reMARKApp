@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid
 
             AppCompatDelegate.CompatVectorFromResourcesEnabled = true;
 
-            LifecycleHandler = new ApplicationLifecycleHandler();
+            LifecycleHandler = new ApplicationLifecycleHandler(Resources.Configuration.Orientation);
             RegisterActivityLifecycleCallbacks(LifecycleHandler);
 
             Task.Run(async () =>
