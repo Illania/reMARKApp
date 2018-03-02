@@ -2,6 +2,7 @@ using System;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
+using LocalAuthentication;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -19,6 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string DocumentsToDownloadKey = "DocumentsToDownload";
+        const string FingerprintIntervalKey = "FingerprintInterval";
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
         const string OpenSettingsAppKey = "openSettingsApp";
@@ -97,18 +99,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return cell;
         }
 
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        public override async void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var specifier = SettingsReader.GetSpecifier(indexPath);
             if (specifier.Type == "PSMultiValueSpecifier")
             {
+                if (specifier.Key == FingerprintIntervalKey)
+                {
+                    NSError error;
+
+                    if (!new LAContext().CanEvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, out error))
+                    {
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("fingerprint_auth_cant_evaluate_policy_title"), Localization.GetString("fingerprint_auth_cant_evaluate_policy_content"));
+                    }
+                }
+
                 var vc = new CustomSpecifierValuesViewController
                 {
                     CurrentSpecifier = specifier,
                     SettingsReader = SettingsReader,
                     SettingsStore = SettingsStore
                 };
-                vc.View.TintColor = View.TintColor;
+                vc.View.TintColor = View.TintColor; 
                 NavigationController.PushViewController(vc, true);
                 return;
             }
@@ -223,7 +235,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     Dialogs.ShowErrorAlert(this, ex);
                 }
-
 
                 return;
             }

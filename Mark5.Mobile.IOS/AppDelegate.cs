@@ -174,7 +174,9 @@ namespace Mark5.Mobile.IOS
 
         public override void OnActivated(UIApplication application)
         {
-            FingerprintAuthentication.Authenticate(application);
+            if(PlatformConfig.Preferences.FingerprintInterval != -1)
+                FingerprintAuthentication.Authenticate();
+            
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
@@ -185,7 +187,9 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsUploadService?.Stop();
             Services.DocumentPreviewsDownloadService?.Stop();
             Services.DocumentsDownloadService?.Stop();
-            FingerprintAuthentication.Stopwatch.Start();
+
+            if (PlatformConfig.Preferences.FingerprintInterval != -1)
+                FingerprintAuthentication.Stopwatch.Start();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)

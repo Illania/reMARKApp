@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Utilities.Fingerprint
             Stopwatch = new Stopwatch();
         }
 
-        public static void Authenticate(UIApplication application)
+        public static void Authenticate()
         {
             if (AuthenticationRequired)
             {
@@ -32,18 +32,29 @@ namespace Mark5.Mobile.IOS.Utilities.Fingerprint
                     Stopwatch.Stop();
 
                 var laContext = new LAContext();
+                NSError policyError;
                 var authReason = new NSString("To continue using the app");
 
-                var replyHandler = new LAContextReplyHandler((bool success, NSError error) =>
+                if (laContext.CanEvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, out policyError))
                 {
-                    if (success)
+                    var replyHandler = new LAContextReplyHandler((bool success, NSError error) =>
                     {
-                        CommonConfig.Logger.Info("Local Authentication succeeded.");
-                        Stopwatch.Reset();
-                    }
-                });
+                        if (success)
+                        {
+                            CommonConfig.Logger.Info("Local Authentication succeeded.");
+                            Stopwatch.Reset();
+                        }
+                    });
 
-                laContext.EvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, authReason, replyHandler);
+                    laContext.EvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, authReason, replyHandler);
+                }
+                else 
+                {
+                    Stopwatch.Reset();
+
+                    if (policyError != null)
+                        CommonConfig.Logger.Info("Policy can't be evaluated: " + policyError.LocalizedDescription);
+                }
             }
         }
     }
