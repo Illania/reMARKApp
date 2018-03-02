@@ -2,6 +2,8 @@
 using Android.OS;
 using System.Diagnostics;
 using Android.Content.Res;
+using Android.Content;
+using Android.Support.V4.Hardware.Fingerprint;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -36,13 +38,22 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 if (!ApplicationVisible)
                 {
-                    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+                    if (PlatformConfig.Preferences.AuthEnabled)
                     {
                         stopWatch.Stop();
                         
-                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
+                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthInterval) //settings
                         {
-                            activity.StartActivity(FingerprintActivity.CreateIntent(activity));
+                            KeyguardManager keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
+                            FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.From(activity);
+                            if (fingerprintManager.HasEnrolledFingerprints && keyguardManager.IsKeyguardSecure)
+                            {
+                                activity.StartActivity(FingerprintActivity.CreateIntent(activity));
+                            } 
+                            else if(keyguardManager.IsKeyguardSecure)
+                            {
+                                //ask for pin    
+                            }
                         }
                         stopWatch.Reset();
                     }
@@ -56,7 +67,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 activitiesStarted--;
                 if (!ApplicationVisible)
                 {
-                    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+                    if (PlatformConfig.Preferences.AuthEnabled)
                         stopWatch.Start();
                 }
         }

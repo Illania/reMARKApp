@@ -146,8 +146,8 @@
 "favorites" = "Favorites";
 "fax" = "Fax";
 "filter" = "Filter";
-"fingerprint_auth_cant_evaluate_policy_content" = "For fingerprint authentication to work the device must have a passcode set and have Touch Id enabled.";
-"fingerprint_auth_cant_evaluate_policy_title" = "Touch Id is not enabled.";
+"auth_cant_evaluate_policy_content" = "For authentication to work the device must have a passcode set and, if possible, have Touch Id enabled.";
+"auth_cant_evaluate_policy_title" = "No passcode set for device.";
 "first_name" = "First name";
 "folder_empty" = "Folder is empty";
 "folder_offline_message" = "This folder is saved offline. You can make the folder online again or redownload its contents.";

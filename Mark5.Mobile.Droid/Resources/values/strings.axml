@@ -278,6 +278,9 @@
 	<string name="private_header">Private</string>
 	<string name="phonebook_contacts_no_access_title">Phonebook access refused</string>
 	<string name="phonebook_contacts_no_access_content">You need to grant MARK5 access to the Phonebook in order to use this functionality</string>
+    <string name ="phone_unprotected_title">The phone is unprotected.</string>
+    <string name ="phone_unprotected_content">For authentication to work when reopening MARK5, the device must be protected by a PIN code.</string>
+    <string name ="phone_unprotected_fingerprint_content">For authentication to work when reopening MARK5 the device must at least be protected by a PIN, but preferably also a fingerprint.</string>
 	<string name="read_by">Read by:</string>
 	<string name="recent_addresses">Recent addresses</string>
 	<string name="read_by_prefix">read by</string>

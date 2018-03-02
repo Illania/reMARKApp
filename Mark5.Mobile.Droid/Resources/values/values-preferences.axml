@@ -122,7 +122,7 @@
 	</string-array>
 	<string name="pref_search_shortcodes_to_get_default">100</string>
 	<bool name="pref_search_partial_word_default">false</bool>
-    <string-array name="pref_fingerprint_auth_entries">
+    <string-array name="pref_auth_interval_entries">
         <item>Disabled</item>
         <item>Everytime the app is opened</item>
         <item>5 minutes</item>
@@ -132,7 +132,7 @@
         <item>25 minutes</item>
         <item>30 minutes</item>
     </string-array>
-    <string-array name="pref_fingerprint_auth_entryvalues">
+    <string-array name="pref_auth_interval_entryvalues">
         <item>-1</item>
         <item>0</item>
         <item>5</item>
@@ -142,5 +142,5 @@
         <item>25</item>
         <item>30</item>
     </string-array>
-    <string name="pref_fingerprint_auth_default">-1</string>
+    <string name="pref_auth_interval_default">-1</string>
 </resources>
