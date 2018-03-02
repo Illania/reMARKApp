@@ -14,9 +14,6 @@ namespace Mark5.Mobile.Droid
     [Activity()]
     public class FingerprintActivity : BaseAppCompatActivity
     {
-        const string StateKey = "765aef8a-d625-40df-86a6-a037a4986d21";
-        FingerprintActivityState state;
-
         AppCompatTextView instructions;
 
         FingerprintCallback fingerprintCallback;
@@ -36,76 +33,23 @@ namespace Mark5.Mobile.Droid
             SetContentView(Resource.Layout.fingerprint);
 
             instructions = FindViewById<AppCompatTextView>(Resource.Id.fingerprint_instructions_textview);
+            instructions.Text = "Scan finger.";
             
             if (savedInstanceState == null)
             {
-                state = new FingerprintActivityState();
                 fingerprintManager = FingerprintManagerCompat.From(this);
                 cryptoHelper = new CryptoObjectUtility();
                 cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
                 fingerprintCallback = new FingerprintCallback(this);
-
-                setInstructions();
 
                 fingerprintManager.Authenticate(cryptoHelper.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
 
                 CommonConfig.Logger.Info($"Created {nameof(FingerprintActivity)}");
             }
             else
-            {
-                setInstructions();
+            {               
                 CommonConfig.Logger.Info($"Restored {nameof(FingerprintActivity)}");
             }
         }
-
-        protected override void OnSaveInstanceState(Bundle outState)
-        {
-            base.OnSaveInstanceState(outState);
-
-            state.CancellationSignal = cancellationSignal;
-            state.CryptoHelper = cryptoHelper;
-            state.FingerprintCallback = fingerprintCallback;
-            state.FingerprintManager = fingerprintManager;
-
-            outState.PutString(StateKey,Serializer.Serialize(state));
-        }
-
-        protected override void OnRestoreInstanceState(Bundle savedInstanceState)
-        {
-            base.OnRestoreInstanceState(savedInstanceState);
-
-            state = Serializer.Deserialize<FingerprintActivityState>(savedInstanceState.GetString(StateKey));
-
-            cancellationSignal = state.CancellationSignal;
-            cryptoHelper = state.CryptoHelper;
-            fingerprintCallback = state.FingerprintCallback;
-            fingerprintManager = state.FingerprintManager;
-        }
-
-        void setInstructions()
-        {
-            if(fingerprintManager != null && instructions != null)
-            {
-                if (!fingerprintManager.HasEnrolledFingerprints)
-                    instructions.Text = "No enrolled fingerprints.";
-                else
-                    instructions.Text = "Scan fingerprint.";
-            }
-        }
     }
-
-    #region State class
-
-    class FingerprintActivityState
-    {
-        public FingerprintCallback FingerprintCallback { get; set; }
-
-        public FingerprintManagerCompat FingerprintManager { get; set; }
-
-        public CryptoObjectUtility CryptoHelper { get; set; }
-
-        public Android.Support.V4.OS.CancellationSignal CancellationSignal { get; set; }
-    }
-
-    #endregion
 }
