@@ -17,9 +17,12 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public static readonly int PinRequestCode = 1928;
+
         Stopwatch stopWatch;
         int activitiesStarted;
         Orientation currentOrientation;
+        bool pincodeRequested;
 
         public ApplicationLifecycleHandler(Orientation initialOrientation)
         {
@@ -41,8 +44,8 @@ namespace Mark5.Mobile.Droid.Utilities
                     if (PlatformConfig.Preferences.AuthEnabled)
                     {
                         stopWatch.Stop();
-                        
-                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthInterval) //settings
+
+                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthInterval) 
                         {
                             KeyguardManager keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
                             FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.From(activity);
@@ -50,9 +53,11 @@ namespace Mark5.Mobile.Droid.Utilities
                             {
                                 activity.StartActivity(FingerprintActivity.CreateIntent(activity));
                             } 
-                            else if(keyguardManager.IsKeyguardSecure)
+                            else if(keyguardManager.IsKeyguardSecure && !pincodeRequested)
                             {
-                                //ask for pin    
+                                var screenLockIntent = keyguardManager.CreateConfirmDeviceCredentialIntent("Enter Device PIN", "To continue using MARK5 the device PIN must be entered.");
+                                activity.StartActivityForResult(screenLockIntent,PinRequestCode);
+                                pincodeRequested = true;
                             }
                         }
                         stopWatch.Reset();
@@ -64,12 +69,15 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStopped(Activity activity)
         {
-                activitiesStarted--;
-                if (!ApplicationVisible)
+            activitiesStarted--;
+            if (!ApplicationVisible)
+            {
+                if (PlatformConfig.Preferences.AuthEnabled)
                 {
-                    if (PlatformConfig.Preferences.AuthEnabled)
-                        stopWatch.Start();
+                    stopWatch.Start();
+                    pincodeRequested = false;
                 }
+            }
         }
 
         #region Unused callbacks
