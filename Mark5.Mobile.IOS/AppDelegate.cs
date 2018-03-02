@@ -91,6 +91,9 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            var OneDayInterval = 60 * 24;
+            UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
+
             Window.MakeKeyAndVisible();
 
             if (launchOptions == null)
@@ -286,6 +289,25 @@ namespace Mark5.Mobile.IOS
             {
                 completionHandler();
             }
+        }
+
+        public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    CommonConfig.Logger.Info("Background Fetch: Retrieving system settings...");
+
+                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
+                    completionHandler(UIBackgroundFetchResult.NewData);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.",ex);
+                    completionHandler(UIBackgroundFetchResult.Failed);
+                }
+            });
         }
 
         void InitializeCommon()
