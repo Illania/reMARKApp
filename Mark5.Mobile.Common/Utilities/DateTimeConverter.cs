@@ -11,7 +11,17 @@ namespace Mark5.Mobile.Common.Utilities
         static readonly int LocalUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
 
         static int? serverUtcOffset;
-        static int ServerUtcOffset => serverUtcOffset ?? GetServerUtcOffset();
+        static int ServerUtcOffset
+        {
+            get
+            {
+                if (serverUtcOffset == null)
+                {
+                    serverUtcOffset = GetServerUtcOffset();
+                }
+                return serverUtcOffset.Value;
+            }
+        }
 
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
@@ -30,47 +40,48 @@ namespace Mark5.Mobile.Common.Utilities
         public static DateTime ConvertUtcToUserTime(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
-            return dt.AddHours(UseServerTimezone ? ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : LocalUtcOffset);
+            return dt.AddHours(UseServerTimezone ? ServerUtcOffset : LocalUtcOffset);
         }
 
         public static DateTime ConvertUserTimeToUtc(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
-            return dt.AddHours(UseServerTimezone ? -ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours : -LocalUtcOffset);
+            return dt.AddHours(UseServerTimezone ? -ServerUtcOffset : -LocalUtcOffset);
         }
 
         public static DateTime ConvertUtcToServerTime(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
-            return dt.AddHours(ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours);
+            return dt.AddHours(ServerUtcOffset);
         }
 
         public static DateTime ConvertServerTimeToUtc(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
-            return dt.AddHours(-ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours);
+            return dt.AddHours(-ServerUtcOffset);
         }
 
         static int GetServerUtcOffset()
         {
             int offset;
 
-            if (string.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized) || GetTimeZoneInfoFromSerializedString == null)
+            if (!string.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized) && GetTimeZoneInfoFromSerializedString != null)
+            {
+                try
+                {
+                    var serverTimeZoneInfo = GetTimeZoneInfoFromSerializedString(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized);
+                    offset = serverTimeZoneInfo.GetUtcOffset(DateTime.Now).Hours;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while trying to get server UTC offset", ex);
+                    offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours;
+                }
+            }
+            else
                 offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours;
 
-            try
-            {
-                var serverTimeZoneInfo = GetTimeZoneInfoFromSerializedString(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized);
-                offset = serverTimeZoneInfo.GetUtcOffset(DateTime.Now).Hours;
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Error while trying to get server UTC offset", ex);
-                offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours;
-            }
-
-            serverUtcOffset = offset;
-            return serverUtcOffset.Value;
+            return offset;
         }
     }
 }
