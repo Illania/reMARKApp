@@ -301,7 +301,7 @@ namespace Mark5.Mobile.IOS
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.",ex);
+                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.", ex);
                     completionHandler(UIBackgroundFetchResult.Failed);
                 }
             });
@@ -443,6 +443,7 @@ namespace Mark5.Mobile.IOS
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
+                DateTimeConverter.GetTimeZoneInfoFromSerializedString = TimeZoneInfo.FromSerializedString;
 
                 BeginInvokeOnMainThread(() =>
                 {

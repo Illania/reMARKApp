@@ -7,8 +7,11 @@ namespace Mark5.Mobile.Common.Model
     {
         public Version SystemVersion { get; set; }
         public Version ServiceVersion { get; set; }
-        List<ModuleType> availableModules;
+        public string ServerTimeZoneInfoSerialized { get; set; }
+        public string CustomerName { get; set; }
+        public Guid CustomerGuid { get; set; }
 
+        List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
         {
             get
@@ -20,6 +23,7 @@ namespace Mark5.Mobile.Common.Model
             set => availableModules = value;
         }
 
+        //This could be incorrect in case of daylight saving and so on, better use ServerTimeZoneInfoSerialized
         public TimeSpan ServerUtcOffset { get; set; }
     }
 }

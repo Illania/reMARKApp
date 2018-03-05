@@ -612,10 +612,14 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 SystemVersion = new Version(si.SystemVersion),
                 ServiceVersion = si.ServiceVersion,
-                ServerUtcOffset = si.ServerUtcOffset
+                ServerUtcOffset = si.ServerUtcOffset,
+                CustomerName = si.CustomerName,
+                CustomerGuid = si.CustomerGuid,
+                ServerTimeZoneInfoSerialized = si.ServerTimeZoneInfoSerialized
             };
             if (si.AvailableModules != null)
                 result.AvailableModules.AddRange(si.AvailableModules.Select(mt => mt.ConvertEnum<ModuleType>()));
+
             return result;
         }
 

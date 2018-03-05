@@ -5,9 +5,13 @@ namespace Mark5.Mobile.Common.Utilities
     public static class DateTimeConverter
     {
         public static bool UseServerTimezone = true;
+        public static Func<string, TimeZoneInfo> GetTimeZoneInfoFromSerializedString;
 
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         static readonly int LocalUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
+
+        static int? serverUtcOffset;
+        static int ServerUtcOffset => serverUtcOffset ?? GetServerUtcOffset();
 
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
@@ -45,6 +49,28 @@ namespace Mark5.Mobile.Common.Utilities
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
             return dt.AddHours(-ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours);
+        }
+
+        static int GetServerUtcOffset()
+        {
+            int offset;
+
+            if (string.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized) || GetTimeZoneInfoFromSerializedString == null)
+                offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours;
+
+            try
+            {
+                var serverTimeZoneInfo = GetTimeZoneInfoFromSerializedString(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized);
+                offset = serverTimeZoneInfo.GetUtcOffset(DateTime.Now).Hours;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while trying to get server UTC offset", ex);
+                offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours;
+            }
+
+            serverUtcOffset = offset;
+            return serverUtcOffset.Value;
         }
     }
 }

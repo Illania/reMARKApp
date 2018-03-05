@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
@@ -142,6 +143,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     LocalNotificationsListener.Initialize();
 
                     DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+                    DateTimeConverter.GetTimeZoneInfoFromSerializedString = TimeZoneInfo.FromSerializedString;
 
                     CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
