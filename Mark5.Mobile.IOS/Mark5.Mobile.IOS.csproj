@@ -531,12 +531,6 @@
 		<BundleResource Include="Resources\html\blank.html" />
 	</ItemGroup>
 	<ItemGroup>
-		<XamarinComponentReference Include="InAppSettingsKit">
-			<Version>2.6.0.0</Version>
-			<Visible>False</Visible>
-		</XamarinComponentReference>
-	</ItemGroup>
-	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
 	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
