@@ -136,7 +136,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
                     {
                         await newContentSemaphore.WaitAsync();
-                        await newContentWebView.LoadPlainText(context, PreviousDocument.HtmlBody, PlainTextProcessingConfiguration.DefaultForEditing);
+                        await newContentWebView.LoadPlainText(context, PreviousDocument.PlainTextBody, PlainTextProcessingConfiguration.DefaultForEditing);
                     }
                 }
                 else if (PreviousDocumentPreview != null && (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
