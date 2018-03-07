@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if (activity.Resources.Configuration.Orientation != currentOrientation && activitiesStarted > 0)
+            if (activity.Resources.Configuration.Orientation != currentOrientation && activitiesStarted >= 0)
             {
                 currentOrientation = activity.Resources.Configuration.Orientation;
                 activitiesStarted++;
@@ -38,22 +38,18 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 if (!ApplicationVisible)
                 {
-                    if (PlatformConfig.Preferences.AuthEnabled)
+                    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
                     {
                         stopWatch.Stop();
                         
-                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthInterval) //settings
+                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
                         {
-                            KeyguardManager keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
-                            FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.From(activity);
+                            var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
+                            var fingerprintManager = FingerprintManagerCompat.From(activity);
                             if (fingerprintManager.HasEnrolledFingerprints && keyguardManager.IsKeyguardSecure)
                             {
                                 activity.StartActivity(FingerprintActivity.CreateIntent(activity));
                             } 
-                            else if(keyguardManager.IsKeyguardSecure)
-                            {
-                                //ask for pin    
-                            }
                         }
                         stopWatch.Reset();
                     }
@@ -64,12 +60,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStopped(Activity activity)
         {
-                activitiesStarted--;
-                if (!ApplicationVisible)
-                {
-                    if (PlatformConfig.Preferences.AuthEnabled)
-                        stopWatch.Start();
-                }
+            activitiesStarted--;
+            if (!ApplicationVisible)
+            {
+                if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+                    stopWatch.Start();
+            }
         }
 
         #region Unused callbacks

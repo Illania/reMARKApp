@@ -27,14 +27,14 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 
         public FingerprintManagerCompat.CryptoObject BuildCryptoObject()
         {
-            Cipher cipher = CreateCipher();
+            var cipher = CreateCipher();
             return new FingerprintManagerCompat.CryptoObject(cipher);
         }
 
         Cipher CreateCipher(bool retry = true)
         {
-            IKey key = GetKey();
-            Cipher cipher = Cipher.GetInstance(Transformation);
+            var key = GetKey();
+            var cipher = Cipher.GetInstance(Transformation);
             try
             {
                 cipher.Init(CipherMode.EncryptMode | CipherMode.DecryptMode, key);
@@ -63,8 +63,8 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 
         void CreateKey()
         {
-            KeyGenerator keyGen = KeyGenerator.GetInstance(KeyProperties.KeyAlgorithmAes, KeystoreName);
-            KeyGenParameterSpec keyGenSpec =
+            var keyGen = KeyGenerator.GetInstance(KeyProperties.KeyAlgorithmAes, KeystoreName);
+            var keyGenSpec =
                 new KeyGenParameterSpec.Builder(KeyName, KeyStorePurpose.Encrypt | KeyStorePurpose.Decrypt)
                     .SetBlockModes(BlockMode)
                     .SetEncryptionPaddings(Encryptionpadding)
