@@ -137,9 +137,9 @@
 	<string name="pref_key_documents_to_load">pref_key_documents_to_load</string>
 	<string name="pref_key_documents_use_server_timezone">pref_key_documents_use_server_timezone</string>
 	<string name="pref_key_documents_show_creator_outgoing">pref_key_documents_show_creator_outgoing</string>
-    <string name="pref_key_auth_interval">pref_key_auth_interval</string>
-    <string name="pref_auth_interval_title">Fingerprint Authentication</string>
-    <string name="pref_auth_interval_summary">Fingerprint Authentication upon reopening the app.\nCurrently: %s</string>
+    <string name="pref_key_fingerprint_auth">pref_key_fingerprint_auth</string>
+    <string name="pref_fingerprint_auth_title">Fingerprint Authentication</string>
+    <string name="pref_fingerprint_auth_summary">Fingerprint Authentication upon reopening the app.\nCurrently: %s</string>
 	<string name="pref_key_notification_hide_read">pref_key_notification_hide_read</string>
 	<string name="pref_key_notification_ringtone">pref_key_notification_ringtone</string>
 	<string name="pref_key_notification_silence">pref_key_notification_silence</string>

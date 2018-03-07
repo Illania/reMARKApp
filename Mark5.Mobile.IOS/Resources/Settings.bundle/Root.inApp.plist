@@ -371,9 +371,9 @@
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
-			<string>auth_interval</string>
+			<string>fingerprint_auth</string>
 			<key>Key</key>
-			<string>AuthenticationInterval</string>
+			<string>FingerprintInterval</string>
 			<key>DefaultValue</key>
 			<integer>-1</integer>
 			<key>Titles</key>
@@ -403,7 +403,7 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>FooterText</key>
-			<string>auth_interval_desc</string>
+			<string>fingerprint_auth_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>

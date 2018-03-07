@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string DocumentsToDownloadKey = "DocumentsToDownload";
-        const string AuthenticationInterval = "AuthenticationInterval";
+        const string FingerprintIntervalKey = "FingerprintInterval";
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
         const string OpenSettingsAppKey = "openSettingsApp";
@@ -104,13 +104,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var specifier = SettingsReader.GetSpecifier(indexPath);
             if (specifier.Type == "PSMultiValueSpecifier")
             {
-                if (specifier.Key == AuthenticationInterval)
+                if (specifier.Key == FingerprintIntervalKey)
                 {
                     NSError error;
 
                     if (!new LAContext().CanEvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, out error))
                     {
-                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("auth_cant_evaluate_policy_title"), Localization.GetString("auth_cant_evaluate_policy_content"));
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("fingerprint_auth_cant_evaluate_policy_title"), Localization.GetString("fingerprint_auth_cant_evaluate_policy_content"));
                     }
                 }
 
