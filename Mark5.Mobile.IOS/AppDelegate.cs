@@ -334,6 +334,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Reachability = new Reachability();
                 CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
+                CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>
@@ -443,7 +444,6 @@ namespace Mark5.Mobile.IOS
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
-                DateTimeConverter.GetTimeZoneInfoFromSerializedString = TimeZoneInfo.FromSerializedString;
 
                 BeginInvokeOnMainThread(() =>
                 {

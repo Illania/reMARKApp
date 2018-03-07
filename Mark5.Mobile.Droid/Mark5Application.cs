@@ -54,6 +54,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
                     CommonConfig.UsageAnalytics = new UsageAnalytics(FirebaseAnalytics.GetInstance(this));
+                    CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
 
 #if !DEBUG
                     CommonConfig.Logger.Level = LogLevel.INFO;

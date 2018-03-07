@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -25,5 +26,24 @@ namespace Mark5.Mobile.Common.Model
 
         //This could be incorrect in case of daylight saving and so on, better use ServerTimeZoneInfoSerialized
         public TimeSpan ServerUtcOffset { get; set; }
+
+        [JsonIgnore]
+        public Lazy<TimeZoneInfo> ServerTimeZoneInfo = new Lazy<TimeZoneInfo>(InitializeServerTimeZoneInfo);
+
+        static TimeZoneInfo InitializeServerTimeZoneInfo()
+        {
+            if (CommonConfig.TimeZoneInfoDeserializer == null || ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized == null)
+                return null;
+
+            try
+            {
+                return CommonConfig.TimeZoneInfoDeserializer(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while deserializing server timezone info", ex);
+                return null;
+            }
+        }
     }
 }

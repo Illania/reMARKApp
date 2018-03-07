@@ -5,23 +5,9 @@ namespace Mark5.Mobile.Common.Utilities
     public static class DateTimeConverter
     {
         public static bool UseServerTimezone = true;
-        public static Func<string, TimeZoneInfo> GetTimeZoneInfoFromSerializedString;
 
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         static readonly int LocalUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
-
-        static int? serverUtcOffset;
-        static int ServerUtcOffset
-        {
-            get
-            {
-                if (serverUtcOffset == null)
-                {
-                    serverUtcOffset = GetServerUtcOffset();
-                }
-                return serverUtcOffset.Value;
-            }
-        }
 
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
@@ -40,37 +26,40 @@ namespace Mark5.Mobile.Common.Utilities
         public static DateTime ConvertUtcToUserTime(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
-            return dt.AddHours(UseServerTimezone ? ServerUtcOffset : LocalUtcOffset);
+            return dt.AddHours(UseServerTimezone ? +GetServerUtcOffset(dateTime) : +GetLocalUtcOffset(dateTime));
         }
 
         public static DateTime ConvertUserTimeToUtc(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
-            return dt.AddHours(UseServerTimezone ? -ServerUtcOffset : -LocalUtcOffset);
+            return dt.AddHours(UseServerTimezone ? -GetServerUtcOffset(dateTime) : -GetLocalUtcOffset(dateTime));
         }
 
         public static DateTime ConvertUtcToServerTime(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
-            return dt.AddHours(ServerUtcOffset);
+            return dt.AddHours(GetServerUtcOffset(dateTime));
         }
 
         public static DateTime ConvertServerTimeToUtc(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
-            return dt.AddHours(-ServerUtcOffset);
+            return dt.AddHours(-GetServerUtcOffset(dateTime));
         }
 
-        static int GetServerUtcOffset()
+        static int GetLocalUtcOffset(DateTime dateTime) => TimeZoneInfo.Local.GetUtcOffset(dateTime).Hours;
+
+        static int GetServerUtcOffset(DateTime dateTime)
         {
             int offset;
 
-            if (!string.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized) && GetTimeZoneInfoFromSerializedString != null)
+            var serverTimeZoneInfo = ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfo.Value;
+
+            if (serverTimeZoneInfo != null)
             {
                 try
                 {
-                    var serverTimeZoneInfo = GetTimeZoneInfoFromSerializedString(ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfoSerialized);
-                    offset = serverTimeZoneInfo.GetUtcOffset(DateTime.Now).Hours;
+                    offset = serverTimeZoneInfo.GetUtcOffset(dateTime).Hours;
                 }
                 catch (Exception ex)
                 {
@@ -83,5 +72,6 @@ namespace Mark5.Mobile.Common.Utilities
 
             return offset;
         }
+
     }
 }
