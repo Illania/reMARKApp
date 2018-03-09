@@ -2,15 +2,17 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Runtime;
 using Android.Support.V4.Hardware.Fingerprint;
 using Android.Support.V7.Widget;
+using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities.Fingerprint;
 
 namespace Mark5.Mobile.Droid
 {
-    [Activity()]
+    [Activity]
     public class FingerprintActivity : BaseAppCompatActivity
     {
         AppCompatTextView instructions;
@@ -30,11 +32,11 @@ namespace Mark5.Mobile.Droid
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.fingerprint);
+            SetContentView(Resource.Layout.fingerprint_layout);
 
             instructions = FindViewById<AppCompatTextView>(Resource.Id.fingerprint_instructions_textview);
             instructions.Text = "Scan finger.";
-            
+
             if (savedInstanceState == null)
             {
                 fingerprintManager = FingerprintManagerCompat.From(this);
@@ -47,22 +49,41 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.Logger.Info($"Created {nameof(FingerprintActivity)}");
             }
             else
-            {               
+            {
                 CommonConfig.Logger.Info($"Restored {nameof(FingerprintActivity)}");
+            }
+        }
+
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            if (requestCode == pinRequestCode)
+            {
+                if (resultCode == Result.Ok)
+                {
+                    cancellationSignal.Cancel();
+                    Finish();
+                }
+                else
+                {
+                    ((Mark5Application)ApplicationContext).LifecycleHandler.RedirectedToPincodeActivity = false;
+                }
             }
         }
 
         public void ShowPincodeOption()
         {
-            var pinButton = new AppCompatButton(this);
-            pinButton.Text = "Use Pincode";
-            pinButton.Click += delegate 
-            {
-                StartPinCodeActivity();
-            };
+            var linearLayout = FindViewById<LinearLayoutCompat>(Resource.Id.fingerprint_linearlayout);
 
-            var linearLayout = FindViewById<LinearLayoutCompat>(Resource.Layout.fingerprint);
-            linearLayout.AddView(pinButton);
+            var pinButton = new AppCompatButton(this);
+            pinButton.Tag = "PinButtonTag";
+            pinButton.Text = "Use Pincode";
+            var layoutParams = new LinearLayout.LayoutParams(Android.Views.ViewGroup.LayoutParams.WrapContent, Android.Views.ViewGroup.LayoutParams.WrapContent);
+            pinButton.LayoutParameters = layoutParams;
+            pinButton.Click += (sender, e) => StartPinCodeActivity();
+
+            if (linearLayout.FindViewWithTag(pinButton.Tag) == null)
+                linearLayout.AddView(pinButton);
         }
 
         public void StartPinCodeActivity()
@@ -71,6 +92,5 @@ namespace Mark5.Mobile.Droid
             var screenLockIntent = keyguardManager.CreateConfirmDeviceCredentialIntent("Enter Device PIN", "To continue using MARK5 the device PIN must be entered.");
             StartActivityForResult(screenLockIntent, pinRequestCode);
         }
-
     }
 }

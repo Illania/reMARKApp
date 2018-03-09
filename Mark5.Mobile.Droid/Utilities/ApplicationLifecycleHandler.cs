@@ -17,6 +17,11 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public bool RedirectedToPincodeActivity
+        {
+            get; set;
+        }
+
         int activitiesStarted;
         Orientation currentOrientation;
         Stopwatch stopWatch;
@@ -29,7 +34,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if (activity.Resources.Configuration.Orientation != currentOrientation && activitiesStarted >= 0)
+            if (activity.Resources.Configuration.Orientation != currentOrientation)
             {
                 currentOrientation = activity.Resources.Configuration.Orientation;
                 activitiesStarted++;
@@ -42,7 +47,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     {
                         stopWatch.Stop();
                         
-                        if (!(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
+                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
                         {
                             var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
                             var fingerprintManager = FingerprintManagerCompat.From(activity);
@@ -50,6 +55,10 @@ namespace Mark5.Mobile.Droid.Utilities
                             {
                                 activity.StartActivity(FingerprintActivity.CreateIntent(activity));
                             } 
+                        }
+                        else
+                        {
+                            RedirectedToPincodeActivity = false;
                         }
                         stopWatch.Reset();
                     }

@@ -9,9 +9,9 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         FingerprintActivity activity;
         int failureCounter;
 
-        public FingerprintCallback(FingerprintActivity activityContext)
+        public FingerprintCallback(FingerprintActivity activity)
         {
-            this.activity = activityContext;
+            this.activity = activity;
         }
 
         public override void OnAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result)
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Short).Show();
             failureCounter++;
 
-            if (failureCounter >= 3)
+            if (failureCounter == 3)
                 activity.ShowPincodeOption();
         }
 

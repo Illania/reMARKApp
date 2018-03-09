@@ -142,11 +142,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             try
             {
-                var username = usernameEditText.Text;
-                var password = passwordEditText.Text;
-                var hostname = hostnameEditText.Text;
-                var port = portEditText.Text;
-                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
+                var username = "mdt";//usernameEditText.Text;
+                var password = "Ftpj4Gck";//passwordEditText.Text;
+                var hostname = "192.168.75.44";//hostnameEditText.Text;
+                var port = "8096";//portEditText.Text;
+                var sslMode = SslMode.AllowSelfSigned;//(SslMode)sslSpinner.SelectedItemPosition;
 
                 var errors = false;
                 if (!Validator.IsUsernameValid(username))

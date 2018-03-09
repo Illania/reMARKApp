@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Mark5.Mobile.Droid</RootNamespace>
     <AssemblyName>Mark5.Mobile.Droid</AssemblyName>
-    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -772,7 +772,7 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_fingerprint_black_24dp.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_fingerprint_black_24dp.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_fingerprint_black_24dp.png" />
-    <AndroidResource Include="Resources\layout\fingerprint.axml" />
+    <AndroidResource Include="Resources\layout\fingerprint_layout.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
