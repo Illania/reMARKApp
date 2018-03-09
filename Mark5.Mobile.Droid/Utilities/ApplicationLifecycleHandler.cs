@@ -17,9 +17,9 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        Stopwatch stopWatch;
         int activitiesStarted;
         Orientation currentOrientation;
+        Stopwatch stopWatch;
 
         public ApplicationLifecycleHandler(Orientation initialOrientation)
         {

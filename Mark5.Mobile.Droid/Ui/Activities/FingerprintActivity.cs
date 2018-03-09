@@ -1,11 +1,10 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
 using Android.Content;
-using Android.Content.PM;
 using Android.OS;
 using Android.Support.V4.Hardware.Fingerprint;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities.Fingerprint;
 
@@ -16,10 +15,11 @@ namespace Mark5.Mobile.Droid
     {
         AppCompatTextView instructions;
 
+        int pinRequestCode = 9876;
+        Android.Support.V4.OS.CancellationSignal cancellationSignal;
+        CryptoObjectUtility cryptoHelper;
         FingerprintCallback fingerprintCallback;
         FingerprintManagerCompat fingerprintManager;
-        CryptoObjectUtility cryptoHelper;
-        Android.Support.V4.OS.CancellationSignal cancellationSignal;
 
         public static Intent CreateIntent(Context context)
         {
@@ -51,5 +51,26 @@ namespace Mark5.Mobile.Droid
                 CommonConfig.Logger.Info($"Restored {nameof(FingerprintActivity)}");
             }
         }
+
+        public void ShowPincodeOption()
+        {
+            var pinButton = new AppCompatButton(this);
+            pinButton.Text = "Use Pincode";
+            pinButton.Click += delegate 
+            {
+                StartPinCodeActivity();
+            };
+
+            var linearLayout = FindViewById<LinearLayoutCompat>(Resource.Layout.fingerprint);
+            linearLayout.AddView(pinButton);
+        }
+
+        public void StartPinCodeActivity()
+        {
+            var keyguardManager = (KeyguardManager)GetSystemService(KeyguardService);
+            var screenLockIntent = keyguardManager.CreateConfirmDeviceCredentialIntent("Enter Device PIN", "To continue using MARK5 the device PIN must be entered.");
+            StartActivityForResult(screenLockIntent, pinRequestCode);
+        }
+
     }
 }

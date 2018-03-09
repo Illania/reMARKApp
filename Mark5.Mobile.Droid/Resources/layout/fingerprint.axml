@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -25,4 +25,4 @@
         android:layout_marginTop="20dp"
         android:layout_below="@id/fingerprint_button"
         android:layout_centerHorizontal="true" />
-</LinearLayout>
+</android.support.v7.widget.LinearLayoutCompat>

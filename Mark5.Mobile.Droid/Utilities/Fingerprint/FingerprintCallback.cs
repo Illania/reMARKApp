@@ -6,36 +6,41 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 {
     public class FingerprintCallback : FingerprintManagerCompat.AuthenticationCallback
     {
-        Activity activityContext;
+        FingerprintActivity activity;
+        int failureCounter;
 
-        public FingerprintCallback(Activity activityContext)
+        public FingerprintCallback(FingerprintActivity activityContext)
         {
-            this.activityContext = activityContext;
+            this.activity = activityContext;
         }
 
         public override void OnAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result)
         {
             base.OnAuthenticationSucceeded(result);
-
-            Toast.MakeText(activityContext, Resource.String.fingerprint_success, ToastLength.Long).Show();
-            activityContext.Finish();
+            Toast.MakeText(activity, Resource.String.fingerprint_success, ToastLength.Short).Show();
+            activity.Finish();
         }
 
         public override void OnAuthenticationFailed()
         {
             base.OnAuthenticationFailed();
+            Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Short).Show();
+            failureCounter++;
 
-            Toast.MakeText(activityContext, Resource.String.fingerprint_try_again, ToastLength.Long).Show();
+            if (failureCounter >= 3)
+                activity.ShowPincodeOption();
         }
 
-        public override void OnAuthenticationError(int errMsgId, Java.Lang.ICharSequence errString)
+        public override void OnAuthenticationError(int errMsgId, Java.Lang.ICharSequence errString) //Unrecoverable error, nothing todo except try again.
         {
             base.OnAuthenticationError(errMsgId, errString);
+            activity.ShowPincodeOption();
         }
 
-        public override void OnAuthenticationHelp(int helpMsgId, Java.Lang.ICharSequence helpString)
+        public override void OnAuthenticationHelp(int helpMsgId, Java.Lang.ICharSequence helpString) //Recoverable error, e.g. user swipes finger too fast.
         {
             base.OnAuthenticationHelp(helpMsgId, helpString);
+            Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Long).Show();
         }
     }
 }
