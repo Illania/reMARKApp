@@ -1,11 +1,31 @@
-﻿using Android.App;
-using Android.Support.V4.Hardware.Fingerprint;
+﻿using Android.Support.V4.Hardware.Fingerprint;
 using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 {
     public class FingerprintCallback : FingerprintManagerCompat.AuthenticationCallback
     {
+
+        public FingerprintActivity Activity 
+        { 
+            set
+            {
+                activity = value;
+            }
+        }
+
+        public int FailureCounter
+        {
+            get
+            {
+                return failureCounter;
+            }
+            set
+            {
+                failureCounter = value;
+            }
+        }
+
         FingerprintActivity activity;
         int failureCounter;
 
@@ -27,7 +47,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Short).Show();
             failureCounter++;
 
-            if (failureCounter == 3)
+            if (FailureCounter == 3)
                 activity.ShowPincodeOption();
         }
 
@@ -36,7 +56,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             base.OnAuthenticationError(errMsgId, errString);
             failureCounter++;
 
-            if (failureCounter == 3)
+            if (FailureCounter == 3)
                 activity.ShowPincodeOption();
         }
 

@@ -298,6 +298,7 @@
 	<string name="save_draft">Save draft</string>
 	<string name="save_offline">Save offline</string>
 	<string name="saving_draft">Saving draft</string>
+    <string name="scan_finger">Scan finger</string>
 	<string name="search">Search</string>
 	<string name="search_editable_empty">___</string>
 	<string name="search_categories">Categories</string>

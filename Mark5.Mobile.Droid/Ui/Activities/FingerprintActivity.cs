@@ -1,12 +1,13 @@
-﻿using System;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.Hardware.Fingerprint;
 using Android.Support.V7.Widget;
+using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities.Fingerprint;
 
@@ -15,13 +16,18 @@ namespace Mark5.Mobile.Droid
     [Activity]
     public class FingerprintActivity : BaseAppCompatActivity
     {
-        AppCompatTextView instructions;
+        const string StateKey = "eb749a0d-0547-4643-bbd8-28306d9a816e";
 
         int pinRequestCode = 9876;
+        AppCompatButton pinButton;
+        AppCompatTextView instructions;
+
         Android.Support.V4.OS.CancellationSignal cancellationSignal;
-        CryptoObjectUtility cryptoHelper;
+        CryptoObjectUtility cryptoObjectUtility;
         FingerprintCallback fingerprintCallback;
         FingerprintManagerCompat fingerprintManager;
+
+        FingerprintActivityState state;
 
         public static Intent CreateIntent(Context context)
         {
@@ -40,7 +46,7 @@ namespace Mark5.Mobile.Droid
             if (savedInstanceState == null)
             {
                 fingerprintManager = FingerprintManagerCompat.From(this);
-                cryptoHelper = new CryptoObjectUtility();
+                cryptoObjectUtility = new CryptoObjectUtility();
                 fingerprintCallback = new FingerprintCallback(this);
 
                 CommonConfig.Logger.Info($"Created {nameof(FingerprintActivity)}");
@@ -55,7 +61,7 @@ namespace Mark5.Mobile.Droid
         {
             base.OnResume();
             cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
-            fingerprintManager.Authenticate(cryptoHelper.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
+            fingerprintManager.Authenticate(cryptoObjectUtility.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
         }
 
         protected override void OnPause()
@@ -65,9 +71,37 @@ namespace Mark5.Mobile.Droid
             cancellationSignal = null;
         }
 
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+            state = new FingerprintActivityState
+            {
+                CryptoObjectUtility = cryptoObjectUtility,
+                FingerprintCallback = fingerprintCallback,
+                FailureCounter = fingerprintCallback.FailureCounter,
+                ButtonVisibility = pinButton.Visibility
+            };
+
+            outState.PutString(StateKey, Serializer.Serialize(state));
+        }
+
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
         {
             base.OnRestoreInstanceState(savedInstanceState);
+
+            if (savedInstanceState?.ContainsKey(StateKey) == true)
+            {
+                state = Serializer.Deserialize<FingerprintActivityState>(savedInstanceState.GetString(StateKey));
+
+                cryptoObjectUtility = state.CryptoObjectUtility;
+                fingerprintCallback = state.FingerprintCallback;
+                fingerprintCallback.Activity = this;
+                fingerprintCallback.FailureCounter = state.FailureCounter;
+                fingerprintManager = FingerprintManagerCompat.From(this);
+                if(state.ButtonVisibility == ViewStates.Visible)
+                    FindViewById<LinearLayoutCompat>(Resource.Id.fingerprint_linearlayout).AddView(pinButton);
+                    
+            }
         }
 
         public override void OnBackPressed()
@@ -94,17 +128,7 @@ namespace Mark5.Mobile.Droid
 
         public void ShowPincodeOption()
         {
-            var linearLayout = FindViewById<LinearLayoutCompat>(Resource.Id.fingerprint_linearlayout);
-
-            var pinButton = new AppCompatButton(this);
-            pinButton.Tag = "PinButtonTag";
-            pinButton.Text = "Use Pincode";
-            var layoutParams = new LinearLayout.LayoutParams(Android.Views.ViewGroup.LayoutParams.WrapContent, Android.Views.ViewGroup.LayoutParams.WrapContent);
-            pinButton.LayoutParameters = layoutParams;
-            pinButton.Click += (sender, e) => StartPinCodeActivity();
-
-            if (linearLayout.FindViewWithTag(pinButton.Tag) == null)
-                linearLayout.AddView(pinButton);
+            pinButton.Visibility = ViewStates.Visible;
         }
 
         public void StartPinCodeActivity()
@@ -115,4 +139,19 @@ namespace Mark5.Mobile.Droid
             ((Mark5Application)ApplicationContext).LifecycleHandler.RedirectedToPincodeActivity = true;
         }
     }
+
+    #region State class
+
+    class FingerprintActivityState
+    {
+        public CryptoObjectUtility CryptoObjectUtility { get; set; }
+
+        public FingerprintCallback FingerprintCallback { get; set; }
+
+        public int FailureCounter { get; set; }
+
+        public ViewStates ButtonVisibility { get; set; }
+    }
+
+    #endregion
 }
