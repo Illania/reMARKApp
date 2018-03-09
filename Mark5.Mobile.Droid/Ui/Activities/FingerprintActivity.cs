@@ -41,10 +41,7 @@ namespace Mark5.Mobile.Droid
             {
                 fingerprintManager = FingerprintManagerCompat.From(this);
                 cryptoHelper = new CryptoObjectUtility();
-                cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
                 fingerprintCallback = new FingerprintCallback(this);
-
-                fingerprintManager.Authenticate(cryptoHelper.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
 
                 CommonConfig.Logger.Info($"Created {nameof(FingerprintActivity)}");
             }
@@ -52,6 +49,30 @@ namespace Mark5.Mobile.Droid
             {
                 CommonConfig.Logger.Info($"Restored {nameof(FingerprintActivity)}");
             }
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
+            fingerprintManager.Authenticate(cryptoHelper.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
+        }
+
+        protected override void OnPause()
+        {
+            base.OnPause();
+            cancellationSignal.Cancel();
+            cancellationSignal = null;
+        }
+
+        protected override void OnRestoreInstanceState(Bundle savedInstanceState)
+        {
+            base.OnRestoreInstanceState(savedInstanceState);
+        }
+
+        public override void OnBackPressed()
+        {
+            //do nothing
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
@@ -91,6 +112,7 @@ namespace Mark5.Mobile.Droid
             var keyguardManager = (KeyguardManager)GetSystemService(KeyguardService);
             var screenLockIntent = keyguardManager.CreateConfirmDeviceCredentialIntent("Enter Device PIN", "To continue using MARK5 the device PIN must be entered.");
             StartActivityForResult(screenLockIntent, pinRequestCode);
+            ((Mark5Application)ApplicationContext).LifecycleHandler.RedirectedToPincodeActivity = true;
         }
     }
 }

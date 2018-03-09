@@ -34,7 +34,10 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         public override void OnAuthenticationError(int errMsgId, Java.Lang.ICharSequence errString) //Unrecoverable error, nothing todo except try again.
         {
             base.OnAuthenticationError(errMsgId, errString);
-            activity.ShowPincodeOption();
+            failureCounter++;
+
+            if (failureCounter == 3)
+                activity.ShowPincodeOption();
         }
 
         public override void OnAuthenticationHelp(int helpMsgId, Java.Lang.ICharSequence helpString) //Recoverable error, e.g. user swipes finger too fast.
