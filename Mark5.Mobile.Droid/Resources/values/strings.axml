@@ -412,6 +412,7 @@
 	<string name="updating_categories">Updating Categories</string>
 	<string name="username">Username</string>
 	<string name="username_invalid">Username is not valid</string>
+    <string name="use_pincode">Use pincode</string>
 	<string name="vat">VAT</string>
 	<string name="warning">Warning</string>
 	<string name="webpage">Webpage</string>

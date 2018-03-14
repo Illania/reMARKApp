@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fingerprint_linearlayout"
@@ -25,12 +25,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_below="@id/fingerprint_button"
         android:layout_centerHorizontal="true" />
-    <android.support.v7.widget.Toolbar.AppCompatButton
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/fingerprint_button"
         android:text="@string/use_pincode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="invisible" />
-</android.support.v7.widget.LinearLayoutCompat>
+        android:visibility="invisible"
+        style="@style/mark5colorbutton" />
+</LinearLayout>

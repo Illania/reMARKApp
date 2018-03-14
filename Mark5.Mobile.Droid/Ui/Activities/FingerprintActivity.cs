@@ -43,6 +43,8 @@ namespace Mark5.Mobile.Droid
             instructions = FindViewById<AppCompatTextView>(Resource.Id.fingerprint_instructions_textview);
             instructions.Text = "Scan finger.";
 
+            pinButton = FindViewById<AppCompatButton>(Resource.Id.fingerprint_button);
+
             if (savedInstanceState == null)
             {
                 fingerprintManager = FingerprintManagerCompat.From(this);
@@ -98,15 +100,15 @@ namespace Mark5.Mobile.Droid
                 fingerprintCallback.Activity = this;
                 fingerprintCallback.FailureCounter = state.FailureCounter;
                 fingerprintManager = FingerprintManagerCompat.From(this);
-                if(state.ButtonVisibility == ViewStates.Visible)
-                    FindViewById<LinearLayoutCompat>(Resource.Id.fingerprint_linearlayout).AddView(pinButton);
+                FindViewById<AppCompatButton>(Resource.Id.fingerprint_button).Visibility = state.ButtonVisibility;
                     
             }
         }
 
         public override void OnBackPressed()
         {
-            //do nothing
+            MoveTaskToBack(true);
+            base.OnBackPressed();
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
