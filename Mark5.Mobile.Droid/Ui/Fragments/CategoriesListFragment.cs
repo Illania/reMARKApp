@@ -60,6 +60,8 @@ namespace Mark5.Mobile.Droid
             base.OnCreate(savedInstanceState);
             if (Arguments.ContainsKey(BusinessEntityPreviewBundleKey))
                 businessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
+
+            SubscribeToMessages();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -106,8 +108,6 @@ namespace Mark5.Mobile.Droid
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
-
-            SubscribeToMessages();
         }
 
         public override void OnDestroy()
