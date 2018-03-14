@@ -44,6 +44,9 @@ namespace Mark5.Mobile.Droid
             instructions.Text = "Scan finger.";
 
             pinButton = FindViewById<AppCompatButton>(Resource.Id.fingerprint_button);
+            pinButton.Click += delegate {
+                StartPinCodeActivity();
+            };
 
             if (savedInstanceState == null)
             {
@@ -116,12 +119,8 @@ namespace Mark5.Mobile.Droid
             {
                 if (resultCode == Result.Ok)
                 {
-                    cancellationSignal.Cancel();
+                    ((Mark5Application)ApplicationContext).LifecycleHandler.RedirectedToPincodeActivity = true;
                     Finish();
-                }
-                else
-                {
-                    ((Mark5Application)ApplicationContext).LifecycleHandler.RedirectedToPincodeActivity = false;
                 }
             }
         }
@@ -136,7 +135,6 @@ namespace Mark5.Mobile.Droid
             var keyguardManager = (KeyguardManager)GetSystemService(KeyguardService);
             var screenLockIntent = keyguardManager.CreateConfirmDeviceCredentialIntent("Enter Device PIN", "To continue using MARK5 the device PIN must be entered.");
             StartActivityForResult(screenLockIntent, pinRequestCode);
-            ((Mark5Application)ApplicationContext).LifecycleHandler.RedirectedToPincodeActivity = true;
         }
     }
 

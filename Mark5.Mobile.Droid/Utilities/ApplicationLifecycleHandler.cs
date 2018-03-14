@@ -17,7 +17,10 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        public bool RedirectedToPincodeActivity
+        /* Used to check if the user has been redirected to the PIN Code activity. 
+         * If it is the case, then when the user is returned to the app from the pin code activity, then the fingerprintactivity should not be started.
+         */
+        public bool RedirectedToPincodeActivity 
         {
             get; set;
         }
@@ -46,8 +49,8 @@ namespace Mark5.Mobile.Droid.Utilities
                     if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
                     {
                         stopWatch.Stop();
-                        
-                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) //settings
+
+                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) 
                         {
                             var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
                             var fingerprintManager = FingerprintManagerCompat.From(activity);
@@ -56,7 +59,7 @@ namespace Mark5.Mobile.Droid.Utilities
                                 activity.StartActivity(FingerprintActivity.CreateIntent(activity));
                             } 
                         }
-                        else
+                        else 
                         {
                             RedirectedToPincodeActivity = false;
                         }
