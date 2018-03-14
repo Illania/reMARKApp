@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using Android.Security.Keystore;
 using Android.Support.V4.Hardware.Fingerprint;
 using Java.Security;

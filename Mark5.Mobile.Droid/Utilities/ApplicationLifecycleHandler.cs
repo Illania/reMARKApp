@@ -18,8 +18,8 @@ namespace Mark5.Mobile.Droid.Utilities
         }
 
         /* Used to check if the user has been redirected to the PIN Code activity. 
-         * If it is the case, then when the user is returned to the app from the pin code activity, then the fingerprintactivity should not be started.
-         */
+         * If it is the case, then when the user is returned to the app from the pin code activity, 
+         * then the fingerprintactivity should not be started. */
         public bool RedirectedToPincodeActivity 
         {
             get; set;
