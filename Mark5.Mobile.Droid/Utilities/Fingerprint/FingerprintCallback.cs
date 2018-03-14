@@ -5,25 +5,13 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 {
     public class FingerprintCallback : FingerprintManagerCompat.AuthenticationCallback
     {
-
-        public FingerprintActivity Activity 
-        { 
-            set
-            {
-                activity = value;
-            }
-        }
-
         public int FailureCounter
         {
-            get
+            get 
             {
-                return failureCounter;
+                return failureCounter;    
             }
-            set
-            {
-                failureCounter = value;
-            }
+
         }
 
         FingerprintActivity activity;
@@ -32,6 +20,13 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         public FingerprintCallback(FingerprintActivity activity)
         {
             this.activity = activity;
+            failureCounter = 0;
+        }
+
+        public FingerprintCallback(FingerprintActivity activity, int failureCounter)
+        {
+            this.activity = activity;
+            this.failureCounter = failureCounter;
         }
 
         public override void OnAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result)
@@ -47,7 +42,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             Toast.MakeText(activity, Resource.String.fingerprint_try_again, ToastLength.Short).Show();
             failureCounter++;
 
-            if (FailureCounter == 3)
+            if (failureCounter == 3)
                 activity.ShowPincodeOption();
         }
 
@@ -56,7 +51,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             base.OnAuthenticationError(errMsgId, errString);
             failureCounter++;
 
-            if (FailureCounter == 3)
+            if (failureCounter == 3)
                 activity.ShowPincodeOption();
         }
 

@@ -78,8 +78,6 @@ namespace Mark5.Mobile.Droid
             base.OnSaveInstanceState(outState);
             state = new FingerprintActivityState
             {
-                CryptoObjectUtility = cryptoObjectUtility,
-                FingerprintCallback = fingerprintCallback,
                 FailureCounter = fingerprintCallback.FailureCounter,
                 ButtonVisibility = pinButton.Visibility
             };
@@ -93,13 +91,13 @@ namespace Mark5.Mobile.Droid
 
             if (savedInstanceState?.ContainsKey(StateKey) == true)
             {
-                state = Serializer.Deserialize<FingerprintActivityState>(savedInstanceState.GetString(StateKey));
+                cryptoObjectUtility = new CryptoObjectUtility();
 
-                cryptoObjectUtility = state.CryptoObjectUtility;
-                fingerprintCallback = state.FingerprintCallback;
-                fingerprintCallback.Activity = this;
-                fingerprintCallback.FailureCounter = state.FailureCounter;
+                state = Serializer.Deserialize<FingerprintActivityState>(savedInstanceState.GetString(StateKey));
+                fingerprintCallback = new FingerprintCallback(this, state.FailureCounter);
+
                 fingerprintManager = FingerprintManagerCompat.From(this);
+
                 FindViewById<AppCompatButton>(Resource.Id.fingerprint_button).Visibility = state.ButtonVisibility;
                     
             }
@@ -107,7 +105,7 @@ namespace Mark5.Mobile.Droid
 
         public override void OnBackPressed()
         {
-            MoveTaskToBack(true);
+            MoveTaskToBack(true); //Pressing back = minimizes the app, otherwise would return to MainActivity.
             base.OnBackPressed();
         }
 
@@ -146,12 +144,7 @@ namespace Mark5.Mobile.Droid
 
     class FingerprintActivityState
     {
-        public CryptoObjectUtility CryptoObjectUtility { get; set; }
-
-        public FingerprintCallback FingerprintCallback { get; set; }
-
         public int FailureCounter { get; set; }
-
         public ViewStates ButtonVisibility { get; set; }
     }
 
