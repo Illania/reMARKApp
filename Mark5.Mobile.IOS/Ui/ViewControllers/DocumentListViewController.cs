@@ -358,7 +358,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MarkAsRead(selectedDocuments, rows);
+                        MarkAsRead(selectedDocuments);
                         EndEditing();
                     }));
 
@@ -367,7 +367,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MarkAsUnread(selectedDocuments, rows);
+                        MarkAsUnread(selectedDocuments);
                         EndEditing();
                     }));
 
@@ -780,10 +780,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MarkAsRead(DocumentPreview documentPreview, NSIndexPath row) =>
-            MarkAsRead(new List<DocumentPreview> { documentPreview }, new[] { row });
+        void MarkAsRead(DocumentPreview documentPreview) =>
+            MarkAsRead(new List<DocumentPreview> { documentPreview });
 
-        async void MarkAsRead(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+        async void MarkAsRead(List<DocumentPreview> documentPreviews)
         {
             CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
 
@@ -792,7 +792,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
-                TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
+
+                var updatedItems = documentPreviews.Select(d => d.Id);
+                ((DataSource)TableView.Source).UpdateItems(updatedItems);
+                ((DataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItems);
             }
             catch (Exception ex)
             {
@@ -802,10 +805,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void MarkAsUnread(DocumentPreview documentPreview, NSIndexPath row) =>
-            MarkAsUnread(new List<DocumentPreview> { documentPreview }, new[] { row });
+        void MarkAsUnread(DocumentPreview documentPreview) =>
+            MarkAsUnread(new List<DocumentPreview> { documentPreview });
 
-        async void MarkAsUnread(List<DocumentPreview> documentPreviews, NSIndexPath[] rows)
+        async void MarkAsUnread(List<DocumentPreview> documentPreviews)
         {
             CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreviews={documentPreviews.Count}]...");
 
@@ -814,7 +817,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, false);
-                TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
+
+                var updatedItems = documentPreviews.Select(d => d.Id);
+                ((DataSource)TableView.Source).UpdateItems(updatedItems);
+                ((DataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItems);
             }
             catch (Exception ex)
             {
@@ -1217,7 +1223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Localization.GetString("mark_as_unread_ml"),
                         (a, ip) =>
                         {
-                            viewControllerWeakReference.Unwrap()?.MarkAsUnread(documentPreview, indexPath);
+                            viewControllerWeakReference.Unwrap()?.MarkAsUnread(documentPreview);
                             viewControllerWeakReference.Unwrap()?.EndEditing();
                         });
                     markAsUnreadAction.BackgroundColor = Theme.Brown;
@@ -1229,7 +1235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Localization.GetString("mark_as_read_ml"),
                         (a, ip) =>
                         {
-                            viewControllerWeakReference.Unwrap()?.MarkAsRead(documentPreview, indexPath);
+                            viewControllerWeakReference.Unwrap()?.MarkAsRead(documentPreview);
                             viewControllerWeakReference.Unwrap()?.EndEditing();
                         });
                     markAsReadAction.BackgroundColor = Theme.Brown;
@@ -1326,13 +1332,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
+            public void UpdateItems(IEnumerable<int> documentPreviewIds)
+            {
+                if (documentPreviewIds == null || !documentPreviewIds.Any())
+                    return;
+
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+                documentPreviewIds.ForEach(UpdateItem);
+                tableViewWeakReference.Unwrap()?.EndUpdates();
+            }
+
             public void UpdateItem(int documentPreviewId)
             {
-                var documentRow = Items.IndexOf(d => d.Id == documentPreviewId);
+                var documentRow = Items?.IndexOf(d => d.Id == documentPreviewId);
                 if (documentRow < 0)
                     return;
 
-                tableViewWeakReference.Unwrap()?.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(documentRow, 0) }, UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadRows(new NSIndexPath[] { NSIndexPath.FromRowSection(documentRow.Value, 0) }, UITableViewRowAnimation.Fade);
             }
 
             public void Reset()
