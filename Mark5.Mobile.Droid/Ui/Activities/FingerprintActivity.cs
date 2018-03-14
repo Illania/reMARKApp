@@ -66,7 +66,16 @@ namespace Mark5.Mobile.Droid
         {
             base.OnResume();
             cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
-            fingerprintManager.Authenticate(cryptoObjectUtility.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
+            try
+            {
+                fingerprintManager.Authenticate(cryptoObjectUtility.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
+            }
+            catch (CipherException e) //Fingerprint auth can't start, so show pincode.
+            {
+                CommonConfig.Logger.Error(e);
+                Toast.MakeText(this, Resource.String.fingerprint_authentication_failure, ToastLength.Long);
+                ShowPincodeOption();
+            }
         }
 
         protected override void OnPause()

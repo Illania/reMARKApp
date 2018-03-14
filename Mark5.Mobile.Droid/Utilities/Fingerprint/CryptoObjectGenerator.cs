@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Android.Security.Keystore;
 using Android.Support.V4.Hardware.Fingerprint;
 using Java.Security;
@@ -46,7 +47,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
                 if (retry)
                     CreateCipher(false);
                 else
-                    throw new Exception("Could not create the cipher for fingerprint authentication.", e);
+                    throw new CipherException("Could not create the cipher for fingerprint authentication.", e);
             }
             return cipher;
         }
@@ -72,6 +73,23 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
                     .Build();
             keyGen.Init(keyGenSpec);
             keyGen.GenerateKey();
+        }
+    }
+
+    public class CipherException : Exception
+    {
+        public CipherException()
+        {
+        }
+
+        public CipherException(string message)
+            : base(message)
+        {
+        }
+
+        public CipherException(string message, Exception innerException)
+            : base(message, innerException)
+        {
         }
     }
 }

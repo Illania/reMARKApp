@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 
         }
 
-        FingerprintActivity activity;
+        readonly FingerprintActivity activity;
         int failureCounter;
 
         public FingerprintCallback(FingerprintActivity activity)
