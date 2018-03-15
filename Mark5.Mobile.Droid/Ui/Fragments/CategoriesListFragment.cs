@@ -60,13 +60,13 @@ namespace Mark5.Mobile.Droid
             base.OnCreate(savedInstanceState);
             if (Arguments.ContainsKey(BusinessEntityPreviewBundleKey))
                 businessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
+
+            SubscribeToMessages();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
-
-            businessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -106,8 +106,6 @@ namespace Mark5.Mobile.Droid
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
-
-            SubscribeToMessages();
         }
 
         public override void OnDestroy()
@@ -121,11 +119,8 @@ namespace Mark5.Mobile.Droid
         {
             base.OnResume();
 
-            if (adapter.ItemCount < 1)
-            {
-                CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
-                RefreshView();
-            }
+            CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
+            RefreshView();
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -177,11 +172,11 @@ namespace Mark5.Mobile.Droid
             {
                 case ObjectType.Document:
                     var documentPreview = businessEntityPreview as DocumentPreview;
-                    adapter.SetItems(documentPreview.Categories);
+                    adapter.ReplaceItems(documentPreview.Categories);
                     break;
                 case ObjectType.Contact:
                     var contactPreview = businessEntityPreview as ContactPreview;
-                    adapter.SetItems(contactPreview.Categories);
+                    adapter.ReplaceItems(contactPreview.Categories);
                     break;
                 default:
                     throw new ArgumentException("The business entity provided does not have categories in the model");
@@ -299,6 +294,9 @@ namespace Mark5.Mobile.Droid
             public void Clear()
             {
                 var count = Items.Count;
+                if (count == 0)
+                    return;
+
                 Items.Clear();
                 NotifyItemRangeRemoved(0, count);
             }
