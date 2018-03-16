@@ -9,25 +9,16 @@ namespace Mark5.Mobile.Droid.Utilities
 {
     public class ApplicationLifecycleHandler : Java.Lang.Object, Application.IActivityLifecycleCallbacks
     {
-        public bool ApplicationVisible
-        {
-            get
-            {
-                return activitiesStarted > 0;
-            }
-        }
+        int activitiesStarted;
+        Orientation currentOrientation;
+        Stopwatch stopWatch;
+
+        public bool ApplicationVisible => activitiesStarted > 0;
 
         /* Used to check if the user has been redirected to the PIN Code activity. 
          * If it is the case, then when the user is returned to the app from the pin code activity, 
          * then the fingerprintactivity should not be started. */
-        public bool RedirectedToPincodeActivity 
-        {
-            get; set;
-        }
-
-        int activitiesStarted;
-        Orientation currentOrientation;
-        Stopwatch stopWatch;
+        public bool RedirectedToPincodeActivity { get; set; }
 
         public ApplicationLifecycleHandler(Orientation initialOrientation)
         {
@@ -50,16 +41,16 @@ namespace Mark5.Mobile.Droid.Utilities
                     {
                         stopWatch.Stop();
 
-                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval) 
+                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval)
                         {
                             var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
                             var fingerprintManager = FingerprintManagerCompat.From(activity);
                             if (fingerprintManager.HasEnrolledFingerprints && keyguardManager.IsKeyguardSecure)
                             {
                                 activity.StartActivity(FingerprintActivity.CreateIntent(activity));
-                            } 
+                            }
                         }
-                        else 
+                        else
                         {
                             RedirectedToPincodeActivity = false;
                         }

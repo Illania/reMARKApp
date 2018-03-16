@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string DocumentsToDownloadKey = "DocumentsToDownload";
-        const string FingerprintIntervalKey = "FingerprintInterval";
+        const string AuthorizationIntervalKey = "AuthorizationInterval";
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
         const string OpenSettingsAppKey = "openSettingsApp";
@@ -104,13 +104,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var specifier = SettingsReader.GetSpecifier(indexPath);
             if (specifier.Type == "PSMultiValueSpecifier")
             {
-                if (specifier.Key == FingerprintIntervalKey)
+                if (specifier.Key == AuthorizationIntervalKey)
                 {
-                    NSError error;
-
-                    if (!new LAContext().CanEvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, out error))
+                    if (!new LAContext().CanEvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, out var error))
                     {
-                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("fingerprint_auth_cant_evaluate_policy_title"), Localization.GetString("fingerprint_auth_cant_evaluate_policy_content"));
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("auth_cant_evaluate_policy_title"),
+                                                            Localization.GetString("auth_cant_evaluate_policy_content"));
                     }
                 }
 
@@ -120,7 +119,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     SettingsReader = SettingsReader,
                     SettingsStore = SettingsStore
                 };
-                vc.View.TintColor = View.TintColor; 
+                vc.View.TintColor = View.TintColor;
                 NavigationController.PushViewController(vc, true);
                 return;
             }

@@ -22,7 +22,6 @@ using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
-using Mark5.Mobile.IOS.Utilities.Fingerprint;
 using ModernHttpClient;
 using PCLStorage;
 using TinyMessenger;
@@ -174,9 +173,8 @@ namespace Mark5.Mobile.IOS
 
         public override void OnActivated(UIApplication application)
         {
-            if(PlatformConfig.Preferences.FingerprintInterval != -1)
-                FingerprintAuthentication.Authenticate();
-            
+            LocalAuthenticationManager.NotifyApplicationActivated();
+
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
@@ -188,8 +186,7 @@ namespace Mark5.Mobile.IOS
             Services.DocumentPreviewsDownloadService?.Stop();
             Services.DocumentsDownloadService?.Stop();
 
-            if (PlatformConfig.Preferences.FingerprintInterval != -1)
-                FingerprintAuthentication.Stopwatch.Start();
+            LocalAuthenticationManager.NotifyApplicationEnteredBackground();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -308,7 +305,7 @@ namespace Mark5.Mobile.IOS
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.",ex);
+                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.", ex);
                     completionHandler(UIBackgroundFetchResult.Failed);
                 }
             });
