@@ -140,6 +140,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnPause()
         {
             fab.Visibility = ViewStates.Gone;
+            UpdateCriteria();
+
             base.OnPause();
         }
 
@@ -161,7 +163,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            outState.PutString(SearchCriteriaKey, Serializer.Serialize(GetCriteria()));
+            outState.PutString(SearchCriteriaKey, Serializer.Serialize(UpdateCriteria()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -230,12 +232,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void HandleSearchButtonClicked()
         {
-            GetCriteria();
+            UpdateCriteria();
 
-            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Shortcodes, shortcodeCriteria: GetCriteria()));
+            StartActivity(SearchResultsActivity.CreateIntent(Context, ModuleType.Shortcodes, shortcodeCriteria: UpdateCriteria()));
         }
 
-        SearchShortcodesCriteria GetCriteria()
+        SearchShortcodesCriteria UpdateCriteria()
         {
             subviews.ForEach(v => v.UpdateCriteria());
 
