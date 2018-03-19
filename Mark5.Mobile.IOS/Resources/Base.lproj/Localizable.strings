@@ -370,6 +370,7 @@
 "updating_config___" = "Updating configuration...";
 "urgent" = "Urgent";
 "username" = "Username";
+"use_passcode" = "Use Passcode";
 "vat" = "VAT";
 "warning" = "Warning";
 "warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between MARK5 server and your device.";

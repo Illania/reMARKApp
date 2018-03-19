@@ -10,9 +10,9 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         static readonly Stopwatch stopwatch;
 
-        static bool AuthenticationEnabled => PlatformConfig.Preferences.FingerprintInterval != -1;
+        static bool AuthenticationEnabled => PlatformConfig.Preferences.AuthorizationInterval != -1;
 
-        static bool AuthenticationRequired => AuthenticationEnabled && stopwatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerprintInterval;
+        static bool AuthenticationRequired => AuthenticationEnabled && stopwatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthorizationInterval;
 
         static bool authenticated;
 
@@ -21,7 +21,7 @@ namespace Mark5.Mobile.IOS.Utilities
             stopwatch = new Stopwatch();
         }
 
-        public static void NotifyApplicationActivated() //TODO on monday see if "authenticated" works, and if there are any edge cases
+        public static void NotifyApplicationActivated()
         {
             if (AuthenticationRequired && !authenticated)
             {
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.IOS.Utilities
                         }
                     });
 
-                    laContext.LocalizedCancelTitle = string.Empty;
+                    laContext.LocalizedFallbackTitle = Localization.GetString("use_passcode");
                     laContext.EvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, Localization.GetString("localized_reason"), replyHandler);
                 }
                 else

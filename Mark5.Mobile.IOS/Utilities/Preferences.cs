@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string ClearCacheKey = "ClearCache";
             public const string EnableReportingKey = "EnableReporting";
 
-            public const string FingerprintInterval = "FingerprintInterval";
+            public const string AuthorizationInterval = "AuthorizationInterval";
 
             public const string PushNotificationTokenKey = "PushNotificationToken";
 
@@ -121,7 +121,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true)
                 },
                 {
-                    new NSString(Keys.FingerprintInterval), NSNumber.FromInt16(-1)
+                    new NSString(Keys.AuthorizationInterval), NSNumber.FromInt16(-1)
                 }
             };
             ud.RegisterDefaults(defaultsDictionary);
@@ -199,7 +199,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public bool EnableReporting => ud.BoolForKey(Keys.EnableReportingKey);
 
-        public int FingerprintInterval => (int)ud.IntForKey(Keys.FingerprintInterval);
+        public int AuthorizationInterval => (int)ud.IntForKey(Keys.AuthorizationInterval);
 
         public string PushNotificationToken
         {
