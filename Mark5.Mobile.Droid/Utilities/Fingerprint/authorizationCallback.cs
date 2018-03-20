@@ -3,27 +3,27 @@ using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 {
-    public class FingerprintCallback : FingerprintManagerCompat.AuthenticationCallback
+    public class AuthorizationCallback : FingerprintManagerCompat.AuthenticationCallback
     {
         public int FailureCounter
         {
-            get 
+            get
             {
-                return failureCounter;    
+                return failureCounter;
             }
 
         }
 
-        readonly FingerprintActivity activity;
+        readonly LocalAuthorizationActivity activity;
         int failureCounter;
 
-        public FingerprintCallback(FingerprintActivity activity)
+        public AuthorizationCallback(LocalAuthorizationActivity activity)
         {
             this.activity = activity;
             failureCounter = 0;
         }
 
-        public FingerprintCallback(FingerprintActivity activity, int failureCounter)
+        public AuthorizationCallback(LocalAuthorizationActivity activity, int failureCounter)
         {
             this.activity = activity;
             this.failureCounter = failureCounter;

@@ -41,13 +41,14 @@ namespace Mark5.Mobile.Droid.Utilities
                     {
                         stopWatch.Stop();
 
-                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(FingerprintActivity)) && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval)
+                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(LocalAuthorizationActivity))
+                            && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval)
                         {
                             var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
                             var fingerprintManager = FingerprintManagerCompat.From(activity);
                             if (fingerprintManager.HasEnrolledFingerprints && keyguardManager.IsKeyguardSecure)
                             {
-                                activity.StartActivity(FingerprintActivity.CreateIntent(activity));
+                                activity.StartActivity(LocalAuthorizationActivity.CreateIntent(activity));
                             }
                         }
                         else

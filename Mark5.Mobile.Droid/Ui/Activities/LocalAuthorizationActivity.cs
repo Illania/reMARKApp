@@ -14,7 +14,7 @@ using Mark5.Mobile.Droid.Utilities.Fingerprint;
 namespace Mark5.Mobile.Droid
 {
     [Activity]
-    public class FingerprintActivity : BaseAppCompatActivity
+    public class LocalAuthorizationActivity : BaseAppCompatActivity
     {
         const string StateKey = "eb749a0d-0547-4643-bbd8-28306d9a816e";
 
@@ -24,14 +24,14 @@ namespace Mark5.Mobile.Droid
 
         Android.Support.V4.OS.CancellationSignal cancellationSignal;
         CryptoObjectUtility cryptoObjectUtility;
-        FingerprintCallback fingerprintCallback;
+        AuthorizationCallback authorizationCallback;
         FingerprintManagerCompat fingerprintManager;
 
         FingerprintActivityState state;
 
         public static Intent CreateIntent(Context context)
         {
-            return new Intent(context, typeof(FingerprintActivity));
+            return new Intent(context, typeof(LocalAuthorizationActivity));
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -41,24 +41,22 @@ namespace Mark5.Mobile.Droid
             SetContentView(Resource.Layout.fingerprint_layout);
 
             instructions = FindViewById<AppCompatTextView>(Resource.Id.fingerprint_instructions_textview);
-            instructions.Text = "Scan finger.";
+            instructions.Text = "Scan finger."; //TODO need to get it from resources
 
             pinButton = FindViewById<AppCompatButton>(Resource.Id.fingerprint_button);
-            pinButton.Click += delegate {
-                StartPinCodeActivity();
-            };
+            pinButton.Click += PinButton_Click;
 
             if (savedInstanceState == null)
             {
                 fingerprintManager = FingerprintManagerCompat.From(this);
                 cryptoObjectUtility = new CryptoObjectUtility();
-                fingerprintCallback = new FingerprintCallback(this);
+                authorizationCallback = new AuthorizationCallback(this);
 
-                CommonConfig.Logger.Info($"Created {nameof(FingerprintActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(LocalAuthorizationActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(FingerprintActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(LocalAuthorizationActivity)}");
             }
         }
 
@@ -68,7 +66,7 @@ namespace Mark5.Mobile.Droid
             cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
             try
             {
-                fingerprintManager.Authenticate(cryptoObjectUtility.BuildCryptoObject(), 0, cancellationSignal, fingerprintCallback, null);
+                fingerprintManager.Authenticate(cryptoObjectUtility.BuildCryptoObject(), 0, cancellationSignal, authorizationCallback, null);
             }
             catch (CipherException e) //Fingerprint auth can't start, so show pincode.
             {
@@ -90,7 +88,7 @@ namespace Mark5.Mobile.Droid
             base.OnSaveInstanceState(outState);
             state = new FingerprintActivityState
             {
-                FailureCounter = fingerprintCallback.FailureCounter,
+                FailureCounter = authorizationCallback.FailureCounter,
                 ButtonVisibility = pinButton.Visibility
             };
 
@@ -106,12 +104,12 @@ namespace Mark5.Mobile.Droid
                 cryptoObjectUtility = new CryptoObjectUtility();
 
                 state = Serializer.Deserialize<FingerprintActivityState>(savedInstanceState.GetString(StateKey));
-                fingerprintCallback = new FingerprintCallback(this, state.FailureCounter);
+                authorizationCallback = new AuthorizationCallback(this, state.FailureCounter);
 
                 fingerprintManager = FingerprintManagerCompat.From(this);
 
                 FindViewById<AppCompatButton>(Resource.Id.fingerprint_button).Visibility = state.ButtonVisibility;
-                    
+
             }
         }
 
@@ -145,15 +143,17 @@ namespace Mark5.Mobile.Droid
             var screenLockIntent = keyguardManager.CreateConfirmDeviceCredentialIntent("Enter Device PIN", "To continue using MARK5 the device PIN must be entered.");
             StartActivityForResult(screenLockIntent, pinRequestCode);
         }
+
+        void PinButton_Click(object sender, System.EventArgs e) => StartPinCodeActivity();
+
+        #region State class
+
+        class FingerprintActivityState
+        {
+            public int FailureCounter { get; set; }
+            public ViewStates ButtonVisibility { get; set; }
+        }
+
+        #endregion
     }
-
-    #region State class
-
-    class FingerprintActivityState
-    {
-        public int FailureCounter { get; set; }
-        public ViewStates ButtonVisibility { get; set; }
-    }
-
-    #endregion
 }

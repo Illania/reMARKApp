@@ -439,8 +439,8 @@
     <Compile Include="Utilities\HtmlUtilities.cs" />
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
     <Compile Include="Utilities\SystemSettingsJobService.cs" />
-    <Compile Include="Ui\Activities\FingerprintActivity.cs" />
-    <Compile Include="Utilities\Fingerprint\FingerprintCallback.cs" />
+    <Compile Include="Ui\Activities\LocalAuthorizationActivity.cs" />
+    <Compile Include="Utilities\Fingerprint\authorizationCallback.cs" />
     <Compile Include="Utilities\Fingerprint\CryptoObjectGenerator.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
   </ItemGroup>
