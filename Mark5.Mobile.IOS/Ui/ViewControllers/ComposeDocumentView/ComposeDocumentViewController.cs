@@ -799,7 +799,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 });
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
 
-                CommonConfig.MessengerHub.PublishAsync(new DraftSentMessage(this, previousDocumentPreview.Id));
+                if (previousDocumentPreview != null)
+                    CommonConfig.MessengerHub.PublishAsync(new DraftSentMessage(this, previousDocumentPreview.Id));
 
                 dismissAction();
 
