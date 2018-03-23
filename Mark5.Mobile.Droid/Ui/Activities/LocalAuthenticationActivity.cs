@@ -14,7 +14,7 @@ using Mark5.Mobile.Droid.Utilities.Fingerprint;
 namespace Mark5.Mobile.Droid
 {
     [Activity]
-    public class LocalAuthorizationActivity : BaseAppCompatActivity
+    public class LocalAuthenticationActivity : BaseAppCompatActivity
     {
         const string StateKey = "eb749a0d-0547-4643-bbd8-28306d9a816e";
 
@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid
 
         public static Intent CreateIntent(Context context)
         {
-            return new Intent(context, typeof(LocalAuthorizationActivity));
+            return new Intent(context, typeof(LocalAuthenticationActivity));
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -52,11 +52,11 @@ namespace Mark5.Mobile.Droid
                 cryptoObjectUtility = new CryptoObjectUtility();
                 authorizationCallback = new AuthorizationCallback(this);
 
-                CommonConfig.Logger.Info($"Created {nameof(LocalAuthorizationActivity)}");
+                CommonConfig.Logger.Info($"Created {nameof(LocalAuthenticationActivity)}");
             }
             else
             {
-                CommonConfig.Logger.Info($"Restored {nameof(LocalAuthorizationActivity)}");
+                CommonConfig.Logger.Info($"Restored {nameof(LocalAuthenticationActivity)}");
             }
         }
 

@@ -63,7 +63,7 @@
     <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
-    <AndroidSigningKeyAlias>default -tsa http://timestamp.comodoca.com/</AndroidSigningKeyAlias>
+    <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
   </PropertyGroup>
   <ItemGroup>
@@ -439,7 +439,7 @@
     <Compile Include="Utilities\HtmlUtilities.cs" />
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
     <Compile Include="Utilities\SystemSettingsJobService.cs" />
-    <Compile Include="Ui\Activities\LocalAuthorizationActivity.cs" />
+    <Compile Include="Ui\Activities\LocalAuthenticationActivity.cs" />
     <Compile Include="Utilities\Fingerprint\authorizationCallback.cs" />
     <Compile Include="Utilities\Fingerprint\CryptoObjectGenerator.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />

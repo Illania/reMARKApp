@@ -14,16 +14,16 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 
         }
 
-        readonly LocalAuthorizationActivity activity;
+        readonly LocalAuthenticationActivity activity;
         int failureCounter;
 
-        public AuthorizationCallback(LocalAuthorizationActivity activity)
+        public AuthorizationCallback(LocalAuthenticationActivity activity)
         {
             this.activity = activity;
             failureCounter = 0;
         }
 
-        public AuthorizationCallback(LocalAuthorizationActivity activity, int failureCounter)
+        public AuthorizationCallback(LocalAuthenticationActivity activity, int failureCounter)
         {
             this.activity = activity;
             this.failureCounter = failureCounter;

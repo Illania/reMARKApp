@@ -119,7 +119,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void RefreshData()
         {
-            var availableLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            var availableLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Union(ServerConfig.SystemSettings.DocumentsModuleInfo.IncomingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid))
+                                             .OrderBy(l => l.Name).ToList();
             adapter.SetSelectedLinesGuid(selectedLinesGuid);
             adapter.SetItems(availableLines);
         }

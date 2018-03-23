@@ -193,7 +193,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                         CommonConfig.Logger.Error("Could not retrieve system settings!", ex);
 
-                        await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                        Activity.RunOnUiThread(async () =>
+                        {
+                            await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                        });
                     }
                 });
 
