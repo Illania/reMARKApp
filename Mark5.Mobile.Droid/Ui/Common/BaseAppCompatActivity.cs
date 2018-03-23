@@ -14,7 +14,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 {
     public abstract class BaseAppCompatActivity : AppCompatActivity
     {
-        FingerprintManagerCompat fingerprintManager;
         FloatingActionButton fab;
 
         public FloatingActionButton Fab
@@ -48,11 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             base.OnResume();
 
-            fingerprintManager = FingerprintManagerCompat.From(ApplicationContext);
-
-            //if(fingerprintManager.IsHardwareDetected) //And app has been reopened
-                //StartActivity(FingerprintActivity.CreateIntent(ApplicationContext));
-            
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             if (connectionBar != null)
             {
