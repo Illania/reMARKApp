@@ -109,7 +109,8 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         UIVisualEffectView _hudView;
         UIVisualEffectView _hudVibrancyView;
         UILabel _statusLabel;
-        UIButton _uiButton;
+        UIView _lineView;
+        UIButton _cancelButton;
         UIImageView _imageView;
         UIView _indefiniteAnimatedView;
         ProgressAnimatedView _ringView;
@@ -376,20 +377,37 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         {
             get
             {
-                if (_uiButton == null)
+                if (_cancelButton == null)
                 {
-                    _uiButton = new UIButton();
-                    _uiButton.BackgroundColor = UIColor.Clear;
-                    _uiButton.SetTitle("Cancel", UIControlState.Normal);
+                    _cancelButton = new UIButton();
+                    _cancelButton.BackgroundColor = UIColor.Clear;
+                    _cancelButton.SetTitle("Cancel", UIControlState.Normal);
                 }
 
-                if (_uiButton.Superview == null)
-                    HudVibrancyView.ContentView.AddSubview(_uiButton);
+                if (_cancelButton.Superview == null)
+                    HudVibrancyView.ContentView.AddSubview(_cancelButton);
                 
-                _uiButton.Font = Font;
+                _cancelButton.Font = UIFont.BoldSystemFontOfSize(Font.PointSize);
 
-                return _uiButton;
+                return _cancelButton;
             }
+        }
+
+        UIView LineView
+        {
+            get
+            {
+                if(_lineView == null)
+                {
+                    _lineView = new UIView();
+                    _lineView.BackgroundColor = UIColor.Black;
+                }
+
+                if (_lineView.Superview == null)
+                    HudVibrancyView.ContentView.AddSubview(_lineView);
+
+                return _lineView;
+            }    
         }
 
         #endregion
@@ -787,6 +805,13 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             StatusLabel.Frame = labelRect;
             StatusLabel.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
             StatusLabel.Hidden = string.IsNullOrWhiteSpace(StatusLabel.Text);
+
+            var lineViewRect = HudView.Bounds;
+            lineViewRect.Height = 1f;
+
+            LineView.Frame = lineViewRect;
+            LineView.Center = new CGPoint(HudView.Bounds.GetMidX(), buttonCenterY - (cancelButtonHeight + CancelButtonSpacing)/2.0);
+            LineView.Hidden = !shouldShowCancelButton;
 
             CancelButton.Frame = cancelButtonRect;
             CancelButton.Center = new CGPoint(HudView.Bounds.GetMidX(), buttonCenterY);
