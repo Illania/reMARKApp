@@ -1,146 +1,140 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <resources>
-	<bool name="pref_documents_use_server_timezone_default">false</bool>
-	<bool name="pref_documents_show_creator_outgoing_default">false</bool>
-	<string-array name="pref_documents_to_load_entries">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string-array name="pref_documents_to_load_entryvalues">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string name="pref_documents_to_load_default">250</string>
-	<string-array name="pref_documents_mark_as_read_entries">
-		<item>Never</item>
-		<item>Immediately</item>
-		<item>1 second</item>
-		<item>2 seconds</item>
-		<item>3 seconds</item>
-	</string-array>
-	<string-array name="pref_documents_mark_as_read_entryvalues">
-		<item>-1</item>
-		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-		<item>3</item>
-	</string-array>
-	<bool name="pref_documents_read_indicator_me_default">true</bool>
-	<bool name="pref_documents_compact_list_default">false</bool>
-	<string name="pref_documents_mark_as_read_default">0</string>
-	<bool name="pref_documents_large_attachment_warn_default">true</bool>
-	<bool name="pref_documents_sub_priority_default">true</bool>
-	<bool name="pref_documents_sub_reference_number_default">true</bool>
-	<bool name="pref_documents_sub_read_by_default">true</bool>
-	<bool name="pref_documents_sub_creator_default">true</bool>
-	<bool name="pref_documents_sub_originator_default">true</bool>
-	<bool name="pref_documents_download_as_plaintext_default">false</bool>
-	<bool name="pref_contacts_sub_comm_fax_default">true</bool>
-	<bool name="pref_contacts_sub_comm_telex_default">true</bool>
-	<bool name="pref_contacts_sub_comm_im_default">true</bool>
-	<bool name="pref_contacts_sub_comm_internal_default">true</bool>
-	<bool name="pref_contacts_sub_comm_other_default">true</bool>
-	<bool name="pref_contacts_sub_address_default">true</bool>
-	<bool name="pref_contacts_sub_birthdate_default">true</bool>
-	<bool name="pref_contacts_sub_account_default">true</bool>
-	<bool name="pref_contacts_sub_vat_default">true</bool>
-	<bool name="pref_compose_priority_enabled_default">false</bool>
-	<bool name="pref_compose_remove_line_default">false</bool>
-	<string-array name="pref_compose_template_mode_entries">
-		<item>Don\'t use</item>
-		<item>Use default</item>
-		<item>Use local</item>
-		<item>Always ask</item>
-	</string-array>
-	<string-array name="pref_compose_template_mode_entryvalues">
-		<item>0</item>
-		<item>1</item>
-		<item>2</item>
-		<item>3</item>
-	</string-array>
-	<string name="pref_compose_template_mode_default">1</string>
-	<string name="pref_compose_template_local_default">Sent from MARK5 for Android</string>
-	<bool name="pref_notification_hide_read_default">false</bool>
-	<bool name="pref_always_use_default_line_default">false</bool>
-	<bool name="pref_notification_silence_default">false</bool>
-	<string name="pref_notification_ringtone_default">content://settings/system/notification_sound</string>
-	<bool name="pref_notification_vibrate_default">true</bool>
-	<string-array name="pref_cache_auto_clean_entries">
-		<item>3 days</item>
-		<item>7 days</item>
-		<item>14 days</item>
-	</string-array>
-	<string-array name="pref_cache_auto_clean_entryvalues">
-		<item>3</item>
-		<item>7</item>
-		<item>14</item>
-	</string-array>
-	<string name="pref_cache_auto_clean_default">7</string>
-	<bool name="pref_cache_clear_default">false</bool>
-	<bool name="pref_advanced_enable_reporting_default">true</bool>
-	<string-array name="pref_search_documents_to_get_entries">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string-array name="pref_search_documents_to_get_entryvalues">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string name="pref_search_documents_to_get_default">100</string>
-	<string-array name="pref_search_contacts_to_get_entries">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string-array name="pref_search_contacts_to_get_entryvalues">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string name="pref_search_contacts_to_get_default">100</string>
-	<string-array name="pref_search_shortcodes_to_get_entries">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string-array name="pref_search_shortcodes_to_get_entryvalues">
-		<item>100</item>
-		<item>250</item>
-		<item>500</item>
-		<item>1000</item>
-	</string-array>
-	<string name="pref_search_shortcodes_to_get_default">100</string>
-	<bool name="pref_search_partial_word_default">false</bool>
-    <string-array name="pref_fingerprint_auth_entries">
+    <bool name="pref_documents_use_server_timezone_default">false</bool>
+    <bool name="pref_documents_show_creator_outgoing_default">false</bool>
+    <string-array name="pref_documents_to_load_entries">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string-array name="pref_documents_to_load_entryvalues">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string name="pref_documents_to_load_default">250</string>
+    <string-array name="pref_documents_mark_as_read_entries">
+        <item>Never</item>
+        <item>Immediately</item>
+        <item>1 second</item>
+        <item>2 seconds</item>
+        <item>3 seconds</item>
+    </string-array>
+    <string-array name="pref_documents_mark_as_read_entryvalues">
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <bool name="pref_documents_read_indicator_me_default">true</bool>
+    <bool name="pref_documents_compact_list_default">false</bool>
+    <string name="pref_documents_mark_as_read_default">0</string>
+    <bool name="pref_documents_large_attachment_warn_default">true</bool>
+    <bool name="pref_documents_sub_priority_default">true</bool>
+    <bool name="pref_documents_sub_reference_number_default">true</bool>
+    <bool name="pref_documents_sub_read_by_default">true</bool>
+    <bool name="pref_documents_sub_creator_default">true</bool>
+    <bool name="pref_documents_sub_originator_default">true</bool>
+    <bool name="pref_documents_download_as_plaintext_default">false</bool>
+    <bool name="pref_contacts_sub_comm_fax_default">true</bool>
+    <bool name="pref_contacts_sub_comm_telex_default">true</bool>
+    <bool name="pref_contacts_sub_comm_im_default">true</bool>
+    <bool name="pref_contacts_sub_comm_internal_default">true</bool>
+    <bool name="pref_contacts_sub_comm_other_default">true</bool>
+    <bool name="pref_contacts_sub_address_default">true</bool>
+    <bool name="pref_contacts_sub_birthdate_default">true</bool>
+    <bool name="pref_contacts_sub_account_default">true</bool>
+    <bool name="pref_contacts_sub_vat_default">true</bool>
+    <bool name="pref_compose_priority_enabled_default">false</bool>
+    <bool name="pref_compose_remove_line_default">false</bool>
+    <string-array name="pref_compose_template_mode_entries">
+        <item>Don\'t use</item>
+        <item>Use default</item>
+        <item>Use local</item>
+        <item>Always ask</item>
+    </string-array>
+    <string-array name="pref_compose_template_mode_entryvalues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string name="pref_compose_template_mode_default">1</string>
+    <string name="pref_compose_template_local_default">Sent from MARK5 for Android</string>
+    <bool name="pref_notification_hide_read_default">false</bool>
+    <bool name="pref_always_use_default_line_default">false</bool>
+    <bool name="pref_notification_silence_default">false</bool>
+    <string name="pref_notification_ringtone_default">content://settings/system/notification_sound</string>
+    <bool name="pref_notification_vibrate_default">true</bool>
+    <string-array name="pref_cache_auto_clean_entries">
+        <item>3 days</item>
+        <item>7 days</item>
+        <item>14 days</item>
+    </string-array>
+    <string-array name="pref_cache_auto_clean_entryvalues">
+        <item>3</item>
+        <item>7</item>
+        <item>14</item>
+    </string-array>
+    <string name="pref_cache_auto_clean_default">7</string>
+    <bool name="pref_cache_clear_default">false</bool>
+    <bool name="pref_advanced_enable_reporting_default">true</bool>
+    <string-array name="pref_search_documents_to_get_entries">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string-array name="pref_search_documents_to_get_entryvalues">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string name="pref_search_documents_to_get_default">100</string>
+    <string-array name="pref_search_contacts_to_get_entries">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string-array name="pref_search_contacts_to_get_entryvalues">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string name="pref_search_contacts_to_get_default">100</string>
+    <string-array name="pref_search_shortcodes_to_get_entries">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string-array name="pref_search_shortcodes_to_get_entryvalues">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string name="pref_search_shortcodes_to_get_default">100</string>
+    <bool name="pref_search_partial_word_default">false</bool>
+    <string-array name="pref_auth_entries">
         <item>Disabled</item>
         <item>Everytime the app is opened</item>
         <item>5 minutes</item>
         <item>10 minutes</item>
-        <item>15 minutes</item>
-        <item>20 minutes</item>
-        <item>25 minutes</item>
         <item>30 minutes</item>
     </string-array>
-    <string-array name="pref_fingerprint_auth_entryvalues">
+    <string-array name="pref_auth_entryvalues">
         <item>-1</item>
         <item>0</item>
         <item>5</item>
         <item>10</item>
-        <item>15</item>
-        <item>20</item>
-        <item>25</item>
         <item>30</item>
     </string-array>
-    <string name="pref_fingerprint_auth_default">-1</string>
+    <string name="pref_auth_default">-1</string>
 </resources>

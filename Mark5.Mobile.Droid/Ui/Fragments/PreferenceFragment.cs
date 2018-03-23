@@ -107,15 +107,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         sslPreference.SummaryFormatted = summary;
                         break;
                 }
-
-            //TODO: When opening the settings, and animation can be seen where the 'Security' category is removed. Could this be avoided?
-            //FindPreference(GetString(Resource.String.pref_key_cat_security)).Visible = false;
-            var fingerprintManager = FingerprintManagerCompat.From(Context);
-
-            if (!fingerprintManager.IsHardwareDetected)
-            {
-                PreferenceScreen.RemovePreference(FindPreference(GetString(Resource.String.pref_key_cat_security)));
-            }
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)
@@ -144,13 +135,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            if (preference.Key == GetString(Resource.String.pref_key_fingerprint_auth))
+            if (preference.Key == GetString(Resource.String.pref_key_auth))
             {
                 Android.App.KeyguardManager keyguardManager = (Android.App.KeyguardManager)Activity.GetSystemService(Context.KeyguardService);
                 FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.From(Context);
 
-                if(!keyguardManager.IsKeyguardSecure || !fingerprintManager.HasEnrolledFingerprints)
-                    Dialogs.ShowConfirmDialog(Context,Resource.String.fingerprint_not_enrolled_title,Resource.String.fingerprint_not_enrolled_content);
+                if (!keyguardManager.IsKeyguardSecure || !fingerprintManager.HasEnrolledFingerprints)
+                    Dialogs.ShowConfirmDialog(Context, Resource.String.auth_not_enrolled_title, Resource.String.auth_not_enrolled_content);
             }
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_create_system_report))
@@ -267,16 +258,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ft.AddToBackStack(pref.Key);
             ft.Commit();
             return true;
-        }
-
-        public void DetermineFingerprintPreferenceVisibility(Context context)
-        {
-            var fingerprintManager = FingerprintManagerCompat.From(context);
-
-            if (!fingerprintManager.IsHardwareDetected)
-            {
-                PreferenceScreen.RemovePreference(FindPreference(GetString(Resource.String.pref_key_cat_security)));
-            }
         }
 
         static class RequestCodes

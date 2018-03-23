@@ -87,9 +87,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Security
 
-        public int FingerPrintAuthInterval => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_fingerprint_auth), Application.Context.Resources.GetString(Resource.String.pref_fingerprint_auth_default)));
+        public int FingerPrintAuthInterval => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_auth), Application.Context.Resources.GetString(Resource.String.pref_auth_default)));
 
-        public bool FingerPrintAuthEnabled => FingerPrintAuthInterval > int.Parse(Application.Context.Resources.GetString(Resource.String.pref_fingerprint_auth_default));
+        public bool FingerPrintAuthEnabled => FingerPrintAuthInterval > int.Parse(Application.Context.Resources.GetString(Resource.String.pref_auth_default));
 
         #endregion
 
