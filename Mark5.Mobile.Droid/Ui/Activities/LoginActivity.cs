@@ -23,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class LoginActivity : BaseAppCompatActivity
     {
+        CancellationTokenSource cts;
+
         TextInputEditText usernameEditText;
         TextInputEditText passwordEditText;
         TextInputEditText hostnameEditText;
@@ -202,10 +204,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         break;
                 }
 
-
                 CommonConfig.Logger.Info("Authenticating...");
 
                 var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
+
+                if (cts.IsCancellationRequested)
+                {
+                    CommonConfig.Logger.Info($"Authentication was cancelled...");
+                    return;
+                }
 
                 CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
 
@@ -246,6 +253,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             catch (Exception ex)
             {
+                if (cts != null && cts.IsCancellationRequested)
+                    return;
+
                 dismissAction();
 
                 CommonConfig.Logger.Error("Log in failed - main exception", ex);
