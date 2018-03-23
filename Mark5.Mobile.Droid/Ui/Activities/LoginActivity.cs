@@ -192,7 +192,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts: new CancellationTokenSource());
+                cts = new CancellationTokenSource();
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
 
                 switch (sslMode)
                 {
@@ -208,7 +209,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
 
-                if (cts.IsCancellationRequested)
+                if (cts.IsCancellationRequested) 
                 {
                     CommonConfig.Logger.Info($"Authentication was cancelled...");
                     return;

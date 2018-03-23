@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -46,6 +47,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float LoginButtonHeight = 24f;
 
         #endregion
+
+        CancellationTokenSource cts;
+        Action dismissAction;
+        NSObject notificationToken;
 
         UIView logoContainer;
         UIImageView logoImageView;
@@ -523,8 +528,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"Attempting login...");
 
-            Action dismissAction = null;
-
             var hapticGenerator = new UINotificationFeedbackGenerator();
             hapticGenerator.Prepare();
 
@@ -608,7 +611,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 hostnameTextField.ResignFirstResponder();
                 portTextField.ResignFirstResponder();
 
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"));
+                cts = new CancellationTokenSource();
+                notificationToken = NSNotificationCenter.DefaultCenter.AddObserver((Foundation.NSString)SVProgressHUD.ProgressHUD.DidTouchDownInsideNotification, ProgressHUDDidTouchDownInsideNotification);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), true);
 
                 switch (sslMode)
                 {
@@ -623,6 +628,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info("Authenticating...");
 
                 var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
+
+                if (cts.IsCancellationRequested)
+                {
+                    CommonConfig.Logger.Info($"Authentication was cancelled...");
+                    return;
+                }
 
                 CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
 
@@ -675,6 +686,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
+                if(cts != null && cts.IsCancellationRequested)
+                    return;
+
                 dismissAction?.Invoke();
 
                 CommonConfig.Logger.Error("Log in failed - exception", ex);
@@ -700,6 +714,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (IsViewLoaded)
                 SlideViewOverKeyboard(e, true);
+        }
+
+        void ProgressHUDDidTouchDownInsideNotification (NSNotification notification)
+        {
+            dismissAction?.Invoke();
+            cts.Cancel();
+            loginButton.TouchUpInside += LoginButton_TouchUpInside;
         }
 
         #endregion

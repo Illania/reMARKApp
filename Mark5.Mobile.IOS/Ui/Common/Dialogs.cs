@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.Exceptions;
@@ -138,10 +139,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Non-awaitable dialogs
 
-        public static Action ShowInfiniteProgressDialog(string content)
+        public static Action ShowInfiniteProgressDialog(string content, bool shouldShowCancelButton = false)
         {
-            ProgressHUD.Instance.ShowProgress(Localization.GetString(content));
-            return ProgressHUD.Instance.Dismiss;
+            var progressHud = ProgressHUD.Instance;
+            progressHud.ShowProgress(Localization.GetString(content), shouldShowCancelButton);
+
+            return progressHud.Dismiss;
         }
 
         #endregion

@@ -28,6 +28,7 @@ namespace SVProgressHUD
         const float VerticalSpacing = 14f;
         const float HorizontalSpacing = 14f;
         const float LabelSpacing = 8f;
+        const float CancelButtonSpacing = 8f;
 
         #endregion
 
@@ -108,6 +109,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         UIVisualEffectView _hudView;
         UIVisualEffectView _hudVibrancyView;
         UILabel _statusLabel;
+        UIButton _uiButton;
         UIImageView _imageView;
         UIView _indefiniteAnimatedView;
         ProgressAnimatedView _ringView;
@@ -303,7 +305,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     var iav = (IndefiniteAnimatedView) _indefiniteAnimatedView;
                     iav.StrokeColor = GetForegroundColorForStyle();
                     iav.StrokeThickness = RingThickness;
-                    iav.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
+                    iav.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
                 }
                 else
                 {
@@ -350,7 +352,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 _backgroundRingView.StrokeColor = GetForegroundColorForStyle().ColorWithAlpha(0.1f);
                 _backgroundRingView.StrokeThickness = RingThickness;
-                _backgroundRingView.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
+                _backgroundRingView.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
 
                 return _backgroundRingView;
             }
@@ -367,6 +369,26 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     _hapticGenerator = new UINotificationFeedbackGenerator();
 
                 return _hapticGenerator;
+            }
+        }
+
+        UIButton CancelButton
+        {
+            get
+            {
+                if (_uiButton == null)
+                {
+                    _uiButton = new UIButton();
+                    _uiButton.BackgroundColor = UIColor.Clear;
+                    _uiButton.SetTitle("Cancel", UIControlState.Normal);
+                }
+
+                if (_uiButton.Superview == null)
+                    HudVibrancyView.ContentView.AddSubview(_uiButton);
+                
+                _uiButton.Font = Font;
+
+                return _uiButton;
             }
         }
 
@@ -387,7 +409,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
         #region Show methods
 
-        public void ShowProgress(string status = null, float progress = UndefinedProgress)
+        public void ShowProgress(string status = null, bool shouldShowCancelButton = false, float progress = UndefinedProgress)
         {
             UserInteractionEnabled = false;
 
@@ -439,7 +461,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     strongThis.activityCount++;
                 }
 
-                strongThis.ShowInternal();
+                strongThis.ShowInternal(shouldShowCancelButton);
 
                 strongThis.HapticGenerator?.Prepare();
             });
@@ -496,9 +518,9 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             });
         }
 
-        void ShowInternal()
+        void ShowInternal(bool shouldShowCancelButton = false)
         {
-            UpdateHudFrame();
+            UpdateHudFrame(shouldShowCancelButton);
             PositionHud(null);
 
             ControlView.UserInteractionEnabled = DefaultMaskType != MaskType.None;
@@ -655,7 +677,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 ControlView.AddSubview(this);
         }
 
-        void UpdateHudFrame()
+        void UpdateHudFrame(bool shouldShowCancelButton = false)
         {
             var imageUsed = ImageView.Image != null && !ImageView.Hidden;
             var progressUsed = ImageView.Hidden;
@@ -678,6 +700,25 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 labelWidth = (float) Math.Ceiling(labelRect.Width);
             }
 
+            var cancelButtonRect = CGRect.Empty;
+            var cancelButtonHeight = 0f;
+            var cancelButtonWidth = 0f;
+
+            if(shouldShowCancelButton)
+            {
+                var constraintSize = new CGSize(200f, 300f);
+                cancelButtonRect = new NSString(CancelButton.Title(UIControlState.Normal)).GetBoundingRect(constraintSize,
+                    NSStringDrawingOptions.UsesFontLeading | NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin,
+                    new UIStringAttributes
+                    {
+                        Font = CancelButton.Font
+                    },
+                    null);
+
+                cancelButtonHeight = (float)Math.Ceiling(cancelButtonRect.Height);
+                cancelButtonWidth = (float)Math.Ceiling(cancelButtonRect.Width);
+            }
+
             var hudHeight = 0f;
             var hudWidth = 0f;
 
@@ -690,8 +731,8 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 contentWidth = (float) (imageUsed ? ImageView.Frame.Width : IndefiniteAnimatedView.Frame.Width);
             }
 
-            hudWidth = HorizontalSpacing + Math.Max(labelWidth, contentWidth) + HorizontalSpacing;
-            hudHeight = VerticalSpacing + labelHeight + contentHeight + VerticalSpacing;
+            hudWidth = HorizontalSpacing + Math.Max(cancelButtonWidth,Math.Max(labelWidth, contentWidth)) + HorizontalSpacing;
+            hudHeight = VerticalSpacing + labelHeight + cancelButtonHeight + contentHeight + VerticalSpacing;
 
             if (!string.IsNullOrWhiteSpace(StatusLabel.Text) && (imageUsed || progressUsed))
                 hudHeight += LabelSpacing;
@@ -704,9 +745,20 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             CATransaction.DisableActions = true;
 
             float centerY;
-            if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
+
+            if(!string.IsNullOrWhiteSpace(StatusLabel.Text) && shouldShowCancelButton)
+            {
+                var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - (LabelSpacing + CancelButtonSpacing) - (labelHeight + cancelButtonHeight)) / 2f);
+                centerY = yOffset + contentHeight / 2f;
+            }
+            else if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
             {
                 var yOffset = (float) Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - LabelSpacing - labelHeight) / 2f);
+                centerY = yOffset + contentHeight / 2f;
+            }
+            else if(shouldShowCancelButton)
+            {
+                var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - CancelButtonSpacing - cancelButtonHeight) / 2f);
                 centerY = yOffset + contentHeight / 2f;
             }
             else
@@ -719,14 +771,26 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 BackgroundRingView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
             ImageView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
 
+            float buttonCenterY;
+
             if (imageUsed || progressUsed)
+            {
                 centerY = (float) ((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY() + LabelSpacing + labelHeight / 2f);
+                buttonCenterY = centerY + CancelButtonSpacing + cancelButtonHeight;
+            }
             else
+            {
                 centerY = (float) HudView.Bounds.GetMidY();
+                buttonCenterY = centerY;
+            }
 
             StatusLabel.Frame = labelRect;
             StatusLabel.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
             StatusLabel.Hidden = string.IsNullOrWhiteSpace(StatusLabel.Text);
+
+            CancelButton.Frame = cancelButtonRect;
+            CancelButton.Center = new CGPoint(HudView.Bounds.GetMidX(), buttonCenterY);
+            CancelButton.Hidden = !shouldShowCancelButton;
 
             CATransaction.Commit();
         }
