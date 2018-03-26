@@ -441,7 +441,6 @@
     <Compile Include="Utilities\SystemSettingsJobService.cs" />
     <Compile Include="Ui\Activities\LocalAuthenticationActivity.cs" />
     <Compile Include="Utilities\Fingerprint\authorizationCallback.cs" />
-    <Compile Include="Utilities\Fingerprint\CryptoObjectGenerator.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
   </ItemGroup>
   <ItemGroup>

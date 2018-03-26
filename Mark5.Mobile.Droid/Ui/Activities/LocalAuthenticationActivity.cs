@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
@@ -23,7 +24,6 @@ namespace Mark5.Mobile.Droid
         AppCompatTextView instructions;
 
         Android.Support.V4.OS.CancellationSignal cancellationSignal;
-        CryptoObjectUtility cryptoObjectUtility;
         AuthorizationCallback authorizationCallback;
         FingerprintManagerCompat fingerprintManager;
 
@@ -49,7 +49,6 @@ namespace Mark5.Mobile.Droid
             if (savedInstanceState == null)
             {
                 fingerprintManager = FingerprintManagerCompat.From(this);
-                cryptoObjectUtility = new CryptoObjectUtility();
                 authorizationCallback = new AuthorizationCallback(this);
 
                 CommonConfig.Logger.Info($"Created {nameof(LocalAuthenticationActivity)}");
@@ -66,9 +65,9 @@ namespace Mark5.Mobile.Droid
             cancellationSignal = new Android.Support.V4.OS.CancellationSignal();
             try
             {
-                fingerprintManager.Authenticate(cryptoObjectUtility.BuildCryptoObject(), 0, cancellationSignal, authorizationCallback, null);
+                fingerprintManager.Authenticate(null, 0, cancellationSignal, authorizationCallback, null); //TODO the first object could be null, and this could simplify stuff
             }
-            catch (CipherException e) //Fingerprint auth can't start, so show pincode.
+            catch (Exception e) //Fingerprint auth can't start, so show pincode.
             {
                 CommonConfig.Logger.Error(e);
                 Toast.MakeText(this, Resource.String.fingerprint_authentication_failure, ToastLength.Long);
@@ -101,8 +100,6 @@ namespace Mark5.Mobile.Droid
 
             if (savedInstanceState?.ContainsKey(StateKey) == true)
             {
-                cryptoObjectUtility = new CryptoObjectUtility();
-
                 state = Serializer.Deserialize<FingerprintActivityState>(savedInstanceState.GetString(StateKey));
                 authorizationCallback = new AuthorizationCallback(this, state.FailureCounter);
 
