@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if (!(activity is BaseAppCompatActivity))
+            if (!(activity is Android.Support.V7.App.AppCompatActivity))
                 return;
 
             var f = new Ui.Fragments.FingerprintDialogFragment();
@@ -72,12 +72,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStopped(Activity activity)
         {
-            activitiesStarted--;
-            if (!ApplicationVisible)
-            {
-                if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
-                    stopWatch.Start();
-            }
+            //activitiesStarted--;
+            //if (!ApplicationVisible)
+            //{
+            //    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+            //        stopWatch.Start();
+            //}
         }
 
         #region Unused callbacks
