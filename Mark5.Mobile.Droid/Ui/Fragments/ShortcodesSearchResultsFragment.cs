@@ -120,8 +120,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            //if (adapter?.Items != null || savedResults != null) // Cannot be used because the size of the results could be too big
-                //outState.PutString(ShortcodePreviewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
+            if (adapter?.Items != null || savedResults != null)
+                outState.PutString(ShortcodePreviewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
         }
 
         #endregion
