@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid
         AppCompatTextView instructions;
 
         Android.Support.V4.OS.CancellationSignal cancellationSignal;
-        AuthorizationCallback authorizationCallback;
+        FingerprintUiHelper authorizationCallback;
         FingerprintManagerCompat fingerprintManager;
 
         FingerprintActivityState state;
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid
             if (savedInstanceState == null)
             {
                 fingerprintManager = FingerprintManagerCompat.From(this);
-                authorizationCallback = new AuthorizationCallback(this);
+                //authorizationCallback = new FingerprintUiHelper(this);
 
                 CommonConfig.Logger.Info($"Created {nameof(LocalAuthenticationActivity)}");
             }
@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid
             base.OnSaveInstanceState(outState);
             state = new FingerprintActivityState
             {
-                FailureCounter = authorizationCallback.FailureCounter,
+                //FailureCounter = authorizationCallback.FailureCounter,
                 ButtonVisibility = pinButton.Visibility
             };
 
@@ -101,7 +101,7 @@ namespace Mark5.Mobile.Droid
             if (savedInstanceState?.ContainsKey(StateKey) == true)
             {
                 state = Serializer.Deserialize<FingerprintActivityState>(savedInstanceState.GetString(StateKey));
-                authorizationCallback = new AuthorizationCallback(this, state.FailureCounter);
+                //authorizationCallback = new FingerprintUiHelper(this, state.FailureCounter);
 
                 fingerprintManager = FingerprintManagerCompat.From(this);
 

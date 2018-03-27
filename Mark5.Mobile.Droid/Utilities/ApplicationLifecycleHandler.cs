@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Android.Content.Res;
 using Android.Content;
 using Android.Support.V4.Hardware.Fingerprint;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -28,38 +29,45 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if (activity.Resources.Configuration.Orientation != currentOrientation)
-            {
-                currentOrientation = activity.Resources.Configuration.Orientation;
-                activitiesStarted++;
-            }
-            else
-            {
-                if (!ApplicationVisible)
-                {
-                    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
-                    {
-                        stopWatch.Stop();
+            if (!(activity is BaseAppCompatActivity))
+                return;
 
-                        if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(LocalAuthenticationActivity))
-                            && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval)
-                        {
-                            var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
-                            var fingerprintManager = FingerprintManagerCompat.From(activity);
-                            if (fingerprintManager.HasEnrolledFingerprints && keyguardManager.IsKeyguardSecure)
-                            {
-                                activity.StartActivity(LocalAuthenticationActivity.CreateIntent(activity));
-                            }
-                        }
-                        else
-                        {
-                            RedirectedToPincodeActivity = false;
-                        }
-                        stopWatch.Reset();
-                    }
-                }
-                activitiesStarted++;
-            }
+            var f = new Ui.Fragments.FingerprintDialogFragment();
+            f.Show(activity.FragmentManager, "test_tag");
+
+            //if (activity.Resources.Configuration.Orientation != currentOrientation)
+            //{
+            //    currentOrientation = activity.Resources.Configuration.Orientation;
+            //    activitiesStarted++;
+            //}
+            //else
+            //{
+            //    if (!ApplicationVisible)
+            //    {
+            //        if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+            //        {
+            //            stopWatch.Stop();
+
+            //            if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(LocalAuthenticationActivity))
+            //                && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval)
+            //            {
+            //                var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
+            //                var fingerprintManager = FingerprintManagerCompat.From(activity);
+            //                if (fingerprintManager.HasEnrolledFingerprints && keyguardManager.IsKeyguardSecure)
+            //                {
+            //                    var f = new Ui.Fragments.FingerprintDialogFragment();
+            //                    f.Show(activity.FragmentManager, "test_tag");
+            //                }
+            //            }
+            //            else
+            //            {
+            //                RedirectedToPincodeActivity = false;
+            //            }
+            //            stopWatch.Reset();
+            //        }
+            //    }
+            //    activitiesStarted++;
+            //}
         }
 
         public void OnActivityStopped(Activity activity)
