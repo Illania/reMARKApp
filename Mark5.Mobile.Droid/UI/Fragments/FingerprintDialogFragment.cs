@@ -26,9 +26,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var view = inflater.Inflate(Resource.Layout.fingerprint_dialog_container, container, false);
             var icon = view.FindViewById<AppCompatImageView>(Resource.Id.fingerprint_icon);
             var status = view.FindViewById<AppCompatTextView>(Resource.Id.fingerprint_status);
-            var pin = view.FindViewById<AppCompatButton>(Resource.Id.pin_button);
-
-            pin.SetText(Resource.String.fingerprint_use_pin);
 
             var fingerprintManager = FingerprintManagerCompat.From(Context);
             fingerprintUiHelper = new FingerprintUiHelper(fingerprintManager, icon, status, this);
