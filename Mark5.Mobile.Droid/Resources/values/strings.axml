@@ -178,6 +178,9 @@
     <string name="fingerprint_authentication_failure">Fingerprint authentication failed, please use pin code</string>
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
     <string name="fingerprint_hint">Touch sensor</string>
+    <string name="fingerprint_dialog_title">Authenticate</string>
+    <string name="fingerprint_not_recognized">Fingerprint not recognized. Try again</string>
+    <string name="fingerprint_use_pin">Pin</string>
     <string name="filter">Filter...</string>
     <string name="folder_favorites">Favorites</string>
     <string name="folder_local">Local folders</string>
