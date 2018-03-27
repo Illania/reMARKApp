@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using Android.Support.V4.Hardware.Fingerprint;
 using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
