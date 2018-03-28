@@ -612,7 +612,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 portTextField.ResignFirstResponder();
 
                 cts = new CancellationTokenSource();
-                notificationToken = NSNotificationCenter.DefaultCenter.AddObserver((Foundation.NSString)SVProgressHUD.ProgressHUD.DidTouchDownInsideNotification, ProgressHUDDidTouchDownInsideNotification);
+                notificationToken = NSNotificationCenter.DefaultCenter.AddObserver((NSString) SVProgressHUD.ProgressHUD.DidTouchDownInsideNotification, ProgressHUDDidTouchDownInsideNotification);
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), true);
 
                 switch (sslMode)
