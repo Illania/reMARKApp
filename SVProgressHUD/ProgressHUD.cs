@@ -306,7 +306,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     var iav = (IndefiniteAnimatedView) _indefiniteAnimatedView;
                     iav.StrokeColor = GetForegroundColorForStyle();
                     iav.StrokeThickness = RingThickness;
-                    iav.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) && CancelButton == null) ? RingRadius : RingNoTextRadius;
+                    iav.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
                 }
                 else
                 {
@@ -338,7 +338,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 _ringView.StrokeColor = GetForegroundColorForStyle();
                 _ringView.StrokeThickness = RingThickness;
-                _ringView.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) && CancelButton == null) ? RingRadius : RingNoTextRadius;
+                _ringView.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
 
                 return _ringView;
             }
