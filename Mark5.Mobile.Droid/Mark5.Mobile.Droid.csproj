@@ -444,7 +444,7 @@
     <Compile Include="Utilities\SystemSettingsJobService.cs" />
     <Compile Include="Utilities\Fingerprint\FingerprintUiHelper.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
-    <Compile Include="Ui\Fragments\FingerprintDialogFragment.cs" />
+    <Compile Include="Ui\Fragments\AuthenticationDialogFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -2,14 +2,15 @@
 using Android.OS;
 using System.Diagnostics;
 using Android.Content.Res;
-using Android.Content;
-using Android.Support.V4.Hardware.Fingerprint;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
     public class ApplicationLifecycleHandler : Java.Lang.Object, Application.IActivityLifecycleCallbacks
     {
+        const string AuthenticationFragmentTag = "authenticationFragmentTag";
+
         int activitiesStarted;
         Orientation currentOrientation;
         Stopwatch stopWatch;
@@ -29,11 +30,16 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if (!(activity is Android.Support.V7.App.AppCompatActivity))
+            if (!(activity is BaseAppCompatActivity))
                 return;
 
-            var f = new Ui.Fragments.FingerprintDialogFragment();
-            f.Show(activity.FragmentManager, "test_tag");
+            if (activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
+            {
+                var authenticationFragment = new AuthenticationDialogFragment();
+                authenticationFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
+            }
+
+            //TODO if authenticating with PIN, this will be called again, and the fragment will not be there, because it has already been dismisssed
 
             //if (activity.Resources.Configuration.Orientation != currentOrientation)
             //{

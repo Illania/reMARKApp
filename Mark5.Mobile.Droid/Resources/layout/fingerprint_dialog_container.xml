@@ -26,7 +26,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:visibility="invisible" />
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/pin_button"
             style="?android:attr/buttonBarPositiveButtonStyle"
             android:layout_width="wrap_content"
