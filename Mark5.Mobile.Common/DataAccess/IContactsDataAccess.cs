@@ -9,6 +9,8 @@ namespace Mark5.Mobile.Common.DataAccess
     {
         Task SaveContactPreviewsAsync(Folder folder, List<ContactPreview> contactPreviews, bool clean);
 
+        Task SaveContactPreviewsAsync(List<ContactPreview> contactPreviews);
+
         Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId, int maxItems);
 
         Task SaveContactAsync(Contact contact);

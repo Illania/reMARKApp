@@ -210,6 +210,7 @@ namespace Mark5.Mobile.Common.Manager
                 });
 
                 var shortcodePreviews = result.ShortcodePreviews.WhereNotNull().OrderBy(sp => sp.RowId).Select(sp => sp.Convert()).ToList();
+
                 return shortcodePreviews;
             }
 
