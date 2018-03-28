@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nordic_it.mark5.android" android:versionName="2.5" android:versionCode="214">
     <uses-sdk android:minSdkVersion="22" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
