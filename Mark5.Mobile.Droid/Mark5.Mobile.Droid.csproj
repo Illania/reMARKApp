@@ -139,9 +139,6 @@
     <Reference Include="HockeySDK">
       <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\MonoAndroid403\HockeySDK.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.7.1\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
       <Private>False</Private>
@@ -202,6 +199,9 @@
     </Reference>
     <Reference Include="Xamarin.Android.Support.v14.Preference">
       <HintPath>..\packages\Xamarin.Android.Support.v14.Preference.27.0.2\lib\MonoAndroid81\Xamarin.Android.Support.v14.Preference.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
