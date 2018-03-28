@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.Exceptions;
@@ -141,10 +140,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static Action ShowInfiniteProgressDialog(string content, bool shouldShowCancelButton = false)
         {
-            var progressHud = ProgressHUD.Instance;
-            progressHud.ShowProgress(Localization.GetString(content), shouldShowCancelButton);
-
-            return progressHud.Dismiss;
+            ProgressHUD.Instance.ShowProgress(Localization.GetString(content), shouldShowCancelButton);
+            return ProgressHUD.Instance.Dismiss;
         }
 
         #endregion

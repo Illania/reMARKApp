@@ -306,7 +306,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     var iav = (IndefiniteAnimatedView) _indefiniteAnimatedView;
                     iav.StrokeColor = GetForegroundColorForStyle();
                     iav.StrokeThickness = RingThickness;
-                    iav.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
+                    iav.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) && CancelButton == null) ? RingRadius : RingNoTextRadius;
                 }
                 else
                 {
@@ -338,7 +338,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 _ringView.StrokeColor = GetForegroundColorForStyle();
                 _ringView.StrokeThickness = RingThickness;
-                _ringView.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
+                _ringView.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) && CancelButton == null) ? RingRadius : RingNoTextRadius;
 
                 return _ringView;
             }
@@ -752,7 +752,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             hudWidth = HorizontalSpacing + Math.Max(cancelButtonWidth,Math.Max(labelWidth, contentWidth)) + HorizontalSpacing;
             hudHeight = VerticalSpacing + labelHeight + cancelButtonHeight + contentHeight + VerticalSpacing;
 
-            if (!string.IsNullOrWhiteSpace(StatusLabel.Text) && (imageUsed || progressUsed))
+            if ((!string.IsNullOrWhiteSpace(StatusLabel.Text) || shouldShowCancelButton) && (imageUsed || progressUsed))
                 hudHeight += LabelSpacing;
 
             HudView.Bounds = new CGRect(0f, 0f, Math.Max(MinimumSize.Width, hudWidth), Math.Max(MinimumSize.Height, hudHeight));
@@ -764,7 +764,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
             float centerY;
 
-            if(!string.IsNullOrWhiteSpace(StatusLabel.Text) && shouldShowCancelButton)
+            if (!string.IsNullOrWhiteSpace(StatusLabel.Text) && shouldShowCancelButton)
             {
                 var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - (LabelSpacing + CancelButtonSpacing) - (labelHeight + cancelButtonHeight)) / 2f);
                 centerY = yOffset + contentHeight / 2f;
@@ -774,7 +774,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 var yOffset = (float) Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - LabelSpacing - labelHeight) / 2f);
                 centerY = yOffset + contentHeight / 2f;
             }
-            else if(shouldShowCancelButton)
+            else if (shouldShowCancelButton)
             {
                 var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - CancelButtonSpacing - cancelButtonHeight) / 2f);
                 centerY = yOffset + contentHeight / 2f;
@@ -789,12 +789,20 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 BackgroundRingView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
             ImageView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
 
-            float buttonCenterY;
+            float buttonCenterY = 0f;
 
             if (imageUsed || progressUsed)
             {
-                centerY = (float) ((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY() + LabelSpacing + labelHeight / 2f);
-                buttonCenterY = centerY + CancelButtonSpacing + cancelButtonHeight;
+                if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
+                {
+                    centerY = (float)((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY() + LabelSpacing + labelHeight / 2f);
+                    buttonCenterY = centerY + CancelButtonSpacing + cancelButtonHeight;
+                }
+                else
+                {
+                    centerY = (float)((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY());
+                    buttonCenterY = centerY + CancelButtonSpacing + cancelButtonHeight;
+                }
             }
             else
             {
