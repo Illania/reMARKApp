@@ -442,7 +442,6 @@
     <Compile Include="Utilities\HtmlUtilities.cs" />
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
     <Compile Include="Utilities\SystemSettingsJobService.cs" />
-    <Compile Include="Ui\Activities\LocalAuthenticationActivity.cs" />
     <Compile Include="Utilities\Fingerprint\FingerprintUiHelper.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
     <Compile Include="Ui\Fragments\FingerprintDialogFragment.cs" />
