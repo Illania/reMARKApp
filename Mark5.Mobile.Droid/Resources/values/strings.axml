@@ -384,6 +384,8 @@
 	<string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
 	<string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
 	<string name="subject">Subject</string>
+    <string name="subject_view_empty_title">No subject has been entered</string>
+    <string name="subject_view_empty_content">The subject line is empty. Do you still want to send?</string>
 	<string name="subscribe_folder">Subscribe</string>
 	<string name="subscribing_folders">Subscribing to folders...</string>
 	<string name="templates">Templates</string>
