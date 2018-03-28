@@ -132,6 +132,8 @@ namespace Mark5.Mobile.Common.Manager
 
                 var documentPreviews = result.SearchResults.WhereNotNull().OrderByDescending(dp => dp.DateReceived).Select(dp => dp.Convert()).ToList();
 
+                await documentsDataAccess.SaveDocumentPreviewsAsync(documentPreviews);
+
                 return documentPreviews;
             }
 
@@ -177,6 +179,8 @@ namespace Mark5.Mobile.Common.Manager
 
                 var contactPreviews = result.SearchResults.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
 
+                await contactsDataAccess.SaveContactPreviewsAsync(contactPreviews);
+
                 return contactPreviews;
             }
 
@@ -210,6 +214,8 @@ namespace Mark5.Mobile.Common.Manager
                 });
 
                 var shortcodePreviews = result.ShortcodePreviews.WhereNotNull().OrderBy(sp => sp.RowId).Select(sp => sp.Convert()).ToList();
+
+                await shortcodesDataAccess.SaveShortcodePreviewsAsync(shortcodePreviews);
 
                 return shortcodePreviews;
             }
