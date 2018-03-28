@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Common.Manager
             ContactsManager = new ContactsManager(connectionInfo, appServiceProxy, contactsDataAccess);
             ShortcodesManager = new ShortcodesManager(connectionInfo, appServiceProxy, shortcodesDataAccess);
             CalendarManager = new CalendarManager(connectionInfo, appServiceProxy, calendarDataAccess);
-            SearchManager = new SearchManager(connectionInfo, appServiceProxy);
+            SearchManager = new SearchManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             NotificationsManager = new NotificationsManager(connectionInfo, appServiceProxy, foldersDataAccess, notificationsDataAccess);
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
             CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
@@ -18,9 +19,19 @@ namespace Mark5.Mobile.Common.Manager
     {
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
-        public SearchManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy)
+        readonly IDocumentsDataAccess documentsDataAccess;
+        readonly IContactsDataAccess contactsDataAccess;
+        readonly IShortcodesDataAccess shortcodesDataAccess;
+
+        public SearchManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy,
+                             IDocumentsDataAccess documentsDataAccess,
+                             IContactsDataAccess contactsDataAccess,
+                             IShortcodesDataAccess shortcodesDataAccess)
             : base(connectionInfo, appServiceProxy)
         {
+            this.documentsDataAccess = documentsDataAccess;
+            this.contactsDataAccess = contactsDataAccess;
+            this.shortcodesDataAccess = shortcodesDataAccess;
         }
 
         public async Task<List<SavedSearch>> GetSavedSearches(SourceType sourceType = SourceType.Auto)
@@ -119,7 +130,9 @@ namespace Mark5.Mobile.Common.Manager
                     ExtraFields = criteria.ExtraFields
                 });
 
-                return result.SearchResults.WhereNotNull().OrderByDescending(dp => dp.DateReceived).Select(dp => dp.Convert()).ToList();
+                var documentPreviews = result.SearchResults.WhereNotNull().OrderByDescending(dp => dp.DateReceived).Select(dp => dp.Convert()).ToList();
+
+                return documentPreviews;
             }
 
             if (sourceType == SourceType.Local)
@@ -162,7 +175,9 @@ namespace Mark5.Mobile.Common.Manager
                     FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>()
                 });
 
-                return result.SearchResults.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
+                var contactPreviews = result.SearchResults.WhereNotNull().OrderBy(cp => cp.RowId).Select(cp => cp.Convert()).ToList();
+
+                return contactPreviews;
             }
 
             if (sourceType == SourceType.Local)
@@ -194,7 +209,8 @@ namespace Mark5.Mobile.Common.Manager
                     FiledInFolderFolderType = criteria.FiledInFolderFolderType.ConvertEnum<DataContract.FiledInFolderFolderType>()
                 });
 
-                return result.ShortcodePreviews.WhereNotNull().OrderBy(sp => sp.RowId).Select(sp => sp.Convert()).ToList();
+                var shortcodePreviews = result.ShortcodePreviews.WhereNotNull().OrderBy(sp => sp.RowId).Select(sp => sp.Convert()).ToList();
+                return shortcodePreviews;
             }
 
             if (sourceType == SourceType.Local)
