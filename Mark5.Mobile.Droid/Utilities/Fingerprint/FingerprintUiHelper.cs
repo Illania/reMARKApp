@@ -9,7 +9,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
     {
         public interface ICallback
         {
-            void OnAuthenticated();
+            void OnAuthenticatedWithFingerprint();
             void OnError();
         }
 
@@ -29,12 +29,8 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         const long errorTimeout = 1600;
         const long successDelay = 1300;
 
-        public bool IsFingerprintAuthAvailable => fingerprintManager.IsHardwareDetected
-                                         && fingerprintManager.HasEnrolledFingerprints;
-
-        public FingerprintUiHelper(FingerprintManagerCompat fingerprintManager, ImageView fingerprintIcon, TextView fingerprintStatus, ICallback callback = null)
+        public FingerprintUiHelper(ImageView fingerprintIcon, TextView fingerprintStatus, ICallback callback = null)
         {
-            this.fingerprintManager = fingerprintManager;
             this.fingerprintIcon = fingerprintIcon;
             this.fingerprintStatus = fingerprintStatus;
             this.callback = callback;
@@ -46,9 +42,6 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 
         public void StartListening()
         {
-            if (!IsFingerprintAuthAvailable)
-                return;
-
             cancellationSignal = new CancellationSignal();
             selfCancelled = false;
             fingerprintManager.Authenticate(null, 0, cancellationSignal, this, null);
@@ -74,7 +67,7 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
             fingerprintStatus.Text = fingerprintStatus.Resources.GetString(Resource.String.fingerprint_success);
             fingerprintIcon.PostDelayed(() =>
             {
-                callback?.OnAuthenticated();
+                callback?.OnAuthenticatedWithFingerprint();
             }, successDelay);
         }
 

@@ -33,13 +33,17 @@ namespace Mark5.Mobile.Droid.Utilities
             if (!(activity is BaseAppCompatActivity))
                 return;
 
-            if (activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
-            {
-                var authenticationFragment = new AuthenticationDialogFragment();
-                authenticationFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
-            }
 
-            //TODO if authenticating with PIN, this will be called again, and the fragment will not be there, because it has already been dismisssed
+            var authFragment = (AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag);
+            if (authFragment == null)
+            {
+                authFragment = new AuthenticationDialogFragment();
+                authFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
+            }
+            else
+            {
+                authFragment.DismissIfAuthenticated();
+            }
 
             //if (activity.Resources.Configuration.Orientation != currentOrientation)
             //{
