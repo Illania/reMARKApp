@@ -175,7 +175,6 @@
     <string name="failed_send_document_notification_title">Failed to send emails</string>
     <string name="fingerprint_success">Fingerprint recognised</string>
     <string name="fingerprint_try_again">Fingerprint not recognised. Try again</string>
-    <string name="fingerprint_authentication_failure">Fingerprint authentication failed, please use pin code</string>
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
     <string name="fingerprint_hint">Touch sensor</string>
     <string name="fingerprint_dialog_title">Authenticate</string>
@@ -286,6 +285,8 @@
     <string name="phonebook_contacts_no_access_content">You need to grant MARK5 access to the Phonebook in order to use this functionality</string>
     <string name="auth_not_enrolled_title">No local authentication set</string>
     <string name="auth_not_enrolled_content">For local authentication to work when reopening MARK5 the device must at least have one fingerprint enrolled or a PIN, pattern or password set</string>
+    <string name="auth_credential_title">Enter device credential</string>
+    <string name="auth_credential_content">To continue using MARK5 the device credential must be entered.</string>
     <string name="read_by">Read by:</string>
     <string name="recent_addresses">Recent addresses</string>
     <string name="read_by_prefix">read by</string>
