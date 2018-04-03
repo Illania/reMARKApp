@@ -17,11 +17,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool ApplicationVisible => activitiesStarted > 0;
 
-        /* Used to check if the user has been redirected to the PIN Code activity. 
-         * If it is the case, then when the user is returned to the app from the pin code activity, 
-         * then the fingerprintactivity should not be started. */
-        public bool RedirectedToPincodeActivity { get; set; }
-
         public ApplicationLifecycleHandler(Orientation initialOrientation)
         {
             stopWatch = new Stopwatch();
@@ -32,7 +27,6 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             if (!(activity is BaseAppCompatActivity))
                 return;
-
 
             var authFragment = (AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag);
             if (authFragment == null)
