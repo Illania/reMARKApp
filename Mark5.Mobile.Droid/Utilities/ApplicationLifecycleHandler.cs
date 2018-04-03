@@ -4,6 +4,8 @@ using System.Diagnostics;
 using Android.Content.Res;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
+using Android.Support.V4.Hardware.Fingerprint;
+using Android.Content;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -48,12 +50,11 @@ namespace Mark5.Mobile.Droid.Utilities
             //{
             //    if (!ApplicationVisible)
             //    {
-            //        if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
+            //        if (PlatformConfig.Preferences.AuthorizationEnabled)
             //        {
             //            stopWatch.Stop();
 
-            //            if (!RedirectedToPincodeActivity && !(activity.GetType() == typeof(LocalAuthenticationActivity))
-            //                && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.FingerPrintAuthInterval)
+            //            if (stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthorizationInterval)
             //            {
             //                var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
             //                var fingerprintManager = FingerprintManagerCompat.From(activity);
@@ -63,10 +64,7 @@ namespace Mark5.Mobile.Droid.Utilities
             //                    f.Show(activity.FragmentManager, "test_tag");
             //                }
             //            }
-            //            else
-            //            {
-            //                RedirectedToPincodeActivity = false;
-            //            }
+
             //            stopWatch.Reset();
             //        }
             //    }
@@ -76,12 +74,20 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStopped(Activity activity)
         {
-            //activitiesStarted--;
-            //if (!ApplicationVisible)
-            //{
-            //    if (PlatformConfig.Preferences.FingerPrintAuthEnabled)
-            //        stopWatch.Start();
-            //}
+            activitiesStarted--;
+            if (!ApplicationVisible)
+            {
+                if (PlatformConfig.Preferences.AuthorizationEnabled)
+                    stopWatch.Start();
+            }
+        }
+
+        bool IsAuthorizationPossible(Activity activity)
+        {
+            var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
+            var fingerprintManager = FingerprintManagerCompat.From(activity);
+
+            return keyguardManager.IsKeyguardSecure || (fingerprintManager.IsHardwareDetected && fingerprintManager.HasEnrolledFingerprints);
         }
 
         #region Unused callbacks
