@@ -1,11 +1,10 @@
-﻿using Android.App;
+﻿using System.Diagnostics;
+using Android.App;
+using Android.Content;
 using Android.OS;
-using System.Diagnostics;
-using Android.Content.Res;
+using Android.Support.V4.Hardware.Fingerprint;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
-using Android.Support.V4.Hardware.Fingerprint;
-using Android.Content;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -26,25 +25,22 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public void OnActivityStarted(Activity activity)
         {
-            if (!authenticated)
+            if (!authenticated &&
+                 !ApplicationVisible &&
+                 activity is BaseAppCompatActivity &&
+                 PlatformConfig.Preferences.AuthorizationEnabled &&
+                 stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthorizationInterval &&
+                 IsAuthenticationPossible(activity))
             {
-                //if (!(activity is BaseAppCompatActivity))
-                //return;
-
-                if (!ApplicationVisible)
+                if ((AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
                 {
-                    stopWatch.Stop();
-
-                    if (PlatformConfig.Preferences.AuthorizationEnabled
-                        && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthorizationInterval && IsAuthenticationPossible(activity))
-                    {
-                        if ((AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
-                        {
-                            var authFragment = new AuthenticationDialogFragment();
-                            authFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
-                        }
-                    }
+                    var authFragment = new AuthenticationDialogFragment();
+                    authFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
                 }
+            }
+            else
+            {
+                stopWatch.Reset();
             }
 
             activitiesStarted++;
