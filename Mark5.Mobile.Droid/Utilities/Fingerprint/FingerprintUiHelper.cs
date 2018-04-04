@@ -29,8 +29,9 @@ namespace Mark5.Mobile.Droid.Utilities.Fingerprint
         const long errorTimeout = 1600;
         const long successDelay = 1300;
 
-        public FingerprintUiHelper(ImageView fingerprintIcon, TextView fingerprintStatus, ICallback callback = null)
+        public FingerprintUiHelper(FingerprintManagerCompat fingerprintManager, ImageView fingerprintIcon, TextView fingerprintStatus, ICallback callback = null)
         {
+            this.fingerprintManager = fingerprintManager;
             this.fingerprintIcon = fingerprintIcon;
             this.fingerprintStatus = fingerprintStatus;
             this.callback = callback;
