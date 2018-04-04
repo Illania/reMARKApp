@@ -39,9 +39,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 }
             }
             else
-            {
                 stopWatch.Reset();
-            }
 
             activitiesStarted++;
         }
@@ -95,6 +93,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             //Nothing to do
         }
+
         #endregion
     }
 }
