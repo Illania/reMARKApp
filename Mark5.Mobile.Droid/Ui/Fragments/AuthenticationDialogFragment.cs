@@ -14,8 +14,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FingerprintManagerCompat fingerprintManager;
         FingerprintUiHelper fingerprintUiHelper;
         KeyguardManager keyguardManager;
-        bool authenticatedWithDeviceCredential;
-        bool authenticatedWithFingerprint;
 
         bool IsFingerprintAuthAvailable => fingerprintManager.IsHardwareDetected
                                 && fingerprintManager.HasEnrolledFingerprints;
@@ -51,9 +49,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 deviceCredentialButton.Visibility = ViewStates.Visible;
                 deviceCredentialButton.Click += (s, e) => OnDeviceCredentialRequest();
+
+                if (!IsFingerprintAuthAvailable)
+                {
+                    Dialog.SetTitle(string.Empty);
+                    view.Visibility = ViewStates.Gone;
+                }
             }
 
-            fingerprintUiHelper = new FingerprintUiHelper(iconImageView, statusTextView, this);
+            fingerprintManager = FingerprintManagerCompat.From(Context);
+            fingerprintUiHelper = new FingerprintUiHelper(fingerprintManager, iconImageView, statusTextView, this);
 
             return view;
         }
@@ -67,7 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else if (IsDeviceCredentialAuthAvailable)
                 OnDeviceCredentialRequest();
             else
-                Dismiss();  //Should never reach this
+                DismissAndNotify();  //Should never reach this
         }
 
         public override void OnPause()
@@ -93,25 +98,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void OnAuthenticatedWithFingerprint()
         {
-            authenticatedWithFingerprint = true;
-            Dismiss();
+            DismissAndNotify();
         }
 
         public void OnAuthenticatedWithDeviceCredential()
         {
-            authenticatedWithDeviceCredential = true;
+            DismissAndNotify();
+        }
+
+        void DismissAndNotify()
+        {
+            ((Mark5Application)Activity.Application).LifecycleHandler.OnAuthenticationSuccessful();
+            Dismiss();
         }
 
         public void OnError()
         {
             //Empty on purpose
         }
-
-        public void DismissIfAuthenticated()
-        {
-            if (authenticatedWithDeviceCredential || authenticatedWithFingerprint)
-                Dismiss();
-        }
-
     }
 }

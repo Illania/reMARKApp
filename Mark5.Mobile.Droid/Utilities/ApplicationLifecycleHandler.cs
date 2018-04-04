@@ -13,76 +13,59 @@ namespace Mark5.Mobile.Droid.Utilities
     {
         const string AuthenticationFragmentTag = "authenticationFragmentTag";
 
+        bool authenticated;
         int activitiesStarted;
-        Orientation currentOrientation;
         Stopwatch stopWatch;
 
         public bool ApplicationVisible => activitiesStarted > 0;
 
-        public ApplicationLifecycleHandler(Orientation initialOrientation)
+        public ApplicationLifecycleHandler()
         {
             stopWatch = new Stopwatch();
-            currentOrientation = initialOrientation;
         }
 
         public void OnActivityStarted(Activity activity)
         {
-            if (!(activity is BaseAppCompatActivity))
-                return;
-
-            var authFragment = (AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag);
-            if (authFragment == null)
+            if (!authenticated)
             {
-                authFragment = new AuthenticationDialogFragment();
-                authFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
+                //if (!(activity is BaseAppCompatActivity))
+                //return;
+
+                if (!ApplicationVisible)
+                {
+                    stopWatch.Stop();
+
+                    if (PlatformConfig.Preferences.AuthorizationEnabled
+                        && stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthorizationInterval && IsAuthenticationPossible(activity))
+                    {
+                        if ((AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
+                        {
+                            var authFragment = new AuthenticationDialogFragment();
+                            authFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
+                        }
+                    }
+                }
             }
-            else
-            {
-                authFragment.DismissIfAuthenticated();
-            }
 
-            //if (activity.Resources.Configuration.Orientation != currentOrientation)
-            //{
-            //    currentOrientation = activity.Resources.Configuration.Orientation;
-            //    activitiesStarted++;
-            //}
-            //else
-            //{
-            //    if (!ApplicationVisible)
-            //    {
-            //        if (PlatformConfig.Preferences.AuthorizationEnabled)
-            //        {
-            //            stopWatch.Stop();
-
-            //            if (stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthorizationInterval)
-            //            {
-            //                var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
-            //                var fingerprintManager = FingerprintManagerCompat.From(activity);
-            //                if (fingerprintManager.HasEnrolledFingerprints && keyguardManager.IsKeyguardSecure)
-            //                {
-            //                    var f = new Ui.Fragments.FingerprintDialogFragment();
-            //                    f.Show(activity.FragmentManager, "test_tag");
-            //                }
-            //            }
-
-            //            stopWatch.Reset();
-            //        }
-            //    }
-            //    activitiesStarted++;
-            //}
+            activitiesStarted++;
         }
 
         public void OnActivityStopped(Activity activity)
         {
             activitiesStarted--;
-            if (!ApplicationVisible)
-            {
-                if (PlatformConfig.Preferences.AuthorizationEnabled)
-                    stopWatch.Start();
-            }
+            authenticated = false;
+
+            if (!ApplicationVisible && PlatformConfig.Preferences.AuthorizationEnabled)
+                stopWatch.Start();
         }
 
-        bool IsAuthorizationPossible(Activity activity)
+        public void OnAuthenticationSuccessful()
+        {
+            authenticated = true;
+            stopWatch.Reset();
+        }
+
+        bool IsAuthenticationPossible(Activity activity)
         {
             var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
             var fingerprintManager = FingerprintManagerCompat.From(activity);
