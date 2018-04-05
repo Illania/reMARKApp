@@ -636,10 +636,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Activity?.Finish();
             };
 
-            if (new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid))
-                sendAction();
-            else
+            var allEmailsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
+
+            if (!allEmailsValid && subjectView.Empty)
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, null);
+            else if (!allEmailsValid)
                 Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
+            else if (subjectView.Empty)
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, null);
+            else
+                sendAction();
         }
 
         async void HandleAddAttachment(Intent data)
@@ -782,9 +788,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 recipientAdded |= !recipientView.Empty;
 
             if (!recipientAdded)
-                return false;
-
-            if (subjectView.Empty)
                 return false;
 
             return !lineView.LineSelectedIsAmbiguous;

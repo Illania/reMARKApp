@@ -198,8 +198,12 @@
     <string name="hostname_invalid">Hostname is not valid</string>
     <string name="internet_access">Internet access:</string>
     <string name="insert_template">Insert template</string>
-    <string name="invalid_emails_title">Invalid emails entered</string>
+    <string name="invalid_emails_title">Invalid emails</string>
     <string name="invalid_emails_content">Not all emails you entered are valid. Do you still want to send the email?</string>
+    <string name="invalid_subject_title">Empty subject</string>
+    <string name="invalid_subject_content">The subject line is empty. Do you still want to send the email?</string>
+    <string name="invalid_emails_and_subject_title">Invalid emails and empty subject</string>
+    <string name="invalid_emails_and_subject_content">Not all emails you entered are valid and the subject line is empty. Do you still want to send the email?</string>
     <string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
     <string name="last_downloaded_on">Last downloaded on:</string>
     <string name="ledger">Ledger</string>
