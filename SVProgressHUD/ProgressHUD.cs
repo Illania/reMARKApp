@@ -28,7 +28,6 @@ namespace SVProgressHUD
         const float VerticalSpacing = 14f;
         const float HorizontalSpacing = 14f;
         const float LabelSpacing = 8f;
-        const float CancelButtonSpacing = 8f;
 
         #endregion
 
@@ -109,8 +108,6 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         UIVisualEffectView _hudView;
         UIVisualEffectView _hudVibrancyView;
         UILabel _statusLabel;
-        UIView _lineView;
-        UIButton _cancelButton;
         UIImageView _imageView;
         UIView _indefiniteAnimatedView;
         ProgressAnimatedView _ringView;
@@ -303,10 +300,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     if (_indefiniteAnimatedView == null)
                         _indefiniteAnimatedView = new IndefiniteAnimatedView();
 
-                    var iav = (IndefiniteAnimatedView) _indefiniteAnimatedView;
+                    var iav = (IndefiniteAnimatedView)_indefiniteAnimatedView;
                     iav.StrokeColor = GetForegroundColorForStyle();
                     iav.StrokeThickness = RingThickness;
-                    iav.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
+                    iav.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
                 }
                 else
                 {
@@ -319,7 +316,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     if (_indefiniteAnimatedView == null)
                         _indefiniteAnimatedView = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
 
-                    var aiv = (UIActivityIndicatorView) _indefiniteAnimatedView;
+                    var aiv = (UIActivityIndicatorView)_indefiniteAnimatedView;
                     aiv.Color = GetForegroundColorForStyle();
                 }
 
@@ -338,7 +335,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 _ringView.StrokeColor = GetForegroundColorForStyle();
                 _ringView.StrokeThickness = RingThickness;
-                _ringView.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
+                _ringView.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
 
                 return _ringView;
             }
@@ -353,7 +350,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 _backgroundRingView.StrokeColor = GetForegroundColorForStyle().ColorWithAlpha(0.1f);
                 _backgroundRingView.StrokeThickness = RingThickness;
-                _backgroundRingView.Radius = (string.IsNullOrWhiteSpace(StatusLabel.Text) || CancelButton == null) ? RingRadius : RingNoTextRadius;
+                _backgroundRingView.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
 
                 return _backgroundRingView;
             }
@@ -373,43 +370,6 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             }
         }
 
-        UIButton CancelButton
-        {
-            get
-            {
-                if (_cancelButton == null)
-                {
-                    _cancelButton = new UIButton();
-                    _cancelButton.BackgroundColor = UIColor.Clear;
-                    _cancelButton.SetTitle("Cancel", UIControlState.Normal);
-                }
-
-                if (_cancelButton.Superview == null)
-                    HudVibrancyView.ContentView.AddSubview(_cancelButton);
-                
-                _cancelButton.Font = UIFont.BoldSystemFontOfSize(Font.PointSize);
-
-                return _cancelButton;
-            }
-        }
-
-        UIView LineView
-        {
-            get
-            {
-                if(_lineView == null)
-                {
-                    _lineView = new UIView();
-                    _lineView.BackgroundColor = UIColor.Black;
-                }
-
-                if (_lineView.Superview == null)
-                    HudVibrancyView.ContentView.AddSubview(_lineView);
-
-                return _lineView;
-            }    
-        }
-
         #endregion
 
         #region Private constructors
@@ -427,7 +387,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
         #region Show methods
 
-        public void ShowProgress(string status = null, bool shouldShowCancelButton = false, float progress = UndefinedProgress)
+        public void ShowProgress(string status = null, float progress = UndefinedProgress)
         {
             UserInteractionEnabled = false;
 
@@ -479,7 +439,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     strongThis.activityCount++;
                 }
 
-                strongThis.ShowInternal(shouldShowCancelButton);
+                strongThis.ShowInternal();
 
                 strongThis.HapticGenerator?.Prepare();
             });
@@ -536,9 +496,9 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             });
         }
 
-        void ShowInternal(bool shouldShowCancelButton = false)
+        void ShowInternal()
         {
-            UpdateHudFrame(shouldShowCancelButton);
+            UpdateHudFrame();
             PositionHud(null);
 
             ControlView.UserInteractionEnabled = DefaultMaskType != MaskType.None;
@@ -695,7 +655,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 ControlView.AddSubview(this);
         }
 
-        void UpdateHudFrame(bool shouldShowCancelButton = false)
+        void UpdateHudFrame()
         {
             var imageUsed = ImageView.Image != null && !ImageView.Hidden;
             var progressUsed = ImageView.Hidden;
@@ -714,27 +674,8 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                         Font = StatusLabel.Font
                     },
                     null);
-                labelHeight = (float) Math.Ceiling(labelRect.Height);
-                labelWidth = (float) Math.Ceiling(labelRect.Width);
-            }
-
-            var cancelButtonRect = CGRect.Empty;
-            var cancelButtonHeight = 0f;
-            var cancelButtonWidth = 0f;
-
-            if(shouldShowCancelButton)
-            {
-                var constraintSize = new CGSize(200f, 300f);
-                cancelButtonRect = new NSString(CancelButton.Title(UIControlState.Normal)).GetBoundingRect(constraintSize,
-                    NSStringDrawingOptions.UsesFontLeading | NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin,
-                    new UIStringAttributes
-                    {
-                        Font = CancelButton.Font
-                    },
-                    null);
-
-                cancelButtonHeight = (float)Math.Ceiling(cancelButtonRect.Height);
-                cancelButtonWidth = (float)Math.Ceiling(cancelButtonRect.Width);
+                labelHeight = (float)Math.Ceiling(labelRect.Height);
+                labelWidth = (float)Math.Ceiling(labelRect.Width);
             }
 
             var hudHeight = 0f;
@@ -745,14 +686,14 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
             if (imageUsed || progressUsed)
             {
-                contentHeight = (float) (imageUsed ? ImageView.Frame.Height : IndefiniteAnimatedView.Frame.Height);
-                contentWidth = (float) (imageUsed ? ImageView.Frame.Width : IndefiniteAnimatedView.Frame.Width);
+                contentHeight = (float)(imageUsed ? ImageView.Frame.Height : IndefiniteAnimatedView.Frame.Height);
+                contentWidth = (float)(imageUsed ? ImageView.Frame.Width : IndefiniteAnimatedView.Frame.Width);
             }
 
-            hudWidth = HorizontalSpacing + Math.Max(cancelButtonWidth,Math.Max(labelWidth, contentWidth)) + HorizontalSpacing;
-            hudHeight = VerticalSpacing + labelHeight + cancelButtonHeight + contentHeight + VerticalSpacing;
+            hudWidth = HorizontalSpacing + Math.Max(labelWidth, contentWidth) + HorizontalSpacing;
+            hudHeight = VerticalSpacing + labelHeight + contentHeight + VerticalSpacing;
 
-            if ((!string.IsNullOrWhiteSpace(StatusLabel.Text) || shouldShowCancelButton) && (imageUsed || progressUsed))
+            if (!string.IsNullOrWhiteSpace(StatusLabel.Text) && (imageUsed || progressUsed))
                 hudHeight += LabelSpacing;
 
             HudView.Bounds = new CGRect(0f, 0f, Math.Max(MinimumSize.Width, hudWidth), Math.Max(MinimumSize.Height, hudHeight));
@@ -763,25 +704,14 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             CATransaction.DisableActions = true;
 
             float centerY;
-
-            if (!string.IsNullOrWhiteSpace(StatusLabel.Text) && shouldShowCancelButton)
+            if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
             {
-                var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - (LabelSpacing + CancelButtonSpacing) - (labelHeight + cancelButtonHeight)) / 2f);
-                centerY = yOffset + contentHeight / 2f;
-            }
-            else if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
-            {
-                var yOffset = (float) Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - LabelSpacing - labelHeight) / 2f);
-                centerY = yOffset + contentHeight / 2f;
-            }
-            else if (shouldShowCancelButton)
-            {
-                var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - CancelButtonSpacing - cancelButtonHeight) / 2f);
+                var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - LabelSpacing - labelHeight) / 2f);
                 centerY = yOffset + contentHeight / 2f;
             }
             else
             {
-                centerY = (float) HudView.Bounds.GetMidY();
+                centerY = (float)HudView.Bounds.GetMidY();
             }
 
             IndefiniteAnimatedView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
@@ -789,41 +719,14 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 BackgroundRingView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
             ImageView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
 
-            float buttonCenterY = 0f;
-
             if (imageUsed || progressUsed)
-            {
-                if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
-                {
-                    centerY = (float)((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY() + LabelSpacing + labelHeight / 2f);
-                    buttonCenterY = centerY + CancelButtonSpacing + cancelButtonHeight;
-                }
-                else
-                {
-                    centerY = (float)((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY());
-                    buttonCenterY = centerY + CancelButtonSpacing + cancelButtonHeight;
-                }
-            }
+                centerY = (float)((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY() + LabelSpacing + labelHeight / 2f);
             else
-            {
-                centerY = (float) HudView.Bounds.GetMidY();
-                buttonCenterY = centerY;
-            }
+                centerY = (float)HudView.Bounds.GetMidY();
 
             StatusLabel.Frame = labelRect;
             StatusLabel.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
             StatusLabel.Hidden = string.IsNullOrWhiteSpace(StatusLabel.Text);
-
-            var lineViewRect = HudView.Bounds;
-            lineViewRect.Height = 1f;
-
-            LineView.Frame = lineViewRect;
-            LineView.Center = new CGPoint(HudView.Bounds.GetMidX(), buttonCenterY - (cancelButtonHeight + CancelButtonSpacing)/2.0);
-            LineView.Hidden = !shouldShowCancelButton;
-
-            CancelButton.Frame = cancelButtonRect;
-            CancelButton.Center = new CGPoint(HudView.Bounds.GetMidX(), buttonCenterY);
-            CancelButton.Hidden = !shouldShowCancelButton;
 
             CATransaction.Commit();
         }
@@ -852,10 +755,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 if (notification.Name == UIKeyboard.WillShowNotification || notification.Name == UIKeyboard.DidShowNotification)
                 {
                     var keyboardInfo = notification.UserInfo;
-                    var keyboardFrame = ((NSValue) keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
-                    animationDuration = ((NSNumber) keyboardInfo[UIKeyboard.AnimationDurationUserInfoKey]).DoubleValue;
+                    var keyboardFrame = ((NSValue)keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
+                    animationDuration = ((NSNumber)keyboardInfo[UIKeyboard.AnimationDurationUserInfoKey]).DoubleValue;
 
-                    keyboardHeight = (float) keyboardFrame.Height;
+                    keyboardHeight = (float)keyboardFrame.Height;
                 }
             }
             else
@@ -878,7 +781,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             activeHeight -= keyboardHeight;
 
             var posX = orientationFrame.GetMidX();
-            var posY = (float) Math.Floor(activeHeight * 0.45f);
+            var posY = (float)Math.Floor(activeHeight * 0.45f);
 
             var rotateAngle = 0f;
             var newCenter = new CGPoint(posX, posY);
@@ -983,12 +886,12 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             foreach (var possibleKeyboard in keyboardWindow.Subviews)
             {
                 if (possibleKeyboard.IsKindOfClass(new Class("UIPeripheralHostView")) || possibleKeyboard.IsKindOfClass(new Class("UIKeyboard")))
-                    return (float) possibleKeyboard.Bounds.Height;
+                    return (float)possibleKeyboard.Bounds.Height;
 
                 if (possibleKeyboard.IsKindOfClass(new Class("UIInputSetContainerView")))
                     foreach (var possibleKeyboardSubview in possibleKeyboard.Subviews)
                         if (possibleKeyboardSubview.IsKindOfClass(new Class("UIInputSetHostView")))
-                            return (float) possibleKeyboardSubview.Bounds.Height;
+                            return (float)possibleKeyboardSubview.Bounds.Height;
             }
 #endif
             return 0f;
@@ -1054,7 +957,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         {
             NSNotificationCenter.DefaultCenter.PostNotificationName(DidReceiveTouchEventNotification, this, GetNotificationUserInfo());
 
-            var touch = (UITouch) e.AllTouches.AnyObject;
+            var touch = (UITouch)e.AllTouches.AnyObject;
             var touchLocation = touch.LocationInView(this);
 
             if (HudView.Frame.Contains(touchLocation))
