@@ -44,6 +44,7 @@
 	<string name="pref_cat_notifications">Notifications</string>
 	<string name="pref_cat_shortcodes">Shortcodes</string>
 	<string name="pref_cat_search">Search</string>
+    <string name="pref_cat_security">Security</string>
 	<string name="pref_compose_priority_enabled_title">Priority</string>
 	<string name="pref_compose_remove_line_summary_off">Do not remove mailbox address from recipents when replying to all</string>
 	<string name="pref_compose_remove_line_summary_on">Remove mailbox address from recipents when replying to all</string>
@@ -111,6 +112,7 @@
 	<string name="pref_key_cat_notifications">pref_key_cat_notifications</string>
 	<string name="pref_key_cat_shortcodes">pref_key_cat_shortcodes</string>
 	<string name="pref_key_cat_search">pref_key_cat_search</string>
+    <string name="pref_key_cat_security">pref_key_cat_security</string>
 	<string name="pref_key_compose_priority_enabled">pref_key_compose_priority_enabled</string>
 	<string name="pref_key_compose_remove_line">pref_key_compose_remove_line</string>
 	<string name="pref_key_compose_template_local">pref_key_compose_template_local</string>
@@ -135,6 +137,9 @@
 	<string name="pref_key_documents_to_load">pref_key_documents_to_load</string>
 	<string name="pref_key_documents_use_server_timezone">pref_key_documents_use_server_timezone</string>
 	<string name="pref_key_documents_show_creator_outgoing">pref_key_documents_show_creator_outgoing</string>
+    <string name="pref_key_auth">pref_key_auth</string>
+    <string name="pref_auth_title">Local authentication</string>
+    <string name="pref_auth_summary">Frequency of authentication upon reopening the app.\nCurrently: %s</string>
 	<string name="pref_key_notification_hide_read">pref_key_notification_hide_read</string>
 	<string name="pref_key_notification_ringtone">pref_key_notification_ringtone</string>
 	<string name="pref_key_notification_silence">pref_key_notification_silence</string>

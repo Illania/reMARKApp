@@ -173,6 +173,8 @@ namespace Mark5.Mobile.IOS
 
         public override void OnActivated(UIApplication application)
         {
+            LocalAuthenticationManager.NotifyApplicationActivated();
+
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
@@ -183,6 +185,8 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsUploadService?.Stop();
             Services.DocumentPreviewsDownloadService?.Stop();
             Services.DocumentsDownloadService?.Stop();
+
+            LocalAuthenticationManager.NotifyApplicationEnteredBackground();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -301,7 +305,7 @@ namespace Mark5.Mobile.IOS
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.",ex);
+                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.", ex);
                     completionHandler(UIBackgroundFetchResult.Failed);
                 }
             });

@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid
     {
         public bool StartedFromRoot { get; set; }
 
+        public ApplicationLifecycleHandler LifecycleHandler;
+
         public Mark5Application(IntPtr javaReference, JniHandleOwnership transfer)
             : base(javaReference, transfer)
         {
@@ -34,6 +36,9 @@ namespace Mark5.Mobile.Droid
             base.OnCreate();
 
             AppCompatDelegate.CompatVectorFromResourcesEnabled = true;
+
+            LifecycleHandler = new ApplicationLifecycleHandler();
+            RegisterActivityLifecycleCallbacks(LifecycleHandler);
 
             Task.Run(async () =>
                 {
