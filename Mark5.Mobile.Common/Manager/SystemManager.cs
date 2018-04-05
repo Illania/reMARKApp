@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Extensions;
@@ -39,6 +40,8 @@ namespace Mark5.Mobile.Common.Manager
                     UserInfo = systemSettingsResult.UserInfo.Convert()
                 };
 
+                result.DocumentsModuleInfo.IncomingLines = await GetIncomingLines();
+
                 await FileSystemStorage.SaveSystemSettingsAsync(result);
 
                 return result;
@@ -49,6 +52,29 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        async Task<List<Line>> GetIncomingLines()
+        {
+            var lines = new List<Line>();
+
+            try
+            {
+                var linesResult = await AppServiceProxy.GetLinesAsync(new DataContract.GetLinesParameters
+                {
+                    Token = ConnectionInfo.Token
+                });
+
+                if (linesResult.IncomingLines != null)
+                    lines.AddRange(linesResult.IncomingLines.WhereNotNull().Select(DataContractConverters.Convert));
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while retrieving incoming lines", ex);
+            }
+
+            return lines;
+        }
+
 
         public async Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Auto)
         {

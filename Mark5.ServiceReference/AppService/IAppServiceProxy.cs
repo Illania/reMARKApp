@@ -41,6 +41,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetDefaultTemplateResult> GetDefaultTemplateAsync(GetDefaultTemplateParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<GetLinesResult> GetLinesAsync(GetLinesParameters parameters, CancellationToken ct = default(CancellationToken));
+
         #endregion
 
         #region Contacts module

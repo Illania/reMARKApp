@@ -6,6 +6,7 @@ namespace Mark5.Mobile.Common.Model
     {
         public OnSendToSystemUser OnSendToSystemUser { get; set; }
         public Line DefaultOutgoingLine { get; set; }
+
         List<Line> outgoingLines;
 
         public List<Line> OutgoingLines
@@ -17,6 +18,19 @@ namespace Mark5.Mobile.Common.Model
                 return outgoingLines;
             }
             set => outgoingLines = value;
+        }
+
+        List<Line> incomingLines;
+
+        public List<Line> IncomingLines
+        {
+            get
+            {
+                if (incomingLines == null)
+                    incomingLines = new List<Line>();
+                return incomingLines;
+            }
+            set => incomingLines = value;
         }
 
         public bool IsMissingAttachmentWarningEnabled { get; set; }
