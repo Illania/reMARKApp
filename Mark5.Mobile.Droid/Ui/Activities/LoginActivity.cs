@@ -207,11 +207,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info("Authenticating...");
 
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
+                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), cts.Token);
 
-                if (cts.IsCancellationRequested) 
+                if (cts.IsCancellationRequested)
                 {
                     CommonConfig.Logger.Info($"Authentication was cancelled...");
+                    cts = null;
                     return;
                 }
 
