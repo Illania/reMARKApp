@@ -25,5 +25,7 @@ namespace Mark5.Mobile.Common
         public static IUsageAnalytics UsageAnalytics { get; set; }
         public static Type ConcurrentQueueType { get; set; }
         public static Func<string, string> Utf8Normalizer { get; set; }
+        public static Func<string, TimeZoneInfo> TimeZoneInfoDeserializer { get; set; }
+
     }
 }

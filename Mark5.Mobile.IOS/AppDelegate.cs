@@ -338,6 +338,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Reachability = new Reachability();
                 CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
+                CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>

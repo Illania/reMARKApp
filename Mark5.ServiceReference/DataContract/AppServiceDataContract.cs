@@ -2280,6 +2280,15 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "ServerUtcOffset", Order = 0)]
         public TimeSpan ServerUtcOffset { get; set; }
+
+        [DataMember(Name = "CustomerName", Order = 1)]
+        public string CustomerName { get; set; }
+
+        [DataMember(Name = "CustomerGuid", Order = 1)]
+        public Guid CustomerGuid { get; set; }
+
+        [DataMember(Name = "ServerTimeZoneInfoSerialized", Order = 1)]
+        public string ServerTimeZoneInfoSerialized { get; set; }
     }
 
     [DataContract(Name = "DocumentsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
