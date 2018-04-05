@@ -29,6 +29,8 @@
 "dont_use_short" = "Don't use";
 "enable_reporting" = "Share diagnostic information";
 "enable_reporting_desc" = "Share anonymous usage statistics and diagnostic information with Nordic IT, to help improve MARK5.";
+"auth_interval" = "Authentication interval";
+"auth_interval_desc" = "Require authentication when reopening the app after a certain amount of time.";
 "hide_read_notifications" = "Hide read notifications from list";
 "html" = "HTML";
 "large_attachment_warning" = "Large attachment warning";

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using Android.Content;
 using Android.OS;
