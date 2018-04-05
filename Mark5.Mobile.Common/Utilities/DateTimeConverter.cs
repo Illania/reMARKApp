@@ -7,7 +7,6 @@ namespace Mark5.Mobile.Common.Utilities
         public static bool UseServerTimezone = true;
 
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        static readonly int LocalUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
 
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
