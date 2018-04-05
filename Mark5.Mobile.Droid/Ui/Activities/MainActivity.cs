@@ -169,7 +169,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
-        {            base.OnSaveInstanceState(outState);
+        {
+            base.OnSaveInstanceState(outState);
 
             state.NavHeaderTitle = navHeaderTitleTextView.Text;
 
@@ -205,7 +206,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (drawerToggle.OnOptionsItemSelected(item))
-                return true; 
+                return true;
 
             return base.OnOptionsItemSelected(item);
         }
