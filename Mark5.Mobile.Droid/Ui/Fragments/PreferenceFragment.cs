@@ -7,6 +7,7 @@ using Android.OS;
 using Android.Provider;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
+using Android.Support.V4.Hardware.Fingerprint;
 using Android.Support.V7.App;
 using Android.Support.V7.Preferences;
 using Android.Text;
@@ -132,6 +133,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20for%20Android%20Feedback"));
                 StartActivity(sendIntent);
                 return true;
+            }
+
+            if (preference.Key == GetString(Resource.String.pref_key_auth))
+            {
+                var keyguardManager = (Android.App.KeyguardManager)Activity.GetSystemService(Context.KeyguardService);
+                var fingerprintManager = FingerprintManagerCompat.From(Context);
+
+                if (!keyguardManager.IsKeyguardSecure && !fingerprintManager.HasEnrolledFingerprints)
+                    Dialogs.ShowConfirmDialog(Context, Resource.String.auth_not_enrolled_title, Resource.String.auth_not_enrolled_content);
             }
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_create_system_report))
