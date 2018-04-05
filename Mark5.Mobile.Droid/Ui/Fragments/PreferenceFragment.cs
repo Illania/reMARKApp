@@ -137,10 +137,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_auth))
             {
-                Android.App.KeyguardManager keyguardManager = (Android.App.KeyguardManager)Activity.GetSystemService(Context.KeyguardService);
-                FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.From(Context);
+                var keyguardManager = (Android.App.KeyguardManager)Activity.GetSystemService(Context.KeyguardService);
+                var fingerprintManager = FingerprintManagerCompat.From(Context);
 
-                if (!keyguardManager.IsKeyguardSecure || !fingerprintManager.HasEnrolledFingerprints)
+                if (!keyguardManager.IsKeyguardSecure && !fingerprintManager.HasEnrolledFingerprints)
                     Dialogs.ShowConfirmDialog(Context, Resource.String.auth_not_enrolled_title, Resource.String.auth_not_enrolled_content);
             }
 
