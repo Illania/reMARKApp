@@ -636,19 +636,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Activity?.Finish();
             };
 
-            Action dialogAction = () =>
-            {
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
-            };
-
             var allEmailsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
 
             if (!allEmailsValid && subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.subject_view_empty_title, Resource.String.subject_view_empty_content, dialogAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, null);
             else if (!allEmailsValid)
                 Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
             else if (subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.subject_view_empty_title, Resource.String.subject_view_empty_title, sendAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, null);
             else
                 sendAction();
         }
