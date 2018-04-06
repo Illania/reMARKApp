@@ -112,6 +112,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         UIView _indefiniteAnimatedView;
         ProgressAnimatedView _ringView;
         ProgressAnimatedView _backgroundRingView;
+        Action _onCancel;
 
         UINotificationFeedbackGenerator _hapticGenerator;
         // END
@@ -300,7 +301,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     if (_indefiniteAnimatedView == null)
                         _indefiniteAnimatedView = new IndefiniteAnimatedView();
 
-                    var iav = (IndefiniteAnimatedView) _indefiniteAnimatedView;
+                    var iav = (IndefiniteAnimatedView)_indefiniteAnimatedView;
                     iav.StrokeColor = GetForegroundColorForStyle();
                     iav.StrokeThickness = RingThickness;
                     iav.Radius = string.IsNullOrWhiteSpace(StatusLabel.Text) ? RingRadius : RingNoTextRadius;
@@ -316,7 +317,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                     if (_indefiniteAnimatedView == null)
                         _indefiniteAnimatedView = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
 
-                    var aiv = (UIActivityIndicatorView) _indefiniteAnimatedView;
+                    var aiv = (UIActivityIndicatorView)_indefiniteAnimatedView;
                     aiv.Color = GetForegroundColorForStyle();
                 }
 
@@ -387,9 +388,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
         #region Show methods
 
-        public void ShowProgress(string status = null, float progress = UndefinedProgress)
+        public void ShowProgress(string status = null, float progress = UndefinedProgress, Action onCancel = null)
         {
             UserInteractionEnabled = false;
+            _onCancel = onCancel;
 
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
@@ -630,6 +632,8 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 strongThis.SetNeedsDisplay();
             });
+
+            _onCancel = null;
         }
 
         #endregion
@@ -674,8 +678,8 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                         Font = StatusLabel.Font
                     },
                     null);
-                labelHeight = (float) Math.Ceiling(labelRect.Height);
-                labelWidth = (float) Math.Ceiling(labelRect.Width);
+                labelHeight = (float)Math.Ceiling(labelRect.Height);
+                labelWidth = (float)Math.Ceiling(labelRect.Width);
             }
 
             var hudHeight = 0f;
@@ -686,8 +690,8 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
             if (imageUsed || progressUsed)
             {
-                contentHeight = (float) (imageUsed ? ImageView.Frame.Height : IndefiniteAnimatedView.Frame.Height);
-                contentWidth = (float) (imageUsed ? ImageView.Frame.Width : IndefiniteAnimatedView.Frame.Width);
+                contentHeight = (float)(imageUsed ? ImageView.Frame.Height : IndefiniteAnimatedView.Frame.Height);
+                contentWidth = (float)(imageUsed ? ImageView.Frame.Width : IndefiniteAnimatedView.Frame.Width);
             }
 
             hudWidth = HorizontalSpacing + Math.Max(labelWidth, contentWidth) + HorizontalSpacing;
@@ -706,12 +710,12 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             float centerY;
             if (!string.IsNullOrWhiteSpace(StatusLabel.Text))
             {
-                var yOffset = (float) Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - LabelSpacing - labelHeight) / 2f);
+                var yOffset = (float)Math.Max(VerticalSpacing, (MinimumSize.Height - contentHeight - LabelSpacing - labelHeight) / 2f);
                 centerY = yOffset + contentHeight / 2f;
             }
             else
             {
-                centerY = (float) HudView.Bounds.GetMidY();
+                centerY = (float)HudView.Bounds.GetMidY();
             }
 
             IndefiniteAnimatedView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
@@ -720,9 +724,9 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             ImageView.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
 
             if (imageUsed || progressUsed)
-                centerY = (float) ((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY() + LabelSpacing + labelHeight / 2f);
+                centerY = (float)((imageUsed ? ImageView.Frame : IndefiniteAnimatedView.Frame).GetMaxY() + LabelSpacing + labelHeight / 2f);
             else
-                centerY = (float) HudView.Bounds.GetMidY();
+                centerY = (float)HudView.Bounds.GetMidY();
 
             StatusLabel.Frame = labelRect;
             StatusLabel.Center = new CGPoint(HudView.Bounds.GetMidX(), centerY);
@@ -755,10 +759,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
                 if (notification.Name == UIKeyboard.WillShowNotification || notification.Name == UIKeyboard.DidShowNotification)
                 {
                     var keyboardInfo = notification.UserInfo;
-                    var keyboardFrame = ((NSValue) keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
-                    animationDuration = ((NSNumber) keyboardInfo[UIKeyboard.AnimationDurationUserInfoKey]).DoubleValue;
+                    var keyboardFrame = ((NSValue)keyboardInfo[UIKeyboard.FrameBeginUserInfoKey]).CGRectValue;
+                    animationDuration = ((NSNumber)keyboardInfo[UIKeyboard.AnimationDurationUserInfoKey]).DoubleValue;
 
-                    keyboardHeight = (float) keyboardFrame.Height;
+                    keyboardHeight = (float)keyboardFrame.Height;
                 }
             }
             else
@@ -781,7 +785,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             activeHeight -= keyboardHeight;
 
             var posX = orientationFrame.GetMidX();
-            var posY = (float) Math.Floor(activeHeight * 0.45f);
+            var posY = (float)Math.Floor(activeHeight * 0.45f);
 
             var rotateAngle = 0f;
             var newCenter = new CGPoint(posX, posY);
@@ -886,12 +890,12 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             foreach (var possibleKeyboard in keyboardWindow.Subviews)
             {
                 if (possibleKeyboard.IsKindOfClass(new Class("UIPeripheralHostView")) || possibleKeyboard.IsKindOfClass(new Class("UIKeyboard")))
-                    return (float) possibleKeyboard.Bounds.Height;
+                    return (float)possibleKeyboard.Bounds.Height;
 
                 if (possibleKeyboard.IsKindOfClass(new Class("UIInputSetContainerView")))
                     foreach (var possibleKeyboardSubview in possibleKeyboard.Subviews)
                         if (possibleKeyboardSubview.IsKindOfClass(new Class("UIInputSetHostView")))
-                            return (float) possibleKeyboardSubview.Bounds.Height;
+                            return (float)possibleKeyboardSubview.Bounds.Height;
             }
 #endif
             return 0f;
@@ -957,11 +961,14 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         {
             NSNotificationCenter.DefaultCenter.PostNotificationName(DidReceiveTouchEventNotification, this, GetNotificationUserInfo());
 
-            var touch = (UITouch) e.AllTouches.AnyObject;
+            var touch = (UITouch)e.AllTouches.AnyObject;
             var touchLocation = touch.LocationInView(this);
 
             if (HudView.Frame.Contains(touchLocation))
+            {
                 NSNotificationCenter.DefaultCenter.PostNotificationName(DidTouchDownInsideNotification, this, GetNotificationUserInfo());
+                _onCancel?.Invoke();
+            }
         }
 
         NSDictionary GetNotificationUserInfo()
