@@ -452,7 +452,7 @@ namespace Mark5.Mobile.IOS
                 if (!String.IsNullOrEmpty(customerInfo.FirstName) && !String.IsNullOrEmpty(customerInfo.LastName))
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, customerInfo.FirstName + " " + customerInfo.LastName);
 
-                if(customerInfo.Guid != null)
+                if (customerInfo.Guid != null)
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerGuid, customerInfo.Guid.ToString());
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
