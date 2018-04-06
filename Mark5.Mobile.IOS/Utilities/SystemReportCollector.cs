@@ -76,6 +76,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("Platform: iOS");
             sb.AppendLine("Version: " + NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"] + " (" + NSBundle.MainBundle.InfoDictionary["CFBundleVersion"] + ")");
             sb.AppendLine("Date: " + DateTime.UtcNow);
+            sb.AppendLine("Local Date: " + DateTime.Now);
             sb.AppendLine();
 
             sb.AppendLine("===== Device information =====");
