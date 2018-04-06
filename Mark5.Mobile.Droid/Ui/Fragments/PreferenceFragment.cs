@@ -212,8 +212,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
-                        if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
-                            await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                        try
+                        {
+                            if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                                await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
+                        }
 
                         Integration.ClearDataAndStop();
                     });
