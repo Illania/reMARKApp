@@ -219,7 +219,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         }
                         catch (Exception ex)
                         {
-                            CommonConfig.Logger.Error(ex);
+                            CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
                         }
 
                         Integration.ClearDataAndStop();
