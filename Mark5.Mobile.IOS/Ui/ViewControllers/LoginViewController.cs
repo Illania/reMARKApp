@@ -634,6 +634,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested)
                 {
                     CommonConfig.Logger.Info($"Authentication was cancelled...");
+                    cts = null;
                     return;
                 }
 
