@@ -303,7 +303,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error(ex);
+                    CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
                 }
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;
