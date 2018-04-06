@@ -50,7 +50,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         CancellationTokenSource cts;
         Action dismissAction;
-        NSObject notificationToken;
 
         UIView logoContainer;
         UIImageView logoImageView;
