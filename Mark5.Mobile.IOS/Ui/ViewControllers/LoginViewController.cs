@@ -677,6 +677,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, username.ToLowerInvariant());
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
 
+                var customerInfo = ServerConfig.SystemSettings.UserInfo.User;
+
+                if (!String.IsNullOrEmpty(customerInfo.FirstName) && !String.IsNullOrEmpty(customerInfo.LastName))
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, customerInfo.FirstName + " " + customerInfo.LastName);
+
+                if (customerInfo.Guid != null)
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerGuid, customerInfo.Guid.ToString());
+
                 UIViewController vc;
                 if (Integration.IsIPad())
                     vc = new SplitMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };

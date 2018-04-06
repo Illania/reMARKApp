@@ -17,7 +17,9 @@ namespace Mark5.Mobile.Common.Utilities
     {
         SSL,
         Hostname,
-        Username
+        Username,
+        CustomerName,
+        CustomerGuid
     }
 
     public enum ContactActionChoice

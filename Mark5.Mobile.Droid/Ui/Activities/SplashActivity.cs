@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
+using System;
 #if !DEBUG
 using HockeyApp.Android;
 using Mark5.Mobile.Droid.Utilities.Hockey;
@@ -138,6 +139,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
                     SystemSettingsJobService.ScheduleJob();
+
+                    var customerInfo = ServerConfig.SystemSettings.UserInfo.User;
+
+                    if (!String.IsNullOrEmpty(customerInfo.FirstName) && !String.IsNullOrEmpty(customerInfo.LastName))
+                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, customerInfo.FirstName + " " + customerInfo.LastName);
+
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerGuid, customerInfo.Guid.ToString());
 
                     LocalNotificationsListener.Initialize();
 
