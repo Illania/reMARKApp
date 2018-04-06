@@ -723,7 +723,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             dismissAction?.Invoke();
             cts?.Cancel();
-            loginButton?.TouchUpInside += LoginButton_TouchUpInside;
+            if (loginButton != null)
+                loginButton.TouchUpInside += LoginButton_TouchUpInside;
         }
 
         #endregion
