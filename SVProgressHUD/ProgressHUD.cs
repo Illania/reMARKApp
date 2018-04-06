@@ -112,6 +112,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
         UIView _indefiniteAnimatedView;
         ProgressAnimatedView _ringView;
         ProgressAnimatedView _backgroundRingView;
+        Action _onCancel;
 
         UINotificationFeedbackGenerator _hapticGenerator;
         // END
@@ -387,9 +388,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
         #region Show methods
 
-        public void ShowProgress(string status = null, float progress = UndefinedProgress)
+        public void ShowProgress(string status = null, float progress = UndefinedProgress, Action onCancel = null)
         {
             UserInteractionEnabled = false;
+            _onCancel = onCancel;
 
             var weakThis = new WeakReference<ProgressHUD>(this);
             NSOperationQueue.MainQueue.AddOperation(() =>
@@ -630,6 +632,8 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
                 strongThis.SetNeedsDisplay();
             });
+
+            _onCancel = null;
         }
 
         #endregion
@@ -961,7 +965,10 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
             var touchLocation = touch.LocationInView(this);
 
             if (HudView.Frame.Contains(touchLocation))
+            {
                 NSNotificationCenter.DefaultCenter.PostNotificationName(DidTouchDownInsideNotification, this, GetNotificationUserInfo());
+                _onCancel?.Invoke();
+            }
         }
 
         NSDictionary GetNotificationUserInfo()

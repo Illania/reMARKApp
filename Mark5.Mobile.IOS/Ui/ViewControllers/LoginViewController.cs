@@ -531,6 +531,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var hapticGenerator = new UINotificationFeedbackGenerator();
             hapticGenerator.Prepare();
 
+            CancellationToken token;
+
             try
             {
                 var username = usernameTextField.Text;
@@ -612,8 +614,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 portTextField.ResignFirstResponder();
 
                 cts = new CancellationTokenSource();
-                notificationToken = NSNotificationCenter.DefaultCenter.AddObserver((NSString) SVProgressHUD.ProgressHUD.DidTouchDownInsideNotification, ProgressHUDDidTouchDownInsideNotification);
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), true);
+                token = cts.Token;
+
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), OnCancelLogin);
 
                 switch (sslMode)
                 {
@@ -627,9 +630,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Authenticating...");
 
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
+                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
 
-                if (cts.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                 {
                     CommonConfig.Logger.Info($"Authentication was cancelled...");
                     return;
@@ -686,7 +689,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                if(cts != null && cts.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                     return;
 
                 dismissAction?.Invoke();
@@ -716,11 +719,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SlideViewOverKeyboard(e, true);
         }
 
-        void ProgressHUDDidTouchDownInsideNotification (NSNotification notification)
+        void OnCancelLogin()
         {
             dismissAction?.Invoke();
-            cts.Cancel();
-            loginButton.TouchUpInside += LoginButton_TouchUpInside;
+            cts?.Cancel();
+            loginButton?.TouchUpInside += LoginButton_TouchUpInside;
         }
 
         #endregion
