@@ -145,7 +145,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     if (!String.IsNullOrEmpty(customerInfo.FirstName) && !String.IsNullOrEmpty(customerInfo.LastName))
                         CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, customerInfo.FirstName + " " + customerInfo.LastName);
 
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerGuid, customerInfo.Guid.ToString());
+                    if (customerInfo.Guid != null)
+                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerGuid, customerInfo.Guid.ToString());
 
                     LocalNotificationsListener.Initialize();
 
