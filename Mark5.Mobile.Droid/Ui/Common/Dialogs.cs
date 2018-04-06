@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MaterialDialogs;
-using Android.App;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
