@@ -142,6 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Attempting login...");
 
             Action dismissAction = null;
+            CancellationToken token;
 
             try
             {
@@ -193,6 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
                 cts = new CancellationTokenSource();
+                token = cts.Token;
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
 
                 switch (sslMode)
@@ -207,9 +209,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info("Authenticating...");
 
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), cts.Token);
+                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
 
-                if (cts.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                 {
                     CommonConfig.Logger.Info($"Authentication was cancelled...");
                     cts = null;
@@ -255,7 +257,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             catch (Exception ex)
             {
-                if (cts != null && cts.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                     return;
 
                 dismissAction();
