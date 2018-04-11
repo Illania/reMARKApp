@@ -145,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             View.AddSubview(webViewProgressView);
             View.AddConstraints(new[]
             {
-                webViewProgressView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                webViewProgressView.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor),
                 webViewProgressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
