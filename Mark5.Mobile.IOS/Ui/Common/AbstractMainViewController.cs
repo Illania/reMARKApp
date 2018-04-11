@@ -47,7 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 ClipsToBounds = true,
                 ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f)
             };
-            searchButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "search_large.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            searchButton.SetImage(UIImage.FromBundle("Search-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             searchButton.Layer.BorderColor = Theme.DarkGray.CGColor;
             searchButton.Layer.BorderWidth = .7f;
             searchButton.Layer.CornerRadius = 27.5f;

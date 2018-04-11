@@ -112,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            SearchButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "search_large.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            SearchButton.SetImage(UIImage.FromBundle("Search-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             SearchButton.Layer.CornerRadius = 27.5f;
             View.AddSubview(SearchButton);
             View.AddConstraints(new[]

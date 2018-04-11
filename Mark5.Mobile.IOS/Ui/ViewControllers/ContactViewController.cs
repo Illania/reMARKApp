@@ -214,7 +214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            button1.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button1.SetImage(UIImage.FromBundle("Email-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             buttonsView.AddSubview(button1);
             buttonsView.AddConstraints(new[]
             {
@@ -232,7 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            button2.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_mobile.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button2.SetImage(UIImage.FromBundle("Mobile-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             buttonsView.AddSubview(button2);
             buttonsView.AddConstraints(new[]
             {
@@ -250,7 +250,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            button3.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_sms.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button3.SetImage(UIImage.FromBundle("Sms-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             buttonsView.AddSubview(button3);
             buttonsView.AddConstraints(new[]
             {
@@ -268,7 +268,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            button4.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button4.SetImage(UIImage.FromBundle("Map-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             buttonsView.AddSubview(button4);
             buttonsView.AddConstraints(new[]
             {
@@ -286,25 +286,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 assignCategoryButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "flag.png")),
+                    Image = UIImage.FromBundle("Flag"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
+                    Image = UIImage.FromBundle("Worktray"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 commentsButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "comments.png")),
+                    Image = UIImage.FromBundle("Comments"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 actionsLinksButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "actions.png")),
+                    Image = UIImage.FromBundle("Actions"),
                     Enabled = false
                 }
             };

@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             iconImage = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Email").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
@@ -113,13 +113,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             switch (ca.Type)
             {
                 case CommunicationAddressType.Email:
-                    iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    iconImage.Image = UIImage.FromBundle("Email").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case CommunicationAddressType.Mobile:
-                    iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    iconImage.Image = UIImage.FromBundle("Phone").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case CommunicationAddressType.Phone:
-                    iconImage.Image = UIImage.FromBundle(Path.Combine("icons", "phone.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    iconImage.Image = UIImage.FromBundle("Phone").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 default:
                     iconImage.Image = null;
