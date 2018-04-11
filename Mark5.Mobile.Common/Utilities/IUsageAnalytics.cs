@@ -17,7 +17,6 @@ namespace Mark5.Mobile.Common.Utilities
     {
         SSL,
         Hostname,
-        Username,
         CustomerName,
     }
 

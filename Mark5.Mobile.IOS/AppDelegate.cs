@@ -398,7 +398,6 @@ namespace Mark5.Mobile.IOS
                 var ci = await authenticator.GetConnectionInfoAsync();
                 CommonConfig.Logger.Info($"Current connection info: {ci}");
 
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username.ToLowerInvariant());
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
