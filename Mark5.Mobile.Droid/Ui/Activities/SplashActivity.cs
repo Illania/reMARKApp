@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
@@ -16,7 +17,6 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
-using System;
 #if !DEBUG
 using HockeyApp.Android;
 using Mark5.Mobile.Droid.Utilities.Hockey;
