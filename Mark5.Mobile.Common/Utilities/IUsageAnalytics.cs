@@ -19,7 +19,6 @@ namespace Mark5.Mobile.Common.Utilities
         Hostname,
         Username,
         CustomerName,
-        CustomerGuid
     }
 
     public enum ContactActionChoice

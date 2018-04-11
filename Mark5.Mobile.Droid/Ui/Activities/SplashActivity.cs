@@ -138,15 +138,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Info("Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                    if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
+
                     SystemSettingsJobService.ScheduleJob();
-
-                    var customerInfo = ServerConfig.SystemSettings.UserInfo.User;
-
-                    if (!String.IsNullOrEmpty(customerInfo.FirstName) && !String.IsNullOrEmpty(customerInfo.LastName))
-                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, customerInfo.FirstName + " " + customerInfo.LastName);
-
-                    if (customerInfo.Guid != null)
-                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerGuid, customerInfo.Guid.ToString());
 
                     LocalNotificationsListener.Initialize();
 
