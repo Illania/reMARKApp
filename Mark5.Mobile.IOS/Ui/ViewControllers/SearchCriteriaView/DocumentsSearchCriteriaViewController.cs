@@ -272,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 var icon = new UIImageView
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "search_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    Image = UIImage.FromBundle("Search-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TintColor = Theme.LightGray,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false
@@ -455,7 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
 
                 var icon = new UIImageView
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "search_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    Image = UIImage.FromBundle("Search-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TintColor = Theme.LightGray,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     UserInteractionEnabled = false

@@ -44,7 +44,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             iconImage = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Email").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 

@@ -45,14 +45,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             favoriteIndicatorImage = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "checkmark.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Checkmark).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(favoriteIndicatorImage);
 
             offlineIndicatorImage = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "offline.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Offline").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(offlineIndicatorImage);
@@ -72,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            expandButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "expand.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            expandButton.SetImage(UIImage.FromBundle("Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             ContentView.Add(expandButton);
 
             ContentView.AddConstraints(new[]
@@ -135,12 +135,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         static UIImage GetIcon(Folder folder)
         {
             if (folder.InternalType == FolderInternalType.Worktray)
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "worktray.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                return UIImage.FromBundle("Folderslist-Worktray").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
 
             if (folder.Type == FolderType.Draft)
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "draft.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                return UIImage.FromBundle("Folderslist-Draft").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
 
-            return UIImage.FromBundle(Path.Combine("icons", "folderslist", "folder.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            return UIImage.FromBundle("Folderslist-Folder").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         }
     }
 }

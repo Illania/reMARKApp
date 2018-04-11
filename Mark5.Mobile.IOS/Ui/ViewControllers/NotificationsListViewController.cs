@@ -163,7 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             markAsReadItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "markasread.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Mark-As-Read").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 Enabled = false
             };
             NavigationItem.SetRightBarButtonItem(markAsReadItem, false);

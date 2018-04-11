@@ -189,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 unreadIndicatorImageView = new UIImageView
                 {
                     ContentMode = UIViewContentMode.ScaleToFill,
-                    Image = UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    Image = UIImage.FromBundle("Full-Dot").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
 
@@ -208,7 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 attachmentsIndicatorImageView = new UIImageView
                 {
                     ContentMode = UIViewContentMode.ScaleToFill,
-                    Image = UIImage.FromBundle(Path.Combine("icons", "attachment-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    Image = UIImage.FromBundle("Attachment-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
 
@@ -224,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 commentsIndicatorImageView = new UIImageView
                 {
                     ContentMode = UIViewContentMode.ScaleToFill,
-                    Image = UIImage.FromBundle(Path.Combine("icons", "message-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    Image = UIImage.FromBundle("Message-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
 
@@ -340,13 +340,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             switch (dp.Direction)
             {
                 case DocumentDirection.Incoming:
-                    i = UIImage.FromBundle(Path.Combine("icons", "incoming.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    i = UIImage.FromBundle("Incoming").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case DocumentDirection.Outgoing:
-                    i = UIImage.FromBundle(Path.Combine("icons", "outgoing.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    i = UIImage.FromBundle("Outgoing").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 case DocumentDirection.Draft:
-                    i = UIImage.FromBundle(Path.Combine("icons", "edit_small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    i = UIImage.FromBundle("Edit-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
             }
             directionIndicatorImageView.Image = i;
