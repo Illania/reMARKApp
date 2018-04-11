@@ -144,10 +144,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             switch (notification.ObjectType)
             {
                 case ObjectType.Document:
-                    icon = UIImage.FromBundle(Path.Combine("icons", "documents-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    icon = UIImage.FromBundle("Documents-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
                 default:
-                    icon = UIImage.FromBundle(Path.Combine("icons", "notifications-small.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    //Used to be a icon/notification-small.png that didn't exist.
+                    icon = UIImage.FromBundle("Documents-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                     break;
             }
 
@@ -176,7 +177,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 .ConvertUtcToUserTime()
                 .ConvertDateTimeToTimestampMilliseconds()
                 .FormatUserTimestampAsCompactShortDateTimeString();
-            readImageView.Image = notification.IsRead ? null : UIImage.FromBundle(Path.Combine("icons", "full-dot.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            readImageView.Image = notification.IsRead ? null : UIImage.FromBundle("Full-Dot").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
 
             SelectionStyle = notification.ObjectType == ObjectType.Document ? UITableViewCellSelectionStyle.Default : UITableViewCellSelectionStyle.None;
         }

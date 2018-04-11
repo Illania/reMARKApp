@@ -45,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             favoriteIndicatorImage = new UIImageView
             {
-                Image = UIImage.FromBundle("Checkmark).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Checkmark").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(favoriteIndicatorImage);
