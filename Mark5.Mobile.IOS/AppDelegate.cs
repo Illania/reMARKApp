@@ -398,7 +398,6 @@ namespace Mark5.Mobile.IOS
                 var ci = await authenticator.GetConnectionInfoAsync();
                 CommonConfig.Logger.Info($"Current connection info: {ci}");
 
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username.ToLowerInvariant());
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
@@ -445,7 +444,11 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.ReachabilityReceiver.Register();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
+
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
 
