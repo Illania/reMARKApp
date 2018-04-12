@@ -200,9 +200,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 var directions = Criteria.Directions;
 
                 if (!directions.Any())
-                    directions.AddRange(new[] { DocumentDirection.Incoming, DocumentDirection.Outgoing, DocumentDirection.Draft });
-
-                if (directions.Count > 2)
                 {
                     SetLabelActive(allView, true);
                     SetLabelActive(inboxView, false);
@@ -228,9 +225,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 }
                 else
                 {
-                    if (directions.Count > 2)
-                        directions.Clear();
-
                     if (recognizer.View == inboxView)
                         if (directions.Contains(DocumentDirection.Incoming))
                             directions.Remove(DocumentDirection.Incoming);
@@ -246,6 +240,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                             directions.Remove(DocumentDirection.Draft);
                         else
                             directions.Add(DocumentDirection.Draft);
+
+                    if (directions.Count > 2)
+                        directions.Clear();
                 }
 
                 UpdateRow();

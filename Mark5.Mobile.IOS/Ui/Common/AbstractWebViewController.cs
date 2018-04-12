@@ -555,6 +555,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
         {
+            if (webView == null)
+                return;
+
             if (ofObject == webView && keyPath == "estimatedProgress")
                 webViewProgressView.SetProgress((float)webView.EstimatedProgress, true);
 
@@ -572,6 +575,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("scrollViewDidScroll:")]
         public void Scrolled(UIScrollView scrollView)
         {
+            if (webView == null)
+                return;
+
             var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.leadingAnchor");
             if (constraint == null)
                 return;
@@ -581,6 +587,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("scrollViewDidZoom:")]
         public void DidZoom(UIScrollView scrollView)
         {
+            if (webView == null)
+                return;
+
             if (headerContainerView.Bounds.Height > 0)
             {
                 var headerPaddingJs = headerPaddingJsTemplate;
