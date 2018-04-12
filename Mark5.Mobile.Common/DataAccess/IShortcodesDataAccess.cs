@@ -9,6 +9,8 @@ namespace Mark5.Mobile.Common.DataAccess
     {
         Task SaveShortcodePreviewsAsync(Folder folder, List<ShortcodePreview> shortcodePreviews, bool clean);
 
+        Task SaveShortcodePreviewsAsync(List<ShortcodePreview> shortcodePreviews);
+
         Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId, int maxItems);
 
         Task SaveShortcodeAsync(Shortcode shortocode);

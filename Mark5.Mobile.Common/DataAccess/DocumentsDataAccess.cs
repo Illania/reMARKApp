@@ -37,6 +37,21 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
+                throw new DataAccessException("Error saving document previews with folder.", ex);
+            }
+        }
+
+        public async Task SaveDocumentPreviewsAsync(List<DocumentPreview> documentPreviews)
+        {
+            try
+            {
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(documentPreviews);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
                 throw new DataAccessException("Error saving document previews.", ex);
             }
         }

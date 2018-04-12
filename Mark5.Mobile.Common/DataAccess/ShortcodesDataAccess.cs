@@ -37,6 +37,21 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
+                throw new DataAccessException("Error saving shortcodes with folder.", ex);
+            }
+        }
+
+        public async Task SaveShortcodePreviewsAsync(List<ShortcodePreview> shortcodePreviews)
+        {
+            try
+            {
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(shortcodePreviews);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
                 throw new DataAccessException("Error saving shortcodes.", ex);
             }
         }
