@@ -109,13 +109,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             var selectedDirections = new List<DocumentDirection>();
 
-            if (draftButton.Selected || allButton.Selected)
+            if (draftButton.Selected)
                 selectedDirections.Add(DocumentDirection.Draft);
 
-            if (inboxButton.Selected || allButton.Selected)
+            if (inboxButton.Selected)
                 selectedDirections.Add(DocumentDirection.Incoming);
 
-            if (outboxButton.Selected || allButton.Selected)
+            if (outboxButton.Selected)
                 selectedDirections.Add(DocumentDirection.Outgoing);
 
             Criteria.Directions = selectedDirections;

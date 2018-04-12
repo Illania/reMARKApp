@@ -37,6 +37,21 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
+                throw new DataAccessException("Error saving contacts with folder.", ex);
+            }
+        }
+
+        public async Task SaveContactPreviewsAsync(List<ContactPreview> contactPreviews)
+        {
+            try
+            {
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(contactPreviews);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
                 throw new DataAccessException("Error inserting contacts.", ex);
             }
         }
@@ -459,7 +474,7 @@ namespace Mark5.Mobile.Common.DataAccess
                         + " collate Nocase";
                     var cmd = c.CreateCommand(commandString);
                     cmd.Bind("@phrase", $"%{phrase}%");
-                    cmd.Bind("@addressType", (int) CommunicationAddressType.Email);
+                    cmd.Bind("@addressType", (int)CommunicationAddressType.Email);
                     var result = cmd.ExecuteQuery<Recipient>();
                     suggestions = result;
                 });
