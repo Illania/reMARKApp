@@ -122,7 +122,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 PhoneNumber phoneNumber = phoneNumberUtil.Parse(baseNumber, countryString);
                 number = phoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.E164);
             }
-            catch (NumberParseException ex)
+            catch (NumberParseException)
             {
                 return; //Number has been stored incorrectly, e.g. it contains letters, so it is ignored.
             }
