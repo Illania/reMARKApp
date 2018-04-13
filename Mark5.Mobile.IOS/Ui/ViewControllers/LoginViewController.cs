@@ -221,8 +221,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             logoImageView = new UIImageView
             {
-                //Image = UIImage.FromBundle(logoFileName),
-                Image = UIImage.FromBundle("Startscreen-Logo"),
+                Image = UIImage.FromBundle(logoFileName),
                 ContentMode = UIViewContentMode.ScaleAspectFit,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -242,8 +241,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var backgroundImageView = new UIImageView
             {
-                //Image = UIImage.FromBundle(backgroundFileName),
-                Image = UIImage.FromBundle("Startscreen-Background"),
+                Image = UIImage.FromBundle(backgroundFileName),
                 ContentMode = UIViewContentMode.ScaleAspectFill,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
