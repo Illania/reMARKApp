@@ -232,6 +232,8 @@
     <string name="marks_as_unread">Mark as unread</string>
     <string name="move_to_folder">Move to folder</string>
     <string name="moving_to_folder">Moving to folder</string>
+    <string name="must_save_persons_companies_offline_title">Contacts must be saved offline.</string>
+    <string name="must_save_persons_companies_offline_content">For caller identification to work, the contacts that should be identified should be saved offline.</string>
     <string name="network_interface">Network interface:</string>
     <string name="new_document">New email</string>
     <string name="no">No</string>
@@ -293,6 +295,8 @@
     <string name="auth_credential_content">To continue using MARK5 the device credential must be entered.</string>
     <string name="read_by">Read by:</string>
     <string name="recent_addresses">Recent addresses</string>
+    <string name="redirect_to_draw_settings_title">You must allow MARK5 to draw over other apps</string>
+    <string name="redirect_to_draw_settings_content">You will be redirected to the settings where you must enable MARK5 to draw over other apps. Only contacts that are saved offline will be identified by MARK5.</string>
     <string name="read_by_prefix">read by</string>
     <string name="reference">Ref.</string>
     <string name="reset">Reset</string>
