@@ -398,9 +398,6 @@
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small%403x.png">
 			<InProject>false</InProject>
 		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json">
-			<InProject>false</InProject>
-		</ImageAsset>
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appstore1024.png" />
 		<ImageAsset Include="Assets_startscreens.xcassets\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Contents.json" />
@@ -557,18 +554,26 @@
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\Contents.json" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\Contents.json" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\start-screen-bg-ipadretina-landscape.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\start-screen-bg-ipadretina-portrait.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\start-screen-bg-retina4.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\start-screen-bg-retinahd47.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\start-screen-bg-retinahd55.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\start-screen-bg-retinahd55-landscape.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\start-screen-logo-ipadretina-landscape.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\start-screen-logo-ipadretina-portrait.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\start-screen-logo-retina4.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\start-screen-logo-retinahd47.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\start-screen-logo-retinahd55.png" />
+		<ImageAsset Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\start-screen-logo-retinahd55-landscape.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
 		<BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
 		<BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
 		<BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-portrait.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retina4.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-logo-ipadretina-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-logo-ipadretina-portrait.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-logo-retina4.png" />
@@ -646,6 +651,8 @@
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Folder.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Download.imageset\" />
+	  <Folder Include="Assets_startscreens.xcassets\Startscreen-Background.launchimage\" />
+	  <Folder Include="Assets_startscreens.xcassets\Startscreen-Logo.launchimage\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
