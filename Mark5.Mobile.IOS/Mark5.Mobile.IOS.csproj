@@ -553,7 +553,6 @@
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png" />
-		<ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
