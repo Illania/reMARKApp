@@ -8,6 +8,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
     {
         public string Tag { get; set; }
 
+        bool recyclingOnDisappearEnabled = true;
         bool recycled;
 
         public override void LoadView()
@@ -27,6 +28,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void ViewDidDisappear(bool animated)
         {
             base.ViewDidDisappear(animated);
+
+            if (!recyclingOnDisappearEnabled)
+                return;
 
             if (IsBeingDismissed
                 || IsMovingFromParentViewController
@@ -49,8 +53,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
         }
 
+        public void DisableRecyclingOnDisappear()
+        {
+            recyclingOnDisappearEnabled = false;
+        }
+
+        public bool IsRecycled() => recycled;
+
         protected virtual void Recycle()
         {
         }
+
     }
 }

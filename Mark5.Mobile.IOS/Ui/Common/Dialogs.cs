@@ -90,6 +90,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListActionSheetAsync(UIViewController vc, string[] listStrings)
+        {
+            return ShowListActionSheetAsync(vc, listStrings, (UIPopoverPresentationControllerDelegate)null);
+        }
+
         public static Task<int> ShowListActionSheetAsync(UIViewController vc, string[] listStrings, UIView anchorView)
         {
             return ShowListActionSheetAsync(vc, listStrings, new PopoverPresentationControllerDelegate(anchorView));
@@ -115,7 +120,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 actionSheet.AddAction(UIAlertAction.Create(listStrings[ii], UIAlertActionStyle.Default, a => tcs.SetResult(ii)));
             }
             actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
-            if (actionSheet.PopoverPresentationController != null)
+            if (d != null && actionSheet.PopoverPresentationController != null) //If the PopoverController property is even just read, it will try to present the action sheet as a popover
                 actionSheet.PopoverPresentationController.Delegate = d;
             vc.PresentViewController(actionSheet, true, null);
             return tcs.Task;
