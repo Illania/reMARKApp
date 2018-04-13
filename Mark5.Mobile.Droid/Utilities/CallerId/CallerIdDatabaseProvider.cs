@@ -133,10 +133,12 @@ namespace Mark5.Mobile.Droid.Utilities
                 {
                     connectionSemaphore.Wait();
 
-                    var contactName = new ContactIdentification();
-                    contactName.FolderId = folderId;
-                    contactName.Name = name;
-                    contactName.Number = number;
+                    var contactName = new ContactIdentification
+                    {
+                        FolderId = folderId,
+                        Name = name,
+                        Number = number
+                    };
 
                     connection.Insert(contactName);
                 }

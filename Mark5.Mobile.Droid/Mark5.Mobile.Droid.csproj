@@ -439,8 +439,6 @@
     <Compile Include="Ui\Views\AddEditViews\AddEditShortcodeViews\EntryView.cs" />
     <Compile Include="Model\HubMessages\ShortcodePreviewChangedMessage.cs" />
     <Compile Include="Utilities\AsyncHelpers.cs" />
-    <Compile Include="Utilities\CallerIdDatabaseProvider.cs" />
-    <Compile Include="Utilities\CallStateBroadcastReceiver.cs" />
     <Compile Include="Utilities\UsageAnalytics.cs" />
     <Compile Include="Model\HtmlProcessingConfiguration.cs" />
     <Compile Include="Model\PlainTextProcessingConfiguration.cs" />
@@ -450,6 +448,8 @@
     <Compile Include="Utilities\Fingerprint\FingerprintUiHelper.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
     <Compile Include="Ui\Fragments\AuthenticationDialogFragment.cs" />
+    <Compile Include="Utilities\CallerId\CallerIdDatabaseProvider.cs" />
+    <Compile Include="Utilities\CallerId\CallStateBroadcastReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -471,6 +471,7 @@
     <Folder Include="Ui\Views\AddEditViews\AddEditContactViews\" />
     <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
     <Folder Include="Utilities\Fingerprint\" />
+    <Folder Include="Utilities\CallerId\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
