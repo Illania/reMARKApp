@@ -1,4 +1,4 @@
-﻿using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
 
@@ -40,6 +40,8 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string CleanCacheIntervalDaysKey = "CleanCacheIntervalDays";
             public const string ClearCacheKey = "ClearCache";
             public const string EnableReportingKey = "EnableReporting";
+
+            public const string AuthorizationInterval = "AuthorizationInterval";
 
             public const string PushNotificationTokenKey = "PushNotificationToken";
 
@@ -121,6 +123,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.CallerIdentificationEnabledKey), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.AuthorizationInterval), NSNumber.FromInt16(-1)
                 }
             };
             ud.RegisterDefaults(defaultsDictionary);
@@ -197,6 +202,8 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         public bool EnableReporting => ud.BoolForKey(Keys.EnableReportingKey);
+
+        public int AuthorizationInterval => (int)ud.IntForKey(Keys.AuthorizationInterval);
 
         public string PushNotificationToken
         {

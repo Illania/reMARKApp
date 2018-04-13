@@ -90,6 +90,9 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            var OneDayInterval = 60 * 24;
+            UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
+
             Window.MakeKeyAndVisible();
 
             if (launchOptions == null)
@@ -170,6 +173,8 @@ namespace Mark5.Mobile.IOS
 
         public override void OnActivated(UIApplication application)
         {
+            LocalAuthenticationManager.NotifyApplicationActivated();
+
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
@@ -180,6 +185,8 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsUploadService?.Stop();
             Services.DocumentPreviewsDownloadService?.Stop();
             Services.DocumentsDownloadService?.Stop();
+
+            LocalAuthenticationManager.NotifyApplicationEnteredBackground();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -285,6 +292,25 @@ namespace Mark5.Mobile.IOS
             }
         }
 
+        public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    CommonConfig.Logger.Info("Background Fetch: Retrieving system settings...");
+
+                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
+                    completionHandler(UIBackgroundFetchResult.NewData);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.", ex);
+                    completionHandler(UIBackgroundFetchResult.Failed);
+                }
+            });
+        }
+
         void InitializeCommon()
         {
             Task.Run(async () =>
@@ -312,6 +338,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Reachability = new Reachability();
                 CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
+                CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>
@@ -371,7 +398,6 @@ namespace Mark5.Mobile.IOS
                 var ci = await authenticator.GetConnectionInfoAsync();
                 CommonConfig.Logger.Info($"Current connection info: {ci}");
 
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username.ToLowerInvariant());
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
@@ -418,7 +444,11 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.ReachabilityReceiver.Register();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
+
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimezone;
 

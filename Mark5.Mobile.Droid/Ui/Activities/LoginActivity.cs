@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -22,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class LoginActivity : BaseAppCompatActivity
     {
+        CancellationTokenSource cts;
+
         TextInputEditText usernameEditText;
         TextInputEditText passwordEditText;
         TextInputEditText hostnameEditText;
@@ -139,6 +142,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Attempting login...");
 
             Action dismissAction = null;
+            CancellationToken token;
 
             try
             {
@@ -189,7 +193,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait);
+                cts = new CancellationTokenSource();
+                token = cts.Token;
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
 
                 switch (sslMode)
                 {
@@ -201,10 +207,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         break;
                 }
 
-
                 CommonConfig.Logger.Info("Authenticating...");
 
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
+                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
+
+                if (token.IsCancellationRequested)
+                {
+                    CommonConfig.Logger.Info($"Authentication was cancelled...");
+                    cts = null;
+                    return;
+                }
 
                 CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
 
@@ -221,6 +233,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
+                SystemSettingsJobService.ScheduleJob();
 
                 CommonConfig.Logger.Info($"Starting services...");
                 Services.DocumentsUploadService.Start();
@@ -236,14 +249,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, username.ToLowerInvariant());
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
+
+                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
                 StartActivity(MainActivity.CreateIntent(this));
                 Finish();
             }
             catch (Exception ex)
             {
+                if (token.IsCancellationRequested)
+                    return;
+
                 dismissAction();
 
                 CommonConfig.Logger.Error("Log in failed - main exception", ex);

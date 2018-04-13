@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -46,6 +47,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float LoginButtonHeight = 24f;
 
         #endregion
+
+        CancellationTokenSource cts;
+        Action dismissAction;
 
         UIView logoContainer;
         UIImageView logoImageView;
@@ -523,10 +527,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"Attempting login...");
 
-            Action dismissAction = null;
-
             var hapticGenerator = new UINotificationFeedbackGenerator();
             hapticGenerator.Prepare();
+
+            CancellationToken token;
 
             try
             {
@@ -608,7 +612,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 hostnameTextField.ResignFirstResponder();
                 portTextField.ResignFirstResponder();
 
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"));
+                cts = new CancellationTokenSource();
+                token = cts.Token;
+
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), OnCancelLogin);
 
                 switch (sslMode)
                 {
@@ -622,7 +629,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Authenticating...");
 
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port));
+                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
+
+                if (token.IsCancellationRequested)
+                {
+                    CommonConfig.Logger.Info($"Authentication was cancelled...");
+                    cts = null;
+                    return;
+                }
 
                 CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
 
@@ -660,8 +674,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => { });
 
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, username.ToLowerInvariant());
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
+
+                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
                 UIViewController vc;
                 if (Integration.IsIPad())
@@ -675,6 +691,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
+                if (token.IsCancellationRequested)
+                    return;
+
                 dismissAction?.Invoke();
 
                 CommonConfig.Logger.Error("Log in failed - exception", ex);
@@ -700,6 +719,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (IsViewLoaded)
                 SlideViewOverKeyboard(e, true);
+        }
+
+        void OnCancelLogin()
+        {
+            dismissAction?.Invoke();
+            cts?.Cancel();
+            if (loginButton != null)
+                loginButton.TouchUpInside += LoginButton_TouchUpInside;
         }
 
         #endregion

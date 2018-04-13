@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Mark5.Mobile.Common.Model;
@@ -96,6 +96,14 @@ namespace Mark5.Mobile.Droid.Utilities
         public int MaxShortcodesToSearch => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_search_shortcodes_to_get), Application.Context.Resources.GetString(Resource.String.pref_search_shortcodes_to_get_default)));
 
         public bool PartialWordSearch => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_search_partial_word), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_search_partial_word_default));
+
+        #endregion
+
+        #region Security
+
+        public int AuthorizationInterval => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_auth), Application.Context.Resources.GetString(Resource.String.pref_auth_default)));
+
+        public bool AuthorizationEnabled => AuthorizationInterval > int.Parse(Application.Context.Resources.GetString(Resource.String.pref_auth_default));
 
         #endregion
 

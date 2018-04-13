@@ -356,6 +356,21 @@ namespace Mark5.ServiceReference.DataContract
         public Template Template { get; set; }
     }
 
+    [DataContract(Name = "GetLinesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetLinesParameters : AbstractParameters
+    {
+    }
+
+    [DataContract(Name = "GetLinesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetLinesResult
+    {
+        [DataMember(Name = "OutgoingLines", Order = 0)]
+        public List<Line> OutgoingLines { get; set; } = new List<Line>();
+
+        [DataMember(Name = "IncomingLines", Order = 0)]
+        public List<Line> IncomingLines { get; set; } = new List<Line>();
+    }
+
     [DataContract(Name = "Document", Namespace = "com.nordic-it.appservice.v3")]
     public class Document
     {
@@ -2265,6 +2280,15 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "ServerUtcOffset", Order = 0)]
         public TimeSpan ServerUtcOffset { get; set; }
+
+        [DataMember(Name = "CustomerName", Order = 1)]
+        public string CustomerName { get; set; }
+
+        [DataMember(Name = "CustomerGuid", Order = 1)]
+        public Guid CustomerGuid { get; set; }
+
+        [DataMember(Name = "ServerTimeZoneInfoSerialized", Order = 1)]
+        public string ServerTimeZoneInfoSerialized { get; set; }
     }
 
     [DataContract(Name = "DocumentsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]

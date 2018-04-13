@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid
     {
         public bool StartedFromRoot { get; set; }
 
+        public ApplicationLifecycleHandler LifecycleHandler;
+
         public Mark5Application(IntPtr javaReference, JniHandleOwnership transfer)
             : base(javaReference, transfer)
         {
@@ -34,6 +36,9 @@ namespace Mark5.Mobile.Droid
             base.OnCreate();
 
             AppCompatDelegate.CompatVectorFromResourcesEnabled = true;
+
+            LifecycleHandler = new ApplicationLifecycleHandler();
+            RegisterActivityLifecycleCallbacks(LifecycleHandler);
 
             Task.Run(async () =>
                 {
@@ -54,6 +59,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
                     CommonConfig.UsageAnalytics = new UsageAnalytics(FirebaseAnalytics.GetInstance(this));
+                    CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
 
 #if !DEBUG
                     CommonConfig.Logger.Level = LogLevel.INFO;

@@ -2,6 +2,7 @@ using System;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
+using LocalAuthentication;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -22,6 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string DocumentsToDownloadKey = "DocumentsToDownload";
         const string CallerIdentificationEnabled = "CallerIdentificationEnabled";
+        const string AuthorizationIntervalKey = "AuthorizationInterval";
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
         const string OpenSettingsAppKey = "openSettingsApp";
@@ -109,11 +111,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return cell;
         }
 
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        public override async void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var specifier = SettingsReader.GetSpecifier(indexPath);
             if (specifier.Type == "PSMultiValueSpecifier")
             {
+                if (specifier.Key == AuthorizationIntervalKey)
+                {
+                    if (!new LAContext().CanEvaluatePolicy(LAPolicy.DeviceOwnerAuthentication, out var error))
+                    {
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("auth_cant_evaluate_policy_title"),
+                                                            Localization.GetString("auth_cant_evaluate_policy_content"));
+                    }
+                }
+
                 var vc = new CustomSpecifierValuesViewController
                 {
                     CurrentSpecifier = specifier,
@@ -320,7 +331,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error(ex);
+                    CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
                 }
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;

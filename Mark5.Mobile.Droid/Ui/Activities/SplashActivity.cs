@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
@@ -83,7 +84,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var ci = await authenticator.GetConnectionInfoAsync();
 
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Username, ci.Username.ToLowerInvariant());
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
                     CommonConfig.Logger.Info($"Current connection info: {ci}");
@@ -142,6 +142,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                
                     CommonConfig.Logger.Info("Retrieving system settings...");
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
+                    if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
+
+                    SystemSettingsJobService.ScheduleJob();
 
                     LocalNotificationsListener.Initialize();
 

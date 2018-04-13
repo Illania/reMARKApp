@@ -1119,7 +1119,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             {
                 if (recognizer.View == lineView)
                 {
-                    var data = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.ToArray();
+                    var data = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Union(ServerConfig.SystemSettings.DocumentsModuleInfo.IncomingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid))
+                                           .OrderBy(l => l.Name).ToArray();
                     var preselected = data.Where(l => Criteria.LineGuids.Contains(l.Guid)).ToArray();
 
                     var result = await Dialogs.ShowMultiSelectViewControllerAsync(parentViewControllerWeakReference.Unwrap(),

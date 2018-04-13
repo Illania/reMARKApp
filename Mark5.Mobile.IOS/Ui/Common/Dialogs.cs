@@ -143,9 +143,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Non-awaitable dialogs
 
-        public static Action ShowInfiniteProgressDialog(string content)
+        public static Action ShowInfiniteProgressDialog(string content, Action onCancel = null)
         {
-            ProgressHUD.Instance.ShowProgress(Localization.GetString(content));
+            ProgressHUD.Instance.ShowProgress(Localization.GetString(content), onCancel: onCancel);
             return ProgressHUD.Instance.Dismiss;
         }
 
