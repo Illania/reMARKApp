@@ -225,8 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     editButtonItem = new UIBarButtonItem
                     {
-                        //icons/pencil doesn't exist?
-                        Image = UIImage.FromBundle(Path.Combine("icons", "pencil")),
+                        Image = UIImage.FromBundle("Edit"),
                         Enabled = false
                     };
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
