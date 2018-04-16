@@ -15,9 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.3</string>
-	<key>CFBundleVersion</key>
-	<string>212</string>
+	<string>2.5</string>
 	<key>MinimumOSVersion</key>
 	<string>10.0</string>
 	<key>NSExtension</key>
@@ -27,5 +25,7 @@
 		<key>NSExtensionPrincipalClass</key>
 		<string>CallDirectoryHandler</string>
 	</dict>
+	<key>CFBundleVersion</key>
+	<string>221</string>
 </dict>
 </plist>
