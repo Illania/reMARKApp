@@ -1,12 +1,11 @@
 ﻿using System;
+using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class SeparatorSubView : UIView
     {
-        static readonly UIColor backgroundColor = new UITableView().SeparatorColor;
-
         public SeparatorSubView()
         {
             Initialize();
@@ -16,7 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             var line = new UIView
             {
-                BackgroundColor = backgroundColor,
+                BackgroundColor = Theme.DarkBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             AddSubview(line);
@@ -26,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(line, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(line, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f),
                 NSLayoutConstraint.Create(line, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f),
+                NSLayoutConstraint.Create(line, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 2f),
             };
             foreach (var constraint in constraints)
                 constraint.Priority = 500;

@@ -24,6 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         DateView dateView;
         ReadByView readByView;
         ReferenceNumberView referenceNumberView;
+        SeparatorSubView firstSeparator
 
         public HeaderView()
         {
@@ -54,8 +55,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             subjectView = new SubjectView();
             fromView = new FromView();
-            dateView = new DateView();
+            ccView = new CcView();
+            bccView = new BccView();
             toView = new ToView();
+            dateView = new DateView();
+            originatorView = new OriginatorView();
+            readByView = new ReadByView();
+            referenceNumberView = new ReferenceNumberView();
 
             var showMoreButton = new UIButton
             {
@@ -71,8 +77,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             subViews.Add(subjectView);
             subViews.Add(fromView);
-            subViews.Add(dateView);
             subViews.Add(toView);
+            subViews.Add(ccView);
+            subViews.Add(bccView);
+            subViews.Add(dateView);
+            subViews.Add(originatorView);
+            subViews.Add(readByView);
+            subViews.Add(referenceNumberView);
 
             var firstLine = new UIStackView
             {
@@ -96,10 +107,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             contentView.AddArrangedSubview(firstLine);
             contentView.AddArrangedSubview(secondLine);
 
+            var first
+
+            contentView.AddArrangedSubview(new SeparatorSubView());
+            contentView.AddArrangedSubview(ccView);
+            contentView.AddArrangedSubview(bccView);
+            contentView.AddArrangedSubview(new SeparatorSubView());
+            contentView.AddArrangedSubview(readByView);
+            contentView.AddArrangedSubview(referenceNumberView);
+            contentView.AddArrangedSubview(originatorView);
+
         }
 
         void ShowMoreButton_TouchUpInside(object sender, EventArgs e)
         {
+            UIView.Animate(0.3, () =>
+            {
+                contentView.AddArrangedSubview(new SeparatorSubView());
+                contentView.AddArrangedSubview(ccView);
+                contentView.AddArrangedSubview(bccView);
+                contentView.AddArrangedSubview(new SeparatorSubView());
+                contentView.AddArrangedSubview(readByView);
+                contentView.AddArrangedSubview(referenceNumberView);
+                contentView.AddArrangedSubview(originatorView);
+            });
+
         }
 
         public void RefreshHeader()
