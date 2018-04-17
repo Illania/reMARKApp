@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -191,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            button1.SetImage(UIImage.FromBundle(Path.Combine("icons", "large_email.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            button1.SetImage(UIImage.FromBundle("Email-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             buttonsView.AddSubview(button1);
             buttonsView.AddConstraints(new[]
             {
@@ -210,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
+                    Image = UIImage.FromBundle("Worktray"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
@@ -225,7 +225,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     editButtonItem = new UIBarButtonItem
                     {
-                        Image = UIImage.FromBundle(Path.Combine("icons", "edit")),
+                        Image = UIImage.FromBundle("Edit"),
                         Enabled = false
                     };
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);

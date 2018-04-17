@@ -205,7 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 editDocumentButtonItem = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "edit.png"))
+                    Image = UIImage.FromBundle("Edit")
                 };
             }
             else if (!hideDoneButton)
@@ -248,31 +248,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 flagButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "flag.png")),
+                    Image = UIImage.FromBundle("Flag"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 replyActionsButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "reply.png")),
+                    Image = UIImage.FromBundle("Reply"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "worktray.png")),
+                    Image = UIImage.FromBundle("Worktray"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 commentsButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "comments.png")),
+                    Image = UIImage.FromBundle("Comments"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 userActionsButton = new UIBarButtonItem
                 {
-                    Image = UIImage.FromBundle(Path.Combine("icons", "actions.png")),
+                    Image = UIImage.FromBundle("Actions"),
                     Enabled = false
                 }
             };

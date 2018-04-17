@@ -207,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var imageView = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "download.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Download").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             upView.AddSubview(imageView);
@@ -323,7 +323,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var warningImage = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "warning.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Warning").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TintColor = Theme.LightGray,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -452,7 +452,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var imageView = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "done.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Done").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             upView.AddSubview(imageView);

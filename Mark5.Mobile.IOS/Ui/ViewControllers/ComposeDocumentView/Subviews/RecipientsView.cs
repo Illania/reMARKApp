@@ -85,7 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (!hideAddButton)
             {
                 addButton = new UIButton();
-                addButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "add.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                addButton.SetImage(UIImage.FromBundle("Add").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 addButton.BackgroundColor = Theme.Clear;
                 addButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 addButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);

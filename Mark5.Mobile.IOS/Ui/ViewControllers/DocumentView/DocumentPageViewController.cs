@@ -68,17 +68,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             nextDocumentButtonItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "arrow-down.png")),
+                Image = UIImage.FromBundle("Arrow-Down"),
             };
 
             previousDocumentButtonItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "arrow-up.png")),
+                Image = UIImage.FromBundle("Arrow-Up"),
             };
 
             editDocumentButtonItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "edit.png"))
+                Image = UIImage.FromBundle("Edit"),
             };
         }
 
