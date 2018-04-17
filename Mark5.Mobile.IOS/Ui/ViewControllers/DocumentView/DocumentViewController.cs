@@ -45,6 +45,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIStackView headerStackView;
 
+        DocumentView.HeaderView.HeaderView headerView;
+
         FromView fromView;
         ToView toView;
         CcView ccView;
@@ -239,7 +241,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerStackView.AddArrangedSubview(extraFieldsView = new ExtraFieldsView());
             headerStackView.AddArrangedSubview(attachmentsListView = new AttachmentsView());
 
-            SetHeaderView(headerStackView);
+            headerView = new DocumentView.HeaderView.HeaderView();
+
+            SetHeaderView(headerView);
         }
 
         void InitToolbar()
@@ -501,13 +505,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (token.IsCancellationRequested)
                     return;
 
-                foreach (var dv in headerStackView.Subviews.OfType<DocumentSubView>())
-                {
-                    dv.Document = document;
-                    dv.DocumentPreview = documentPreview;
-                    dv.RefreshView();
-                    dv.UpdateVisibility();
-                };
+                headerView.Document = document;
+                headerView.DocumentPreview = DocumentPreview;
+                headerView.RefreshHeader();
 
                 if (document != null)
                 {

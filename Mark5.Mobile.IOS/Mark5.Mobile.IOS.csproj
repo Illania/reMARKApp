@@ -256,6 +256,21 @@
 		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
 		<Compile Include="Utilities\LocalAuthenticationManager.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\HeaderView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DocumentSubView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\TextSubView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReadByView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReferenceNumberView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\OriginatorView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\RecipientsView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CcView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\BccView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DateView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ToView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\FromView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SeparatorSubView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\LargeTextSubView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SubjectView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -645,6 +660,7 @@
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Folder.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Download.imageset\" />
+	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
