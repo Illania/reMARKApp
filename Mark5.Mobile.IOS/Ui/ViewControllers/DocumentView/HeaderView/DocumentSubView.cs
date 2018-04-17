@@ -23,8 +23,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void Initialize()
         {
-            BackgroundColor = Theme.White;
-            Opaque = false;
             Axis = UILayoutConstraintAxis.Vertical;
             Alignment = UIStackViewAlignment.Fill;
             Distribution = UIStackViewDistribution.Fill;

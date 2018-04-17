@@ -6,12 +6,14 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
-    public class HeaderView : UIStackView
+    public class HeaderView : UIView
     {
         List<DocumentSubView> subViews = new List<DocumentSubView>();
 
         public Document Document { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
+
+        UIStackView contentView;
 
         FromView fromView;
         ToView toView;
@@ -30,13 +32,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void Initialize()
         {
-            BackgroundColor = Theme.White;
-            Opaque = false;
-            Axis = UILayoutConstraintAxis.Vertical;
-            Alignment = UIStackViewAlignment.Fill;
-            Distribution = UIStackViewDistribution.Fill;
-            Spacing = 0f;
-            TranslatesAutoresizingMaskIntoConstraints = false;
+            BackgroundColor = Theme.LightGray;
+
+            contentView = new UIStackView()
+            {
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Fill,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0f,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+
+            AddSubview(contentView);
+            AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0)
+            });
 
             subjectView = new SubjectView();
             fromView = new FromView();
@@ -51,7 +65,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             showMoreButton.TouchUpInside += ShowMoreButton_TouchUpInside;
             showMoreButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             showMoreButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-
+            showMoreButton.ContentEdgeInsets = new UIEdgeInsets(0, 12f, 0, 12f);
+            showMoreButton.BackgroundColor = Theme.Clear;
+            showMoreButton.TitleLabel.Font = Theme.DefaultBoldFont;
 
             subViews.Add(subjectView);
             subViews.Add(fromView);
@@ -62,7 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 Alignment = UIStackViewAlignment.Center,
                 Axis = UILayoutConstraintAxis.Horizontal,
-                Distribution = UIStackViewDistribution.Fill
+                Distribution = UIStackViewDistribution.Fill,
             };
             firstLine.AddArrangedSubview(fromView);
             firstLine.AddArrangedSubview(dateView);
@@ -71,14 +87,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 Alignment = UIStackViewAlignment.Center,
                 Axis = UILayoutConstraintAxis.Horizontal,
-                Distribution = UIStackViewDistribution.Fill
+                Distribution = UIStackViewDistribution.Fill,
             };
             secondLine.AddArrangedSubview(toView);
             secondLine.AddArrangedSubview(showMoreButton);
 
-            AddArrangedSubview(subjectView);
-            AddArrangedSubview(firstLine);
-            AddArrangedSubview(secondLine);
+            contentView.AddArrangedSubview(subjectView);
+            contentView.AddArrangedSubview(firstLine);
+            contentView.AddArrangedSubview(secondLine);
 
         }
 

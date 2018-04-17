@@ -57,6 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             textView = new UITextView(CGRect.Empty, textContainer)
             {
+                BackgroundColor = Theme.Clear,
                 Editable = false,
                 Font = Theme.DefaultFont,
                 Opaque = false,
