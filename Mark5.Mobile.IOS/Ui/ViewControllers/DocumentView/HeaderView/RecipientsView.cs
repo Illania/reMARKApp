@@ -160,15 +160,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 var textInMatch = textView.Text.SafeSubstring(match.Index, match.Length);
                 if (Validator.ContainsValidEmails(textInMatch))
-                    textView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
+                    textView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.DarkBlue, new NSRange(match.Index, match.Length));
             }
 
             textView.TextStorage.EndEditing();
         }
 
-        public void ExpandView()
+        public void ExpandCompressView()
         {
-            // Work around to force text view layout
+            // Workaround to force text view layout
             textView.TextStorage.BeginEditing();
             textView.TextStorage.Insert(" ".ToNSAttributedString(), 0);
             textView.TextStorage.DeleteRange(new NSRange(0, 1));

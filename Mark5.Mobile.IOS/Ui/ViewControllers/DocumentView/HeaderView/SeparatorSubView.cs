@@ -4,7 +4,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
-    public class SeparatorSubView : UIView
+    public class SeparatorSubView : DocumentSubView
     {
         public SeparatorSubView()
         {
@@ -34,5 +34,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             AddConstraints(constraints);
         }
+
+        public override void RefreshView()
+        {
+        }
+
+        public override void UpdateVisibility()
+        {
+            Hidden = false;
+        }
+
     }
 }

@@ -14,8 +14,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             TextView = new UITextView
             {
                 BackgroundColor = Theme.Clear,
-                TextColor = Theme.DarkBlue,
-                Font = Theme.DefaultFont.WithRelativeSize(4f),
+                TextColor = Theme.DarkerBlue,
+                Font = Theme.DefaultSha.WithRelativeSize(4f),
                 Editable = false,
                 Opaque = false,
                 AutocapitalizationType = UITextAutocapitalizationType.Sentences,
