@@ -106,6 +106,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         UIView lineContainer;
         UIButton showMoreButton;
 
+        NSLayoutConstraint[] compressedConstraints;
+        NSLayoutConstraint[] expandedConstraints;
+        bool shown;
+
         UIView PrepareFirstLine()
         {
             var firstLine = new UIStackView
@@ -129,9 +133,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             showMoreButton.SetTitle("Show more", UIControlState.Normal);
             showMoreButton.TouchUpInside += ShowMoreButton_TouchUpInside;
             showMoreButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            showMoreButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            showMoreButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             showMoreButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             showMoreButton.ContentEdgeInsets = new UIEdgeInsets(0, 12f, 0, 12f);
-            showMoreButton.BackgroundColor = Theme.LightBlue;
+            showMoreButton.BackgroundColor = Theme.Clear;
             showMoreButton.TitleLabel.Font = Theme.DefaultBoldFont;
 
             lineContainer = new UIView
@@ -143,63 +149,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             lineContainer.AddSubview(toView);
             lineContainer.AddSubview(firstSeparator);
 
-            lineContainer.AddConstraints(new[]
+
+            compressedConstraints = new[]
             {
                 NSLayoutConstraint.Create(toView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Leading, 1f, 0f),
-                toTrailing = NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, 0f), //
+                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, 0f),
                 NSLayoutConstraint.Create(toView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Bottom, 1f, 0f),
-                toTop = NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 0f), //
+                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 0f),
 
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, 0f),
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 0f),
-                buttonBottom = NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Bottom, 1f, 0f), //
 
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, -6f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.CenterY, 1f, 0f),
-                separatorHeight = NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f), //
-                separatorWidth = NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f), //
-            });
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
+            };
 
+            expandedConstraints = new[]
+            {
+                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Leading, 1f, 0f),
+                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, 0f),
+
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 0f),
+
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Leading, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, -6f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.CenterY, 1f, 0f),
+            };
+
+            lineContainer.AddConstraints(compressedConstraints);
 
             return lineContainer;
         }
-
-        NSLayoutConstraint separatorHeight;
-        NSLayoutConstraint separatorWidth;
-        NSLayoutConstraint buttonBottom;
-        NSLayoutConstraint toTop;
-        NSLayoutConstraint toTrailing;
-
-        NSLayoutConstraint toTopAfter;
-        NSLayoutConstraint toTrailingAfter;
-        NSLayoutConstraint separatorLeadingAfter;
-
-
-        bool shown;
 
         void ShowMoreButton_TouchUpInside(object sender, EventArgs e)
         {
             LayoutIfNeeded();
 
-            Animate(1, () =>
+            Animate(0.5, () =>
             {
                 if (!shown)
                 {
                     showMoreButton.SetTitle("Show less", UIControlState.Normal);
                     hiddenViews.ForEach(v => v.Hidden = false);
 
-                    lineContainer.RemoveConstraint(toTop);
-                    lineContainer.RemoveConstraint(toTrailing);
-                    lineContainer.RemoveConstraint(buttonBottom);
-                    lineContainer.RemoveConstraint(separatorWidth);
-                    lineContainer.RemoveConstraint(separatorHeight);
-
-                    lineContainer.AddConstraints(new[]
-                    {
-                        separatorLeadingAfter = NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Leading, 1f, 0f),
-                        toTopAfter = NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Bottom, 1f, 0f),
-                        toTrailingAfter = NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, 0f),
-                    });
+                    lineContainer.RemoveConstraints(compressedConstraints);
+                    lineContainer.AddConstraints(expandedConstraints);
                 }
                 else
                 {
@@ -207,14 +206,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
                     hiddenViews.ForEach(v => v.Hidden = true);
 
-                    lineContainer.RemoveConstraint(separatorLeadingAfter);
-                    lineContainer.RemoveConstraint(toTopAfter);
-                    lineContainer.RemoveConstraint(toTrailingAfter);
-
-                    lineContainer.AddConstraints(new[]
-                    {
-                        toTop, toTrailing, buttonBottom, separatorWidth, separatorHeight,
-                    });
+                    lineContainer.RemoveConstraints(expandedConstraints);
+                    lineContainer.AddConstraints(compressedConstraints);
                 }
 
                 shown = !shown;
