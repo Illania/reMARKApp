@@ -1,6 +1,4 @@
-﻿using System;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.IOS.Ui.Common;
+﻿using Mark5.Mobile.Common.Model;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
@@ -12,9 +10,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         protected UIView ContainerView;
 
-        protected float HorizontalMargin = 12f;
-        protected float VerticalMargin = 6f;
-        protected float InnerMargin = 5f;
+        protected float HorizontalMargin => HeaderView.HorizontalMargin;
+        protected float VerticalMargin => HeaderView.VerticalMargin;
+        protected float InnerMargin => HeaderView.InnerMargin;
 
         protected DocumentSubView()
         {
@@ -23,11 +21,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void Initialize()
         {
+            TranslatesAutoresizingMaskIntoConstraints = false;
             Axis = UILayoutConstraintAxis.Vertical;
             Alignment = UIStackViewAlignment.Fill;
             Distribution = UIStackViewDistribution.Fill;
             Spacing = 0f;
-            TranslatesAutoresizingMaskIntoConstraints = false;
 
             ContainerView = new UIView();
             AddArrangedSubview(ContainerView);

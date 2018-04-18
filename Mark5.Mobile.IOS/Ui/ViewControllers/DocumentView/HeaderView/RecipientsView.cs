@@ -166,11 +166,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             textView.TextStorage.EndEditing();
         }
 
-        void ExpandView()
+        public void ExpandView()
         {
-            if (expanded)
-                return;
-
             // Work around to force text view layout
             textView.TextStorage.BeginEditing();
             textView.TextStorage.Insert(" ".ToNSAttributedString(), 0);
@@ -179,14 +176,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             AnimateNotify(0.2d, () =>
             {
-                textView.TextContainer.MaximumNumberOfLines = 0;
-                textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+                if (!expanded)
+                {
+                    textView.TextContainer.MaximumNumberOfLines = 0;
+                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+                }
+                else
+                {
+                    textView.TextContainer.MaximumNumberOfLines = 1;
+                    textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
+                }
 
-                Superview.SetNeedsLayout();
                 Superview.LayoutIfNeeded();
 
-                expanded = true;
             }, null);
+
+            expanded = !expanded;
         }
     }
 

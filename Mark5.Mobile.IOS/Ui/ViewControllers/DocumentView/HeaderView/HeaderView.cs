@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -8,6 +10,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class HeaderView : UIView
     {
+        static public float HorizontalMargin = 18f;
+        static public float VerticalMargin = 2f;
+        static public float InnerMargin = 5f;
+        static public float TopMargin = 10f;
+
         public Document Document { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
 
@@ -28,6 +35,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         SeparatorSubView firstSeparator;
         SeparatorSubView secondSeparator;
+
+        UIView lineContainer;
+        UIButton showMoreButton;
+
+        NSLayoutConstraint[] compressedConstraints;
+        NSLayoutConstraint[] expandedConstraints;
+        bool shown;
 
         public HeaderView()
         {
@@ -50,10 +64,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AddSubview(contentView);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, TopMargin),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0)
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, -TopMargin)
             });
 
             subjectView = new SubjectView();
@@ -100,15 +114,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             hiddenViews.Add(referenceNumberView);
             hiddenViews.Add(originatorView);
 
-            hiddenViews.ForEach(v => v.Hidden = true);
+            hiddenViews.ForEach(v =>
+            {
+                v.Hidden = true;
+                v.Alpha = 0.0f;
+            });
         }
-
-        UIView lineContainer;
-        UIButton showMoreButton;
-
-        NSLayoutConstraint[] compressedConstraints;
-        NSLayoutConstraint[] expandedConstraints;
-        bool shown;
 
         UIView PrepareFirstLine()
         {
@@ -133,22 +144,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             showMoreButton.SetTitle("Show more", UIControlState.Normal);
             showMoreButton.TouchUpInside += ShowMoreButton_TouchUpInside;
             showMoreButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            showMoreButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             showMoreButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            showMoreButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             showMoreButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-            showMoreButton.ContentEdgeInsets = new UIEdgeInsets(0, 12f, 0, 12f);
+            showMoreButton.ContentEdgeInsets = new UIEdgeInsets(0f, 0.1f, 0f, 0f);
             showMoreButton.BackgroundColor = Theme.Clear;
             showMoreButton.TitleLabel.Font = Theme.DefaultBoldFont;
 
             lineContainer = new UIView
             {
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
             lineContainer.AddSubview(showMoreButton);
             lineContainer.AddSubview(toView);
             lineContainer.AddSubview(firstSeparator);
-
 
             compressedConstraints = new[]
             {
@@ -157,8 +167,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(toView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 0f),
 
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.CenterY, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Bottom, 1f, 0f),
 
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, -6f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.CenterY, 1f, 0f),
@@ -173,8 +185,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, 0f),
 
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Top, 1f, 6f),
 
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, lineContainer, NSLayoutAttribute.Leading, 1f, 0f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, -6f),
@@ -189,31 +201,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         void ShowMoreButton_TouchUpInside(object sender, EventArgs e)
         {
             LayoutIfNeeded();
+            Animate(0.5, AnimateAction);
+        }
 
-            Animate(0.5, () =>
+        void AnimateAction()
+        {
+            if (!shown)
             {
-                if (!shown)
+                showMoreButton.SetTitle("Show less", UIControlState.Normal);
+                hiddenViews.ForEach(v =>
                 {
-                    showMoreButton.SetTitle("Show less", UIControlState.Normal);
-                    hiddenViews.ForEach(v => v.Hidden = false);
+                    v.Hidden = false;
+                    v.Alpha = 1.0f;
+                });
 
-                    lineContainer.RemoveConstraints(compressedConstraints);
-                    lineContainer.AddConstraints(expandedConstraints);
-                }
-                else
+                lineContainer.RemoveConstraints(compressedConstraints);
+                lineContainer.AddConstraints(expandedConstraints);
+
+                subViews.OfType<RecipientsView>().ForEach(r => r.ExpandView());
+            }
+            else
+            {
+                showMoreButton.SetTitle("Show more", UIControlState.Normal);
+
+                hiddenViews.ForEach(v =>
                 {
-                    showMoreButton.SetTitle("Show more", UIControlState.Normal);
+                    v.Hidden = true;
+                    v.Alpha = 0.0f;
+                });
 
-                    hiddenViews.ForEach(v => v.Hidden = true);
+                lineContainer.RemoveConstraints(expandedConstraints);
+                lineContainer.AddConstraints(compressedConstraints);
 
-                    lineContainer.RemoveConstraints(expandedConstraints);
-                    lineContainer.AddConstraints(compressedConstraints);
-                }
+                subViews.OfType<RecipientsView>().ForEach(r => r.ExpandView());
+            }
 
-                shown = !shown;
-                LayoutIfNeeded();
-            });
-
+            shown = !shown;
+            LayoutIfNeeded();
         }
 
         public void RefreshHeader()
