@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 10f),
                 NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
             });
 
@@ -39,16 +39,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
-                Spacing = InnerMargin,
+                Spacing = 0f,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContainerView.AddSubview(stackView);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -ExternalVerticalMargin)
             });
         }
 
@@ -82,9 +82,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 v.RemoveFromSuperview();
             };
 
-            if (Document.Attachments.Count > 4)
+            if (Document.Attachments.Count > 2)
             {
-                foreach (var ad in Document.Attachments.Take(3))
+                foreach (var ad in Document.Attachments.Take(2))
                 {
                     var alssv = new AttachmentsSubView(this, ad);
                     stackView.AddArrangedSubview(alssv);
@@ -127,7 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             btn.TouchUpInside -= HandleShowMoreButtonTapped;
             btn.RemoveFromSuperview();
 
-            foreach (var ad in Document.Attachments.Skip(3))
+            foreach (var ad in Document.Attachments.Skip(2))
             {
                 var alssv = new AttachmentsSubView(this, ad);
                 stackView.AddArrangedSubview(alssv);
@@ -158,13 +158,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             Opaque = false;
             TranslatesAutoresizingMaskIntoConstraints = false;
 
-            attachmentButton = new UIButton(UIButtonType.RoundedRect);
+            attachmentButton = new UIButton(UIButtonType.RoundedRect)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                HorizontalAlignment = UIControlContentHorizontalAlignment.Left,
+                Opaque = false,
+                ContentEdgeInsets = new UIEdgeInsets(0.5f, 0.1f, 0.1f, 0.1f)
+            };
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
             attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
-            attachmentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
             attachmentButton.TouchUpInside += AttachmentButton_TouchUpInside;
-            attachmentButton.Opaque = false;
-            attachmentButton.TranslatesAutoresizingMaskIntoConstraints = false;
             AddSubview(attachmentButton);
             AddConstraints(new[]
             {

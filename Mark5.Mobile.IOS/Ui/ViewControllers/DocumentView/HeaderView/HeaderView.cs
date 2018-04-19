@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         static public float HorizontalMargin = 18f;
         static public float VerticalMargin = 2f;
         static public float InnerMargin = 5f;
-        static public float TopMargin = 10f;
+        static public float ExternalVerticalMargin = 10f;
 
         public Document Document { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
@@ -40,11 +40,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         SeparatorSubView firstSeparator;
         SeparatorSubView secondSeparator;
 
-        UIView toShowMoreContainer;
         UIButton showMoreButton;
+
+        UIView subHeaderView;
 
         NSLayoutConstraint[] compressedConstraints;
         NSLayoutConstraint[] expandedConstraints;
+
         bool detailsShown;
 
         public HeaderView()
@@ -68,50 +70,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AddSubview(contentView);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, TopMargin),
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, ExternalVerticalMargin),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0)
             });
 
-            subjectView = new SubjectView();
-            fromView = new FromView();
-            toView = new ToView();
-            ccView = new CcView();
-            bccView = new BccView();
-            dateView = new DateView();
-            readByView = new ReadByView();
-            referenceNumberView = new ReferenceNumberView();
-            priorityView = new PriorityView();
-            originatorView = new OriginatorView();
-            creatorView = new CreatorView();
-            extraFieldsView = new ExtraFieldsView();
-            attachmentsListView = new AttachmentsView();
+            subViews.Add(subjectView = new SubjectView());
+            subViews.Add(fromView = new FromView());
+            subViews.Add(toView = new ToView());
+            subViews.Add(ccView = new CcView());
+            subViews.Add(bccView = new BccView());
+            subViews.Add(dateView = new DateView());
+            subViews.Add(readByView = new ReadByView());
+            subViews.Add(referenceNumberView = new ReferenceNumberView());
+            subViews.Add(priorityView = new PriorityView());
+            subViews.Add(originatorView = new OriginatorView());
+            subViews.Add(creatorView = new CreatorView());
+            subViews.Add(extraFieldsView = new ExtraFieldsView());
+            subViews.Add(attachmentsListView = new AttachmentsView());
 
             firstSeparator = new SeparatorSubView();
             secondSeparator = new SeparatorSubView();
             showMoreButton = CreateShowMoreButton();
 
-            subViews.Add(subjectView);
-            subViews.Add(fromView);
-            subViews.Add(toView);
-            subViews.Add(ccView);
-            subViews.Add(bccView);
-            subViews.Add(dateView);
-            subViews.Add(readByView);
-            subViews.Add(referenceNumberView);
-            subViews.Add(priorityView);
-            subViews.Add(originatorView);
-            subViews.Add(creatorView);
-            subViews.Add(extraFieldsView);
-            subViews.Add(attachmentsListView);
-
-            var fromDateView = CreateFromDateView();
-            var toShowMoreView = CreateToShowMoreView();
+            subHeaderView = GetSubHeader();
+            var bottomView = new UIView();
 
             contentView.AddArrangedSubview(subjectView);
-            contentView.AddArrangedSubview(fromDateView);
-            contentView.AddArrangedSubview(toShowMoreView);
+            contentView.AddArrangedSubview(subHeaderView);
+            contentView.AddArrangedSubview(fromView);
+            contentView.AddArrangedSubview(toView);
             contentView.AddArrangedSubview(ccView);
             contentView.AddArrangedSubview(bccView);
             contentView.AddArrangedSubview(secondSeparator);
@@ -121,8 +110,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             contentView.AddArrangedSubview(creatorView);
             contentView.AddArrangedSubview(originatorView);
             contentView.AddArrangedSubview(extraFieldsView);
+            contentView.AddArrangedSubview(bottomView);
             contentView.AddArrangedSubview(attachmentsListView);
 
+            contentView.AddConstraints(new[]
+             {
+                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Width, 1f, 0f),
+                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, ExternalVerticalMargin),
+            });
+
+            hiddenViews.Add(firstSeparator);
             hiddenViews.Add(ccView);
             hiddenViews.Add(bccView);
             hiddenViews.Add(secondSeparator);
@@ -132,8 +129,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             hiddenViews.Add(creatorView);
             hiddenViews.Add(originatorView);
             hiddenViews.Add(extraFieldsView);
-            hiddenViews.Add(attachmentsListView);
-
 
             hiddenViews.ForEach(v =>
             {
@@ -154,79 +149,60 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             button.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             button.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             button.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-            button.ContentEdgeInsets = new UIEdgeInsets(0f, 0.1f, 0f, 0f);
+            button.ContentEdgeInsets = new UIEdgeInsets(0f, 0.1f, 0f, 0);
             button.BackgroundColor = Theme.Clear;
             button.TitleLabel.Font = Theme.DefaultBoldFont;
 
             return button;
         }
 
-        UIView CreateFromDateView()
+        UIView GetSubHeader()
         {
-            var firstLine = new UIStackView
+            var container = new UIView
             {
-                Alignment = UIStackViewAlignment.Top,
-                Axis = UILayoutConstraintAxis.Horizontal,
-                Distribution = UIStackViewDistribution.Fill,
-            };
-            firstLine.AddArrangedSubview(fromView);
-            firstLine.AddArrangedSubview(dateView);
-
-            return firstLine;
-        }
-
-        UIView CreateToShowMoreView()
-        {
-            toShowMoreContainer = new UIView
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            PrepareConstraints();
+            container.AddSubview(dateView);
+            container.AddSubview(showMoreButton);
+            container.AddSubview(firstSeparator);
 
-            toShowMoreContainer.AddSubview(showMoreButton);
-            toShowMoreContainer.AddSubview(toView);
-            toShowMoreContainer.AddSubview(firstSeparator);
-
-            toShowMoreContainer.AddConstraints(compressedConstraints);
-
-            return toShowMoreContainer;
-        }
-
-        void PrepareConstraints()
-        {
             compressedConstraints = new[]
             {
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Leading, 1f, 0f),
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, 0f),
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
+                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
 
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.CenterY, 1f, 0f),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, container, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Trailing, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.CenterY, 1f, 0f),
 
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, -6f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.CenterY, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Trailing, 1f, 0f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
             };
 
             expandedConstraints = new[]
             {
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Leading, 1f, 0f),
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Trailing, 1f, 0f),
+                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
+                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
 
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, container, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Trailing, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.CenterY, 1f, 0f),
 
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Leading, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, -6f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.CenterY, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Trailing, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
             };
+
+            container.AddConstraints(compressedConstraints);
+
+            return container;
         }
 
         void ShowMoreButton_TouchUpInside(object sender, EventArgs e)
@@ -239,15 +215,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             if (!detailsShown)
             {
-                showMoreButton.SetTitle(Localization.GetString("show_less"), UIControlState.Normal); //TODO need to get string from localization
+                showMoreButton.SetTitle(Localization.GetString("show_less"), UIControlState.Normal);
                 hiddenViews.ForEach(v =>
                 {
                     v.UpdateVisibility();
                     v.Alpha = 1.0f;
                 });
 
-                toShowMoreContainer.RemoveConstraints(compressedConstraints);
-                toShowMoreContainer.AddConstraints(expandedConstraints);
+                subHeaderView.RemoveConstraints(compressedConstraints);
+                subHeaderView.AddConstraints(expandedConstraints);
 
                 subViews.OfType<RecipientsView>().ForEach(r => r.ExpandCompressView());
             }
@@ -261,8 +237,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     v.Alpha = 0.0f;
                 });
 
-                toShowMoreContainer.RemoveConstraints(expandedConstraints);
-                toShowMoreContainer.AddConstraints(compressedConstraints);
+                subHeaderView.RemoveConstraints(expandedConstraints);
+                subHeaderView.AddConstraints(compressedConstraints);
 
                 subViews.OfType<RecipientsView>().ForEach(r => r.ExpandCompressView());
             }
@@ -279,6 +255,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 view.DocumentPreview = DocumentPreview;
                 view.RefreshView();
             }
+
+            attachmentsListView.UpdateVisibility();
         }
     }
 }

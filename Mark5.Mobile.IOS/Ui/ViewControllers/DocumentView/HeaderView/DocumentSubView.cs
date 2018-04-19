@@ -13,6 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         protected float HorizontalMargin => HeaderView.HorizontalMargin;
         protected float VerticalMargin => HeaderView.VerticalMargin;
         protected float InnerMargin => HeaderView.InnerMargin;
+        protected float ExternalVerticalMargin => HeaderView.ExternalVerticalMargin;
 
         protected DocumentSubView()
         {
