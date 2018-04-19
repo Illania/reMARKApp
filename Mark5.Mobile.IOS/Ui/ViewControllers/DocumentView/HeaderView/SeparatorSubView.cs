@@ -6,6 +6,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class SeparatorSubView : DocumentSubView
     {
+        const float SeparatorVerticalMargin = 12f;
+
         public SeparatorSubView()
         {
             Initialize();
@@ -23,10 +25,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AddSubview(line);
             var constraints = new[]
             {
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 2f),
+                NSLayoutConstraint.Create(line, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, SeparatorVerticalMargin),
                 NSLayoutConstraint.Create(line, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
                 NSLayoutConstraint.Create(line, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, -2f),
+                NSLayoutConstraint.Create(line, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, -SeparatorVerticalMargin),
                 NSLayoutConstraint.Create(line, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f),
             };
             foreach (var constraint in constraints)

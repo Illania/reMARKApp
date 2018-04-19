@@ -145,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             var firstLine = new UIStackView
             {
-                Alignment = UIStackViewAlignment.Center,
+                Alignment = UIStackViewAlignment.Top,
                 Axis = UILayoutConstraintAxis.Horizontal,
                 Distribution = UIStackViewDistribution.Fill,
             };
@@ -154,8 +154,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             return firstLine;
         }
-
-        //TODO start with new font name and type
 
         UIView CreateToShowMoreView()
         {
@@ -203,7 +201,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(toView, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Trailing, 1f, 0f),
 
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Top, 1f, 6f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Top, 1f, 0f),
 
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, toShowMoreContainer, NSLayoutAttribute.Leading, 1f, 0f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Leading, 1f, -6f),
