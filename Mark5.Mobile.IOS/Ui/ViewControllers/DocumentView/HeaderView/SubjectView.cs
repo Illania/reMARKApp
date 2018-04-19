@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.IOS.Ui.Common;
+﻿using Foundation;
+using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
@@ -6,33 +7,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class SubjectView : DocumentSubView
     {
-        UITextView subjectTextView;
+        UILabel subjectLabel;
 
         public SubjectView()
         {
-            subjectTextView = new UITextView
+            subjectLabel = new UILabel
             {
                 BackgroundColor = Theme.Clear,
                 TextColor = Theme.DarkerBlue,
                 Font = Theme.DefaultLightBoldFont.WithRelativeSize(4f),
-                Editable = false,
                 Opaque = false,
-                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
-                AutocorrectionType = UITextAutocorrectionType.Yes,
-                SpellCheckingType = UITextSpellCheckingType.Yes,
-                TextContainerInset = UIEdgeInsets.Zero,
                 ClipsToBounds = false,
-                ScrollEnabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            subjectTextView.TextContainer.LineFragmentPadding = 0f;
-            ContainerView.AddSubview(subjectTextView);
+            subjectLabel.Lines = 0;
+            subjectLabel.LineBreakMode = UILineBreakMode.WordWrap;
+            ContainerView.AddSubview(subjectLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(subjectTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(subjectTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(subjectTextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(subjectTextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -5f)
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -5f)
             });
         }
 
@@ -40,15 +36,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             if (newsuper == null)
             {
-                subjectTextView?.RemoveFromSuperview();
-                subjectTextView = null;
+                subjectLabel?.RemoveFromSuperview();
+                subjectLabel = null;
             }
         }
 
         public override void RefreshView()
         {
             if (DocumentPreview != null)
-                subjectTextView.Text = DocumentPreview.Subject;
+                subjectLabel.Text = DocumentPreview.Subject;
         }
 
         public override void UpdateVisibility()

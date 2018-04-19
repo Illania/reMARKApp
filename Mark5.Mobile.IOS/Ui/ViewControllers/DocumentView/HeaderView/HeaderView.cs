@@ -149,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             button.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             button.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             button.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-            button.ContentEdgeInsets = new UIEdgeInsets(0f, 0.1f, 0f, 0);
+            button.ContentEdgeInsets = new UIEdgeInsets(0.1f, 0.1f, 0.1f, 2.0f);
             button.BackgroundColor = Theme.Clear;
             button.TitleLabel.Font = Theme.DefaultBoldFont;
 
