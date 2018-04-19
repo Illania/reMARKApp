@@ -274,6 +274,7 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\AttachmentsView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ExtraFieldsView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\PriorityView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CreatorView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

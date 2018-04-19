@@ -23,15 +23,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         UIStackView contentView;
 
+        SubjectView subjectView;
         FromView fromView;
         ToView toView;
         CcView ccView;
         BccView bccView;
-        OriginatorView originatorView;
-        SubjectView subjectView;
         DateView dateView;
         ReadByView readByView;
         ReferenceNumberView referenceNumberView;
+        PriorityView priorityView;
+        OriginatorView originatorView;
+        CreatorView creatorView;
+        ExtraFieldsView extraFieldsView;
+        AttachmentsView attachmentsListView;
 
         SeparatorSubView firstSeparator;
         SeparatorSubView secondSeparator;
@@ -67,18 +71,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, TopMargin),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, -TopMargin)
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0)
             });
 
             subjectView = new SubjectView();
             fromView = new FromView();
+            toView = new ToView();
             ccView = new CcView();
             bccView = new BccView();
-            toView = new ToView();
             dateView = new DateView();
-            originatorView = new OriginatorView();
             readByView = new ReadByView();
             referenceNumberView = new ReferenceNumberView();
+            priorityView = new PriorityView();
+            originatorView = new OriginatorView();
+            creatorView = new CreatorView();
+            extraFieldsView = new ExtraFieldsView();
+            attachmentsListView = new AttachmentsView();
+
             firstSeparator = new SeparatorSubView();
             secondSeparator = new SeparatorSubView();
             showMoreButton = CreateShowMoreButton();
@@ -89,10 +98,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             subViews.Add(ccView);
             subViews.Add(bccView);
             subViews.Add(dateView);
-            subViews.Add(originatorView);
             subViews.Add(readByView);
             subViews.Add(referenceNumberView);
-
+            subViews.Add(priorityView);
+            subViews.Add(originatorView);
+            subViews.Add(creatorView);
+            subViews.Add(extraFieldsView);
+            subViews.Add(attachmentsListView);
 
             var fromDateView = CreateFromDateView();
             var toShowMoreView = CreateToShowMoreView();
@@ -100,20 +112,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             contentView.AddArrangedSubview(subjectView);
             contentView.AddArrangedSubview(fromDateView);
             contentView.AddArrangedSubview(toShowMoreView);
-
             contentView.AddArrangedSubview(ccView);
             contentView.AddArrangedSubview(bccView);
             contentView.AddArrangedSubview(secondSeparator);
+            contentView.AddArrangedSubview(priorityView);
             contentView.AddArrangedSubview(readByView);
             contentView.AddArrangedSubview(referenceNumberView);
+            contentView.AddArrangedSubview(creatorView);
             contentView.AddArrangedSubview(originatorView);
+            contentView.AddArrangedSubview(extraFieldsView);
+            contentView.AddArrangedSubview(attachmentsListView);
 
             hiddenViews.Add(ccView);
             hiddenViews.Add(bccView);
             hiddenViews.Add(secondSeparator);
+            hiddenViews.Add(priorityView);
             hiddenViews.Add(readByView);
             hiddenViews.Add(referenceNumberView);
+            hiddenViews.Add(creatorView);
             hiddenViews.Add(originatorView);
+            hiddenViews.Add(extraFieldsView);
+            hiddenViews.Add(attachmentsListView);
+
 
             hiddenViews.ForEach(v =>
             {
@@ -128,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
-            button.SetTitle("Show more", UIControlState.Normal);
+            button.SetTitle(Localization.GetString("show_more"), UIControlState.Normal);
             button.TouchUpInside += ShowMoreButton_TouchUpInside;
             button.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             button.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
@@ -219,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             if (!detailsShown)
             {
-                showMoreButton.SetTitle("Show less", UIControlState.Normal); //TODO need to get string from localization
+                showMoreButton.SetTitle(Localization.GetString("show_less"), UIControlState.Normal); //TODO need to get string from localization
                 hiddenViews.ForEach(v =>
                 {
                     v.UpdateVisibility();
@@ -233,7 +253,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             }
             else
             {
-                showMoreButton.SetTitle("Show more", UIControlState.Normal);
+                showMoreButton.SetTitle(Localization.GetString("show_more"), UIControlState.Normal);
 
                 hiddenViews.ForEach(v =>
                 {

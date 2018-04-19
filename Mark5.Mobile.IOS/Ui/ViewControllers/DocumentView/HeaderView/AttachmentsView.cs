@@ -25,6 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            ContainerView.BackgroundColor = Theme.White;
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
             {
@@ -174,7 +175,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             });
         }
 
-        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => viewWeakReference.Wrap()?.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(Attachment));
+        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => viewWeakReference.Unwrap()?.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(Attachment));
 
         public override void WillMoveToSuperview(UIView newsuper)
         {
