@@ -271,6 +271,9 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SeparatorSubView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\LargeTextSubView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SubjectView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\AttachmentsView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ExtraFieldsView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\PriorityView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
