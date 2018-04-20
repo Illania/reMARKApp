@@ -3,11 +3,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
-using Mark5.Mobile.Common.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
@@ -77,6 +78,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
                 NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f,  -HorizontalMargin)
             });
+
+            textView.AddGestureRecognizer(new UITapGestureRecognizer(HandleTextTapped));
         }
 
         public override void WillMoveToSuperview(UIView newsuper)
@@ -90,6 +93,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 textView.GestureRecognizers.ForEach(textView.RemoveGestureRecognizer);
                 textView = null;
             }
+        }
+
+        void HandleTextTapped(UITapGestureRecognizer gestureRecognizer)
+        {
+            if (!expanded)
+                return;
+
+            var tapPosition = textView.GetClosestPositionToPoint(gestureRecognizer.LocationInView(textView));
+            var offset = textView.GetOffsetFromPosition(textView.BeginningOfDocument, tapPosition);
+
+            var beforeSubstring = textView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = textView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+
+            var tappedRecipent = beforeSubstring + afterSubstring;
+
+            if (CommonConfig.Logger.IsTraceEnabled())
+                CommonConfig.Logger.Trace(string.Format("Tapped recipent. [recipent={0}]", tappedRecipent));
+
+            RecipientTapped?.Invoke(this, new RecipientTappedEventArgs(tappedRecipent));
         }
 
         public override void RefreshView()

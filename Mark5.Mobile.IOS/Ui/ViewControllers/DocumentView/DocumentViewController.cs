@@ -14,7 +14,7 @@ using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
-using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews;
+using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem editDocumentButtonItem;
 
-        DocumentView.HeaderView.HeaderView headerView;
+        HeaderView headerView;
 
         UIBarButtonItem flagButton;
         UIBarButtonItem fileToButton;
@@ -218,8 +218,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (headerView != null)
             {
-                headerView.RecipientTapped += RecipientsView_RecipientTapped;
-                headerView.AttachmentTapped += AttachmentsList_AttachmentTapped;
+                headerView.RecipientTapped += HeaderView_RecipientTapped;
+                headerView.AttachmentTapped += HeaderView_AttachmentTapped;
             }
 
             if (flagButton != null)
@@ -244,8 +244,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (headerView != null)
             {
-                headerView.RecipientTapped -= RecipientsView_RecipientTapped;
-                headerView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
+                headerView.RecipientTapped -= HeaderView_RecipientTapped;
+                headerView.AttachmentTapped -= HeaderView_AttachmentTapped;
             }
 
             if (flagButton != null)
@@ -535,7 +535,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Subviews event handlers
 
-        async void AttachmentsList_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+        async void HeaderView_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
         {
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
@@ -599,7 +599,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void RecipientsView_RecipientTapped(object sender, RecipientTappedEventArgs e)
+        void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
         {
             PresentComposeViewWithPreconfiguredAddresses(new string[] { e.Recipent });
         }

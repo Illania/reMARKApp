@@ -55,7 +55,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public HeaderView()
         {
             Initialize();
-            InitializeHandlers();
         }
 
         void Initialize()
@@ -158,15 +157,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         void DeinitializeHandlers()
         {
             if (fromView != null)
-                fromView.RecipientTapped += RecipientTapped;
+                fromView.RecipientTapped -= RecipientTapped;
             if (toView != null)
-                toView.RecipientTapped += RecipientTapped;
+                toView.RecipientTapped -= RecipientTapped;
             if (ccView != null)
-                ccView.RecipientTapped += RecipientTapped;
+                ccView.RecipientTapped -= RecipientTapped;
             if (bccView != null)
-                bccView.RecipientTapped += RecipientTapped;
+                bccView.RecipientTapped -= RecipientTapped;
             if (attachmentsListView != null)
-                attachmentsListView.AttachmentTapped += AttachmentTapped;
+                attachmentsListView.AttachmentTapped -= AttachmentTapped;
         }
 
         public override void WillMoveToSuperview(UIView newsuper)
@@ -298,9 +297,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         #region Public methods
 
-
         public void RefreshHeader()
         {
+            DeinitializeHandlers();
+            InitializeHandlers();
+
             foreach (var view in subViews)
             {
                 view.Document = Document;
