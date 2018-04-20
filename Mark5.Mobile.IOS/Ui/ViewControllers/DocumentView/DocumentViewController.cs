@@ -43,23 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIBarButtonItem doneButtonItem;
         UIBarButtonItem editDocumentButtonItem;
 
-        UIStackView headerStackView;
-
         DocumentView.HeaderView.HeaderView headerView;
-
-        FromView fromView;
-        ToView toView;
-        CcView ccView;
-        BccView bccView;
-        ExtraFieldsView extraFieldsView;
-        OriginatorView originatorView;
-        SubjectView subjectView;
-        DateReceivedView dateReceivedView;
-        PriorityView priorityView;
-        AttachmentsView attachmentsListView;
-        CreatorView creatorView;
-        ReadByView readByView;
-        ReferenceNumberView referenceNumberView;
 
         UIBarButtonItem flagButton;
         UIBarButtonItem fileToButton;
@@ -156,37 +140,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             doneButtonItem = null;
             editDocumentButtonItem = null;
 
-            headerStackView.RemoveFromSuperview();
+            headerView.RemoveFromSuperview();
 
-            fromView.RemoveFromSuperview();
-            toView.RemoveFromSuperview();
-            ccView.RemoveFromSuperview();
-            bccView.RemoveFromSuperview();
-            extraFieldsView.RemoveFromSuperview();
-            originatorView.RemoveFromSuperview();
-            subjectView.RemoveFromSuperview();
-            dateReceivedView.RemoveFromSuperview();
-            priorityView.RemoveFromSuperview();
-            attachmentsListView.RemoveFromSuperview();
-            creatorView.RemoveFromSuperview();
-            readByView.RemoveFromSuperview();
-            referenceNumberView.RemoveFromSuperview();
-
-            headerStackView = null;
-
-            fromView = null;
-            toView = null;
-            ccView = null;
-            bccView = null;
-            extraFieldsView = null;
-            originatorView = null;
-            subjectView = null;
-            dateReceivedView = null;
-            priorityView = null;
-            attachmentsListView = null;
-            creatorView = null;
-            readByView = null;
-            referenceNumberView = null;
+            headerView = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -219,31 +175,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitHeaderView()
         {
-            headerStackView = new UIStackView
-            {
-                Axis = UILayoutConstraintAxis.Vertical,
-                Alignment = UIStackViewAlignment.Fill,
-                Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0f,
-            };
-
-            headerStackView.AddArrangedSubview(subjectView = new SubjectView());
-            headerStackView.AddArrangedSubview(referenceNumberView = new ReferenceNumberView());
-            headerStackView.AddArrangedSubview(fromView = new FromView());
-            headerStackView.AddArrangedSubview(toView = new ToView());
-            headerStackView.AddArrangedSubview(ccView = new CcView());
-            headerStackView.AddArrangedSubview(bccView = new BccView());
-            headerStackView.AddArrangedSubview(dateReceivedView = new DateReceivedView());
-            headerStackView.AddArrangedSubview(priorityView = new PriorityView());
-            headerStackView.AddArrangedSubview(creatorView = new CreatorView());
-            headerStackView.AddArrangedSubview(originatorView = new OriginatorView());
-            headerStackView.AddArrangedSubview(readByView = new ReadByView());
-            headerStackView.AddArrangedSubview(extraFieldsView = new ExtraFieldsView());
-            headerStackView.AddArrangedSubview(attachmentsListView = new AttachmentsView());
-
-            headerView = new DocumentView.HeaderView.HeaderView();
-
-            SetHeaderView(headerView);
+            SetHeaderView(headerView = new DocumentView.HeaderView.HeaderView());
         }
 
         void InitToolbar()
@@ -284,16 +216,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
-            if (fromView != null)
-                fromView.RecipientTapped += RecipientsView_RecipientTapped;
-            if (toView != null)
-                toView.RecipientTapped += RecipientsView_RecipientTapped;
-            if (ccView != null)
-                ccView.RecipientTapped += RecipientsView_RecipientTapped;
-            if (bccView != null)
-                bccView.RecipientTapped += RecipientsView_RecipientTapped;
-            if (attachmentsListView != null)
-                attachmentsListView.AttachmentTapped += AttachmentsList_AttachmentTapped;
+            if (headerView != null)
+            {
+                headerView.RecipientTapped += RecipientsView_RecipientTapped;
+                headerView.AttachmentTapped += AttachmentsList_AttachmentTapped;
+            }
 
             if (flagButton != null)
                 flagButton.Clicked += FlagButton_Clicked;
@@ -315,16 +242,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeinitializeHandlers()
         {
-            if (fromView != null)
-                fromView.RecipientTapped -= RecipientsView_RecipientTapped;
-            if (toView != null)
-                toView.RecipientTapped -= RecipientsView_RecipientTapped;
-            if (ccView != null)
-                ccView.RecipientTapped -= RecipientsView_RecipientTapped;
-            if (bccView != null)
-                bccView.RecipientTapped -= RecipientsView_RecipientTapped;
-            if (attachmentsListView != null)
-                attachmentsListView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
+            if (headerView != null)
+            {
+                headerView.RecipientTapped -= RecipientsView_RecipientTapped;
+                headerView.AttachmentTapped -= AttachmentsList_AttachmentTapped;
+            }
 
             if (flagButton != null)
                 flagButton.Clicked -= FlagButton_Clicked;
@@ -799,8 +721,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void UpdatePriority()
         {
-            priorityView.RefreshView();
-            priorityView.UpdateVisibility();
+            headerView.UpdatePriority();
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)
@@ -1108,8 +1029,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                readByView?.RefreshView();
-                readByView?.UpdateVisibility();
+                headerView.UpdateReadBy();
             });
         }
 

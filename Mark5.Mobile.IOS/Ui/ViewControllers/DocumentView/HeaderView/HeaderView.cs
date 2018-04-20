@@ -10,6 +10,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class HeaderView : UIView
     {
+        public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
+        public event EventHandler<AttachmentButtonTappedEventArgs> AttachmentTapped = delegate { };
+
         static public float HorizontalMargin = 18f;
         static public float VerticalMargin = 2f;
         static public float InnerMargin = 5f;
@@ -52,6 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public HeaderView()
         {
             Initialize();
+            InitializeHandlers();
         }
 
         void Initialize()
@@ -135,6 +139,51 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 v.Hidden = true;
                 v.Alpha = 0.0f;
             });
+        }
+
+        void InitializeHandlers()
+        {
+            if (fromView != null)
+                fromView.RecipientTapped += RecipientTapped;
+            if (toView != null)
+                toView.RecipientTapped += RecipientTapped;
+            if (ccView != null)
+                ccView.RecipientTapped += RecipientTapped;
+            if (bccView != null)
+                bccView.RecipientTapped += RecipientTapped;
+            if (attachmentsListView != null)
+                attachmentsListView.AttachmentTapped += AttachmentTapped;
+        }
+
+        void DeinitializeHandlers()
+        {
+            if (fromView != null)
+                fromView.RecipientTapped += RecipientTapped;
+            if (toView != null)
+                toView.RecipientTapped += RecipientTapped;
+            if (ccView != null)
+                ccView.RecipientTapped += RecipientTapped;
+            if (bccView != null)
+                bccView.RecipientTapped += RecipientTapped;
+            if (attachmentsListView != null)
+                attachmentsListView.AttachmentTapped += AttachmentTapped;
+        }
+
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                DeinitializeHandlers();
+
+                contentView.ArrangedSubviews.ForEach(v =>
+                {
+                    v.RemoveFromSuperview();
+                    v = null;
+                });
+
+                contentView.RemoveFromSuperview();
+                contentView = null;
+            }
         }
 
         UIButton CreateShowMoreButton()
@@ -247,6 +296,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             LayoutIfNeeded();
         }
 
+        #region Public methods
+
+
         public void RefreshHeader()
         {
             foreach (var view in subViews)
@@ -258,5 +310,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             attachmentsListView.UpdateVisibility();
         }
+
+        public void UpdatePriority() //TODO Implement
+        {
+
+        }
+
+        public void UpdateReadBy()
+        {
+
+        }
+
+        #endregion
+
     }
 }

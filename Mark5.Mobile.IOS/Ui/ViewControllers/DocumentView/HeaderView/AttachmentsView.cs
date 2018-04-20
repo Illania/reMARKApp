@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -10,8 +12,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class AttachmentsView : DocumentSubView
     {
+        const int columnSize = 2;
+
         UILabel titleLabel;
         UIStackView stackView;
+        UIScrollView scrollView;
 
         public event EventHandler<AttachmentButtonTappedEventArgs> AttachmentTapped = delegate { };
 
@@ -33,22 +38,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
             });
 
+            scrollView = new UIScrollView
+            {
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+
+            ContainerView.AddSubview(scrollView);
+            ContainerView.AddConstraints(new[]
+            {
+                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -ExternalVerticalMargin)
+            });
+
             stackView = new UIStackView
             {
                 Opaque = false,
-                Axis = UILayoutConstraintAxis.Vertical,
-                Alignment = UIStackViewAlignment.Fill,
+                Axis = UILayoutConstraintAxis.Horizontal,
+                Alignment = UIStackViewAlignment.Top,
                 Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0f,
+                Spacing = 10f,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            ContainerView.AddSubview(stackView);
+            scrollView.AddSubview(stackView);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -ExternalVerticalMargin)
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Height, 1f, 0f)
             });
         }
 
@@ -82,28 +103,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 v.RemoveFromSuperview();
             };
 
-            if (Document.Attachments.Count > 2)
+            Document.Attachments.Add(new AttachmentDescription
             {
-                foreach (var ad in Document.Attachments.Take(2))
-                {
-                    var alssv = new AttachmentsSubView(this, ad);
-                    stackView.AddArrangedSubview(alssv);
-                }
+                Name = "SUPER VER LONG NAME", //TODO for testing
+                SizeInBytes = 23456,
+            });
 
-                var showMoreButton = new UIButton(UIButtonType.RoundedRect);
-                showMoreButton.SetTitle(Localization.GetString("show_more___"), UIControlState.Normal);
-                showMoreButton.TintColor = Theme.DarkBlue;
-                showMoreButton.TouchUpInside += HandleShowMoreButtonTapped;
-                stackView.AddArrangedSubview(showMoreButton);
-            }
-            else
+            foreach (var batch in Document.Attachments.Batch(columnSize))
+                stackView.AddArrangedSubview(PrepareColumnStack(batch));
+        }
+
+        UIStackView PrepareColumnStack(IEnumerable<AttachmentDescription> batch)
+        {
+            var columnStack = new UIStackView
             {
-                foreach (var ad in Document.Attachments)
-                {
-                    var alssv = new AttachmentsSubView(this, ad);
-                    stackView.AddArrangedSubview(alssv);
-                }
+                Opaque = false,
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Leading,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 0f,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            foreach (var ad in batch)
+            {
+                var alssv = new AttachmentsSubView(this, ad);
+                columnStack.AddArrangedSubview(alssv);
             }
+
+            return columnStack;
         }
 
         public override void UpdateVisibility()
@@ -163,10 +191,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 HorizontalAlignment = UIControlContentHorizontalAlignment.Left,
                 Opaque = false,
-                ContentEdgeInsets = new UIEdgeInsets(0.5f, 0.1f, 0.1f, 0.1f)
+                ContentEdgeInsets = new UIEdgeInsets(0.5f, 0.1f, 0.1f, 0.1f),
             };
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
             attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
+            attachmentButton.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Vertical);
+            attachmentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             attachmentButton.TouchUpInside += AttachmentButton_TouchUpInside;
             AddSubview(attachmentButton);
             AddConstraints(new[]
