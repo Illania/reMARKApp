@@ -563,6 +563,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\icons8-forward-filled-50.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -647,6 +649,7 @@
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Download.imageset\" />
 	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
+	  <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

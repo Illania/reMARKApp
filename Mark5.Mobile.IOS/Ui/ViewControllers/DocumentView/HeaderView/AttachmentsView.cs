@@ -42,15 +42,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false,
+                ShowsHorizontalScrollIndicator = false,
             };
-
             ContainerView.AddSubview(scrollView);
             ContainerView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -ExternalVerticalMargin)
+                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, 0f),
+                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f)
             });
 
             stackView = new UIStackView
@@ -66,8 +66,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             ContainerView.AddConstraints(new[]
             {
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, 0f),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
                 NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Height, 1f, 0f)
             });
@@ -103,12 +103,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 v.RemoveFromSuperview();
             };
 
-            Document.Attachments.Add(new AttachmentDescription
-            {
-                Name = "SUPER VER LONG NAME", //TODO for testing
-                SizeInBytes = 23456,
-            });
-
             foreach (var batch in Document.Attachments.Batch(columnSize))
                 stackView.AddArrangedSubview(PrepareColumnStack(batch));
         }
@@ -121,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Leading,
                 Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0f,
+                Spacing = 5f,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
@@ -191,9 +185,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 HorizontalAlignment = UIControlContentHorizontalAlignment.Left,
                 Opaque = false,
-                ContentEdgeInsets = new UIEdgeInsets(0.5f, 0.1f, 0.1f, 0.1f),
+                ContentEdgeInsets = new UIEdgeInsets(3.5f, 7.5f, 3.5f, 7.5f),
+                BackgroundColor = Theme.Gray,
             };
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
+            attachmentButton.Layer.CornerRadius = 5f;
             attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
             attachmentButton.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Vertical);
             attachmentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
