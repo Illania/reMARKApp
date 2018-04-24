@@ -34,8 +34,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, 10f),
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+                titleLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, 10f),
+                titleLabel.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin),
             });
 
             scrollView = new UIScrollView
@@ -47,10 +47,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             ContainerView.AddSubview(scrollView);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(scrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, 0f)
+                scrollView.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, 1f),
+                scrollView.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor),
+                scrollView.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor),
+                scrollView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor),
             });
 
             stackView = new UIStackView
@@ -65,11 +65,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             scrollView.AddSubview(stackView);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Height, 1f, 0f)
+                stackView.TopAnchor.ConstraintEqualTo(scrollView.TopAnchor),
+                stackView.LeftAnchor.ConstraintEqualTo(scrollView.LeftAnchor, HorizontalMargin),
+                stackView.RightAnchor.ConstraintEqualTo(scrollView.RightAnchor, -HorizontalMargin),
+                stackView.BottomAnchor.ConstraintEqualTo(scrollView.BottomAnchor),
+                stackView.HeightAnchor.ConstraintEqualTo(scrollView.HeightAnchor),
             });
         }
 
@@ -197,10 +197,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AddSubview(attachmentButton);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f)
+                attachmentButton.TopAnchor.ConstraintEqualTo(TopAnchor),
+                attachmentButton.LeftAnchor.ConstraintEqualTo(LeftAnchor),
+                attachmentButton.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+                attachmentButton.RightAnchor.ConstraintEqualTo(RightAnchor),
             });
         }
 
