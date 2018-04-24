@@ -25,6 +25,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         UIButton expandButton;
 
         bool expanded;
+        bool buttonExpanded;
+
+        NSLayoutConstraint expandButtonWidthConstraint;
 
         public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
 
@@ -86,13 +89,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 BackgroundColor = Theme.Clear,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(2f, 2f, 2f, 2f)
+                ContentEdgeInsets = new UIEdgeInsets(2f, 4f, 4f, 0f)
             };
             expandButton.SetImage(UIImage.FromBundle("Arrow-Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             ContainerView.AddSubview(expandButton);
             ContainerView.AddConstraints(new[]
             {
-                widthConstraint = expandButton.WidthAnchor.ConstraintEqualTo(0f),
+                expandButtonWidthConstraint = expandButton.WidthAnchor.ConstraintEqualTo(0f),
                 expandButton.HeightAnchor.ConstraintEqualTo(20f),
                 expandButton.TrailingAnchor.ConstraintEqualTo(ContainerView.TrailingAnchor, -HorizontalMargin),
                 expandButton.LeadingAnchor.ConstraintEqualTo(textView.TrailingAnchor, InnerMargin),
@@ -103,21 +106,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             expandButton.TouchUpInside += ExpandButton_TouchUpInside;
         }
 
-        bool buttonExpanded;
-
         void ExpandButton_TouchUpInside(object sender, EventArgs e)
         {
-            ContainerView.Superview.ContentMode = UIViewContentMode.Top;
-            ContainerView.ContentMode = UIViewContentMode.Top;
-            ContentMode = UIViewContentMode.Top;
-            textView.ContentMode = UIViewContentMode.Top;
-
             textView.TextStorage.BeginEditing();
             textView.TextStorage.Insert(" ".ToNSAttributedString(), 0);
             textView.TextStorage.DeleteRange(new NSRange(0, 1));
             textView.TextStorage.EndEditing();
 
-            AnimateNotify(1.2d, () =>
+            AnimateNotify(0.3d, () =>
             {
                 if (!buttonExpanded)
                 {
@@ -133,14 +129,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     expandButton.Transform = CGAffineTransform.MakeRotation(0f);
                 }
 
-                ContainerView.LayoutIfNeeded();
+                Superview.Superview.Superview.Superview.LayoutIfNeeded();
 
                 buttonExpanded = !buttonExpanded;
             }, null);
         }
 
-
-        NSLayoutConstraint widthConstraint;
 
         public override void WillMoveToSuperview(UIView newsuper)
         {
@@ -266,13 +260,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 {
                     textView.TextContainer.MaximumNumberOfLines = 3;
                     textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                    widthConstraint.Constant = 20f;
+                    expandButtonWidthConstraint.Constant = 20f;
                 }
                 else
                 {
                     textView.TextContainer.MaximumNumberOfLines = 1;
                     textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
-                    widthConstraint.Constant = 0f;
+                    expandButtonWidthConstraint.Constant = 0f;
                 }
 
                 Superview.LayoutIfNeeded();
