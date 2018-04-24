@@ -114,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void TransitionToState(State state)
         {
-            if (currentState == state)
+            if (currentState == state || (state == State.FullyExpanded && addressType == DocumentAddressType.From))
                 return;
 
             currentState = state;
