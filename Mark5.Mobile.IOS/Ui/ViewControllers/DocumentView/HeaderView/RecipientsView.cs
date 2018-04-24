@@ -143,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     case State.FullyExpanded:
                         textView.TextContainer.MaximumNumberOfLines = 0;
                         textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                        //textView.SizeToFit(); //TODO needed?
+                        expandButtonWidthConstraint.Constant = 20f;
                         expandButton.Transform = CGAffineTransform.MakeRotation((nfloat)(Math.PI / 2.0f));
                         break;
                 }
@@ -188,7 +188,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             if (DocumentPreview != null)
             {
-                DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses);
+                DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses); //TODO TESTING!
                 DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses);
 
 

@@ -101,8 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 if (v is UIButton b)
                     b.TouchUpInside -= HandleShowMoreButtonTapped;
                 v.RemoveFromSuperview();
-            };
-
+            }
             foreach (var batch in Document.Attachments.Batch(columnSize))
                 stackView.AddArrangedSubview(PrepareColumnStack(batch));
         }
