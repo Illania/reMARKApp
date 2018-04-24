@@ -15,6 +15,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class RecipientsView : DocumentSubView
     {
+        enum State
+        {
+            Compressed,
+            PartiallyExpanded,
+            FullyExpanded,
+        }
+
         const string EmailSeparator = ", ";
         const string RecipentRegex = @"[^,]*";
 
@@ -24,8 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         UITextView textView;
         UIButton expandButton;
 
-        bool expanded;
-        bool buttonExpanded;
+        State currentState;
 
         NSLayoutConstraint expandButtonWidthConstraint;
 
@@ -106,8 +112,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             expandButton.TouchUpInside += ExpandButton_TouchUpInside;
         }
 
-        void ExpandButton_TouchUpInside(object sender, EventArgs e)
+        void TransitionToState(State state)
         {
+            if (currentState == state)
+                return;
+
+            currentState = state;
+
             textView.TextStorage.BeginEditing();
             textView.TextStorage.Insert(" ".ToNSAttributedString(), 0);
             textView.TextStorage.DeleteRange(new NSRange(0, 1));
@@ -115,26 +126,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             AnimateNotify(0.3d, () =>
             {
-                if (!buttonExpanded)
+                switch (state)
                 {
-                    textView.TextContainer.MaximumNumberOfLines = 0;
-                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                    textView.SizeToFit();
-                    expandButton.Transform = CGAffineTransform.MakeRotation((nfloat)(Math.PI / 2.0f));
-                }
-                else
-                {
-                    textView.TextContainer.MaximumNumberOfLines = 3;
-                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                    expandButton.Transform = CGAffineTransform.MakeRotation(0f);
+                    case State.Compressed:
+                        textView.TextContainer.MaximumNumberOfLines = 1;
+                        textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
+                        expandButtonWidthConstraint.Constant = 0f;
+                        expandButton.Transform = CGAffineTransform.MakeRotation(0f);
+                        break;
+                    case State.PartiallyExpanded:
+                        textView.TextContainer.MaximumNumberOfLines = 3;
+                        textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+                        expandButtonWidthConstraint.Constant = 20f;
+                        expandButton.Transform = CGAffineTransform.MakeRotation(0f);
+                        break;
+                    case State.FullyExpanded:
+                        textView.TextContainer.MaximumNumberOfLines = 0;
+                        textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+                        //textView.SizeToFit(); //TODO needed?
+                        expandButton.Transform = CGAffineTransform.MakeRotation((nfloat)(Math.PI / 2.0f));
+                        break;
                 }
 
                 Superview.Superview.Superview.Superview.LayoutIfNeeded();
-
-                buttonExpanded = !buttonExpanded;
             }, null);
         }
-
 
         public override void WillMoveToSuperview(UIView newsuper)
         {
@@ -151,7 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void HandleTextTapped(UITapGestureRecognizer gestureRecognizer)
         {
-            if (!expanded)
+            if (currentState == State.Compressed)
                 return;
 
             var tapPosition = textView.GetClosestPositionToPoint(gestureRecognizer.LocationInView(textView));
@@ -246,34 +262,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             textView.TextStorage.EndEditing();
         }
 
+
+        void ExpandButton_TouchUpInside(object sender, EventArgs e)
+        {
+            if (currentState == State.PartiallyExpanded)
+                TransitionToState(State.FullyExpanded);
+            else if (currentState == State.FullyExpanded)
+                TransitionToState(State.PartiallyExpanded);
+        }
+
         public void ExpandCompressView()
         {
-            // Workaround to force text view layout
-            textView.TextStorage.BeginEditing();
-            textView.TextStorage.Insert(" ".ToNSAttributedString(), 0);
-            textView.TextStorage.DeleteRange(new NSRange(0, 1));
-            textView.TextStorage.EndEditing();
-
-            AnimateNotify(0.2d, () =>
-            {
-                if (!expanded)
-                {
-                    textView.TextContainer.MaximumNumberOfLines = 3;
-                    textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                    expandButtonWidthConstraint.Constant = 20f;
-                }
-                else
-                {
-                    textView.TextContainer.MaximumNumberOfLines = 1;
-                    textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
-                    expandButtonWidthConstraint.Constant = 0f;
-                }
-
-                Superview.LayoutIfNeeded();
-
-            }, null);
-
-            expanded = !expanded;
+            if (currentState == State.Compressed)
+                TransitionToState(State.PartiallyExpanded);
+            else
+                TransitionToState(State.Compressed);
         }
     }
 
