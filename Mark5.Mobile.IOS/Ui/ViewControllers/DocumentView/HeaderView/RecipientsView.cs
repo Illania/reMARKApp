@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         const string RecipentRegex = @"[^,]*";
 
         readonly DocumentAddressType addressType;
-        readonly float buttonSize = 99f;
+        readonly float buttonSize = 20f;
 
         UILabel titleLabel;
         UITextView textView;
@@ -55,9 +55,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 45f),
+                titleLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                titleLabel.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin),
+                titleLabel.WidthAnchor.ConstraintEqualTo(45f),
             });
 
             var textStorage = new NSTextStorage();
@@ -84,9 +84,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Right, 1f, InnerMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+                textView.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                textView.LeftAnchor.ConstraintEqualTo(titleLabel.RightAnchor, InnerMargin),
+                textView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin),
             });
             textView.AddGestureRecognizer(new UITapGestureRecognizer(HandleTextTapped));
 
