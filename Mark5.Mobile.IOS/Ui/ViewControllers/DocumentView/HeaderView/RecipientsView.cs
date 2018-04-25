@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         const string RecipentRegex = @"[^,]*";
 
         readonly DocumentAddressType addressType;
+        readonly float buttonSize = 99f;
 
         UILabel titleLabel;
         UITextView textView;
@@ -95,14 +96,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 BackgroundColor = Theme.Clear,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(2f, 4f, 4f, 0f)
+                ContentEdgeInsets = new UIEdgeInsets(4f, 4f, 4f, 0f)
             };
             expandButton.SetImage(UIImage.FromBundle("Arrow-Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             ContainerView.AddSubview(expandButton);
             ContainerView.AddConstraints(new[]
             {
                 expandButtonWidthConstraint = expandButton.WidthAnchor.ConstraintEqualTo(0f),
-                expandButton.HeightAnchor.ConstraintEqualTo(20f),
+                expandButton.HeightAnchor.ConstraintEqualTo(buttonSize),
                 expandButton.TrailingAnchor.ConstraintEqualTo(ContainerView.TrailingAnchor, -HorizontalMargin),
                 expandButton.LeadingAnchor.ConstraintEqualTo(textView.TrailingAnchor, InnerMargin),
                 expandButton.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
@@ -114,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void TransitionToState(State state)
         {
-            if (currentState == state || (state == State.FullyExpanded && addressType == DocumentAddressType.From))
+            if (currentState == state || Superview == null)
                 return;
 
             currentState = state;
@@ -135,20 +136,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                         expandButton.Transform = CGAffineTransform.MakeRotation(0f);
                         break;
                     case State.PartiallyExpanded:
-                        textView.TextContainer.MaximumNumberOfLines = 3;
+                        textView.TextContainer.MaximumNumberOfLines = addressType == DocumentAddressType.From ? 0 : (uint)3;
                         textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                        expandButtonWidthConstraint.Constant = 20f;
+                        expandButtonWidthConstraint.Constant = addressType == DocumentAddressType.From ? 0f : buttonSize;
                         expandButton.Transform = CGAffineTransform.MakeRotation(0f);
                         break;
                     case State.FullyExpanded:
                         textView.TextContainer.MaximumNumberOfLines = 0;
                         textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                        expandButtonWidthConstraint.Constant = 20f;
+                        expandButtonWidthConstraint.Constant = buttonSize;
                         expandButton.Transform = CGAffineTransform.MakeRotation((nfloat)(Math.PI / 2.0f));
                         break;
                 }
 
-                Superview.Superview.Superview.Superview.LayoutIfNeeded();
+                Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
             }, null);
         }
 
@@ -188,9 +189,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             if (DocumentPreview != null)
             {
-                DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses); //TODO TESTING!
-                DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses);
-
+                if (addressType != DocumentAddressType.From)
+                {
+                    DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses); //TODO TESTING!
+                    DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses);
+                    DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses);
+                }
 
                 Func<DocumentAddress, string> addressText = (da) =>
                 {
@@ -223,7 +227,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 return;
             }
 
-            Hidden = !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
+            Hidden = IsEmpty();
+        }
+
+        public bool IsEmpty()
+        {
+            return !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
         }
 
         string GetTitle()

@@ -13,10 +13,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
         public event EventHandler<AttachmentButtonTappedEventArgs> AttachmentTapped = delegate { };
 
-        static public float HorizontalMargin = 18f;
-        static public float VerticalMargin = 2f;
-        static public float InnerMargin = 5f;
-        static public float ExternalVerticalMargin = 10f;
+        public const float HorizontalMargin = 18f;
+        public const float VerticalMargin = 0.5f;
+        public const float InnerMargin = 5f;
+        public const float ExternalVerticalMargin = 10f;
 
         public Document Document { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
@@ -46,6 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         UIButton showMoreButton;
 
         UIView subHeaderView;
+        UIView bottomView;
 
         NSLayoutConstraint[] compressedConstraints;
         NSLayoutConstraint[] expandedConstraints;
@@ -76,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, ExternalVerticalMargin),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0),
                 NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0)
+                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f)
             });
 
             subViews.Add(subjectView = new SubjectView());
@@ -98,12 +99,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             showMoreButton = CreateShowMoreButton();
 
             subHeaderView = GetSubHeader();
-            var bottomView = new UIView();
+            bottomView = new UIView();
+        }
 
+        void PrepareContent()
+        {
             contentView.AddArrangedSubview(subjectView);
             contentView.AddArrangedSubview(subHeaderView);
             contentView.AddArrangedSubview(fromView);
-            contentView.AddArrangedSubview(toView);
+            if (!toView.IsEmpty())
+                contentView.AddArrangedSubview(toView);
             contentView.AddArrangedSubview(ccView);
             contentView.AddArrangedSubview(bccView);
             contentView.AddArrangedSubview(secondSeparator);
@@ -123,7 +128,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             });
 
             hiddenViews.Add(firstSeparator);
-            hiddenViews.Add(ccView);
+            if (!toView.IsEmpty())
+                hiddenViews.Add(ccView);
             hiddenViews.Add(bccView);
             hiddenViews.Add(secondSeparator);
             hiddenViews.Add(priorityView);
@@ -138,6 +144,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 v.Hidden = true;
                 v.Alpha = 0.0f;
             });
+
+            if (toView.IsEmpty())
+                subViews.Remove(toView);
         }
 
         void InitializeHandlers()
@@ -218,15 +227,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             compressedConstraints = new[]
             {
                 NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
-                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, VerticalMargin),
 
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, container, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Trailing, 1f, 0f),
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.CenterY, 1f, 0f),
 
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Trailing, 1f, 0f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
@@ -238,12 +247,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
 
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, container, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
+                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Top, 1f, 0f),
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Trailing, 1f, 0f),
                 NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.CenterY, 1f, 0f),
 
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, 0f),
+                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Trailing, 1f, 0f),
                 NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
             };
@@ -309,6 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 view.RefreshView();
             }
 
+            PrepareContent();
             attachmentsListView.UpdateVisibility();
         }
 
