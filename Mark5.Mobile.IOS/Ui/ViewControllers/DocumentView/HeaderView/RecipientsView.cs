@@ -61,7 +61,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             });
 
             var textStorage = new NSTextStorage();
-            textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, 0));
             var layoutManager = new NSLayoutManager();
             textStorage.AddLayoutManager(layoutManager);
             var textContainer = new NSTextContainer();
@@ -71,7 +70,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 BackgroundColor = Theme.Clear,
                 Editable = false,
-                Font = Theme.DefaultFont,
                 Opaque = false,
                 TextContainerInset = UIEdgeInsets.Zero,
                 ClipsToBounds = false,
@@ -81,6 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             textView.TextContainer.LineFragmentPadding = 0f;
             textView.TextContainer.MaximumNumberOfLines = 1;
             textView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
+            textView.TextAlignment = UITextAlignment.Justified;
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
             {
@@ -105,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 expandButtonWidthConstraint = expandButton.WidthAnchor.ConstraintEqualTo(0f),
                 expandButton.HeightAnchor.ConstraintEqualTo(buttonSize),
                 expandButton.TrailingAnchor.ConstraintEqualTo(ContainerView.TrailingAnchor, -HorizontalMargin),
-                expandButton.LeadingAnchor.ConstraintEqualTo(textView.TrailingAnchor, InnerMargin),
+                expandButton.LeadingAnchor.ConstraintEqualTo(textView.TrailingAnchor, 0),
                 expandButton.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
             });
             expandButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);

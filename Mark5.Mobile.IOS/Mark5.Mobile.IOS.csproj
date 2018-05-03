@@ -564,7 +564,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\icons8-forward-filled-50.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\icons8-ferdinando 45x45px.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\icons8-ferdinando 30x30px.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
