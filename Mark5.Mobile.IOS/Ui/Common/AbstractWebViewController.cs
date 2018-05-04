@@ -157,7 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UIKeyboard.Notifications.ObserveDidShow((e, args) =>
             {
                 isKeyboardVisible = true;
-                keyboardDimensions = args.FrameBegin;
+                keyboardDimensions = args.FrameEnd;
             });
 
             UIKeyboard.Notifications.ObserveDidHide((e, args) =>
@@ -692,7 +692,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (isKeyboardVisible)
             {
                 if (visiblePosition + cursorHeight > scrollView.Bounds.Height - keyboardDimensions.Height)
-                    offset = new CGPoint(0, (visiblePosition + lineHeight) - (scrollView.Bounds.Height + keyboardDimensions.Height + scrollView.ContentOffset.Y));
+                    offset = new CGPoint(0, (visiblePosition + lineHeight) - (scrollView.Bounds.Height - keyboardDimensions.Height) + scrollView.ContentOffset.Y);
                 else if (visiblePosition < 0)
                 {
                     var amount = scrollView.ContentOffset.Y + visiblePosition;

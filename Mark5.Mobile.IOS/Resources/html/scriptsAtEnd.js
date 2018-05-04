@@ -26,15 +26,13 @@ document.addEventListener("keypress", function(e) {
     }
 });
 
-getRelativeCaretYPosition = function() {
+getCaretYCoordinate = function() {
     var y = 0;
-    var sel = window.getSelection();
-    if (sel.rangeCount) {
-        var range = sel.getRangeAt(0);
-        var needsWorkAround = (range.startOffset == 0)
-        /* Removing fixes bug when node name other than 'div' */
-        /* && range.startContainer.nodeName.toLowerCase() == 'div'); */
-        if (needsWorkAround) {
+    var selection = window.getSelection();
+    if (selection.rangeCount) {
+        var range = selection.getRangeAt(0);
+        var noStartOffset = (range.startOffset == 0)
+        if (noStartOffset) {
             y = range.startContainer.offsetTop - window.pageYOffset;
         } else {
             if (range.getClientRects) {
