@@ -676,44 +676,40 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var lineHeightResult = await EvaluateJavaScriptAsync("document.getElementById('editor').style.lineHeight;");
             var lineHeight = 28;//Int32.Parse(lineHeightResult.Item1.ToString());
 
-            var relativeCaretResult = await EvaluateJavaScriptAsync("getRelativeCaretYPosition()");
-            var relativeCaret = Int32.Parse(relativeCaretResult.Item1.ToString());
+            var caretCoordResult = await EvaluateJavaScriptAsync("getCaretYCoordinate()");
+            var caretCoord = Int32.Parse(caretCoordResult.Item1.ToString());
 
-            var scrollView = webView.ScrollView;
+            var contentHeight = clientHeight > 0 ? clientHeight : webView.ScrollView.Frame.Height;
 
-            var contentHeight = clientHeight > 0 ? clientHeight : scrollView.Frame.Height;
-
-            var cursorHeight = lineHeight - 4;
-
-            var visiblePosition = (nfloat)relativeCaret;
+            var caretHeight = lineHeight - 4;
 
             CGPoint offset = new CGPoint(0, 0);
 
             if (isKeyboardVisible)
             {
-                if (visiblePosition + cursorHeight > scrollView.Bounds.Height - keyboardDimensions.Height)
-                    offset = new CGPoint(0, (visiblePosition + lineHeight) - (scrollView.Bounds.Height - keyboardDimensions.Height) + scrollView.ContentOffset.Y);
-                else if (visiblePosition < 0)
+                if (caretCoord + caretHeight > webView.ScrollView.Bounds.Height - keyboardDimensions.Height)
+                    offset = new CGPoint(0, (caretCoord + lineHeight) - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height) + webView.ScrollView.ContentOffset.Y);
+                else if (caretCoord < 0)
                 {
-                    var amount = scrollView.ContentOffset.Y + visiblePosition;
+                    var amount = webView.ScrollView.ContentOffset.Y + caretCoord;
                     amount = amount < 0 ? 0 : amount;
-                    offset = new CGPoint(scrollView.ContentOffset.X, amount);
+                    offset = new CGPoint(webView.ScrollView.ContentOffset.X, amount);
                 }
             }
             else
             {
-                if (visiblePosition + cursorHeight > scrollView.Bounds.Height)
-                    offset = new CGPoint(0, (visiblePosition + lineHeight) - scrollView.Bounds.Height + scrollView.ContentOffset.Y);
-                else if (visiblePosition < 0)
+                if (caretCoord + caretHeight > webView.ScrollView.Bounds.Height)
+                    offset = new CGPoint(0, (caretCoord + lineHeight) - webView.ScrollView.Bounds.Height + webView.ScrollView.ContentOffset.Y);
+                else if (caretCoord < 0)
                 {
-                    var amount = scrollView.ContentOffset.Y + visiblePosition;
+                    var amount = webView.ScrollView.ContentOffset.Y + caretCoord;
                     amount = amount < 0 ? 0 : amount;
-                    offset = new CGPoint(scrollView.ContentOffset.X, amount);
+                    offset = new CGPoint(webView.ScrollView.ContentOffset.X, amount);
                 }
             }
 
             if ((offset.X != 0 || offset.Y != 0))
-                scrollView.SetContentOffset(offset, false);
+                webView.ScrollView.SetContentOffset(offset, false);
         }
 
         protected virtual void OnWebViewEnterPressed() { }
