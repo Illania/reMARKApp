@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +31,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         TaskCompletionSource<bool> loadTcs;
 
         string headerPaddingJsTemplate;
+
+        bool isKeyboardVisible = false;
+        CGRect keyboardDimensions;
 
         public override void ViewDidLoad()
         {
@@ -149,7 +153,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 webViewProgressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
+
+            UIKeyboard.Notifications.ObserveDidShow((e, args) =>
+            {
+                isKeyboardVisible = true;
+                keyboardDimensions = args.FrameBegin;
+            });
+
+            UIKeyboard.Notifications.ObserveDidHide((e, args) =>
+            {
+                isKeyboardVisible = false;
+            });
         }
+
 
         public override void ViewWillLayoutSubviews()
         {
@@ -653,7 +669,52 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected virtual void OnWebViewMutated() { }
 
-        protected virtual void OnWebViewKeyPressed() { }
+        protected virtual async void OnWebViewKeyPressed() {
+            var clientHeightResult = await EvaluateJavaScriptAsync("document.getElementById('editor').clientHeight;");
+            var clientHeight = Int32.Parse(clientHeightResult.Item1.ToString());
+
+            var lineHeightResult = await EvaluateJavaScriptAsync("document.getElementById('editor').style.lineHeight;");
+            var lineHeight = 28;//Int32.Parse(lineHeightResult.Item1.ToString());
+
+            var relativeCaretResult = await EvaluateJavaScriptAsync("getRelativeCaretYPosition()");
+            var relativeCaret = Int32.Parse(relativeCaretResult.Item1.ToString());
+
+            var scrollView = webView.ScrollView;
+
+            var contentHeight = clientHeight > 0 ? clientHeight : scrollView.Frame.Height;
+
+            var cursorHeight = lineHeight - 4;
+
+            var visiblePosition = (nfloat)relativeCaret;
+
+            CGPoint offset = new CGPoint(0, 0);
+
+            if (isKeyboardVisible)
+            {
+                if (visiblePosition + cursorHeight > scrollView.Bounds.Height - keyboardDimensions.Height)
+                    offset = new CGPoint(0, (visiblePosition + lineHeight) - (scrollView.Bounds.Height + keyboardDimensions.Height + scrollView.ContentOffset.Y));
+                else if (visiblePosition < 0)
+                {
+                    var amount = scrollView.ContentOffset.Y + visiblePosition;
+                    amount = amount < 0 ? 0 : amount;
+                    offset = new CGPoint(scrollView.ContentOffset.X, amount);
+                }
+            }
+            else
+            {
+                if (visiblePosition + cursorHeight > scrollView.Bounds.Height)
+                    offset = new CGPoint(0, (visiblePosition + lineHeight) - scrollView.Bounds.Height + scrollView.ContentOffset.Y);
+                else if (visiblePosition < 0)
+                {
+                    var amount = scrollView.ContentOffset.Y + visiblePosition;
+                    amount = amount < 0 ? 0 : amount;
+                    offset = new CGPoint(scrollView.ContentOffset.X, amount);
+                }
+            }
+
+            if ((offset.X != 0 || offset.Y != 0))
+                scrollView.SetContentOffset(offset, false);
+        }
 
         protected virtual void OnWebViewEnterPressed() { }
 
