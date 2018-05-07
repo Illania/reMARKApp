@@ -155,7 +155,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewWillLayoutSubviews();
 
-            if (webView == null)
+            if (webView == null || currentState == State.AnimationStarted)
                 return;
 
             var desireHeaderSize = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
@@ -163,15 +163,46 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (desiredHeaderHeight < 1)
                 return;
 
-            var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
-            if (constraint == null)
-                return;
-            constraint.Constant = desiredHeaderHeight;
+            //var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
+            //if (constraint == null)
+            //    return;
+            //constraint.Constant = desiredHeaderHeight; //TODO most probably not needed
 
             var headerPaddingJs = headerPaddingJsTemplate;
             headerPaddingJs = ProcessWebTemplate(headerPaddingJs, desireHeaderSize.Height);
             webView?.EvaluateJavaScript(headerPaddingJs, null);
         }
+
+        State currentState;
+
+        enum State
+        {
+            AnimationStarted,
+            AnimationEnded,
+        }
+
+        public void BeginAnimate()
+        {
+            currentState = State.AnimationStarted;
+        }
+
+        public void Animate(float height)
+        {
+            //var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
+            //if (constraint == null)
+            //    return;
+            //constraint.Constant = desiredHeaderHeight;
+
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, height);
+            webView?.EvaluateJavaScript(headerPaddingJs, null);
+        }
+
+        public void EndAnimate()
+        {
+            currentState = State.AnimationEnded;
+        }
+
 
         protected override void Recycle()
         {

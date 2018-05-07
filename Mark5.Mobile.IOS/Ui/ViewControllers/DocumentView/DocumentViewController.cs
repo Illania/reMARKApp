@@ -175,7 +175,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitHeaderView()
         {
-            SetHeaderView(headerView = new DocumentView.HeaderView.HeaderView());
+            SetHeaderView(headerView = new HeaderView());
         }
 
         void InitToolbar()
@@ -220,6 +220,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 headerView.RecipientTapped += HeaderView_RecipientTapped;
                 headerView.AttachmentTapped += HeaderView_AttachmentTapped;
+
+                headerView.BeginAnimate += HeaderView_BeginAnimate;
+                headerView.AnimateH += HeaderView_Animate;
+                headerView.EndAnimate += HeaderView_EndAnimate;
+
             }
 
             if (flagButton != null)
@@ -239,6 +244,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (editDocumentButtonItem != null)
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
         }
+
+        void HeaderView_BeginAnimate(object sender, EventArgs e)
+        {
+            BeginAnimate();
+        }
+
+        void HeaderView_Animate(object sender, float height)
+        {
+            Animate(height);
+        }
+
+        void HeaderView_EndAnimate(object sender, EventArgs e)
+        {
+            EndAnimate();
+        }
+
 
         void DeinitializeHandlers()
         {

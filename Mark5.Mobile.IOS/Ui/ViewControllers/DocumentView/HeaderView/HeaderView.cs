@@ -13,6 +13,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
         public event EventHandler<AttachmentButtonTappedEventArgs> AttachmentTapped = delegate { };
 
+        public event EventHandler BeginAnimate = delegate { };
+        public event EventHandler<float> AnimateH = delegate { };
+        public event EventHandler EndAnimate = delegate { };
+
+
         public const float HorizontalMargin = 18f;
         public const float VerticalMargin = 0.5f;
         public const float InnerMargin = 5f;
@@ -151,28 +156,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void InitializeHandlers()
         {
-            if (fromView != null)
-                fromView.RecipientTapped += RecipientTapped;
-            if (toView != null)
-                toView.RecipientTapped += RecipientTapped;
-            if (ccView != null)
-                ccView.RecipientTapped += RecipientTapped;
-            if (bccView != null)
-                bccView.RecipientTapped += RecipientTapped;
+            subViews.OfType<RecipientsView>().ForEach(rv =>
+            {
+                rv.RecipientTapped += RecipientTapped;
+                rv.BeginAnimate += BeginAnimate;
+                rv.AnimateH += AnimateH;
+                rv.EndAnimate += EndAnimate;
+            });
+
             if (attachmentsListView != null)
                 attachmentsListView.AttachmentTapped += AttachmentTapped;
         }
 
         void DeinitializeHandlers()
         {
-            if (fromView != null)
-                fromView.RecipientTapped -= RecipientTapped;
-            if (toView != null)
-                toView.RecipientTapped -= RecipientTapped;
-            if (ccView != null)
-                ccView.RecipientTapped -= RecipientTapped;
-            if (bccView != null)
-                bccView.RecipientTapped -= RecipientTapped;
+            subViews.OfType<RecipientsView>().ForEach(rv =>
+            {
+                rv.RecipientTapped -= RecipientTapped;
+                rv.BeginAnimate -= BeginAnimate;
+                rv.AnimateH -= AnimateH;
+                rv.EndAnimate -= EndAnimate;
+            });
+
             if (attachmentsListView != null)
                 attachmentsListView.AttachmentTapped -= AttachmentTapped;
         }

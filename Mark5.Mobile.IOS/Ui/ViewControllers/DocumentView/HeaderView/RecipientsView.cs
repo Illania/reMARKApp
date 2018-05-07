@@ -24,6 +24,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             FullyExpanded,
         }
 
+        public event EventHandler BeginAnimate = delegate { };
+        public event EventHandler<float> AnimateH = delegate { };
+        public event EventHandler EndAnimate = delegate { };
+
         const string EmailSeparator = ", ";
         const string RecipentRegex = @"[^,]*";
 
@@ -115,7 +119,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             expandButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             expandButton.TouchUpInside += ExpandButton_TouchUpInside;
 
-            dl = CADisplayLink.Create(HandleAction);
         }
 
         CADisplayLink dl;
@@ -134,6 +137,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             AnimateNotify(0.3d, () =>
             {
+                CommonConfig.Logger.Error($"{addressType} - BEGIN ANIMATE");
+
+                BeginAnimate(this, EventArgs.Empty);
+                dl = CADisplayLink.Create(HandleAction);
                 dl.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
 
                 switch (state)
@@ -160,12 +167,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 }
 
                 Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
-            }, (finished) => { dl.Invalidate(); });
+            }, (finished) =>
+            {
+                dl.Invalidate(); dl = null; EndAnimate(this, EventArgs.Empty); CommonConfig.Logger.Error($"{addressType} -  END ANIMATE");
+            });
         }
 
         void HandleAction()
         {
-            InvokeOnMainThread(() => CommonConfig.Logger.Error($"------------{Superview.Superview.Superview.Layer.PresentationLayer.Frame.Height}"));
+            InvokeOnMainThread(() =>
+            {
+                var height = Superview.Superview.Superview.Layer.PresentationLayer.Frame.Height;
+                CommonConfig.Logger.Error($"{addressType} - ANIMATE");
+                AnimateH(this, (float)height);
+            });
         }
 
         public override void WillMoveToSuperview(UIView newsuper)
@@ -204,11 +219,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             if (DocumentPreview != null)
             {
-                if (addressType != DocumentAddressType.From)
-                {
-                    DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses); //TODO TESTING!
-                }
-
                 Func<DocumentAddress, string> addressText = (da) =>
                 {
                     if (!string.IsNullOrWhiteSpace(da.Name) && string.IsNullOrWhiteSpace(da.Address))
