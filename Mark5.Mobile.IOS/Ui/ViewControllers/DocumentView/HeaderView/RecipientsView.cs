@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -9,6 +10,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
@@ -27,6 +29,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         readonly DocumentAddressType addressType;
         readonly float buttonSize = 20f;
+        readonly UIFont addressesFont = Theme.DefaultFont;
+        readonly uint partiallyExpandedLines = 3;
 
         UILabel titleLabel;
         UITextView textView;
@@ -95,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 BackgroundColor = Theme.Clear,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(4f, 4f, 4f, 0f)
+                ContentEdgeInsets = new UIEdgeInsets(1f, 0f, 4f, 1f)
             };
             expandButton.SetImage(UIImage.FromBundle("Arrow-Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             ContainerView.AddSubview(expandButton);
@@ -110,7 +114,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             expandButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             expandButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             expandButton.TouchUpInside += ExpandButton_TouchUpInside;
+
+            dl = CADisplayLink.Create(HandleAction);
         }
+
+        CADisplayLink dl;
 
         void TransitionToState(State state)
         {
@@ -126,6 +134,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             AnimateNotify(0.3d, () =>
             {
+                dl.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
+
                 switch (state)
                 {
                     case State.Compressed:
@@ -135,9 +145,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                         expandButton.Transform = CGAffineTransform.MakeRotation(0f);
                         break;
                     case State.PartiallyExpanded:
-                        textView.TextContainer.MaximumNumberOfLines = addressType == DocumentAddressType.From ? 0 : (uint)3;
+                        textView.TextContainer.MaximumNumberOfLines = addressType == DocumentAddressType.From ? 0 : partiallyExpandedLines;
                         textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                        expandButtonWidthConstraint.Constant = addressType == DocumentAddressType.From ? 0f : buttonSize;
+                        expandButtonWidthConstraint.Constant = (addressType == DocumentAddressType.From || partiallyExpandedLines >= GetNumberLines())
+                            ? 0f : buttonSize;
                         expandButton.Transform = CGAffineTransform.MakeRotation(0f);
                         break;
                     case State.FullyExpanded:
@@ -149,7 +160,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 }
 
                 Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
-            }, null);
+            }, (finished) => { dl.Invalidate(); });
+        }
+
+        void HandleAction()
+        {
+            InvokeOnMainThread(() => CommonConfig.Logger.Error($"------------{Superview.Superview.Superview.Layer.PresentationLayer.Frame.Height}"));
         }
 
         public override void WillMoveToSuperview(UIView newsuper)
@@ -191,8 +207,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 if (addressType != DocumentAddressType.From)
                 {
                     DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses); //TODO TESTING!
-                    DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses);
-                    DocumentPreview.Addresses.AddRange(DocumentPreview.Addresses);
                 }
 
                 Func<DocumentAddress, string> addressText = (da) =>
@@ -255,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             textView.TextStorage.BeginEditing();
 
-            textView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, textView.Text.Length));
+            textView.TextStorage.AddAttribute(UIStringAttributeKey.Font, addressesFont, new NSRange(0, textView.Text.Length));
             textView.TextStorage.RemoveAttribute(UIStringAttributeKey.ForegroundColor, new NSRange(0, textView.Text.Length));
 
             var matches = Regex.Matches(textView.Text, RecipentRegex, RegexOptions.IgnoreCase);
@@ -270,6 +284,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             textView.TextStorage.EndEditing();
         }
 
+        int GetNumberLines()
+        {
+            var size = new NSString(textView.Text).GetBoundingRect(new CGSize(textView.Bounds.Width, nfloat.MaxValue),
+                                                    NSStringDrawingOptions.UsesLineFragmentOrigin,
+                                                    new UIStringAttributes { Font = addressesFont },
+                                                    null);
+            return (int)Math.Ceiling(size.Height / addressesFont.LineHeight);
+        }
 
         void ExpandButton_TouchUpInside(object sender, EventArgs e)
         {

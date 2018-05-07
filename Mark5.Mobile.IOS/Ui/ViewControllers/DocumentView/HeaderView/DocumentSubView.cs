@@ -35,5 +35,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public abstract void RefreshView();
 
         public abstract void UpdateVisibility();
+
+        //TODO BIG TODO
+        // - Try to change the padding on the web view controller following the animation 
+        // - Test on iPad
+        // - Need to find a solution to the disappearing text -- Probably could leave it like this, we never had problems before
+        // - Maybe we could have a "shortcode" subview on the compose view, so it's easier to remove / add shortcodes 
+        // - At the moment the arrow doesn't appear if not needed. Show to Una in case we need to do something different
     }
 }
