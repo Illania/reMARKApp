@@ -288,11 +288,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         int GetNumberLines()
         {
-            var size = new NSString(textView.Text).GetBoundingRect(new CGSize(textView.Bounds.Width, nfloat.MaxValue),
+            var rect = new NSString(textView.Text).GetBoundingRect(new CGSize(textView.Bounds.Width, nfloat.MaxValue),
                                                     NSStringDrawingOptions.UsesLineFragmentOrigin,
                                                     new UIStringAttributes { Font = addressesFont },
                                                     null);
-            return (int)Math.Ceiling(size.Height / addressesFont.LineHeight);
+            return (int)Math.Ceiling(rect.Height / addressesFont.LineHeight - 0.001);
         }
 
         void ExpandButton_TouchUpInside(object sender, EventArgs e)
