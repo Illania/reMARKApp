@@ -167,25 +167,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UpdateHeaderPadding(desiredHeaderHeight);
         }
 
-        void UpdateHeaderPadding(float height)
-        {
-            var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, height);
-            webView?.EvaluateJavaScript(headerPaddingJs, null);
-        }
-
-        public void HeaderView_BeginAnimating(object sender, EventArgs e)
+        protected void HeaderView_BeginAnimating(object sender, EventArgs e)
         {
             headerAnimationRunning = true;
         }
 
-        public void HeaderView_Animating(object sender, EventArgs e)
+        protected void HeaderView_Animating(object sender, EventArgs e)
         {
             var height = (float)headerView.Layer.PresentationLayer.Frame.Height;
             UpdateHeaderPadding(height);
         }
 
-        public void HeaderView_EndAnimating(object sender, EventArgs e)
+        protected void HeaderView_EndAnimating(object sender, EventArgs e)
         {
             headerAnimationRunning = false;
         }
@@ -590,6 +583,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     if (finished && !webView.IsLoading)
                         webViewProgressView.SetProgress(0f, false);
                 });
+        }
+
+        void UpdateHeaderPadding(float height)
+        {
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, height);
+            webView?.EvaluateJavaScript(headerPaddingJs, null);
         }
 
         [Export("scrollViewDidScroll:")]
