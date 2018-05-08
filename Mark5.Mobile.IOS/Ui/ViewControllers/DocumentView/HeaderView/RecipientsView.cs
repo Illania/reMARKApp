@@ -223,6 +223,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 var prettyAddresses = DocumentPreview.Addresses.Where(da => da.AddressType == addressType).Select(addressText);
                 var text = string.Join(EmailSeparator, prettyAddresses);
 
+                if (text.Length == 0 && addressType == DocumentAddressType.From)
+                    text = " ";
+
                 textView.TextStorage.BeginEditing();
                 textView.TextStorage.SetString(text.ToNSAttributedString());
                 textView.TextStorage.EndEditing();
