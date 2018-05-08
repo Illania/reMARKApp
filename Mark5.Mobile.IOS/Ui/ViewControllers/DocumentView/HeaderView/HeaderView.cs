@@ -13,10 +13,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
         public event EventHandler<AttachmentButtonTappedEventArgs> AttachmentTapped = delegate { };
 
-        public event EventHandler BeginAnimate = delegate { };
-        public event EventHandler<float> AnimateH = delegate { };
-        public event EventHandler EndAnimate = delegate { };
-
+        public event EventHandler BeginAnimating = delegate { };
+        public event EventHandler Animating = delegate { };
+        public event EventHandler EndAnimating = delegate { };
 
         public const float HorizontalMargin = 18f;
         public const float VerticalMargin = 0.5f;
@@ -28,6 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         readonly List<DocumentSubView> subViews = new List<DocumentSubView>();
         readonly List<DocumentSubView> hiddenViews = new List<DocumentSubView>();
+        readonly List<DocumentSubView> animatingSubviews = new List<DocumentSubView>();
 
         UIStackView contentView;
 
@@ -159,9 +159,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             subViews.OfType<RecipientsView>().ForEach(rv =>
             {
                 rv.RecipientTapped += RecipientTapped;
-                rv.BeginAnimate += BeginAnimate;
-                rv.AnimateH += AnimateH;
-                rv.EndAnimate += EndAnimate;
+                rv.BeginAnimating += RecipientView_BeginAnimating;
+                rv.Animating += RecipientView_Animating;
+                rv.EndAnimating += RecipientView_EndAnimating;
             });
 
             if (attachmentsListView != null)
@@ -173,9 +173,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             subViews.OfType<RecipientsView>().ForEach(rv =>
             {
                 rv.RecipientTapped -= RecipientTapped;
-                rv.BeginAnimate -= BeginAnimate;
-                rv.AnimateH -= AnimateH;
-                rv.EndAnimate -= EndAnimate;
+                rv.BeginAnimating -= RecipientView_BeginAnimating;
+                rv.Animating -= RecipientView_Animating;
+                rv.EndAnimating -= RecipientView_EndAnimating;
             });
 
             if (attachmentsListView != null)
@@ -196,6 +196,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
                 contentView.RemoveFromSuperview();
                 contentView = null;
+
+                animatingSubviews.Clear();
+                subViews.Clear();
+                hiddenViews.Clear();
             }
         }
 
@@ -309,6 +313,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             LayoutIfNeeded();
         }
 
+        void RecipientView_BeginAnimating(object sender, EventArgs e)
+        {
+            if (!animatingSubviews.Any())
+                BeginAnimating(this, EventArgs.Empty);
+
+            var subview = (DocumentSubView)sender;
+            if (!animatingSubviews.Contains(subview))
+                animatingSubviews.Add(subview);
+        }
+
+        void RecipientView_Animating(object sender, EventArgs e)
+        {
+            Animating(this, EventArgs.Empty);
+        }
+
+        void RecipientView_EndAnimating(object sender, EventArgs e)
+        {
+            var subview = (DocumentSubView)sender;
+            if (animatingSubviews.Contains(subview))
+                animatingSubviews.Remove(subview);
+
+            if (!animatingSubviews.Any())
+                EndAnimating(this, EventArgs.Empty);
+        }
+
+
         #region Public methods
 
         public void RefreshHeader()
@@ -332,7 +362,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         }
 
-        public void UpdateReadBy()
+        public void UpdateReadBy()  //TODO implement
         {
 
         }

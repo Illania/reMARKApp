@@ -10,7 +10,6 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
-using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
@@ -24,9 +23,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             FullyExpanded,
         }
 
-        public event EventHandler BeginAnimate = delegate { };
-        public event EventHandler<float> AnimateH = delegate { };
-        public event EventHandler EndAnimate = delegate { };
+        public event EventHandler BeginAnimating = delegate { };
+        public event EventHandler Animating = delegate { };
+        public event EventHandler EndAnimating = delegate { };
 
         const string EmailSeparator = ", ";
         const string RecipentRegex = @"[^,]*";
@@ -41,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         UIButton expandButton;
 
         State currentState;
+        CADisplayLink displayLink;
 
         NSLayoutConstraint expandButtonWidthConstraint;
 
@@ -118,10 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             expandButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             expandButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             expandButton.TouchUpInside += ExpandButton_TouchUpInside;
-
         }
-
-        CADisplayLink dl;
 
         void TransitionToState(State state)
         {
@@ -137,11 +134,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             AnimateNotify(0.3d, () =>
             {
-                CommonConfig.Logger.Error($"{addressType} - BEGIN ANIMATE");
-
-                BeginAnimate(this, EventArgs.Empty);
-                dl = CADisplayLink.Create(HandleAction);
-                dl.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
+                BeginAnimating(this, EventArgs.Empty);
+                displayLink = CADisplayLink.Create(() => Animating(this, EventArgs.Empty));
+                displayLink.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
 
                 switch (state)
                 {
@@ -168,19 +163,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
                 Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
             }, (finished) =>
-            {
-                dl.Invalidate(); dl = null; EndAnimate(this, EventArgs.Empty); CommonConfig.Logger.Error($"{addressType} -  END ANIMATE");
-            });
-        }
-
-        void HandleAction()
-        {
-            InvokeOnMainThread(() =>
-            {
-                var height = Superview.Superview.Superview.Layer.PresentationLayer.Frame.Height;
-                CommonConfig.Logger.Error($"{addressType} - ANIMATE");
-                AnimateH(this, (float)height);
-            });
+                {
+                    displayLink.Invalidate();
+                    displayLink = null;
+                    EndAnimating(this, EventArgs.Empty);
+                });
         }
 
         public override void WillMoveToSuperview(UIView newsuper)
@@ -193,6 +180,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 textView?.RemoveFromSuperview();
                 textView.GestureRecognizers.ForEach(textView.RemoveGestureRecognizer);
                 textView = null;
+
+                expandButton.TouchUpInside -= ExpandButton_TouchUpInside;
             }
         }
 

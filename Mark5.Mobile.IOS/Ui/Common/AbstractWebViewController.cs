@@ -25,11 +25,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIActivityIndicatorView loadIndicatorView;
         WKWebView webView;
         UIView headerContainerView;
+        UIView headerView;
         UIProgressView webViewProgressView;
 
         TaskCompletionSource<bool> loadTcs;
 
         string headerPaddingJsTemplate;
+        bool headerAnimationRunning;
 
         public override void ViewDidLoad()
         {
@@ -155,54 +157,38 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewWillLayoutSubviews();
 
-            if (webView == null || currentState == State.AnimationStarted)
+            if (webView == null || headerAnimationRunning)
                 return;
 
-            var desireHeaderSize = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
-            var desiredHeaderHeight = desireHeaderSize.Height;
+            var desiredHeaderHeight = (float)headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize).Height;
             if (desiredHeaderHeight < 1)
                 return;
 
-            //var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
-            //if (constraint == null)
-            //    return;
-            //constraint.Constant = desiredHeaderHeight; //TODO most probably not needed
-
-            var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, desireHeaderSize.Height);
-            webView?.EvaluateJavaScript(headerPaddingJs, null);
+            UpdateHeaderPadding(desiredHeaderHeight);
         }
 
-        State currentState;
-
-        enum State
+        void UpdateHeaderPadding(float height)
         {
-            AnimationStarted,
-            AnimationEnded,
-        }
-
-        public void BeginAnimate()
-        {
-            currentState = State.AnimationStarted;
-        }
-
-        public void Animate(float height)
-        {
-            //var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
-            //if (constraint == null)
-            //    return;
-            //constraint.Constant = desiredHeaderHeight;
-
             var headerPaddingJs = headerPaddingJsTemplate;
             headerPaddingJs = ProcessWebTemplate(headerPaddingJs, height);
             webView?.EvaluateJavaScript(headerPaddingJs, null);
         }
 
-        public void EndAnimate()
+        public void HeaderView_BeginAnimating(object sender, EventArgs e)
         {
-            currentState = State.AnimationEnded;
+            headerAnimationRunning = true;
         }
 
+        public void HeaderView_Animating(object sender, EventArgs e)
+        {
+            var height = (float)headerView.Layer.PresentationLayer.Frame.Height;
+            UpdateHeaderPadding(height);
+        }
+
+        public void HeaderView_EndAnimating(object sender, EventArgs e)
+        {
+            headerAnimationRunning = false;
+        }
 
         protected override void Recycle()
         {
@@ -236,11 +222,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView = null;
             loadIndicatorView = null;
             headerContainerView = null;
+            headerView = null;
             webView = null;
         }
 
         protected void SetHeaderView(UIView headerView)
         {
+            this.headerView = headerView;
+
             foreach (var subview in headerContainerView.Subviews)
                 subview.RemoveFromSuperview();
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -221,10 +220,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 headerView.RecipientTapped += HeaderView_RecipientTapped;
                 headerView.AttachmentTapped += HeaderView_AttachmentTapped;
 
-                headerView.BeginAnimate += HeaderView_BeginAnimate;
-                headerView.AnimateH += HeaderView_Animate;
-                headerView.EndAnimate += HeaderView_EndAnimate;
-
+                headerView.BeginAnimating += HeaderView_BeginAnimating;
+                headerView.Animating += HeaderView_Animating;
+                headerView.EndAnimating += HeaderView_EndAnimating;
             }
 
             if (flagButton != null)
@@ -245,28 +243,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
         }
 
-        void HeaderView_BeginAnimate(object sender, EventArgs e)
-        {
-            BeginAnimate();
-        }
-
-        void HeaderView_Animate(object sender, float height)
-        {
-            Animate(height);
-        }
-
-        void HeaderView_EndAnimate(object sender, EventArgs e)
-        {
-            EndAnimate();
-        }
-
-
         void DeinitializeHandlers()
         {
             if (headerView != null)
             {
                 headerView.RecipientTapped -= HeaderView_RecipientTapped;
                 headerView.AttachmentTapped -= HeaderView_AttachmentTapped;
+
+                headerView.BeginAnimating -= HeaderView_BeginAnimating;
+                headerView.Animating -= HeaderView_Animating;
+                headerView.EndAnimating -= HeaderView_EndAnimating;
             }
 
             if (flagButton != null)
