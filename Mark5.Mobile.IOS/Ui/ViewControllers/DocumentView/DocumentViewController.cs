@@ -1034,10 +1034,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage obj)
         {
-            BeginInvokeOnMainThread(() =>
-            {
-                headerView.UpdateReadBy();
-            });
+            BeginInvokeOnMainThread(headerView.UpdateReadBy);
         }
 
         void DraftSentHandler(DraftSentMessage message)

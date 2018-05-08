@@ -357,14 +357,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             attachmentsListView.UpdateVisibility();
         }
 
-        public void UpdatePriority() //TODO Implement
+        public void UpdatePriority()
         {
+            if (priorityView == null)
+                return;
 
+            priorityView.RefreshView();
+
+            if (detailsShown)
+                Animate(0.3, priorityView.UpdateVisibility);
         }
 
-        public void UpdateReadBy()  //TODO implement
+        public void UpdateReadBy()
         {
+            if (readByView == null)
+                return;
 
+            readByView.RefreshView();
+
+            if (detailsShown)
+                Animate(0.3, readByView.UpdateVisibility);
         }
 
         #endregion
