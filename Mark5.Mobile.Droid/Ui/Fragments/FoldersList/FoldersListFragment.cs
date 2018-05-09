@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected const string HideFabBundleKey = "HideFab_35efe47d-6c24-4374-afe4-74713393d00a";
         protected const string LoadRemoteFromCacheBundleKey = "LoadRemote_ae16f485-9e09-4f74-9f47-ad4d357eee12";
         protected const string RecoveredPositionsKey = "RecoveredItemPositions_e71c23ca-686c-4c63-a4ee-022c3855fdeb";
-        protected const string SubFoldersKey = "Subfolders_35f51cb3-b96c-4f26-be2d-af6760109bbc";
+        protected const string SubFoldersDownloadedKey = "SubfoldersDownloaded_35f51cb3-b96c-4f26-be2d-af6760109bbc";
 
         protected Folder RemoteFolder;
         protected bool HideSearch;
@@ -98,8 +98,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (savedInstanceState?.ContainsKey(RecoveredPositionsKey) == true)
                 recoveredSelectedItemsPosition = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(RecoveredPositionsKey));
 
-            if (savedInstanceState?.ContainsKey(SubFoldersKey) == true)
-                RemoteFolder.SubFolders = Serializer.Deserialize<List<Folder>>(savedInstanceState.GetString(SubFoldersKey));
+            if (savedInstanceState?.ContainsKey(SubFoldersDownloadedKey) == true)
+                LoadRemoteFromCache = LoadRemoteFromCache || savedInstanceState.GetBoolean(SubFoldersDownloadedKey);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -226,8 +226,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Adapter?.SelectedItemPositions != null)
                 outState.PutString(RecoveredPositionsKey, Serializer.Serialize(Adapter.SelectedItemPositions));
 
-            if (RemoteFolder.SubFolders != null)
-                outState.PutString(SubFoldersKey, Serializer.Serialize(RemoteFolder.SubFolders));
+            if (RemoteFolder.SubFolders != null && RemoteFolder.SubFolders.Any())
+                outState.PutBoolean(SubFoldersDownloadedKey, true);
         }
 
         public override void OnUserVisibilityHintChanged()
