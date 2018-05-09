@@ -111,7 +111,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 };
 
                 var prettyAddresses = DocumentPreview.Addresses.Where(da => da.AddressType == addressType).Select(addressText);
-                var text = string.Join(EmailSeparator, prettyAddresses);
+                string text;
+                if (addressType == DocumentAddressType.From)
+                    text = prettyAddresses.Any() ? string.Join(EmailSeparator, prettyAddresses) : (DocumentPreview.Creator ?? " ");
+                else
+                    text = string.Join(EmailSeparator, prettyAddresses);
 
                 textView.TextStorage.BeginEditing();
                 textView.TextStorage.SetString(text.ToNSAttributedString());
@@ -129,7 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 return;
             }
 
-            Hidden = !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
+            Hidden = addressType != DocumentAddressType.From && !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
         }
 
         void HandleTextTapped(UITapGestureRecognizer gestureRecognizer)

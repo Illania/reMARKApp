@@ -335,6 +335,15 @@
 		<Reference Include="Firebase.InstanceID">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.2.0.8\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
 		</Reference>
+		<Reference Include="Firebase.Analytics">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.Core">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.4.0.13\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.InstanceID">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.2.0.8\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
