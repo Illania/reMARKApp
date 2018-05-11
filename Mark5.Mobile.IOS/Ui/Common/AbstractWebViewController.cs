@@ -34,6 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         bool isKeyboardVisible = false;
         CGRect keyboardDimensions;
+        nfloat bottomInset;
 
         public override void ViewDidLoad()
         {
@@ -158,6 +159,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 isKeyboardVisible = true;
                 keyboardDimensions = args.FrameEnd;
+                if (Integration.IsRunningAtLeast(11))
+                    keyboardDimensions.Height -= webView.SafeAreaInsets.Bottom;
             });
 
             UIKeyboard.Notifications.ObserveDidHide((e, args) =>
@@ -187,6 +190,15 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var headerPaddingJs = headerPaddingJsTemplate;
             headerPaddingJs = ProcessWebTemplate(headerPaddingJs, desireHeaderSize.Height);
             webView?.EvaluateJavaScript(headerPaddingJs, null);
+        }
+
+        public override void ViewSafeAreaInsetsDidChange()
+        {
+            if (Integration.IsRunningAtLeast(11))
+            {
+                base.ViewSafeAreaInsetsDidChange();
+                bottomInset = View.SafeAreaInsets.Bottom;
+            }
         }
 
         protected override void Recycle()
@@ -569,6 +581,38 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
+        async void MoveViewToCaret(bool enterOffset = false)
+        {
+            var clientHeightResult = await EvaluateJavaScriptAsync("document.getElementById('editor').clientHeight;");
+            var clientHeight = Int32.Parse(clientHeightResult.Item1.ToString());
+
+            var lineHeightResult = await EvaluateJavaScriptAsync("window.getElementById('editor').style.lineHeight;");
+            var lineHeight = 20; //Int32.Parse(lineHeightResult.Item1.ToString());
+
+            var caretCoordResult = await EvaluateJavaScriptAsync("getCaretYCoordinate()");
+            var caretCoord = Int32.Parse(caretCoordResult.Item1.ToString());
+
+            var contentHeight = clientHeight > 0 ? clientHeight : webView.ScrollView.Frame.Height;
+
+            var caretHeight = lineHeight - 4;
+
+            var enterOffsetValue = enterOffset ? lineHeight : 0;
+
+            CGPoint offset = new CGPoint(0, 0);
+
+            if (caretCoord + caretHeight + enterOffsetValue > webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset)
+                offset = new CGPoint(0, (caretCoord + lineHeight + enterOffsetValue) - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset) + webView.ScrollView.ContentOffset.Y);
+            else if (caretCoord < 0)
+            {
+                var amount = webView.ScrollView.ContentOffset.Y + caretCoord;
+                amount = amount < 0 ? 0 : amount;
+                offset = new CGPoint(webView.ScrollView.ContentOffset.X, amount);
+            }
+
+            if ((offset.X != 0 || offset.Y != 0))
+                webView.ScrollView.SetContentOffset(offset, false);
+        }
+
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
         {
             if (webView == null)
@@ -661,6 +705,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 OnWebViewEnterPressed();
         }
 
+
         protected virtual void OnWebViewDomLoaded() { }
 
         protected virtual void OnWebViewLoaded() { }
@@ -669,50 +714,15 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected virtual void OnWebViewMutated() { }
 
-        protected virtual async void OnWebViewKeyPressed() {
-            var clientHeightResult = await EvaluateJavaScriptAsync("document.getElementById('editor').clientHeight;");
-            var clientHeight = Int32.Parse(clientHeightResult.Item1.ToString());
-
-            var lineHeightResult = await EvaluateJavaScriptAsync("document.getElementById('editor').style.lineHeight;");
-            var lineHeight = 28;//Int32.Parse(lineHeightResult.Item1.ToString());
-
-            var caretCoordResult = await EvaluateJavaScriptAsync("getCaretYCoordinate()");
-            var caretCoord = Int32.Parse(caretCoordResult.Item1.ToString());
-
-            var contentHeight = clientHeight > 0 ? clientHeight : webView.ScrollView.Frame.Height;
-
-            var caretHeight = lineHeight - 4;
-
-            CGPoint offset = new CGPoint(0, 0);
-
-            if (isKeyboardVisible)
-            {
-                if (caretCoord + caretHeight > webView.ScrollView.Bounds.Height - keyboardDimensions.Height)
-                    offset = new CGPoint(0, (caretCoord + lineHeight) - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height) + webView.ScrollView.ContentOffset.Y);
-                else if (caretCoord < 0)
-                {
-                    var amount = webView.ScrollView.ContentOffset.Y + caretCoord;
-                    amount = amount < 0 ? 0 : amount;
-                    offset = new CGPoint(webView.ScrollView.ContentOffset.X, amount);
-                }
-            }
-            else
-            {
-                if (caretCoord + caretHeight > webView.ScrollView.Bounds.Height)
-                    offset = new CGPoint(0, (caretCoord + lineHeight) - webView.ScrollView.Bounds.Height + webView.ScrollView.ContentOffset.Y);
-                else if (caretCoord < 0)
-                {
-                    var amount = webView.ScrollView.ContentOffset.Y + caretCoord;
-                    amount = amount < 0 ? 0 : amount;
-                    offset = new CGPoint(webView.ScrollView.ContentOffset.X, amount);
-                }
-            }
-
-            if ((offset.X != 0 || offset.Y != 0))
-                webView.ScrollView.SetContentOffset(offset, false);
+        protected virtual async void OnWebViewKeyPressed()
+        {
+            MoveViewToCaret();
         }
 
-        protected virtual void OnWebViewEnterPressed() { }
+        protected virtual void OnWebViewEnterPressed() 
+        {
+            MoveViewToCaret(true);
+        }
 
         protected virtual bool CanNavigate(WKNavigationAction action)
         {

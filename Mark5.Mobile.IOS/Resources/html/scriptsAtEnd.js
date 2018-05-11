@@ -22,7 +22,6 @@ document.addEventListener("keypress", function(e) {
     }
     else {
         window.webkit.messageHandlers.keypressed.postMessage({});
-        document.getElementById('editor').style.lineHei
     }
 });
 
