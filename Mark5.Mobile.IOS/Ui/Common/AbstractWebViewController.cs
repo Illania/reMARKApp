@@ -168,9 +168,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return;
             constraint.Constant = desiredHeaderHeight;
 
-            var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, desireHeaderSize.Height);
-            webView?.EvaluateJavaScript(headerPaddingJs, null);
+            SetHeaderPadding(desiredHeaderHeight);
         }
 
         protected override void Recycle()
@@ -591,11 +589,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return;
 
             if (headerContainerView.Bounds.Height > 0)
-            {
-                var headerPaddingJs = headerPaddingJsTemplate;
-                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-                webView?.EvaluateJavaScript(headerPaddingJs, null);
-            }
+                SetHeaderPadding(headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
@@ -605,20 +599,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         [Export("webView:didFinishNavigation:")]
-        async void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+        void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
         {
             if (headerContainerView.Bounds.Height > 0)
-            {
-                var headerPaddingJs = headerPaddingJsTemplate;
-                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-                await webView?.EvaluateJavaScriptAsync(headerPaddingJs);
-            }
+                SetHeaderPadding(headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
 
             loadTcs.SetResult(true);
         }
 
         [Export("webView:didFailNavigation:withError:")]
         void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error) => loadTcs.SetResult(false);
+
+        void SetHeaderPadding(nfloat height)
+        {
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, (int)height);
+            webView?.EvaluateJavaScript(headerPaddingJs, null);
+        }
 
         void IWKScriptMessageHandler.DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
