@@ -158,15 +158,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (webView == null)
                 return;
 
-            var desireHeaderSize = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
-            var desiredHeaderHeight = desireHeaderSize.Height;
+            var desiredHeaderHeight = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize).Height;
             if (desiredHeaderHeight < 1)
                 return;
-
-            var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
-            if (constraint == null)
-                return;
-            constraint.Constant = desiredHeaderHeight;
 
             SetHeaderPadding(desiredHeaderHeight);
         }
