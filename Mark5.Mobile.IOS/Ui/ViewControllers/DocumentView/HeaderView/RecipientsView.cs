@@ -97,13 +97,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             });
             textView.AddGestureRecognizer(new UITapGestureRecognizer(HandleTextTapped));
 
-            expandButton = new UIButton
+            expandButton = new LargeHitAreaButton
             {
                 TintColor = Theme.Blue,
                 BackgroundColor = Theme.Clear,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(1f, 0f, 4f, 1f)
+                HitAreaMargin = 10,
             };
             expandButton.SetImage(UIImage.FromBundle("Arrow-Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             ContainerView.AddSubview(expandButton);
@@ -190,17 +190,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             if (currentState == State.Compressed)
                 return;
 
-            var tapPosition = textView.GetClosestPositionToPoint(gestureRecognizer.LocationInView(textView));
-            var offset = textView.GetOffsetFromPosition(textView.BeginningOfDocument, tapPosition);
+            var location = gestureRecognizer.LocationInView(textView);
 
-            var beforeSubstring = textView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
-            var afterSubstring = textView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var tapPosition = textView.GetClosestPositionToPoint(location);
+            var caretPosition = textView.GetCaretRectForPosition(tapPosition);
+
+            if (Math.Abs(caretPosition.X - location.X) > 25) //If true, the click is too far away from the text to be considered "valid"
+                return;
+
+            var offset = (int)textView.GetOffsetFromPosition(textView.BeginningOfDocument, tapPosition);
+
+            var beforeSubstring = textView.Text.SafeSubstring(0, offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = offset >= textView.Text.Length ? "" : textView.Text.SafeSubstring(offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
 
             var tappedRecipent = beforeSubstring + afterSubstring;
 
-            if (CommonConfig.Logger.IsTraceEnabled())
-                CommonConfig.Logger.Trace(string.Format("Tapped recipent. [recipent={0}]", tappedRecipent));
-
+            CommonConfig.Logger.Trace(string.Format($"Tapped recipent. [recipent={tappedRecipent}]"));
             RecipientTapped?.Invoke(this, new RecipientTappedEventArgs(tappedRecipent));
         }
 
