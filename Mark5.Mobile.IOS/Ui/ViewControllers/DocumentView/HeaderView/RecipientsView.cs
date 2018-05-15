@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CoreAnimation;
@@ -221,10 +221,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 };
 
                 var prettyAddresses = DocumentPreview.Addresses.Where(da => da.AddressType == addressType).Select(addressText);
-                var text = string.Join(EmailSeparator, prettyAddresses);
-
-                if (text.Length == 0 && addressType == DocumentAddressType.From)
-                    text = " ";
+                string text;
+                if (addressType == DocumentAddressType.From)
+                    text = prettyAddresses.Any() ? string.Join(EmailSeparator, prettyAddresses) : (DocumentPreview.Creator ?? " ");
+                else
+                    text = string.Join(EmailSeparator, prettyAddresses);
 
                 textView.TextStorage.BeginEditing();
                 textView.TextStorage.SetString(text.ToNSAttributedString());
@@ -242,7 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 return;
             }
 
-            Hidden = IsEmpty();
+            Hidden = addressType != DocumentAddressType.From && !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
         }
 
         public bool IsEmpty()
