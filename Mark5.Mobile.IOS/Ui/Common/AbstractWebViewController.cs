@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -160,11 +160,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (webView == null || headerAnimationRunning)
                 return;
 
-            var desiredHeaderHeight = (float)headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize).Height;
+            var desiredHeaderHeight = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize).Height;
             if (desiredHeaderHeight < 1)
                 return;
 
-            UpdateHeaderPadding(desiredHeaderHeight);
+            SetHeaderPadding(desiredHeaderHeight);
         }
 
         protected void HeaderView_BeginAnimating(object sender, EventArgs e)
@@ -174,8 +174,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected void HeaderView_Animating(object sender, EventArgs e)
         {
-            var height = (float)headerView.Layer.PresentationLayer.Frame.Height;
-            UpdateHeaderPadding(height);
+            var height = headerView.Layer.PresentationLayer.Frame.Height;
+            SetHeaderPadding(height);
         }
 
         protected void HeaderView_EndAnimating(object sender, EventArgs e)
@@ -585,13 +585,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 });
         }
 
-        void UpdateHeaderPadding(float height)
-        {
-            var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, height);
-            webView?.EvaluateJavaScript(headerPaddingJs, null);
-        }
-
         [Export("scrollViewDidScroll:")]
         public void Scrolled(UIScrollView scrollView)
         {
@@ -611,11 +604,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return;
 
             if (headerContainerView.Bounds.Height > 0)
-            {
-                var headerPaddingJs = headerPaddingJsTemplate;
-                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-                webView?.EvaluateJavaScript(headerPaddingJs, null);
-            }
+                SetHeaderPadding(headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
@@ -625,20 +614,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         [Export("webView:didFinishNavigation:")]
-        async void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+        void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
         {
             if (headerContainerView.Bounds.Height > 0)
-            {
-                var headerPaddingJs = headerPaddingJsTemplate;
-                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-                await webView?.EvaluateJavaScriptAsync(headerPaddingJs);
-            }
+                SetHeaderPadding(headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
 
             loadTcs.SetResult(true);
         }
 
         [Export("webView:didFailNavigation:withError:")]
         void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error) => loadTcs.SetResult(false);
+
+        void SetHeaderPadding(nfloat height)
+        {
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, (int)height);
+            webView?.EvaluateJavaScript(headerPaddingJs, null);
+        }
 
         void IWKScriptMessageHandler.DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
