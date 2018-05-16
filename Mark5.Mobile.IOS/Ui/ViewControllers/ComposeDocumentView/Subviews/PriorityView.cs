@@ -51,6 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             selectedPriorityLabel = new UILabel
             {
+                BackgroundColor = UIColor.Clear,
                 Text = UI.PrettyPriorityString(selectedPriority),
                 Font = Theme.DefaultFont,
                 Opaque = false,
@@ -85,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 if (previousDocumentPriority != Priority.Low && previousDocumentPriority != Priority.Normal && previousDocumentPriority != Priority.Urgent)
                     previousDocumentPriority = Priority.Normal;
-                
+
                 SelectPriority(previousDocumentPriority);
             }
 

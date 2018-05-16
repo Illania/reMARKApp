@@ -37,7 +37,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public abstract void UpdateVisibility();
 
         //TODO BIG TODO
-        // - Test on iPad
-        // - At the moment the arrow doesn't appear if not needed. Show to Una in case we need to do something different
+        // - EML VIEWER
+        // - Compose doc view color
+        // - All good with CADisplay?
     }
 }
