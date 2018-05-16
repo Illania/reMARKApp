@@ -159,7 +159,6 @@
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateReceivedView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
@@ -258,6 +257,9 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CreatorView.cs" />
 		<Compile Include="Ui\Common\LargeHitAreaButton.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\HeaderView.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SeparatorSubview.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\NewRecipientsView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

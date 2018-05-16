@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using HtmlAgilityPack;
 using MailBee;
-using MailBee.Html;
 using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model.Exceptions;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -33,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         UIBarButtonItem closeItem;
         UIBarButtonItem shareItem;
 
-        UIStackView headerStackView;
+        HeaderView headerView;
 
         MailMessage mailMessage;
 
@@ -64,25 +60,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             shareItem = new UIBarButtonItem(UIBarButtonSystemItem.Action);
             NavigationItem.SetRightBarButtonItem(shareItem, false);
 
-            headerStackView = new UIStackView
-            {
-                Axis = UILayoutConstraintAxis.Vertical,
-                Alignment = UIStackViewAlignment.Fill,
-                Distribution = UIStackViewDistribution.Fill,
-                Spacing = 0f
-            };
+            headerView = new HeaderView();
 
-            headerStackView.AddArrangedSubview(new SubjectView());
-            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.From));
-            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.To));
-            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Cc));
-            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.Bcc));
-            headerStackView.AddArrangedSubview(new RecipientsView(RecipientsView.Type.ReplyTo));
-            headerStackView.AddArrangedSubview(new DateReceivedView());
-            headerStackView.AddArrangedSubview(new PriorityView());
-            headerStackView.AddArrangedSubview(new AttachmentsView(this));
-
-            SetHeaderView(headerStackView);
+            SetHeaderView(headerView);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -98,6 +78,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             closeItem.Clicked += CloseItem_Clicked;
             shareItem.Clicked += ShareItem_Clicked;
+
+            headerView.BeginAnimating += HeaderView_BeginAnimating;
+            headerView.Animating += HeaderView_Animating;
+            headerView.EndAnimating += HeaderView_EndAnimating;
+            headerView.AttachmentTapped += HeaderView_AttachmentTapped;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -114,6 +99,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
             closeItem.Clicked -= CloseItem_Clicked;
             shareItem.Clicked -= ShareItem_Clicked;
+
+            headerView.BeginAnimating -= HeaderView_BeginAnimating;
+            headerView.Animating -= HeaderView_Animating;
+            headerView.EndAnimating -= HeaderView_EndAnimating;
+            headerView.AttachmentTapped -= HeaderView_AttachmentTapped;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -131,9 +121,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             closeItem = null;
             shareItem = null;
 
-            headerStackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
-            headerStackView.RemoveFromSuperview();
-            headerStackView = null;
+            headerView.RemoveFromSuperview();
+            headerView = null;
         }
 
         protected override void Dispose(bool disposing)
@@ -264,12 +253,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         {
             await StartRefreshing();
 
-            foreach (var sv in headerStackView.Subviews.OfType<MailViewerSubview>())
-            {
-                sv.MailMessage = mailMessage;
-                sv.RefreshView();
-                sv.UpdateVisibility();
-            }
+            headerView.MailMessage = mailMessage;
+            headerView.RefreshHeader();
 
             if (mailMessage != null)
             {
@@ -286,21 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             await EndRefreshing();
         }
 
-        public void OpenComposeDocumentView(string[] preconfiguredEmailAddresses)
-        {
-            var vc = new ComposeDocumentViewController
-            {
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
-                {
-                    { DocumentAddressType.To, preconfiguredEmailAddresses }
-                }
-            };
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        public async void OpenAttachment(Attachment attachment)
+        async void HeaderView_AttachmentTapped(object sender, Attachment attachment)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("please_wait___"));
 
@@ -363,10 +334,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 if (string.IsNullOrWhiteSpace(cid))
                     continue;
 
-                MailBee.Mime.Attachment matchingAtt = null;
+                Attachment matchingAtt = null;
                 foreach (var obj in atts)
                 {
-                    var att = (MailBee.Mime.Attachment)obj;
+                    var att = (Attachment)obj;
                     if (att.ContentID == cid)
                     {
                         matchingAtt = att;

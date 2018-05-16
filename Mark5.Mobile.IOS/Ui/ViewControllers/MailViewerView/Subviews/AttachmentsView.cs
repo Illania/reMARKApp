@@ -14,10 +14,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         UILabel titleLabel;
         UIStackView stackView;
 
-        public AttachmentsView(MailViewerViewController mailViewerViewController)
-        {
-            mailViewerViewControllerWeakReference = mailViewerViewController.Wrap();
+        public event EventHandler<Attachment> AttachmentTapped = delegate { };
 
+        public AttachmentsView()
+        {
             titleLabel = new UILabel
             {
                 Text = Localization.GetString("attachments") + ":",
@@ -73,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             foreach (var att in MailMessage.Attachments)
             {
-                var alssv = new AttachmentsSubView(mailViewerViewControllerWeakReference, (Attachment)att);
+                var alssv = new AttachmentsSubView(this, (Attachment)att);
                 stackView.AddArrangedSubview(alssv);
             }
         }
@@ -88,19 +88,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             Hidden = MailMessage.Attachments.Count < 1;
         }
+
+        public void OpenAttachment(Attachment attachment) => AttachmentTapped?.Invoke(this, attachment);
     }
 
     class AttachmentsSubView : UIView
     {
-        readonly WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference;
+        readonly WeakReference<AttachmentsView> viewWeakReference;
         readonly Attachment attachment;
 
         readonly UIButton attachmentButton;
 
-        public AttachmentsSubView(WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference, Attachment attachment)
+        public AttachmentsSubView(AttachmentsView attachmentsView, Attachment attachment)
         {
             this.attachment = attachment;
-            this.mailViewerViewControllerWeakReference = mailViewerViewControllerWeakReference;
+            this.viewWeakReference = attachmentsView.Wrap();
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
@@ -133,6 +135,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             }
         }
 
-        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => mailViewerViewControllerWeakReference.Unwrap()?.OpenAttachment(attachment);
+        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => viewWeakReference.Unwrap()?.OpenAttachment(attachment);
     }
 }
