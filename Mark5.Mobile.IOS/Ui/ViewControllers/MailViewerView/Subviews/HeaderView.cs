@@ -29,11 +29,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         UIStackView contentView;
 
         SubjectView subjectView;
-        NewRecipientsView fromView;
-        NewRecipientsView toView;
-        NewRecipientsView ccView;
-        NewRecipientsView bccView;
-        NewRecipientsView replyToView;
+        RecipientsView fromView;
+        RecipientsView toView;
+        RecipientsView ccView;
+        RecipientsView bccView;
+        RecipientsView replyToView;
         DateView dateView;
         PriorityView priorityView;
         AttachmentsView attachmentsListView;
@@ -79,11 +79,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             });
 
             subViews.Add(subjectView = new SubjectView());
-            subViews.Add(fromView = new NewRecipientsView(NewRecipientsView.Type.From));
-            subViews.Add(toView = new NewRecipientsView(NewRecipientsView.Type.To));
-            subViews.Add(ccView = new NewRecipientsView(NewRecipientsView.Type.Cc));
-            subViews.Add(bccView = new NewRecipientsView(NewRecipientsView.Type.Bcc));
-            subViews.Add(replyToView = new NewRecipientsView(NewRecipientsView.Type.ReplyTo));
+            subViews.Add(fromView = new RecipientsView(RecipientsView.Type.From));
+            subViews.Add(toView = new RecipientsView(RecipientsView.Type.To));
+            subViews.Add(ccView = new RecipientsView(RecipientsView.Type.Cc));
+            subViews.Add(bccView = new RecipientsView(RecipientsView.Type.Bcc));
+            subViews.Add(replyToView = new RecipientsView(RecipientsView.Type.ReplyTo));
             subViews.Add(dateView = new DateView());
             subViews.Add(priorityView = new PriorityView());
             subViews.Add(attachmentsListView = new AttachmentsView());
@@ -132,7 +132,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         void InitializeHandlers()
         {
-            subViews.OfType<NewRecipientsView>().ForEach(rv =>
+            subViews.OfType<RecipientsView>().ForEach(rv =>
             {
                 rv.BeginAnimating += RecipientView_BeginAnimating;
                 rv.Animating += RecipientView_Animating;
@@ -144,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         void DeinitializeHandlers()
         {
-            subViews.OfType<NewRecipientsView>().ForEach(rv =>
+            subViews.OfType<RecipientsView>().ForEach(rv =>
             {
                 rv.BeginAnimating -= RecipientView_BeginAnimating;
                 rv.Animating -= RecipientView_Animating;
@@ -263,7 +263,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 subHeaderView.RemoveConstraints(compressedConstraints);
                 subHeaderView.AddConstraints(expandedConstraints);
 
-                subViews.OfType<NewRecipientsView>().ForEach(r => r.ExpandCompressView());
+                subViews.OfType<RecipientsView>().ForEach(r => r.ExpandCompressView());
             }
             else
             {
@@ -278,7 +278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 subHeaderView.RemoveConstraints(expandedConstraints);
                 subHeaderView.AddConstraints(compressedConstraints);
 
-                subViews.OfType<NewRecipientsView>().ForEach(r => r.ExpandCompressView());
+                subViews.OfType<RecipientsView>().ForEach(r => r.ExpandCompressView());
             }
 
             detailsShown = !detailsShown;

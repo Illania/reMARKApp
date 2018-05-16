@@ -9,7 +9,7 @@ using Foundation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
-    public class NewRecipientsView : MailViewerSubview
+    public class RecipientsView : MailViewerSubview
     {
         public enum Type
         {
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         NSLayoutConstraint expandButtonWidthConstraint;
 
-        public NewRecipientsView(Type addressType)
+        public RecipientsView(Type addressType)
         {
             this.addressType = addressType;
 
