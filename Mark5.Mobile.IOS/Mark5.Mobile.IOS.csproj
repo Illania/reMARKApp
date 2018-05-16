@@ -156,7 +156,7 @@
 		<Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateReceivedView.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />

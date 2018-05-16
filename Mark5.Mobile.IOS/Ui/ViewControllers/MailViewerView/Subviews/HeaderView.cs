@@ -34,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         NewRecipientsView ccView;
         NewRecipientsView bccView;
         NewRecipientsView replyToView;
-        DateReceivedView dateView;
+        DateView dateView;
         PriorityView priorityView;
         AttachmentsView attachmentsListView;
 
@@ -84,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             subViews.Add(ccView = new NewRecipientsView(NewRecipientsView.Type.Cc));
             subViews.Add(bccView = new NewRecipientsView(NewRecipientsView.Type.Bcc));
             subViews.Add(replyToView = new NewRecipientsView(NewRecipientsView.Type.ReplyTo));
-            subViews.Add(dateView = new DateReceivedView());
+            subViews.Add(dateView = new DateView());
             subViews.Add(priorityView = new PriorityView());
             subViews.Add(attachmentsListView = new AttachmentsView());
 

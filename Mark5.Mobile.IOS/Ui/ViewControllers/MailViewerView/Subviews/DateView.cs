@@ -1,12 +1,16 @@
-﻿using Mark5.Mobile.IOS.Ui.Common;
+using System;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
-    public class DateView : DocumentSubView
+    public class DateView : MailViewerSubview
     {
+        //TODO add will move to superview here and there
+        //TODO search about circulars in iOS
+
         UILabel dateLabel;
 
         public DateView()
@@ -37,25 +41,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
         }
 
+        public override void WillMoveToSuperview(UIView newsuper)
+        {
+            if (newsuper == null)
+            {
+                dateLabel?.RemoveFromSuperview();
+                dateLabel = null;
+            }
+        }
+
         public override void RefreshView()
         {
-            if (DocumentPreview != null)
-                dateLabel.Text = DocumentPreview.DateReceivedTimestamp
-                    .ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsCompactLongDateTimeString();
+            if (MailMessage != null)
+                dateLabel.Text = DateTime.SpecifyKind(MailMessage.Date, DateTimeKind.Unspecified).ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
         }
 
         public override void UpdateVisibility()
         {
-            if (DocumentPreview == null)
+            if (MailMessage == null)
             {
                 Hidden = true;
                 return;
             }
 
-            Hidden = string.IsNullOrWhiteSpace(DocumentPreview.DateReceivedTimestamp.ToString());
+            Hidden = false;
         }
     }
 }

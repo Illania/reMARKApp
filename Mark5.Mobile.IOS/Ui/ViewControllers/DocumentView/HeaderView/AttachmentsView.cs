@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -22,6 +21,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         public AttachmentsView()
         {
+            ContainerView.BackgroundColor = Theme.White;
+
             titleLabel = new UILabel
             {
                 Text = Localization.GetString("attachments") + ":",
@@ -30,7 +31,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            ContainerView.BackgroundColor = Theme.White;
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
             {
@@ -81,12 +81,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 titleLabel = null;
 
                 stackView?.RemoveFromSuperview();
-                foreach (var v in stackView.ArrangedSubviews)
-                {
-                    if (v is UIButton b)
-                        b.TouchUpInside -= HandleShowMoreButtonTapped;
-                    v.RemoveFromSuperview();
-                }
                 stackView = null;
             }
         }
@@ -96,12 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             if (Document == null)
                 return;
 
-            foreach (var v in stackView.ArrangedSubviews)
-            {
-                if (v is UIButton b)
-                    b.TouchUpInside -= HandleShowMoreButtonTapped;
-                v.RemoveFromSuperview();
-            }
+            stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
             foreach (var batch in Document.Attachments.Batch(columnSize))
                 stackView.AddArrangedSubview(PrepareColumnStack(batch));
         }
@@ -142,21 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs) => AttachmentTapped?.Invoke(this, eventArgs);
 
-        void HandleShowMoreButtonTapped(object sender, EventArgs e)
-        {
-            var btn = (UIButton)sender;
-            btn.TouchUpInside -= HandleShowMoreButtonTapped;
-            btn.RemoveFromSuperview();
-
-            foreach (var ad in Document.Attachments.Skip(2))
-            {
-                var alssv = new AttachmentsSubView(this, ad);
-                stackView.AddArrangedSubview(alssv);
-            }
-        }
-
         #endregion
-
     }
 
     class AttachmentsSubView : UIView
