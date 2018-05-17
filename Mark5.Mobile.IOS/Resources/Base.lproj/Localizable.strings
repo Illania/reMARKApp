@@ -183,7 +183,7 @@
 "low" = "Low";
 "mark5_server_reachability" = "MARK5 server: ";
 "mark5_service_reachability" = "MARK5 service: ";
-"select_all_downloaded_items" = "Select all downloaded items";
+"select_all" = "Select all";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
 "mark_as_unread" = "Mark as unread";
@@ -367,6 +367,7 @@
 "unable_open_link_content" = "There are no applications that can open link type ";
 "unable_open_link_title" = "Unable to open link";
 "unavailable" = "Unavailable";
+"unselect_all" = "Unselect all";
 "updating_categories___" = "Updating categories...";
 "updating_config___" = "Updating configuration...";
 "urgent" = "Urgent";

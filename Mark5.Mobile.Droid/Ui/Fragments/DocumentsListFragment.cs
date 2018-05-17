@@ -489,7 +489,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
-            menu.Add(Menu.None, MenuItemActions.SelectAllDownloadedItems, MenuItemActions.SelectAllDownloadedItems, Resource.String.select_all_downloaded_items);
+            if (CurrentAdapter.SelectedItemCount == CurrentAdapter.ItemCount)
+                menu.Add(Menu.None, MenuItemActions.UnselectAll, MenuItemActions.UnselectAll, Resource.String.unselect_all);
+            else
+                menu.Add(Menu.None, MenuItemActions.SelectAll, MenuItemActions.SelectAll, Resource.String.select_all);
 
             if (CurrentAdapter.SelectedItemCount == 1)
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
@@ -545,9 +548,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.SelectAllDownloadedItems)
+            if (item.ItemId == MenuItemActions.SelectAll)
             {
-                SelectAllDownloadedItems();
+                SelectAll();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.UnselectAll)
+            {
+                UnSelectAll();
                 return true;
             }
 
@@ -722,9 +731,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void SelectAllDownloadedItems()
+        void SelectAll()
         {
             CurrentAdapter.SetSelected(CurrentAdapter.Items, true);
+            actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
+            actionMode.Invalidate();
+        }
+
+        void UnSelectAll()
+        {
+            CurrentAdapter.SetSelected(CurrentAdapter.Items, false);
+            actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
+            actionMode.Invalidate();
         }
 
         async void DeleteFromFolderAction()
@@ -792,7 +810,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Categories = 50;
             public const int DeleteFromFolder = 60;
             public const int Delete = 61;
-            public const int SelectAllDownloadedItems = 70;
+            public const int SelectAll = 70;
+            public const int UnselectAll = 71;
         }
 
         #endregion
