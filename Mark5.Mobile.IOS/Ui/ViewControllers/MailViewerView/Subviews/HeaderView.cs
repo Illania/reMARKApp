@@ -90,7 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             firstSeparator = new SeparatorSubView();
             secondSeparator = new SeparatorSubView();
-            showMoreButton = CreateShowMoreButton();
+            showMoreButton = GetShowMoreButton();
 
             subHeaderView = GetSubHeader();
             bottomView = new UIView();
@@ -175,7 +175,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             }
         }
 
-        UIButton CreateShowMoreButton()
+        UIButton GetShowMoreButton()
         {
             var button = new UIButton
             {
@@ -242,6 +242,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             return container;
         }
+
+        #region Handlers
 
         void ShowMoreButton_TouchUpInside(object sender, EventArgs e)
         {
@@ -310,6 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 EndAnimating(this, EventArgs.Empty);
         }
 
+        #endregion
 
         #region Public methods
 
