@@ -271,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView);
+            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView, ParentFolder.Module);
             searchResultsController.TableView.Source = searchResultsDataSource;
             searchResultsController.TableView.EstimatedRowHeight = 50f;
             searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -1566,14 +1566,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             readonly WeakReference<AbstractFoldersListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
+            readonly ModuleType moduleType;
+
+            SortedDictionary<int, bool> favoritesStatus;
 
             bool loading = true;
             readonly List<Folder> items = new List<Folder>();
 
-            public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView)
+            public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType moduleType)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
+                favoritesStatus = new SortedDictionary<int, bool>();
+                this.moduleType = moduleType;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -1633,12 +1638,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderDeselected(f);
             }
 
-            public void SetFolders(List<Folder> folders)
+            public async void SetFolders(List<Folder> folders)
             {
                 items.Clear();
                 items.AddRange(folders);
                 loading = false;
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+
+                var newFavoritesStatus = new SortedDictionary<int, bool>();
+
+                foreach (var folder in folders)
+                {
+                    newFavoritesStatus[folder.Id] = await Managers.FoldersManager.IsFolderFavouriteAsync(moduleType, folder.Id);
+                }
+
+                if (!favoritesStatus.SequenceEqual(newFavoritesStatus))
+                    favoritesStatus = newFavoritesStatus;
             }
 
             public void Reset()
@@ -1646,6 +1661,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 loading = true;
                 items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var f = items[indexPath.Row];
+                var actions = new List<UITableViewRowAction>();
+
+                if (favoritesStatus.ContainsKey(f.Id))
+                    if (favoritesStatus[f.Id])
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                            Localization.GetString("remove_from_favorites"),
+                            (a, ip) =>
+                            {
+                                viewControllerWeakReference.Unwrap()?.RemoveFromFavorites(items[ip.Row]);
+                                tableView.SetEditing(false, true);
+                                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                            });
+                        action.BackgroundColor = Theme.Brown;
+                        actions.Add(action);
+                    }
+                    else
+                    {
+                        var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                            Localization.GetString("add_to_favorites"),
+                            (a, ip) =>
+                            {
+                                viewControllerWeakReference.Unwrap()?.AddToFavorites(items[ip.Row]);
+                                tableView.SetEditing(false, true);
+                                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                            });
+                        action.BackgroundColor = Theme.Brown;
+                        actions.Add(action);
+                    }
+
+                return actions.ToArray();
             }
         }
 
