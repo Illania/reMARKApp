@@ -184,6 +184,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 textView = null;
 
                 expandButton.TouchUpInside -= ExpandButton_TouchUpInside;
+
+                displayLink?.Invalidate();
+                displayLink = null;
             }
         }
 

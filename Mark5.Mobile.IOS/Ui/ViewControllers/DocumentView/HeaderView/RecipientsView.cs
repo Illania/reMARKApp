@@ -182,6 +182,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 textView = null;
 
                 expandButton.TouchUpInside -= ExpandButton_TouchUpInside;
+
+                displayLink?.Invalidate();
+                displayLink = null;
             }
         }
 
