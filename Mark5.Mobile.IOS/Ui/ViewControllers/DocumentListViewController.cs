@@ -397,6 +397,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_all_downloaded_emails"),
+                                               UIAlertActionStyle.Default,
+                                               a =>
+            {
+                var dataSource = (DataSource)TableView.Source;
+                var currentSection = 0;
+                var rowsInSection = dataSource.RowsInSection(null,0);
+
+                for (int i = 0; i < rowsInSection; i++)
+                {
+                    var path = NSIndexPath.FromItemSection(i, currentSection);
+                    TableView.SelectRow(path, false, UITableViewScrollPosition.None);
+                }
+            }));
+
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments, d)));
 
