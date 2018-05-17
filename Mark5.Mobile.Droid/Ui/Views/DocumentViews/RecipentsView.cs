@@ -319,7 +319,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 };
 
                 var fromTextArray = DocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(addressText);
-                var fromText = string.Join(",\n", fromTextArray);
+                var fromText = fromTextArray.Any() ? string.Join(",\n", fromTextArray) : (DocumentPreview.Creator ?? " ");
                 tableRowFrom.Visibility = string.IsNullOrWhiteSpace(fromText) ? ViewStates.Gone : ViewStates.Visible;
                 fromValue.Text = fromText;
 
