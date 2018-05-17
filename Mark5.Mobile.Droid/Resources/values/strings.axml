@@ -378,6 +378,7 @@
     <string name="search_shortcodes">Search shortcodes</string>
     <string name="search_shortcodes_result">Result</string>
     <string name="select">Select</string>
+    <string name="select_all_downloaded_emails">Select all downloaded Emails</string>
     <string name="select_email_address">Select email address</string>
     <string name="select_a_line">Select a mailbox</string>
     <string name="select_categories">Select categories</string>

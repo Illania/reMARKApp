@@ -489,6 +489,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
+            menu.Add(Menu.None, MenuItemActions.SelectAllDownloadedEmails, MenuItemActions.SelectAllDownloadedEmails, Resource.String.select_all_downloaded_emails);
+
             if (CurrentAdapter.SelectedItemCount == 1)
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
 
@@ -540,6 +542,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.SetPriority)
             {
                 SetPriority();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.SelectAllDownloadedEmails)
+            {
+                SelectAllDownloadedEmails();
                 return true;
             }
 
@@ -714,6 +722,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        void SelectAllDownloadedEmails()
+        {
+            foreach (var documentPreview in CurrentAdapter.Items)
+                CurrentAdapter.SetSelected(documentPreview, true);   
+        }
+
         async void DeleteFromFolderAction()
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
@@ -779,6 +793,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Categories = 50;
             public const int DeleteFromFolder = 60;
             public const int Delete = 61;
+            public const int SelectAllDownloadedEmails = 70;
         }
 
         #endregion
