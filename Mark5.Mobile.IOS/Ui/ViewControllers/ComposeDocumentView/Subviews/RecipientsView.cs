@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -428,8 +427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     TextView.TextContainer.MaximumNumberOfLines = 0;
                     TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                    Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
 
                     expanded = true;
                 });
@@ -447,8 +445,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     TextView.TextContainer.MaximumNumberOfLines = 1;
                     TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                    Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
 
                     expanded = false;
                 });
