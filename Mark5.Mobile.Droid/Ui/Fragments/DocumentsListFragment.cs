@@ -724,8 +724,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SelectAllDownloadedEmails()
         {
-            foreach (var documentPreview in CurrentAdapter.Items)
-                CurrentAdapter.SetSelected(documentPreview, true);   
+            CurrentAdapter.SetSelected(CurrentAdapter.Items, true);
         }
 
         async void DeleteFromFolderAction()

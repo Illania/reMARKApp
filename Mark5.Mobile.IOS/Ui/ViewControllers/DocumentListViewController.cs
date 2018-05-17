@@ -397,7 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("mark_all_downloaded_emails"),
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("select_all_downloaded_emails"),
                                                UIAlertActionStyle.Default,
                                                a =>
             {
