@@ -594,10 +594,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SendDocument(bool saveDraft = false)
         {
+            fab.Enabled = false;
+
             if (saveDraft)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
 
-            Action sendAction = async () =>
+            async void sendAction()
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
@@ -631,19 +633,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", t.Exception.InnerException);
                     await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                    fab.Enabled = true;
                 }
                 else
                     Activity?.Finish();
-            };
+            }
 
             var allEmailsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
 
             if (!allEmailsValid && subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, () => fab.Enabled = true);
             else if (!allEmailsValid)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, () => fab.Enabled = true);
             else if (subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, () => fab.Enabled = true);
             else
                 sendAction();
         }
