@@ -66,10 +66,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             };
             ContentView.Add(nameLabel);
 
-            expandButton = new UIButton
+            expandButton = new LargeHitAreaButton
             {
                 ImageEdgeInsets = new UIEdgeInsets(-10f, -10f, -10f, -10f),
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                HitAreaMargin = 15
             };
 
             expandButton.SetImage(UIImage.FromBundle("Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);

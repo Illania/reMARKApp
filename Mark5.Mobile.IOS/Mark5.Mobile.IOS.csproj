@@ -256,6 +256,7 @@
 		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
 		<Compile Include="Utilities\LocalAuthenticationManager.cs" />
+		<Compile Include="Ui\Common\LargeHitAreaButton.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
