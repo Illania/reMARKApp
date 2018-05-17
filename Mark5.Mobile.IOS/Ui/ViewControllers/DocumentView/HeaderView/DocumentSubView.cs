@@ -35,10 +35,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public abstract void RefreshView();
 
         public abstract void UpdateVisibility();
-
-        //TODO BIG TODO
-        // - EML VIEWER
-        // - Compose doc view color
-        // - All good with CADisplay?
     }
 }

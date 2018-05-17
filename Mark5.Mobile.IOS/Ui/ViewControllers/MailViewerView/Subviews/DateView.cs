@@ -8,9 +8,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class DateView : MailViewerSubview
     {
-        //TODO add will move to superview here and there
-        //TODO search about circulars in iOS
-
         UILabel dateLabel;
 
         public DateView()

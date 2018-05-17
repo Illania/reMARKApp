@@ -209,6 +209,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             var tappedRecipent = beforeSubstring + afterSubstring;
 
             CommonConfig.Logger.Trace(string.Format($"Tapped recipent. [recipent={tappedRecipent}]"));
+
             RecipientTapped?.Invoke(this, new RecipientTappedEventArgs(tappedRecipent));
         }
 
