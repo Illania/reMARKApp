@@ -489,11 +489,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
-            menu.Add(Menu.None, MenuItemActions.SelectAllDownloadedEmails, MenuItemActions.SelectAllDownloadedEmails, Resource.String.select_all_downloaded_emails);
+            menu.Add(Menu.None, MenuItemActions.SelectAllDownloadedItems, MenuItemActions.SelectAllDownloadedItems, Resource.String.select_all_downloaded_items);
 
             if (CurrentAdapter.SelectedItemCount == 1)
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-
+            
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
@@ -545,9 +545,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.SelectAllDownloadedEmails)
+            if (item.ItemId == MenuItemActions.SelectAllDownloadedItems)
             {
-                SelectAllDownloadedEmails();
+                SelectAllDownloadedItems();
                 return true;
             }
 
@@ -722,7 +722,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void SelectAllDownloadedEmails()
+        void SelectAllDownloadedItems()
         {
             CurrentAdapter.SetSelected(CurrentAdapter.Items, true);
         }
@@ -792,7 +792,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Categories = 50;
             public const int DeleteFromFolder = 60;
             public const int Delete = 61;
-            public const int SelectAllDownloadedEmails = 70;
+            public const int SelectAllDownloadedItems = 70;
         }
 
         #endregion

@@ -397,20 +397,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("select_all_downloaded_emails"),
-                                               UIAlertActionStyle.Default,
-                                               a =>
-            {
-                var dataSource = (DataSource)TableView.Source;
-                var currentSection = 0;
-                var rowsInSection = dataSource.RowsInSection(null,0);
-
-                for (int i = 0; i < rowsInSection; i++)
-                {
-                    var path = NSIndexPath.FromItemSection(i, currentSection);
-                    TableView.SelectRow(path, false, UITableViewScrollPosition.None);
-                }
-            }));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("select_all_downloaded_items"), UIAlertActionStyle.Default, a => SelectAllDownloadedItems()));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments, d)));
@@ -680,6 +667,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error($"Error while setting priority for documents", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        void SelectAllDownloadedItems() 
+        {
+            var dataSource = (DataSource)TableView.Source;
+            var currentSection = 0;
+            var rowsInSection = dataSource.RowsInSection(null, currentSection);
+
+            for (int i = 0; i < rowsInSection; i++)
+            {
+                var path = NSIndexPath.FromItemSection(i, currentSection);
+                TableView.SelectRow(path, false, UITableViewScrollPosition.None);
             }
         }
 
