@@ -156,7 +156,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     case State.FullyExpanded:
                         textView.TextContainer.MaximumNumberOfLines = 0;
                         textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                        expandButtonWidthConstraint.Constant = buttonSize;
+                        expandButtonWidthConstraint.Constant = (addressType == DocumentAddressType.From || partiallyExpandedLines >= GetNumberLines())
+                            ? 0f : buttonSize;
                         expandButton.Transform = CGAffineTransform.MakeRotation((nfloat)(Math.PI / 2.0f));
                         break;
                 }
