@@ -682,7 +682,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Could not remote folder from favorites", ex);
+                CommonConfig.Logger.Error("Could not remove folder from favorites", ex);
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
@@ -1567,17 +1567,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             readonly WeakReference<AbstractFoldersListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly ModuleType moduleType;
-
-            SortedDictionary<int, bool> favoritesStatus;
-
-            bool loading = true;
             readonly List<Folder> items = new List<Folder>();
+
+            SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
+            bool loading = true;
 
             public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType moduleType)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
-                favoritesStatus = new SortedDictionary<int, bool>();
                 this.moduleType = moduleType;
             }
 
@@ -1652,8 +1650,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     newFavoritesStatus[folder.Id] = await Managers.FoldersManager.IsFolderFavouriteAsync(moduleType, folder.Id);
                 }
 
-                if (!favoritesStatus.SequenceEqual(newFavoritesStatus))
-                    favoritesStatus = newFavoritesStatus;
+                if (!FavoriteStatus.SequenceEqual(newFavoritesStatus))
+                    FavoriteStatus = newFavoritesStatus;
             }
 
             public void Reset()
@@ -1668,16 +1666,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var f = items[indexPath.Row];
                 var actions = new List<UITableViewRowAction>();
 
-                if (favoritesStatus.ContainsKey(f.Id))
-                    if (favoritesStatus[f.Id])
+                if (FavoriteStatus.ContainsKey(f.Id))
+                    if (FavoriteStatus[f.Id])
                     {
                         var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                             Localization.GetString("remove_from_favorites"),
                             (a, ip) =>
                             {
-                                viewControllerWeakReference.Unwrap()?.RemoveFromFavorites(items[ip.Row]);
+                                RemoveFromFavorites(f);
                                 tableView.SetEditing(false, true);
-                                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                             });
                         action.BackgroundColor = Theme.Brown;
                         actions.Add(action);
@@ -1688,9 +1685,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                             Localization.GetString("add_to_favorites"),
                             (a, ip) =>
                             {
-                                viewControllerWeakReference.Unwrap()?.AddToFavorites(items[ip.Row]);
+                                AddToFavorites(f);
                                 tableView.SetEditing(false, true);
-                                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                             });
                         action.BackgroundColor = Theme.Brown;
                         actions.Add(action);
@@ -1698,9 +1694,64 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 return actions.ToArray();
             }
+
+            public NSIndexPath[] GetIndexPaths(int folderId)
+            {
+                var indexPaths = new List<NSIndexPath>();
+                for (var i = 0; i < items.Count; i++)
+                {
+                    var f = items[i];
+                    if (f.Id == folderId)
+                        indexPaths.Add(NSIndexPath.FromRowSection(i, 0));
+                }
+
+                return indexPaths.ToArray();
+            }
+
+            public async void AddToFavorites(Folder folder)
+            {
+                try
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
+
+                    await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+
+                        FavoriteStatus[folder.Id] = true;
+
+                        var indexPaths = GetIndexPaths(folder.Id);
+                        tableViewWeakReference.Unwrap()?.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
+                        viewControllerWeakReference.Unwrap()?.QuickRefreshData();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not add folder to favorites", ex);
+
+                    await Dialogs.ShowErrorAlertAsync(viewControllerWeakReference.Unwrap(), ex);
+                }
+            }
+
+            public async void RemoveFromFavorites(Folder folder)
+            {
+                try
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
+
+                    await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+
+                    FavoriteStatus[folder.Id] = false;
+
+                    var indexPaths = GetIndexPaths(folder.Id);
+                    tableViewWeakReference.Unwrap()?.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
+                    viewControllerWeakReference.Unwrap()?.QuickRefreshData();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not remove folder from favorites", ex);
+
+                    await Dialogs.ShowErrorAlertAsync(viewControllerWeakReference.Unwrap(), ex);
+                }
+            }
         }
-
         #endregion
-
     }
 }
