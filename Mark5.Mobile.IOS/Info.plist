@@ -68,5 +68,7 @@
 	<array>
 		<string>fetch</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>MARK5 needs your permission to use Face ID to provide additional security</string>
 </dict>
 </plist>

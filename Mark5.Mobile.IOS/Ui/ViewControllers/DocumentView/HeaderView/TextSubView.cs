@@ -1,7 +1,8 @@
+﻿using System;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public abstract class TextSubView : DocumentSubView
     {
@@ -23,9 +24,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            label.SetContentHuggingPriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            label.SetContentCompressionResistancePriority((float) UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
             {
@@ -35,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.Subviews
 
             TextView = new UITextView
             {
+                BackgroundColor = Theme.Clear,
                 Font = Theme.DefaultFont,
                 Editable = false,
                 Opaque = false,

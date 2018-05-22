@@ -26,14 +26,22 @@ namespace Mark5.Mobile.Common.Extensions
         {
             //The +1 and -1 are used to exactly mimic the original IndexOf
             return enumeration.Select((value, index) => new
-                       {
-                           value,
-                           index = index + 1
-                       })
+            {
+                value,
+                index = index + 1
+            })
                        .Where(s => predicate(s.value))
                        .Select(s => s.index)
                        .FirstOrDefault() -
                    1;
+        }
+
+        public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> items,
+                                                   int maxItems)
+        {
+            return items.Select((item, inx) => new { item, inx })
+                        .GroupBy(x => x.inx / maxItems)
+                        .Select(g => g.Select(x => x.item));
         }
     }
 }

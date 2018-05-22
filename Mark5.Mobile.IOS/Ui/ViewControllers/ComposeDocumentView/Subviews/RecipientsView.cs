@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -36,7 +35,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         UITapGestureRecognizer textViewTapGestureRecognizer;
 
         public event EventHandler Edited = delegate { };
-        public event EventHandler<RecipentTappedEventArgs> RecipentTapped = delegate { };
         public event EventHandler<string> SearchRequested = delegate { };
         public event EventHandler CommaOrEnterPressed = delegate { };
         public event EventHandler AddButtonTapped = delegate { };
@@ -104,6 +102,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             TextView = new CustomUITextView(CGRect.Empty, textContainer)
             {
+                BackgroundColor = UIColor.Clear,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
                 Font = Theme.DefaultFont,
@@ -248,19 +247,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 ExpandView();
                 return;
             }
-
-            var tapPosition = TextView.GetClosestPositionToPoint(textViewTapGestureRecognizer.LocationInView(TextView));
-            var offset = TextView.GetOffsetFromPosition(TextView.BeginningOfDocument, tapPosition);
-
-            var beforeSubstring = TextView.Text.SafeSubstring(0, (int)offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
-            var afterSubstring = TextView.Text.SafeSubstring((int)offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
-
-            var tappedRecipent = beforeSubstring + afterSubstring;
-
-            if (CommonConfig.Logger.IsDebugEnabled())
-                CommonConfig.Logger.Debug($"Tapped recipent. [recipent={tappedRecipent}]");
-
-            RecipentTapped(this, new RecipentTappedEventArgs(tappedRecipent));
         }
 
         void HandleTextViewSelectionChanged(object sender, EventArgs e)
@@ -441,8 +427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     TextView.TextContainer.MaximumNumberOfLines = 0;
                     TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                    Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
 
                     expanded = true;
                 });
@@ -460,8 +445,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     TextView.TextContainer.MaximumNumberOfLines = 1;
                     TextView.TextContainer.LineBreakMode = UILineBreakMode.TailTruncation;
 
-                    Superview.SetNeedsLayout();
-                    Superview.LayoutIfNeeded();
+                    Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
 
                     expanded = false;
                 });

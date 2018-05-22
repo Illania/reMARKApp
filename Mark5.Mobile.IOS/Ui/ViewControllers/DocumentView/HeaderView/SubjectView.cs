@@ -2,9 +2,9 @@
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
-    public class SubjectView : MailViewerSubview
+    public class SubjectView : DocumentSubView
     {
         UILabel subjectLabel;
 
@@ -42,19 +42,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         public override void RefreshView()
         {
-            if (MailMessage != null)
-                subjectLabel.Text = MailMessage.Subject;
+            if (DocumentPreview != null)
+                subjectLabel.Text = DocumentPreview.Subject;
         }
 
         public override void UpdateVisibility()
         {
-            if (MailMessage == null)
+            if (DocumentPreview == null)
             {
                 Hidden = true;
                 return;
             }
 
-            Hidden = string.IsNullOrWhiteSpace(MailMessage.Subject);
+            Hidden = string.IsNullOrWhiteSpace(DocumentPreview.Subject);
         }
     }
 }

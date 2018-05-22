@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             textView = new UITextView
             {
+                BackgroundColor = UIColor.Clear,
                 Font = Theme.DefaultFont,
                 Opaque = false,
                 AutocapitalizationType = UITextAutocapitalizationType.Sentences,

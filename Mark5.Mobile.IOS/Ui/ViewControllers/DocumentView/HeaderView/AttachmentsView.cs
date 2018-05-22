@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using MailBee.Mime;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
-    public class AttachmentsView : MailViewerSubview
+    public class AttachmentsView : DocumentSubView
     {
         const int columnSize = 2;
 
@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         UIStackView stackView;
         UIScrollView scrollView;
 
-        public event EventHandler<Attachment> AttachmentTapped = delegate { };
+        public event EventHandler<AttachmentButtonTappedEventArgs> AttachmentTapped = delegate { };
 
         public AttachmentsView()
         {
@@ -87,21 +87,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         public override void RefreshView()
         {
-            if (MailMessage == null)
+            if (Document == null)
                 return;
 
             stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
-
-            List<Attachment> attachments = new List<Attachment>();
-
-            foreach (var att in MailMessage.Attachments)
-                attachments.Add((Attachment)att);
-
-            foreach (var batch in attachments.Batch(columnSize))
+            foreach (var batch in Document.Attachments.Batch(columnSize))
                 stackView.AddArrangedSubview(PrepareColumnStack(batch));
         }
 
-        UIStackView PrepareColumnStack(IEnumerable<Attachment> batch)
+        UIStackView PrepareColumnStack(IEnumerable<AttachmentDescription> batch)
         {
             var columnStack = new UIStackView
             {
@@ -124,30 +118,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         public override void UpdateVisibility()
         {
-            if (MailMessage == null)
+            if (Document == null)
             {
                 Hidden = true;
                 return;
             }
 
-            Hidden = MailMessage.Attachments.Count < 1;
+            Hidden = Document.Attachments.Count < 1;
         }
 
-        public void OpenAttachment(Attachment attachment) => AttachmentTapped?.Invoke(this, attachment);
+        #region Event handlers
+
+        public void HandleAttachmentButtonTapped(AttachmentButtonTappedEventArgs eventArgs) => AttachmentTapped?.Invoke(this, eventArgs);
+
+        #endregion
     }
 
     class AttachmentsSubView : UIView
     {
-        readonly WeakReference<AttachmentsView> viewWeakReference;
-        readonly Attachment attachment;
+        public AttachmentDescription Attachment { get; }
 
+        WeakReference<AttachmentsView> viewWeakReference;
         UIButton attachmentButton;
 
-        public AttachmentsSubView(AttachmentsView attachmentsView, Attachment attachment)
+        public AttachmentsSubView(AttachmentsView view, AttachmentDescription attachmentDescription)
         {
-            this.attachment = attachment;
-            this.viewWeakReference = attachmentsView.Wrap();
+            viewWeakReference = view.Wrap();
+            Attachment = attachmentDescription;
 
+            InitSubViews();
+        }
+
+        void InitSubViews()
+        {
+            Opaque = false;
             TranslatesAutoresizingMaskIntoConstraints = false;
 
             attachmentButton = new UIButton(UIButtonType.RoundedRect)
@@ -160,7 +164,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             };
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
             attachmentButton.Layer.CornerRadius = 5f;
-            attachmentButton.SetTitle(attachment.Name + " (" + UI.PrettyFileSize(attachment.Size) + ")", UIControlState.Normal);
+            attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
             attachmentButton.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Vertical);
             attachmentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             attachmentButton.TouchUpInside += AttachmentButton_TouchUpInside;
@@ -174,7 +178,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             });
         }
 
-        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => viewWeakReference.Unwrap()?.OpenAttachment(attachment);
+        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => viewWeakReference.Unwrap()?.HandleAttachmentButtonTapped(new AttachmentButtonTappedEventArgs(Attachment));
 
         public override void WillMoveToSuperview(UIView newsuper)
         {
@@ -185,6 +189,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 attachmentButton = null;
             }
         }
+    }
 
+    public class AttachmentButtonTappedEventArgs : EventArgs
+    {
+        public AttachmentDescription Attachment { get; }
+
+        public AttachmentButtonTappedEventArgs(AttachmentDescription attachment)
+        {
+            Attachment = attachment;
+        }
     }
 }

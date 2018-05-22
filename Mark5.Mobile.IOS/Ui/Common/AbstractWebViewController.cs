@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -25,11 +25,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIActivityIndicatorView loadIndicatorView;
         WKWebView webView;
         UIView headerContainerView;
+        UIView headerView;
         UIProgressView webViewProgressView;
 
         TaskCompletionSource<bool> loadTcs;
 
         string headerPaddingJsTemplate;
+        bool headerAnimationRunning;
 
         public override void ViewDidLoad()
         {
@@ -155,7 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewWillLayoutSubviews();
 
-            if (webView == null)
+            if (webView == null || headerAnimationRunning)
                 return;
 
             var desiredHeaderHeight = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize).Height;
@@ -163,6 +165,22 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return;
 
             SetHeaderPadding(desiredHeaderHeight);
+        }
+
+        protected void HeaderView_BeginAnimating(object sender, EventArgs e)
+        {
+            headerAnimationRunning = true;
+        }
+
+        protected void HeaderView_Animating(object sender, EventArgs e)
+        {
+            var height = headerView.Layer.PresentationLayer.Frame.Height;
+            SetHeaderPadding(height);
+        }
+
+        protected void HeaderView_EndAnimating(object sender, EventArgs e)
+        {
+            headerAnimationRunning = false;
         }
 
         protected override void Recycle()
@@ -197,11 +215,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView = null;
             loadIndicatorView = null;
             headerContainerView = null;
+            headerView = null;
             webView = null;
         }
 
         protected void SetHeaderView(UIView headerView)
         {
+            this.headerView = headerView;
+
             foreach (var subview in headerContainerView.Subviews)
                 subview.RemoveFromSuperview();
 
