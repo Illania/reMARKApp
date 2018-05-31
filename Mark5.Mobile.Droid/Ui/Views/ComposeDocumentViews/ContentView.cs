@@ -10,13 +10,12 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Webkit;
 using HtmlAgilityPack;
-using Java.Lang;
 using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -58,7 +57,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             newContentWebView.SetWebViewClient(customWebViewClient);
             newContentWebView.Settings.JavaScriptEnabled = true;
             newContentWebView.Settings.DomStorageEnabled = true;
-
             AddView(newContentWebView);
 
             showOldContentButton = new AppCompatButton(context)
@@ -88,15 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             oldContentWebView.Settings.JavaScriptEnabled = true;
             oldContentWebView.Visibility = ViewStates.Gone;
             AddView(oldContentWebView);
-
-            newContentWebView.AddJavascriptInterface(new WebAppInterface(context, newContentWebView), "webViewInterface");
-
-            using (var sr = new StreamReader(context.Assets.Open("editorScript.js")))
-                editorScript = "javascript: " + sr.ReadToEnd();
-
         }
-
-        string editorScript;
 
         void ShowOldContentButton_Click(object sender, EventArgs e)
         {
@@ -133,6 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 await newContentSemaphore.WaitAsync();
                 newContentWebView.LoadEditor(context);
+
 
                 if (PreviousDocument != null && PreviousDocumentDirection == DocumentDirection.Draft ||
                     (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
@@ -337,7 +328,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         static string GetAddressTextFromPreviousDocument(DocumentPreview documentPreview, params DocumentAddressType[] addressTypes)
         {
-            var sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
             var addresses = documentPreview.Addresses.Where(da => addressTypes.Contains(da.AddressType)).ToArray();
             for (var i = 0; i < addresses.Length; i++)
             {
@@ -352,38 +343,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             return sb.ToString();
-        }
-
-        class WebAppInterface : Java.Lang.Object
-        {
-            Context context;
-            CustomWebView webView;
-
-            public WebAppInterface(Context context, CustomWebView webView)
-            {
-                this.context = context;
-                this.webView = webView;
-            }
-
-
-            [JavascriptInterface]
-            public void OnTest()
-            {
-                CommonConfig.Logger.Debug("OSJDOJSIDOJSIDPJSPIDJSPDI");
-            }
-
-
-            [JavascriptInterface]
-            public void OnKeyPressed(int caretYcoord)
-            {
-
-            }
-
-            [JavascriptInterface]
-            public void OnEnterPressed(int caretYCoord)
-            {
-
-            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Views;
 using Android.Webkit;
+using Foundation;
 using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
@@ -17,7 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         {
             if (e.FindPointerIndex(0) != -1)
                 RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
-
+            
             return base.OnTouchEvent(e);
         }
 
@@ -43,14 +44,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         {
             base.OnPageFinished(view, url);
             PageFinishedLoading(this, EventArgs.Empty);
-
-            view.AddJavascriptInterface(new WebAppInterface(view.Context, (CustomWebView)view), "webViewInterface");
-
+            
             string editorScript;
             using (var sr = new System.IO.StreamReader(view.Context.Assets.Open("editorScript.js")))
                 editorScript = "javascript: " + sr.ReadToEnd();
-
-            view.EvaluateJavascript(editorScript, null);
+            
+            view.AddJavascriptInterface(new WebAppInterface(view.Context, (CustomWebView)view), "webViewInterface");
+            view.EvaluateJavascript(editorScript,null);
+            CommonConfig.Logger.Debug("JS ADDED");
         }
     }
 
@@ -65,24 +66,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
             this.webView = webView;
         }
 
-
+        [Java.Interop.Export]
         [JavascriptInterface]
         public void OnTest()
         {
             CommonConfig.Logger.Debug("OSJDOJSIDOJSIDPJSPIDJSPDI");
         }
 
-
+        [Java.Interop.Export]
         [JavascriptInterface]
         public void OnKeyPressed(int caretYcoord)
         {
-
+            //See AbstractWebViewController.MoveViewToCaret
+            CommonConfig.Logger.Debug("OnKeyPressed");
         }
 
+        [Java.Interop.Export]
         [JavascriptInterface]
         public void OnEnterPressed(int caretYCoord)
         {
-
+            CommonConfig.Logger.Debug("OnEnterPressed");
         }
     }
 }

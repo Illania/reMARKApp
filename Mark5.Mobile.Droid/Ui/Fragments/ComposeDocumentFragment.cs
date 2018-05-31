@@ -484,8 +484,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     if (string.IsNullOrWhiteSpace(path))
                         throw new Exception("Unable to opent attachment");
-
-                    var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
+                    
+                    var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 
                     var openFileIntent = new Intent(Intent.ActionView);
