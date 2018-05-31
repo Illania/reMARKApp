@@ -34,6 +34,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         const string DefaultFontName = "Avenir-Book";
         const string DefaultBoldFontName = "Avenir-Black";
         const string DefaultLightFontName = "Avenir-Light";
+        const string DefaultLightBoldFontName = "Avenir-Medium";
+
 
         const float DefaultFontSize = 16f;
 
@@ -41,6 +43,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public static UIFont DefaultBoldFont => UIFont.FromName(DefaultBoldFontName, DefaultFontSize);
         public static UIFont DefaultLightFont => UIFont.FromName(DefaultLightFontName, DefaultFontSize);
         public static UIFont DefaultActionsFont => UIFont.FromName(DefaultFontName, 14f);
+        public static UIFont DefaultLightBoldFont => UIFont.FromName(DefaultLightBoldFontName, DefaultFontSize);
+
 
         #endregion
 

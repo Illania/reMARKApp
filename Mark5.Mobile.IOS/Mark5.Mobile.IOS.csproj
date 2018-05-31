@@ -151,31 +151,14 @@
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SubjectView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ToView.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\DocumentViewController.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\BccView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\CcView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\CreatorView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\DateReceivedView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\DocumentSubView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\FromView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\LargeTextSubView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\OriginatorView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\PriorityView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ReadByView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\RecipientsView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ReferenceNumberView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\TextSubView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ToView.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateReceivedView.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
@@ -221,7 +204,6 @@
 		<Compile Include="Ui\ViewControllers\ContactsList\PickerParentContactListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
 		<Compile Include="Config.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\Subviews\ExtraFieldsView.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
@@ -256,6 +238,28 @@
 		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
 		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
 		<Compile Include="Utilities\LocalAuthenticationManager.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\HeaderView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DocumentSubView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\TextSubView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReadByView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReferenceNumberView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\OriginatorView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\RecipientsView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CcView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\BccView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DateView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ToView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\FromView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SeparatorSubView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SubjectView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\AttachmentsView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ExtraFieldsView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\PriorityView.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CreatorView.cs" />
+		<Compile Include="Ui\Common\LargeHitAreaButton.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\HeaderView.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SeparatorSubview.cs" />
+		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -322,18 +326,6 @@
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-		</Reference>
-		<Reference Include="Newtonsoft.Json">
-		  <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.Analytics">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.Core">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.4.0.13\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.InstanceID">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.2.0.8\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -562,6 +554,9 @@
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -585,6 +580,12 @@
 		<BundleResource Include="Resources\html\headerPadding.js" />
 		<BundleResource Include="Resources\html\replyHeader.html" />
 		<BundleResource Include="Resources\html\blank.html" />
+		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-landscape.png" />
+		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-portrait.png" />
+		<BundleResource Include="Resources\startscreens\start-screen-bg-retina4.png" />
+		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
+		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
+		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
@@ -645,6 +646,8 @@
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Folder.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Download.imageset\" />
+	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
+	  <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

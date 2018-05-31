@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         protected float MinimumHeight = 21f;
         protected float HorizontalMargin = 15f;
-        protected float VerticalMargin = 12f;
+        protected float VerticalMargin = 10f;
         protected float InnerMargin = 5f;
 
         protected ComposeDocumentSubView()
@@ -33,7 +33,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
-            BackgroundColor = Theme.White;
             Opaque = false;
             Axis = UILayoutConstraintAxis.Vertical;
             Alignment = UIStackViewAlignment.Fill;
@@ -43,7 +42,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             ContainerView = new UIView();
             AddArrangedSubview(ContainerView);
-
             AddArrangedSubview(new SeparatorSubView());
         }
 
