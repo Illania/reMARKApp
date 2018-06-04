@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Android;
 using Android.Content;
 using Android.Content.PM;
@@ -156,6 +157,34 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             permissionsAsked = true;
 
             CheckAutoSavedDocument();
+
+            var n1 = new Mobile.Common.Model.Notification();
+            n1.ObjectId = 1;
+            n1.FolderId = 1;
+            n1.Guid = System.Guid.Empty;
+            n1.Title = "title1";
+            n1.Message = "msg1";
+
+            var n2 = new Mobile.Common.Model.Notification();
+            n2.ObjectId = 1;
+            n2.FolderId = 1;
+            n2.Guid = System.Guid.Empty;
+            n2.Title = "title2";
+            n2.Message = "msg2";
+
+            var n3 = new Mobile.Common.Model.Notification();
+            n3.ObjectId = 1;
+            n3.FolderId = 1;
+            n3.Guid = System.Guid.Empty;
+            n3.Title = "title3";
+            n3.Message = "msg3";
+
+            Thread.Sleep(1000);
+            NotificationBuilder.EmailReceived(this, n1);
+            Thread.Sleep(1000);
+            NotificationBuilder.EmailReceived(this, n2);
+            Thread.Sleep(1000);
+            NotificationBuilder.EmailReceived(this, n3);
         }
 
         public override void OnBackPressed()
