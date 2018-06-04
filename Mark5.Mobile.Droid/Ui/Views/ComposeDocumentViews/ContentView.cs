@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -173,7 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task UpdateDocument()
         {
-            Document.HtmlBody = await GetContentAsync();
+            Document.HtmlBody = await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => GetContentAsync());
         }
 
         public async Task InsertTemplate(Template template)
