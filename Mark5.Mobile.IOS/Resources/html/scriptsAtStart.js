@@ -3,9 +3,8 @@
 });
 
 document.addEventListener("input", function() {
-    window.webkit.messageHandlers.inputdone.postMessage(getCaretYCoordinate());
+    window.webkit.messageHandlers.input.postMessage(getCaretYCoordinate());
 });
-
 
 getCaretYCoordinate = function() {
     var y = 0;
@@ -13,7 +12,7 @@ getCaretYCoordinate = function() {
     if (selection.rangeCount) 
     {
         var range = selection.getRangeAt(0);
-        if (range.startOffset == 0) 
+        if (range.startOffset == 0 && range.startContainer.offsetTop != undefined) 
         {
             y = range.startContainer.offsetTop - window.pageYOffset;
         } 
@@ -26,6 +25,5 @@ getCaretYCoordinate = function() {
             }
         }
     }
-
     return y;
 };

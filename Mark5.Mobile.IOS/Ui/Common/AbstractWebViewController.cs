@@ -64,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             userContentController.AddScriptMessageHandler(this, "resized");
             userContentController.AddScriptMessageHandler(this, "domloaded");
             userContentController.AddScriptMessageHandler(this, "mutated");
-            userContentController.AddScriptMessageHandler(this, "inputdone");
+            userContentController.AddScriptMessageHandler(this, "input");
 
             var configuration = new WKWebViewConfiguration
             {
@@ -222,8 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 userContentController.RemoveScriptMessageHandler("resized");
                 userContentController.RemoveScriptMessageHandler("domloaded");
                 userContentController.RemoveScriptMessageHandler("mutated");
-                userContentController.RemoveScriptMessageHandler("keypressed");
-                userContentController.RemoveScriptMessageHandler("enterpressed");
+                userContentController.RemoveScriptMessageHandler("input");
             }
 
             webView.RemoveObserver(this, new NSString("estimatedProgress"));
@@ -593,27 +592,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void MoveViewToCaret(int caretPosition)
         {
-            //var lineHeightResult = await EvaluateJavaScriptAsync("document.body.style.lineHeight;");
-            var lineHeight = 20; //Int32.Parse(lineHeightResult.Item1.ToString());
-            var caretHeight = lineHeight - 4;
+            var bottomCaretPosition = caretPosition + 20; //TODO didn't find a simple way of getting line height from javascript
+            var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset);
 
-            var bottomCaretPosition = caretPosition + caretHeight;
+            CGPoint offset;
 
-            var distance = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset);
-
-            CGPoint offset = new CGPoint(0, 0);
-
-            if (distance > 0)
-                offset = new CGPoint(0, distance + webView.ScrollView.ContentOffset.Y);
+            if (verticalOffset > 0)
+            {
+                offset = new CGPoint(webView.ScrollView.ContentOffset.X, verticalOffset + webView.ScrollView.ContentOffset.Y);
+                webView.ScrollView.SetContentOffset(offset, true);
+            }
             else if (caretPosition < 0)
             {
-                var amount = webView.ScrollView.ContentOffset.Y + caretPosition;
-                amount = amount < 0 ? 0 : amount;
-                offset = new CGPoint(webView.ScrollView.ContentOffset.X, amount);
-            }
-
-            if ((offset.X != 0 || offset.Y != 0))
+                var yOffset = webView.ScrollView.ContentOffset.Y + caretPosition;
+                yOffset = yOffset < 0 ? 0 : yOffset;
+                offset = new CGPoint(webView.ScrollView.ContentOffset.X, yOffset < 0 ? 0 : yOffset);
                 webView.ScrollView.SetContentOffset(offset, true);
+            }
         }
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
@@ -702,8 +697,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (messageName == "mutated")
                 OnWebViewMutated();
 
-            if (messageName == "inputdone")
-                OnWebViewInput(int.Parse(messageBody)); //TODO MAKE IT BETTER //TODO TEST
+            if (messageName == "input" && int.TryParse(messageBody, out int caretYposition))
+                OnWebViewInput(caretYposition);
         }
 
 
