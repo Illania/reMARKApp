@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,9 +33,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
         string headerPaddingJsTemplate;
         bool headerAnimationRunning;
 
-        bool isKeyboardVisible = false;
         CGRect keyboardDimensions;
         nfloat bottomInset;
+
+        NSObject keyboardDisShowNotification;
 
         public override void ViewDidLoad()
         {
@@ -64,8 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             userContentController.AddScriptMessageHandler(this, "resized");
             userContentController.AddScriptMessageHandler(this, "domloaded");
             userContentController.AddScriptMessageHandler(this, "mutated");
-            userContentController.AddScriptMessageHandler(this, "keypressed");
-            userContentController.AddScriptMessageHandler(this, "enterpressed");
+            userContentController.AddScriptMessageHandler(this, "inputdone");
 
             var configuration = new WKWebViewConfiguration
             {
@@ -157,20 +156,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
 
-            UIKeyboard.Notifications.ObserveDidShow((e, args) =>
-            {
-                isKeyboardVisible = true;
-                keyboardDimensions = args.FrameEnd;
-                if (Integration.IsRunningAtLeast(11))
-                    keyboardDimensions.Height -= webView.SafeAreaInsets.Bottom;
-            });
 
-            UIKeyboard.Notifications.ObserveDidHide((e, args) =>
-            {
-                isKeyboardVisible = false;
-            });
+            keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
         }
 
+        void HandleKeyboardDidShow(object sender, UIKeyboardEventArgs e)
+        {
+            keyboardDimensions = e.FrameEnd;
+            if (Integration.IsRunningAtLeast(11))
+                keyboardDimensions.Height -= webView.SafeAreaInsets.Bottom;
+        }
 
         public override void ViewWillLayoutSubviews()
         {
@@ -217,6 +212,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             webView.NavigationDelegate = null;
             webView.ScrollView.Delegate = null;
+
+            keyboardDisShowNotification.Dispose();
 
             var userContentController = webView?.Configuration?.UserContentController;
             if (userContentController != null)
@@ -594,36 +591,29 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
-        async void MoveViewToCaret(bool enterOffset = false)
+        void MoveViewToCaret(int caretPosition)
         {
-            var clientHeightResult = await EvaluateJavaScriptAsync("document.getElementById('editor').clientHeight;");
-            var clientHeight = Int32.Parse(clientHeightResult.Item1.ToString());
-
-            var lineHeightResult = await EvaluateJavaScriptAsync("window.getElementById('editor').style.lineHeight;");
+            //var lineHeightResult = await EvaluateJavaScriptAsync("document.body.style.lineHeight;");
             var lineHeight = 20; //Int32.Parse(lineHeightResult.Item1.ToString());
-
-            var caretCoordResult = await EvaluateJavaScriptAsync("getCaretYCoordinate()");
-            var caretCoord = Int32.Parse(caretCoordResult.Item1.ToString());
-
-            var contentHeight = clientHeight > 0 ? clientHeight : webView.ScrollView.Frame.Height;
-
             var caretHeight = lineHeight - 4;
 
-            var enterOffsetValue = enterOffset ? lineHeight : 0;
+            var bottomCaretPosition = caretPosition + caretHeight;
+
+            var distance = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset);
 
             CGPoint offset = new CGPoint(0, 0);
 
-            if (caretCoord + caretHeight + enterOffsetValue > webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset)
-                offset = new CGPoint(0, (caretCoord + lineHeight + enterOffsetValue) - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset) + webView.ScrollView.ContentOffset.Y);
-            else if (caretCoord < 0)
+            if (distance > 0)
+                offset = new CGPoint(0, distance + webView.ScrollView.ContentOffset.Y);
+            else if (caretPosition < 0)
             {
-                var amount = webView.ScrollView.ContentOffset.Y + caretCoord;
+                var amount = webView.ScrollView.ContentOffset.Y + caretPosition;
                 amount = amount < 0 ? 0 : amount;
                 offset = new CGPoint(webView.ScrollView.ContentOffset.X, amount);
             }
 
             if ((offset.X != 0 || offset.Y != 0))
-                webView.ScrollView.SetContentOffset(offset, false);
+                webView.ScrollView.SetContentOffset(offset, true);
         }
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
@@ -698,6 +688,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (messageName == null)
                 return;
 
+            var messageBody = message?.Body?.ToString();
+
             if (messageName == "domloaded")
                 OnWebViewDomLoaded();
 
@@ -710,11 +702,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (messageName == "mutated")
                 OnWebViewMutated();
 
-            if (messageName == "keypressed")
-                OnWebViewKeyPressed();
-
-            if (messageName == "enterpressed")
-                OnWebViewEnterPressed();
+            if (messageName == "inputdone")
+                OnWebViewInput(int.Parse(messageBody)); //TODO MAKE IT BETTER //TODO TEST
         }
 
 
@@ -726,14 +715,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected virtual void OnWebViewMutated() { }
 
-        protected virtual async void OnWebViewKeyPressed()
+        protected virtual void OnWebViewInput(int caretPosition)
         {
-            MoveViewToCaret();
-        }
-
-        protected virtual void OnWebViewEnterPressed() 
-        {
-            MoveViewToCaret(true);
+            MoveViewToCaret(caretPosition);
         }
 
         protected virtual bool CanNavigate(WKNavigationAction action)
