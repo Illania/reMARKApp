@@ -573,7 +573,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var bottomCaretPosition = caretPosition + 30; //Line height
 
-            var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardHeight);
+            var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardHeight - webView.ScrollView.ContentInset.Top); //The last is only for iOS 10 
 
             CGPoint offset;
 
