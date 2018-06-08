@@ -8,7 +8,6 @@ using Android.Content;
 using Android.OS;
 using Android.Provider;
 using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -200,7 +199,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             attachmentsView.Clicked += AttachmentsView_Clicked;
             subViews.Add(attachmentsView);
 
-            contentView = new ContentView(Context);
+            contentView = new ContentView(Context, MoveViewToCaret);
             subViews.Add(contentView);
 
             foreach (var subview in subViews)
@@ -219,8 +218,54 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             HasOptionsMenu = true;
 
+            rootView.ViewTreeObserver.GlobalLayout += ViewTreeObserver_GlobalLayout;
+
             return rootView;
         }
+
+        int keyboardHeight;
+
+        void ViewTreeObserver_GlobalLayout(object sender, EventArgs e)
+        {
+            if (View == null)
+                return;
+
+            var rect = new Android.Graphics.Rect();
+            View.GetWindowVisibleDisplayFrame(rect);
+            keyboardHeight = View.RootView.Height - (rect.Bottom - rect.Top);
+
+            CommonConfig.Logger.Debug($"KeyboardHeight {keyboardHeight}");
+
+            //var manager = Activity.Window.WindowManager;
+            //var metrics = new Android.Util.DisplayMetrics();
+            //manager.DefaultDisplay.GetMetrics(metrics);
+            //var metHeight = metrics.HeightPixels;
+            //manager.DefaultDisplay.GetRealMetrics(metrics);
+            //var realHeight = metrics.HeightPixels;
+
+            //CommonConfig.Logger.Debug($"HEIGHTSSSS - {metHeight} - {}")
+        }
+
+        void MoveViewToCaret(View webView, int caretYPosition)
+        {
+            int[] windowCoordinates = new int[2];
+
+            webView.GetLocationInWindow(windowCoordinates);
+
+            CommonConfig.Logger.Debug($"WINDOW COORDINATES - {windowCoordinates[0]} {windowCoordinates[1]}");
+            CommonConfig.Logger.Debug($"CARET POSITION {caretYPosition}");
+
+            var absoluteCaretPosition = caretYPosition + windowCoordinates[1];
+
+            var delta = View.RootView.Height - absoluteCaretPosition - keyboardHeight - 144; //96 144
+
+            if (delta < 0 || absoluteCaretPosition < 0)
+            {
+                var scrollY = scrollView.ScrollY - delta;
+                scrollView.SmoothScrollTo(scrollView.ScrollX, scrollY < 0 ? 0 : scrollY);
+            }
+        }
+
 
         public override async void OnResume()
         {
@@ -341,7 +386,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 autoSaveWorkingCopyWorker?.Stop();
                 autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
-                autoSaveWorkingCopyWorker.Start();
+                //autoSaveWorkingCopyWorker.Start(); //TODO TESTING
             }
             catch (Exception ex)
             {
@@ -484,7 +529,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     if (string.IsNullOrWhiteSpace(path))
                         throw new Exception("Unable to opent attachment");
-                    
+
                     var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 

@@ -2,13 +2,13 @@
 using Android.Content;
 using Android.Views;
 using Android.Webkit;
-using Foundation;
-using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
     class CustomWebView : WebView
     {
+        public Action<View, int> OnInputAction { get; set; }
+
         public CustomWebView(Context context)
             : base(context)
         {
@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         {
             if (e.FindPointerIndex(0) != -1)
                 RequestDisallowInterceptTouchEvent(e.PointerCount > 1);
-            
+
             return base.OnTouchEvent(e);
         }
 
@@ -26,6 +26,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         {
             base.OnOverScrolled(scrollX, scrollY, clampedX, clampedY);
             RequestDisallowInterceptTouchEvent(true);
+        }
+
+        public void OnInput(int caretYcoord)
+        {
+            OnInputAction?.Invoke(this, caretYcoord);
         }
     }
 
@@ -44,14 +49,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         {
             base.OnPageFinished(view, url);
             PageFinishedLoading(this, EventArgs.Empty);
-            
+
             string editorScript;
             using (var sr = new System.IO.StreamReader(view.Context.Assets.Open("editorScript.js")))
                 editorScript = "javascript: " + sr.ReadToEnd();
-            
-            view.AddJavascriptInterface(new WebAppInterface(view.Context, (CustomWebView)view), "webViewInterface");
-            view.EvaluateJavascript(editorScript,null);
-            CommonConfig.Logger.Debug("JS ADDED");
+
+            view.AddJavascriptInterface(new WebAppInterface(view.Context, (CustomWebView)view), "Android");
+            view.LoadUrl(editorScript);
         }
     }
 
@@ -68,24 +72,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
 
         [Java.Interop.Export]
         [JavascriptInterface]
-        public void OnTest()
+        public void OnInput(int caretYcoord)
         {
-            CommonConfig.Logger.Debug("OSJDOJSIDOJSIDPJSPIDJSPDI");
+            webView.OnInput(caretYcoord);
         }
 
-        [Java.Interop.Export]
-        [JavascriptInterface]
-        public void OnKeyPressed(int caretYcoord)
-        {
-            //See AbstractWebViewController.MoveViewToCaret
-            CommonConfig.Logger.Debug("OnKeyPressed");
-        }
-
-        [Java.Interop.Export]
-        [JavascriptInterface]
-        public void OnEnterPressed(int caretYCoord)
-        {
-            CommonConfig.Logger.Debug("OnEnterPressed");
-        }
     }
 }

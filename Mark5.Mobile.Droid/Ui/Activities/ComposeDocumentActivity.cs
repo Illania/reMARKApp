@@ -94,7 +94,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(PreviousDocumentDirectionIntentKey))
                     previousDocumentDirection = (DocumentDirection)Intent.Extras.GetInt(PreviousDocumentDirectionIntentKey);
-                
+
                 if (Intent.HasExtra(PreviousDocumentFolderIdIntentKey))
                     previousDocumentFolderId = Intent.Extras.GetInt(PreviousDocumentFolderIdIntentKey);
 
