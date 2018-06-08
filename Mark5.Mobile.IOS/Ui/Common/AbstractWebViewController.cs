@@ -33,8 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         string headerPaddingJsTemplate;
         bool headerAnimationRunning;
 
-        CGRect keyboardDimensions;
-        nfloat bottomInset;
+        nfloat keyboardHeight;
 
         NSObject keyboardDisShowNotification;
 
@@ -156,15 +155,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
 
-
             keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
         }
 
         void HandleKeyboardDidShow(object sender, UIKeyboardEventArgs e)
         {
-            keyboardDimensions = e.FrameEnd;
+            keyboardHeight = e.FrameEnd.Height;
             if (Integration.IsRunningAtLeast(11))
-                keyboardDimensions.Height -= webView.SafeAreaInsets.Bottom;
+                keyboardHeight -= View.SafeAreaInsets.Bottom;
         }
 
         public override void ViewWillLayoutSubviews()
@@ -181,30 +179,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             SetHeaderPadding(desiredHeaderHeight);
         }
 
-        protected void HeaderView_BeginAnimating(object sender, EventArgs e)
-        {
-            headerAnimationRunning = true;
-        }
+        protected void HeaderView_BeginAnimating(object sender, EventArgs e) => headerAnimationRunning = true;
 
-        protected void HeaderView_Animating(object sender, EventArgs e)
-        {
-            var height = headerView.Layer.PresentationLayer.Frame.Height;
-            SetHeaderPadding(height);
-        }
+        protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
 
-        protected void HeaderView_EndAnimating(object sender, EventArgs e)
-        {
-            headerAnimationRunning = false;
-        }
-
-        public override void ViewSafeAreaInsetsDidChange()
-        {
-            if (Integration.IsRunningAtLeast(11))
-            {
-                base.ViewSafeAreaInsetsDidChange();
-                bottomInset = View.SafeAreaInsets.Bottom;
-            }
-        }
+        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height);
 
         protected override void Recycle()
         {
@@ -592,8 +571,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void MoveViewToCaret(int caretPosition)
         {
-            var bottomCaretPosition = caretPosition + 20; //TODO didn't find a simple way of getting line height from javascript
-            var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardDimensions.Height + bottomInset);
+            var bottomCaretPosition = caretPosition + 25; //TODO didn't find a simple way of getting line height from javascript
+
+            var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardHeight);
 
             CGPoint offset;
 
@@ -605,7 +585,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             else if (caretPosition < 0)
             {
                 var yOffset = webView.ScrollView.ContentOffset.Y + caretPosition;
-                yOffset = yOffset < 0 ? 0 : yOffset;
                 offset = new CGPoint(webView.ScrollView.ContentOffset.X, yOffset < 0 ? 0 : yOffset);
                 webView.ScrollView.SetContentOffset(offset, true);
             }
