@@ -571,7 +571,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void MoveViewToCaret(int caretPosition)
         {
-            var bottomCaretPosition = caretPosition + 25; //TODO didn't find a simple way of getting line height from javascript
+            var bottomCaretPosition = caretPosition + 30; //Line height
 
             var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardHeight);
 
